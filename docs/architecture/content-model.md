@@ -332,9 +332,9 @@ threshold marks the card seen — fast readers tap, everyone else is covered by 
 friction. The two are recorded as **separate events**: explicit completion is a much stronger
 signal for ranking than elapsed time.
 
-The action bar is already carrying like, bookmark, note, ask AI and share. "Got it" likely
-belongs at the **end of the expanded body**, where a reader naturally finishes, rather than
-as a sixth icon — it is then self-explanatory instead of needing a tooltip.
+**"Got it" sits at the end of the expanded card's content**, not in the action bar. A reader
+reaches it exactly when they finish, so it is self-explanatory; a sixth icon alongside like,
+bookmark, note, ask AI and share would need a tooltip to mean anything.
 
 ## Custom topics
 

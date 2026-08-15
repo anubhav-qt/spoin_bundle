@@ -14,9 +14,11 @@ and, in v1, with **no Redis** (ADR-0003) — Postgres only.
 ### Pipeline
 
 ```
-SELECT (stratified by difficulty)  ->  RANK (within strata)
-                                   ->  INTERLEAVE (diversity + topic affinity)
-                                   ->  SLATE (materialize 50, page from it)
+per topic:  SELECT (stratified by difficulty)  ->  RANK (within strata)
+                                               ->  SLATE (~25 cards)
+
+across topics:  INTERLEAVE PLAN (affinity-weighted round-robin, 50 slots)
+                              ->  page from the plan
 ```
 
 ### The difficulty mix is a constraint, not a score
@@ -112,24 +114,68 @@ death spiral: new cards get no impressions, so accumulate no quality signal, so 
 so never get impressions. A fixed 10% of each page is chosen randomly from eligible
 candidates so new content can prove itself.
 
-### Pagination: slates
+### Pagination: per-topic slates plus a cheap interleave plan
 
 Offset pagination breaks when the underlying set changes, and generation changes it
-constantly. Cursor-on-id does not work either, because ordering is by a shifting score.
+constantly. Cursor-on-id does not work either, because ordering is by a shifting score. So
+we materialize a ranked slate and page from it.
 
-**Rank once, materialize 50 card IDs into a `feed_session`, page from that list**, recompute
-when exhausted or stale (~30 min TTL, or on subscription change).
+**The slate is per topic, not per feed**, with a separate interleave plan on top:
 
-Ranking cost is paid once per session rather than per page, pagination is stable, and
-"delivered" has clean semantics.
+```
+per-topic slate    ~25 ranked card ids per subscribed topic
+                   EXPENSIVE to compute, rarely invalidated
 
-**The slate is keyed by the filter set.** Switching from all-topics to a single topic must
-invalidate and recompute; otherwise a slate built for a different query is served.
+interleave plan    [topic_id x 50], affinity-weighted round-robin
+                   CHEAP, regenerated freely
+```
+
+Position is a single integer into the plan, so pagination stays simple.
+
+**Principle: cache at the layer where invalidation is rare, and keep the volatile layer
+cheap enough that recomputing it is free.** Filter change, affinity shift, and slate refill
+all regenerate only the plan, which requires no ranking.
+
+#### Why per-topic rather than one combined slate
+
+**It removes the cross-topic score normalization problem.** `card_quality` is an engagement
+rate, and rates differ systematically between topics: a topic with 50 enthusiasts has a
+different baseline than one with 5,000. Ranking all topics in one pool lets the "hot" topic
+dominate every page regardless of the user's affinity, and fixing that requires per-topic
+normalization that is fiddly and easy to get subtly wrong.
+
+Per-topic slates make scores **only ever comparable within a topic**, where they are
+commensurable. Cross-topic weighting moves to the affinity interleave, where the decision is
+explicit and tunable instead of buried in score arithmetic.
+
+**The difficulty mix composes correctly.** Each slate is stratified for *that topic's* tier,
+so any interleave preserves every topic's mix. This matters because a user can be beginner
+in one topic and advanced in another — which one combined slate handles awkwardly.
+
+**Filtering never causes repeats or skips.** Per-topic slate positions persist across filter
+changes, so a user can filter to one topic, read, unfilter, and resume exactly where they
+were in every topic.
+
+**Slates refill independently** rather than all-or-nothing, and topics the user is not
+currently reading cost nothing to re-rank.
+
+#### Plan generation
+
+Weighted round-robin with deficit counters (the algorithm packet schedulers use for weighted
+fair queuing). Deterministic, and a topic with 2x the affinity gets 2x the slots spread
+evenly rather than clumped.
+
+#### Sizes and lifetimes
+
+- Slate: ~25 cards per topic, refilled below a threshold.
+- Plan: 50 positions, regenerated on filter change, affinity shift, or slate refill.
+- Slate TTL ~30 min, or on subscription change.
 
 ### Topic filters
 
 Default: all subscribed topics, interleaved weighted by affinity. The user may filter to any
-N of their topics, which restricts candidates and re-keys the slate.
+N of their topics; unselected topics are simply excluded from the plan. Their slates are
+retained, not discarded.
 
 ### No aggregation at request time
 
@@ -150,7 +196,8 @@ needed yet.
 **Harder**
 - Seen-state is now three states plus a cycle counter, and is dual-written (table + bitmap)
   with a reconciliation job.
-- `feed_session` is server-side state with a TTL and invalidation rules.
+- Slates and plans are server-side state with TTLs and invalidation rules, and there are now
+  N slates per user rather than one.
 - Deferred-card cycling is genuinely fiddly and needs real test coverage. A bug here shows
   as "I keep seeing the same cards", which is the most damaging feed bug there is.
 
@@ -169,6 +216,11 @@ Rejected because the derived bitmap costs little given the bounded corpus and re
 feed query's most expensive component permanently.
 
 **Difficulty mix as a ranking weight.** Rejected: approximate, drifting, untestable.
+
+**One combined slate across all topics.** Simpler state (one row, one position), and
+rejected: it forces cross-topic score comparison, which requires normalization we would
+likely get subtly wrong; it handles per-topic difficulty tiers awkwardly; and every filter
+change would invalidate the whole ranked slate, causing repeats or skips.
 
 **Learned ranking (ML).** Rejected at this scale. There is no training data, no way to debug
 a bad ranking, and a linear model with tunable weights is more useful until there is real

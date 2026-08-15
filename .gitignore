@@ -1,0 +1,40 @@
+# ---- env / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+dist/
+build/
+*.egg-info/
+
+# ---- node / next ----
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# ---- generated api types (regenerated from OpenAPI in CI) ----
+packages/api-types/schema.d.ts
+
+# ---- local model / generation artifacts ----
+models/
+*.gguf
+generated/
+
+# ---- editors / os ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

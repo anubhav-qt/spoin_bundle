@@ -18,8 +18,13 @@ Web first; a React Native app comes later and shares this backend.
 | If you want to… | Read |
 |---|---|
 | Understand how Slocho works | [Architecture overview](docs/architecture/overview.md) |
+| Know what a card actually is | [Content model](docs/architecture/content-model.md) |
 | Know *why* something is the way it is | [ADR index](docs/adr/) |
+| **Find the work assigned to you** | **[Tasks](docs/tasks/)** |
 | Add a significant decision | [ADR template](docs/adr/TEMPLATE.md) |
+
+**New here?** Read the architecture overview first, then the ADR index, then your task in
+[`docs/tasks/`](docs/tasks/).
 
 ## The one thing to internalise
 

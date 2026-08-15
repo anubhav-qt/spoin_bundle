@@ -24,6 +24,7 @@ engagement_event
   id              client-generated (idempotency)
   user_id, card_id, topic_id, subtopic_id
   kind            impression | expand | collapse | dwell | skip | share | ask_ai
+                  | explicit_complete | dwell_complete
   dwell_ms        nullable
   occurred_at     server-assigned
   session_id
@@ -60,6 +61,25 @@ columns directly. No `COUNT(*)` over the event log in a user-facing path, ever.
 
 This is the single most important performance decision in the read path, and it is why
 Redis is not required in v1.
+
+### Completion is two events, not one
+
+A card becomes `SEEN` via either path ([ADR-0010](0010-feed-serving.md)), but they are
+recorded **separately** because they are very different quality signals:
+
+| Event | Meaning | Signal strength |
+|---|---|---|
+| `explicit_complete` | User tapped "Got it" | **Strong.** A deliberate claim of comprehension |
+| `dwell_complete` | Tab was open past the threshold | Weak. They may have been making tea |
+
+For the progression gate they are equivalent. For **ranking and topic affinity they are
+weighted differently** — an explicit completion is among the highest-quality positive
+signals available, arguably better than a like since it reports understanding rather than
+enjoyment.
+
+Collapsing them into one boolean discards that permanently. Unlike most modelling mistakes,
+this one is *not* recoverable from the event log, because the distinction would never have
+been written down.
 
 ### Rate, not count
 

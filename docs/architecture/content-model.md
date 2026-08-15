@@ -323,11 +323,18 @@ Full schema and the events/state/aggregates split in [ADR-0011](../adr/0011-enga
 ```
 UNSEEN     never shown
 DEFERRED   shown, not expanded  -> returns after the difficulty cycle completes
-SEEN       expanded + ~3s dwell -> counts toward the 80% gate, never returns
+SEEN       expanded AND ("Got it" tapped OR dwell >= threshold)
+                                -> counts toward the 80% gate, never returns
 ```
 
-Only expansion counts as SEEN, which is what makes the progression gate un-gameable: you
-cannot scroll your way to a quiz.
+Scrolling past never counts. Beyond that, either an explicit **"Got it"** tap or a dwell
+threshold marks the card seen — fast readers tap, everyone else is covered by dwell with no
+friction. The two are recorded as **separate events**: explicit completion is a much stronger
+signal for ranking than elapsed time.
+
+The action bar is already carrying like, bookmark, note, ask AI and share. "Got it" likely
+belongs at the **end of the expanded body**, where a reader naturally finishes, rather than
+as a sixth icon — it is then self-explanatory instead of needing a tooltip.
 
 ## Custom topics
 

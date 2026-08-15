@@ -43,7 +43,8 @@ about the *set* (mix, diversity, spacing) belongs outside the ranker.
 ```
 UNSEEN     never shown
 DEFERRED   shown but not expanded  -> returns after the cycle completes
-SEEN       expanded (+ ~3s dwell)  -> counts toward progression, never returns
+SEEN       expanded AND ("Got it" tapped OR dwell >= threshold)
+                                   -> counts toward progression, never returns
 ```
 
 - Cycle counter per `(user, topic, difficulty)`.
@@ -51,17 +52,29 @@ SEEN       expanded (+ ~3s dwell)  -> counts toward progression, never returns
 - Eligible = `UNSEEN` or (`DEFERRED` and `deferred_cycle < current_cycle`).
 - The cycle advances when no `UNSEEN` cards remain at that difficulty across all subtopics.
 
-**Only expansion counts as SEEN.** This is what makes the progression gate
-([ADR-0009](0009-quiz-gated-progression.md)) un-gameable: you cannot scroll your way to a
-quiz. Speed-swiping earns nothing.
+**Scrolling past never counts.** Expansion is required, so speed-swiping earns nothing.
 
-**Expansion requires a dwell floor (~3s).** Opening and instantly closing a card is not
-reading it; without a floor, fast double-tapping becomes the new speedrun.
+**Beyond expansion, either an explicit "Got it" tap or a dwell threshold marks it SEEN.**
 
-**Expansion rate is a health metric, not an analytics nicety.** If users expand only 20% of
-cards, nobody ever reaches the 80% coverage gate and the quiz never unlocks for anyone. That
-failure presents as "users aren't progressing", not as "our gate is unreachable". Instrument
-it from day one.
+An earlier version of this ADR made expansion-plus-dwell the only path, justified as making
+progression un-gameable. That justification was overstated: **the coverage gate was never
+the real gate — the quiz is.** Someone who taps their way to 80% coverage takes the quiz,
+fails, and receives a remediation list pointing at the cards they skipped. The system
+self-corrects and the only cost falls on them.
+
+So the coverage gate should be optimised for **low friction and honesty**, not anti-cheat:
+
+- Fast reader, finishes in 2s -> taps "Got it", counted immediately. Their reading speed
+  decides, not an arbitrary threshold.
+- Normal reader -> dwell catches it. Zero friction, nothing to remember.
+
+Explicit-only was rejected because it demands ~250 deliberate taps per tier. Users forget,
+progress stalls for people who genuinely read everything, and that is indistinguishable from
+a broken gate.
+
+**Expansion rate remains a health metric.** If users expand only 20% of cards, nobody reaches
+the 80% coverage gate and the quiz never unlocks for anyone. That failure presents as "users
+aren't progressing", not as "our gate is unreachable". Instrument it from day one.
 
 ### Storage: table as truth, bitmap as derived read model
 
@@ -226,8 +239,17 @@ change would invalidate the whole ranked slate, causing repeats or skips.
 a bad ranking, and a linear model with tunable weights is more useful until there is real
 volume.
 
-**Dwell-threshold instead of expansion for SEEN.** Rejected in favour of expansion, which is
-a deliberate act and therefore un-gameable. Dwell is retained only as the floor on expansion.
+**Dwell only, no explicit control.** Rejected: an arbitrary threshold penalises fast readers,
+and it gives no way for a user to say "I've got this".
+
+**Explicit "Got it" only, no dwell fallback.** Rejected: ~250 deliberate taps per tier. Users
+forget, and stalled progress for people who genuinely read everything is indistinguishable
+from a broken gate.
+
+**Treating explicit and dwell completion as the same signal.** Rejected for ranking purposes.
+They both satisfy the progression gate, but an explicit tap is strong evidence of
+comprehension while dwell only means a tab was open. Merging them discards that permanently —
+and unlike most mistakes it is not recoverable from the event log if never recorded.
 
 ## Revisit when
 

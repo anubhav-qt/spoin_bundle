@@ -316,6 +316,19 @@ above load-bearing rather than bookkeeping.
 Notes are **per-user, per-card** and private. Ask AI opens a synchronous streaming chat
 scoped to the card, on the side path in `overview.md`, with its own rate limit.
 
+Full schema and the events/state/aggregates split in [ADR-0011](../adr/0011-engagement.md).
+
+**Seen-state is three states, not a boolean** ([ADR-0010](../adr/0010-feed-serving.md)):
+
+```
+UNSEEN     never shown
+DEFERRED   shown, not expanded  -> returns after the difficulty cycle completes
+SEEN       expanded + ~3s dwell -> counts toward the 80% gate, never returns
+```
+
+Only expansion counts as SEEN, which is what makes the progression gate un-gameable: you
+cannot scroll your way to a quiz.
+
 ## Custom topics
 
 Three free custom topics per user. Unlimited is a planned premium feature.

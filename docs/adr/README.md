@@ -46,3 +46,5 @@ useful than the decision itself.
 | [0007](0007-curriculum-driven-generation.md) | Curriculum-driven generation with a bounded, completable corpus | Accepted |
 | [0008](0008-local-gpu-generation.md) | Local GPU generation for seed content, cloud verification | Accepted |
 | [0009](0009-quiz-gated-progression.md) | Quiz-gated difficulty progression | Accepted |
+| [0010](0010-feed-serving.md) | Feed serving: stratified selection, linear ranking, slate pagination | Accepted |
+| [0011](0011-engagement.md) | Engagement: append-only events, mutable state, derived aggregates | Accepted |

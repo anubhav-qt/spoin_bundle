@@ -88,7 +88,11 @@ To hold that line, built in from the start rather than retrofitted:
 - `docker compose up` brings up everything. No "first install Python 3.13, then…" prose.
 - `make setup` / `make dev` / `make seed` / `make test` — nobody memorizes commands.
 - Seed data includes a **pre-generated card corpus fixture**, so a new developer sees a
-  working feed without burning LLM quota or waiting on generation.
+  working feed without burning LLM quota or waiting on generation. Also seeded: two
+  topics from a manual multi-agent generation experiment (`fixtures/generated_corpus.json`,
+  loaded by `seed_generated.py`) — a proof-of-concept preview of what the real generation
+  pipeline should eventually produce, tagged with its own `gen_meta.backend` so it stays
+  distinguishable from the hand-written fixture.
 - `.env.example` documents every variable, with safe local defaults.
 - FastAPI serves interactive API docs at `/docs`.
 - A `README.md` in each package: what it is, what it owns, where to start reading.

@@ -54,3 +54,5 @@ useful than the decision itself.
 | [0015](0015-topic-progress-and-discovery.md) | Per-topic progress box, engagement-stats modal, and topic discovery | Accepted |
 | [0016](0016-theme-consolidation.md) | Replace Phosphor with a monochrome dark palette, Cyanotype with a light one | Accepted |
 | [0017](0017-card-archetypes.md) | Archetype-based card rendering, color-only highlighting, motion | Accepted |
+| [0018](0018-hero-mechanism-and-teaser-refinements.md) | Real hero mechanism, teaser refinements, block-expand modal | Accepted |
+| [0019](0019-experimental-generated-fixture-content.md) | A second, honestly-tagged fixture for AI-generated content | Accepted |

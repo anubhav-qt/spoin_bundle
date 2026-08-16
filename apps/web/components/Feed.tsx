@@ -174,11 +174,9 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
       {/* Not sticky, deliberately — the wordmark already lives in the left
           nav, so this is just a one-line orientation cue that scrolls away
           with the rest of the thread rather than pinning a second banner. */}
-      {kind === "subtopic" || seen.size > 0 ? (
+      {kind === "subtopic" ? (
         <p className="feed-intro">
-          {seen.size > 0
-            ? `${seen.size} read this session`
-            : "One topic — following the curriculum"}
+          One topic — following the curriculum
         </p>
       ) : null}
 

@@ -181,33 +181,62 @@ export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHer
     };
   }, [expanded, isHero, collapse]);
 
-  // Dwell accrues only while expanded AND the page is visible. A tab left open
-  // overnight is not a nine-hour read.
+  // Dwell accrues only while expanded, the tab is visible, AND the card is
+  // actually the one in view (`focused`, from the intersection observer
+  // above) — scrolling on to the next card while this one stays expanded
+  // must stop the clock, or a card gets silently marked read seconds after
+  // the reader has moved past it. The completion check is scheduled for the
+  // remaining time (threshold minus what's already accumulated) rather than
+  // a flat 8s-from-mount timeout, so pausing and resuming across several
+  // scroll-past/scroll-back cycles still adds up correctly instead of either
+  // firing early or never re-arming.
   useEffect(() => {
     if (!expanded) return;
 
     const timer = dwell.current;
-    timer.start();
+    let completeTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") timer.pause();
-      else timer.start();
+    const clearScheduled = () => {
+      if (completeTimer !== null) {
+        clearTimeout(completeTimer);
+        completeTimer = null;
+      }
     };
-    document.addEventListener("visibilitychange", onVisibility);
 
-    const threshold = setTimeout(() => {
-      if (document.visibilityState !== "visible") return;
+    const complete = () => {
       engagement.record(card.id, "dwell_complete", timer.elapsedMs);
       onSeen(card.id);
-    }, DWELL_COMPLETE_MS);
+    };
+
+    const schedule = () => {
+      const remaining = DWELL_COMPLETE_MS - timer.elapsedMs;
+      if (remaining <= 0) {
+        complete();
+        return;
+      }
+      completeTimer = setTimeout(complete, remaining);
+    };
+
+    const sync = () => {
+      clearScheduled();
+      if (document.visibilityState === "visible" && focused) {
+        timer.start();
+        schedule();
+      } else {
+        timer.pause();
+      }
+    };
+
+    sync();
+    document.addEventListener("visibilitychange", sync);
 
     return () => {
-      clearTimeout(threshold);
-      document.removeEventListener("visibilitychange", onVisibility);
+      clearScheduled();
+      document.removeEventListener("visibilitychange", sync);
       timer.pause();
       if (timer.elapsedMs > 0) engagement.record(card.id, "dwell", timer.elapsedMs);
     };
-  }, [expanded, card.id, onSeen]);
+  }, [expanded, focused, card.id, onSeen]);
 
   // Clicking the card anywhere outside the action row toggles it — open if
   // collapsed, closed if already expanded. Symmetric with the click-outside

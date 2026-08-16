@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 import { api, type Difficulty, type Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
@@ -92,6 +93,31 @@ export function AppShell() {
     [refreshProgress],
   );
 
+  // Both rails swap for entirely different DOM (rail <-> empty spacer, and
+  // FocusToggle jumps from inline to fixed-position) when this flips, so a
+  // plain CSS transition can't bridge it — there's nothing shared to
+  // interpolate between. A View Transition snapshots before/after and
+  // cross-fades the two, which works across that kind of structural swap.
+  // Falls back to an instant flip on browsers without support.
+  const setFocusModeAnimated = useCallback((next: boolean) => {
+    if (typeof document === "undefined" || !("startViewTransition" in document)) {
+      setFocusMode(next);
+      return;
+    }
+    // The feed keeps mutating DOM on its own (Framer Motion's layout
+    // animations, IntersectionObserver-driven focus changes) independent of
+    // this toggle, which can abort an in-flight transition's snapshot —
+    // the browser then rejects `.ready`/`.finished` with InvalidStateError.
+    // The rail swap itself already completed by then; this is a best-effort
+    // cosmetic transition, so a rejection here is expected and safe to drop
+    // rather than surfacing as an unhandled rejection.
+    const transition = document.startViewTransition(() => {
+      flushSync(() => setFocusMode(next));
+    });
+    transition.ready.catch(() => {});
+    transition.finished.catch(() => {});
+  }, []);
+
   const toggleTopic = (topicId: string) => {
     setSelected((current) =>
       current.includes(topicId) ? current.filter((id) => id !== topicId) : [...current, topicId],
@@ -135,7 +161,7 @@ export function AppShell() {
         {focusMode ? (
           <>
             <div className="rail-right" aria-hidden="true" />
-            <FocusToggle focused onToggle={() => setFocusMode(false)} />
+            <FocusToggle focused onToggle={() => setFocusModeAnimated(false)} />
           </>
         ) : (
           <RightRail
@@ -145,7 +171,7 @@ export function AppShell() {
             selected={selected}
             onToggle={toggleTopic}
             onFollowed={onFollowed}
-            onEnterFocus={() => setFocusMode(true)}
+            onEnterFocus={() => setFocusModeAnimated(true)}
           />
         )}
       </div>

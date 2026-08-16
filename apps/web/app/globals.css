@@ -228,9 +228,12 @@ body {
 
 /* Not sticky, deliberately (Feed.tsx) — the wordmark lives in the left nav
    now, so this is a one-line cue that scrolls away with the thread rather
-   than a second pinned banner. */
+   than a second pinned banner. Top spacing lives on `.track` (below), not
+   here — this only renders in filtered/subtopic mode, and the mixed feed
+   (no intro) still needs its first card level with the rails' own 20px top
+   padding regardless. */
 .feed-intro {
-  margin: 18px 0 6px;
+  margin: 0 0 6px;
   font-size: 12.5px;
   color: var(--fg-3);
 }
@@ -241,7 +244,7 @@ body {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 12px 18px 14px;
+  padding: 13px 18px;
   margin: 0 -18px;
   scrollbar-width: none;
 }
@@ -329,7 +332,12 @@ body {
 
 .track {
   position: relative;
-  padding-top: 6px;
+  /* Matches `.rail-left`/`.rail-right`'s own 20px top padding, so the first
+     card lines up with the rails regardless of whether `.feed-intro` above
+     renders (mixed feed has no intro text at all) — the offset used to live
+     on `.feed-intro`'s margin, which meant alignment depended on that
+     element actually being present. */
+  padding-top: 20px;
 }
 
 /* Names what you are moving through — topic when mixed, subtopic when
@@ -1408,6 +1416,18 @@ body.custom-cursor-active textarea {
   box-shadow: 0 6px 20px var(--shadow);
 }
 
+/* Entering/exiting focus mode swaps whole subtrees (rail <-> empty spacer,
+   FocusToggle jumping from inline to fixed) rather than animating a shared
+   property, so it's driven by a View Transition (AppShell's
+   `setFocusModeAnimated`) instead of a plain CSS transition. This just tunes
+   the browser's default cross-fade to match the rest of the shell's timing;
+   unsupported browsers skip both the transition and this block entirely. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-2);
+  animation-timing-function: var(--ease);
+}
+
 
 /* Rounded square, four quadrants — reads as "here is the palette" instead of
    a single blended color. Bigger than the old circle so the quadrants stay
@@ -1506,7 +1526,12 @@ body.custom-cursor-active textarea {
    base `.topic-chip`. */
 .rail-right .topic-rail {
   margin: 0;
-  padding: 0 0 4px;
+  /* Symmetric top/bottom (was `0 0 4px`) — this rule, not the base
+     `.topic-rail` padding above, is what actually wins here (higher
+     specificity), so the asymmetry that pushed the pills' true center below
+     the wrap's midpoint — where `.topic-rail-arrow` is positioned at
+     `top: 50%` — lived here all along. */
+  padding: 2px 0;
   /* Flex items default to `min-width: auto`, which for a row of
      `flex: 0 0 auto` chips is the sum of every chip's width — with no
      explicit min-width the rail grows to fit all chips instead of being
@@ -1601,7 +1626,12 @@ body.custom-cursor-active textarea {
   border: 1px solid var(--line);
   border-radius: var(--r-card);
   background: var(--bg-2);
-  padding: 12px 20px 4px;
+  /* Matches `.discover-box`'s 14px side padding exactly — the two are
+     deliberately the same kind of box (see header comment above), and
+     `.progress-row:hover`'s -14px negative-margin expansion already assumes
+     this container padding, so a mismatch here left a gap the hover
+     highlight didn't reach on the outer edge. */
+  padding: 12px 14px 4px;
 }
 
 .progress-box-head {
@@ -1821,19 +1851,17 @@ body.custom-cursor-active textarea {
   transition: background var(--dur-1) var(--ease);
 }
 
-/* Unlike `.progress-row`, the whole row isn't the click target here — only
-   the text block is (the Follow button stays a separate action) — so the
-   hover treatment lives on `.discover-row-text`, not `.discover-row`.
-   `.discover-row` itself has no horizontal padding (it's the `.discover-box`
-   parent that carries the 14px side padding), and no vertical padding of its
-   own to reclaim on this element, so the negative-margin expansion reaches
-   left into the box's 14px padding and up/down into the row's 9px vertical
-   rhythm, rather than reusing `.progress-row:hover`'s -14px/8px figures
-   verbatim. */
-.discover-row-text:hover {
+/* The click target is still only `.discover-row-text` (the Follow button
+   stays a separate action, via its own `stopPropagation`), but the hover
+   highlight itself lives on `.discover-row` so it covers the full row width
+   — including the gap behind the Follow button — rather than stopping short
+   of it. Mirrors `.progress-row:hover`'s -14px/14px figures, expanding into
+   `.discover-box`'s 14px side padding via negative margin. */
+.discover-row:hover {
   background: var(--bg-3);
-  margin: -9px 0 -9px -14px;
-  padding: 9px 0 9px 14px;
+  margin: 0 -14px;
+  padding-left: 14px;
+  padding-right: 14px;
   border-radius: 8px;
 }
 

@@ -47,7 +47,7 @@ services:
     volumes:
       - ./apps/api/src:/app/src
       - ./apps/api/alembic:/app/alembic
-    command: ["sh", "-c", "alembic upgrade head && python -m slocho.seed"]
+    command: ["sh", "-c", "alembic upgrade head && python -m slocho.seed && python -m slocho.seed_generated"]
 
   api:
     build:

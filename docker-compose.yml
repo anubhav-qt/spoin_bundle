@@ -1,0 +1,138 @@
+# One command brings up the whole stack with seeded data:
+#
+#     docker compose up
+#
+# That is the promise in the README, and it is a CI-checked one. If you ever need
+# to say "first install X, then...", something here is broken.
+#
+# Services:
+#   db      Postgres 17 + pgvector          (Neon in production)
+#   seed    runs migrations + loads fixtures, then exits
+#   api     FastAPI                          http://localhost:8000/docs
+#   web     Next.js                          http://localhost:3000
+#   worker  batch job, `--profile worker`    (cron in production, not always-on)
+
+name: slocho
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: slocho
+      POSTGRES_PASSWORD: slocho
+      POSTGRES_DB: slocho
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slocho -d slocho"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Migrations and fixtures run as their own service rather than in the API's
+  # entrypoint. An API container that migrates on boot races itself the moment
+  # there is more than one replica.
+  seed:
+    build:
+      context: ./apps/api
+    environment:
+      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
+    depends_on:
+      db:
+        condition: service_healthy
+    # Mounted so `make migration` writes the generated file to the host rather than
+    # into a container that is then thrown away.
+    volumes:
+      - ./apps/api/src:/app/src
+      - ./apps/api/alembic:/app/alembic
+    command: ["sh", "-c", "alembic upgrade head && python -m slocho.seed"]
+
+  api:
+    build:
+      context: ./apps/api
+    environment:
+      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
+      SLOCHO_ENV: local
+      SLOCHO_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - ./apps/api/src:/app/src
+      # Mounted so `make lint` / `make types` see the working tree rather than
+      # whatever was baked into the image at build time.
+      - ./apps/api/tests:/app/tests
+    command:
+      ["uvicorn", "slocho.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  web:
+    build:
+      context: ./apps/web
+    environment:
+      # The browser resolves this, not the container, so it is localhost either way.
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web:/app
+      - web-node-modules:/app/node_modules
+    command: ["npm", "run", "dev"]
+
+  # Its own database, because the test fixtures drop and recreate every table.
+  # Sharing `slocho` would silently wipe the seeded corpus every time anyone ran
+  # the suite, which is a confusing way to lose your dev data.
+  test:
+    profiles: ["test"]
+    build:
+      context: ./apps/api
+    environment:
+      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
+      SLOCHO_TEST_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho_test
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api/src:/app/src
+      - ./apps/api/tests:/app/tests
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        python - <<'PY'
+        import asyncio, asyncpg
+        async def main():
+            conn = await asyncpg.connect("postgresql://slocho:slocho@db:5432/slocho")
+            try:
+                await conn.execute("CREATE DATABASE slocho_test")
+            except asyncpg.DuplicateDatabaseError:
+                pass
+            await conn.close()
+        asyncio.run(main())
+        PY
+        pytest -q "$@"
+
+  # Not always-on by design (ADR-0003 §3): at free-tier quota a persistent pool has
+  # nothing to do 99% of the time. Production runs this on a GitHub Actions cron.
+  #     docker compose --profile worker run --rm worker
+  worker:
+    profiles: ["worker"]
+    build:
+      context: ./apps/api
+    environment:
+      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
+      SLOCHO_GENERATOR: fake
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api/src:/app/src
+    command: ["python", "-m", "slocho.worker"]
+
+volumes:
+  db-data:
+  web-node-modules:

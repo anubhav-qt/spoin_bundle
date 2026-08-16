@@ -20,11 +20,15 @@ card
   subtopic_id         fk -> subtopic (curriculum slot; see ADR-0007)
   difficulty          beginner | intermediate | advanced
 
-  title               str     LLM-capped at N characters
+  title               str     display title; playful some of the time (see note below)
+  canonical_title     str     literal title; what machines read (see note below)
   summary             str     the collapsed-state hook (see note below)
   body                str     markdown; scrolls inside the expanded card
   archetype           str[]   content shapes present in body (see note below)
   is_hero             bool    at most one true per subtopic (see note below)
+
+  visual_id           str     null; key into the ASCII scene catalog (see note below)
+  visual_slots        jsonb   null; {slot_name: text} for that scene
 
   source              generated | authored
   author_id           fk -> user, null for generated
@@ -39,13 +43,43 @@ card
 
 | Field | Origin |
 |---|---|
-| `title`, `summary`, `body` | **Generated** (or authored, for user-submitted cards) |
+| `title`, `canonical_title`, `summary`, `body` | **Generated** (or authored, for user-submitted cards) |
+| `visual_id`, `visual_slots` | **Selected** by the generator from a curated catalog — never drawn by it, and validated deterministically after (see [ADR-0021](../adr/0021-ascii-scene-library.md)) |
 | `difficulty` | **Requested** at generation time, then **independently verified** by the quality gate |
 | `topic_id` | Requested at generation time, verified by the quality gate |
 | `content_embedding` | **Derived** locally, post-generation |
 | `archetype` | **Derived** locally from `body`, post-generation — never requested, never LLM-self-reported (see [ADR-0017](../adr/0017-card-archetypes.md)) |
 | `is_hero` | **Planned** by a curriculum/content step, one per subtopic — today set by the fixture seeder only (see below); never a per-card LLM self-report |
 | `status`, `version`, `family_id` | **System-owned**. Never set by the generator |
+
+### On `title` / `canonical_title`
+
+**Decided in [ADR-0022](../adr/0022-dual-titles.md); not yet built.** `title` is what the
+feed card face shows and is playful some of the time (the proportion is a config value,
+not a code path). `canonical_title` is the literal, descriptive name of the concept and is
+always present.
+
+**`canonical_title` is the default for every consumer except the feed face.** Quiz stems,
+remediation links, progress and coverage lists, and search all read it. The one that is
+easy to get wrong and silent when you do: the generation prompt's already-covered list
+takes **both** — canonical so the model can tell a subject is taken, display so it doesn't
+invent the same joke twice.
+
+`content_embedding` stays derived from `body`. Neither title feeds dedup.
+
+### On `visual_id` / `visual_slots`
+
+**Decided in [ADR-0021](../adr/0021-ascii-scene-library.md); not yet built.** Cards may
+carry an ASCII scene. The generator **selects** a scene from a curated, hand-authored
+catalog and writes its dialogue slots; it never draws art. Models are unreliable at ASCII
+art and none of the four quality-gate checks below can detect a broken drawing — the
+catalog is what replaces the missing detector.
+
+The card stores a reference plus text, never rendered art, so fixing a scene improves
+every card using it with no regeneration. Three constraints are enforced server-side, not
+prompted: slot text over the scene's `max_chars`, an unknown `visual_id`, and a scene
+already used on two active cards in the topic all cause the **visual to be dropped and the
+card kept**. Failure degrades to "no art", never to "broken art".
 
 ### On `summary`
 
@@ -64,8 +98,8 @@ is the safety net, not the design.
 
 ### On `archetype`
 
-A set of content-shape tags — `code`, `diagram`, `comparison`, any subset, `[]` for
-plain prose — used by the web client to pick a collapsed-state preview shape (a code
+A set of content-shape tags — `code`, `diagram`, `comparison`, `ascii`, any subset, `[]`
+for plain prose — used by the web client to pick a collapsed-state preview shape (a code
 snippet gets a language badge + first line, a diagram gets a breadcrumb, and so on).
 Full reasoning in [ADR-0017](../adr/0017-card-archetypes.md); the one thing worth
 repeating here: it is **derived, not requested**. Unlike `difficulty`, whether a body
@@ -74,6 +108,11 @@ no self-report to independently verify — the classifier (`content/archetype.py
 runs on `body` after it exists. The generation prompt is still expected to *use* these
 markdown shapes where a subtopic calls for it (same spirit as `summary` below), it just
 never emits `archetype` as a field.
+
+`ascii` follows the same rule and is the easiest case of all: it is derived from
+`visual_id is not null` (see [ADR-0021](../adr/0021-ascii-scene-library.md)). Note it is
+derived from the *field*, not from `body` — ASCII scenes deliberately live outside the
+markdown so the renderer owns their monospace box and column width.
 
 ### On `is_hero`
 

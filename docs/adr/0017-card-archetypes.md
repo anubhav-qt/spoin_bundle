@@ -1,6 +1,8 @@
 # ADR-0017: Archetype-based card rendering, color-only highlighting, motion
 
 - **Status:** Accepted
+- **Amended by:** [ADR-0021](0021-ascii-scene-library.md) — adds `ascii` to the archetype
+  set, derived from `card.visual_id` rather than from `body`
 - **Date:** 2026-08-16
 - **Deciders:** Anubhav, Mayank
 

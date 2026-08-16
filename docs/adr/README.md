@@ -53,6 +53,10 @@ useful than the decision itself.
 | [0014](0014-progress-insights-panel.md) | Right-rail insights: a progress-stats panel, not a relationship graph | Accepted |
 | [0015](0015-topic-progress-and-discovery.md) | Per-topic progress box, engagement-stats modal, and topic discovery | Accepted |
 | [0016](0016-theme-consolidation.md) | Replace Phosphor with a monochrome dark palette, Cyanotype with a light one | Accepted |
-| [0017](0017-card-archetypes.md) | Archetype-based card rendering, color-only highlighting, motion | Accepted |
+| [0017](0017-card-archetypes.md) | Archetype-based card rendering, color-only highlighting, motion | Accepted (amended by 0021) |
 | [0018](0018-hero-mechanism-and-teaser-refinements.md) | Real hero mechanism, teaser refinements, block-expand modal | Accepted |
 | [0019](0019-experimental-generated-fixture-content.md) | A second, honestly-tagged fixture for AI-generated content | Accepted |
+| [0020](0020-rename-to-spoin.md) | Rename the product from Slocho to Spoin | Accepted |
+| [0021](0021-ascii-scene-library.md) | ASCII art from a curated scene library, not from the generator | Accepted |
+| [0022](0022-dual-titles.md) | Every card carries a display title and a canonical title | Accepted |
+| [0023](0023-reader-font-selection.md) | Five selectable reader fonts, with the monospace face locked | Accepted |

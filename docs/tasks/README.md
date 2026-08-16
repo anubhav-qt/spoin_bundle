@@ -20,3 +20,4 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0003](0003-personalized-topic-recommendations.md) | Personalized "for you" topic recommendations | unassigned |
 | [0004](0004-notes-in-one-place.md) | A single view of all your notes | unassigned |
 | [0005](0005-remove-seed-subscriber-baseline.md) | Remove the seeded `subscriber_count` baseline | unassigned |
+| [0006](0006-curated-hero-cards.md) | A real curated `is_hero` flag, replacing the "first in station" heuristic | unassigned |

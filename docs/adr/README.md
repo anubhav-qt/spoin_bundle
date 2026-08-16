@@ -52,3 +52,5 @@ useful than the decision itself.
 | [0013](0013-topic-relationship-graph.md) | Topic-relationship graph: request-time embedding similarity, topics as nodes | Superseded by 0014 |
 | [0014](0014-progress-insights-panel.md) | Right-rail insights: a progress-stats panel, not a relationship graph | Accepted |
 | [0015](0015-topic-progress-and-discovery.md) | Per-topic progress box, engagement-stats modal, and topic discovery | Accepted |
+| [0016](0016-theme-consolidation.md) | Replace Phosphor with a monochrome dark palette, Cyanotype with a light one | Accepted |
+| [0017](0017-card-archetypes.md) | Archetype-based card rendering, color-only highlighting, motion | Accepted |

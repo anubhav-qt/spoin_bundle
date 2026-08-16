@@ -19,6 +19,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
 import { api, type Card as CardModel, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
@@ -36,6 +37,11 @@ interface Props {
 export function Feed({ topics, selected, onCardSeen }: Props) {
   const [cards, setCards] = useState<CardModel[]>([]);
   const [seen, setSeen] = useState<Set<string>>(new Set());
+  // Swipe-to-dismiss removes a card from THIS render only (ADR-0017) — the
+  // seen/state data underneath is untouched, this is purely "what's currently
+  // in the DOM for this scroll session." Tapping the checkmark instead of
+  // swiping still leaves the card in place, unlike a swipe.
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -159,6 +165,10 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
     });
   }, []);
 
+  const dismissCard = useCallback((cardId: string) => {
+    setDismissed((current) => new Set(current).add(cardId));
+  }, []);
+
   return (
     <>
       {/* Not sticky, deliberately — the wordmark already lives in the left
@@ -189,21 +199,36 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
         {stations.map((station, index) => (
           <section key={stationKey(station, index)}>
-            <div className="station">
-              <span className="station-name">{station.label}</span>
-              <span className="station-count">{station.cards.length}</span>
-            </div>
+            {/* Only when exactly one topic is filtered (station kind is
+                "subtopic") — the curriculum slot is genuinely new information
+                there. In the mixed feed (kind "topic"), the topic name is
+                already shown on every card's own head, so a station heading
+                that just repeats it is dead weight, not orientation. */}
+            {kind === "subtopic" ? (
+              <div className="station">
+                <span className="station-name">{station.label}</span>
+                <span className="station-count">{station.cards.length}</span>
+              </div>
+            ) : null}
 
-            {station.cards.map((card) => (
-              <Card
-                key={card.id}
-                card={card}
-                topicName={topicName(card.topic_id)}
-                seen={seen.has(card.id)}
-                onSeen={markSeen}
-                onUnseen={unmarkSeen}
-              />
-            ))}
+            <AnimatePresence initial={false}>
+              {station.cards
+                .filter((card) => !dismissed.has(card.id))
+                .map((card) => (
+                  <Card
+                    key={card.id}
+                    card={card}
+                    topicName={topicName(card.topic_id)}
+                    seen={seen.has(card.id)}
+                    onSeen={markSeen}
+                    onUnseen={unmarkSeen}
+                    onDismiss={dismissCard}
+                    // Server-owned (ADR-0017) — at most one true per subtopic.
+                    // No client heuristic here anymore.
+                    isHero={card.is_hero}
+                  />
+                ))}
+            </AnimatePresence>
           </section>
         ))}
 

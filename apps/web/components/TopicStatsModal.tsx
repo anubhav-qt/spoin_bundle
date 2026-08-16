@@ -29,6 +29,15 @@ interface Props {
   topicId: string;
   topicName: string;
   onClose: () => void;
+  /** Present only when opened from Discover, for a topic not yet followed —
+   *  renders a Follow action in the modal instead of assuming the caller
+   *  already knows the topic is followed. `/topics/{id}/stats` itself works
+   *  fine with no UserTopicProgress row (defaults to 0% coverage, beginner
+   *  tier), so this reuses the same modal rather than a separate "preview"
+   *  component — the stats it shows are simply honestly empty for a topic
+   *  the user hasn't started. */
+  onFollow?: () => void | Promise<void>;
+  following?: boolean;
 }
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -42,8 +51,12 @@ const TIERS: { key: Difficulty; label: string }[] = [
   { key: "advanced", label: "Advanced quiz" },
 ];
 
-export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
+export function TopicStatsModal({ topicId, topicName, onClose, onFollow, following = false }: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
+  // The quiz itself isn't built yet — this only announces intent, same
+  // placeholder behavior the row's old Quiz button had (ADR-0017 moved it
+  // here rather than building the quiz flow as a side effect of this fix).
+  const [announced, setAnnounced] = useState(false);
 
   useEffect(() => {
     void api.topicStats(topicId).then(setStats);
@@ -73,7 +86,7 @@ export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
         className="modal-panel"
         role="dialog"
         aria-modal="true"
-        aria-label={`${topicName} progress`}
+        aria-label={`${topicName} details`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-head">
@@ -83,6 +96,17 @@ export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
           </button>
         </div>
 
+        {onFollow !== undefined ? (
+          <button
+            type="button"
+            className="modal-follow"
+            disabled={following}
+            onClick={() => void onFollow()}
+          >
+            {following ? "Following…" : "Follow this topic"}
+          </button>
+        ) : null}
+
         {stats === null ? (
           <p className="modal-loading mono">Loading…</p>
         ) : (
@@ -90,7 +114,7 @@ export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
             <div className="modal-progress-row">
               <span className="mono">{DIFFICULTY_LABEL[stats.current_difficulty]}</span>
               <span className="mono">{Math.round(stats.coverage * 100)}% coverage</span>
-              {stats.mastered ? <span className="modal-badge">Mastered</span> : null}
+              {stats.mastered ? <span className="modal-badge">Completed</span> : null}
             </div>
 
             <div className="modal-tiers">
@@ -101,6 +125,20 @@ export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
                 </span>
               ))}
             </div>
+
+            <button
+              type="button"
+              className="modal-quiz"
+              data-locked={!stats.quiz_unlocked}
+              disabled={!stats.quiz_unlocked}
+              onClick={() => setAnnounced(true)}
+            >
+              {!stats.quiz_unlocked
+                ? "Quiz locked — reach 80% coverage"
+                : announced
+                  ? "Quiz coming soon"
+                  : `Take the ${DIFFICULTY_LABEL[stats.current_difficulty]} quiz`}
+            </button>
 
             <div className="modal-engagement">
               <div className="modal-engagement-stat">

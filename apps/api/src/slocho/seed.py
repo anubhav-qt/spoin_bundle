@@ -20,6 +20,7 @@ from typing import Any
 
 from sqlalchemy import func, select
 
+from slocho.content.archetype import classify_archetype
 from slocho.core.db import session_scope
 from slocho.domain.enums import CardStatus, Difficulty, GenerationBackend
 from slocho.domain.models import (
@@ -156,7 +157,7 @@ async def _seed_subtopic(
     subtopic.position = position
     await session.flush()
 
-    for card_data in data["cards"]:
+    for index, card_data in enumerate(data["cards"]):
         card = await session.scalar(
             select(Card).where(Card.subtopic_id == subtopic.id, Card.title == card_data["title"])
         )
@@ -173,6 +174,14 @@ async def _seed_subtopic(
         card.title = card_data["title"]
         card.summary = card_data["summary"]
         card.body = card_data["body"]
+        # Deterministic, derived from body — re-running seed on an edited fixture
+        # naturally re-derives this alongside title/summary/body, so there is no
+        # separate backfill step (ADR-0017).
+        card.archetype = classify_archetype(card.body)
+        # Placeholder for the real content-planning step (docs/tasks/0006):
+        # the first card listed for a subtopic is its hero. Re-running seed on
+        # a reordered fixture re-derives this too, same as archetype above.
+        card.is_hero = index == 0
         # Fixture cards bypass the quality gate and land ACTIVE directly. They are
         # hand-written and reviewed in the diff, which is a stronger guarantee than
         # the gate provides. `gen_meta.backend` records that, so a later quality

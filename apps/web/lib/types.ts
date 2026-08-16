@@ -3,7 +3,10 @@
  * so they don't belong in api.ts alongside the wire contracts.
  */
 
+import type { Difficulty } from "./api";
+
 export interface TopicProgress {
+  currentDifficulty: Difficulty;
   coverage: number;
   quizUnlocked: boolean;
   mastered: boolean;

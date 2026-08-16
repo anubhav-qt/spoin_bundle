@@ -54,6 +54,8 @@ async def get_feed(
                 title=card.title,
                 summary=card.summary,
                 body=card.body,
+                archetype=card.archetype,
+                is_hero=card.is_hero,
                 created_at=card.created_at,
             )
             for card_id in page.card_ids

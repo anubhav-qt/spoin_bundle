@@ -23,6 +23,8 @@ card
   title               str     LLM-capped at N characters
   summary             str     the collapsed-state hook (see note below)
   body                str     markdown; scrolls inside the expanded card
+  archetype           str[]   content shapes present in body (see note below)
+  is_hero             bool    at most one true per subtopic (see note below)
 
   source              generated | authored
   author_id           fk -> user, null for generated
@@ -41,6 +43,8 @@ card
 | `difficulty` | **Requested** at generation time, then **independently verified** by the quality gate |
 | `topic_id` | Requested at generation time, verified by the quality gate |
 | `content_embedding` | **Derived** locally, post-generation |
+| `archetype` | **Derived** locally from `body`, post-generation — never requested, never LLM-self-reported (see [ADR-0017](../adr/0017-card-archetypes.md)) |
+| `is_hero` | **Planned** by a curriculum/content step, one per subtopic — today set by the fixture seeder only (see below); never a per-card LLM self-report |
 | `status`, `version`, `family_id` | **System-owned**. Never set by the generator |
 
 ### On `summary`
@@ -57,6 +61,29 @@ different job from the line that opens an essay. Truncation also cuts mid-senten
 
 **Fallback:** if `summary` is missing, render `body` with CSS `line-clamp`. Truncation
 is the safety net, not the design.
+
+### On `archetype`
+
+A set of content-shape tags — `code`, `diagram`, `comparison`, any subset, `[]` for
+plain prose — used by the web client to pick a collapsed-state preview shape (a code
+snippet gets a language badge + first line, a diagram gets a breadcrumb, and so on).
+Full reasoning in [ADR-0017](../adr/0017-card-archetypes.md); the one thing worth
+repeating here: it is **derived, not requested**. Unlike `difficulty`, whether a body
+contains a fenced code block is objectively checkable from the text itself, so there is
+no self-report to independently verify — the classifier (`content/archetype.py`) just
+runs on `body` after it exists. The generation prompt is still expected to *use* these
+markdown shapes where a subtopic calls for it (same spirit as `summary` below), it just
+never emits `archetype` as a field.
+
+### On `is_hero`
+
+The card the web client renders as a never-collapsed visual anchor, with distinct
+typography and a border treatment. Real mechanism (not yet built — see
+[docs/tasks/0006](../tasks/0006-curated-hero-cards.md)): a content-planning step
+designates exactly one hero per subtopic. Until that exists, the fixture seeder marks
+the first card listed per subtopic. Either way this is a **planning decision**, not a
+per-card judgment the generator makes about its own output — same category of thing as
+`status`/`version`, just not fully automated yet.
 
 ### On `source` / `author_id`
 

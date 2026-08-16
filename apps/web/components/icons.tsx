@@ -2,9 +2,9 @@
  * Thin stroked line icons, matched to the reference's weight: 1.5px strokes on a
  * 24 viewBox, rounded caps and joins, no fills.
  *
- * Inline rather than from a package. There are seven of them, they need to
- * inherit `currentColor` and the card's stroke width, and an icon dependency
- * would ship a few hundred glyphs to render these.
+ * Inline rather than from a package. They need to inherit `currentColor` and
+ * the card's stroke width, and an icon dependency would ship a few hundred
+ * glyphs to render these.
  */
 
 type IconProps = { className?: string };
@@ -152,6 +152,34 @@ export function LayersIcon(_: IconProps) {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="m12 3 9 5-9 5-9-5 9-5Z" />
       <path d="m3 13 9 5 9-5" />
+    </svg>
+  );
+}
+
+export function CloseIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+export function CopyIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="9" y="9" width="11" height="11" rx="2" />
+      <path d="M15 9V6.5A2.5 2.5 0 0 0 12.5 4H6.5A2.5 2.5 0 0 0 4 6.5v6A2.5 2.5 0 0 0 6.5 15H9" />
+    </svg>
+  );
+}
+
+export function ExpandIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 4.5H4.5V9" />
+      <path d="M15 4.5h4.5V9" />
+      <path d="M9 19.5H4.5V15" />
+      <path d="M15 19.5h4.5V15" />
     </svg>
   );
 }

@@ -27,7 +27,19 @@ class CardDraft(BaseModel):
     """One generated card, before the quality gate sees it.
 
     Note what is absent: `status`, `version`, `family_id`. Those are system-owned
-    and never set by a generator.
+    and never set by a generator. Also absent, deliberately: `archetype`. It is
+    NOT requested here — content/archetype.py derives it from `body` itself once
+    the card is persisted (ADR-0017), the same reasoning as leaving `status` out:
+    a self-reported archetype tag would just echo whatever the prompt asked for.
+
+    What the prompt SHOULD do instead: actually use the markdown shapes the
+    classifier looks for, where the subtopic calls for it — a fenced code block
+    with a language tag for command/query/config-heavy material, a compact
+    arrow-chain diagram for request-flow/process-order material, a ❌/✅ pair for
+    misconception-correction material. This is a content-quality instruction for
+    whichever prompt template implements `generate_cards`, not a schema change —
+    same spirit as `summary` being a purpose-written hook rather than a
+    truncation: better use of the body the model already writes, not a new field.
     """
 
     title: str = Field(max_length=120)

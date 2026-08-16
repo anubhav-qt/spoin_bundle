@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from slocho.api.routers import engagement, feed, topics
+from slocho.api.routers import dev, engagement, feed, topics
 from slocho.core.config import get_settings
 from slocho.core.db import get_engine
 
@@ -52,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(feed.router)
     app.include_router(topics.router)
     app.include_router(engagement.router)
+    app.include_router(dev.router)
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, Any]:

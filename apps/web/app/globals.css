@@ -33,12 +33,29 @@
   --fg-3: #838c7d;
   --accent: #c1442b;
   --accent-2: #a83a24;
+  /* Secondary highlight — technical syntax/parameters, distinct hue from
+     --accent so "primary concept" vs "technical detail" read as two tiers
+     at a glance (ADR-0017). Muted teal-blue, readable on pale paper. */
+  --accent-syntax: #2f6b78;
   --line: rgba(38, 42, 34, 0.14);
   --line-strong: rgba(38, 42, 34, 0.26);
   --good: #4c7a5a;
   --shadow: rgba(38, 42, 34, 0.18);
-  --texture: repeating-linear-gradient(0deg, rgba(38, 42, 34, 0.05) 0px, rgba(38, 42, 34, 0.05) 1px, transparent 1px, transparent 22px),
-    repeating-linear-gradient(90deg, rgba(38, 42, 34, 0.05) 0px, rgba(38, 42, 34, 0.05) 1px, transparent 1px, transparent 22px);
+  /* A single SVG tile, not two overlapping `repeating-linear-gradient`
+     layers — see the note above `body`'s `background-image` for why: two
+     independently-antialiased hard-1px gradients don't agree with each other
+     at their crossings under fractional display scaling, which is what
+     produced the wobbly, not-quite-connected grid. One path per tile has
+     nothing to disagree with.
+     Deliberately no `shape-rendering="crispEdges"` — it was tried and
+     reverted: crispEdges disables antialiasing and snaps the stroke to the
+     nearest device pixel, which is fine at 100% zoom but at any other
+     browser zoom the (sub-device-pixel) stroke can snap to zero-width
+     instead of partial coverage, making the whole grid vanish rather than
+     just looking soft. Default rendering always paints *some* partial-alpha
+     coverage, so it degrades gracefully across zoom levels instead of
+     disappearing. */
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(38,42,34,0.05)' stroke-width='1'/%3E%3C/svg%3E");
 
   --font-sans: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
@@ -65,12 +82,12 @@
   --fg-3: #6d8078;
   --accent: #e2985f;
   --accent-2: #c97a4a;
+  --accent-syntax: #5fb4d9;
   --line: rgba(231, 237, 231, 0.12);
   --line-strong: rgba(231, 237, 231, 0.22);
   --good: #7fbf95;
   --shadow: rgba(0, 0, 0, 0.45);
-  --texture: repeating-linear-gradient(0deg, rgba(231, 237, 231, 0.04) 0px, rgba(231, 237, 231, 0.04) 1px, transparent 1px, transparent 22px),
-    repeating-linear-gradient(90deg, rgba(231, 237, 231, 0.04) 0px, rgba(231, 237, 231, 0.04) 1px, transparent 1px, transparent 22px);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(231,237,231,0.04)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 /* Cyanotype — the light counterpart to Phosphor below: soft, pale blueprint
@@ -84,12 +101,14 @@
   --fg-3: #7891a3;
   --accent: #3f7ea3;
   --accent-2: #2f6486;
+  /* This theme's own accent is already blue, so syntax highlighting needs
+     the opposite temperature to still read as a distinct second tier. */
+  --accent-syntax: #b5793f;
   --line: rgba(30, 52, 72, 0.12);
   --line-strong: rgba(30, 52, 72, 0.24);
   --good: #4a8f76;
   --shadow: rgba(30, 52, 72, 0.16);
-  --texture: repeating-linear-gradient(0deg, rgba(30, 52, 72, 0.045) 0px, rgba(30, 52, 72, 0.045) 1px, transparent 1px, transparent 22px),
-    repeating-linear-gradient(90deg, rgba(30, 52, 72, 0.045) 0px, rgba(30, 52, 72, 0.045) 1px, transparent 1px, transparent 22px);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(30,52,72,0.045)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 /* Phosphor — true black-and-gray dark theme, no hue at all (Copper already
@@ -104,12 +123,16 @@
   --fg-3: #6c6c6f;
   --accent: #f4f4f5;
   --accent-2: #d4d4d6;
+  /* No new hue here — ADR-0016 committed this theme to strict monochrome.
+     A mid-gray, dimmer than the near-white --accent and brighter than
+     --fg-3, keeps a two-tier hierarchy (bright bold vs. quieter mono)
+     through brightness alone rather than color. */
+  --accent-syntax: #a8a8ab;
   --line: rgba(230, 230, 231, 0.12);
   --line-strong: rgba(230, 230, 231, 0.24);
   --good: #b8b8ba;
   --shadow: rgba(0, 0, 0, 0.6);
-  --texture: repeating-linear-gradient(0deg, rgba(230, 230, 231, 0.045) 0px, rgba(230, 230, 231, 0.045) 1px, transparent 1px, transparent 22px),
-    repeating-linear-gradient(90deg, rgba(230, 230, 231, 0.045) 0px, rgba(230, 230, 231, 0.045) 1px, transparent 1px, transparent 22px);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(230,230,231,0.045)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 [data-palette="scope"] {
@@ -121,12 +144,14 @@
   --fg-3: #5e7180;
   --accent: #38c6d9;
   --accent-2: #e8a33d;
+  /* Already has two genuinely distinct hues (cyan primary, amber secondary
+     channel) — reuse --accent-2 rather than mint a third color. */
+  --accent-syntax: #e8a33d;
   --line: rgba(227, 236, 242, 0.12);
   --line-strong: rgba(227, 236, 242, 0.22);
   --good: #38c6d9;
   --shadow: rgba(0, 0, 0, 0.5);
-  --texture: repeating-linear-gradient(0deg, rgba(227, 236, 242, 0.04) 0px, rgba(227, 236, 242, 0.04) 1px, transparent 1px, transparent 22px),
-    repeating-linear-gradient(90deg, rgba(227, 236, 242, 0.04) 0px, rgba(227, 236, 242, 0.04) 1px, transparent 1px, transparent 22px);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(227,236,242,0.04)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 *,
@@ -351,6 +376,19 @@ body {
   margin-bottom: 10px;
 }
 
+/* Focus pull (ADR-0017) — a separate element from `.node` deliberately: Card.tsx
+   puts Framer Motion's own transform (layout/drag) on `.node` itself, and a
+   competing CSS `transform` on that same element would fight Framer's inline
+   style management. This wrapper is plain CSS, one layer in. */
+.card-focus {
+  transition: transform var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease);
+}
+
+.card-focus[data-focused="false"] {
+  transform: scale(0.97);
+  opacity: 0.6;
+}
+
 .card {
   position: relative;
   background: var(--bg-2);
@@ -368,6 +406,180 @@ body {
 .card[data-expanded="true"] {
   cursor: default;
   border-color: var(--accent);
+}
+
+/* Hero (ADR-0017) — never collapsed, reads as a visual anchor rather than
+   another item in the stack: bigger type, an animated conic-gradient ring,
+   background bumped a touch above a normal card. */
+@property --hero-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.card[data-hero="true"] {
+  cursor: pointer;
+  background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
+  border-color: transparent;
+}
+
+.card[data-hero="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--r-card);
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--hero-angle),
+    var(--accent-2) 0deg,
+    color-mix(in srgb, var(--accent) 45%, var(--bg-2)) 100deg,
+    var(--accent) 180deg,
+    color-mix(in srgb, var(--accent) 45%, var(--bg-2)) 260deg,
+    var(--accent-2) 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.6;
+  pointer-events: none;
+  animation: hero-ring-rotate 11s linear infinite;
+  transition: opacity 0.35s var(--ease);
+}
+
+.card[data-hero="true"]:hover::before {
+  opacity: 1;
+  animation-duration: 3.2s;
+}
+
+@keyframes hero-ring-rotate {
+  to { --hero-angle: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card[data-hero="true"]::before { animation: none; }
+}
+
+.card[data-hero="true"] > * { position: relative; z-index: 1; }
+
+.card[data-hero="true"] .card-title {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.hero-badge {
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-3));
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+/* -- archetype teasers (ADR-0017): the collapsed-state preview when a card
+   has a code/diagram/comparison tag, in place of the plain summary line. */
+.card-teaser {
+  margin: 0 0 10px;
+}
+
+.card-teaser-code {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg-3);
+  overflow: hidden;
+}
+
+.card-teaser-badge {
+  flex: 0 0 auto;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--fg-3);
+}
+
+.card-teaser-line {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--accent-syntax);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-teaser-diagram {
+  font-size: 12.5px;
+  color: var(--fg-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-teaser-comparison {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* combo teaser (code + diagram both present) */
+.card-teaser-combo {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 10px;
+}
+.card-teaser-combo .card-teaser-code { margin: 0; border-radius: 8px 8px 0 0; }
+.card-teaser-combo-divider {
+  height: 1px;
+  margin: 0 10px;
+  background: repeating-linear-gradient(to right, var(--line-strong) 0, var(--line-strong) 4px, transparent 4px, transparent 8px);
+}
+.card-teaser-combo .card-teaser-diagram {
+  margin: 0;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--fg) 4%, var(--bg-3));
+  border-radius: 0 0 8px 8px;
+}
+
+/* minimal "myth vs fact" comparison teaser */
+.card-teaser-comparison-mini { margin: 0 0 10px; }
+.comparison-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 8px;
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--fg-2);
+}
+.comparison-badge-dots { display: inline-flex; align-items: center; gap: 3px; flex: 0 0 auto; }
+.comparison-badge-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; }
+.comparison-badge-dots i:first-child { background: color-mix(in srgb, var(--accent) 75%, var(--bg-3)); }
+.comparison-badge-dots i:last-child { background: var(--good); }
+
+.teaser-tag {
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.teaser-tag[data-tone="bad"] {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-3));
+  color: var(--fg-2);
+}
+
+.teaser-tag[data-tone="good"] {
+  background: color-mix(in srgb, var(--good) 15%, var(--bg-3));
+  color: var(--fg-2);
 }
 
 .card-head {
@@ -411,6 +623,40 @@ body {
   color: var(--good);
 }
 
+/* Only rendered while expanded — pushed to the far right of the head row by
+   `margin-left: auto` on an otherwise flex-start row. The one way to close an
+   expanded card from inside it, now that tapping the body no longer does. */
+.card-close {
+  margin-left: auto;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+
+.card-close svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.card-close:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-3);
+  color: var(--fg);
+}
+
 .card-title {
   font-size: 17px;
   font-weight: 700;
@@ -428,18 +674,13 @@ body {
   color: var(--fg-2);
 }
 
-/* The reveal opens instantly and fades in — no height animation.
- *
- * `grid-template-rows: 0fr -> 1fr` was tried and rejected: Chrome will not
- * interpolate the `fr` unit against an auto-height grid container, so the
- * row stays pinned at zero and the card never visibly opens. Animating an
- * explicit measured pixel height works but needs a requestAnimationFrame to
- * seed the collapsed value, and React's development double-invocation
- * cancels that frame in the effect cleanup, leaving it stuck open.
- *
- * Opacity and a small translate interpolate reliably with none of that, and
- * an instant reveal plus a fade reads as intentional rather than as a
- * missing animation. */
+/* The outer `.node` (Card.tsx) carries Framer Motion's `layout` prop, which
+ * FLIP-animates the height change this display toggle causes — solving the
+ * problem this comment used to describe fighting with pure CSS: Chrome won't
+ * interpolate `grid-template-rows: 0fr -> 1fr`, and a measured-height + rAF
+ * animation breaks under React's development double-invocation. Framer's
+ * `layout` prop handles the outer reflow; this local opacity/translate fade
+ * is just the newly-revealed content's own entrance, not the height change. */
 .card-reveal {
   display: none;
 }
@@ -467,7 +708,16 @@ body {
   font-size: 15px;
   line-height: 1.68;
   color: var(--fg);
+  max-height: 520px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
+
+.card-body::-webkit-scrollbar { width: 8px; }
+.card-body::-webkit-scrollbar-track { background: transparent; }
+.card-body::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+.card-body::-webkit-scrollbar-thumb:hover { background: var(--fg-3); }
 
 .card-body strong {
   color: var(--accent);
@@ -506,12 +756,205 @@ body {
   color: var(--fg-3);
 }
 
+/* Color-only, no background pill — inline code is the "technical syntax /
+   parameter" tier, paired with --accent-syntax the same way **bold** pairs
+   with --accent for "primary concept." Two tiers from color alone, per
+   ADR-0017's semantic hierarchy, so a highlight pulls the eye before the
+   sentence is even read. */
 .card-body code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  padding: 1px 5px;
-  border-radius: 5px;
+  font-weight: 600;
+  color: var(--accent-syntax);
+}
+
+/* -- code blocks (ADR-0017) --------------------------------------------- */
+
+.code-block {
+  position: relative;
+  margin: 0 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
   background: var(--bg-3);
+  overflow-x: auto;
+}
+
+.code-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.code-block-copy {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.code-block-copy svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.code-block-copy:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.code-block-copy[data-copied="true"] {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+/* Icon-only sibling of .code-block-copy — same visual weight, opens the
+   block full-size in a modal instead of copying it. Shared by both the code
+   and diagram block headers. */
+.block-expand {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.block-expand svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.block-expand:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 10px 12px;
+  display: flex;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.code-block-lines {
+  flex: 0 0 auto;
+  text-align: right;
+  color: var(--fg-3);
+  opacity: 0.6;
+  user-select: none;
+}
+
+.code-block-source {
+  flex: 1 1 auto;
+  white-space: pre;
+  color: var(--fg);
+}
+
+.code-tok-keyword {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.code-tok-string {
+  color: var(--good);
+}
+
+.code-tok-comment {
+  color: var(--fg-3);
+  font-style: italic;
+}
+
+/* -- diagram blocks (ADR-0017) -------------------------------------------
+   `white-space: pre` and `overflow-x: auto` rather than wrapping — a wrapped
+   box-drawing diagram is corrupted, not just reflowed. */
+.diagram-block {
+  position: relative;
+  margin: 0 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
+  overflow-x: auto;
+}
+
+.diagram-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.diagram-block pre {
+  margin: 0;
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  white-space: pre;
+  color: var(--fg-2);
+}
+
+/* -- comparison pairs (ADR-0017) ------------------------------------------ */
+.comparison-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.comparison-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.comparison-row[data-tone="bad"] {
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-3));
+}
+
+.comparison-row[data-tone="good"] {
+  background: color-mix(in srgb, var(--good) 12%, var(--bg-3));
 }
 
 /* -- "Got it" (text pill) ---------------------------------------------------
@@ -713,6 +1156,56 @@ body {
   height: 1px;
 }
 
+/* -- custom cursor (ADR-0017's follow-up fix) ----------------------------- */
+
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
+body.custom-cursor-active input,
+body.custom-cursor-active textarea {
+  cursor: text !important;
+}
+
+.custom-cursor-pos {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease);
+}
+
+.custom-cursor-pos[data-visible="true"] {
+  opacity: 1;
+}
+
+.custom-cursor {
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent-2) 45%, transparent);
+  transition: background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+}
+
+.custom-cursor[data-state="hover"] {
+  background: var(--accent);
+  transform: scale(1.15);
+}
+
+.custom-cursor[data-state="active"] {
+  background: color-mix(in srgb, var(--accent) 70%, black);
+  transform: scale(0.85);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -771,7 +1264,23 @@ body {
   gap: 2px;
 }
 
+/* Also the dev-reset easter egg's click target (Sidebar.tsx) — a <button>
+   now for keyboard/screen-reader access. Two things had to be undone from a
+   first pass at this: a `font` shorthand reset that also reset font-family,
+   fighting `.mono` (declared earlier in this file) for the cascade and
+   silently swapping the wordmark to the sans font; and `align-self: start`
+   here, because `display: inline-block` alone does NOT stop `.rail-left`'s
+   flex layout from stretching this child to the full column width — a flex
+   item's box is "blockified" and stretched by the parent's default
+   `align-items: stretch` regardless of its own specified `display`. Without
+   `align-self`, the button was a 275px-wide invisible rectangle instead of
+   sized to its own text. */
 .sidebar-mark {
+  align-self: start;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -1004,19 +1513,32 @@ body {
      clamped by its column-flex parent, so `overflow-x: auto` above never
      has anything to actually clip/scroll. */
   min-width: 0;
-  flex: 1 1 auto;
+  /* Soft fade at both edges rather than an abrupt clip — reads as
+     intentional (there's more here, scroll for it) instead of content just
+     getting cut off, and it holds together with the overlaid arrow buttons
+     whether or not either one is currently visible. */
+  mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
 }
 
 /* Wraps the rail with click targets for horizontal scroll — the rail itself
-   scrolls fine by wheel/trackpad/drag, but nothing on screen signals that. */
+   scrolls fine by wheel/trackpad/drag, but nothing on screen signals that.
+   The arrows are ABSOLUTELY positioned overlays, not flex siblings of the
+   rail: as flex items they permanently reserved their own width even while
+   disabled/invisible at rest, which is what pushed the first pill in from
+   the left edge (out of step with every other flush-left thing in the rail)
+   and, since a 22px arrow's own box no longer has to share cross-axis
+   centering with the rail's content height, also fixes the arrows reading
+   as slightly below-center against the pills. */
 .topic-rail-wrap {
-  display: flex;
-  align-items: center;
-  gap: 2px;
+  position: relative;
 }
 
 .topic-rail-arrow {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
   width: 22px;
   height: 22px;
   display: inline-flex;
@@ -1028,6 +1550,14 @@ body {
   color: var(--fg-3);
   cursor: pointer;
   transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), opacity var(--dur-1) var(--ease);
+}
+
+.topic-rail-arrow[data-side="left"] {
+  left: 0;
+}
+
+.topic-rail-arrow[data-side="right"] {
+  right: 0;
 }
 
 .topic-rail-arrow svg {
@@ -1045,8 +1575,13 @@ body {
   color: var(--fg);
 }
 
+/* Fully hidden, not just faded — at rest (nothing to scroll to yet) the
+   first/last pill should sit flush against the rail's edge with nothing
+   overlaying it, which is only true if the disabled arrow takes up no
+   visual space at all. */
 .topic-rail-arrow:disabled {
-  opacity: 0.25;
+  opacity: 0;
+  pointer-events: none;
   cursor: default;
 }
 
@@ -1057,90 +1592,62 @@ body {
   font-weight: 600;
 }
 
-/* -- insights panel: radial ring + two stat lines (ADR-0015) -- */
-.insights-panel {
-  display: flex;
-  align-items: center;
-  /* `justify-content: center` (rather than the default flex-start) balances
-     the ring + stats as a group in the middle of the box — left-aligned,
-     the pair only ever fills its own content width and everything left over
-     collects as dead space on the right, reading as misaligned rather than
-     a deliberate layout. */
-  justify-content: center;
-  gap: 24px;
-  height: 108px;
-  padding: 0 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: var(--bg-2);
-}
-
-.insights-ring {
-  position: relative;
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.insights-ring-track {
-  stroke: var(--line);
-}
-
-.insights-ring-fill {
-  stroke: var(--accent);
-  transition: stroke-dashoffset var(--dur-2) var(--ease);
-}
-
-.insights-ring-fill[data-complete="true"] {
-  stroke: var(--good);
-}
-
-.insights-ring-value {
-  position: absolute;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--fg);
-}
-
-.insights-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.insights-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.insights-stat-value {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--fg);
-  line-height: 1.1;
-}
-
-.insights-stat-label {
-  font-size: 10.5px;
-  color: var(--fg-3);
-}
-
-/* -- per-topic progress box, replaces the global quiz CTA (ADR-0015) -- */
+/* -- per-topic progress box, replaces the global quiz CTA (ADR-0015) --
+   Deliberately mirrors `.discover-*` below rather than having its own bespoke
+   look — both are "a titled, filterable list of topics in the right rail,"
+   and should read as the same kind of thing (head + toggle, flat rows split
+   by a hairline, a two-line text block per row). */
 .progress-box {
   border: 1px solid var(--line);
   border-radius: var(--r-card);
   background: var(--bg-2);
-  padding: 4px 14px;
+  padding: 12px 20px 4px;
+}
+
+.progress-box-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
 }
 
 .progress-box-title {
-  padding: 10px 0 8px;
   font-size: 10.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.progress-toggle {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+}
+
+.progress-toggle button {
+  padding: 4px 9px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.progress-toggle button[data-active="true"] {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+
+.progress-box-empty {
+  padding: 10px 0 14px;
+  font-size: 11.5px;
   color: var(--fg-3);
 }
 
@@ -1149,7 +1656,7 @@ body {
    shrinking, more than 5 scrolls internally, so the box never pushes
    `.rail-right`'s own height around. */
 .progress-box-list {
-  height: 258px;
+  height: 230px;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -1161,17 +1668,29 @@ body {
 .progress-row {
   display: flex;
   align-items: center;
-  gap: 12px;
   padding: 9px 0;
   border-top: 1px solid var(--line);
   cursor: pointer;
+  transition: background var(--dur-1) var(--ease);
 }
 
 .progress-row:first-of-type {
   border-top: none;
 }
 
-.progress-row-main {
+/* Discover's rows aren't themselves a click target (only the Follow button
+   is), so they don't need hover feedback — this one is, so it gets a subtle
+   one, expanding into the row's own horizontal padding via negative margin
+   rather than shifting layout. */
+.progress-row:hover {
+  background: var(--bg-3);
+  margin: 0 -14px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 8px;
+}
+
+.progress-row-text {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
@@ -1179,8 +1698,17 @@ body {
   gap: 6px;
 }
 
+.progress-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .progress-row-name {
-  font-size: 13.5px;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13px;
   font-weight: 600;
   color: var(--fg);
   overflow: hidden;
@@ -1188,25 +1716,15 @@ body {
   white-space: nowrap;
 }
 
-.progress-row-quiz {
+.progress-row-difficulty {
   flex: 0 0 auto;
-  padding: 6px 12px;
+  padding: 2px 8px;
   border-radius: var(--r-pill);
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: var(--bg);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-}
-
-.progress-row-quiz[data-locked="true"] {
-  background: transparent;
-  border-color: var(--line-strong);
+  background: var(--bg-3);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--fg-3);
-  cursor: default;
 }
 
 /* -- discover box (ADR-0015) -- */
@@ -1299,6 +1817,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease);
+}
+
+/* Unlike `.progress-row`, the whole row isn't the click target here — only
+   the text block is (the Follow button stays a separate action) — so the
+   hover treatment lives on `.discover-row-text`, not `.discover-row`.
+   `.discover-row` itself has no horizontal padding (it's the `.discover-box`
+   parent that carries the 14px side padding), and no vertical padding of its
+   own to reclaim on this element, so the negative-margin expansion reaches
+   left into the box's 14px padding and up/down into the row's 9px vertical
+   rhythm, rather than reusing `.progress-row:hover`'s -14px/8px figures
+   verbatim. */
+.discover-row-text:hover {
+  background: var(--bg-3);
+  margin: -9px 0 -9px -14px;
+  padding: 9px 0 9px 14px;
+  border-radius: 8px;
 }
 
 .discover-row-name {
@@ -1362,6 +1898,12 @@ body {
   background: var(--bg-2);
   padding: 18px 20px 20px;
   box-shadow: 0 20px 50px var(--shadow);
+}
+
+/* Wider variant for content that gets cramped at 380px — code/diagram
+   blocks opened full-size from Card.tsx. */
+.modal-panel-wide {
+  max-width: 640px;
 }
 
 .modal-head {
@@ -1460,6 +2002,64 @@ body {
 .modal-tier[data-passed="true"] svg {
   stroke: var(--good);
   opacity: 1;
+}
+
+/* The quiz action itself — moved here from the progress row (ADR-0017's
+   follow-up fix), since it's a real action with progression consequences,
+   not a status glance. */
+.modal-quiz {
+  display: block;
+  width: 100%;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.modal-quiz[data-locked="true"] {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--fg-3);
+  cursor: default;
+}
+
+/* Only present when this modal was opened from Discover, for a topic not
+   yet followed — an outline button (not a solid accent fill like the quiz
+   CTA) since it isn't gating anything, just an action. */
+.modal-follow {
+  display: block;
+  width: 100%;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.modal-follow:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.modal-follow:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .modal-engagement {

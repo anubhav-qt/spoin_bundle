@@ -41,6 +41,14 @@ class CardOut(BaseModel):
     #: line-clamp — truncation is the safety net, not the design.
     summary: str
     body: str
+    #: Content shapes present in `body` — "code", "diagram", "comparison", any
+    #: subset, `[]` for plain prose. Derived server-side from `body` itself
+    #: (ADR-0017), a rendering hint for which collapsed-preview shape to use.
+    archetype: list[str]
+    #: At most one true per subtopic (ADR-0017). The client renders this one
+    #: never-collapsed with anchor styling — it does not decide for itself
+    #: which card that is.
+    is_hero: bool
     created_at: datetime
 
 

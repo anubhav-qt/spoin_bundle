@@ -33,6 +33,11 @@
           "min_cards": 4,
           "cards": [
             {
+              "title": "A kubectl apply doesn't talk to the scheduler directly",
+              "summary": "Every actor in the system only ever talks to one thing: the API server.",
+              "body": "It's tempting to picture `kubectl apply` reaching out to \"the scheduler\" or \"a node\" directly. It never does - everything in the cluster, including the scheduler itself, only ever talks to the API server, which is backed by etcd as the single source of truth:\n\n```diagram\nkubectl --> API server --> etcd\n                |\n                +--> scheduler   (watches for unscheduled pods)\n                +--> kubelet     (watches for pods assigned to its node)\n```\n\nThe scheduler doesn't get a request \"place this pod\" - it's watching the API server for pods with no node assigned, same as the kubelet on every node is watching for pods assigned *to it*. Nothing in this diagram is called directly by anything else in it. That's the whole architecture: independent controllers, all converging on one shared state through one door."
+            },
+            {
               "title": "A pod is the unit of scheduling",
               "summary": "Kubernetes never schedules a container. It schedules a pod.",
               "body": "Kubernetes never schedules a container — it schedules a **pod**.\n\nA pod is one or more containers that share a network namespace and storage volumes. Containers in the same pod reach each other on `localhost` and are always placed on the same node, together, or not at all.\n\nThis matters the moment you try to scale: you scale pods, not containers. If you put two things in one pod that need to scale independently, you have made a mistake that is awkward to undo later."
@@ -323,6 +328,11 @@
               "title": "A container is a process, not a lightweight VM",
               "summary": "It shares the host kernel; isolation comes from namespaces and cgroups, not virtualization.",
               "body": "A container is an ordinary process on the host, isolated by Linux namespaces (its own view of processes, network, filesystem) and constrained by cgroups (CPU, memory limits). There is no hypervisor and no separate kernel.\n\nThat's why containers start in milliseconds where VMs take seconds, and also why a kernel-level exploit can escape a container in a way it never could a VM - the isolation boundary is thinner by design."
+            },
+            {
+              "title": "Reading a layer's real size with docker history",
+              "summary": "The image size you see isn't one number - it's a stack, and one command shows you the stack.",
+              "body": "Every instruction in a Dockerfile that touches the filesystem adds a layer, and `docker history` shows you exactly what each one cost.\n\n```bash\n$ docker history myapp:latest\nIMAGE          CREATED BY                                      SIZE\na1b2c3d4e5f6   CMD [\"node\" \"server.js\"]                        0B\nf6e5d4c3b2a1   RUN npm ci --production                         142MB\n9988776655aa   COPY package*.json ./                           4.2kB\n1122334455bb   FROM node:20-slim                               198MB\n```\n\nThe `RUN npm ci` layer is almost always the biggest line in a Node image - and it's also the one most Dockerfiles accidentally invalidate on every build by copying the full source before installing dependencies, instead of copying just `package*.json` first."
             }
           ]
         }
@@ -418,6 +428,11 @@
               "title": "A dataloader batches what would otherwise be N separate queries",
               "summary": "Per-request batching turns 'fetch this author' called 50 times into one query for 50 authors.",
               "body": "When a list of 50 posts each resolves its own `author` field independently, a naive resolver fires 50 separate 'fetch one author' queries. A **dataloader** batches all calls made within the same tick into a single `WHERE id IN (...)` query and hands each caller its slice of the result.\n\nThis is the standard fix for GraphQL's N+1 problem, and it's opt-in - nothing about the spec forces you to use one, which is why unoptimized GraphQL APIs are a very common performance complaint."
+            },
+            {
+              "title": "The over-fetching fix and the N+1 fix are two different problems",
+              "summary": "GraphQL is often sold as solving both at once. It only structurally solves one of them.",
+              "body": "It's a common misconception that adopting GraphQL automatically fixes both over-fetching and query-count explosions. Only one of those is actually built into the spec:\n\n❌ **GraphQL eliminates over-fetching** - technically true, but this is a REST framing, not a GraphQL one; over-fetching is a symptom of a rigid endpoint shape, and GraphQL's field selection genuinely fixes exactly that.\n\n✅ **GraphQL requires a resolver for every field, and naive resolvers cause N+1** - asking for 50 posts and each post's author, with no batching, is 51 round trips to the database: 1 for posts, 50 more for authors, one per post. The query language changed; the naive data-fetching pattern underneath it didn't.\n\nThe field-selection problem is solved by the spec itself. The N+1 problem is solved by a dataloader - a separate piece of infrastructure GraphQL does not give you for free."
             }
           ]
         }

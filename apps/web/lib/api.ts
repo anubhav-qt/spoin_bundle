@@ -16,6 +16,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"
 
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 
+/** Content shapes present in a card's `body`, derived server-side from the
+ *  markdown itself (never client-guessed) — see content/archetype.py on the
+ *  API. A card can carry more than one; rendering picks a priority order for
+ *  the collapsed teaser only, the expanded view always shows everything. */
+export type ArchetypeTag = "code" | "diagram" | "comparison";
+
 export interface Card {
   id: string;
   topic_id: string;
@@ -27,6 +33,10 @@ export interface Card {
   /** The collapsed-state hook — a purpose-written line, not a truncation of body. */
   summary: string;
   body: string;
+  archetype: ArchetypeTag[];
+  /** At most one true per subtopic (ADR-0017) — the client renders this card
+   *  never-collapsed with anchor styling; it does not decide for itself. */
+  is_hero: boolean;
   created_at: string;
 }
 
@@ -143,6 +153,11 @@ export const api = {
     request<Topic>(`/topics/${topicId}/subscribe`, { method: "POST" }),
 
   topicStats: (topicId: string) => request<TopicStats>(`/topics/${topicId}/stats`),
+
+  /** Dev-only (see api/routers/dev.py) — resets this user's progress and
+   *  unfollows a couple of topics back to Discover. Returns the refreshed
+   *  topic list. */
+  resetDemo: () => request<Topic[]>("/dev/reset", { method: "POST" }),
 
   sendEvents: (events: EngagementEvent[]) =>
     request<{ accepted: number; duplicates: number; rejected: number }>(

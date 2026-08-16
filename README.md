@@ -1,4 +1,4 @@
-# Slocho
+# Slocho → Spoin
 
 A swipeable feed of AI-generated knowledge flash cards. Pick topics, get bite-sized
 cards at your difficulty level, dig deeper with inline AI chat or personal notes.
@@ -6,6 +6,13 @@ cards at your difficulty level, dig deeper with inline AI chat or personal notes
 Web first; a React Native app comes later and shares this backend.
 
 ---
+
+> **The product is named Spoin.** The tree still says Slocho everywhere, and that is
+> deliberate: [ADR-0020](docs/adr/0020-rename-to-spoin.md) commits the rename to a single
+> mechanical sweep — package path, imports, database name, docs, mockups — because a
+> half-renamed tree makes "which name is current?" a question every future session has to
+> answer by reading code. Until task [0007](docs/tasks/0007-rename-to-spoin.md) runs,
+> **Slocho is the correct name to use in code and config.** Don't rename opportunistically.
 
 > **Status: early build.** Feed serving, engagement, and the web app's feed (visual design
 > in [ADR-0012](docs/adr/0012-feed-visual-design.md)) are live against seeded data.
@@ -27,6 +34,7 @@ rules that keep a new session from re-deriving context that already exists on di
 | Understand how Slocho works | [Architecture overview](docs/architecture/overview.md) |
 | Know what a card actually is | [Content model](docs/architecture/content-model.md) |
 | See the feed's visual design | [Mockups](docs/design/mockups/) ([ADR-0012](docs/adr/0012-feed-visual-design.md)) |
+| Know why cards are funny on purpose | [ADR-0021](docs/adr/0021-ascii-scene-library.md), [ADR-0022](docs/adr/0022-dual-titles.md) |
 | Know *why* something is the way it is | [ADR index](docs/adr/) |
 | **Find the work assigned to you** | **[Tasks](docs/tasks/)** |
 | Add a significant decision | [ADR template](docs/adr/TEMPLATE.md) |
@@ -45,6 +53,27 @@ personalization is ranking over a shared corpus, not per-user generation.
 
 If that's surprising, read the overview before writing code.
 
+## The card's personality — decided, not yet built
+
+Cards are meant to be funny enough to screenshot and honest enough to be quizzed on.
+Those two goals are kept from fighting by one rule:
+
+> **Silliness lives in the hook layer — title, summary, ASCII art. Never in `body`.**
+
+The explanation a user is tested on stays straight prose, which is also what keeps the
+quality gate's factual-accuracy and difficulty checks meaningful. What that buys, and what
+it costs:
+
+| Decision | Shape |
+|---|---|
+| [ADR-0021](docs/adr/0021-ascii-scene-library.md) — ASCII scenes | Cards can carry a stickman scene. The generator **picks from a hand-authored catalog and writes the dialogue; it never draws.** Models are unreliable at ASCII art and no quality-gate check can detect a broken drawing — the catalog is what replaces the missing detector. |
+| [ADR-0022](docs/adr/0022-dual-titles.md) — two titles | `title` is playful and shown on the feed face; `canonical_title` is literal and is what quizzes, progress lists, search, and the generation prompt read. Make the title playful without this and ADR-0007's duplicate prevention silently stops working. |
+| [ADR-0023](docs/adr/0023-reader-font-selection.md) — five reader fonts | Same mechanism as the five palettes. `--font-mono` is deliberately **not** part of the choice: ADR-0021's 40-column scenes are only real if the characters are fixed-width. |
+| [ADR-0020](docs/adr/0020-rename-to-spoin.md) — the name | Slocho → Spoin, as one atomic sweep. See the banner at the top. |
+
+None of the four is implemented. The schema fields they add are documented in
+[content-model.md](docs/architecture/content-model.md) and marked as such.
+
 ## Stack
 
 | Layer | Choice | Why |
@@ -56,6 +85,7 @@ If that's surprising, read the overview before writing code.
 | Embeddings | `fastembed` / BGE-small, **local** | free and unlimited; protects LLM quota |
 | Generation | Gemini Flash via LangChain, behind `ContentGenerator` | [ADR-0002](docs/adr/0002-langchain-behind-an-interface.md) |
 | Web | Next.js + TypeScript → Cloudflare Pages | Vercel Hobby forbids commercial use |
+| Typography | Five self-hosted OFL faces, user-selectable; mono locked | [ADR-0023](docs/adr/0023-reader-font-selection.md) |
 | API types | Generated from OpenAPI, checked in CI | [ADR-0001](docs/adr/0001-python-fastapi-over-node.md) |
 
 ## Planned layout

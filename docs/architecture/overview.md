@@ -3,6 +3,10 @@
 > Read this first. It is the mental model everything else assumes.
 > If you only read one document before touching the codebase, read this one.
 
+> **On the name:** the product is **Spoin**; the codebase is still `slocho` until the
+> single-sweep rename in [ADR-0020](../adr/0020-rename-to-spoin.md) / task
+> [0007](../tasks/0007-rename-to-spoin.md) runs. Nothing in this document changes with it.
+
 ## What Slocho is
 
 A swipeable feed of AI-generated knowledge flash cards. Users pick topics, receive
@@ -80,7 +84,7 @@ is why they are separated. You cannot tune them together.
 | Generation Planner | Deciding *what* to generate next, and in what priority | batch | free |
 | Job Queue | Durability, retries, parallelism | batch | free |
 | LLM Workers | Producing card content | seconds–minutes | **scarce (quota)** |
-| Quality Gate | Rejecting bad/duplicate cards before they reach the corpus | seconds | cheap |
+| Quality Gate | Rejecting bad/duplicate cards, and validating visual slots/reuse caps deterministically | seconds | cheap |
 | Feed Serving | Candidate generation, seen-filtering, ranking, pagination | **< 100ms** | cheap |
 | Engagement | Ingesting swipe/read/save events, aggregating into taste signals | ms write | cheap |
 | Quiz Bank | Questions generated from cards; sampling, seen-tracking | batch gen / ms read | cheap |
@@ -104,10 +108,20 @@ These are not style preferences. Breaking any of them breaks the architecture.
 7. **Every LLM interface takes a collection, never a single item.** The free tier meters
    requests, not tokens: batch everything, never economize on output size.
    See [ADR-0005](../adr/0005-batch-llm-calls.md).
+8. **The generator is trusted for taste, never for constraints.** Anything that must be
+   *true* is enforced or independently verified outside the model; anything that merely
+   needs to be *good* is the model's job. This is why the quality gate re-rates difficulty
+   rather than trusting the self-report, why `archetype` is derived
+   ([ADR-0017](../adr/0017-card-archetypes.md)), and why ASCII scene reuse and slot
+   lengths are checked server-side ([ADR-0021](../adr/0021-ascii-scene-library.md)).
+   A constraint stated only in a prompt is a wish.
 
 ## Where to go next
 
 - [ADR index](../adr/) — every significant decision and *why*
 - [content-model.md](content-model.md) — what a card actually is
+- [ADR-0021](../adr/0021-ascii-scene-library.md) / [ADR-0022](../adr/0022-dual-titles.md) —
+  how cards get a personality (ASCII scenes, playful titles) without the write path losing
+  the literal, machine-readable version of what a card teaches
 - `docs/architecture/generation-pipeline.md` — how the corpus gets filled *(not yet written)*
 - `docs/architecture/feed-algorithm.md` — candidate → filter → rank *(not yet written)*

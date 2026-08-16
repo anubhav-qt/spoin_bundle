@@ -28,12 +28,46 @@ and [ADR-0011](docs/adr/0011-engagement.md) before writing code — that trio de
 (SEEN semantics, event/state/aggregate separation, ranking inputs) that are easy to
 accidentally violate from the UI side without realizing it.
 
-## The rule that generalizes
+If a task touches **card content, titles, or generation prompts**, read
+[ADR-0021](docs/adr/0021-ascii-scene-library.md) and [ADR-0022](docs/adr/0022-dual-titles.md)
+first. Same reason: both define rules whose violation is *silent*. Free-form ASCII art and
+a single playful `title` both look fine on the handful of cards anyone actually eyeballs,
+and degrade everywhere else.
+
+## The name is Spoin; the tree still says Slocho
+
+Deliberate, not stale. [ADR-0020](docs/adr/0020-rename-to-spoin.md) commits the rename to
+one atomic sweep (task [0007](docs/tasks/0007-rename-to-spoin.md)) covering the package
+path, imports, database name, docs, and mockups together.
+
+**Until that task runs, `slocho` is correct in code and config.** Do not rename the files
+you happen to be touching — a half-renamed tree costs every future session more than
+either end state, because "which name is current?" stops being answerable from the docs.
+If you are asked to do the rename, do all of it in one commit and verify with
+`grep -ri slocho` returning zero.
+
+## The rules that generalize
 
 **No business logic in `apps/web`.** The web app talks to `apps/api` over HTTP exactly as
 the mobile app will. If the web client can do something the mobile client can't, that's a
 bug. When in doubt about whether something belongs in a component or the API, it belongs
 in the API.
+
+**The generator is trusted for taste, never for constraints.** Anything that must be
+*true* — a column budget, a reuse cap, a character limit, a difficulty rating — is
+enforced or independently verified outside the model. Anything that merely needs to be
+*good* — prose, a punchline, which scene fits an idea — is the model's job. This is one
+rule, not three: it is why the quality gate re-rates difficulty instead of trusting the
+self-report (content-model.md), why `archetype` is derived rather than requested
+([ADR-0017](docs/adr/0017-card-archetypes.md)), and why ASCII scene reuse is counted
+server-side rather than asked for in the prompt
+([ADR-0021](docs/adr/0021-ascii-scene-library.md)). When you catch yourself adding a
+"please keep this under N characters" line to a prompt, you want a check, not a sentence.
+
+**Silliness lives in the hook layer — title, summary, ASCII art. Never in `body`.** The
+product's claim is quiz-gated mastery of true things. A joke in the line that stops a
+scroll is charm; a joke in the explanation someone is tested on is noise, and it
+undermines the gate checks that operate on `body` as meaning.
 
 ## Keep the loop closed
 

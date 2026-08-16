@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from slocho.core.config import Settings
-from slocho.domain.enums import COMPLETION_KINDS, EngagementKind, SeenState
+from slocho.domain.enums import COMPLETION_KINDS, CardStatus, EngagementKind, SeenState
 from slocho.domain.models import (
     Card,
     CardBookmark,
@@ -240,7 +240,12 @@ class EngagementService:
             )
         )
         total_count = await self._session.scalar(
-            select(func.count()).select_from(Card).where(Card.subtopic_id == row["subtopic_id"])
+            select(func.count())
+            .select_from(Card)
+            .where(
+                Card.subtopic_id == row["subtopic_id"],
+                Card.status == CardStatus.ACTIVE,
+            )
         )
 
         await self._session.execute(

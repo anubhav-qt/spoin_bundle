@@ -18,10 +18,14 @@ const STORAGE_KEY = "slocho-palette";
 const DEFAULT_PALETTE = "notebook";
 
 const PALETTES = [
-  { key: "copper", name: "Copper Board" },
-  { key: "cyanotype", name: "Cyanotype" },
-  { key: "phosphor", name: "Phosphor" },
   { key: "notebook", name: "Notebook" },
+  { key: "copper", name: "Copper Board" },
+  // Display names, not the `data-palette`/localStorage keys (ADR-0016 kept
+  // the keys "cyanotype"/"phosphor" stable for persistence, but their
+  // identities changed entirely, so the name shown on hover is renamed to
+  // match what they actually look like now.
+  { key: "cyanotype", name: "Skylight" },
+  { key: "phosphor", name: "Obsidian" },
   { key: "scope", name: "Oscilloscope" },
 ] as const;
 

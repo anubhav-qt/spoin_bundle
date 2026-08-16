@@ -61,26 +61,28 @@ export function DiscoverBox({ onFollowed }: Props) {
 
       {mode === "for_you" ? <p className="discover-note mono">Personalizing soon</p> : null}
 
-      {items.length === 0 ? (
-        <p className="discover-empty mono">Nothing new to discover right now</p>
-      ) : (
-        items.map((item) => (
-          <div key={item.topic_id} className="discover-row">
-            <div className="discover-row-text">
-              <span className="discover-row-name">{item.display_name}</span>
-              <span className="discover-row-meta mono">{item.subscriber_count} followers</span>
+      <div className="discover-box-list">
+        {items.length === 0 ? (
+          <p className="discover-empty mono">Nothing new to discover right now</p>
+        ) : (
+          items.map((item) => (
+            <div key={item.topic_id} className="discover-row">
+              <div className="discover-row-text">
+                <span className="discover-row-name">{item.display_name}</span>
+                <span className="discover-row-meta mono">{item.subscriber_count} followers</span>
+              </div>
+              <button
+                type="button"
+                className="discover-follow"
+                disabled={followingId === item.topic_id}
+                onClick={() => void follow(item.topic_id)}
+              >
+                Follow
+              </button>
             </div>
-            <button
-              type="button"
-              className="discover-follow"
-              disabled={followingId === item.topic_id}
-              onClick={() => void follow(item.topic_id)}
-            >
-              Follow
-            </button>
-          </div>
-        ))
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

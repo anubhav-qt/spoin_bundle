@@ -69,45 +69,47 @@
   --line-strong: rgba(231, 237, 231, 0.22);
   --good: #7fbf95;
   --shadow: rgba(0, 0, 0, 0.45);
-  --texture: none;
+  --texture: repeating-linear-gradient(0deg, rgba(231, 237, 231, 0.04) 0px, rgba(231, 237, 231, 0.04) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(231, 237, 231, 0.04) 0px, rgba(231, 237, 231, 0.04) 1px, transparent 1px, transparent 22px);
 }
 
+/* Cyanotype — the light counterpart to Phosphor below: soft, pale blueprint
+   blue with muted ink, not a stark white/black theme. */
 [data-palette="cyanotype"] {
-  --bg: #0f2a4a;
-  --bg-2: #163a63;
-  --bg-3: #1e4a7d;
-  --fg: #eaf2fb;
-  --fg-2: #b7cbe3;
-  --fg-3: #7e9cc0;
-  --accent: #d9a441;
-  --accent-2: #c68f31;
-  --line: rgba(234, 242, 251, 0.16);
-  --line-strong: rgba(234, 242, 251, 0.28);
-  --good: #8fd9c4;
-  --shadow: rgba(3, 12, 24, 0.55);
-  --texture: none;
+  --bg: #e8f0f7;
+  --bg-2: #dce8f2;
+  --bg-3: #cddfec;
+  --fg: #1e3448;
+  --fg-2: #4c6478;
+  --fg-3: #7891a3;
+  --accent: #3f7ea3;
+  --accent-2: #2f6486;
+  --line: rgba(30, 52, 72, 0.12);
+  --line-strong: rgba(30, 52, 72, 0.24);
+  --good: #4a8f76;
+  --shadow: rgba(30, 52, 72, 0.16);
+  --texture: repeating-linear-gradient(0deg, rgba(30, 52, 72, 0.045) 0px, rgba(30, 52, 72, 0.045) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(30, 52, 72, 0.045) 0px, rgba(30, 52, 72, 0.045) 1px, transparent 1px, transparent 22px);
 }
 
+/* Phosphor — true black-and-gray dark theme, no hue at all (Copper already
+   owns the dark-with-a-warm-accent look, so this one stays strictly
+   monochrome to read as distinct rather than a near-duplicate). */
 [data-palette="phosphor"] {
-  --bg: #0a0d0a;
-  --bg-2: #111611;
-  --bg-3: #182018;
-  --fg: #d3e0d3;
-  --fg-2: #93a896;
-  --fg-3: #5c6e5e;
-  --accent: #4fe38a;
-  --accent-2: #38c271;
-  --line: rgba(79, 227, 138, 0.14);
-  --line-strong: rgba(79, 227, 138, 0.26);
-  --good: #4fe38a;
+  --bg: #0b0b0c;
+  --bg-2: #141415;
+  --bg-3: #1e1e1f;
+  --fg: #e6e6e7;
+  --fg-2: #a3a3a5;
+  --fg-3: #6c6c6f;
+  --accent: #f4f4f5;
+  --accent-2: #d4d4d6;
+  --line: rgba(230, 230, 231, 0.12);
+  --line-strong: rgba(230, 230, 231, 0.24);
+  --good: #b8b8ba;
   --shadow: rgba(0, 0, 0, 0.6);
-  --texture: repeating-linear-gradient(
-    180deg,
-    rgba(79, 227, 138, 0.035) 0px,
-    rgba(79, 227, 138, 0.035) 1px,
-    transparent 1px,
-    transparent 3px
-  );
+  --texture: repeating-linear-gradient(0deg, rgba(230, 230, 231, 0.045) 0px, rgba(230, 230, 231, 0.045) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(230, 230, 231, 0.045) 0px, rgba(230, 230, 231, 0.045) 1px, transparent 1px, transparent 22px);
 }
 
 [data-palette="scope"] {
@@ -123,7 +125,8 @@
   --line-strong: rgba(227, 236, 242, 0.22);
   --good: #38c6d9;
   --shadow: rgba(0, 0, 0, 0.5);
-  --texture: none;
+  --texture: repeating-linear-gradient(0deg, rgba(227, 236, 242, 0.04) 0px, rgba(227, 236, 242, 0.04) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(227, 236, 242, 0.04) 0px, rgba(227, 236, 242, 0.04) 1px, transparent 1px, transparent 22px);
 }
 
 *,
@@ -944,15 +947,15 @@ body {
 .theme-pill-swatch[data-palette-preview="copper"] i:nth-child(3) { background: #c97a4a; }
 .theme-pill-swatch[data-palette-preview="copper"] i:nth-child(4) { background: #7fbf95; }
 
-.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(1) { background: #0f2a4a; }
-.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(2) { background: #d9a441; }
-.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(3) { background: #c68f31; }
-.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(4) { background: #8fd9c4; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(1) { background: #e8f0f7; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(2) { background: #3f7ea3; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(3) { background: #2f6486; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(4) { background: #4a8f76; }
 
-.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(1) { background: #0a0d0a; }
-.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(2) { background: #4fe38a; }
-.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(3) { background: #38c271; }
-.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(4) { background: #4fe38a; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(1) { background: #0b0b0c; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(2) { background: #f4f4f5; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(3) { background: #d4d4d6; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(4) { background: #b8b8ba; }
 
 .theme-pill-swatch[data-palette-preview="notebook"] i:nth-child(1) { background: #edf0ea; }
 .theme-pill-swatch[data-palette-preview="notebook"] i:nth-child(2) { background: #c1442b; }
@@ -995,6 +998,56 @@ body {
 .rail-right .topic-rail {
   margin: 0;
   padding: 0 0 4px;
+  /* Flex items default to `min-width: auto`, which for a row of
+     `flex: 0 0 auto` chips is the sum of every chip's width — with no
+     explicit min-width the rail grows to fit all chips instead of being
+     clamped by its column-flex parent, so `overflow-x: auto` above never
+     has anything to actually clip/scroll. */
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Wraps the rail with click targets for horizontal scroll — the rail itself
+   scrolls fine by wheel/trackpad/drag, but nothing on screen signals that. */
+.topic-rail-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.topic-rail-arrow {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), opacity var(--dur-1) var(--ease);
+}
+
+.topic-rail-arrow svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.topic-rail-arrow:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.topic-rail-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
 }
 
 .rail-right .topic-chip {
@@ -1008,7 +1061,13 @@ body {
 .insights-panel {
   display: flex;
   align-items: center;
-  gap: 16px;
+  /* `justify-content: center` (rather than the default flex-start) balances
+     the ring + stats as a group in the middle of the box — left-aligned,
+     the pair only ever fills its own content width and everything left over
+     collects as dead space on the right, reading as misaligned rather than
+     a deliberate layout. */
+  justify-content: center;
+  gap: 24px;
   height: 108px;
   padding: 0 16px;
   border: 1px solid var(--line);
@@ -1083,6 +1142,20 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-3);
+}
+
+/* Fixed to ~5 rows' worth of height regardless of how many topics are
+   followed — fewer than 5 leaves matching empty space rather than the box
+   shrinking, more than 5 scrolls internally, so the box never pushes
+   `.rail-right`'s own height around. */
+.progress-box-list {
+  height: 258px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.progress-box-list::-webkit-scrollbar {
+  display: none;
 }
 
 .progress-row {
@@ -1197,6 +1270,17 @@ body {
   color: var(--fg-3);
 }
 
+/* Same fixed-height/overflow-scroll treatment as `.progress-box-list`. */
+.discover-box-list {
+  height: 290px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.discover-box-list::-webkit-scrollbar {
+  display: none;
+}
+
 .discover-row {
   display: flex;
   align-items: center;
@@ -1264,8 +1348,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: color-mix(in srgb, var(--fg) 40%, transparent);
-  backdrop-filter: blur(3px);
+  background: color-mix(in srgb, var(--fg) 22%, transparent);
+  backdrop-filter: blur(1.5px);
 }
 
 .modal-panel {

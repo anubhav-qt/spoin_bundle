@@ -45,6 +45,7 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
   const sentinel = useRef<HTMLDivElement>(null);
   const position = useRef<number | undefined>(undefined);
+  const loadingMoreRef = useRef(false);
 
   const topicName = useCallback(
     (topicId: string) => topics.find((t) => t.id === topicId)?.display_name ?? "",
@@ -95,6 +96,7 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
       } finally {
         setLoading(false);
         setLoadingMore(false);
+        loadingMoreRef.current = false;
       }
     },
     [selected],
@@ -105,13 +107,25 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
   }, [loadPage]);
 
   // -- infinite scroll -------------------------------------------------------
+  // `loadingMore` is read via a ref, not a dependency: keeping it out of the
+  // deps array means the observer is created once per exhausted/loading
+  // transition and only reacts to real intersection changes. Depending on
+  // `loadingMore` directly used to tear down and recreate the observer on
+  // every fetch start/end, and IntersectionObserver fires its callback
+  // immediately on `observe()` with the sentinel's current state — with the
+  // generous 600px rootMargin, the sentinel is often still intersecting right
+  // after a page loads, so the recreated observer would immediately fire a
+  // second, spurious `loadPage` with no real user scroll behind it.
   useEffect(() => {
     const node = sentinel.current;
     if (node === null || exhausted || loading) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !loadingMore) void loadPage(false);
+        if (entry.isIntersecting && !loadingMoreRef.current) {
+          loadingMoreRef.current = true;
+          void loadPage(false);
+        }
       },
       // Prefetch a screen early, so the next page is usually already there.
       { rootMargin: "600px" },
@@ -119,7 +133,7 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [exhausted, loading, loadingMore, loadPage]);
+  }, [exhausted, loading, loadPage]);
 
   const markSeen = useCallback(
     (cardId: string) => {

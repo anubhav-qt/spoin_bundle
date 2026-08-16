@@ -27,14 +27,16 @@ export function TopicsProgressBox({ topics, progress }: Props) {
     <div className="progress-box">
       <h3 className="progress-box-title mono">Your topics</h3>
 
-      {topics.map((topic) => (
-        <TopicProgressRow
-          key={topic.id}
-          topic={topic}
-          progress={progress[topic.id]}
-          onOpen={() => setOpenTopicId(topic.id)}
-        />
-      ))}
+      <div className="progress-box-list">
+        {topics.map((topic) => (
+          <TopicProgressRow
+            key={topic.id}
+            topic={topic}
+            progress={progress[topic.id]}
+            onOpen={() => setOpenTopicId(topic.id)}
+          />
+        ))}
+      </div>
 
       {openTopic !== null ? (
         <TopicStatsModal

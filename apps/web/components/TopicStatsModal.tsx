@@ -5,9 +5,22 @@
  * plus engagement counts (likes/saves/notes/shares — ask-AI excluded, per
  * instruction, since it isn't a comprehension/ownership signal the way the
  * other four are).
+ *
+ * Rendered via a portal into `document.body`, not in place. This component
+ * is mounted from TopicsProgressBox, which lives inside `.rail-right` — a
+ * `position: sticky` element with its own `overflow-y: auto` scroll. Sticky
+ * and fixed elements always create a stacking context (CSS Position spec),
+ * so a `.modal-overlay` nested there is still stacked *within* `.rail-right`'s
+ * context rather than at the document root: card titles and other positioned
+ * content elsewhere in the tree (`.station`'s sticky headers, `.notice`'s
+ * `z-index: 2`) could end up painting through it depending on compositor
+ * layer order, `z-index: 100` notwithstanding. A portal makes `.modal-overlay`
+ * an actual direct child of `<body>`, sidestepping the ancestor entirely
+ * instead of trying to out-layer it with `transform`/`will-change` hacks.
  */
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { api, type Difficulty, type TopicStats } from "@/lib/api";
 import { CheckIcon, HeartIcon, BookmarkIcon, NoteIcon, ShareIcon } from "./icons";
@@ -44,7 +57,17 @@ export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
+  // The thread scrolls at the window/body level (no inner scroll container),
+  // so without this the feed keeps scrolling right underneath an open modal.
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-panel"
@@ -104,6 +127,7 @@ export function TopicStatsModal({ topicId, topicName, onClose }: Props) {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

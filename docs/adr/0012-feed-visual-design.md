@@ -93,10 +93,18 @@ arbitrary hue choice:
 | Key | Name | Reference | Natural mode |
 |---|---|---|---|
 | `copper` | Copper Board | populated PCB, copper trace on dark laminate | dark |
-| `cyanotype` | Cyanotype | the actual chemical-print blueprint blue | dark |
-| `phosphor` | Phosphor | CRT terminal glow, desaturated so body text stays readable | dark |
+| `cyanotype` | Cyanotype | ~~the actual chemical-print blueprint blue~~ — see below | light |
+| `phosphor` | Phosphor | ~~CRT terminal glow, desaturated so body text stays readable~~ — see below | dark |
 | `notebook` | Notebook | squared engineering paper, graphite ink, red-pencil accent | light |
 | `scope` | Oscilloscope | dual-trace readout, cyan primary + amber secondary channel | dark |
+
+> **Superseded in part by [ADR-0016](0016-theme-consolidation.md):** Copper Board and
+> Phosphor converged visually (both near-black with one warm/green accent), and Notebook
+> was the only light palette. `phosphor` and `cyanotype` were redefined — Phosphor to a
+> strictly monochrome black/gray dark theme, Cyanotype to a soft, light blue-toned theme —
+> rather than kept as the chemical-print/CRT identities described in this table. The keys
+> and the "five full palettes, not light/dark toggle" decision below still stand; only
+> those two identities changed.
 
 **All five ship.** This is a departure from the usual "pick one, design light and dark
 variants of it" approach: each palette here is a full, deliberate world (per

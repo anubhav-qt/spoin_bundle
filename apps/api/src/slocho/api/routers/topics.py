@@ -14,7 +14,7 @@ from slocho.api.schemas import (
     TopicOut,
     TopicStatsOut,
 )
-from slocho.domain.enums import Difficulty, EngagementKind, SeenState
+from slocho.domain.enums import CardStatus, Difficulty, EngagementKind, SeenState
 from slocho.domain.models import (
     Card,
     CardBookmark,
@@ -259,7 +259,11 @@ async def _tier_coverage(
                 UserCardState,
                 (UserCardState.card_id == Card.id) & (UserCardState.user_id == user_id),
             )
-            .where(Subtopic.topic_id == topic_id, Subtopic.difficulty == tier)
+            .where(
+                Subtopic.topic_id == topic_id,
+                Subtopic.difficulty == tier,
+                (Card.id.is_(None)) | (Card.status == CardStatus.ACTIVE),
+            )
             .group_by(Subtopic.id)
         )
     ).all()

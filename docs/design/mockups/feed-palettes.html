@@ -19,39 +19,51 @@
   --line-strong: rgba(231, 237, 231, 0.22);
   --good: #7FBF95;
   --shadow: rgba(0, 0, 0, 0.45);
-  --texture: none;
+  --texture:
+    repeating-linear-gradient(0deg, rgba(231,237,231,0.04) 0px, rgba(231,237,231,0.04) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(231,237,231,0.04) 0px, rgba(231,237,231,0.04) 1px, transparent 1px, transparent 22px);
 }
 
+/* Cyanotype — redefined by ADR-0016 as the soft light-blue counterpart to
+   Notebook, replacing the original deep-Prussian-blue "actual blueprint
+   print" identity (superseded — see ADR-0016). */
 body[data-palette="cyanotype"] {
-  --bg: #0F2A4A;
-  --bg-2: #163A63;
-  --bg-3: #1E4A7D;
-  --fg: #EAF2FB;
-  --fg-2: #B7CBE3;
-  --fg-3: #7E9CC0;
-  --accent: #D9A441;
-  --accent-2: #C68F31;
-  --line: rgba(234, 242, 251, 0.16);
-  --line-strong: rgba(234, 242, 251, 0.28);
-  --good: #8FD9C4;
-  --shadow: rgba(3, 12, 24, 0.55);
-  --texture: none;
+  --bg: #E8F0F7;
+  --bg-2: #DCE8F2;
+  --bg-3: #CDDFEC;
+  --fg: #1E3448;
+  --fg-2: #4C6478;
+  --fg-3: #7891A3;
+  --accent: #3F7EA3;
+  --accent-2: #2F6486;
+  --line: rgba(30, 52, 72, 0.12);
+  --line-strong: rgba(30, 52, 72, 0.24);
+  --good: #4A8F76;
+  --shadow: rgba(30, 52, 72, 0.16);
+  --texture:
+    repeating-linear-gradient(0deg, rgba(30,52,72,0.045) 0px, rgba(30,52,72,0.045) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(30,52,72,0.045) 0px, rgba(30,52,72,0.045) 1px, transparent 1px, transparent 22px);
 }
 
+/* Phosphor — redefined by ADR-0016 as a strictly monochrome black/gray dark
+   theme, replacing the original CRT-green-glow identity (superseded — see
+   ADR-0016), which had converged visually with Copper Board. */
 body[data-palette="phosphor"] {
-  --bg: #0A0D0A;
-  --bg-2: #111611;
-  --bg-3: #182018;
-  --fg: #D3E0D3;
-  --fg-2: #93A896;
-  --fg-3: #5C6E5E;
-  --accent: #4FE38A;
-  --accent-2: #38C271;
-  --line: rgba(79, 227, 138, 0.14);
-  --line-strong: rgba(79, 227, 138, 0.26);
-  --good: #4FE38A;
+  --bg: #0B0B0C;
+  --bg-2: #141415;
+  --bg-3: #1E1E1F;
+  --fg: #E6E6E7;
+  --fg-2: #A3A3A5;
+  --fg-3: #6C6C6F;
+  --accent: #F4F4F5;
+  --accent-2: #D4D4D6;
+  --line: rgba(230, 230, 231, 0.12);
+  --line-strong: rgba(230, 230, 231, 0.24);
+  --good: #B8B8BA;
   --shadow: rgba(0, 0, 0, 0.6);
-  --texture: repeating-linear-gradient(180deg, rgba(79,227,138,0.035) 0px, rgba(79,227,138,0.035) 1px, transparent 1px, transparent 3px);
+  --texture:
+    repeating-linear-gradient(0deg, rgba(230,230,231,0.045) 0px, rgba(230,230,231,0.045) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(230,230,231,0.045) 0px, rgba(230,230,231,0.045) 1px, transparent 1px, transparent 22px);
 }
 
 body[data-palette="notebook"] {
@@ -85,7 +97,9 @@ body[data-palette="scope"] {
   --line-strong: rgba(227, 236, 242, 0.22);
   --good: #38C6D9;
   --shadow: rgba(0, 0, 0, 0.5);
-  --texture: none;
+  --texture:
+    repeating-linear-gradient(0deg, rgba(227,236,242,0.04) 0px, rgba(227,236,242,0.04) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(227,236,242,0.04) 0px, rgba(227,236,242,0.04) 1px, transparent 1px, transparent 22px);
 }
 
 * { box-sizing: border-box; }
@@ -379,6 +393,15 @@ body {
 <script>
 const PALETTES = [
   {
+    key: "notebook", name: "Notebook", dot: "#C1442B",
+    tagline: "Squared engineering paper",
+    copy: "The shipped default: pale grid paper with a graphite ink for text and a red-pencil accent for the moments that matter — like margin corrections in a real engineering notebook.",
+    swatches: [
+      { name: "Paper", hex: "#EDF0EA" }, { name: "Grid", hex: "#D6DDD1" },
+      { name: "Graphite", hex: "#262A22" }, { name: "Red pencil", hex: "#C1442B" },
+    ],
+  },
+  {
     key: "copper", name: "Copper Board", dot: "#E2985F",
     tagline: "Populated circuit board",
     copy: "Near-black board laminate with copper trace as the only warm note — like looking down at a populated PCB under work light. Signals feel etched in, not decorated on.",
@@ -388,30 +411,21 @@ const PALETTES = [
     ],
   },
   {
-    key: "cyanotype", name: "Cyanotype", dot: "#D9A441",
-    tagline: "The blueprint itself",
-    copy: "The actual color of a cyanotype print — the process blueprints were made with before it became a metaphor. Deep Prussian blue ground, chalk-white linework, a brass/gold accent standing in for the drafter's pencil.",
+    key: "cyanotype", name: "Skylight", dot: "#3F7EA3",
+    tagline: "Soft blueprint wash",
+    copy: "A light second option next to Notebook, with its own personality: pale blueprint-blue paper, muted ink-blue text, and a soft blue accent instead of graphite and red pencil. (ADR-0016 — redefined from the original deep Prussian-blue \"Cyanotype\" print identity, which was dark-native; renamed to match, `data-palette` key unchanged.)",
     swatches: [
-      { name: "Print", hex: "#0F2A4A" }, { name: "Wash", hex: "#163A63" },
-      { name: "Chalk", hex: "#EAF2FB" }, { name: "Brass", hex: "#D9A441" },
+      { name: "Wash", hex: "#E8F0F7" }, { name: "Paper", hex: "#DCE8F2" },
+      { name: "Ink", hex: "#1E3448" }, { name: "Blue", hex: "#3F7EA3" },
     ],
   },
   {
-    key: "phosphor", name: "Phosphor", dot: "#4FE38A",
-    tagline: "CRT terminal glow",
-    copy: "A warm near-black rather than true black, with a faint scanline texture and a desaturated phosphor green reserved for accents and headings so long-form body text stays readable — the terminal aesthetic without the eye strain.",
+    key: "phosphor", name: "Obsidian", dot: "#F4F4F5",
+    tagline: "Black and shades of gray",
+    copy: "A strictly monochrome dark theme — no hue anywhere, just a black ground and a grayscale ramp from body text up to a near-white accent. (ADR-0016 — redefined from the original CRT \"Phosphor\" green identity, which read too close to Copper Board; renamed to match, `data-palette` key unchanged.)",
     swatches: [
-      { name: "Tube", hex: "#0A0D0A" }, { name: "Glass", hex: "#111611" },
-      { name: "Text", hex: "#D3E0D3" }, { name: "Phosphor", hex: "#4FE38A" },
-    ],
-  },
-  {
-    key: "notebook", name: "Notebook", dot: "#C1442B",
-    tagline: "Squared engineering paper",
-    copy: "The one light option: pale grid paper with a graphite ink for text and a red-pencil accent for the moments that matter — like margin corrections in a real engineering notebook.",
-    swatches: [
-      { name: "Paper", hex: "#EDF0EA" }, { name: "Grid", hex: "#D6DDD1" },
-      { name: "Graphite", hex: "#262A22" }, { name: "Red pencil", hex: "#C1442B" },
+      { name: "Black", hex: "#0B0B0C" }, { name: "Panel", hex: "#141415" },
+      { name: "Text", hex: "#E6E6E7" }, { name: "White", hex: "#F4F4F5" },
     ],
   },
   {

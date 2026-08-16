@@ -48,3 +48,7 @@ useful than the decision itself.
 | [0009](0009-quiz-gated-progression.md) | Quiz-gated difficulty progression | Accepted |
 | [0010](0010-feed-serving.md) | Feed serving: stratified selection, linear ranking, slate pagination | Accepted |
 | [0011](0011-engagement.md) | Engagement: append-only events, mutable state, derived aggregates | Accepted |
+| [0012](0012-feed-visual-design.md) | Feed visual design: Thread layout, five committed palettes | Accepted |
+| [0013](0013-topic-relationship-graph.md) | Topic-relationship graph: request-time embedding similarity, topics as nodes | Superseded by 0014 |
+| [0014](0014-progress-insights-panel.md) | Right-rail insights: a progress-stats panel, not a relationship graph | Accepted |
+| [0015](0015-topic-progress-and-discovery.md) | Per-topic progress box, engagement-stats modal, and topic discovery | Accepted |

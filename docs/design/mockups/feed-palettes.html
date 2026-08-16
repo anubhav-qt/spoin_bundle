@@ -1,0 +1,485 @@
+<title>Feed Palettes</title>
+<style>
+/* ============================================================
+   Base tokens — palette A (Copper Board) is the default on :root;
+   each palette overrides the same token set on [data-palette="x"].
+   Every one of these five is a deliberate single-world commitment,
+   not a light/dark pair — see the rationale under each tab.
+   ============================================================ */
+:root {
+  --bg: #0B1613;
+  --bg-2: #10201B;
+  --bg-3: #162B23;
+  --fg: #E7EDE7;
+  --fg-2: #A9B8AE;
+  --fg-3: #6D8078;
+  --accent: #E2985F;
+  --accent-2: #C97A4A;
+  --line: rgba(231, 237, 231, 0.12);
+  --line-strong: rgba(231, 237, 231, 0.22);
+  --good: #7FBF95;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --texture: none;
+}
+
+body[data-palette="cyanotype"] {
+  --bg: #0F2A4A;
+  --bg-2: #163A63;
+  --bg-3: #1E4A7D;
+  --fg: #EAF2FB;
+  --fg-2: #B7CBE3;
+  --fg-3: #7E9CC0;
+  --accent: #D9A441;
+  --accent-2: #C68F31;
+  --line: rgba(234, 242, 251, 0.16);
+  --line-strong: rgba(234, 242, 251, 0.28);
+  --good: #8FD9C4;
+  --shadow: rgba(3, 12, 24, 0.55);
+  --texture: none;
+}
+
+body[data-palette="phosphor"] {
+  --bg: #0A0D0A;
+  --bg-2: #111611;
+  --bg-3: #182018;
+  --fg: #D3E0D3;
+  --fg-2: #93A896;
+  --fg-3: #5C6E5E;
+  --accent: #4FE38A;
+  --accent-2: #38C271;
+  --line: rgba(79, 227, 138, 0.14);
+  --line-strong: rgba(79, 227, 138, 0.26);
+  --good: #4FE38A;
+  --shadow: rgba(0, 0, 0, 0.6);
+  --texture: repeating-linear-gradient(180deg, rgba(79,227,138,0.035) 0px, rgba(79,227,138,0.035) 1px, transparent 1px, transparent 3px);
+}
+
+body[data-palette="notebook"] {
+  --bg: #EDF0EA;
+  --bg-2: #E2E7DE;
+  --bg-3: #D6DDD1;
+  --fg: #262A22;
+  --fg-2: #565F51;
+  --fg-3: #838C7D;
+  --accent: #C1442B;
+  --accent-2: #A83A24;
+  --line: rgba(38, 42, 34, 0.14);
+  --line-strong: rgba(38, 42, 34, 0.26);
+  --good: #4C7A5A;
+  --shadow: rgba(38, 42, 34, 0.18);
+  --texture:
+    repeating-linear-gradient(0deg, rgba(38,42,34,0.05) 0px, rgba(38,42,34,0.05) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(38,42,34,0.05) 0px, rgba(38,42,34,0.05) 1px, transparent 1px, transparent 22px);
+}
+
+body[data-palette="scope"] {
+  --bg: #0D1116;
+  --bg-2: #141B22;
+  --bg-3: #1C2730;
+  --fg: #E3ECF2;
+  --fg-2: #98ADBB;
+  --fg-3: #5E7180;
+  --accent: #38C6D9;
+  --accent-2: #E8A33D;
+  --line: rgba(227, 236, 242, 0.12);
+  --line-strong: rgba(227, 236, 242, 0.22);
+  --good: #38C6D9;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --texture: none;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 48px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mono { font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace; }
+
+/* ---------------- intro ---------------- */
+.intro { max-width: 640px; text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.eyebrow {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600;
+}
+.intro h1 { font-size: 1.9rem; line-height: 1.15; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.intro p { color: var(--fg-2); font-size: 0.98rem; line-height: 1.55; margin: 0; text-wrap: balance; }
+
+/* ---------------- tabs ---------------- */
+.tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; flex-wrap: wrap; justify-content: center; }
+.tab {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.76rem; letter-spacing: 0.02em; padding: 9px 15px; border-radius: 7px; border: none;
+  background: transparent; color: var(--fg-2); cursor: pointer; transition: background 0.15s ease, color 0.15s ease;
+  display: flex; align-items: center; gap: 7px;
+}
+.tab .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { background: var(--bg); color: var(--accent); box-shadow: 0 1px 0 var(--line-strong); }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------------- palette copy + swatches ---------------- */
+.palette-copy { max-width: 640px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
+.palette-copy h2 { font-size: 1.15rem; margin: 0; letter-spacing: -0.005em; }
+.palette-copy p { color: var(--fg-2); font-size: 0.92rem; line-height: 1.55; margin: 0; text-wrap: balance; }
+
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 640px; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.swatch .chip { width: 46px; height: 46px; border-radius: 9px; border: 1px solid var(--line-strong); }
+.swatch .label { font-size: 0.68rem; color: var(--fg-3); font-family: ui-monospace, monospace; text-align: center; }
+.swatch .label b { display: block; color: var(--fg-2); font-family: ui-sans-serif, sans-serif; font-size: 0.7rem; font-weight: 600; }
+
+/* ---------------- device frame (thread) ---------------- */
+.frame {
+  width: 380px; height: 720px; background: var(--bg-2); border: 1px solid var(--line-strong);
+  border-radius: 26px; box-shadow: 0 24px 60px -20px var(--shadow); overflow: hidden; position: relative;
+  display: flex; flex-direction: column; background-image: var(--texture);
+  /* Forces its own compositing layer with paint containment — without this the
+     sticky station label (two levels down, inside the scrolling thread) can
+     paint a ghost sliver of the element above it, because its clipping
+     ancestor has both border-radius and overflow:hidden. */
+  contain: layout paint;
+  transform: translateZ(0);
+}
+.statusbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 6px;
+  font-family: ui-monospace, monospace; font-size: 0.68rem; color: var(--fg-3); flex-shrink: 0; }
+.pips { display: inline-flex; gap: 3px; vertical-align: middle; }
+.pips i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-strong); display: inline-block; }
+.pips i[data-on="true"] { background: var(--accent); }
+
+.thread-scroll { flex: 1; overflow-y: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; }
+.station-head { display: flex; align-items: baseline; gap: 8px; padding: 18px 4px 10px; position: sticky; top: 0;
+  background: linear-gradient(var(--bg-2) 70%, transparent); z-index: 2; }
+.station-head .stub { width: 14px; height: 1px; background: var(--line-strong); }
+.station-head span { font-family: ui-monospace, monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-3); }
+
+.tcard { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 14px 15px 12px;
+  margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s ease; }
+.tcard:hover { border-color: var(--line-strong); }
+.tcard[data-open="true"] { border-color: var(--accent); }
+.tcard-head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.tcard-head .topic { font-family: ui-monospace, monospace; font-size: 0.63rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); }
+.tcard h3 { font-size: 0.98rem; margin: 0 0 4px; line-height: 1.3; letter-spacing: -0.005em; }
+.tcard .summary { font-size: 0.82rem; color: var(--fg-2); line-height: 1.45; margin: 0; }
+.tcard-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.22s ease; }
+.tcard[data-open="true"] .tcard-body { grid-template-rows: 1fr; }
+.tcard-body-inner { overflow: hidden; }
+.tcard-body p { font-size: 0.84rem; line-height: 1.6; color: var(--fg); margin: 10px 0 0; }
+.tcard-body strong { color: var(--accent); font-weight: 600; }
+.tcard-body code { background: var(--bg-3); padding: 1px 5px; border-radius: 4px; font-size: 0.8em; }
+.tcard-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding-top: 2px; }
+.tcard-actions button { background: none; border: none; padding: 0; cursor: pointer; }
+
+/* Every action is the same circular outline shape — quiet until touched, no
+   label needed once the glyph itself is legible at a glance. */
+.tcard-action-icon {
+  width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
+  border: 1px solid var(--line); background: transparent; color: var(--fg-3);
+  display: flex; align-items: center; justify-content: center;
+}
+.tcard-action-icon svg { width: 14px; height: 14px; }
+.tcard-action-icon:hover { border-color: var(--line-strong); color: var(--fg); }
+
+.tcard-actions-spacer { flex: 1; }
+
+/* The only action that skips reading and marks the card seen directly, so it
+   sits apart from the rest by both position and spacing — extreme right, its
+   own circular shape, not just another item in the row. */
+.tcard-gotit-icon {
+  width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: transparent; color: var(--fg-3);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.tcard-gotit-icon svg { width: 14px; height: 14px; }
+.tcard-gotit-icon:hover { color: var(--fg); border-color: var(--accent); }
+.tcard-gotit-icon[data-done="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.tcard-gotit-icon:disabled { cursor: not-allowed; opacity: 0.35; }
+.tcard-gotit-icon:disabled:hover { border-color: var(--line-strong); color: var(--fg-3); }
+
+.eof { margin: 6px 4px 0; padding: 14px 14px; border: 1px dashed var(--line-strong); border-radius: 12px;
+  text-align: center; color: var(--fg-3); font-size: 0.78rem; line-height: 1.5; }
+.eof b { color: var(--fg-2); }
+
+@media (max-width: 460px) { .frame { width: 100%; max-width: 380px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="intro">
+  <div class="eyebrow">Slocho — thread, five color directions</div>
+  <h1>Same thread, five color systems</h1>
+  <p>Layout and type stay exactly as chosen. Only color changes — each one is a
+  full commitment to a real engineering material or instrument, not a light/dark
+  pair, so you can judge each on its own terms.</p>
+</div>
+
+<div class="tabs" role="tablist" aria-label="Palette" id="tabs"></div>
+<div class="palette-copy" id="palette-copy"></div>
+<div class="swatches" id="swatches"></div>
+
+<div class="frame">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="mono">3 topics <span class="pips"><i data-on="true"></i><i data-on="true"></i><i></i></span></span>
+  </div>
+  <div class="thread-scroll" id="thread-scroll">
+    <div class="station-head"><span class="stub"></span><span>Kubernetes</span></div>
+
+    <article class="tcard" data-open="false">
+      <div class="tcard-head">
+        <span class="topic mono">Pods &amp; scheduler</span>
+        <span class="pips"><i data-on="true"></i><i></i><i></i></span>
+      </div>
+      <h3>A pod is the unit of scheduling</h3>
+      <p class="summary">Kubernetes never schedules a container. It schedules a pod.</p>
+      <div class="tcard-body"><div class="tcard-body-inner">
+        <p>Kubernetes never schedules a container — it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on <code>localhost</code> and are always placed on the same node, together, or not at all.</p>
+        <p>This matters the moment you try to scale: you scale pods, not containers. If you put two things in one pod that need to scale independently, you have made a mistake that is awkward to undo later.</p>
+      </div></div>
+      <div class="tcard-actions">
+        <button class="tcard-action-icon" aria-label="Like">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 17s-6-3.8-6-8.4C4 5.8 6 4 8.2 4 9.3 4 10 4.6 10 4.6S10.7 4 11.8 4C14 4 16 5.8 16 8.6 16 13.2 10 17 10 17z" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Save">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M5 3h10v14l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Note">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M13.5 3.5 16.5 6.5 7.5 15.5l-3.2.7.7-3.2 8.5-9.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Ask AI">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 3l1.4 4.6L16 9l-4.6 1.4L10 15l-1.4-4.6L4 9l4.6-1.4L10 3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Share">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="15" cy="5" r="2"/><circle cx="5.5" cy="10" r="2"/><circle cx="15" cy="15" r="2"/><path d="M7.3 9 13.2 5.9M7.3 11 13.2 14.1"/></svg>
+        </button>
+        <span class="tcard-actions-spacer"></span>
+        <button class="tcard-gotit-icon" aria-label="Got it (open the card first)" onclick="markSeenIcon(this, event)" disabled>
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </article>
+
+    <article class="tcard" data-open="false">
+      <div class="tcard-head">
+        <span class="topic mono">Pods &amp; scheduler</span>
+        <span class="pips"><i data-on="true"></i><i></i><i></i></span>
+      </div>
+      <h3>The scheduler filters, then scores</h3>
+      <p class="summary">Placement is two phases, and only the first one can fail outright.</p>
+      <div class="tcard-body"><div class="tcard-body-inner">
+        <p><strong>Filtering</strong> removes nodes that cannot run the pod at all — insufficient CPU or memory, a taint the pod does not tolerate. If filtering removes every node, the pod stays <code>Pending</code>.</p>
+        <p><strong>Scoring</strong> ranks whatever survived, preferring spread across nodes and better resource fit. Scoring never fails; it only picks a winner.</p>
+      </div></div>
+      <div class="tcard-actions">
+        <button class="tcard-action-icon" aria-label="Like">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 17s-6-3.8-6-8.4C4 5.8 6 4 8.2 4 9.3 4 10 4.6 10 4.6S10.7 4 11.8 4C14 4 16 5.8 16 8.6 16 13.2 10 17 10 17z" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Save">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M5 3h10v14l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Note">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M13.5 3.5 16.5 6.5 7.5 15.5l-3.2.7.7-3.2 8.5-9.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Ask AI">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 3l1.4 4.6L16 9l-4.6 1.4L10 15l-1.4-4.6L4 9l4.6-1.4L10 3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Share">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="15" cy="5" r="2"/><circle cx="5.5" cy="10" r="2"/><circle cx="15" cy="15" r="2"/><path d="M7.3 9 13.2 5.9M7.3 11 13.2 14.1"/></svg>
+        </button>
+        <span class="tcard-actions-spacer"></span>
+        <button class="tcard-gotit-icon" aria-label="Got it (open the card first)" onclick="markSeenIcon(this, event)" disabled>
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </article>
+
+    <div class="station-head"><span class="stub"></span><span>Distributed Systems</span></div>
+
+    <article class="tcard" data-open="false">
+      <div class="tcard-head">
+        <span class="topic mono">Failure &amp; partial failure</span>
+        <span class="pips"><i data-on="true"></i><i></i><i></i></span>
+      </div>
+      <h3>Partial failure is the whole problem</h3>
+      <p class="summary">A single machine is up or down. A distributed system is neither.</p>
+      <div class="tcard-body"><div class="tcard-body-inner">
+        <p>On one machine, a component is working or it is not, and your process usually finds out immediately. Across machines, some parts work and others do not, and <strong>you cannot reliably tell which</strong>.</p>
+        <p>Almost every complication in distributed systems — retries, idempotency, consensus, timeouts — exists to cope with that one ambiguity.</p>
+      </div></div>
+      <div class="tcard-actions">
+        <button class="tcard-action-icon" aria-label="Like">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 17s-6-3.8-6-8.4C4 5.8 6 4 8.2 4 9.3 4 10 4.6 10 4.6S10.7 4 11.8 4C14 4 16 5.8 16 8.6 16 13.2 10 17 10 17z" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Save">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M5 3h10v14l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Note">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M13.5 3.5 16.5 6.5 7.5 15.5l-3.2.7.7-3.2 8.5-9.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Ask AI">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 3l1.4 4.6L16 9l-4.6 1.4L10 15l-1.4-4.6L4 9l4.6-1.4L10 3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Share">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="15" cy="5" r="2"/><circle cx="5.5" cy="10" r="2"/><circle cx="15" cy="15" r="2"/><path d="M7.3 9 13.2 5.9M7.3 11 13.2 14.1"/></svg>
+        </button>
+        <span class="tcard-actions-spacer"></span>
+        <button class="tcard-gotit-icon" aria-label="Got it (open the card first)" onclick="markSeenIcon(this, event)" disabled>
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </article>
+
+    <article class="tcard" data-open="false">
+      <div class="tcard-head">
+        <span class="topic mono">Failure &amp; partial failure</span>
+        <span class="pips"><i data-on="true"></i><i></i><i></i></span>
+      </div>
+      <h3>A timeout is not a failure detector</h3>
+      <p class="summary">It is a guess with a deadline attached.</p>
+      <div class="tcard-body"><div class="tcard-body-inner">
+        <p>You cannot distinguish a crashed node from a slow one. All you can do is wait a while and give up. That makes every timeout a tradeoff: too short and healthy nodes look dead; too long and real failures go unnoticed.</p>
+        <p>There is no correct value, only one tuned to a specific latency distribution — which is why a timeout copied from another system is usually wrong.</p>
+      </div></div>
+      <div class="tcard-actions">
+        <button class="tcard-action-icon" aria-label="Like">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 17s-6-3.8-6-8.4C4 5.8 6 4 8.2 4 9.3 4 10 4.6 10 4.6S10.7 4 11.8 4C14 4 16 5.8 16 8.6 16 13.2 10 17 10 17z" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Save">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M5 3h10v14l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Note">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M13.5 3.5 16.5 6.5 7.5 15.5l-3.2.7.7-3.2 8.5-9.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Ask AI">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 3l1.4 4.6L16 9l-4.6 1.4L10 15l-1.4-4.6L4 9l4.6-1.4L10 3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="tcard-action-icon" aria-label="Share">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="15" cy="5" r="2"/><circle cx="5.5" cy="10" r="2"/><circle cx="15" cy="15" r="2"/><path d="M7.3 9 13.2 5.9M7.3 11 13.2 14.1"/></svg>
+        </button>
+        <span class="tcard-actions-spacer"></span>
+        <button class="tcard-gotit-icon" aria-label="Got it (open the card first)" onclick="markSeenIcon(this, event)" disabled>
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </article>
+
+    <div class="eof"><b>That's everything fresh</b> for these topics right now.<br>More is generating — check back soon.</div>
+  </div>
+</div>
+
+<script>
+const PALETTES = [
+  {
+    key: "copper", name: "Copper Board", dot: "#E2985F",
+    tagline: "Populated circuit board",
+    copy: "Near-black board laminate with copper trace as the only warm note — like looking down at a populated PCB under work light. Signals feel etched in, not decorated on.",
+    swatches: [
+      { name: "Board", hex: "#0B1613" }, { name: "Panel", hex: "#10201B" },
+      { name: "Ink", hex: "#E7EDE7" }, { name: "Copper", hex: "#E2985F" },
+    ],
+  },
+  {
+    key: "cyanotype", name: "Cyanotype", dot: "#D9A441",
+    tagline: "The blueprint itself",
+    copy: "The actual color of a cyanotype print — the process blueprints were made with before it became a metaphor. Deep Prussian blue ground, chalk-white linework, a brass/gold accent standing in for the drafter's pencil.",
+    swatches: [
+      { name: "Print", hex: "#0F2A4A" }, { name: "Wash", hex: "#163A63" },
+      { name: "Chalk", hex: "#EAF2FB" }, { name: "Brass", hex: "#D9A441" },
+    ],
+  },
+  {
+    key: "phosphor", name: "Phosphor", dot: "#4FE38A",
+    tagline: "CRT terminal glow",
+    copy: "A warm near-black rather than true black, with a faint scanline texture and a desaturated phosphor green reserved for accents and headings so long-form body text stays readable — the terminal aesthetic without the eye strain.",
+    swatches: [
+      { name: "Tube", hex: "#0A0D0A" }, { name: "Glass", hex: "#111611" },
+      { name: "Text", hex: "#D3E0D3" }, { name: "Phosphor", hex: "#4FE38A" },
+    ],
+  },
+  {
+    key: "notebook", name: "Notebook", dot: "#C1442B",
+    tagline: "Squared engineering paper",
+    copy: "The one light option: pale grid paper with a graphite ink for text and a red-pencil accent for the moments that matter — like margin corrections in a real engineering notebook.",
+    swatches: [
+      { name: "Paper", hex: "#EDF0EA" }, { name: "Grid", hex: "#D6DDD1" },
+      { name: "Graphite", hex: "#262A22" }, { name: "Red pencil", hex: "#C1442B" },
+    ],
+  },
+  {
+    key: "scope", name: "Oscilloscope", dot: "#38C6D9",
+    tagline: "Dual-trace readout",
+    copy: "Charcoal-slate ground like an oscilloscope bezel, with cyan as the primary trace and amber reserved for a second channel — difficulty, or anything that needs to read as a distinct signal from the main accent.",
+    swatches: [
+      { name: "Bezel", hex: "#0D1116" }, { name: "Screen", hex: "#141B22" },
+      { name: "Trace", hex: "#38C6D9" }, { name: "Ch. 2", hex: "#E8A33D" },
+    ],
+  },
+];
+
+const tabsEl = document.getElementById("tabs");
+const copyEl = document.getElementById("palette-copy");
+const swatchEl = document.getElementById("swatches");
+
+PALETTES.forEach((p, i) => {
+  const btn = document.createElement("button");
+  btn.className = "tab";
+  btn.setAttribute("role", "tab");
+  btn.setAttribute("aria-selected", i === 0 ? "true" : "false");
+  btn.innerHTML = `<span class="dot" style="background:${p.dot}"></span>${p.name}`;
+  btn.addEventListener("click", () => selectPalette(p.key));
+  tabsEl.appendChild(btn);
+});
+
+function selectPalette(key) {
+  const p = PALETTES.find(x => x.key === key);
+  document.body.setAttribute("data-palette", key === "copper" ? "" : key);
+  [...tabsEl.children].forEach((btn, i) => btn.setAttribute("aria-selected", PALETTES[i].key === key ? "true" : "false"));
+  copyEl.innerHTML = `<h2>${p.name} — ${p.tagline}</h2><p>${p.copy}</p>`;
+  swatchEl.innerHTML = p.swatches.map(s =>
+    `<div class="swatch"><div class="chip" style="background:${s.hex}"></div><div class="label"><b>${s.name}</b>${s.hex}</div></div>`
+  ).join("");
+}
+
+// re-collapse all cards when switching palettes, so each look is judged fresh
+// Toggleable — a stray tap on a 28px circle is easy to make, so tapping it
+// again undoes the local indicator.
+function markSeenIcon(btn, e) {
+  e.stopPropagation();
+  const done = btn.getAttribute("data-done") === "true";
+  btn.setAttribute("data-done", done ? "false" : "true");
+}
+
+// Cards toggle independently — opening one never closes another. Only a
+// click that lands outside every card closes whatever is open.
+document.querySelectorAll(".tcard").forEach(card => {
+  card.addEventListener("click", (e) => {
+    if (e.target.closest(".tcard-actions")) return;
+    const isOpen = card.getAttribute("data-open") === "true";
+    card.setAttribute("data-open", isOpen ? "false" : "true");
+    // The Got it icon unlocks the first time a card opens, and stays
+    // unlocked after it closes again — it confirms a look already taken,
+    // it doesn't let you skip taking one.
+    if (!isOpen) {
+      const gotIt = card.querySelector(".tcard-gotit-icon");
+      gotIt.disabled = false;
+      gotIt.setAttribute("aria-label", "Got it");
+    }
+  });
+});
+document.getElementById("thread-scroll").addEventListener("click", (e) => {
+  if (e.target.closest(".tcard") !== null) return;
+  document.querySelectorAll(".tcard[data-open='true']")
+    .forEach(card => card.setAttribute("data-open", "false"));
+});
+
+selectPalette("copper");
+</script>

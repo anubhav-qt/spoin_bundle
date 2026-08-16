@@ -332,9 +332,11 @@ threshold marks the card seen — fast readers tap, everyone else is covered by 
 friction. The two are recorded as **separate events**: explicit completion is a much stronger
 signal for ranking than elapsed time.
 
-**"Got it" sits at the end of the expanded card's content**, not in the action bar. A reader
-reaches it exactly when they finish, so it is self-explanatory; a sixth icon alongside like,
-bookmark, note, ask AI and share would need a tooltip to mean anything.
+**Superseded by [ADR-0012](../adr/0012-feed-visual-design.md):** "Got it" no longer lives at
+the end of the expanded body — it moved to a toggleable circular icon in the action row, the
+only "Got it" affordance now. The icon stays disabled until the card has been expanded at
+least once this session, so "expanded AND" above still holds: the icon is a faster way to
+confirm completion after a look, not a way to skip the look.
 
 ## Custom topics
 

@@ -7,18 +7,26 @@ Web first; a React Native app comes later and shares this backend.
 
 ---
 
-> **Status: design phase.** No application code yet — this repo currently holds the
-> architecture and decision records. Read [`docs/architecture/overview.md`](docs/architecture/overview.md)
-> first; it is the mental model everything else assumes.
+> **Status: early build.** Feed serving, engagement, and the web app's feed (visual design
+> in [ADR-0012](docs/adr/0012-feed-visual-design.md)) are live against seeded data.
+> Generation, quiz-gated progression UI, and the palette picker (task
+> [0002](docs/tasks/0002-palette-selection-ui.md)) are not built yet. Read
+> [`docs/architecture/overview.md`](docs/architecture/overview.md) first; it is the mental
+> model everything else assumes.
 
 ---
 
 ## Start here
 
+**Using Claude Code (or another agent) in this repo?** [`CLAUDE.md`](CLAUDE.md) is the
+bootstrap it reads automatically every session — what to read first, and the doc-hygiene
+rules that keep a new session from re-deriving context that already exists on disk.
+
 | If you want to… | Read |
 |---|---|
 | Understand how Slocho works | [Architecture overview](docs/architecture/overview.md) |
 | Know what a card actually is | [Content model](docs/architecture/content-model.md) |
+| See the feed's visual design | [Mockups](docs/design/mockups/) ([ADR-0012](docs/adr/0012-feed-visual-design.md)) |
 | Know *why* something is the way it is | [ADR index](docs/adr/) |
 | **Find the work assigned to you** | **[Tasks](docs/tasks/)** |
 | Add a significant decision | [ADR template](docs/adr/TEMPLATE.md) |

@@ -1,0 +1,1464 @@
+/* ============================================================================
+   Slocho — Thread.
+
+   Full history in ADR-0012 and the working mockups it points at
+   (docs/design/mockups/feed-directions.html, feed-palettes.html). Build from
+   those, don't redraw this from memory — they are the source of truth.
+
+   Cards sit in a plain scroll under sticky station labels (the topic when the
+   feed is mixed, the subtopic when filtered to one — see lib/stations.ts).
+   Deliberately NOT wrapped in any rounded, overflow:hidden "device frame":
+   that combination is what caused the sticky-header repaint glitch in the
+   early mockups (a position:sticky descendant of a border-radius +
+   overflow:hidden ancestor glitches in Chromium/WebKit — occasional ghost
+   slivers of the previous element painted above the sticky one). The real
+   page scrolls at the window level with no such ancestor, which avoids the
+   bug structurally instead of patching around it.
+
+   Five palettes ship (ADR-0012), switched by `[data-palette]` on <body>.
+   Component CSS below reads only the token names, never a literal color, so
+   a component never needs to know which of the five is active. Only ONE is
+   wired up as the default right now — the picker itself is deferred
+   (docs/tasks/0002-palette-selection-ui.md).
+   ========================================================================= */
+
+:root {
+  /* Notebook — squared engineering paper, graphite ink, red-pencil accent.
+     Shipped default until the onboarding/settings picker exists. */
+  --bg: #edf0ea;
+  --bg-2: #e2e7de;
+  --bg-3: #d6ddd1;
+  --fg: #262a22;
+  --fg-2: #565f51;
+  --fg-3: #838c7d;
+  --accent: #c1442b;
+  --accent-2: #a83a24;
+  --line: rgba(38, 42, 34, 0.14);
+  --line-strong: rgba(38, 42, 34, 0.26);
+  --good: #4c7a5a;
+  --shadow: rgba(38, 42, 34, 0.18);
+  --texture: repeating-linear-gradient(0deg, rgba(38, 42, 34, 0.05) 0px, rgba(38, 42, 34, 0.05) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(38, 42, 34, 0.05) 0px, rgba(38, 42, 34, 0.05) 1px, transparent 1px, transparent 22px);
+
+  --font-sans: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+
+  --r-card: 14px;
+  --r-pill: 999px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-1: 0.15s;
+  --dur-2: 0.22s;
+}
+
+/* -- the other four palettes, ready for docs/tasks/0002 to wire up --------
+   Notebook is the default and lives on :root above, so it has no block of
+   its own here — `[data-palette="notebook"]` still resolves correctly (it
+   just falls through to :root with nothing to override), this only avoids
+   a block that would be a byte-for-byte duplicate of :root. */
+
+[data-palette="copper"] {
+  --bg: #0b1613;
+  --bg-2: #10201b;
+  --bg-3: #162b23;
+  --fg: #e7ede7;
+  --fg-2: #a9b8ae;
+  --fg-3: #6d8078;
+  --accent: #e2985f;
+  --accent-2: #c97a4a;
+  --line: rgba(231, 237, 231, 0.12);
+  --line-strong: rgba(231, 237, 231, 0.22);
+  --good: #7fbf95;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --texture: none;
+}
+
+[data-palette="cyanotype"] {
+  --bg: #0f2a4a;
+  --bg-2: #163a63;
+  --bg-3: #1e4a7d;
+  --fg: #eaf2fb;
+  --fg-2: #b7cbe3;
+  --fg-3: #7e9cc0;
+  --accent: #d9a441;
+  --accent-2: #c68f31;
+  --line: rgba(234, 242, 251, 0.16);
+  --line-strong: rgba(234, 242, 251, 0.28);
+  --good: #8fd9c4;
+  --shadow: rgba(3, 12, 24, 0.55);
+  --texture: none;
+}
+
+[data-palette="phosphor"] {
+  --bg: #0a0d0a;
+  --bg-2: #111611;
+  --bg-3: #182018;
+  --fg: #d3e0d3;
+  --fg-2: #93a896;
+  --fg-3: #5c6e5e;
+  --accent: #4fe38a;
+  --accent-2: #38c271;
+  --line: rgba(79, 227, 138, 0.14);
+  --line-strong: rgba(79, 227, 138, 0.26);
+  --good: #4fe38a;
+  --shadow: rgba(0, 0, 0, 0.6);
+  --texture: repeating-linear-gradient(
+    180deg,
+    rgba(79, 227, 138, 0.035) 0px,
+    rgba(79, 227, 138, 0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+[data-palette="scope"] {
+  --bg: #0d1116;
+  --bg-2: #141b22;
+  --bg-3: #1c2730;
+  --fg: #e3ecf2;
+  --fg-2: #98adbb;
+  --fg-3: #5e7180;
+  --accent: #38c6d9;
+  --accent-2: #e8a33d;
+  --line: rgba(227, 236, 242, 0.12);
+  --line-strong: rgba(227, 236, 242, 0.22);
+  --good: #38c6d9;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --texture: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Reserves the scrollbar's width whether or not it's actually showing.
+     Without this, switching topic filters changes the card count, which
+     changes page height, which toggles the scrollbar on/off, which shifts
+     the centered `.app-grid` sideways by half the scrollbar's width — the
+     "cards resize slightly" report traced back to this, not the cards
+     themselves. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  background-image: var(--texture);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0.01s;
+    --dur-2: 0.01s;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* ============================== layout ================================== */
+
+.shell {
+  /* `margin:0 auto` centered this back when it was a plain block under
+     `<body>`. As an `.app-grid` item now, auto inline-axis margins disable
+     the grid's default stretch and shrink the box to its content width
+     instead (a real, spec'd grid behavior) — centering is already handled
+     by `.app-grid`'s `justify-content:center` plus the fixed side tracks, so
+     this was both redundant and the actual cause of the "cards resize
+     slightly" bug: content-dependent shrink-to-fit width, not a real size
+     change. `max-width` still caps it in the single-column fallback below
+     680px, where `.app-grid` stops being a grid at all. */
+  max-width: 640px;
+  padding: 0 18px 140px;
+}
+
+/* Not sticky, deliberately (Feed.tsx) — the wordmark lives in the left nav
+   now, so this is a one-line cue that scrolls away with the thread rather
+   than a second pinned banner. */
+.feed-intro {
+  margin: 18px 0 6px;
+  font-size: 12.5px;
+  color: var(--fg-3);
+}
+
+/* ============================ topic filter ============================== */
+
+.topic-rail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 18px 14px;
+  margin: 0 -18px;
+  scrollbar-width: none;
+}
+
+.topic-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.topic-chip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 140px;
+  padding: 9px 13px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-2);
+  color: var(--fg-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+
+.topic-chip:hover {
+  border-color: var(--line-strong);
+}
+
+.topic-chip[data-selected="true"] {
+  background: var(--bg-3);
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.topic-chip-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--fg);
+}
+
+.topic-chip-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.meter {
+  position: relative;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  transition: width var(--dur-2) var(--ease);
+}
+
+.meter-fill[data-complete="true"] {
+  background: var(--good);
+}
+
+.meter-gate {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--fg-3);
+  opacity: 0.6;
+}
+
+/* =============================== thread ================================= */
+
+.track {
+  position: relative;
+  padding-top: 6px;
+}
+
+/* Names what you are moving through — topic when mixed, subtopic when
+   filtered to one (lib/stations.ts). Sticks against the page scroll itself,
+   not against any inner clipped container — see the file header note. */
+.station {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 16px 0 10px;
+  padding: 6px 0;
+  background: linear-gradient(var(--bg) 72%, transparent);
+}
+
+.station::before {
+  content: "";
+  width: 14px;
+  height: 1px;
+  background: var(--line-strong);
+  flex: 0 0 auto;
+}
+
+.station-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.station-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  margin-left: auto;
+}
+
+/* ================================ card ================================== */
+
+.node {
+  margin-bottom: 10px;
+}
+
+.card {
+  position: relative;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 14px 15px 12px;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.card:hover {
+  border-color: var(--line-strong);
+}
+
+.card[data-expanded="true"] {
+  cursor: default;
+  border-color: var(--accent);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  min-width: 0;
+}
+
+.card-topic {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.difficulty {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.difficulty i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.difficulty i[data-on="true"] {
+  background: var(--accent);
+}
+
+.card-read {
+  color: var(--good);
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0 0 5px;
+  color: var(--fg);
+  text-wrap: balance;
+}
+
+.card-summary {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+/* The reveal opens instantly and fades in — no height animation.
+ *
+ * `grid-template-rows: 0fr -> 1fr` was tried and rejected: Chrome will not
+ * interpolate the `fr` unit against an auto-height grid container, so the
+ * row stays pinned at zero and the card never visibly opens. Animating an
+ * explicit measured pixel height works but needs a requestAnimationFrame to
+ * seed the collapsed value, and React's development double-invocation
+ * cancels that frame in the effect cleanup, leaving it stuck open.
+ *
+ * Opacity and a small translate interpolate reliably with none of that, and
+ * an instant reveal plus a fade reads as intentional rather than as a
+ * missing animation. */
+.card-reveal {
+  display: none;
+}
+
+.card[data-expanded="true"] .card-reveal {
+  display: block;
+  animation: reveal var(--dur-2) var(--ease) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.card-body {
+  padding-top: 12px;
+  margin-top: 2px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 1.68;
+  color: var(--fg);
+}
+
+.card-body strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.card-body h1,
+.card-body h2,
+.card-body h3 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  margin: 18px 0 7px;
+}
+
+.card-body h1:first-child,
+.card-body h2:first-child,
+.card-body h3:first-child {
+  margin-top: 0;
+}
+
+.card-body p {
+  margin: 0 0 12px;
+}
+
+.card-body ul {
+  margin: 0 0 12px;
+  padding-left: 18px;
+}
+
+.card-body li {
+  margin-bottom: 6px;
+}
+
+.card-body li::marker {
+  color: var(--fg-3);
+}
+
+.card-body code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--bg-3);
+}
+
+/* -- "Got it" (text pill) ---------------------------------------------------
+   At the END of the expanded body, deliberately (content-model.md). A reader
+   reaches it exactly when they finish, so it explains itself, and it stays
+   off the collapsed card so it cannot be tapped by someone who has read
+   nothing. The circular icon in the action row (below) is a second, faster
+   path to the same signal and is available on the collapsed card too — a
+   deliberate shortcut, not an oversight. */
+.got-it {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 4px;
+  padding: 10px 20px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--bg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.got-it svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.got-it[data-done="true"] {
+  background: transparent;
+  border-color: var(--good);
+  color: var(--good);
+  cursor: default;
+}
+
+/* -- actions ----------------------------------------------------------------
+   Icon-only, each its own circular outline — quiet until touched, legible at
+   a glance without a label. Like/Save/Note/Ask AI/Share sit on the left;
+   "Got it" is the one action that skips reading and marks the card seen
+   directly, so it sits apart by both position and shape: pushed to the
+   extreme right by a flex spacer, not just another item in the row. */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.action {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.action svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.action:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.action[data-on="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.action[data-on="true"] svg {
+  fill: currentColor;
+}
+
+.action-spacer {
+  flex: 1;
+}
+
+.action-gotit {
+  border-color: var(--line-strong);
+}
+
+.action-gotit:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.action-gotit[data-done="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.action-gotit:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.action-gotit:disabled:hover {
+  border-color: var(--line);
+  color: var(--fg-3);
+}
+
+/* ============================ feed states ===============================
+   Not error states. ADR-0006 makes these a real design surface: on free tier
+   a fill can take hours, so the copy must never imply imminent arrival. */
+
+.notice {
+  position: relative;
+  z-index: 2;
+  margin: 16px 0 0;
+  padding: 22px 20px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-card);
+  text-align: center;
+}
+
+.notice[data-tone="degraded"] {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--bg-2);
+}
+
+.notice-kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: 8px;
+}
+
+.notice-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  color: var(--fg);
+}
+
+.notice-body {
+  margin: 0 auto;
+  max-width: 44ch;
+  font-size: 14px;
+  color: var(--fg-2);
+}
+
+.skeleton {
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  margin-bottom: 10px;
+}
+
+.skeleton-line {
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+  animation: pulse 1.4s var(--ease) infinite;
+}
+
+.skeleton-line + .skeleton-line {
+  margin-top: 10px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 460px) {
+  .card-title {
+    font-size: 16px;
+  }
+}
+
+/* ============================= app shell =================================
+   The three-column desktop shell (ADR-0013, restructured by ADR-0015): left
+   nav, center thread (`.shell`, unchanged from the single-column layout),
+   right rail (theme switcher, topic filter, insights ring, per-topic
+   progress + quiz, discover). */
+
+.app-grid {
+  display: grid;
+  grid-template-columns: 275px minmax(0, 640px) 350px;
+  justify-content: center;
+  align-items: start;
+  gap: 28px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.rail-left,
+.rail-right {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 20px 0 24px;
+}
+
+.rail-left::-webkit-scrollbar,
+.rail-right::-webkit-scrollbar {
+  display: none;
+}
+
+/* ------------------------------- left nav -------------------------------- */
+
+.rail-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-mark {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  padding: 8px 12px 20px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 14px;
+  border-radius: var(--r-pill);
+  color: var(--fg-2);
+  text-decoration: none;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.nav-item:hover {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+
+.nav-item[aria-current="page"] {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.nav-item[aria-disabled="true"] {
+  color: var(--fg-3);
+  opacity: 0.55;
+  cursor: default;
+}
+
+.nav-item[aria-disabled="true"]:hover {
+  background: transparent;
+  color: var(--fg-3);
+}
+
+.nav-item-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+.nav-item-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------ right rail -------------------------------- */
+
+.rail-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rail-top-row {
+  display: flex;
+  align-items: stretch;
+  gap: 9px;
+}
+
+.theme-picker {
+  display: flex;
+  gap: 9px;
+  padding: 2px 4px;
+}
+
+/* Fills the leftover width next to the swatches when entering; fixed
+   top-right when exiting, since the rail hosting it is unmounted in focus
+   mode (AppShell renders this instance standalone in that case). */
+.focus-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 44px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.focus-toggle:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.focus-toggle svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.focus-toggle[data-focused="true"] {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 50;
+  flex: 0 0 auto;
+  width: 38px;
+  min-width: 0;
+  background: var(--bg-2);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+
+
+/* Rounded square, four quadrants — reads as "here is the palette" instead of
+   a single blended color. Bigger than the old circle so the quadrants stay
+   legible at this size. */
+.theme-pill {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  border: 2px solid var(--line);
+  padding: 2px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.theme-pill:hover,
+.theme-pill:focus-visible {
+  border-color: var(--line-strong);
+}
+
+.theme-pill[data-active="true"] {
+  border-color: var(--accent);
+}
+
+.theme-pill-swatch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Literal colors — the only place they appear outside the token blocks at
+   the top of this file. These preview a palette's identity independent of
+   which one is currently applied to <body>, so token indirection can't
+   reach them. Each palette's four swatches are its --bg, --accent,
+   --accent-2, --good, in that order (ADR-0012's table; the quadrant order
+   here is otherwise arbitrary). */
+.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(1) { background: #0b1613; }
+.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(2) { background: #e2985f; }
+.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(3) { background: #c97a4a; }
+.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(4) { background: #7fbf95; }
+
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(1) { background: #0f2a4a; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(2) { background: #d9a441; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(3) { background: #c68f31; }
+.theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(4) { background: #8fd9c4; }
+
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(1) { background: #0a0d0a; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(2) { background: #4fe38a; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(3) { background: #38c271; }
+.theme-pill-swatch[data-palette-preview="phosphor"] i:nth-child(4) { background: #4fe38a; }
+
+.theme-pill-swatch[data-palette-preview="notebook"] i:nth-child(1) { background: #edf0ea; }
+.theme-pill-swatch[data-palette-preview="notebook"] i:nth-child(2) { background: #c1442b; }
+.theme-pill-swatch[data-palette-preview="notebook"] i:nth-child(3) { background: #a83a24; }
+.theme-pill-swatch[data-palette-preview="notebook"] i:nth-child(4) { background: #4c7a5a; }
+
+.theme-pill-swatch[data-palette-preview="scope"] i:nth-child(1) { background: #0d1116; }
+.theme-pill-swatch[data-palette-preview="scope"] i:nth-child(2) { background: #38c6d9; }
+.theme-pill-swatch[data-palette-preview="scope"] i:nth-child(3) { background: #e8a33d; }
+.theme-pill-swatch[data-palette-preview="scope"] i:nth-child(4) { background: #38c6d9; }
+
+/* Pure-CSS tooltip — no extra DOM. `data-tooltip` carries the name. */
+.theme-pill::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-1) var(--ease);
+  z-index: 10;
+}
+
+.theme-pill:hover::after,
+.theme-pill:focus-visible::after {
+  opacity: 1;
+}
+
+/* Topic rail, relocated here from the feed's own masthead. Name-only pills
+   now (ADR-0015) — no meta line, so this is just a smaller version of the
+   base `.topic-chip`. */
+.rail-right .topic-rail {
+  margin: 0;
+  padding: 0 0 4px;
+}
+
+.rail-right .topic-chip {
+  min-width: 0;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* -- insights panel: radial ring + two stat lines (ADR-0015) -- */
+.insights-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 108px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+}
+
+.insights-ring {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insights-ring-track {
+  stroke: var(--line);
+}
+
+.insights-ring-fill {
+  stroke: var(--accent);
+  transition: stroke-dashoffset var(--dur-2) var(--ease);
+}
+
+.insights-ring-fill[data-complete="true"] {
+  stroke: var(--good);
+}
+
+.insights-ring-value {
+  position: absolute;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.insights-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.insights-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.insights-stat-value {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1.1;
+}
+
+.insights-stat-label {
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+/* -- per-topic progress box, replaces the global quiz CTA (ADR-0015) -- */
+.progress-box {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  padding: 4px 14px;
+}
+
+.progress-box-title {
+  padding: 10px 0 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.progress-row:first-of-type {
+  border-top: none;
+}
+
+.progress-row-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-row-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-row-quiz {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.progress-row-quiz[data-locked="true"] {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--fg-3);
+  cursor: default;
+}
+
+/* -- discover box (ADR-0015) -- */
+.discover-box {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  padding: 12px 14px 4px;
+}
+
+.discover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.discover-title {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.discover-toggle {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+}
+
+.discover-toggle button {
+  padding: 4px 10px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.discover-toggle button[data-active="true"] {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+
+.discover-note {
+  margin: 0 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--fg-3);
+}
+
+.discover-empty {
+  padding: 10px 0 14px;
+  font-size: 11.5px;
+  color: var(--fg-3);
+}
+
+.discover-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+
+.discover-row:first-of-type {
+  border-top: none;
+}
+
+.discover-row-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.discover-row-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discover-row-meta {
+  font-size: 10px;
+  color: var(--fg-3);
+}
+
+.discover-follow {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.discover-follow:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.discover-follow:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* -- modal (ADR-0015; the app's first) -- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: color-mix(in srgb, var(--fg) 40%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 380px;
+  max-height: 84vh;
+  overflow-y: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  padding: 18px 20px 20px;
+  box-shadow: 0 20px 50px var(--shadow);
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.modal-close {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-3);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.modal-loading {
+  padding: 20px 0;
+  color: var(--fg-3);
+  font-size: 12px;
+}
+
+.modal-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--fg-2);
+  margin-bottom: 12px;
+}
+
+.modal-badge {
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--good);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.modal-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+
+.modal-tier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--fg-3);
+}
+
+.modal-tier svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.3;
+}
+
+.modal-tier[data-passed="true"] {
+  color: var(--fg);
+}
+
+.modal-tier[data-passed="true"] svg {
+  stroke: var(--good);
+  opacity: 1;
+}
+
+.modal-engagement {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.modal-engagement-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 10px;
+  background: var(--bg-3);
+}
+
+.modal-engagement-stat svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--fg-3);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.modal-engagement-stat span:nth-child(2) {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.modal-engagement-stat span:nth-child(3) {
+  font-size: 9.5px;
+  color: var(--fg-3);
+}
+
+/* ------------------------------ breakpoints ------------------------------- */
+
+/* The three fixed/capped tracks (275 + up to 640 + 350) plus gaps and padding
+   need ~1369px to render at full size without squeezing — matches
+   `.app-grid`'s own 1400px max-width. Below that, the previous 1100px cutoff
+   let the grid attempt three columns in a width that didn't actually fit,
+   silently shrinking the center column (and its cards) by a few px depending
+   on exactly how much overflow there was — the "cards resize slightly" bug. */
+@media (max-width: 1400px) {
+  .app-grid {
+    grid-template-columns: 275px minmax(0, 640px);
+  }
+  .rail-right {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-grid {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 4px;
+    padding: 0 8px;
+  }
+  .sidebar-mark,
+  .nav-item-label {
+    display: none;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 11px;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-grid {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    padding: 0;
+  }
+  .rail-left {
+    display: none;
+  }
+  .rail-right {
+    position: static;
+    max-height: none;
+    padding: 0 18px 24px;
+  }
+}

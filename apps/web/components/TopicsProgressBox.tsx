@@ -33,9 +33,9 @@ const DIFFICULTY_LABEL: Record<Difficulty, string> = {
 type FilterMode = "all" | "mastered" | "active";
 
 const FILTERS: { key: FilterMode; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "mastered", label: "Completed" },
   { key: "active", label: "In Progress" },
+  { key: "mastered", label: "Completed" },
+  { key: "all", label: "All" },
 ];
 
 interface Props {
@@ -44,7 +44,7 @@ interface Props {
 }
 
 export function TopicsProgressBox({ topics, progress }: Props) {
-  const [mode, setMode] = useState<FilterMode>("all");
+  const [mode, setMode] = useState<FilterMode>("active");
   const [openTopicId, setOpenTopicId] = useState<string | null>(null);
   const openTopic = topics.find((t) => t.id === openTopicId) ?? null;
 

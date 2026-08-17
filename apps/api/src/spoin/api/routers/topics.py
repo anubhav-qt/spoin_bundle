@@ -9,6 +9,7 @@ from sqlalchemy import func, select
 
 from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
+    OnboardingCompleteIn,
     ProgressOut,
     TopicDiscoverOut,
     TopicOut,
@@ -26,6 +27,7 @@ from spoin.domain.models import (
     GenerationJob,
     Subtopic,
     Topic,
+    User,
     UserCardState,
     UserTopic,
     UserTopicProgress,
@@ -255,6 +257,60 @@ async def subscribe_topic(
         is_custom=False,
         current_difficulty=entry_difficulty,
     )
+
+
+@router.post("/onboarding/complete", response_model=list[TopicOut])
+async def complete_onboarding(
+    payload: OnboardingCompleteIn, session: SessionDep, user_id: UserDep
+) -> list[TopicOut]:
+    """First-run setup: subscribe to the chosen topics at the chosen entry tier,
+    then flip the gate the root route checks (see docs/adr on auth/onboarding).
+    Unknown IDs are skipped rather than failing the whole request -- onboarding
+    should not strand a user over one stale entry in the picker's list."""
+    subscribed: list[TopicOut] = []
+    for topic_id in payload.topic_ids:
+        topic = await session.get(Topic, topic_id)
+        if topic is None:
+            continue
+
+        existing = await session.scalar(
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic.id)
+        )
+        if existing is not None:
+            continue
+
+        user_topic = UserTopic(
+            user_id=user_id,
+            topic_id=topic.id,
+            display_name=topic.canonical_name,
+            is_custom=False,
+        )
+        session.add(user_topic)
+        topic.subscriber_count += 1
+        session.add(
+            UserTopicProgress(
+                user_id=user_id,
+                topic_id=topic.id,
+                current_difficulty=payload.entry_difficulty,
+                tier_unlocked=_entry_tier_unlock(payload.entry_difficulty),
+            )
+        )
+        subscribed.append(
+            TopicOut(
+                id=topic.id,
+                display_name=user_topic.display_name,
+                slug=topic.slug,
+                is_custom=False,
+                current_difficulty=payload.entry_difficulty,
+            )
+        )
+
+    user = await session.get(User, user_id)
+    assert user is not None
+    user.onboarding_complete = True
+
+    await session.commit()
+    return subscribed
 
 
 @router.get("/{topic_id}/stats", response_model=TopicStatsOut)

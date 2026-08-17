@@ -44,10 +44,27 @@ _EMBEDDING_DIM = get_settings().embedding_dim
 class User(Base, UUIDPrimaryKey, Timestamps):
     __tablename__ = "app_user"  # "user" is reserved in Postgres
 
-    email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
+    #: Nullable so a guest can hold a row with no email at all (see
+    #: `auth/rate_limit.py`'s neighbour `api/routers/auth.py` for the guest
+    #: flow). Postgres treats every NULL as distinct under a UNIQUE constraint,
+    #: so many guests can coexist with `email IS NULL` without collision.
+    email: Mapped[str | None] = mapped_column(String(320), unique=True, nullable=True)
     display_name: Mapped[str] = mapped_column(String(80), nullable=False)
+    password_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    google_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
+    #: Gates onboarding, not signup — set once the onboarding flow finishes.
+    onboarding_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     topics: Mapped[list[UserTopic]] = relationship(back_populates="user")
+
+    @property
+    def is_guest(self) -> bool:
+        """A guest is a `User` row with no login method attached yet — no
+        password, no linked Google account, and (the field this actually
+        keys off) no email. Claiming an account sets `email`, which is why
+        this is derived rather than a separate stored flag: it can't drift
+        out of sync with the fields that actually gate login."""
+        return self.email is None
 
 
 class Topic(Base, UUIDPrimaryKey, Timestamps):

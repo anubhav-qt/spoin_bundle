@@ -18,6 +18,7 @@ import type { TopicProgress } from "@/lib/types";
 import { CustomCursor } from "./CustomCursor";
 import { Feed } from "./Feed";
 import { FocusToggle } from "./FocusToggle";
+import { GuestNotice } from "./GuestNotice";
 import { RightRail } from "./RightRail";
 import { Sidebar } from "./Sidebar";
 
@@ -150,6 +151,7 @@ export function AppShell() {
   return (
     <>
       <CustomCursor />
+      <GuestNotice />
       <div className="app-grid" data-focused={focusMode}>
         {/* Both rails keep reserving their grid track even when hidden — an
             empty spacer, not a removed column — so toggling focus mode never

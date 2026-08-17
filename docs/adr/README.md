@@ -69,3 +69,4 @@ useful than the decision itself.
 | [0030](0030-two-pass-quality-gate.md) | Two-pass, self-correcting quality gate | Accepted (amends 0008, 0028) |
 | [0031](0031-verification-feedback-and-per-tier-gate-durability.md) | Verification rejection feedback, and a per-tier durable gate | Accepted (amends 0030) |
 | [0032](0032-entry-tier-quiz-still-earned.md) | The entry tier's own quiz is still earned, not free | Accepted (amends 0027) |
+| [0033](0033-jwt-auth-and-guest-identity.md) | JWT auth, localStorage token storage, and guest identity via a nullable-email User row | Accepted |

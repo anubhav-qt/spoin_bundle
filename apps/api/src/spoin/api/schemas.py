@@ -247,3 +247,49 @@ class QuizSubmitFreeTextOut(BaseModel):
     #: mastery — always False for a `placement`-kind (practice) attempt, and
     #: for any attempt that didn't pass.
     progressed: bool
+
+
+# ------------------------------------------------------------------------ auth --
+
+
+class RegisterIn(BaseModel):
+    email: str = Field(max_length=320)
+    password: str = Field(min_length=8, max_length=128)
+    display_name: str = Field(min_length=1, max_length=80)
+
+
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
+
+class GoogleAuthIn(BaseModel):
+    id_token: str
+
+
+class TokenOut(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshIn(BaseModel):
+    refresh_token: str
+
+
+class UserOut(BaseModel):
+    id: UUID
+    #: None for a guest — see `User.is_guest` (domain/models/topic.py).
+    email: str | None
+    display_name: str
+    is_guest: bool
+    onboarding_complete: bool
+
+
+class OnboardingCompleteIn(BaseModel):
+    #: Topics chosen during onboarding (from /topics/discover), subscribed to
+    #: server-side. IDs, not slugs -- matches what discover already returns,
+    #: no extra lookup needed on either side.
+    topic_ids: list[UUID] = Field(default_factory=list, max_length=10)
+    entry_difficulty: Difficulty = Difficulty.BEGINNER
+

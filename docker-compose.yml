@@ -56,6 +56,7 @@ services:
       SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
       SPOIN_ENV: local
       SPOIN_CORS_ORIGINS: http://localhost:3000
+      SPOIN_JWT_SECRET_KEY: dev-secret-not-for-prod
     ports:
       - "8000:8000"
     depends_on:
@@ -75,6 +76,9 @@ services:
     environment:
       # The browser resolves this, not the container, so it is localhost either way.
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+      # Empty by default -- renders a disabled Google button rather than a
+      # broken one. Set to match SPOIN_GOOGLE_CLIENT_ID above.
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${SPOIN_GOOGLE_CLIENT_ID:-}
     ports:
       - "3000:3000"
     depends_on:

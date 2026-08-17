@@ -71,3 +71,4 @@ useful than the decision itself.
 | [0032](0032-entry-tier-quiz-still-earned.md) | The entry tier's own quiz is still earned, not free | Accepted (amends 0027) |
 | [0033](0033-jwt-auth-and-guest-identity.md) | JWT auth, localStorage token storage, and guest identity via a nullable-email User row | Accepted |
 | [0034](0034-per-topic-accent-color.md) | Per-topic accent color, composed with the active palette via relative color hue rotation | Accepted |
+| [0035](0035-hero-card-tutorial-overlay.md) | First-time hero-card tutorial overlay; no new SEEN mechanism needed | Accepted |

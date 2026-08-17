@@ -65,6 +65,28 @@
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-1: 0.15s;
   --dur-2: 0.22s;
+
+  /* Per-topic accent (ADR-0034). Falls back to the palette's own --accent
+     unmixed on browsers without relative color syntax (the @supports block
+     below is what actually rotates it toward a card's --topic-hue) and
+     wherever a card sets no --topic-hue at all (mixed-content, no topic). */
+  --topic-accent: var(--accent);
+}
+
+/* Rotate --topic-accent to a card's --topic-hue, keeping the active
+   palette's own lightness/chroma — never a bare hex dropped on five
+   different grounds. Gated behind @supports so unsupported browsers keep
+   the flat var(--accent) above instead of an invalid declaration. */
+@supports (color: oklch(from red l c h)) {
+  :root {
+    --topic-accent: oklch(from var(--accent) l c var(--topic-hue, h));
+  }
+
+  /* Phosphor is deliberately hue-free (ADR-0016) — topic coloring opts out
+     here rather than being special-cased per card. */
+  [data-palette="phosphor"] {
+    --topic-accent: var(--accent);
+  }
 }
 
 /* -- the other four palettes, ready for docs/tasks/0002 to wire up --------
@@ -413,7 +435,7 @@ body {
 
 .card[data-expanded="true"] {
   cursor: default;
-  border-color: var(--accent);
+  border-color: var(--topic-accent);
 }
 
 /* Hero (ADR-0017) — never collapsed, reads as a visual anchor rather than
@@ -441,9 +463,9 @@ body {
   background: conic-gradient(
     from var(--hero-angle),
     var(--accent-2) 0deg,
-    color-mix(in srgb, var(--accent) 45%, var(--bg-2)) 100deg,
-    var(--accent) 180deg,
-    color-mix(in srgb, var(--accent) 45%, var(--bg-2)) 260deg,
+    color-mix(in srgb, var(--topic-accent) 45%, var(--bg-2)) 100deg,
+    var(--topic-accent) 180deg,
+    color-mix(in srgb, var(--topic-accent) 45%, var(--bg-2)) 260deg,
     var(--accent-2) 360deg
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -2175,6 +2197,39 @@ body.custom-cursor-active textarea {
 .modal-engagement-stat span:nth-child(3) {
   font-size: 9.5px;
   color: var(--fg-3);
+}
+
+/* -- per-topic accent color picker (ADR-0034) -- */
+.modal-color-picker {
+  margin-bottom: 14px;
+}
+
+.modal-color-picker-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.modal-color-swatches {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: oklch(from var(--accent) l c var(--swatch-hue, h));
+}
+
+.modal-color-swatch[data-active="true"] {
+  border-color: var(--fg);
 }
 
 /* -- quiz (ADR-0009) -- */

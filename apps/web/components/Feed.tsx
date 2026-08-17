@@ -24,6 +24,7 @@ import { AnimatePresence } from "framer-motion";
 import { api, type Card as CardModel, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
 import { groupIntoStations, stationKey, stationKind } from "@/lib/stations";
+import { topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
 import { CardSkeleton, DegradedNotice, EmptyFeed, EndOfFeed, ErrorNotice } from "./FeedStates";
 
@@ -55,6 +56,15 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
   const topicName = useCallback(
     (topicId: string) => topics.find((t) => t.id === topicId)?.display_name ?? "",
+    [topics],
+  );
+
+  const topicAccentHue = useCallback(
+    (topicId: string) => {
+      const index = topics.findIndex((t) => t.id === topicId);
+      if (index === -1) return undefined;
+      return topicHue(topicId, topics[index].accent_hue, index);
+    },
     [topics],
   );
 
@@ -217,6 +227,7 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
                     key={card.id}
                     card={card}
                     topicName={topicName(card.topic_id)}
+                    accentHue={topicAccentHue(card.topic_id)}
                     seen={seen.has(card.id)}
                     onSeen={markSeen}
                     onUnseen={unmarkSeen}

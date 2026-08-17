@@ -41,9 +41,10 @@ const FILTERS: { key: FilterMode; label: string }[] = [
 interface Props {
   topics: Topic[];
   progress: Record<string, TopicProgress>;
+  onTopicColorChanged: (topicId: string, accentHue: number | null) => void;
 }
 
-export function TopicsProgressBox({ topics, progress }: Props) {
+export function TopicsProgressBox({ topics, progress, onTopicColorChanged }: Props) {
   const [mode, setMode] = useState<FilterMode>("all");
   const [openTopicId, setOpenTopicId] = useState<string | null>(null);
   const openTopic = topics.find((t) => t.id === openTopicId) ?? null;
@@ -88,6 +89,9 @@ export function TopicsProgressBox({ topics, progress }: Props) {
         <TopicStatsModal
           topicId={openTopic.id}
           topicName={openTopic.display_name}
+          accentHue={openTopic.accent_hue}
+          topicIndex={topics.indexOf(openTopic)}
+          onColorChanged={(hue) => onTopicColorChanged(openTopic.id, hue)}
           onClose={() => setOpenTopicId(null)}
         />
       ) : null}

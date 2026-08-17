@@ -11,6 +11,7 @@ from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
     OnboardingCompleteIn,
     ProgressOut,
+    TopicColorIn,
     TopicDiscoverOut,
     TopicOut,
     TopicRequestIn,
@@ -175,9 +176,45 @@ async def list_topics(session: SessionDep, user_id: UserDep) -> list[TopicOut]:
             slug=topic.slug,
             is_custom=user_topic.is_custom,
             current_difficulty=tier or Difficulty.BEGINNER,
+            accent_hue=user_topic.accent_hue,
         )
         for user_topic, topic, tier in rows
     ]
+
+
+@router.patch("/{topic_id}/color", response_model=TopicOut)
+async def set_topic_color(
+    topic_id: UUID, payload: TopicColorIn, session: SessionDep, user_id: UserDep
+) -> TopicOut:
+    """ADR-0034: per-subscription accent hue, not a shared `Topic` property --
+    two users may color the same topic differently. `hue=null` resets to the
+    deterministic default the client computes itself, so this only ever needs
+    to be called for an explicit override."""
+
+    user_topic = await session.scalar(
+        select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+    )
+    if user_topic is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not subscribed to this topic")
+
+    user_topic.accent_hue = payload.hue
+    progress = await session.scalar(
+        select(UserTopicProgress).where(
+            UserTopicProgress.user_id == user_id, UserTopicProgress.topic_id == topic_id
+        )
+    )
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+    await session.commit()
+
+    return TopicOut(
+        id=topic.id,
+        display_name=user_topic.display_name,
+        slug=topic.slug,
+        is_custom=user_topic.is_custom,
+        current_difficulty=progress.current_difficulty if progress else Difficulty.BEGINNER,
+        accent_hue=user_topic.accent_hue,
+    )
 
 
 @router.get("/discover", response_model=list[TopicDiscoverOut])

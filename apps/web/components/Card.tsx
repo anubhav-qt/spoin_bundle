@@ -37,7 +37,7 @@
  *   dwell_complete    -> they stayed past the threshold
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { motion, type PanInfo } from "framer-motion";
 
@@ -72,6 +72,10 @@ const DIFFICULTY_RANK: Record<Difficulty, number> = {
 interface Props {
   card: CardModel;
   topicName: string;
+  /** 0-359, or undefined for a mixed/unknown topic — omitted entirely rather
+   *  than defaulted here, so --topic-accent falls back to the plain palette
+   *  accent (ADR-0034) instead of every card converging on hue 0 (red). */
+  accentHue: number | undefined;
   seen: boolean;
   onSeen: (cardId: string) => void;
   onUnseen: (cardId: string) => void;
@@ -81,7 +85,7 @@ interface Props {
   isHero: boolean;
 }
 
-export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHero }: Props) {
+export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDismiss, isHero }: Props) {
   // Hero never collapses: starting `expanded` (and `everExpanded`) true and
   // making `toggle` a no-op for hero reuses every bit of existing dwell/reveal
   // logic below instead of forking a parallel code path for it.
@@ -323,6 +327,7 @@ export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHer
           data-hero={isHero}
           onClick={toggle}
           aria-expanded={expanded}
+          style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as CSSProperties) : undefined}
         >
           <div className="card-head">
             {/* Always this user's own name for the topic (ADR-0004). */}

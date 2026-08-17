@@ -99,7 +99,15 @@ class _WireCardBatch(BaseModel):
 
 
 class _WireQuestion(BaseModel):
-    card_index: int = -1
+    card_index: int = Field(
+        default=-1,
+        description=(
+            "The number shown immediately before the card this question is about "
+            "(e.g. '3. <title>' -> card_index=3). Must exactly match one of the "
+            "input card numbers -- this is how the question gets attached back to "
+            "the right card, so get it right even when you reorder your reasoning."
+        ),
+    )
     kind: str = "mcq"
     stem: str = ""
     options: list[str] | None = None
@@ -321,13 +329,17 @@ what difficulty each was requested at.
 """
 
 _QUESTIONS_SYSTEM = """\
-You write quiz questions FROM the given cards — one question per card, in the \
-same order. All but the last question in a batch should be a 4-option multiple \
-choice question with exactly one correct answer (kind="mcq") testing something \
-the card body actually teaches, with a short explanation. The LAST question in \
-the batch should instead be free-text (kind="free_text"): an open-ended prompt \
-with a 0-3 level grading rubric (0 none / 1 surface / 2 solid / 3 deep) and a \
-reference answer.
+You write quiz questions FROM the given cards — exactly one question per card. \
+Every card below is numbered ("0. <title>", "1. <title>", ...); set each \
+question's card_index to that exact number so it attaches back to the right \
+card — this matters most for the cards whose content is topically similar to \
+each other, where it's easy to write a correct question but tag it with the \
+wrong neighbor's number. All but one question in a batch should be a 4-option \
+multiple choice question with exactly one correct answer (kind="mcq") testing \
+something the card body actually teaches, with a short explanation. Exactly \
+one question in the batch — for the card with the highest index — should \
+instead be free-text (kind="free_text"): an open-ended prompt with a 0-3 level \
+grading rubric (0 none / 1 surface / 2 solid / 3 deep) and a reference answer.
 """
 
 _QUESTIONS_USER = """\
@@ -809,7 +821,27 @@ class GeminiContentGenerator(ContentGenerator):
                 )
             except ValidationError as exc:
                 failures.append(f"malformed question: {exc}")
-        return BatchResult(items=items, failures=failures)
+
+        # The model self-reports card_index (see _WireQuestion's field
+        # description) rather than the code deriving it from response
+        # position, so a mislabeled item is possible. Two items claiming the
+        # same card_index would otherwise silently overwrite one another at
+        # the QUESTION table's card_id FK with no signal that a different
+        # card went without a question -- keep the first, drop the rest as
+        # failures instead of guessing which one is right.
+        seen_indices: set[int] = set()
+        deduped: list[QuestionDraft] = []
+        for draft in items:
+            if draft.card_index in seen_indices:
+                failures.append(
+                    f"duplicate card_index {draft.card_index} (question dropped, "
+                    "another question already claimed this card)"
+                )
+                continue
+            seen_indices.add(draft.card_index)
+            deduped.append(draft)
+
+        return BatchResult(items=deduped, failures=failures)
 
     async def grade_free_text(
         self, items: list[FreeTextGradeQuery]

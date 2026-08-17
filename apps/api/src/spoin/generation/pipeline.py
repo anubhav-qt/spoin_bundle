@@ -1330,6 +1330,12 @@ async def _process_gate_item(
             await runtime.session.commit()
         questions_accepted = len(new_questions)
         questions_rejected = len(question_failures)
+        if question_failures:
+            logger.info(
+                "subtopic %s [%s]: %d question failure(s): %s",
+                item.subtopic_id, item.difficulty, len(question_failures),
+                "; ".join(question_failures),
+            )
 
     return {
         "topic_id": item.topic_id,

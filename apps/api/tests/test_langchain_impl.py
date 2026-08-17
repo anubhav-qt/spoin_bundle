@@ -416,6 +416,37 @@ async def test_generate_questions_maps_mcq_and_free_text() -> None:
     assert result.items[1].rubric == "0/1/2/3"
 
 
+async def test_generate_questions_drops_duplicate_card_index() -> None:
+    generator = _generator()
+    wire = _WireQuestionBatch(
+        questions=[
+            _WireQuestion(
+                card_index=0,
+                stem="First question, correctly attached.",
+                options=["a", "b", "c", "d"],
+                correct_index=0,
+            ),
+            _WireQuestion(
+                card_index=0,
+                stem="Second question, mislabeled with the same card_index.",
+                options=["a", "b", "c", "d"],
+                correct_index=1,
+            ),
+        ]
+    )
+    with patch.object(
+        ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
+    ):
+        result = await generator.generate_questions(
+            [("Card A", "body a"), ("Card B", "body b")], Difficulty.BEGINNER
+        )
+
+    assert len(result.items) == 1
+    assert result.items[0].stem == "First question, correctly attached."
+    assert len(result.failures) == 1
+    assert "duplicate card_index" in result.failures[0]
+
+
 async def test_generate_curriculum_threads_existing_subtopics_into_prompt() -> None:
     from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
 

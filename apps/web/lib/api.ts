@@ -212,6 +212,21 @@ export interface TopicStats {
   shares: number;
 }
 
+export interface SubtopicProgress {
+  subtopic_id: string;
+  title: string;
+  difficulty: Difficulty;
+  total_cards: number;
+  seen_cards: number;
+  coverage: number;
+  covered: boolean;
+}
+
+export interface TopicCurriculum {
+  topic_id: string;
+  subtopics: SubtopicProgress[];
+}
+
 export interface QuizMcqQuestion {
   question_id: string;
   stem: string;
@@ -337,6 +352,8 @@ export const api = {
     }),
 
   topicStats: (topicId: string) => request<TopicStats>(`/topics/${topicId}/stats`),
+
+  topicCurriculum: (topicId: string) => request<TopicCurriculum>(`/topics/${topicId}/curriculum`),
 
   /** Dev-only (see api/routers/dev.py) — resets this user's progress and
    *  unfollows a couple of topics back to Discover. Returns the refreshed

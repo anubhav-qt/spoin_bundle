@@ -3,6 +3,10 @@
 - **Status:** Accepted
 - **Date:** 2026-08-17
 - **Deciders:** Anubhav
+- **Extended by:** [ADR-0031](0031-verification-feedback-and-per-tier-gate-durability.md) —
+  adds a second feedback channel (verification rejection reasons, alongside this ADR's
+  near-duplicate `avoid_bodies`) and replaces `gate_and_persist`'s four global phase-barriers
+  with a per-subtopic-tier pipeline.
 - **Supersedes:** [content-model.md](../architecture/content-model.md)'s original "Quality
   gate" section — checks 2-4 (topic conformance, difficulty, factual accuracy) as
   independent reject-only checks are replaced by the two-pass design below. Check 1

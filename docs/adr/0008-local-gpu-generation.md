@@ -116,6 +116,14 @@ of that topic.
 **Local embeddings only, no local generation.** Already the plan (ADR-0003) and unaffected;
 this ADR adds generation on top.
 
+## Open question: specific model choice
+
+This ADR commits to the cloud/local *split*, not to specific model names. `gemini-2.5-flash`
+and `qwen3:14b` currently appear as defaults in `core/config.py`, but neither was actually
+discussed — they were picked in code, not decided. Both need a real discussion (cost,
+quality, structured-output reliability, VRAM fit for the local model) before they should be
+treated as settled rather than placeholders.
+
 ## Revisit when
 
 - Measured quality of local cards (rejection rate, and engagement relative to cloud-generated

@@ -171,15 +171,6 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
   return (
     <>
-      {/* Not sticky, deliberately — the wordmark already lives in the left
-          nav, so this is just a one-line orientation cue that scrolls away
-          with the rest of the thread rather than pinning a second banner. */}
-      {kind === "subtopic" ? (
-        <p className="feed-intro">
-          One topic — following the curriculum
-        </p>
-      ) : null}
-
       <main className="track">
         {error !== null && cards.length === 0 ? (
           <ErrorNotice message={error} onRetry={() => void loadPage(true)} />

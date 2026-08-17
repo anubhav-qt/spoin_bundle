@@ -78,14 +78,10 @@ class Settings(BaseSettings):
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     embedding_dim: int = 384
 
-    # Topic canonicalization bands (ADR-0004).
-    #
-    # PLACEHOLDERS. These are guesses, and ADR-0004 is explicit that a guessed
-    # threshold "produces a system that looks tuned but is a superstition".
-    # docs/tasks/0001 exists to replace them with measured values. They are
-    # specific to `embedding_model` and must be recalibrated if it changes.
-    topic_merge_high: float = 0.92
-    topic_merge_low: float = 0.80
+    #: How many existing-topic candidates the embedding pre-filter offers the
+    #: batched matching call per incoming topic (ADR-0025). Not a threshold — the
+    #: LLM decides; this just bounds recall-filter/prompt size.
+    topic_match_candidates: int = 5
 
     # Card near-duplicate threshold. Different vectors, different numbers — the
     # topic threshold does not transfer (content-model.md, open questions).

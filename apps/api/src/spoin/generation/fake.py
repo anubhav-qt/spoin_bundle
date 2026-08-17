@@ -23,7 +23,8 @@ from spoin.generation.base import (
     QuestionDraft,
     SubtopicGroupDraft,
     SubtopicTierDraft,
-    TopicMatchVerdict,
+    TopicMatchQuery,
+    TopicMatchResult,
 )
 
 
@@ -43,7 +44,6 @@ class FakeContentGenerator(ContentGenerator):
         self,
         topic_name: str,
         description: str,
-        related_subtopic_hints: list[str] | None = None,
         existing_subtopics: list[str] | None = None,
     ) -> CurriculumDraft:
         groups = [
@@ -69,37 +69,20 @@ class FakeContentGenerator(ContentGenerator):
             # actually reuses that row instead of forking a duplicate.
             reused_title = existing_subtopics[0].split(" :: ", 1)[0]
             groups[0].title = reused_title
-        if related_subtopic_hints:
-            # Deterministically fold hints in as their own group, so a test can
-            # assert the pipeline actually threaded them through rather than the
-            # generator silently ignoring them.
-            groups.append(
-                SubtopicGroupDraft(
-                    title=f"{topic_name}: from related topic",
-                    tiers=[
-                        SubtopicTierDraft(
-                            difficulty=Difficulty.BEGINNER,
-                            description="Adapted from: " + "; ".join(related_subtopic_hints),
-                            target_cards=5,
-                        )
-                    ],
-                    position=len(groups),
-                )
-            )
         return CurriculumDraft(subtopics=groups)
 
-    async def judge_topic_match(
-        self,
-        candidate_name: str,
-        candidate_description: str,
-        matched_topic_name: str,
-        matched_subtopic_titles: list[str],
-    ) -> TopicMatchVerdict:
-        same_topic = _stable_index(candidate_name, matched_topic_name, modulo=2) == 0
-        return TopicMatchVerdict(
-            same_topic=same_topic,
-            relevant_subtopic_titles=matched_subtopic_titles[:2],
-        )
+    async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
+        # Deterministic stand-in for an LLM opinion: the highest-similarity
+        # candidate "matches" above a fixed cutoff. This is the FAKE's own
+        # simulated judgment, not a system threshold — ADR-0025 removed those.
+        items = []
+        for query in queries:
+            best = max(query.candidates, key=lambda c: c.similarity, default=None)
+            matched = best.topic_id if best is not None and best.similarity >= 0.9 else None
+            items.append(
+                TopicMatchResult(request_index=query.request_index, matched_topic_id=matched)
+            )
+        return BatchResult(items=items)
 
     async def generate_cards(
         self,
@@ -110,7 +93,9 @@ class FakeContentGenerator(ContentGenerator):
         difficulty: Difficulty,
         count: int,
         existing_titles: list[str],
+        builds_on: list[str],
     ) -> BatchResult[CardDraft]:
+        builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
         items = [
             CardDraft(
                 title=f"{subtopic_title} — note {n + 1}"[:120],
@@ -119,7 +104,7 @@ class FakeContentGenerator(ContentGenerator):
                 body=(
                     f"# {subtopic_title}\n\n"
                     f"Placeholder body {n + 1} for **{topic_name}** "
-                    f"({difficulty.value}).\n\n{subtopic_description}\n"
+                    f"({difficulty.value}).{builds_on_note}\n\n{subtopic_description}\n"
                 ),
                 difficulty=difficulty,
             )

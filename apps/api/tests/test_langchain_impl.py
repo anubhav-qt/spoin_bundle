@@ -90,6 +90,7 @@ async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:
             difficulty=Difficulty.INTERMEDIATE,
             count=2,
             existing_titles=[],
+            builds_on=[],
         )
 
     assert len(result.items) == 1
@@ -113,11 +114,40 @@ async def test_generate_cards_whole_call_failure_degrades_to_empty_batch() -> No
             difficulty=Difficulty.BEGINNER,
             count=5,
             existing_titles=[],
+            builds_on=[],
         )
 
     assert result.items == []
     assert len(result.failures) == 1
     assert "network blip" in result.failures[0]
+
+
+async def test_generate_cards_threads_builds_on_into_prompt() -> None:
+    generator = _generator()
+    wire = _WireCardBatch(
+        cards=[_WireCard(title="Advanced take", canonical_title="Advanced Take", summary="s", body="b")]
+    )
+    captured_prompt: list[object] = []
+
+    async def _capture(prompt: object) -> _WireCardBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        await generator.generate_cards(
+            topic_name="T",
+            subtopic_title="S",
+            subtopic_description="d",
+            difficulty=Difficulty.ADVANCED,
+            count=1,
+            existing_titles=[],
+            builds_on=["Lower-tier card body about the basics."],
+        )
+
+    prompt_text = str(captured_prompt[0])
+    assert "Lower-tier card body about the basics." in prompt_text
 
 
 async def test_judge_difficulty_parses_verdicts_and_rejects_bad_enum() -> None:
@@ -169,38 +199,6 @@ async def test_generate_questions_maps_mcq_and_free_text() -> None:
     assert result.items[1].rubric == "0/1/2/3"
 
 
-async def test_generate_curriculum_threads_related_hints_into_prompt() -> None:
-    from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
-
-    generator = _generator()
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
-    captured_prompt: list[object] = []
-
-    async def _capture(prompt: object) -> CurriculumDraft:
-        captured_prompt.append(prompt)
-        return draft
-
-    runnable = AsyncMock()
-    runnable.ainvoke = _capture
-    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        result = await generator.generate_curriculum("Topic", "desc", ["Related Hint One"])
-
-    assert result is draft
-    prompt_text = str(captured_prompt[0])
-    assert "Related Hint One" in prompt_text
-
-
 async def test_generate_curriculum_threads_existing_subtopics_into_prompt() -> None:
     from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
 
@@ -234,14 +232,49 @@ async def test_generate_curriculum_threads_existing_subtopics_into_prompt() -> N
     assert "Existing Subtopic One" in prompt_text
 
 
-async def test_judge_topic_match_returns_verdict_directly() -> None:
-    from spoin.generation.base import TopicMatchVerdict
+async def test_match_topics_batches_every_query_in_one_call() -> None:
+    from spoin.generation.langchain_impl import _WireTopicMatchBatch, _WireTopicMatchResult
 
     generator = _generator()
-    verdict = TopicMatchVerdict(same_topic=True, relevant_subtopic_titles=["X"])
-    with patch.object(
-        ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(verdict)
-    ):
-        result = await generator.judge_topic_match("A", "a", "A'", ["X", "Y"])
+    wire = _WireTopicMatchBatch(
+        results=[
+            _WireTopicMatchResult(request_index=0, matched_topic_id="11111111-1111-1111-1111-111111111111"),
+            _WireTopicMatchResult(request_index=1, matched_topic_id=None),
+        ]
+    )
+    captured_prompt: list[object] = []
 
-    assert result is verdict
+    async def _capture(prompt: object) -> _WireTopicMatchBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        from spoin.generation.base import TopicMatchCandidate, TopicMatchQuery
+
+        queries = [
+            TopicMatchQuery(
+                request_index=0,
+                name="k8s",
+                description="",
+                candidates=[
+                    TopicMatchCandidate(
+                        topic_id="11111111-1111-1111-1111-111111111111",
+                        name="Kubernetes",
+                        similarity=0.95,
+                    )
+                ],
+            ),
+            TopicMatchQuery(request_index=1, name="Sourdough Baking", description="", candidates=[]),
+        ]
+        result = await generator.match_topics(queries)
+
+    assert len(result.items) == 2
+    assert result.items[0].matched_topic_id == "11111111-1111-1111-1111-111111111111"
+    assert result.items[1].matched_topic_id is None
+    prompt_text = str(captured_prompt[0])
+    assert "k8s" in prompt_text
+    assert "Sourdough Baking" in prompt_text
+    # One call for the whole batch, not one per query (ADR-0025).
+    assert len(captured_prompt) == 1

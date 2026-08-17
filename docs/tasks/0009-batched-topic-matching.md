@@ -1,5 +1,11 @@
 # Task 0009: Implement batched LLM topic matching
 
+**Status:** Done — executed 2026-08-17. `match_and_create_topics()` in
+`generation/pipeline.py`; `ContentGenerator.match_topics` replaces
+`judge_topic_match`/`TopicMatchVerdict`; `Settings.topic_merge_high/low` removed
+(`topic_match_candidates` replaces them). Covered by
+`tests/test_generation_pipeline.py` and `tests/test_langchain_impl.py`.
+
 **Owner:** unassigned
 
 **Background reading:** [ADR-0025](../adr/0025-batched-llm-topic-matching.md), then

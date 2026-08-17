@@ -110,8 +110,10 @@ class TopicAlias(Base, UUIDPrimaryKey, CreatedAt):
     topic_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), nullable=False
     )
-    #: 'exact' | 'auto_merge' | 'llm_judge' | 'new_topic'. How this alias was
-    #: decided, kept so a bad band can be audited after the fact.
+    #: 'llm_batch_match' as of ADR-0025 (every match decision flows through the
+    #: batched LLM call now). Older rows predating that migration may still
+    #: carry 'auto_merge' or 'llm_judge' from the threshold-banded system it
+    #: replaced. Kept so a bad decision can be audited after the fact.
     decided_by: Mapped[str] = mapped_column(String(20), nullable=False)
     similarity: Mapped[float | None] = mapped_column()
 

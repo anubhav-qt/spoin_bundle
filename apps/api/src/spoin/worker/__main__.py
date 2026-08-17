@@ -9,26 +9,77 @@ instead of exhausting it by 9am.
 The same job functions run as a persistent loop once we are paying — a different
 entrypoint over identical code, which is what "no accommodation may require a
 rewrite to undo" means in practice.
+
+**Per-job isolation (ADR-0026).** Each claimed job runs the one-shot pipeline
+(`run_generation_pipeline`, ADR-0026) in its OWN `asyncio` task with its OWN DB
+session, gathered together. One job's exception marks only that job `failed` —
+it never touches any other job in the same pass. Cross-job concurrency and
+failure isolation live here, in the worker; the pipeline's own LangGraph
+concurrency (ADR-0024) is scoped to a single topic's run.
 """
 
 from __future__ import annotations
 
 import asyncio
 import logging
+import uuid
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine, session_scope
 from spoin.domain.models import GenerationJob
+from spoin.embeddings import Embedder, get_embedder
+from spoin.generation import get_content_generator
+from spoin.generation.base import ContentGenerator
+from spoin.generation.pipeline import run_generation_pipeline
 
 logger = logging.getLogger("spoin.worker")
 
 
-async def run_once() -> int:
-    """Claim and run whatever is pending, highest priority first.
+async def _run_job(
+    job_id: uuid.UUID,
+    topic_id: uuid.UUID,
+    generator: ContentGenerator,
+    embedder: Embedder,
+) -> None:
+    """One job, start to finish, on its own session throughout — including the
+    status write-back, so a crash between generation and write-back can't leave
+    a job silently stuck `running` forever (the next pass's claim query would
+    just never see it again; an operational concern for later, not solved here)."""
 
-    Returns the number of jobs processed.
+    settings = get_settings()
+    try:
+        async with session_scope() as session:
+            report = await run_generation_pipeline(
+                session, generator, embedder, settings, topic_ids=[topic_id]
+            )
+            job = await session.get(GenerationJob, job_id)
+            assert job is not None
+            job.status = "completed"
+            job.completed_at = datetime.now(UTC)
+            job.attempts += 1
+            job.last_error = None
+        topics = report.get("topics", [])
+        accepted = topics[0].get("accepted", 0) if topics else 0
+        logger.info("job %s completed (topic=%s, cards_accepted=%s)", job_id, topic_id, accepted)
+    except Exception as exc:
+        logger.exception("job %s failed (topic=%s)", job_id, topic_id)
+        async with session_scope() as session:
+            job = await session.get(GenerationJob, job_id)
+            if job is not None:
+                job.status = "failed"
+                job.attempts += 1
+                job.last_error = str(exc)[:2000]
+
+
+async def run_once() -> int:
+    """Claim whatever is pending, highest priority first, and run every claimed
+    job concurrently with per-job isolation.
+
+    Returns the number of jobs processed (attempted, not necessarily succeeded —
+    see each job's own `status`/`last_error` for outcome).
     """
 
     settings = get_settings()
@@ -40,11 +91,10 @@ async def run_once() -> int:
                 await session.execute(
                     select(GenerationJob)
                     .where(GenerationJob.status == "pending")
-                    # Prioritised, not FIFO (ADR-0003 §6): refilling a starved popular
-                    # topic outranks one user's niche custom topic, and a
-                    # demand-triggered fill outranks speculative background work. When
-                    # quota runs out, low-priority work waits for tomorrow rather than
-                    # everyone starving equally.
+                    # Prioritised, not FIFO (ADR-0003 §6): a demand-triggered fill
+                    # (a real user is waiting) outranks speculative background
+                    # work. When quota runs out, low-priority work waits for
+                    # tomorrow rather than everyone starving equally.
                     .order_by(GenerationJob.priority.desc(), GenerationJob.created_at)
                     .limit(settings.generation_batch_size)
                 )
@@ -52,25 +102,25 @@ async def run_once() -> int:
             .scalars()
             .all()
         )
+        if not pending:
+            logger.info("nothing to do")
+            return 0
 
-    if not pending:
-        logger.info("nothing to do")
-        return 0
+        # Claim now, in this same transaction, so a crash before dispatch
+        # doesn't leave these silently re-claimable as `pending` next pass.
+        claimed = [(job.id, job.topic_id) for job in pending]
+        for job in pending:
+            job.status = "running"
 
-    # NOT YET WIRED HERE. The generation logic these jobs need (curriculum pass,
-    # card generation) is implemented and tested — generation/pipeline.py's
-    # run_generation_pipeline() — but nothing here calls it yet; see
-    # docs/tasks/0008-wire-generation-job-worker.md. Deliberately not stubbed with
-    # something that half-works: a worker that silently marks jobs complete
-    # without generating anything is worse than one that does nothing, because
-    # the queue would look healthy while the corpus stayed empty. (The batch
-    # judge and question-bank generation are separately unbuilt altogether —
-    # see docs/architecture/generation-pipeline.md.)
-    logger.warning(
-        "%d job(s) queued but no job handlers are wired up yet; leaving them pending",
-        len(pending),
+    generator = get_content_generator()
+    embedder = get_embedder()
+
+    await asyncio.gather(
+        *(_run_job(job_id, topic_id, generator, embedder) for job_id, topic_id in claimed)
     )
-    return 0
+
+    logger.info("worker pass finished (%d job(s) processed)", len(claimed))
+    return len(claimed)
 
 
 async def main() -> None:
@@ -79,8 +129,7 @@ async def main() -> None:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
     try:
-        processed = await run_once()
-        logger.info("worker pass finished (%d jobs)", processed)
+        await run_once()
     finally:
         await get_engine().dispose()
 

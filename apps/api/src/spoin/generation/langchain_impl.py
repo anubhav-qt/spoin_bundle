@@ -27,10 +27,12 @@ type were the direct target, one malformed item would fail the whole batch atomi
 type by hand, with per-item failures collected into `BatchResult.failures` and
 good items still landing in `BatchResult.items`.
 
-The two single-result methods (`generate_curriculum`, `judge_topic_match`) skip
-this — there's no meaningful "partial curriculum," so a hard failure there is
-allowed to raise and fail the whole topic branch, matching ADR-0007's framing of
-the curriculum pass as the highest-stakes single point of failure.
+`generate_curriculum` skips this — there's no meaningful "partial curriculum," so
+a hard failure there is allowed to raise and fail the whole topic branch, matching
+ADR-0007's framing of the curriculum pass as the highest-stakes single point of
+failure. `match_topics` (ADR-0025) does use the wire/domain split, same as the
+other batch methods, since a malformed verdict for one topic in the batch
+shouldn't fail matching for every other topic in it.
 """
 
 from __future__ import annotations
@@ -49,7 +51,8 @@ from spoin.generation.base import (
     CurriculumDraft,
     DifficultyVerdict,
     QuestionDraft,
-    TopicMatchVerdict,
+    TopicMatchQuery,
+    TopicMatchResult,
 )
 from spoin.generation.quota import QuotaGovernor
 
@@ -93,6 +96,15 @@ class _WireDifficultyBatch(BaseModel):
     verdicts: list[_WireDifficultyVerdict] = Field(default_factory=list)
 
 
+class _WireTopicMatchResult(BaseModel):
+    request_index: int = -1
+    matched_topic_id: str | None = None
+
+
+class _WireTopicMatchBatch(BaseModel):
+    results: list[_WireTopicMatchResult] = Field(default_factory=list)
+
+
 # ------------------------------------------------------------------ prompts --
 
 _CURRICULUM_SYSTEM = """\
@@ -129,7 +141,7 @@ Rules:
 _CURRICULUM_USER = """\
 Topic: {topic_name}
 Description: {description}
-{hints_block}{existing_subtopics_block}
+{existing_subtopics_block}
 Design the full curriculum for this topic now.
 """
 
@@ -158,6 +170,10 @@ CRITICAL: never repeat a title (canonical or display) from the "already covered"
 list below — write about something genuinely different within this subtopic. The \
 list is tagged with the difficulty each existing card was written at; a card at a \
 DIFFERENT difficulty on the same idea must differ in DEPTH, not just wording.
+
+If cards from a LOWER difficulty tier of this same subtopic are shown below \
+("builds on"), these new cards should genuinely build on them — assume the \
+reader already knows that material, and go deeper rather than re-explaining it.
 """
 
 _CARDS_USER = """\
@@ -169,26 +185,24 @@ Write exactly {count} NEW cards at this difficulty for this subtopic.
 
 Already covered in this subtopic (do not repeat any of these):
 {existing_titles_block}
+{builds_on_block}"""
+
+_TOPIC_BATCH_MATCH_SYSTEM = """\
+You decide, for each candidate topic below, whether it refers to the SAME \
+subject as one of its listed existing topics — e.g. "k8s" and "Kubernetes" are \
+the same; "Java" and "JavaScript" are NOT, despite the similar name. Each \
+candidate lists its most similar existing topics with a cosine similarity score \
+(0-1) — treat this as a rough hint only, not a rule; judge from the names and \
+descriptions. If a candidate matches one of its listed existing topics, return \
+that topic's id as matched_topic_id; if none match (including when no existing \
+topics are listed at all), return null. Judge every candidate independently and \
+return exactly one result per candidate, keyed by its request_index.
 """
 
-_TOPIC_MATCH_SYSTEM = """\
-You decide whether two topic names/descriptions refer to the SAME subject — \
-e.g. "k8s" and "Kubernetes" are the same; "Java" and "JavaScript" are NOT, \
-despite the similar name. If they're the same, also flag which of the existing \
-topic's subtopics look genuinely relevant to the candidate — even if you decide \
-they are NOT strictly the same topic, still flag any subtopics that could \
-reasonably be adapted for the candidate.
-"""
+_TOPIC_BATCH_MATCH_USER = """\
+{queries_block}
 
-_TOPIC_MATCH_USER = """\
-Candidate topic: {candidate_name}
-Candidate description: {candidate_description}
-
-Existing topic: {matched_topic_name}
-Existing topic's subtopics: {matched_subtopic_titles}
-
-Are these the same subject? Which existing subtopics are relevant to the \
-candidate, whether or not they're the same subject?
+Return one verdict per candidate topic above, referencing its request_index.
 """
 
 _DIFFICULTY_SYSTEM = """\
@@ -231,6 +245,30 @@ def _format_existing_titles(existing_titles: list[str]) -> str:
     return "\n".join(f"- {title}" for title in existing_titles)
 
 
+def _format_builds_on(builds_on: list[str]) -> str:
+    if not builds_on:
+        return ""
+    bodies = "\n\n".join(
+        f"--- lower-tier card {n + 1} ---\n{body}" for n, body in enumerate(builds_on)
+    )
+    return f"\nBuilds on (lower-difficulty cards already written for this subtopic):\n{bodies}\n"
+
+
+def _format_topic_match_query(query: TopicMatchQuery) -> str:
+    if query.candidates:
+        candidates_block = "\n".join(
+            f"     - id={c.topic_id} name={c.name} similarity={c.similarity:.2f}"
+            for c in query.candidates
+        )
+    else:
+        candidates_block = "     (none)"
+    return (
+        f"{query.request_index}. Candidate: {query.name}\n"
+        f"   Description: {query.description or '(none given)'}\n"
+        f"   Existing topics:\n{candidates_block}"
+    )
+
+
 class GeminiContentGenerator(ContentGenerator):
     """ADR-0008: cloud, quota-bound. Always the strongest available model for the
     curriculum pass; also generates cards until a local backend exists.
@@ -267,19 +305,10 @@ class GeminiContentGenerator(ContentGenerator):
         self,
         topic_name: str,
         description: str,
-        related_subtopic_hints: list[str] | None = None,
         existing_subtopics: list[str] | None = None,
     ) -> CurriculumDraft:
         client = await self._next_client()
         structured = client.with_structured_output(CurriculumDraft)
-        hints_block = ""
-        if related_subtopic_hints:
-            hints_block = (
-                "\nSubtopics from a related existing topic you may adapt (never "
-                "copy verbatim, only use what's genuinely relevant):\n"
-                + "\n".join(f"- {hint}" for hint in related_subtopic_hints)
-                + "\n"
-            )
         existing_subtopics_block = ""
         if existing_subtopics:
             existing_subtopics_block = (
@@ -294,7 +323,6 @@ class GeminiContentGenerator(ContentGenerator):
                 _CURRICULUM_USER.format(
                     topic_name=topic_name,
                     description=description or "(no additional description given)",
-                    hints_block=hints_block,
                     existing_subtopics_block=existing_subtopics_block,
                 ),
             ),
@@ -303,30 +331,35 @@ class GeminiContentGenerator(ContentGenerator):
         assert isinstance(result, CurriculumDraft)
         return result
 
-    async def judge_topic_match(
-        self,
-        candidate_name: str,
-        candidate_description: str,
-        matched_topic_name: str,
-        matched_subtopic_titles: list[str],
-    ) -> TopicMatchVerdict:
+    async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
+        if not queries:
+            return BatchResult(items=[])
+
         client = await self._next_client()
-        structured = client.with_structured_output(TopicMatchVerdict)
+        structured = client.with_structured_output(_WireTopicMatchBatch)
+        queries_block = "\n\n".join(_format_topic_match_query(query) for query in queries)
         prompt = [
-            ("system", _TOPIC_MATCH_SYSTEM),
-            (
-                "human",
-                _TOPIC_MATCH_USER.format(
-                    candidate_name=candidate_name,
-                    candidate_description=candidate_description or "(none given)",
-                    matched_topic_name=matched_topic_name,
-                    matched_subtopic_titles=", ".join(matched_subtopic_titles) or "(none)",
-                ),
-            ),
+            ("system", _TOPIC_BATCH_MATCH_SYSTEM),
+            ("human", _TOPIC_BATCH_MATCH_USER.format(queries_block=queries_block)),
         ]
-        result = await structured.ainvoke(prompt)
-        assert isinstance(result, TopicMatchVerdict)
-        return result
+        try:
+            wire_result = await structured.ainvoke(prompt)
+        except Exception as exc:
+            return BatchResult(items=[], failures=[f"match_topics call failed: {exc}"])
+        assert isinstance(wire_result, _WireTopicMatchBatch)
+
+        items: list[TopicMatchResult] = []
+        failures: list[str] = []
+        for wire in wire_result.results:
+            try:
+                items.append(
+                    TopicMatchResult(
+                        request_index=wire.request_index, matched_topic_id=wire.matched_topic_id
+                    )
+                )
+            except ValidationError as exc:
+                failures.append(f"malformed topic match result: {exc}")
+        return BatchResult(items=items, failures=failures)
 
     # ----------------------------------------------------------------------- cards --
 
@@ -339,6 +372,7 @@ class GeminiContentGenerator(ContentGenerator):
         difficulty: Difficulty,
         count: int,
         existing_titles: list[str],
+        builds_on: list[str],
     ) -> BatchResult[CardDraft]:
         client = await self._next_client()
         structured = client.with_structured_output(_WireCardBatch)
@@ -353,6 +387,7 @@ class GeminiContentGenerator(ContentGenerator):
                     difficulty=difficulty.value,
                     count=count,
                     existing_titles_block=_format_existing_titles(existing_titles),
+                    builds_on_block=_format_builds_on(builds_on),
                 ),
             ),
         ]

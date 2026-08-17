@@ -1,5 +1,15 @@
 # Task 0008: Wire `apps/worker` to the generation pipeline
 
+**Status:** Done — executed 2026-08-17. `worker/__main__.py`'s `run_once()`
+claims pending jobs, marks them `running` in the claiming transaction, then
+fires one `asyncio` task per job (own `session_scope()` each) gathered
+together — one job's exception only marks that job `failed`. `GenerationJob`
+migrated (`alembic/versions/a3f0c1b8d4e2_*.py`): `kind`/`subtopic_id` dropped,
+coalescing key moved to `topic_id`. Verified against a live `docker compose`
+Postgres with `SPOIN_GENERATOR=fake`: a seeded `GenerationJob` row went from
+`pending` to `completed` with cards and questions persisted. Covered by
+`tests/test_worker.py`.
+
 **Owner:** unassigned
 
 **Depends on:** [0009](0009-batched-topic-matching.md) (batched matching decides which

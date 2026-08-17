@@ -202,35 +202,33 @@ class UserTopicProgress(Base, Timestamps):
 
 
 class GenerationJob(Base, UUIDPrimaryKey, Timestamps):
-    """A unit of generation work.
+    """A unit of generation work: run the one-shot pipeline (ADR-0026) for one
+    already-existing `topic_id` (minted by `match_and_create_topics`,
+    ADR-0025 -- a job's topic always exists before the job does).
 
-    The uniqueness key is `subtopic_id` (ADR-0007's amendment to ADR-0006). Two
-    things fall out of that single choice: concurrent misses on the same starved
-    slot collapse into one job instead of fifty spending a whole day of quota, and
-    calls to the same subtopic stay sequential so each prompt sees the titles the
-    previous one produced.
+    The uniqueness key is `topic_id`. A topic only ever needs ONE generation
+    job in its lifetime (there is no recurring refill to coalesce, per
+    ADR-0026) -- this just collapses concurrent duplicate triggers for the
+    same topic into one row, the same way the old subtopic-keyed lock did for
+    the demand-driven refill model it replaced.
     """
 
     __tablename__ = "generation_job"
     __table_args__ = (
         # The coalescing lock. Partial-unique on the pending states, so one
-        # subtopic can have at most one outstanding job while completed history is
-        # retained. Without this the first popular topic exhausts the daily budget.
+        # topic can have at most one outstanding job while completed history is
+        # retained.
         Index(
-            "uq_generation_job_subtopic_pending",
-            "subtopic_id",
+            "uq_generation_job_topic_pending",
+            "topic_id",
             unique=True,
             postgresql_where=text("status IN ('pending', 'running')"),
         ),
         Index("ix_generation_job_status_priority", "status", "priority"),
     )
 
-    kind: Mapped[str] = mapped_column(String(32), nullable=False)  # curriculum | cards | questions
     topic_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), nullable=False
-    )
-    subtopic_id: Mapped[uuid.UUID | None] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("subtopic.id", ondelete="CASCADE")
     )
 
     status: Mapped[str] = mapped_column(String(16), default="pending", nullable=False)

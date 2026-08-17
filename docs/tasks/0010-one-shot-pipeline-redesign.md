@@ -1,5 +1,13 @@
 # Task 0010: Redesign the generation pipeline for one-shot completion
 
+**Status:** Done — executed 2026-08-17. `generate_subtopic_cards` now fans out
+per subtopic *group* and runs linked tiers sequentially, passing lower-tier
+card bodies as `builds_on` (full bodies, not summaries — the open question
+below was resolved that way during implementation). `gate_and_persist` now
+also generates and persists questions (via `asyncio.gather`, same semaphore)
+after cards, so a topic isn't reported done until both exist. Covered by
+`tests/test_generation_pipeline.py` and `tests/test_langchain_impl.py`.
+
 **Owner:** unassigned
 
 **Background reading:** [ADR-0026](../adr/0026-one-shot-generation-to-completion.md),

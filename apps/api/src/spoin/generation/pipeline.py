@@ -1,56 +1,74 @@
-"""Many topics, curriculum through corpus — the vertical slice, as a LangGraph graph.
+"""Two topics-in, corpus-out phases — one-shot generation, as a LangGraph graph.
 
-See ADR-0024 for why this is a graph at all and why it does NOT own scheduling,
-retry-across-restart, or priority: that's the worker/`GenerationJob`'s job, unchanged.
-This module owns only what happens *inside* one generation run.
+See ADR-0024 for why this is a graph at all, ADR-0025 for the batched topic
+matching phase, and ADR-0026 for the one-shot-completion redesign this module
+now implements. This module owns only what happens *inside* generation itself —
+scheduling, retry-across-restart, and priority remain the worker/`GenerationJob`'s
+job, unchanged.
+
+**Two entrypoints, two transactions, on purpose:**
+
+```
+match_and_create_topics()    ADR-0025. Cheap, no card generation. For each
+                              incoming (name, description): either alias onto
+                              an existing topic (nothing else happens), or mint
+                              a brand-new Topic row -- curriculum NOT generated
+                              yet. Callers commit this BEFORE calling
+                              run_generation_pipeline, so a topic's identity
+                              (and any GenerationJob row referencing its id)
+                              survives even if generation itself later fails
+                              and retries.
+
+run_generation_pipeline()    ADR-0026. Takes topic_ids that ALREADY exist
+                              (minted by match_and_create_topics, possibly in an
+                              earlier, separately-committed call). Curriculum
+                              (if not already generated) -> cards, per subtopic
+                              per difficulty tier, with a linked tier's higher-
+                              difficulty cards built on its lower tier's actual
+                              content -> questions, generated from the cards
+                              just written. One topic, run once, done --
+                              idempotent if called again for a topic that
+                              already finished (nothing left to generate).
+```
 
 **`langgraph` is confined to this module**, the same way ADR-0002 confines
-`langchain*` to `langchain_impl.py`. This module never imports `langchain*` either —
-it only calls the `ContentGenerator` interface, so it has no idea whether Gemini,
-local, or `FakeContentGenerator` is behind it. It also never imports
-`generation/quota.py` — key rotation is entirely `langchain_impl.py`'s concern, one
-layer further in; this module makes calls through the interface and has no idea
-keys exist.
+`langchain*` to `langchain_impl.py` -- this module never imports `langchain*`
+either, it only calls the `ContentGenerator` interface, so it has no idea
+whether Gemini, local, or `FakeContentGenerator` is behind it.
 
 ```
 START
-  |  Send fan-out, one branch per requested topic
+  |  Send fan-out, one branch per topic_id (independent -- a topic already
+  |  curriculum'd and just topping up cards never waits on a sibling topic
+  |  still doing its first curriculum pass)
   v
-resolve_and_plan_topic     Per topic. ADR-0004 topic resolution (embed -> band
-                           decision -> auto-merge / mid-band judge / new) THEN,
-                           only if curriculum_generated_at is unset, the curriculum
-                           call + subtopic-group persistence. A topic already
-                           curriculum'd skips straight to loading its existing
-                           subtopics — no LLM call, no re-planning.
+resolve_and_plan_topic     Per topic (already exists; ADR-0025 decided that
+                           upstream). Curriculum call only if
+                           curriculum_generated_at is unset. Groups its
+                           subtopics by subtopic_group_id (a curriculum
+                           "concept"'s 1-3 difficulty tiers).
   |
-  | Send fan-out, one branch per subtopic THIS topic still needs cards for
+  | Send fan-out, one branch per subtopic GROUP (not per subtopic-tier --
+  | see generate_subtopic_cards for why)
   v
-generate_subtopic_cards   No DB access (concurrent across subtopics AND topics —
-                           see ADR-0024's "Harder" section on why this node can't
-                           touch the AsyncSession). Loops sequential batches within
-                           ONE subtopic (ADR-0007).
+generate_subtopic_cards   No DB access (concurrent across groups AND topics).
+                          Within one group, tiers run SEQUENTIALLY, lowest
+                          difficulty first, because a linked higher tier's
+                          card generation receives the lower tier's actual
+                          card BODIES as context (ADR-0026) -- it has to exist
+                          first. Groups with only one tier (the common case)
+                          are unaffected: nothing to sequence.
   |
-  | fan-in (state reducer merges every branch's results, across every topic)
+  | fan-in (every branch's results merge, across every topic in the run)
   v
-gate_and_persist          One call, sequential, the only card-writing node. Groups
-                           results back by topic for the final report. Minimal
-                           pass-through gate (generation/gate.py) — the real gate
-                           (dedup, judge) is a separate, later step.
+gate_and_persist          The ONLY card/question-writing node, one writer, no
+                           concurrency to reason about for the DB itself.
+                           Persists cards (minimal gate -- see generation/gate.py),
+                           THEN concurrently (asyncio.gather, same semaphore as
+                           everywhere else) generates questions FROM the cards
+                           just written, per subtopic/difficulty, and persists
+                           those too. A topic isn't done until both exist.
 ```
-
-**Concurrency cap:** every real generator call (curriculum, topic-match judge, card
-generation) acquires `runtime.semaphore` first — without it, a request with several
-topics times many subtopics each would fire dozens of simultaneous calls, blowing
-through `quota_rpm` and turning key exhaustion into a burst of simultaneous failures
-instead of a predictable one-at-a-time rotation (that rotation itself is
-`langchain_impl.py` + `generation/quota.py`'s job, not this module's).
-
-**Why `resolve_and_plan_topic`'s DB work is lock-guarded, not lock-free like
-`generate_subtopic_cards`:** unlike card generation, topic resolution genuinely
-needs to read the DB (embedding similarity search) before it knows whether to call
-the LLM at all, so "no DB access in a concurrent node" isn't an option here. Instead,
-`runtime.topic_plan_lock` serializes the cheap DB bookkeeping across topic branches
-while their LLM calls (still gated by the semaphore) can overlap freely.
 """
 
 from __future__ import annotations
@@ -71,10 +89,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.content.archetype import classify_archetype
 from spoin.core.config import Settings
-from spoin.domain.enums import CardStatus, Difficulty, TopicEdgeKind
-from spoin.domain.models import Card, CardStats, Subtopic, Topic, TopicAlias, TopicEdge
+from spoin.domain.enums import CardStatus, Difficulty, QuestionKind, QuestionStatus, TopicEdgeKind
+from spoin.domain.models import (
+    Card,
+    CardStats,
+    Question,
+    Subtopic,
+    Topic,
+    TopicAlias,
+    TopicEdge,
+)
 from spoin.embeddings import Embedder, normalize_topic_text
-from spoin.generation.base import CardDraft, ContentGenerator
+from spoin.generation.base import (
+    CardDraft,
+    ContentGenerator,
+    TopicMatchCandidate,
+    TopicMatchQuery,
+    TopicMatchResult,
+)
 from spoin.generation.gate import passes_minimal_gate
 
 _SLUG_KEEP = "abcdefghijklmnopqrstuvwxyz0123456789-"
@@ -108,19 +140,40 @@ class TopicRequest(TypedDict):
     description: str
 
 
+class TopicMatchOutcome(TypedDict):
+    """One `match_and_create_topics` result: either an alias onto an existing
+    topic (nothing else happened) or a freshly-minted, not-yet-generated one."""
+
+    topic_id: str
+    topic_name: str
+    matched_existing: bool
+
+
 class SubtopicPlan(TypedDict):
     topic_id: str
     topic_name: str
     subtopic_id: str
+    #: Groups this subtopic with its sibling difficulty tiers of the same
+    #: curriculum-authored concept -- what generate_subtopic_cards fans out on.
+    subtopic_group_id: str
     difficulty: str
     title: str
     description: str
     target_cards: int
-    #: Pre-fetched in resolve_and_plan_topic — see module docstring for why this
-    #: can't be a DB read inside generate_subtopic_cards. Spans every sibling
-    #: subtopic in the same subtopic_group_id (ADR-0007's cross-difficulty ask).
+    #: Pre-fetched in resolve_and_plan_topic -- see module docstring for why
+    #: this can't be a DB read inside generate_subtopic_cards. Spans every
+    #: sibling subtopic in the same subtopic_group_id (ADR-0007's cross-tier ask).
     existing_titles: list[str]
     existing_count: int
+
+
+class SubtopicGroupPlan(TypedDict):
+    """One curriculum concept's 1-3 difficulty tiers, ordered lowest first --
+    the Send fan-out unit for card generation (ADR-0026)."""
+
+    topic_id: str
+    topic_name: str
+    tiers: list[SubtopicPlan]
 
 
 class TopicPlanResult(TypedDict):
@@ -128,7 +181,6 @@ class TopicPlanResult(TypedDict):
     topic_name: str
     is_survey: bool
     deep_dive_topic_names: list[str]
-    merged_into_existing: bool
     subtopics: list[SubtopicPlan]
 
 
@@ -141,12 +193,13 @@ class SubtopicCardsResult(TypedDict):
 
 
 class PipelineState(TypedDict, total=False):
-    topic_requests: list[TopicRequest]
+    #: Already-existing Topic ids (ADR-0025 decided that upstream).
+    topic_ids: list[str]
     #: Only set on a per-branch Send invocation (outer fan-out).
-    topic_job: TopicRequest
-    #: Globally accumulated across every topic branch — used by gate_and_persist
+    topic_job: dict[str, str]
+    #: Globally accumulated across every topic branch -- used by gate_and_persist
     #: to build the final per-topic report. NOTE: this is also the only way
-    #: `resolve_and_plan_topic` gets its own subtopics to a downstream fan-out —
+    #: `resolve_and_plan_topic` gets its own subtopics to a downstream fan-out --
     #: see that function's docstring for why a plain (non-reducer) key doesn't
     #: work here: concurrent topic branches in the same superstep all write into
     #: the SAME shared channels, and a plain "last value" channel raises
@@ -154,7 +207,7 @@ class PipelineState(TypedDict, total=False):
     #: `Send`-created branches are NOT isolated forks with their own local state.
     topic_plans: Annotated[list[TopicPlanResult], operator.add]
     #: Only set on a per-branch Send invocation (inner fan-out).
-    subtopic_job: SubtopicPlan
+    subtopic_group_job: SubtopicGroupPlan
     card_results: Annotated[list[SubtopicCardsResult], operator.add]
     report: dict[str, object]
 
@@ -162,7 +215,7 @@ class PipelineState(TypedDict, total=False):
 @dataclass
 class _Runtime:
     """Dependencies threaded through `config["configurable"]` rather than graph
-    state — none of these are pipeline *data*."""
+    state -- none of these are pipeline *data*."""
 
     session: AsyncSession
     generator: ContentGenerator
@@ -176,7 +229,7 @@ class _Runtime:
 #: `config` is deliberately left untyped on every node function below (here and
 #: in resolve_and_plan_topic / generate_subtopic_cards / gate_and_persist).
 #: LangGraph's own node config type is `RunnableConfig` (from langchain_core), and
-#: at runtime it inspects each node's `config` parameter annotation — if present
+#: at runtime it inspects each node's `config` parameter annotation -- if present
 #: and not exactly `RunnableConfig`, it emits a `UserWarning` ("should be typed as
 #: RunnableConfig"), which this repo's `filterwarnings = ["error"]` pytest config
 #: turns into a hard test failure. Importing `RunnableConfig` here to satisfy it
@@ -191,24 +244,21 @@ def _runtime(config) -> _Runtime:  # type: ignore[no-untyped-def]
     return runtime
 
 
-# ------------------------------------------------------------- topic resolution --
+# ---------------------------------------------------------- topic matching (ADR-0025) --
 
 
-async def _find_nearest_topic(
-    session: AsyncSession, embedding: list[float]
-) -> tuple[Topic, float] | None:
-    row = (
+async def _find_top_topic_candidates(
+    session: AsyncSession, embedding: list[float], *, limit: int
+) -> list[tuple[Topic, float]]:
+    rows = (
         await session.execute(
             select(Topic, Topic.embedding.cosine_distance(embedding).label("distance"))
             .where(Topic.embedding.is_not(None))
             .order_by("distance")
-            .limit(1)
+            .limit(limit)
         )
-    ).first()
-    if row is None:
-        return None
-    topic, distance = row
-    return topic, 1.0 - distance
+    ).all()
+    return [(topic, 1.0 - distance) for topic, distance in rows]
 
 
 async def _ensure_alias(
@@ -230,20 +280,116 @@ async def _ensure_alias(
         )
 
 
-async def _subtopic_titles_for_topic(session: AsyncSession, topic_id: uuid.UUID) -> list[str]:
-    rows = (
-        await session.execute(
-            select(Subtopic.title).where(Subtopic.topic_id == topic_id).distinct()
+async def match_and_create_topics(
+    session: AsyncSession,
+    generator: ContentGenerator,
+    embedder: Embedder,
+    settings: Settings,
+    *,
+    topic_requests: list[TopicRequest],
+) -> list[TopicMatchOutcome]:
+    """ADR-0025. Embeds every incoming topic, finds each one's top-N nearest
+    existing topics locally (pgvector, free), then makes ONE batched LLM call
+    covering every incoming topic at once for the actual yes/no decision. No
+    thresholds -- similarity scores are context for the call, never a gate
+    applied by this function.
+
+    Matched topics get aliased and nothing else happens. Unmatched topics get a
+    brand-new `Topic` row -- **no curriculum, no cards yet**. Callers should
+    commit this before calling `run_generation_pipeline` in a separate
+    transaction, so a topic's identity outlives a failed/retried generation
+    attempt (see module docstring).
+    """
+
+    if not topic_requests:
+        return []
+
+    normalized_names = [normalize_topic_text(request["name"]) for request in topic_requests]
+    embeddings = embedder.embed(normalized_names)
+
+    candidate_lists: list[list[tuple[Topic, float]]] = []
+    queries: list[TopicMatchQuery] = []
+    for index, (request, embedding) in enumerate(zip(topic_requests, embeddings, strict=True)):
+        candidates = await _find_top_topic_candidates(
+            session, embedding, limit=settings.topic_match_candidates
         )
-    ).all()
-    return [row[0] for row in rows]
+        candidate_lists.append(candidates)
+        queries.append(
+            TopicMatchQuery(
+                request_index=index,
+                name=request["name"],
+                description=request["description"],
+                candidates=[
+                    TopicMatchCandidate(
+                        topic_id=str(topic.id), name=topic.canonical_name, similarity=round(sim, 4)
+                    )
+                    for topic, sim in candidates
+                ],
+            )
+        )
+
+    # Only ask the LLM about topics that have at least one candidate -- nothing
+    # to possibly match against otherwise is not a judgment call, it's a fact.
+    askable = [query for query in queries if query.candidates]
+    verdicts_by_index: dict[int, TopicMatchResult] = {}
+    if askable:
+        verdict_result = await generator.match_topics(askable)
+        verdicts_by_index = {verdict.request_index: verdict for verdict in verdict_result.items}
+
+    outcomes: list[TopicMatchOutcome] = []
+    for index, (request, embedding) in enumerate(zip(topic_requests, embeddings, strict=True)):
+        verdict = verdicts_by_index.get(index)
+        matched_topic_id = (
+            uuid.UUID(verdict.matched_topic_id)
+            if verdict is not None and verdict.matched_topic_id
+            else None
+        )
+        if matched_topic_id is not None:
+            topic = await session.get(Topic, matched_topic_id)
+            assert topic is not None, f"match_topics returned unknown topic_id {matched_topic_id}"
+            similarity = next(
+                (
+                    sim
+                    for candidate, sim in candidate_lists[index]
+                    if candidate.id == matched_topic_id
+                ),
+                None,
+            )
+            await _ensure_alias(
+                session, topic, request["name"], decided_by="llm_batch_match", similarity=similarity
+            )
+            outcomes.append(
+                TopicMatchOutcome(
+                    topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=True
+                )
+            )
+        else:
+            topic = Topic(
+                slug=_slugify(request["name"]),
+                canonical_name=request["name"],
+                description=request["description"],
+            )
+            session.add(topic)
+            await session.flush()
+            topic.embedding = embedding
+            outcomes.append(
+                TopicMatchOutcome(
+                    topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=False
+                )
+            )
+
+    await session.flush()
+    return outcomes
+
+
+# ------------------------------------------------------------- topic resolution --
 
 
 async def _create_deep_dive_stubs(
     session: AsyncSession, *, parent: Topic, names: list[str]
 ) -> None:
     """ADR-0007: deep-dive topics are created as canonical topics immediately,
-    without curricula — those are generated lazily on first subscription."""
+    without curricula -- those are generated lazily on first subscription."""
 
     for name in names:
         slug = _slugify(name)
@@ -268,14 +414,14 @@ async def _create_deep_dive_stubs(
 
 
 async def _existing_subtopic_hints(session: AsyncSession, topic_id: uuid.UUID) -> list[str]:
-    """Titles (with description) of subtopics already under THIS topic — fed to
+    """Titles (with description) of subtopics already under THIS topic -- fed to
     `generate_curriculum` as `existing_subtopics` so the model can reuse an exact
     title verbatim when a subtopic it wants is already covered (prevention, same
-    pattern already used for card titles — see `generate_cards`'s
-    `existing_titles`). No embeddings, no separate judge call: this is a taste
-    decision the curriculum call already makes, in the same request, with full
-    context — not one that benefits from independent verification the way
-    `difficulty` does."""
+    pattern already used for card titles -- see `generate_cards`'s
+    `existing_titles`). Empty for a topic reaching this for the first time
+    (the normal case post-ADR-0025); non-empty when `run_generation_pipeline` is
+    called again for a topic that already has some subtopics from an earlier
+    call -- see `generate_curriculum`'s docstring."""
 
     rows = (
         await session.execute(
@@ -290,7 +436,7 @@ async def _existing_subtopic_hints(session: AsyncSession, topic_id: uuid.UUID) -
 async def _reuse_or_create_subtopic(
     session: AsyncSession, *, topic_id: uuid.UUID, title: str, difficulty: Difficulty
 ) -> tuple[Subtopic, bool]:
-    """Exact title+difficulty match only — the curriculum call is trusted to have
+    """Exact title+difficulty match only -- the curriculum call is trusted to have
     already reused an existing title verbatim where it judged that appropriate
     (see `_existing_subtopic_hints`); this is just the mechanical lookup that
     honors that decision. Returns (row, was_reused)."""
@@ -342,6 +488,7 @@ async def _load_subtopic_plans(session: AsyncSession, topic: Topic) -> list[Subt
                 topic_id=str(topic.id),
                 topic_name=topic.canonical_name,
                 subtopic_id=str(subtopic.id),
+                subtopic_group_id=str(subtopic.subtopic_group_id),
                 difficulty=subtopic.difficulty.value,
                 title=subtopic.title,
                 description=subtopic.description,
@@ -356,64 +503,27 @@ async def _load_subtopic_plans(session: AsyncSession, topic: Topic) -> list[Subt
 async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> Command[Any]:
-    """Returns a `Command` (state update + routing) instead of a plain dict,
+    """The topic this branch is for already exists -- ADR-0025's matching phase
+    decided that before this graph even started. All this does now is the
+    curriculum pass (if not already done) and grouping subtopics by difficulty
+    tier for the card-generation fan-out.
+
+    Returns a `Command` (state update + routing) instead of a plain dict,
     specifically so the fan-out to `generate_subtopic_cards` can use THIS
-    invocation's own freshly-computed `plan` directly — a separate conditional-edge
+    invocation's own freshly-computed `plan` directly -- a separate conditional-edge
     function reading a shared state key doesn't work here (see PipelineState's
     `topic_plans` docstring: concurrent topic branches can't each write a
-    non-reducer key in the same step). `Command.goto` sidesteps that entirely: the
-    Sends it carries are pure Python data from this function's own local variable,
-    never round-tripped through a shared channel at all."""
+    non-reducer key in the same step). `Command.goto` sidesteps that entirely.
+    """
 
     runtime = _runtime(config)
-    job = state["topic_job"]
-    name, description = job["name"], job["description"]
+    topic_id = uuid.UUID(state["topic_job"]["topic_id"])
 
     async with runtime.topic_plan_lock:
-        embedding = runtime.embedder.embed_one(normalize_topic_text(name))
-        nearest = await _find_nearest_topic(runtime.session, embedding)
+        topic = await runtime.session.get(Topic, topic_id)
+    assert topic is not None, f"GenerationJob referenced missing topic {topic_id}"
 
-    topic: Topic | None = None
-    merged_into_existing = False
-    related_hints: list[str] = []
-
-    if nearest is not None:
-        matched_topic, similarity = nearest
-        if similarity >= runtime.settings.topic_merge_high:
-            topic = matched_topic
-            merged_into_existing = True
-            async with runtime.topic_plan_lock:
-                await _ensure_alias(
-                    runtime.session, topic, name, decided_by="auto_merge", similarity=similarity
-                )
-        elif similarity > runtime.settings.topic_merge_low:
-            # Mid-band: the judge call is an LLM call, made OUTSIDE the DB lock so
-            # it can overlap with other topic branches; only gated by the
-            # concurrency semaphore, same as every other generator call.
-            async with runtime.topic_plan_lock:
-                matched_titles = await _subtopic_titles_for_topic(runtime.session, matched_topic.id)
-            async with runtime.semaphore:
-                verdict = await runtime.generator.judge_topic_match(
-                    name, description, matched_topic.canonical_name, matched_titles
-                )
-            related_hints = verdict.relevant_subtopic_titles
-            if verdict.same_topic:
-                topic = matched_topic
-                merged_into_existing = True
-                async with runtime.topic_plan_lock:
-                    await _ensure_alias(
-                        runtime.session, topic, name, decided_by="llm_judge", similarity=similarity
-                    )
-        # else: similarity <= topic_merge_low -> falls through, topic stays None (new)
-
-    async with runtime.topic_plan_lock:
-        if topic is None:
-            topic = Topic(slug=_slugify(name), canonical_name=name, description=description)
-            runtime.session.add(topic)
-            await runtime.session.flush()
-            topic.embedding = embedding
-        need_curriculum = topic.curriculum_generated_at is None
-
+    need_curriculum = topic.curriculum_generated_at is None
     deep_dive_names: list[str] = []
     is_survey = topic.is_survey
 
@@ -422,7 +532,7 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
             existing_subtopic_hints = await _existing_subtopic_hints(runtime.session, topic.id)
         async with runtime.semaphore:
             draft = await runtime.generator.generate_curriculum(
-                name, description, related_hints or None, existing_subtopic_hints or None
+                topic.canonical_name, topic.description or "", existing_subtopic_hints or None
             )
         async with runtime.topic_plan_lock:
             topic.is_survey = draft.is_survey
@@ -445,7 +555,7 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
                     for tier in group.tiers
                 ]
                 # A new group adopts an EXISTING subtopic's group id if any of its
-                # tiers reused one — keeps that subtopic's prior tier siblings (if
+                # tiers reused one -- keeps that subtopic's prior tier siblings (if
                 # any) connected to the new tiers landing alongside it, rather than
                 # forking a second, disconnected group for the same concept. A
                 # reused row's OWN group id is never overwritten.
@@ -474,31 +584,39 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         topic_name=topic.canonical_name,
         is_survey=is_survey,
         deep_dive_topic_names=deep_dive_names,
-        merged_into_existing=merged_into_existing,
         subtopics=subtopic_plans,
     )
-    # Every subtopic in the plan gets a branch — deliberately NOT filtered down to
-    # only under-target ones here. `CurriculumDraft.subtopics` requires at least
-    # one entry, so every topic branch is guaranteed >=1 subtopic Send, which
-    # keeps every topic's path to `gate_and_persist` the same shape (topic -> >=1
-    # subtopic branch -> gate_and_persist). A topic-conditional empty fan-out
-    # would let some topics reach `gate_and_persist` in an earlier superstep than
-    # others, risking it firing more than once and double-inserting the earlier
-    # topics' cards. The "already at target, skip the call" optimization still
-    # happens — just inside `generate_subtopic_cards` itself, a safe place for it.
+
+    groups: dict[str, list[SubtopicPlan]] = {}
+    for subtopic_plan in subtopic_plans:
+        groups.setdefault(subtopic_plan["subtopic_group_id"], []).append(subtopic_plan)
+    group_plans = [
+        SubtopicGroupPlan(
+            topic_id=plan["topic_id"],
+            topic_name=plan["topic_name"],
+            tiers=sorted(tiers, key=lambda sp: Difficulty(sp["difficulty"]).rank),
+        )
+        for tiers in groups.values()
+    ]
+
+    # Every subtopic group gets a branch -- deliberately NOT filtered down to
+    # only under-target ones here (see generate_subtopic_cards, which does that
+    # per-tier). `CurriculumDraft.subtopics` requires at least one entry, so
+    # every topic branch is guaranteed >=1 group Send, keeping every topic's
+    # path to `gate_and_persist` the same shape.
     return Command(
         update={"topic_plans": [plan]},
         goto=[
-            Send("generate_subtopic_cards", {"subtopic_job": subtopic})
-            for subtopic in plan["subtopics"]
+            Send("generate_subtopic_cards", {"subtopic_group_job": group_plan})
+            for group_plan in group_plans
         ],
     )
 
 
 def fan_out_topics(state: PipelineState) -> list[Send]:
     return [
-        Send("resolve_and_plan_topic", {"topic_job": request})
-        for request in state["topic_requests"]
+        Send("resolve_and_plan_topic", {"topic_job": {"topic_id": topic_id}})
+        for topic_id in state["topic_ids"]
     ]
 
 
@@ -508,73 +626,126 @@ def fan_out_topics(state: PipelineState) -> list[Send]:
 async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> dict[str, object]:
-    """No DB access — see module docstring. Runs once per subtopic that still
-    needs cards, potentially concurrently with every other such subtopic, across
-    every topic in this run."""
+    """No DB access -- see module docstring. Runs once per subtopic GROUP that
+    still needs cards, potentially concurrently with every other such group,
+    across every topic in this run. Tiers WITHIN one group run sequentially,
+    lowest difficulty first, so a linked higher tier's `generate_cards` call can
+    receive the lower tier's actual card bodies as `builds_on` (ADR-0026) --
+    groups with only one tier (the common case; curricula are never forced to
+    give a concept all three tiers) are unaffected, there's nothing to sequence.
+    """
 
     runtime = _runtime(config)
-    job = state["subtopic_job"]
-    difficulty = Difficulty(job["difficulty"])
+    job = state["subtopic_group_job"]
     batch_size = runtime.settings.generation_batch_size
-    target = job["target_cards"]
 
-    if job["existing_count"] >= target:
-        return {
-            "card_results": [
+    results: list[SubtopicCardsResult] = []
+    lower_tier_bodies: list[str] = []
+
+    for tier in job["tiers"]:
+        difficulty = Difficulty(tier["difficulty"])
+        target = tier["target_cards"]
+
+        if tier["existing_count"] >= target:
+            results.append(
                 SubtopicCardsResult(
-                    topic_id=job["topic_id"],
-                    subtopic_id=job["subtopic_id"],
-                    difficulty=job["difficulty"],
+                    topic_id=tier["topic_id"],
+                    subtopic_id=tier["subtopic_id"],
+                    difficulty=tier["difficulty"],
                     drafts=[],
                     generator_failures=[],
                 )
-            ]
-        }
-
-    drafts: list[CardDraft] = []
-    failures: list[str] = []
-    existing_titles = list(job["existing_titles"])
-    # +1 round of slack: a batch that comes back short of `count` (partial failure,
-    # ADR-0005) shouldn't need a perfectly-sized final call to still reach target.
-    max_rounds = math.ceil(target / batch_size) + 1
-
-    for _ in range(max_rounds):
-        remaining = target - len(drafts)
-        if remaining <= 0:
-            break
-        async with runtime.semaphore:
-            result = await runtime.generator.generate_cards(
-                topic_name=job["topic_name"],
-                subtopic_title=job["title"],
-                subtopic_description=job["description"],
-                difficulty=difficulty,
-                count=min(batch_size, remaining),
-                existing_titles=existing_titles,
             )
-        failures.extend(result.failures)
-        if not result.items:
-            break  # no usable progress this round (empty batch or all-malformed) — stop
-        drafts.extend(result.items)
-        existing_titles.extend(
-            _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in result.items
-        )
+            # Nothing generated THIS run for this tier, so it contributes no
+            # bodies to `lower_tier_bodies` for a higher linked tier above it --
+            # a known gap when a tier was already-covered by an earlier call
+            # (task 0010's follow-up, not solved here: this node has no DB
+            # access to fetch that prior content).
+            continue
 
-    return {
-        "card_results": [
+        drafts: list[CardDraft] = []
+        failures: list[str] = []
+        existing_titles = list(tier["existing_titles"])
+        # +1 round of slack: a batch that comes back short of `count` (partial
+        # failure, ADR-0005) shouldn't need a perfectly-sized final call to
+        # still reach target.
+        max_rounds = math.ceil(target / batch_size) + 1
+
+        for _ in range(max_rounds):
+            remaining = target - len(drafts)
+            if remaining <= 0:
+                break
+            async with runtime.semaphore:
+                result = await runtime.generator.generate_cards(
+                    topic_name=job["topic_name"],
+                    subtopic_title=tier["title"],
+                    subtopic_description=tier["description"],
+                    difficulty=difficulty,
+                    count=min(batch_size, remaining),
+                    existing_titles=existing_titles,
+                    builds_on=lower_tier_bodies,
+                )
+            failures.extend(result.failures)
+            if not result.items:
+                break  # no usable progress this round -- stop
+            drafts.extend(result.items)
+            existing_titles.extend(
+                _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in result.items
+            )
+
+        results.append(
             SubtopicCardsResult(
-                topic_id=job["topic_id"],
-                subtopic_id=job["subtopic_id"],
-                difficulty=job["difficulty"],
+                topic_id=tier["topic_id"],
+                subtopic_id=tier["subtopic_id"],
+                difficulty=tier["difficulty"],
                 drafts=drafts,
                 generator_failures=failures,
             )
-        ]
-    }
+        )
+        lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
+
+    return {"card_results": results}
+
+
+# ------------------------------------------------------- persist cards + questions --
+
+
+async def _generate_questions_for_group(
+    runtime: _Runtime, *, topic_id: str, subtopic_id: str, difficulty: str, cards: list[Card]
+) -> tuple[str, str, str, list[tuple[Any, uuid.UUID]], list[str]]:
+    """Concurrent, no DB writes (only reads the just-persisted `cards` passed
+    in). One subtopic/difficulty's worth of questions, batched per
+    `question_batch_size` same as card generation batches per `generation_batch_size`."""
+
+    batch_size = runtime.settings.question_batch_size
+    parsed_difficulty = Difficulty(difficulty)
+    drafts: list[tuple[Any, uuid.UUID]] = []
+    failures: list[str] = []
+
+    for start in range(0, len(cards), batch_size):
+        chunk = cards[start : start + batch_size]
+        async with runtime.semaphore:
+            result = await runtime.generator.generate_questions(
+                cards=[(card.title, card.body) for card in chunk], difficulty=parsed_difficulty
+            )
+        failures.extend(result.failures)
+        for draft in result.items:
+            if 0 <= draft.card_index < len(chunk):
+                drafts.append((draft, chunk[draft.card_index].id))
+
+    return topic_id, subtopic_id, difficulty, drafts, failures
 
 
 async def gate_and_persist(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> dict[str, object]:
+    """The only writer node. Persists cards (minimal gate), then generates and
+    persists questions FROM the cards just written -- a topic isn't done
+    (ADR-0026) until both exist. Question generation across subtopics/topics
+    runs concurrently (`asyncio.gather`, same semaphore governing every other
+    generator call), but the actual DB writes stay sequential in this one node,
+    same as cards."""
+
     runtime = _runtime(config)
     generated_at = datetime.now(UTC).isoformat()
 
@@ -583,6 +754,8 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
         by_topic.setdefault(result["topic_id"], []).append(result)
 
     topic_reports: list[dict[str, object]] = []
+    pending_questions: list[tuple[str, str, str, list[Card]]] = []
+
     for plan in state.get("topic_plans", []):
         topic_id = plan["topic_id"]
         total_accepted = 0
@@ -630,6 +803,11 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 card.archetype = classify_archetype(card.body)
                 runtime.session.add(CardStats(card_id=card.id))
 
+            if new_cards:
+                pending_questions.append(
+                    (topic_id, result["subtopic_id"], result["difficulty"], new_cards)
+                )
+
             total_accepted += len(new_cards)
             total_rejected += len(rejected_reasons)
             subtopic_reports.append(
@@ -647,14 +825,71 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 "topic_name": plan["topic_name"],
                 "is_survey": plan["is_survey"],
                 "deep_dive_topic_names": plan["deep_dive_topic_names"],
-                "merged_into_existing": plan["merged_into_existing"],
                 "accepted": total_accepted,
                 "rejected": total_rejected,
                 "subtopics": subtopic_reports,
+                "questions_accepted": 0,
+                "questions_rejected": 0,
             }
         )
 
     await runtime.session.flush()
+
+    question_results = (
+        await asyncio.gather(
+            *(
+                _generate_questions_for_group(
+                    runtime, topic_id=t, subtopic_id=s, difficulty=d, cards=cards
+                )
+                for t, s, d, cards in pending_questions
+            )
+        )
+        if pending_questions
+        else []
+    )
+
+    question_counts_by_topic: dict[str, tuple[int, int]] = {}
+    for topic_id, subtopic_id, difficulty, drafts, failures in question_results:
+        parsed_difficulty = Difficulty(difficulty)
+        stems = [draft.stem for draft, _card_id in drafts]
+        embeddings = runtime.embedder.embed(stems) if stems else []
+        new_questions: list[Question] = []
+        for (draft, card_id), embedding in zip(drafts, embeddings, strict=True):
+            new_questions.append(
+                Question(
+                    subtopic_id=uuid.UUID(subtopic_id),
+                    card_id=card_id,
+                    difficulty=parsed_difficulty,
+                    kind=QuestionKind.MCQ if draft.options is not None else QuestionKind.FREE_TEXT,
+                    stem=draft.stem,
+                    options=draft.options,
+                    correct_index=draft.correct_index,
+                    rubric=draft.rubric,
+                    reference_answer=draft.reference_answer,
+                    explanation=draft.explanation,
+                    status=QuestionStatus.ACTIVE,
+                    embedding=embedding,
+                    gen_meta={
+                        "backend": runtime.settings.generator,
+                        "generated_at": generated_at,
+                        "batch_id": str(runtime.batch_id),
+                    },
+                )
+            )
+        runtime.session.add_all(new_questions)
+        accepted, rejected = question_counts_by_topic.get(topic_id, (0, 0))
+        question_counts_by_topic[topic_id] = (
+            accepted + len(new_questions),
+            rejected + len(failures),
+        )
+
+    await runtime.session.flush()
+
+    for topic_report in topic_reports:
+        accepted, rejected = question_counts_by_topic.get(topic_report["topic_id"], (0, 0))
+        topic_report["questions_accepted"] = accepted
+        topic_report["questions_rejected"] = rejected
+
     return {"report": {"topics": topic_reports}}
 
 
@@ -663,14 +898,6 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
 
 def _build_graph() -> CompiledStateGraph[Any, Any, Any, Any]:
     graph = StateGraph(PipelineState)
-    # destinations= documents resolve_and_plan_topic's dynamic Command(goto=...)
-    # routing for graph introspection/visualization — it doesn't add a static
-    # edge (Command handles that at runtime, per-branch).
-    # NodeConfig (a plain dict alias, see its definition above) doesn't match
-    # LangGraph's overloads, which want the real `RunnableConfig` type — the
-    # narrower type import isn't worth pulling `langchain_core` into this module
-    # for (see NodeConfig's docstring). Runtime behavior is unaffected: LangGraph
-    # passes a plain dict-like config object regardless of the annotation.
     graph.add_node(
         "resolve_and_plan_topic", resolve_and_plan_topic, destinations=("generate_subtopic_cards",)
     )
@@ -690,17 +917,16 @@ async def run_generation_pipeline(
     embedder: Embedder,
     settings: Settings,
     *,
-    topic_requests: list[TopicRequest],
+    topic_ids: list[uuid.UUID],
 ) -> dict[str, object]:
-    """The public entrypoint. Callable directly from a CLI script (today) or a
-    worker job handler (once GenerationJob wiring lands) — this function has no
-    idea which is calling it. Accepts many topics at once so independent topics
-    run as independent graph branches: one topic already fully curriculum'd and
-    just topping up cards never waits on a sibling topic still doing its first
-    curriculum pass.
+    """ADR-0026's one-shot run: curriculum (if needed) -> cards -> questions,
+    for topics that ALREADY EXIST (see `match_and_create_topics`). Callable
+    directly from a CLI script (today) or a worker job handler (task 0008) --
+    this function has no idea which is calling it, or whether a topic_id is
+    brand new or a retry of one whose earlier attempt failed partway.
     """
 
-    if not topic_requests:
+    if not topic_ids:
         return {"topics": []}
 
     graph = _build_graph()
@@ -713,7 +939,7 @@ async def run_generation_pipeline(
         semaphore=asyncio.Semaphore(settings.max_concurrent_generation_calls),
     )
     initial_state: PipelineState = {
-        "topic_requests": topic_requests,
+        "topic_ids": [str(topic_id) for topic_id in topic_ids],
         "topic_plans": [],
         "card_results": [],
     }

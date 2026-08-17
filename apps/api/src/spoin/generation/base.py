@@ -110,17 +110,34 @@ class CurriculumDraft(BaseModel):
     is_survey: bool = False
 
 
-class TopicMatchVerdict(BaseModel):
-    """ADR-0004's mid-band call: "are these the same subject?" — but the answer
-    isn't just yes/no. Even when `same_topic` is False, the judge can flag existing
-    subtopics from the matched topic as relevant hints for the NEW topic's own
-    curriculum pass to consider adapting (never copied wholesale — the curriculum
-    pass, not this verdict, decides whether/how to use them)."""
+class TopicMatchCandidate(BaseModel):
+    """One existing topic offered as a possible match, from the embedding
+    pre-filter (ADR-0025). `similarity` is context for the judgment, never a
+    threshold the caller applies itself — the LLM is the sole decision-maker."""
 
-    same_topic: bool
-    #: Existing subtopic titles from the matched topic worth showing the curriculum
-    #: pass as context, whether or not `same_topic` is True.
-    relevant_subtopic_titles: list[str] = Field(default_factory=list)
+    topic_id: str
+    name: str
+    similarity: float
+
+
+class TopicMatchQuery(BaseModel):
+    """One incoming topic's matching question, as part of a batched call
+    (ADR-0025). `request_index` is how the caller maps each result in the
+    response back to the request that produced it."""
+
+    request_index: int
+    name: str
+    description: str
+    #: Up to 5, from the embedding pre-filter. Empty if nothing in the corpus is
+    #: even remotely close (never sent to the LLM in that case — see the caller).
+    candidates: list[TopicMatchCandidate] = Field(default_factory=list)
+
+
+class TopicMatchResult(BaseModel):
+    """Yes/no per query, no ambiguity: either an existing topic_id, or none."""
+
+    request_index: int
+    matched_topic_id: str | None = None
 
 
 class DifficultyVerdict(BaseModel):
@@ -167,17 +184,11 @@ class ContentGenerator(ABC):
         self,
         topic_name: str,
         description: str,
-        related_subtopic_hints: list[str] | None = None,
         existing_subtopics: list[str] | None = None,
     ) -> CurriculumDraft:
         """One call per topic. The highest-stakes call in the system: every card in
         the topic inherits its quality, so it always runs on the strongest
         available model regardless of what generates the cards.
-
-        `related_subtopic_hints` carries titles pulled from a DIFFERENT topic
-        ADR-0004's mid-band judge found related-but-not-identical (see
-        `judge_topic_match`) — loose inspiration, never reused verbatim, since
-        those subtopics belong to a different topic's own identity.
 
         `existing_subtopics` carries titles (with description) already under
         THIS exact topic — from an older seed fixture, or a prior partial run.
@@ -189,20 +200,22 @@ class ContentGenerator(ABC):
         forking a near-duplicate. Deciding whether something counts as "already
         covered" is the same kind of taste call as everything else in the
         curriculum pass — not one that needs independent verification.
+
+        Post-ADR-0026, a topic only ever reaches this call once (ADR-0025's
+        batched matching already ruled out that it's an existing topic), so in
+        practice `existing_subtopics` is empty — kept as a parameter rather than
+        removed because a partially-failed prior run can still leave some
+        subtopics behind to reconcile against on retry.
         """
 
     @abstractmethod
-    async def judge_topic_match(
-        self,
-        candidate_name: str,
-        candidate_description: str,
-        matched_topic_name: str,
-        matched_subtopic_titles: list[str],
-    ) -> TopicMatchVerdict:
-        """ADR-0004's mid-band step: fires only when embedding similarity against
-        an existing topic lands between the auto-merge and auto-new thresholds.
-        Cached permanently in `topic_alias` once decided — this pair is never
-        paid for again."""
+    async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
+        """ADR-0025: one call for the WHOLE BATCH of incoming topics, each judged
+        against its own top-5 embedding candidates. Replaces the old one-call-
+        per-mid-band-topic `judge_topic_match` — every topic gets an opinion now,
+        batched instead of gated by a threshold. Cached permanently in
+        `topic_alias` once decided — a pair is never paid for again.
+        """
 
     @abstractmethod
     async def generate_cards(
@@ -214,14 +227,25 @@ class ContentGenerator(ABC):
         difficulty: Difficulty,
         count: int,
         existing_titles: list[str],
+        builds_on: list[str],
     ) -> BatchResult[CardDraft]:
         """`existing_titles` is every card already in this subtopic **across all
         difficulties, tagged with their level**. Cross-difficulty inclusion is
         deliberate: a beginner and an advanced card on the same subtopic must
         differ in depth, not merely in wording.
 
-        Calls to one subtopic are sequential so each prompt sees what the last
-        produced; different subtopics run concurrently.
+        `builds_on` (ADR-0026) is the actual card BODIES already generated for
+        this subtopic's lower difficulty tier(s) within the same
+        `subtopic_group_id`, if this call is for a linked higher tier — never
+        just titles. Empty for a standalone (unlinked) subtopic-tier, which is
+        the common case (curricula are not forced to give every concept all
+        three tiers).
+
+        Calls to one subtopic-tier are sequential so each prompt sees what the
+        last produced; different subtopics (and different tiers of an unlinked
+        group) run concurrently. Tiers within the SAME linked group run
+        sequentially, lowest first, so `builds_on` is available by the time a
+        higher tier's call happens.
         """
 
     @abstractmethod

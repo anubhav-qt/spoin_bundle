@@ -1,8 +1,9 @@
 /**
  * The left rail: wordmark and nav. Only "Home" is real — the rest are stubs
  * (rendered, `aria-disabled`, no click handler) until those surfaces exist.
- * "Explore" moved out in favor of the right rail's DiscoverBox (ADR-0015),
- * which replaces it with a real (if simple) feature rather than another stub.
+ * "Explore" moved out in favor of the right rail's topic discovery
+ * (ADR-0015, reworked into a modal by ADR-0036), which replaces it with a
+ * real (if simple) feature rather than another stub.
  *
  * The wordmark doubles as a dev-only reset easter egg (`onReset`, wired to
  * POST /dev/reset — see api/routers/dev.py). Deliberately not a labeled

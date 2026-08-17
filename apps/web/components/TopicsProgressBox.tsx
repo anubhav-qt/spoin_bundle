@@ -9,10 +9,9 @@
  * opens — not a button sitting in a scannable list where a stray tap could
  * trigger it.
  *
- * Structurally mirrors DiscoverBox on purpose (head + toggle, flat rows
- * separated by a hairline, a text block per row) rather than having its own
- * bespoke layout — two boxes doing the same job (a titled, filterable list
- * in the right rail) should look like the same kind of thing. The All/
+ * Structurally mirrors TopicDiscoveryModal's row layout on purpose (head +
+ * toggle, flat rows separated by a hairline, a text block per row) rather
+ * than having its own bespoke layout. The All/
  * Mastered/In Progress toggle filters the already-loaded `progress` map
  * client-side — no new request, since `mastered` is already a fact the
  * server sent for every followed topic.

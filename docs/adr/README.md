@@ -72,3 +72,4 @@ useful than the decision itself.
 | [0033](0033-jwt-auth-and-guest-identity.md) | JWT auth, localStorage token storage, and guest identity via a nullable-email User row | Accepted |
 | [0034](0034-per-topic-accent-color.md) | Per-topic accent color, composed with the active palette via relative color hue rotation | Accepted |
 | [0035](0035-hero-card-tutorial-overlay.md) | First-time hero-card tutorial overlay; no new SEEN mechanism needed | Accepted |
+| [0036](0036-topic-discovery-modal.md) | Topic discovery modal replaces the inline Discover list | Accepted |

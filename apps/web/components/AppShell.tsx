@@ -125,8 +125,9 @@ export function AppShell() {
     );
   };
 
-  // DiscoverBox calls this after a successful follow, so the newly-subscribed
-  // topic shows up in the filter/progress box without a full reload.
+  // Called after a successful follow (from RequestTopicBox or
+  // TopicDiscoveryModal), so the newly-subscribed topic shows up in the
+  // filter/progress box without a full reload.
   const onFollowed = useCallback(async (topic: Topic) => {
     setTopics((current) => (current.some((t) => t.id === topic.id) ? current : [...current, topic]));
     const p = await api.progress(topic.id);

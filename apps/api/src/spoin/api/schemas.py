@@ -153,6 +153,25 @@ class TopicStatsOut(BaseModel):
     shares: int
 
 
+class SubtopicProgressOut(BaseModel):
+    subtopic_id: UUID
+    title: str
+    difficulty: Difficulty
+    #: Active cards in this subtopic. 0 means nothing has generated yet — the
+    #: client should render "not generated yet", not 0% coverage.
+    total_cards: int
+    seen_cards: int
+    #: `seen_cards / total_cards`, or 0.0 when `total_cards` is 0.
+    coverage: float
+    #: Same 80% bar as the tier-level gate, applied per subtopic.
+    covered: bool
+
+
+class TopicCurriculumOut(BaseModel):
+    topic_id: UUID
+    subtopics: list[SubtopicProgressOut]
+
+
 # ------------------------------------------------------------------------ quiz --
 # ADR-0009 (quiz shape, grading), amended by ADR-0027 (entry tier / `placement`'s
 # meaning). See api/routers/quiz.py for the actual flow these wire up.

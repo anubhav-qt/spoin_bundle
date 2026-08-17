@@ -22,7 +22,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { api, type Difficulty, type TopicStats } from "@/lib/api";
+import { api, type Difficulty, type SubtopicProgress, type TopicStats } from "@/lib/api";
 import { CheckIcon, HeartIcon, BookmarkIcon, NoteIcon, ShareIcon } from "./icons";
 import { QuizModal } from "./QuizModal";
 
@@ -52,8 +52,11 @@ const TIERS: { key: Difficulty; label: string }[] = [
   { key: "advanced", label: "Advanced quiz" },
 ];
 
+const TIER_ORDER: Difficulty[] = ["beginner", "intermediate", "advanced"];
+
 export function TopicStatsModal({ topicId, topicName, onClose, onFollow, following = false }: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
+  const [subtopics, setSubtopics] = useState<SubtopicProgress[] | null>(null);
   // The tier being quizzed, frozen at the moment the quiz opens — NOT read
   // live from `stats.current_difficulty` while the modal is open. A pass
   // advances that field via `loadStats` (below), and QuizModal keys its
@@ -68,6 +71,9 @@ export function TopicStatsModal({ topicId, topicName, onClose, onFollow, followi
   };
 
   useEffect(loadStats, [topicId]);
+  useEffect(() => {
+    void api.topicCurriculum(topicId).then((c) => setSubtopics(c.subtopics));
+  }, [topicId]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -166,6 +172,40 @@ export function TopicStatsModal({ topicId, topicName, onClose, onFollow, followi
                 <span>{stats.shares}</span>
                 <span className="mono">shares</span>
               </div>
+            </div>
+
+            <div className="modal-curriculum">
+              <h3 className="modal-curriculum-title mono">Curriculum</h3>
+              {subtopics === null ? (
+                <p className="modal-loading mono">Loading…</p>
+              ) : (
+                TIER_ORDER.map((tier) => {
+                  const tierSubtopics = subtopics.filter((s) => s.difficulty === tier);
+                  if (tierSubtopics.length === 0) return null;
+                  return (
+                    <div key={tier} className="modal-curriculum-tier">
+                      <h4 className="modal-curriculum-tier-title mono">{DIFFICULTY_LABEL[tier]}</h4>
+                      <div className="modal-curriculum-list">
+                        {tierSubtopics.map((s) => (
+                          <div key={s.subtopic_id} className="modal-curriculum-row">
+                            <span className="modal-curriculum-row-title">{s.title}</span>
+                            <span className="meter">
+                              <span
+                                className="meter-fill"
+                                data-complete={s.covered}
+                                style={{ width: `${Math.min(s.coverage, 1) * 100}%` }}
+                              />
+                            </span>
+                            <span className="modal-curriculum-row-count mono">
+                              {s.total_cards === 0 ? "not generated yet" : `${s.seen_cards}/${s.total_cards}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </>
         )}

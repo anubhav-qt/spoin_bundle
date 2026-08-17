@@ -2177,6 +2177,60 @@ body.custom-cursor-active textarea {
   color: var(--fg-3);
 }
 
+/* -- curriculum detail (item 1: every subtopic, grouped by tier) -- */
+.modal-curriculum {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.modal-curriculum-title {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.modal-curriculum-tier + .modal-curriculum-tier {
+  margin-top: 14px;
+}
+
+.modal-curriculum-tier-title {
+  margin: 0 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.modal-curriculum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-curriculum-row {
+  display: grid;
+  grid-template-columns: 1fr 60px auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-curriculum-row-title {
+  font-size: 12.5px;
+  color: var(--fg-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-curriculum-row-count {
+  font-size: 10.5px;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
 /* -- quiz (ADR-0009) -- */
 .quiz-panel {
   max-height: 88vh;

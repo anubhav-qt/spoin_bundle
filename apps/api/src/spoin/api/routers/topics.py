@@ -11,6 +11,8 @@ from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
     OnboardingCompleteIn,
     ProgressOut,
+    SubtopicProgressOut,
+    TopicCurriculumOut,
     TopicDiscoverOut,
     TopicOut,
     TopicRequestIn,
@@ -361,6 +363,56 @@ async def get_topic_stats(topic_id: UUID, session: SessionDep, user_id: UserDep)
         notes=event_counts.get(EngagementKind.NOTE, 0),
         shares=event_counts.get(EngagementKind.SHARE, 0),
     )
+
+
+@router.get("/{topic_id}/curriculum", response_model=TopicCurriculumOut)
+async def get_topic_curriculum(
+    topic_id: UUID, session: SessionDep, user_id: UserDep
+) -> TopicCurriculumOut:
+    """Every subtopic across all three tiers, with this user's per-subtopic
+    coverage — the detail TopicStatsModal's aggregate numbers are rolled up
+    from. Ordered by difficulty then `position`, matching curriculum-authoring
+    order (content-model.md), not insertion order.
+    """
+
+    rows = (
+        await session.execute(
+            select(
+                Subtopic.id,
+                Subtopic.title,
+                Subtopic.difficulty,
+                func.count(Card.id).filter(Card.status == CardStatus.ACTIVE),
+                func.count(UserCardState.card_id).filter(UserCardState.state == SeenState.SEEN),
+            )
+            .select_from(Subtopic)
+            .outerjoin(Card, Card.subtopic_id == Subtopic.id)
+            .outerjoin(
+                UserCardState,
+                (UserCardState.card_id == Card.id) & (UserCardState.user_id == user_id),
+            )
+            .where(Subtopic.topic_id == topic_id)
+            .group_by(Subtopic.id, Subtopic.title, Subtopic.difficulty, Subtopic.position)
+            .order_by(Subtopic.difficulty, Subtopic.position)
+        )
+    ).all()
+
+    subtopics = [
+        SubtopicProgressOut(
+            subtopic_id=subtopic_id,
+            title=title,
+            difficulty=difficulty,
+            total_cards=total,
+            seen_cards=seen,
+            coverage=(seen / total) if total else 0.0,
+            # Same gate `_tier_coverage` uses for tier unlock: seen/total >=
+            # COVERAGE_GATE, applied here per subtopic instead of only at the
+            # thinnest one.
+            covered=(total > 0 and seen / total >= COVERAGE_GATE),
+        )
+        for subtopic_id, title, difficulty, total, seen in rows
+    ]
+
+    return TopicCurriculumOut(topic_id=topic_id, subtopics=subtopics)
 
 
 @router.get("/{topic_id}/progress", response_model=ProgressOut)

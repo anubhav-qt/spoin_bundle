@@ -321,6 +321,7 @@ class ContentGenerator(ABC):
         builds_on: list[str],
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
+        rejection_feedback: list[tuple[str, str]],
     ) -> BatchResult[CardDraft]:
         """`existing_titles` is every card already in this subtopic **across all
         difficulties, tagged with their level**. Cross-difficulty inclusion is
@@ -348,6 +349,16 @@ class ContentGenerator(ABC):
         `existing_titles` (titles of cards that WERE accepted), this is full
         body text of cards that were NOT, specifically so the model can see
         what content to avoid, not just what title to avoid.
+
+        `rejection_feedback` is `(body, reason)` pairs for this SAME
+        subtopic-tier's most recent pass-2 verification rejections (a real
+        `reason` string the judge model itself gave, e.g. "reads as
+        intermediate, not advanced" -- distinct from `avoid_bodies`, whose
+        near-duplicate rejections carry no such reasoning, only a similarity
+        score). Same recency-capped, self-pruning shape as `avoid_bodies`:
+        this run's writer sees why the LAST attempt was rejected, not just
+        that it was, so it can fix the actual problem instead of rewording
+        into the same mistake.
 
         Calls to one subtopic-tier are sequential so each prompt sees what the
         last produced; different subtopics (and different tiers of an unlinked

@@ -227,6 +227,10 @@ If any cards are shown below as previously REJECTED for being near-duplicates, \
 treat their content as off-limits too — the problem was the content itself, not \
 just its title, so rewording it is not a fix.
 
+If any cards are shown below as previously REJECTED by a reviewer along with its \
+stated reason, that reason is the actual problem to fix — a difficulty mismatch, \
+a factual error, drifting off-topic. Fix THAT, don't just reword the same card.
+
 If cards from a LOWER difficulty tier of this same subtopic are shown below \
 ("builds on"), these new cards should genuinely build on them — assume the \
 reader already knows that material, and go deeper rather than re-explaining it.
@@ -241,7 +245,7 @@ Write exactly {count} NEW cards at this difficulty for this subtopic.
 {difficulty_examples_block}
 Already covered in this subtopic (do not repeat any of these):
 {existing_titles_block}
-{avoid_bodies_block}{builds_on_block}"""
+{avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
 
 _TOPIC_BATCH_MATCH_SYSTEM = """\
 You decide, for each candidate topic below, whether it refers to the SAME \
@@ -400,6 +404,25 @@ def _format_avoid_bodies(avoid_bodies: list[str]) -> str:
     return (
         "\nThese were REJECTED in an earlier run as near-duplicates of other cards -- "
         "do not write anything this similar again, even reworded:\n" + bodies + "\n"
+    )
+
+
+def _format_rejection_feedback(rejection_feedback: list[tuple[str, str]]) -> str:
+    """`rejection_feedback` is (body, reason) pairs -- unlike near-duplicate
+    rejections (an algorithmic similarity score, no reasoning), pass-2
+    verification rejections carry a real reason the judge model itself gave,
+    so it's shown alongside the body rather than just the body."""
+
+    if not rejection_feedback:
+        return ""
+    blocks = "\n\n".join(
+        f"--- rejected {n + 1} (reviewer's reason: {reason}) ---\n{body}"
+        for n, (body, reason) in enumerate(rejection_feedback)
+    )
+    return (
+        "\nThese were REJECTED in an earlier run by the reviewer, with its stated "
+        "reason -- fix the actual problem the reason describes, don't just reword "
+        "the same card:\n" + blocks + "\n"
     )
 
 
@@ -597,6 +620,7 @@ class GeminiContentGenerator(ContentGenerator):
         builds_on: list[str],
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
+        rejection_feedback: list[tuple[str, str]],
     ) -> BatchResult[CardDraft]:
         prompt = [
             ("system", _CARDS_SYSTEM),
@@ -611,6 +635,7 @@ class GeminiContentGenerator(ContentGenerator):
                     difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
                     existing_titles_block=_format_existing_titles(existing_titles),
                     avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
+                    rejection_feedback_block=_format_rejection_feedback(rejection_feedback),
                     builds_on_block=_format_builds_on(builds_on),
                 ),
             ),

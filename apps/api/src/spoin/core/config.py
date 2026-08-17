@@ -112,6 +112,12 @@ class Settings(BaseSettings):
     #: Bounded for the same reason `existing_titles` is bounded -- prevention
     #: context must stay small enough that the attention argument holds.
     max_duplicate_feedback_bodies: int = 10
+    #: Same shape as `max_duplicate_feedback_bodies`, for a subtopic's most
+    #: recent PASS-2 VERIFICATION `rejected_card` rows instead of near-dup
+    #: ones -- these carry a real reason the judge model gave (not just a
+    #: similarity score), fed back into the next `generate_cards` call so the
+    #: writer fixes the actual problem instead of rewording into it again.
+    max_verification_feedback_bodies: int = 10
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

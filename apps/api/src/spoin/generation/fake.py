@@ -127,6 +127,7 @@ class FakeContentGenerator(ContentGenerator):
         builds_on: list[str],
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
+        rejection_feedback: list[tuple[str, str]],
     ) -> BatchResult[CardDraft]:
         builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
         items = [

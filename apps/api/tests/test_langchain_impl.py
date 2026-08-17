@@ -164,6 +164,7 @@ async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:
             builds_on=[],
             difficulty_examples={},
             avoid_bodies=[],
+            rejection_feedback=[],
         )
 
     assert len(result.items) == 1
@@ -190,6 +191,7 @@ async def test_generate_cards_whole_call_failure_degrades_to_empty_batch() -> No
             builds_on=[],
             difficulty_examples={},
             avoid_bodies=[],
+            rejection_feedback=[],
         )
 
     assert result.items == []
@@ -221,6 +223,7 @@ async def test_generate_cards_threads_builds_on_into_prompt() -> None:
             builds_on=["Lower-tier card body about the basics."],
             difficulty_examples={},
             avoid_bodies=[],
+            rejection_feedback=[],
         )
 
     prompt_text = str(captured_prompt[0])
@@ -249,6 +252,7 @@ async def test_generate_cards_threads_difficulty_examples_into_prompt() -> None:
             builds_on=[],
             difficulty_examples={Difficulty.ADVANCED: ["An example advanced-tier card body."]},
             avoid_bodies=[],
+            rejection_feedback=[],
         )
 
     prompt_text = str(captured_prompt[0])
@@ -277,10 +281,43 @@ async def test_generate_cards_threads_avoid_bodies_into_prompt() -> None:
             builds_on=[],
             difficulty_examples={},
             avoid_bodies=["A body that was rejected as a near-duplicate last run."],
+            rejection_feedback=[],
         )
 
     prompt_text = str(captured_prompt[0])
     assert "A body that was rejected as a near-duplicate last run." in prompt_text
+
+
+async def test_generate_cards_threads_rejection_feedback_into_prompt() -> None:
+    generator = _generator()
+    wire = _WireCardBatch(cards=[_WireCard(title="T", canonical_title="T", summary="s", body="b")])
+    captured_prompt: list[object] = []
+
+    async def _capture(prompt: object) -> _WireCardBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        await generator.generate_cards(
+            topic_name="T",
+            subtopic_title="S",
+            subtopic_description="d",
+            difficulty=Difficulty.BEGINNER,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
+            rejection_feedback=[
+                ("A body the reviewer rejected.", "reads as intermediate, not beginner")
+            ],
+        )
+
+    prompt_text = str(captured_prompt[0])
+    assert "A body the reviewer rejected." in prompt_text
+    assert "reads as intermediate, not beginner" in prompt_text
 
 
 async def test_correct_cards_passes_through_edits_and_rejects_bad_item() -> None:

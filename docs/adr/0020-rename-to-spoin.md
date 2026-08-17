@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -32,14 +32,14 @@ production deployment.
 
 Scope of the sweep (execution tracked in [task 0007](../tasks/0007-rename-to-spoin.md)):
 
-| Surface | Change |
-|---|---|
-| Python package | `apps/api/src/slocho/` → `apps/api/src/spoin/`, and every import |
-| Packaging | `pyproject.toml` name, `Dockerfile` paths, `alembic.ini` |
-| Database | database name in `.env.example`, `docker-compose.yml`, `alembic/env.py` |
-| Web | app metadata, `<title>`, package name, visible copy |
-| Docs | `README.md`, `CLAUDE.md`, `docs/**`, mockups in `docs/design/mockups/` |
-| Repo | directory and remote name |
+| Surface        | Change                                                                  |
+| -------------- | ----------------------------------------------------------------------- |
+| Python package | `apps/api/src/slocho/` → `apps/api/src/spoin/`, and every import        |
+| Packaging      | `pyproject.toml` name, `Dockerfile` paths, `alembic.ini`                |
+| Database       | database name in `.env.example`, `docker-compose.yml`, `alembic/env.py` |
+| Web            | app metadata, `<title>`, package name, visible copy                     |
+| Docs           | `README.md`, `CLAUDE.md`, `docs/**`, mockups in `docs/design/mockups/`  |
+| Repo           | directory and remote name                                               |
 
 Two things are deliberately **not** in scope:
 
@@ -58,12 +58,14 @@ answer by reading code.
 ## Consequences
 
 **Easier**
+
 - The name is settled before it becomes load-bearing, so no future session spends time
   asking whether to rename.
 - A single sweep means `grep -ri slocho` returning zero hits is a complete, checkable
   definition of done.
 
 **Harder**
+
 - Every open branch or uncommitted work in flight conflicts with the sweep, since it
   touches nearly every file in `apps/api`. Anything outstanding should be merged or
   parked before it runs.
@@ -72,13 +74,13 @@ answer by reading code.
 - `git log -S` and `git blame` across the rename commit get noisier — the usual price of
   a mechanical sweep.
 - Committing to the name means the domain and a trademark check are now blocking on
-  *this* name specifically, not a shortlist.
+  _this_ name specifically, not a shortlist.
 
 ## Alternatives considered
 
 **Keep Slocho and revisit after launch.** Rejected — this is the alternative that
 silently decides the question. Every week of delay adds surface (deployments, links,
-data) and there is no future point at which renaming is *cheaper* than today.
+data) and there is no future point at which renaming is _cheaper_ than today.
 
 **Rename user-facing surfaces only, leave the code package as `slocho`.** Rejected: it
 permanently splits the product's identity from its code, which means every new session

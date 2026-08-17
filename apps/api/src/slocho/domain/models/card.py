@@ -93,6 +93,13 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
     judged_difficulty: Mapped[Difficulty | None] = mapped_column(pg_enum(Difficulty, "difficulty"))
 
     title: Mapped[str] = mapped_column(String(120), nullable=False)
+    #: The literal, descriptive name of the concept. Always present, never playful —
+    #: `title` is what the feed face shows and is playful some of the time, but every
+    #: other consumer (quiz stems, remediation links, progress/coverage lists, search,
+    #: and the generation prompt's already-covered list) reads THIS field
+    #: (ADR-0022). Neither title feeds `content_embedding` — that stays derived from
+    #: `body` alone.
+    canonical_title: Mapped[str] = mapped_column(String(160), nullable=False)
     #: A purpose-written hook, NOT a truncation of body. It costs nothing — one
     #: more field in the same structured output on the same request, and the free
     #: tier meters requests, not tokens (ADR-0005). The opening of a good
@@ -141,6 +148,17 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
     #: per subtopic" — a mixed-feed station groups by TOPIC, which can span
     #: several subtopics. See ADR-0017 and docs/tasks/0006.
     is_hero: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    #: Key into the ASCII scene catalog (ADR-0021). Null until the catalog exists —
+    #: the generator SELECTS a scene, it never draws one, so this column is meaningless
+    #: without a catalog to select from. Kept nullable and populated by nothing today
+    #: on purpose: adding it later would mean a data migration and regenerating the
+    #: corpus to backfill it (the "do the schema half now" reasoning in CLAUDE.md).
+    visual_id: Mapped[str | None] = mapped_column(String(64))
+    #: {slot_name: text} for the scene named by `visual_id`. Null together with it.
+    visual_slots: Mapped[dict[str, str] | None] = mapped_column(
+        JSONB().with_variant(JSON(), "sqlite")
+    )
 
     subtopic: Mapped[Subtopic] = relationship(back_populates="cards")
     stats: Mapped[CardStats | None] = relationship(

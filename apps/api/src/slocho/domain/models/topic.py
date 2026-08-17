@@ -180,12 +180,26 @@ class Subtopic(Base, UUIDPrimaryKey, CreatedAt):
     __tablename__ = "subtopic"
     __table_args__ = (
         Index("ix_subtopic_topic_id_difficulty", "topic_id", "difficulty"),
+        Index("ix_subtopic_group_id", "subtopic_group_id"),
         CheckConstraint("min_cards <= target_cards", name="min_within_target"),
         CheckConstraint("target_cards BETWEEN 5 AND 25", name="target_cards_band"),
     )
 
     topic_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), nullable=False
+    )
+    #: Groups this subtopic with its siblings at other difficulty tiers — one
+    #: shared id per curriculum-authored *concept*, minted once when the curriculum
+    #: pass creates the group and reused across however many tiers it decided the
+    #: concept needs (1-3; the model is never forced to fill all three). A
+    #: standalone subtopic with no tier siblings still gets its own group id, of
+    #: size one. This is what makes ADR-0007's "existing titles, across all
+    #: difficulties, tagged with their level" answerable — before this field
+    #: existed there was no way to tell two Subtopic rows were "the same slot" at
+    #: different tiers versus two unrelated subtopics that happened to be created
+    #: in the same curriculum pass.
+    subtopic_group_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), default=uuid.uuid4, nullable=False
     )
     difficulty: Mapped[Difficulty] = mapped_column(
         pg_enum(Difficulty, "difficulty"),

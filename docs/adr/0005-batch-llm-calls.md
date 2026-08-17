@@ -2,12 +2,12 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
 Gemini's free tier meters **requests per day and per minute**, not tokens. Our binding
-constraint is therefore the *number of API calls*, and the size of each call is nearly
+constraint is therefore the _number of API calls_, and the size of each call is nearly
 free by comparison.
 
 This inverts the instinct most developers bring from paid LLM usage, where token count
@@ -31,11 +31,11 @@ Two rules:
 
 ### Applied
 
-| Operation | Naive | Batched | Effective gain |
-|---|---|---|---|
-| Card generation | 1 request per card | ~10 cards per request | ~10x daily output |
-| Difficulty verification | 1 request per card | ~20 cards per request | ~20x, makes the gate affordable |
-| Topic canonicalization judge | 1 request per pair | queue pairs, judge in batches | permanently cached after |
+| Operation                    | Naive              | Batched                       | Effective gain                  |
+| ---------------------------- | ------------------ | ----------------------------- | ------------------------------- |
+| Card generation              | 1 request per card | ~10 cards per request         | ~10x daily output               |
+| Difficulty verification      | 1 request per card | ~20 cards per request         | ~20x, makes the gate affordable |
+| Topic canonicalization judge | 1 request per pair | queue pairs, judge in batches | permanently cached after        |
 
 The generation job is built around `generate_batch(topic, difficulty, n)` from day one.
 There is no single-card entrypoint to retrofit later.
@@ -43,6 +43,7 @@ There is no single-card entrypoint to retrofit later.
 ## Consequences
 
 **Easier**
+
 - Roughly an order of magnitude more content per day on the same free tier. This is the
   difference between the corpus filling and not filling, so it is not an optimization.
 - The quality gate becomes affordable enough to run on **every** card rather than a sample.
@@ -50,6 +51,7 @@ There is no single-card entrypoint to retrofit later.
   weighing each field against cost.
 
 **Harder**
+
 - **Partial failure is now the normal case.** If 3 of 10 cards in a batch are malformed,
   the other 7 must still land. Every batch call needs per-item validation and per-item
   failure handling. A batch that fails atomically wastes a scarce request.
@@ -59,6 +61,7 @@ There is no single-card entrypoint to retrofit later.
   (ADR-0002) is what keeps this tractable.
 
 **Committed to**
+
 - Every LLM-calling interface takes a collection. Single-item calls are a batch of one,
   never a separate code path.
 

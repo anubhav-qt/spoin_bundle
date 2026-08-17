@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 - **Amended by:** [ADR-0007](0007-curriculum-driven-generation.md) — the coalescing lock key
   becomes `(subtopic_id)` rather than `(topic_id, difficulty)`, and the starvation signal
   becomes "this subtopic is below `min_cards`" rather than "this topic's pool is low".
@@ -65,6 +65,7 @@ fills. It slots into the priority queue established in ADR-0003.
 ## Consequences
 
 **Easier**
+
 - Generation follows actual demand instead of guessing, which matters enormously when
   the daily budget is tiny.
 - Users never receive content at the wrong difficulty, which is the failure mode most
@@ -73,6 +74,7 @@ fills. It slots into the priority queue established in ADR-0003.
   forces them early.
 
 **Harder**
+
 - The feed service now has **state** (degraded or not, per slot) rather than being a pure
   function of the corpus. More to reason about and more to test.
 - Degraded mode can persist for hours. Cron runs every ~15 minutes and the daily quota
@@ -82,6 +84,7 @@ fills. It slots into the priority queue established in ADR-0003.
   real design surface, not an error state, and deserves actual design attention.
 
 **Committed to**
+
 - `POOL_LOW` and `POOL_HIGH` are config values, tuned against observed consumption.
 - Every fill job is idempotent and coalescible. No fill path may bypass the lock.
 

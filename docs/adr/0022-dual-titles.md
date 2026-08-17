@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -12,7 +12,7 @@ read by humans. It is currently load-bearing in three machine paths:
 
 - **Generation prevention.** [ADR-0007](0007-curriculum-driven-generation.md) supplies the
   list of titles already covered in a subtopic to the generation prompt, specifically so
-  the model doesn't re-cover ground. This is the *cost* half of the prevention/detection
+  the model doesn't re-cover ground. This is the _cost_ half of the prevention/detection
   split — it is what keeps us from paying to generate duplicates that the gate then throws
   away.
 - **Remediation.** [ADR-0009](0009-quiz-gated-progression.md) links every wrong answer back
@@ -22,7 +22,7 @@ read by humans. It is currently load-bearing in three machine paths:
 
 Make `title` playful and all three degrade at once, quietly. The generator can no longer
 tell what's been covered from a list of puns, so the prevention layer stops preventing.
-"Go read *Big Boy Sits Down*" is a bad answer to "what did I get wrong?". And forty jokes
+"Go read _Big Boy Sits Down_" is a bad answer to "what did I get wrong?". And forty jokes
 in a coverage list is unscannable — the reader cannot find the one subtopic they care
 about.
 
@@ -45,13 +45,13 @@ purpose-written hook rather than a truncation.
 
 ### Which title each consumer reads
 
-| Consumer | Title |
-|---|---|
-| Feed card face, hero cards, share images | `title` |
-| Generation prompt's "already covered" list | **both** (see below) |
-| Quiz stems, remediation links, wrong-answer results | `canonical_title` |
-| Progress lists, coverage surfaces, search | `canonical_title` |
-| Chat / "Ask AI" card context | **both** |
+| Consumer                                            | Title                |
+| --------------------------------------------------- | -------------------- |
+| Feed card face, hero cards, share images            | `title`              |
+| Generation prompt's "already covered" list          | **both** (see below) |
+| Quiz stems, remediation links, wrong-answer results | `canonical_title`    |
+| Progress lists, coverage surfaces, search           | `canonical_title`    |
+| Chat / "Ask AI" card context                        | **both**             |
 
 **Both titles go into the generation prompt's already-covered list.** The canonical title
 is what lets the model tell that a subject is taken; the display title is what stops it
@@ -80,12 +80,14 @@ quietly makes puns look like distinct content.
 ## Consequences
 
 **Easier**
+
 - The feed gets the hook without any machine path losing the literal name of the concept.
 - Adding a surface is unambiguous: canonical unless there's a reason.
-- The prevention layer gets *stronger* than today — it can now catch repeated jokes as
+- The prevention layer gets _stronger_ than today — it can now catch repeated jokes as
   well as repeated subjects.
 
 **Harder**
+
 - Two fields to keep coherent. A display title that doesn't actually correspond to its
   canonical title is a new failure mode, and it is one the quality gate does not check for
   today. It should be added to the batch judge's pass rather than assumed away.
@@ -113,7 +115,7 @@ about at generation time — asking it later to reverse-engineer that from a pun
 worse and costs a request.
 
 **Store playfulness as a boolean flag alongside a single title.** Rejected — it records
-*that* a title is a joke without recovering what the joke is about, so every machine path
+_that_ a title is a joke without recovering what the joke is about, so every machine path
 is still stuck.
 
 ## Revisit when

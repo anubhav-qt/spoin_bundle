@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -67,10 +67,10 @@ Redis is not required in v1.
 A card becomes `SEEN` via either path ([ADR-0010](0010-feed-serving.md)), but they are
 recorded **separately** because they are very different quality signals:
 
-| Event | Meaning | Signal strength |
-|---|---|---|
-| `explicit_complete` | User tapped "Got it" | **Strong.** A deliberate claim of comprehension |
-| `dwell_complete` | Tab was open past the threshold | Weak. They may have been making tea |
+| Event               | Meaning                         | Signal strength                                 |
+| ------------------- | ------------------------------- | ----------------------------------------------- |
+| `explicit_complete` | User tapped "Got it"            | **Strong.** A deliberate claim of comprehension |
+| `dwell_complete`    | Tab was open past the threshold | Weak. They may have been making tea             |
 
 For the progression gate they are equivalent. For **ranking and topic affinity they are
 weighted differently** — an explicit completion is among the highest-quality positive
@@ -78,7 +78,7 @@ signals available, arguably better than a like since it reports understanding ra
 enjoyment.
 
 Collapsing them into one boolean discards that permanently. Unlike most modelling mistakes,
-this one is *not* recoverable from the event log, because the distinction would never have
+this one is _not_ recoverable from the event log, because the distinction would never have
 been written down.
 
 ### Rate, not count
@@ -125,12 +125,14 @@ client loop is indistinguishable from an attack.
 ## Consequences
 
 **Easier**
+
 - Every aggregate is rebuildable, so a bug in aggregation logic is recoverable by
   recomputation rather than being permanent data loss.
 - The feed read path touches only precomputed columns.
 - The raw log supports analytics and future ML that we cannot specify yet.
 
 **Harder**
+
 - Highest write volume in the system, on a free-tier database with limited storage. The
   event log will need a retention policy (aggregate then prune) sooner than anything else.
 - Dual-write between events and derived state introduces drift; reconciliation jobs are
@@ -139,6 +141,7 @@ client loop is indistinguishable from an attack.
   its own writes for anything that matters.
 
 **Committed to**
+
 - No aggregation in a user-facing request.
 - `occurred_at` is server-assigned.
 - Aggregates are always rebuildable from the event log.

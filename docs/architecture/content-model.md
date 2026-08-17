@@ -54,10 +54,15 @@ card
 
 ### On `title` / `canonical_title`
 
-**Decided in [ADR-0022](../adr/0022-dual-titles.md); not yet built.** `title` is what the
-feed card face shows and is playful some of the time (the proportion is a config value,
-not a code path). `canonical_title` is the literal, descriptive name of the concept and is
-always present.
+**Decided in [ADR-0022](../adr/0022-dual-titles.md); schema and generation prompt built,
+see [generation-pipeline.md](generation-pipeline.md).** `title` is what the feed card
+face shows and is playful some of the time (the proportion is a config value, not a code
+path). `canonical_title` is the literal, descriptive name of the concept and is always
+present. `CardDraft.canonical_title` is a required field (`generation/base.py`), and
+`langchain_impl.py`'s card-writing prompt explicitly instructs the model not to make it
+identical to `title` every time. What's still open: whether the *proportion* of playful
+titles the prompt actually produces matches ADR-0022's intent — unverified without a
+live Gemini key.
 
 **`canonical_title` is the default for every consumer except the feed face.** Quiz stems,
 remediation links, progress and coverage lists, and search all read it. The one that is
@@ -69,11 +74,15 @@ invent the same joke twice.
 
 ### On `visual_id` / `visual_slots`
 
-**Decided in [ADR-0021](../adr/0021-ascii-scene-library.md); not yet built.** Cards may
-carry an ASCII scene. The generator **selects** a scene from a curated, hand-authored
-catalog and writes its dialogue slots; it never draws art. Models are unreliable at ASCII
-art and none of the four quality-gate checks below can detect a broken drawing — the
-catalog is what replaces the missing detector.
+**Decided in [ADR-0021](../adr/0021-ascii-scene-library.md); schema fields exist, catalog
+does not.** Cards may carry an ASCII scene. The generator **selects** a scene from a
+curated, hand-authored catalog and writes its dialogue slots; it never draws art. Models
+are unreliable at ASCII art and none of the four quality-gate checks below can detect a
+broken drawing — the catalog is what replaces the missing detector.
+`card.visual_id`/`visual_slots` and `CardDraft.visual_id`/`visual_slots` exist (so a
+future catalog needs no migration or corpus regeneration to land), but with no catalog to
+select from, nothing populates them today — see
+[generation-pipeline.md](generation-pipeline.md).
 
 The card stores a reference plus text, never rendered art, so fixing a scene improves
 every card using it with no regeneration. Three constraints are enforced server-side, not
@@ -279,6 +288,11 @@ retiring old text) is deliberately deferred.
 ## Quality gate
 
 A generated card is `draft` until it passes. It never reaches the corpus otherwise.
+
+**This is the target design; only structural validation exists today**
+(`generation/gate.py`: non-empty body, nothing else) — cards go straight to `active`.
+None of the four checks below (dedup, topic conformance, difficulty, factual accuracy)
+are built. See [generation-pipeline.md](generation-pipeline.md).
 
 Note the division of labour established in [ADR-0007](../adr/0007-curriculum-driven-generation.md):
 **prevention** (curriculum targeting + title lists in the prompt) optimizes *cost*;

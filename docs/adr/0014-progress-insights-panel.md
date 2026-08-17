@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -45,6 +45,7 @@ threshold" comment would actively mislead the next person who reads `topics.py`.
 ## Consequences
 
 **Easier**
+
 - Zero new backend work, zero new network calls beyond what already existed — the panel
   is a pure read of state `AppShell` already holds.
 - No embedding-quality caveat to carry forward. ADR-0013's whole "meaningless under the
@@ -54,6 +55,7 @@ threshold" comment would actively mislead the next person who reads `topics.py`.
   (theme picker, topic filter) change height — the graph's SVG had no such guarantee.
 
 **Harder**
+
 - "Quiz tiers passed" will show `0` for every user until a quiz-taking flow actually
   exists — accurate, but not very interesting yet. Revisit once that flow ships.
 - The topic-relationship idea (which topics are conceptually near each other) is dropped

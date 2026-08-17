@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -28,7 +28,7 @@ This is wrong: it produces approximately-80% that drifts with the candidate pool
 untestable.
 
 Instead, **stratified sampling**: the 80% is pulled from beginner candidates and the 20%
-from intermediate as separate queries, then ranked *within* each stratum. The mix becomes
+from intermediate as separate queries, then ranked _within_ each stratum. The mix becomes
 exact and provable.
 
 Diversity works the same way — a post-ranking interleave, not a score. Five excellent cards
@@ -36,7 +36,7 @@ from one subtopic is a worse page than five good cards from five subtopics, and 
 be expressed per-card because it depends on what preceded it.
 
 **Principle: score individual items; enforce composition rules structurally.** Anything
-about the *set* (mix, diversity, spacing) belongs outside the ranker.
+about the _set_ (mix, diversity, spacing) belongs outside the ranker.
 
 ### Seen-state: three states with a second-chance cycle
 
@@ -102,8 +102,8 @@ Why not table alone:
 periodic reconciliation job makes it a non-event. This is a materialized read model over an
 event log, not a compromise between two options.
 
-*This is only viable because ADR-0007 bounded the corpus. An infinite-corpus feed cannot do
-this.*
+_This is only viable because ADR-0007 bounded the corpus. An infinite-corpus feed cannot do
+this._
 
 ### Ranking: linear, not learned
 
@@ -161,7 +161,7 @@ Per-topic slates make scores **only ever comparable within a topic**, where they
 commensurable. Cross-topic weighting moves to the affinity interleave, where the decision is
 explicit and tunable instead of buried in score arithmetic.
 
-**The difficulty mix composes correctly.** Each slate is stratified for *that topic's* tier,
+**The difficulty mix composes correctly.** Each slate is stratified for _that topic's_ tier,
 so any interleave preserves every topic's mix. This matters because a user can be beginner
 in one topic and advanced in another — which one combined slate handles awkwardly.
 
@@ -202,11 +202,13 @@ needed yet.
 ## Consequences
 
 **Easier**
+
 - The difficulty mix is exact and testable rather than emergent.
 - Progression is un-gameable by construction.
 - The read path touches no aggregates, so it stays fast without a cache.
 
 **Harder**
+
 - Seen-state is now three states plus a cycle counter, and is dual-written (table + bitmap)
   with a reconciliation job.
 - Slates and plans are server-side state with TTLs and invalidation rules, and there are now
@@ -215,6 +217,7 @@ needed yet.
   as "I keep seeing the same cards", which is the most damaging feed bug there is.
 
 **Committed to**
+
 - Composition rules (mix, diversity) never live in the ranker.
 - Ranking weights and the exploration rate are config, not code.
 - The bitmap is always rebuildable from the table.

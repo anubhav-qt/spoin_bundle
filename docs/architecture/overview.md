@@ -123,5 +123,5 @@ These are not style preferences. Breaking any of them breaks the architecture.
 - [ADR-0021](../adr/0021-ascii-scene-library.md) / [ADR-0022](../adr/0022-dual-titles.md) —
   how cards get a personality (ASCII scenes, playful titles) without the write path losing
   the literal, machine-readable version of what a card teaches
-- `docs/architecture/generation-pipeline.md` — how the corpus gets filled *(not yet written)*
+- [generation-pipeline.md](generation-pipeline.md) — how the corpus gets filled
 - `docs/architecture/feed-algorithm.md` — candidate → filter → rank *(not yet written)*

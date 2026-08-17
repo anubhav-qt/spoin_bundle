@@ -10,10 +10,17 @@ request path.
 - **Curriculum pass** — one call per topic, produces subtopics and `deep_dive` edges.
 - **Card generation** — batched, targeted at a subtopic, sequential within a subtopic and
   parallel across them.
-- **Question bank generation** — questions derived from cards.
-- **Quality gate** — dedup, topic conformance, difficulty, factual accuracy.
 - **Topic canonicalization** — local embeddings, banded matching, LLM judge for the
   middle band.
+- **Question bank generation** — questions derived from cards. Not built.
+- **Quality gate** — dedup, topic conformance, difficulty, factual accuracy. Not built
+  (only structural validation exists today).
+
+The first three are implemented in `generation/pipeline.py` (a LangGraph graph — see
+[generation-pipeline.md](../../docs/architecture/generation-pipeline.md)), but this
+package's own entrypoint (`worker/__main__.py`) doesn't call it yet — see task
+[0008](../../docs/tasks/0008-wire-generation-job-worker.md). Today the pipeline only
+runs via `python -m slocho.generate_topics`.
 
 ## How it runs
 
@@ -32,4 +39,7 @@ See [ADR-0008](../../docs/adr/0008-local-gpu-generation.md).
 
 ## Status
 
-Not yet implemented.
+The generation logic this package is meant to run exists and is tested
+(`generation/pipeline.py`); this package's own entrypoint (job claiming, calling that
+pipeline, writing results back to `GenerationJob`) is not implemented — see task
+[0008](../../docs/tasks/0008-wire-generation-job-worker.md).

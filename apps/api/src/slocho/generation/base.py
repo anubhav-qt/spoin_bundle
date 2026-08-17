@@ -42,19 +42,50 @@ class CardDraft(BaseModel):
     truncation: better use of the body the model already writes, not a new field.
     """
 
-    title: str = Field(max_length=120)
+    title: str = Field(max_length=120, min_length=1)
+    #: The literal, descriptive name — always present, never playful. Feeds every
+    #: consumer except the feed face itself: quiz stems, remediation links,
+    #: progress/coverage lists, search, and the already-covered title list this
+    #: generator is shown on the next call to the same subtopic (ADR-0022). Getting
+    #: this one wrong is silent, per the ADR: it's easy to feed the prompt only
+    #: `title` and have it invent the same joke twice under a new punchline.
+    canonical_title: str = Field(max_length=160, min_length=1)
     summary: str
     body: str
     #: What the model was ASKED for. The gate re-rates this independently, because
     #: a self-reported difficulty just echoes the request and validates nothing.
     difficulty: Difficulty
+    #: Selected from the ASCII scene catalog, never drawn (ADR-0021). None until the
+    #: catalog exists — `langchain_impl.py`'s prompt has nothing to select from yet,
+    #: so this stays unset there too. Present now so the schema and CardDraft shape
+    #: don't change again once the catalog lands (no regeneration needed to backfill).
+    visual_id: str | None = None
+    visual_slots: dict[str, str] | None = None
 
 
-class SubtopicDraft(BaseModel):
-    title: str
-    description: str
+class SubtopicTierDraft(BaseModel):
+    """One difficulty tier's treatment of a `SubtopicGroupDraft`."""
+
     difficulty: Difficulty
+    description: str
     target_cards: int = Field(ge=5, le=25)
+
+
+class SubtopicGroupDraft(BaseModel):
+    """One curriculum-authored concept, and the model's own decision about which
+    difficulty tiers it actually needs.
+
+    This does NOT default to three tiers. Mechanically generating a beginner,
+    intermediate, AND advanced entry for every concept forces the model to pad —
+    some concepts only make sense at one or two tiers, and asking it to fill a grid
+    regardless just produces near-duplicate cards with the difficulty label as the
+    only real difference. `tiers` is 1-3 entries, whichever the model decides this
+    concept genuinely needs; a taste decision (same trust level as `target_cards`),
+    not one requiring independent verification the way a per-card difficulty tag does.
+    """
+
+    title: str
+    tiers: list[SubtopicTierDraft] = Field(min_length=1, max_length=3)
     position: int = 0
 
 
@@ -65,13 +96,31 @@ class CurriculumDraft(BaseModel):
     progression instead of three disconnected lists.
     """
 
-    subtopics: list[SubtopicDraft]
+    #: At least one — a topic with zero subtopics would leave the pipeline's
+    #: per-topic branch with nothing to fan out for card generation, which the
+    #: graph topology assumes never happens (every topic branch dispatches >=1
+    #: subtopic branch on the way to the shared persist step; see pipeline.py's
+    #: `fan_out_subtopics` docstring for why that invariant matters).
+    subtopics: list[SubtopicGroupDraft] = Field(min_length=1)
     #: Emitted when the topic is too broad for one curriculum (>~20 subtopics per
     #: tier). The broad topic is NOT deleted — it becomes a survey, and these are
     #: the deeper siblings it introduces. Rule 2 of ADR-0007 is generative, not
     #: destructive.
     deep_dive_topics: list[str] = Field(default_factory=list)
     is_survey: bool = False
+
+
+class TopicMatchVerdict(BaseModel):
+    """ADR-0004's mid-band call: "are these the same subject?" — but the answer
+    isn't just yes/no. Even when `same_topic` is False, the judge can flag existing
+    subtopics from the matched topic as relevant hints for the NEW topic's own
+    curriculum pass to consider adapting (never copied wholesale — the curriculum
+    pass, not this verdict, decides whether/how to use them)."""
+
+    same_topic: bool
+    #: Existing subtopic titles from the matched topic worth showing the curriculum
+    #: pass as context, whether or not `same_topic` is True.
+    relevant_subtopic_titles: list[str] = Field(default_factory=list)
 
 
 class DifficultyVerdict(BaseModel):
@@ -114,10 +163,46 @@ class ContentGenerator(ABC):
     """The only interface the rest of the codebase knows about."""
 
     @abstractmethod
-    async def generate_curriculum(self, topic_name: str, description: str) -> CurriculumDraft:
+    async def generate_curriculum(
+        self,
+        topic_name: str,
+        description: str,
+        related_subtopic_hints: list[str] | None = None,
+        existing_subtopics: list[str] | None = None,
+    ) -> CurriculumDraft:
         """One call per topic. The highest-stakes call in the system: every card in
         the topic inherits its quality, so it always runs on the strongest
-        available model regardless of what generates the cards."""
+        available model regardless of what generates the cards.
+
+        `related_subtopic_hints` carries titles pulled from a DIFFERENT topic
+        ADR-0004's mid-band judge found related-but-not-identical (see
+        `judge_topic_match`) — loose inspiration, never reused verbatim, since
+        those subtopics belong to a different topic's own identity.
+
+        `existing_subtopics` carries titles (with description) already under
+        THIS exact topic — from an older seed fixture, or a prior partial run.
+        Same prevention pattern already used for card titles (see
+        `generate_cards`'s `existing_titles`), one level up: if a subtopic this
+        call wants to propose is already covered by one of these, it should
+        reuse the EXISTING title VERBATIM in its output, so the pipeline's
+        persistence step can match on it directly and reuse that row instead of
+        forking a near-duplicate. Deciding whether something counts as "already
+        covered" is the same kind of taste call as everything else in the
+        curriculum pass — not one that needs independent verification.
+        """
+
+    @abstractmethod
+    async def judge_topic_match(
+        self,
+        candidate_name: str,
+        candidate_description: str,
+        matched_topic_name: str,
+        matched_subtopic_titles: list[str],
+    ) -> TopicMatchVerdict:
+        """ADR-0004's mid-band step: fires only when embedding similarity against
+        an existing topic lands between the auto-merge and auto-new thresholds.
+        Cached permanently in `topic_alias` once decided — this pair is never
+        paid for again."""
 
     @abstractmethod
     async def generate_cards(

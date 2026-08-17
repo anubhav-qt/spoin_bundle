@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -39,6 +39,7 @@ This runs in CI. A Pydantic model change that breaks the frontend fails the buil
 ## Consequences
 
 **Easier**
+
 - The most complex part of the system (LLM orchestration) is written in the language
   with the best tooling for it, by the person most fluent in it.
 - FastAPI's `/docs` gives interactive API documentation for free — a real
@@ -46,12 +47,14 @@ This runs in CI. A Pydantic model change that breaks the frontend fails the buil
 - Async-native fits the workload, which is IO-bound on LLM and DB calls.
 
 **Harder**
+
 - Two languages in the repo: two dependency managers, two lint/format toolchains,
   two CI job families.
 - The API contract is now a generated artifact. If codegen is not wired into CI on
   day one, frontend/backend drift becomes silent. **This is the main risk of this ADR.**
 
 **Committed to**
+
 - The contract between web and API is the OpenAPI schema. It is generated from the
   serving code, never hand-maintained.
 
@@ -69,7 +72,7 @@ service boundary that must be versioned — all to serve a scale that does not e
 ## Revisit when
 
 - Frontend/backend contract drift causes a production bug despite CI codegen, or
-- LangChain JS reaches parity *and* the team's TS proficiency exceeds its Python
+- LangChain JS reaches parity _and_ the team's TS proficiency exceeds its Python
   proficiency (unlikely), or
 - Python's performance becomes a measured bottleneck — note that at any plausible
   scale here the bottleneck will be Postgres and the LLM provider, not the runtime.

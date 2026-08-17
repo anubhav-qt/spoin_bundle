@@ -255,5 +255,13 @@ class QuotaLedger(Base, Timestamps):
     __tablename__ = "quota_ledger"
 
     day: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
-    backend: Mapped[str] = mapped_column(String(32), primary_key=True)
+    #: Free text, not an enum — for a multi-key backend (rotating Gemini keys) this
+    #: is `"gemini:{key_index}"`, one ledger row per key per day, no schema change
+    #: needed to add key-awareness on top of the original single-backend design.
+    backend: Mapped[str] = mapped_column(String(64), primary_key=True)
     requests_spent: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    #: Set once, the moment this row's count reaches that day's target — never
+    #: reset. Explicit rather than inferred from `updated_at` (a plain "last
+    #: touched" timestamp doesn't distinguish "still has headroom" from "just hit
+    #: the wall"), so a caller can query "which key ran out, and when" directly.
+    exhausted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

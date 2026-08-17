@@ -60,3 +60,4 @@ useful than the decision itself.
 | [0021](0021-ascii-scene-library.md) | ASCII art from a curated scene library, not from the generator | Accepted |
 | [0022](0022-dual-titles.md) | Every card carries a display title and a canonical title | Accepted |
 | [0023](0023-reader-font-selection.md) | Five selectable reader fonts, with the monospace face locked | Accepted |
+| [0024](0024-langgraph-for-card-generation-pipeline.md) | LangGraph for the card-generation pipeline, worker stays the scheduler | Accepted (amends 0002) |

@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -50,7 +50,7 @@ Three changes to how a card behaves, made while wiring the Thread design into
   circular outline button — no visible text label. `aria-label` carries what the text used to.
 - **"Got it" moved from a text pill at the end of the expanded body to a circular icon at the
   extreme right of the action row**, separated from the other five by a flex spacer so it
-  reads as a different *kind* of action, not a sixth item in the row. It is **toggleable** —
+  reads as a different _kind_ of action, not a sixth item in the row. It is **toggleable** —
   tapping it again turns the local indicator back off, since a stray tap on a 28px circle is
   easy to make. The text pill in the expanded body is gone entirely; this icon is the only
   "Got it" affordance now.
@@ -69,7 +69,7 @@ ADR-0010's rule rather than quietly dropping it. The two options not taken:
 
 - Ship it reachable pre-expansion and accept the gap, on the theory that ADR-0010 already
   tolerates a weak completion signal for `dwell_complete`. Rejected — that precedent is about
-  signal *strength*, not about skipping the expansion requirement entirely; the two are not
+  signal _strength_, not about skipping the expansion requirement entirely; the two are not
   the same risk.
 - Keep it pre-expansion-reachable but weight it as a third, weaker tier of completion signal
   in ranking. Rejected for now: it's a backend change (`EngagementKind`,
@@ -81,8 +81,8 @@ ADR-0010's rule rather than quietly dropping it. The two options not taken:
 `ui-sans-serif` for reading content, `ui-monospace` for everything that is system
 chrome rather than prose — topic labels, difficulty pips' `aria-label`, station headers,
 the eyebrow/status text. This replaces the single Nunito face used everywhere in "Beads".
-The split carries meaning: monospace reads as *the system talking to you* (labels, state,
-metadata), proportional sans as *the content itself*. No webfonts — system stacks only,
+The split carries meaning: monospace reads as _the system talking to you_ (labels, state,
+metadata), proportional sans as _the content itself_. No webfonts — system stacks only,
 so there is nothing to self-host or risk a silent fallback on.
 
 ### Color: five committed palettes, not one theme with light/dark
@@ -90,13 +90,13 @@ so there is nothing to self-host or risk a silent fallback on.
 Five full palettes were designed, each a specific engineering artifact rather than an
 arbitrary hue choice:
 
-| Key | Name | Reference | Natural mode |
-|---|---|---|---|
-| `copper` | Copper Board | populated PCB, copper trace on dark laminate | dark |
-| `cyanotype` | Cyanotype | ~~the actual chemical-print blueprint blue~~ — see below | light |
-| `phosphor` | Phosphor | ~~CRT terminal glow, desaturated so body text stays readable~~ — see below | dark |
-| `notebook` | Notebook | squared engineering paper, graphite ink, red-pencil accent | light |
-| `scope` | Oscilloscope | dual-trace readout, cyan primary + amber secondary channel | dark |
+| Key         | Name         | Reference                                                                  | Natural mode |
+| ----------- | ------------ | -------------------------------------------------------------------------- | ------------ |
+| `copper`    | Copper Board | populated PCB, copper trace on dark laminate                               | dark         |
+| `cyanotype` | Cyanotype    | ~~the actual chemical-print blueprint blue~~ — see below                   | light        |
+| `phosphor`  | Phosphor     | ~~CRT terminal glow, desaturated so body text stays readable~~ — see below | dark         |
+| `notebook`  | Notebook     | squared engineering paper, graphite ink, red-pencil accent                 | light        |
+| `scope`     | Oscilloscope | dual-trace readout, cyan primary + amber secondary channel                 | dark         |
 
 > **Superseded in part by [ADR-0016](0016-theme-consolidation.md):** Copper Board and
 > Phosphor converged visually (both near-black with one warm/green accent), and Notebook
@@ -109,7 +109,7 @@ arbitrary hue choice:
 **All five ship.** This is a departure from the usual "pick one, design light and dark
 variants of it" approach: each palette here is a full, deliberate world (per
 `artifact-design` guidance, a design that commits to one visual identity is allowed to
-skip the light/dark pairing and commit outright), and the user chooses *which world*,
+skip the light/dark pairing and commit outright), and the user chooses _which world_,
 not light-vs-dark within a single world. `notebook` happens to be light-native and the
 other four dark-native, but that is incidental to their identity, not a paired axis.
 
@@ -120,7 +120,7 @@ literal color, so adding a sixth palette later is additive.
 
 ### Selection: deferred to onboarding + settings, not decided today
 
-The mechanism for a user to *pick* a palette (onboarding) and *change* it later
+The mechanism for a user to _pick_ a palette (onboarding) and _change_ it later
 (settings) is **out of scope for this ADR** — no onboarding flow and no settings screen
 exist yet. See [task 0002](../tasks/0002-palette-selection-ui.md). This ADR only commits
 to: the five palettes exist as a token system, one is used as the shipped default until
@@ -129,12 +129,14 @@ the picker exists, and nothing in the component layer assumes there is only one 
 ## Consequences
 
 **Easier**
+
 - Adding a sixth palette is a new `[data-palette="x"] { ... }` block; no component touches
   a literal color.
 - The mockups are real, working HTML — copy-paste starting points for the actual
   components rather than a picture to redraw from.
 
 **Harder**
+
 - No light/dark toggle in the old sense. A user who wants "dark but not phosphor-green"
   has to pick among the dark-native palettes rather than getting light/dark as an
   independent axis from color identity. Accepted: light/dark was never really independent
@@ -144,6 +146,7 @@ the picker exists, and nothing in the component layer assumes there is only one 
   set grows, instead of one.
 
 **Committed to**
+
 - Component CSS reads tokens only, never a literal hex value.
 - `docs/design/mockups/*.html` stays in sync with what ships — if the real components
   diverge, the mockups get updated too, not left to rot as a historical artifact.

@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -14,7 +14,7 @@ backend decision rather than just UI wiring.
 
 ### Per-topic quiz gating replaces the global button
 
-`QuizCTA` asked "is *any* followed topic quiz-ready" and showed one button. That collapses
+`QuizCTA` asked "is _any_ followed topic quiz-ready" and showed one button. That collapses
 information the user already has per-topic (`TopicProgress.quizUnlocked`) into a single
 bit. `TopicsProgressBox` shows one row per followed topic — name, coverage bar, and a
 per-row quiz pill that enables at 80% — using data the client already fetches. No new
@@ -47,7 +47,7 @@ PostgreSQL — also satisfies wanting more filter chips to demonstrate overflow)
 `GET /topics/discover?mode=popular|for_you` ranks by `Topic.subscriber_count DESC`,
 excluding topics the user already follows (a discovery surface should show what you don't
 have). Both modes run the identical query today — there is no way to personalize
-*unfollowed* topics yet: `UserTopicAffinity` (used for feed ranking) only ever has rows
+_unfollowed_ topics yet: `UserTopicAffinity` (used for feed ranking) only ever has rows
 for topics a user already subscribes to. The `mode` param exists so the frontend toggle is
 real and the future personalized path has somewhere to land without a route shape change.
 Real personalization is task [0003](../tasks/0003-personalized-topic-recommendations.md).
@@ -56,7 +56,7 @@ Real personalization is task [0003](../tasks/0003-personalized-topic-recommendat
 
 `Topic.subscriber_count` (`topic.py:81`) was modeled but never written — its own comment
 claimed a "batch job" that doesn't exist. With effectively one real user, an honestly
-*counted* value ties every topic at 0 or 1, which makes "popular" meaningless. `seed.py`
+_counted_ value ties every topic at 0 or 1, which makes "popular" meaningless. `seed.py`
 now sets a fixture baseline per topic (`seed_subscriber_count` in `corpus.json`) directly,
 clearly commented as **temporary** — task [0005](../tasks/0005-remove-seed-subscriber-baseline.md)
 tracks deleting it once `POST /topics/{id}/subscribe` (new — the app's first real follow
@@ -75,6 +75,7 @@ every other surface goes back to the normal rule.
 ## Consequences
 
 **Easier**
+
 - The stats modal, the progress box, and Discover are all additive — nothing about
   `/topics/{id}/progress` or the feed changed.
 - `subscriber_count` and `UserTopicAffinity` are both real columns now exercised by real
@@ -82,6 +83,7 @@ every other surface goes back to the normal rule.
   caveat is the only fake part, and it's narrow and tracked.
 
 **Harder**
+
 - `for_you` and `popular` are indistinguishable in the UI right now beyond the label —
   worth watching whether that reads as broken before task 0003 lands.
 - The Discover list will look static until `/subscribe` traffic outpaces the seed

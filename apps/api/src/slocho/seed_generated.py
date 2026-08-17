@@ -138,6 +138,7 @@ async def _seed_subtopic(
             session.add(card)
 
         card.title = card_data["title"]
+        card.canonical_title = card_data.get("canonical_title", card_data["title"])
         card.summary = card_data["summary"]
         card.body = card_data["body"]
         card.archetype = classify_archetype(card.body)

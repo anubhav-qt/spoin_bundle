@@ -97,6 +97,7 @@ async def corpus(session: AsyncSession) -> dict[str, object]:
                 difficulty=difficulty,
                 status=CardStatus.ACTIVE,
                 title=f"{difficulty.value} card {n}",
+                canonical_title=f"{difficulty.value} card {n}",
                 summary="hook",
                 body="body",
             )

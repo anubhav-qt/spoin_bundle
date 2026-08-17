@@ -42,14 +42,32 @@ class Settings(BaseSettings):
     # real model, never burn quota, and run in milliseconds.
     generator: GeneratorBackend = "fake"
     gemini_model: str = "gemini-2.5-flash"
+    #: Comma-separated, same plain-string reasoning as `cors_origins` (a list-typed
+    #: setting would make pydantic-settings JSON-parse the env var). One free-tier
+    #: Gemini key per project; the quota governor (generation/quota.py) rotates
+    #: through these when the active one hits `quota_daily_requests` for the day.
+    gemini_api_keys: str = ""
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
+
+    #: Caps requests in flight at once across an ENTIRE generation run, regardless
+    #: of how many subtopics (or topics) fan out concurrently — without this, a
+    #: topic with 20 subtopics dispatches 20 simultaneous calls, blowing through
+    #: `quota_rpm` and turning key exhaustion into a burst of simultaneous
+    #: failures instead of a predictable, one-at-a-time rotation.
+    max_concurrent_generation_calls: int = 5
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.
     generation_batch_size: int = 10
     judge_batch_size: int = 20
     question_batch_size: int = 25
+
+    # Coverage threshold as a fraction of target_cards (content-model.md, open
+    # questions: "somewhere around 50-60% is the intuition, check against real
+    # rejection rates"). Config so it can be retuned without a deploy once real
+    # quality-gate rejection rates exist.
+    min_cards_fraction: float = 0.6
 
     # -- quota governor (ADR-0003 §6) ------------------------------------------
     quota_daily_requests: int = 1500
@@ -107,6 +125,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def gemini_api_key_list(self) -> list[str]:
+        return [key.strip() for key in self.gemini_api_keys.split(",") if key.strip()]
 
     @property
     def pool_thresholds_are_sane(self) -> bool:

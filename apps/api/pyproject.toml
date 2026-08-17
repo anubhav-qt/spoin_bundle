@@ -28,9 +28,15 @@ embeddings = [
 # makes the boundary physical rather than merely conventional — a stray import
 # outside src/slocho/generation/langchain_impl.py fails to resolve at all in the
 # default install, before the CI lint rule ever has to catch it.
+#
+# ADR-0024: langgraph joins this extra for the same reason, confined to
+# src/slocho/generation/pipeline.py instead — it orchestrates ONE job's control
+# flow (curriculum -> per-subtopic generation -> gate), never scheduling or
+# cross-run retry, which stays the worker/GenerationJob's job.
 generation = [
     "langchain-core>=0.3",
     "langchain-google-genai>=2.0",
+    "langgraph>=0.6",
 ]
 
 dev = [
@@ -70,9 +76,15 @@ ignore = [
 "langchain".msg = "Only src/slocho/generation/langchain_impl.py may import langchain (ADR-0002)."
 "langchain_core".msg = "Only src/slocho/generation/langchain_impl.py may import langchain (ADR-0002)."
 "langchain_google_genai".msg = "Only src/slocho/generation/langchain_impl.py may import langchain (ADR-0002)."
+"langgraph".msg = "Only src/slocho/generation/pipeline.py may import langgraph (ADR-0024)."
 
 [tool.ruff.lint.per-file-ignores]
 "src/slocho/generation/langchain_impl.py" = ["TID251"]
+"src/slocho/generation/pipeline.py" = ["TID251"]
+# Mocks ChatGoogleGenerativeAI directly — doesn't touch the real API, and
+# tests/test_architecture.py's AST-level check only scans src/slocho, not this
+# file, so the real architectural boundary is unaffected by this exemption.
+"tests/test_langchain_impl.py" = ["TID251"]
 "tests/*" = ["E501"]
 
 # ------------------------------------------------------------------- mypy -----

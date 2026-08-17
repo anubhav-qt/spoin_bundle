@@ -21,7 +21,9 @@ from slocho.generation.base import (
     CurriculumDraft,
     DifficultyVerdict,
     QuestionDraft,
-    SubtopicDraft,
+    SubtopicGroupDraft,
+    SubtopicTierDraft,
+    TopicMatchVerdict,
 )
 
 
@@ -37,19 +39,67 @@ class FakeContentGenerator(ContentGenerator):
     def __init__(self, *, fail_one_per_batch: bool = False) -> None:
         self._fail_one = fail_one_per_batch
 
-    async def generate_curriculum(self, topic_name: str, description: str) -> CurriculumDraft:
-        subtopics = [
-            SubtopicDraft(
-                title=f"{topic_name}: part {n + 1} ({difficulty.value})",
-                description=f"Placeholder curriculum slot {n + 1} for {topic_name}.",
-                difficulty=difficulty,
-                target_cards=10,
+    async def generate_curriculum(
+        self,
+        topic_name: str,
+        description: str,
+        related_subtopic_hints: list[str] | None = None,
+        existing_subtopics: list[str] | None = None,
+    ) -> CurriculumDraft:
+        groups = [
+            SubtopicGroupDraft(
+                title=f"{topic_name}: part {n + 1}",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=difficulty,
+                        description=f"Placeholder curriculum slot {n + 1} for {topic_name}.",
+                        target_cards=10,
+                    )
+                    for difficulty in Difficulty
+                ],
                 position=n,
             )
-            for difficulty in Difficulty
             for n in range(3)
         ]
-        return CurriculumDraft(subtopics=subtopics)
+        if existing_subtopics:
+            # Deterministically "decide" the first already-existing subtopic is
+            # the same as its own first group, reusing the EXACT title verbatim —
+            # simulates the real prevention behavior (generate_curriculum's
+            # docstring) so a test can assert the pipeline's persistence step
+            # actually reuses that row instead of forking a duplicate.
+            reused_title = existing_subtopics[0].split(" :: ", 1)[0]
+            groups[0].title = reused_title
+        if related_subtopic_hints:
+            # Deterministically fold hints in as their own group, so a test can
+            # assert the pipeline actually threaded them through rather than the
+            # generator silently ignoring them.
+            groups.append(
+                SubtopicGroupDraft(
+                    title=f"{topic_name}: from related topic",
+                    tiers=[
+                        SubtopicTierDraft(
+                            difficulty=Difficulty.BEGINNER,
+                            description="Adapted from: " + "; ".join(related_subtopic_hints),
+                            target_cards=5,
+                        )
+                    ],
+                    position=len(groups),
+                )
+            )
+        return CurriculumDraft(subtopics=groups)
+
+    async def judge_topic_match(
+        self,
+        candidate_name: str,
+        candidate_description: str,
+        matched_topic_name: str,
+        matched_subtopic_titles: list[str],
+    ) -> TopicMatchVerdict:
+        same_topic = _stable_index(candidate_name, matched_topic_name, modulo=2) == 0
+        return TopicMatchVerdict(
+            same_topic=same_topic,
+            relevant_subtopic_titles=matched_subtopic_titles[:2],
+        )
 
     async def generate_cards(
         self,
@@ -64,6 +114,7 @@ class FakeContentGenerator(ContentGenerator):
         items = [
             CardDraft(
                 title=f"{subtopic_title} — note {n + 1}"[:120],
+                canonical_title=f"{subtopic_title}: note {n + 1}"[:160],
                 summary=f"A placeholder hook for {subtopic_title} at {difficulty.value} level.",
                 body=(
                     f"# {subtopic_title}\n\n"

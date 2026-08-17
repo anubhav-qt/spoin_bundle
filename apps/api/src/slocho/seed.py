@@ -172,6 +172,9 @@ async def _seed_subtopic(
             session.add(card)
 
         card.title = card_data["title"]
+        # Fixtures predate ADR-0022 and mostly have no dedicated canonical_title;
+        # falling back to title is a placeholder, same as the migration's backfill.
+        card.canonical_title = card_data.get("canonical_title", card_data["title"])
         card.summary = card_data["summary"]
         card.body = card_data["body"]
         # Deterministic, derived from body — re-running seed on an edited fixture

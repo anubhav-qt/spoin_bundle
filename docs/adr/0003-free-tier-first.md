@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -20,7 +20,7 @@ tier actually provides, so the content pool could never fill.
 ### 1. Managed free tiers, not a self-hosted free VM
 
 An always-free VM (e.g. Oracle Cloud) offers more raw capability, but under
-*free-until-traction* the decisive property is **how cheaply we scale up**. On managed
+_free-until-traction_ the decisive property is **how cheaply we scale up**. On managed
 tiers, scaling is a billing toggle and the connection string does not change.
 Self-hosting would mean performing a data migration during our highest-stress week.
 
@@ -29,12 +29,12 @@ Self-hosting would mean performing a data migration during our highest-stress we
 **This is the load-bearing rule of this ADR.** Everything that changes when we start
 paying must be configuration:
 
-| Free (now) | Paid (traction) | Change type |
-|---|---|---|
-| Neon free tier | Neon paid | billing toggle |
-| Batch worker via cron | Persistent worker pool | env var + process type |
-| Gemini free key, low quota ceiling | Paid key, raised ceiling | config value |
-| Postgres as cache | Add Redis | additive; nothing rewritten |
+| Free (now)                         | Paid (traction)          | Change type                 |
+| ---------------------------------- | ------------------------ | --------------------------- |
+| Neon free tier                     | Neon paid                | billing toggle              |
+| Batch worker via cron              | Persistent worker pool   | env var + process type      |
+| Gemini free key, low quota ceiling | Paid key, raised ceiling | config value                |
+| Postgres as cache                  | Add Redis                | additive; nothing rewritten |
 
 ### 3. Generation runs as a scheduled batch job, not a persistent worker
 
@@ -51,7 +51,7 @@ The same job functions run as a persistent loop later — different entrypoint, 
 Redis's three jobs here were queue, cache, and rate limiting. With a batch worker
 there is no poller to serve; at our scale Postgres handles caching and rate limiting
 fine; and `procrastinate` puts the queue in Postgres with proper locking and retries.
-Managed Redis free tiers also meter *per command*, so a polling queue burns quota while
+Managed Redis free tiers also meter _per command_, so a polling queue burns quota while
 idle. Redis returns as a pure addition when cache pressure is measured — not before.
 
 ### 5. Embeddings run locally
@@ -79,11 +79,13 @@ hits a warm shelf.
 ## Consequences
 
 **Easier**
+
 - £0/month to run. Scaling up is a billing change, not a project.
 - The quota governor and priority queue are things we would need at scale anyway —
   the constraint forces us to build them early, correctly.
 
 **Harder**
+
 - Cold starts. Free web services sleep after ~15 min idle. Mitigated by putting the
   web app on Cloudflare Pages (edge, never sleeps) and keeping the API warm with a
   cron ping. Render's ~750 free hours/month covers roughly one always-on service, so
@@ -94,6 +96,7 @@ hits a warm shelf.
   "preparing your topics" state.
 
 **Committed to**
+
 - Free tier limits are verified against current provider documentation before use.
   Provider pricing moves; assumptions in this ADR have a shelf life.
 - Cloudflare Pages over Vercel for the web app: **Vercel's Hobby tier prohibits

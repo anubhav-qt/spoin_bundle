@@ -4,7 +4,7 @@
 - **Amended by:** [ADR-0021](0021-ascii-scene-library.md) — adds `ascii` to the archetype
   set, derived from `card.visual_id` rather than from `body`
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -32,7 +32,7 @@ characters, or a ❌/✅ pair are objectively present or not, unlike `difficulty
 judgment call, which is why the quality gate independently re-rates it rather than
 trusting the request). Asking the model to also tag structure it already wrote would be
 a second, occasionally-wrong source of truth for something a regex gets right for free.
-The generation prompt is still expected to *use* these shapes where a subtopic calls for
+The generation prompt is still expected to _use_ these shapes where a subtopic calls for
 it — a real command example in a fenced block rather than prose describing one — the
 same spirit as `summary` being a purpose-written hook rather than a truncation.
 
@@ -51,13 +51,13 @@ background pill is dropped (color-only, not a fill) and it's recolored to a new
 `--accent-syntax` token, distinct in hue from `--accent` everywhere that's meaningfully
 possible:
 
-| Palette | `--accent-syntax` | Why |
-|---|---|---|
-| Notebook | `#2f6b78` (teal-blue) | New value; theme had no second hue |
-| Copper Board | `#5fb4d9` (sky cyan) | New value; theme had no second hue |
-| Skylight (cyanotype) | `#b5793f` (warm terracotta) | Opposite temperature from its own blue `--accent` — same hue would collapse the two tiers |
-| Obsidian (phosphor) | `#a8a8ab` (mid-gray) | **No new hue** — ADR-0016 committed this theme to strict monochrome; the two-tier hierarchy comes from brightness (dim gray vs. near-white) instead of color |
-| Oscilloscope (scope) | `#e8a33d` (reuses existing `--accent-2`) | Already had two genuinely distinct hues; no new value needed |
+| Palette              | `--accent-syntax`                        | Why                                                                                                                                                          |
+| -------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Notebook             | `#2f6b78` (teal-blue)                    | New value; theme had no second hue                                                                                                                           |
+| Copper Board         | `#5fb4d9` (sky cyan)                     | New value; theme had no second hue                                                                                                                           |
+| Skylight (cyanotype) | `#b5793f` (warm terracotta)              | Opposite temperature from its own blue `--accent` — same hue would collapse the two tiers                                                                    |
+| Obsidian (phosphor)  | `#a8a8ab` (mid-gray)                     | **No new hue** — ADR-0016 committed this theme to strict monochrome; the two-tier hierarchy comes from brightness (dim gray vs. near-white) instead of color |
+| Oscilloscope (scope) | `#e8a33d` (reuses existing `--accent-2`) | Already had two genuinely distinct hues; no new value needed                                                                                                 |
 
 ### Motion: Framer Motion added as a dependency
 
@@ -96,6 +96,7 @@ expand/collapse.
 ## Consequences
 
 **Easier**
+
 - The feed reads as varied — format changes as often as content does, which is closer
   to what actually holds attention scrolling.
 - Two-tier color hierarchy pulls the eye to the 2-3 words that matter before the
@@ -104,6 +105,7 @@ expand/collapse.
   pointer-event drag math.
 
 **Harder**
+
 - First non-trivial frontend dependency — bundle size and an upgrade surface that didn't
   exist before.
 - `archetype` only reflects what's textually in `body`; a card can be miscategorized

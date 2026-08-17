@@ -2,12 +2,12 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
 Generation quota is the binding constraint on the entire product (ADR-0003), and the
-corpus-first launch requirement means we need thousands of cards *before* we have users.
+corpus-first launch requirement means we need thousands of cards _before_ we have users.
 
 We have an unused asset: a local RTX 5070. A model in the 8-14B range, quantized, fits
 comfortably in its VRAM and can generate continuously with **no request limit at all**.
@@ -30,20 +30,20 @@ Spend scarce cloud quota on verification rather than generation.**
 
 ### Work is split by stakes, not by convenience
 
-| Job | Where | Reasoning |
-|---|---|---|
-| Curriculum pass | **Cloud** | Highest stakes: every card in a topic inherits it. Only 1 call per topic, so quota-cheap regardless |
-| Card generation, our seeded topics | **Local** | Volume work, unlimited, errors are catchable downstream |
-| Card generation, user custom topics | **Cloud** | Cannot depend on a desktop being awake |
-| Verification / difficulty judging | **Cloud** | See below |
-| Card chat | **Cloud** | User-facing latency; the GPU is not production infrastructure |
+| Job                                 | Where     | Reasoning                                                                                           |
+| ----------------------------------- | --------- | --------------------------------------------------------------------------------------------------- |
+| Curriculum pass                     | **Cloud** | Highest stakes: every card in a topic inherits it. Only 1 call per topic, so quota-cheap regardless |
+| Card generation, our seeded topics  | **Local** | Volume work, unlimited, errors are catchable downstream                                             |
+| Card generation, user custom topics | **Cloud** | Cannot depend on a desktop being awake                                                              |
+| Verification / difficulty judging   | **Cloud** | See below                                                                                           |
+| Card chat                           | **Cloud** | User-facing latency; the GPU is not production infrastructure                                       |
 
 ### Spend the frontier model on judgment, not prose
 
 Local generates abundantly; the batch judge (ADR-0005, ~20 cards per request) verifies
 with Gemini. **One cloud request validates twenty locally-generated cards.**
 
-Frontier-model *judgment* is worth far more per token than frontier-model *prose*. This
+Frontier-model _judgment_ is worth far more per token than frontier-model _prose_. This
 buys most of the quality guarantee at roughly 5% of the quota cost, and it is what makes
 local generation safe rather than merely cheap.
 
@@ -51,7 +51,7 @@ local generation safe rather than merely cheap.
 
 A quantized 8-14B model is meaningfully weaker than Gemini Flash at instruction-following
 and, critically, at **factual accuracy**. For a product whose entire value is teaching
-people true things, a hallucinated fact in a *shared* corpus is served to every subscriber
+people true things, a hallucinated fact in a _shared_ corpus is served to every subscriber
 of that topic. This is the most serious failure mode in the system.
 
 The existing gate checks duplication, topic conformance, and difficulty. **None of them
@@ -77,6 +77,7 @@ the read path or the user-facing write path may depend on it being online.
 ## Consequences
 
 **Easier**
+
 - The quota constraint effectively disappears for seed content, which is the hardest part
   of the corpus-first launch requirement in ADR-0003.
 - Overnight runs can fill many topics at once, at zero marginal cost.
@@ -84,6 +85,7 @@ the read path or the user-facing write path may depend on it being online.
   topics, verification, and chat.
 
 **Harder**
+
 - Two generation backends to keep behaviourally consistent. Prompts that work on Gemini may
   need adjustment locally, especially for structured-output adherence.
 - Structured output from smaller models is less reliable. Expect a higher malformed-item
@@ -93,6 +95,7 @@ the read path or the user-facing write path may depend on it being online.
 - A new operational mode (someone runs the box) that is not automated infrastructure.
 
 **Committed to**
+
 - No user-facing path depends on the local GPU.
 - Locally-generated cards pass the same gate as cloud-generated ones, plus factual accuracy.
 - `gen_meta` records which backend produced each card, so quality can be compared between

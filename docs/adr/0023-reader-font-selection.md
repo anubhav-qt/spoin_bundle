@@ -2,12 +2,12 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
 [ADR-0012](0012-feed-visual-design.md) shipped five palettes and
-[ADR-0016](0016-theme-consolidation.md) made them five *visually distinct* choices. The
+[ADR-0016](0016-theme-consolidation.md) made them five _visually distinct_ choices. The
 palette picker is the product's only real customization surface, and it works: choosing
 your own reading environment is a meaningful act of ownership in an app you're meant to
 open daily.
@@ -47,13 +47,13 @@ Five faces chosen to be distinguishable at a glance in the picker — the same b
 ADR-0016 applied to palettes, where two options that differ only in a side-by-side
 swatch comparison are effectively one option.
 
-| Key | Face | Why it's in the set |
-|---|---|---|
-| `literata` | Literata | Reading serif, designed for long-form screen reading. **Default.** |
-| `inter` | Inter | Neutral neo-grotesque; the "no opinion" choice |
-| `grotesk` | Space Grotesk | Geometric with real personality; pairs with the terminal-leaning palettes |
-| `plex` | IBM Plex Sans | Slightly technical humanist sans; distinct from Inter in the ways that matter at body size |
-| `hyperlegible` | Atkinson Hyperlegible | Drawn specifically to disambiguate similar glyphs for low-vision readers |
+| Key            | Face                  | Why it's in the set                                                                        |
+| -------------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `literata`     | Literata              | Reading serif, designed for long-form screen reading. **Default.**                         |
+| `inter`        | Inter                 | Neutral neo-grotesque; the "no opinion" choice                                             |
+| `grotesk`      | Space Grotesk         | Geometric with real personality; pairs with the terminal-leaning palettes                  |
+| `plex`         | IBM Plex Sans         | Slightly technical humanist sans; distinct from Inter in the ways that matter at body size |
+| `hyperlegible` | Atkinson Hyperlegible | Drawn specifically to disambiguate similar glyphs for low-vision readers                   |
 
 All five are OFL/open-licensed and **self-hosted and subset** — no CDN, no third-party
 request, no layout shift while a webfont arrives.
@@ -67,18 +67,20 @@ dashboard. This is the one choice in this ADR that is cheap to reverse.
 Five fonts times five palettes is twenty-five combinations, and some will be ugly. We are
 not building per-palette font restrictions or a curated pairing matrix. The point of a
 customization surface is that the reader's taste wins, including when it differs from
-ours. What we *do* commit to is that all five faces are legible at body size in all five
+ours. What we _do_ commit to is that all five faces are legible at body size in all five
 palettes — legibility is our floor, aesthetics is their call.
 
 ## Consequences
 
 **Easier**
+
 - Readers with a real preference or a real need get served, and the product's
   customization story becomes "make it yours" rather than "pick a color".
 - Zero new mechanism: attribute, `localStorage`, pre-hydration script, picker — all four
   already exist and are already debugged.
 
 **Harder**
+
 - Five self-hosted, subset font families is real bundle weight. Only the selected family
   should load; a naive implementation that ships all five to every reader would be a
   significant regression on a product whose first impression is time-to-first-card.

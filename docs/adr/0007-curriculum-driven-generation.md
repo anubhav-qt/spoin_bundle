@@ -2,13 +2,13 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 - **Amends:** [ADR-0006](0006-demand-driven-pool-fill.md) (lock key and starvation signal)
 
 ## Context
 
 ADR-0005 established that we generate cards in batches. That leaves open the question of
-*what* each batch should be about, and how we avoid generating the same card twice.
+_what_ each batch should be about, and how we avoid generating the same card twice.
 
 The naive answer is detection: generate freely, then reject near-duplicates at the quality
 gate. Under a free tier this is expensive in the worst possible way, because **a rejected
@@ -22,7 +22,7 @@ over long lists are among the weaker things LLMs do, and the list grows unbounde
 
 The deeper problem: avoiding duplicates is a **weak goal**. It permits a corpus of fifty
 cards about one corner of a subject, all phrased differently. What the product needs is
-*coverage*.
+_coverage_.
 
 ## Decision
 
@@ -66,17 +66,17 @@ distributes within it.
 
 The budget is derived from completability rather than picked:
 
-| Step | Value |
-|---|---|
-| A difficulty tier should take 5-10 sessions to finish | product requirement |
-| At ~30 cards per session | **~200-300 cards per tier** |
-| x 3 tiers | **~750 cards per topic** |
-| at ~15 cards per subtopic | **~15-20 subtopics per tier** |
+| Step                                                  | Value                         |
+| ----------------------------------------------------- | ----------------------------- |
+| A difficulty tier should take 5-10 sessions to finish | product requirement           |
+| At ~30 cards per session                              | **~200-300 cards per tier**   |
+| x 3 tiers                                             | **~750 cards per topic**      |
+| at ~15 cards per subtopic                             | **~15-20 subtopics per tier** |
 
 ~750 cards is ~75 requests per topic at batch-of-10, which is affordable on a free tier.
 
-The planner is therefore instructed: *you have ~750 cards for this topic, 5-25 per
-subtopic, allocate them.* Both factors are constrained by one number that traces back to
+The planner is therefore instructed: _you have ~750 cards for this topic, 5-25 per
+subtopic, allocate them._ Both factors are constrained by one number that traces back to
 a product requirement.
 
 ### Two self-correcting rules, at two levels
@@ -86,7 +86,7 @@ a product requirement.
    the attention argument robust rather than marginal.
 2. **Topic too large** (planner wants >~20 subtopics per tier): the topic becomes a
    **tour**, and the curriculum pass additionally emits the deeper sibling topics it
-   introduces. The broad topic is *not* deleted or split out of existence.
+   introduces. The broad topic is _not_ deleted or split out of existence.
 
 Rule 2 is **generative, not destructive.** "Mathematics" remains a real, subscribable
 topic that gives a genuinely good tour. Its curriculum call returns two things:
@@ -96,8 +96,8 @@ survey curriculum   ~750 cards, the tour itself
 deep_dive topics    the siblings it introduces (Linear Algebra, Calculus, Probability...)
 ```
 
-The tour's completion state then becomes a **discovery surface**: *"You've toured
-Mathematics. Go deeper: Linear Algebra, Calculus, Probability."* Finish a topic, get
+The tour's completion state then becomes a **discovery surface**: _"You've toured
+Mathematics. Go deeper: Linear Algebra, Calculus, Probability."_ Finish a topic, get
 pointed at three more, subscribe, repeat. The completion state does real product work
 rather than being a terminal badge.
 
@@ -133,7 +133,7 @@ A broad topic now receives a **survey**, not an exhaustive treatment. "Mathemati
 genuinely good tour within ~750 cards. It does not make you a mathematician and must not
 claim to.
 
-*"Mathematics" is a tour; "Linear Algebra" is a course.*
+_"Mathematics" is a tour; "Linear Algebra" is a course._
 
 The completion copy must match: "you've covered the essentials of Mathematics", with the
 `deep_dive` edges offered as the next step. This is an honest completion state and the
@@ -141,7 +141,7 @@ primary route into further topic subscriptions.
 
 Interaction with [ADR-0004](0004-topic-canonicalization.md): a user typing "maths" lands on
 a survey topic while "linear algebra" lands on a deep one. Both are valid canonical topics
-and the alias logic is unchanged; only the post-subscription *suggestions* differ.
+and the alias logic is unchanged; only the post-subscription _suggestions_ differ.
 
 ### `target_cards` vs `min_cards`
 
@@ -178,7 +178,7 @@ tier**, that tier is complete.
 Mastery is **per-user and per-tier**, not per-topic. Because of the difficulty mix in
 `content-model.md`, a beginner exhausts beginner subtopics long before advanced ones. Per
 tier is both the honest unit and the more useful one, because it chains directly into
-promotion: *"You've mastered this at beginner level. Ready for intermediate?"* The
+promotion: _"You've mastered this at beginner level. Ready for intermediate?"_ The
 difficulty-progression UX is delivered by the same mechanism.
 
 After completion the topic enters **revisit mode**: previously seen cards are re-served at
@@ -197,13 +197,14 @@ comparison is now **scoped to the subtopic** rather than the whole topic, making
 cheaper and more precise.
 
 **Intra-batch dedup is still required.** Neither the title list nor the
-comparison-against-corpus catches a model writing three near-identical cards *within one
-response of ten*. The batch must be compared against itself before insert. Assigning
+comparison-against-corpus catches a model writing three near-identical cards _within one
+response of ten_. The batch must be compared against itself before insert. Assigning
 distinct subtopics across a batch largely prevents this by construction.
 
 ## Consequences
 
 **Easier**
+
 - Coverage instead of mere non-overlap. The corpus teaches a subject rather than
   accumulating trivia about it.
 - Gap detection is a `GROUP BY`, not an LLM judgment.
@@ -212,6 +213,7 @@ distinct subtopics across a batch largely prevents this by construction.
 - Completion, progress indicators, and difficulty promotion all fall out for free.
 
 **Harder**
+
 - **The curriculum pass is a high-stakes single point of failure.** Everything downstream
   inherits its quality. Mitigations: use the best available model for it, store the raw
   output for audit, and human-review the first several topics. It is one call per topic,

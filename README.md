@@ -15,8 +15,12 @@ Web first; a React Native app comes later and shares this backend.
 > **Slocho is the correct name to use in code and config.** Don't rename opportunistically.
 
 > **Status: early build.** Feed serving, engagement, and the web app's feed (visual design
-> in [ADR-0012](docs/adr/0012-feed-visual-design.md)) are live against seeded data.
-> Generation, quiz-gated progression UI, and the palette picker (task
+> in [ADR-0012](docs/adr/0012-feed-visual-design.md)) are live against seeded data. The
+> generation pipeline (curriculum, topic merging, card generation — see
+> [generation-pipeline.md](docs/architecture/generation-pipeline.md)) is built and runs via
+> a CLI; it isn't wired to the worker/cron trigger yet (task
+> [0008](docs/tasks/0008-wire-generation-job-worker.md)), and the real quality gate is still
+> a stub. Quiz-gated progression UI and the palette picker (task
 > [0002](docs/tasks/0002-palette-selection-ui.md)) are not built yet. Read
 > [`docs/architecture/overview.md`](docs/architecture/overview.md) first; it is the mental
 > model everything else assumes.
@@ -33,6 +37,7 @@ rules that keep a new session from re-deriving context that already exists on di
 |---|---|
 | Understand how Slocho works | [Architecture overview](docs/architecture/overview.md) |
 | Know what a card actually is | [Content model](docs/architecture/content-model.md) |
+| Know how the corpus gets filled | [Generation pipeline](docs/architecture/generation-pipeline.md) |
 | See the feed's visual design | [Mockups](docs/design/mockups/) ([ADR-0012](docs/adr/0012-feed-visual-design.md)) |
 | Know why cards are funny on purpose | [ADR-0021](docs/adr/0021-ascii-scene-library.md), [ADR-0022](docs/adr/0022-dual-titles.md) |
 | Know *why* something is the way it is | [ADR index](docs/adr/) |
@@ -53,7 +58,7 @@ personalization is ranking over a shared corpus, not per-user generation.
 
 If that's surprising, read the overview before writing code.
 
-## The card's personality — decided, not yet built
+## The card's personality — decided, partly built
 
 Cards are meant to be funny enough to screenshot and honest enough to be quizzed on.
 Those two goals are kept from fighting by one rule:
@@ -67,12 +72,13 @@ it costs:
 | Decision | Shape |
 |---|---|
 | [ADR-0021](docs/adr/0021-ascii-scene-library.md) — ASCII scenes | Cards can carry a stickman scene. The generator **picks from a hand-authored catalog and writes the dialogue; it never draws.** Models are unreliable at ASCII art and no quality-gate check can detect a broken drawing — the catalog is what replaces the missing detector. |
-| [ADR-0022](docs/adr/0022-dual-titles.md) — two titles | `title` is playful and shown on the feed face; `canonical_title` is literal and is what quizzes, progress lists, search, and the generation prompt read. Make the title playful without this and ADR-0007's duplicate prevention silently stops working. |
+| [ADR-0022](docs/adr/0022-dual-titles.md) — two titles | `title` is playful and shown on the feed face; `canonical_title` is literal and is what quizzes, progress lists, search, and the generation prompt read. Make the title playful without this and ADR-0007's duplicate prevention silently stops working. **Built** — schema and generation prompt (not live-verified, see [generation-pipeline.md](docs/architecture/generation-pipeline.md)). |
 | [ADR-0023](docs/adr/0023-reader-font-selection.md) — five reader fonts | Same mechanism as the five palettes. `--font-mono` is deliberately **not** part of the choice: ADR-0021's 40-column scenes are only real if the characters are fixed-width. |
 | [ADR-0020](docs/adr/0020-rename-to-spoin.md) — the name | Slocho → Spoin, as one atomic sweep. See the banner at the top. |
 
-None of the four is implemented. The schema fields they add are documented in
-[content-model.md](docs/architecture/content-model.md) and marked as such.
+ADR-0021's scene catalog, ADR-0023's font picker, and ADR-0020's rename are not
+implemented. ADR-0022 is. The schema fields ADR-0021 adds exist regardless (so a future
+catalog needs no regeneration) — see [content-model.md](docs/architecture/content-model.md).
 
 ## Stack
 
@@ -84,6 +90,7 @@ None of the four is implemented. The schema fields they add are documented in
 | ORM | SQLAlchemy 2.0 (async) + Alembic | typed, readable SQL |
 | Embeddings | `fastembed` / BGE-small, **local** | free and unlimited; protects LLM quota |
 | Generation | Gemini Flash via LangChain, behind `ContentGenerator` | [ADR-0002](docs/adr/0002-langchain-behind-an-interface.md) |
+| Generation orchestration | LangGraph, confined to `generation/pipeline.py` | [ADR-0024](docs/adr/0024-langgraph-for-card-generation-pipeline.md) |
 | Web | Next.js + TypeScript → Cloudflare Pages | Vercel Hobby forbids commercial use |
 | Typography | Five self-hosted OFL faces, user-selectable; mono locked | [ADR-0023](docs/adr/0023-reader-font-selection.md) |
 | API types | Generated from OpenAPI, checked in CI | [ADR-0001](docs/adr/0001-python-fastapi-over-node.md) |

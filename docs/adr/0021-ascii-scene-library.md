@@ -3,14 +3,14 @@
 - **Status:** Accepted
 - **Amends:** [ADR-0017](0017-card-archetypes.md) (adds `ascii` to the archetype set)
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
 A stack of title + summary cards, even with the archetype-varied teasers from
 [ADR-0017](0017-card-archetypes.md), still reads as text all the way down. We want cards
 that stop a scroll and are worth screenshotting — a silly stickman delivering a real fact, or
-a two-panel scene that *shows* a concept rather than describing it. The canonical example:
+a two-panel scene that _shows_ a concept rather than describing it. The canonical example:
 weight classes in wrestling, panel one two stick figures facing off, panel two the heavy
 one sitting on the light one, who says "shouldn't have done this".
 
@@ -24,7 +24,7 @@ with two facts about this system:
 2. **Our quality gate cannot catch the failure.** The gate
    (content-model.md, "Quality gate") is near-duplicate embedding comparison, topic
    conformance, an independent difficulty re-rating, and a factual-accuracy pass — all of
-   them operating on *text as meaning*. None of them can tell whether a grid of characters
+   them operating on _text as meaning_. None of them can tell whether a grid of characters
    looks like anything. We would be adding a content dimension with no detector, into a
    **shared** corpus, which is the failure shape ADR-0007 and the gate exist to prevent.
 
@@ -93,7 +93,7 @@ The model is trusted for taste, never for constraints:
    overflow.
 2. **A `visual_id` not in the catalog is dropped.** Same fallback.
 3. **A scene may appear on at most two active cards within a topic.** Checked by
-   counting active cards in the topic at insert/activation time — *not* trusted to the
+   counting active cards in the topic at insert/activation time — _not_ trusted to the
    prompt. The model generates in batches of ~10 and cannot see the rest of the corpus,
    which is exactly the reasoning behind requiring intra-batch dedup on top of
    corpus dedup (content-model.md, "Near-duplicate detection"). The third and later
@@ -122,16 +122,18 @@ screen reader gets a sentence rather than a character grid.
 ## Consequences
 
 **Easier**
+
 - Art quality is decided once per scene by a human, instead of ~750 times per topic by a
   model with no reviewer.
 - Width safety, monospace rendering, and alt text are structural rather than prompted.
 - Improving art is a data edit, not a regeneration run.
 
 **Harder**
+
 - Somebody has to draw ~40 scenes. This is real, unglamorous authoring work and it
   gates the feature; there is no version of this ADR where the art appears for free.
 - A fixed catalog is inherently less specific than bespoke art. Some concepts will get a
-  scene that *nearly* fits, and the honest options are to accept the near-fit, add a
+  scene that _nearly_ fits, and the honest options are to accept the near-fit, add a
   scene, or ship the card without art. It must never be "let the model draw this one".
 - The catalog description list occupies prompt space in every generation call, growing
   with the library.
@@ -166,7 +168,7 @@ above: a model generating ten cards cannot know what the other seventy-four alre
 - The library is large enough, or a topic broad enough, that the two-per-topic cap starts
   stripping visuals from cards that would benefit — the signal to grow the catalog or
   reconsider the cap.
-- Engagement data shows art-bearing cards are *not* outperforming plain ones, which would
+- Engagement data shows art-bearing cards are _not_ outperforming plain ones, which would
   mean the authoring cost is buying charm we like and users don't.
 - Model ASCII-art quality changes enough that the premise of this ADR is simply false. It
   is a claim about capability, not a principle, and it should be re-tested rather than

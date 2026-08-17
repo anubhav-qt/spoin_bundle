@@ -20,7 +20,11 @@ cron batch worker to a persistent pool must be a process-type change, not a rewr
 
 ## Does not own
 
-- Content generation. That's `apps/worker` (same code, different entrypoint).
+- Triggering content generation on a schedule. That's `apps/worker` (same code, different
+  entrypoint) — though as of now the generation logic itself (`generation/pipeline.py`)
+  only runs via a CLI script (`generate_topics.py`), not the worker; see
+  [generation-pipeline.md](../../docs/architecture/generation-pipeline.md) and task
+  [0008](../../docs/tasks/0008-wire-generation-job-worker.md).
 - Rendering or client state. That's `apps/web`.
 
 ## Layout
@@ -32,7 +36,8 @@ src/slocho/
   api/          FastAPI app, routers, wire schemas
   feed/         the read path: strata, ranking, interleave, service
   engagement/   event ingest and the seen-state machine
-  generation/   ContentGenerator — the ONLY place LangChain may be imported
+  generation/   ContentGenerator, the LangGraph pipeline, quota governor — the
+                ONLY place LangChain/LangGraph may be imported (one file each)
   embeddings/   local embedders; never a quota'd API
   worker/       batch job entrypoint
   fixtures/     the pre-generated card corpus used by `make seed`
@@ -71,5 +76,8 @@ Both are excluded from the default install on purpose.
 
 ## Status
 
-Foundation and the feed read path are implemented. Generation workers, the quality
-gate and quizzes are scaffolded but not built — see the repo README's roadmap.
+Foundation and the feed read path are implemented. The generation pipeline (curriculum,
+topic merging, card generation, both a `fake` and a real Gemini backend) is built and
+tested — see [generation-pipeline.md](../../docs/architecture/generation-pipeline.md) —
+but only runs via a CLI script today, not the worker/cron trigger. The real quality gate
+and quizzes are still scaffolded, not built.

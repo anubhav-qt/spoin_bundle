@@ -2,7 +2,7 @@
 
 - **Status:** Superseded by [ADR-0014](0014-progress-insights-panel.md)
 - **Date:** 2026-08-16
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -34,7 +34,7 @@ The catch: the default embedder
 `HashEmbedder`, whose own docstring states it is "not semantically meaningful... any
 threshold measured against this is meaningless." Task
 [0001](../tasks/0001-topic-threshold-calibration.md) exists precisely because thresholds
-against the *real* embedder (`fastembed`) aren't calibrated yet either — that task
+against the _real_ embedder (`fastembed`) aren't calibrated yet either — that task
 calibrates for canonicalization aliasing, a different consumer of the same embeddings.
 
 ## Decision
@@ -64,6 +64,7 @@ right after a card in that topic is marked seen (`Feed.tsx`'s `markSeen` → `Ap
 ## Consequences
 
 **Easier**
+
 - No new table, no migration, no generation-pipeline change — reuses two data sources
   (`Topic.embedding`, the existing progress computation) that already exist and are
   already correct for their original purposes.
@@ -71,6 +72,7 @@ right after a card in that topic is marked seen (`Feed.tsx`'s `markSeen` → `Ap
   canonicalization/generation) still renders as a node, just with no edges to it.
 
 **Harder**
+
 - Edge weight is not a real "relatedness" signal until task 0001 lands and/or
   `TOPIC_GRAPH_EDGE_THRESHOLD` gets calibrated against it — right now it is a guess.
 - Anyone testing locally with the default `hash` embedder will see a graph whose edges
@@ -91,7 +93,7 @@ system, so the graph would ship permanently empty. Revisit the moment something 
 writing to that table.
 
 **Wait for task 0001, ship the graph without edges until then.** Rejected: coverage alone
-(nodes with no connective structure) drops the actual ask — the user wants a *relationship*
+(nodes with no connective structure) drops the actual ask — the user wants a _relationship_
 graph, not a topic list with fill bars. A provisional, clearly-flagged threshold beats
 shipping something that isn't the feature.
 

@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
-- **Deciders:** Anubhav, Mayank
+- **Deciders:** Anubhav
 
 ## Context
 
@@ -18,10 +18,10 @@ in-process composition library — it has no scheduler, no durable state, no
 retry-across-restart, and no distributed execution. If the process dies mid-chain,
 the work is gone. Parallelism and durability come from the job queue, not LangChain.
 
-| Concern | Layer | Tool |
-|---|---|---|
+| Concern                                                    | Layer             | Tool                       |
+| ---------------------------------------------------------- | ----------------- | -------------------------- |
 | Run N jobs in parallel, retry on failure, survive a deploy | **Orchestration** | `procrastinate` (ADR-0003) |
-| Inside one job: prompt → call → parse → validate → embed | **Composition** | LangChain |
+| Inside one job: prompt → call → parse → validate → embed   | **Composition**   | LangChain                  |
 
 **2. LangChain is not obviously the right tool for this specific workload.** For
 schema-constrained card generation, `google-genai` + Pydantic + `instructor` is close
@@ -53,6 +53,7 @@ boundary.
 ## Consequences
 
 **Easier**
+
 - LangSmith tracing across all generation, which is our primary debugging tool for
   prompt quality and cost attribution.
 - A `FakeContentGenerator` means tests and local development never call a real model,
@@ -60,12 +61,14 @@ boundary.
 - Swapping LangChain out later is a one-module rewrite, not a refactor.
 
 **Harder**
+
 - A layer of indirection over an already-abstracted library. Accepted deliberately:
   LangChain's abstractions are chosen for LangChain's needs, not ours.
 - A dependency with a history of breaking changes. The interface is what contains
   the blast radius when that happens.
 
 **Committed to**
+
 - The orchestration/composition split. Requests to "make generation faster" are
   answered by worker concurrency, never by changing chain code.
 
@@ -88,6 +91,14 @@ Today it is a single structured call and LangGraph would be overhead.
 
 - LangChain ships a breaking change that costs more than a day to absorb, or
 - Generation becomes a multi-step stateful workflow (consider LangGraph, or Temporal
-  if it needs durability *between* steps), or
+  if it needs durability _between_ steps), or
 - LangSmith's free tier stops covering our trace volume and the tracing benefit no
   longer justifies the dependency.
+
+**Update:** the "multi-step stateful workflow" condition above was hit by the first
+vertical slice (curriculum → per-subtopic generation → gate) and revisited in
+[ADR-0024](0024-langgraph-for-card-generation-pipeline.md). LangGraph is now used, but
+scoped to _inside_ one job's execution — the worker/`GenerationJob` split this ADR
+describes for orchestration vs. composition is unchanged; LangGraph lives entirely on
+the composition side of that line, confined to `generation/pipeline.py` the same way
+`langchain*` is confined to `langchain_impl.py`.

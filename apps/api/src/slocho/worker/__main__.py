@@ -57,13 +57,17 @@ async def run_once() -> int:
         logger.info("nothing to do")
         return 0
 
-    # NOT YET IMPLEMENTED. The jobs themselves — curriculum pass, card generation,
-    # the batch judge, question banks — are the next milestone. Deliberately not
-    # stubbed with something that half-works: a worker that silently marks jobs
-    # complete without generating anything is worse than one that does nothing,
-    # because the queue would look healthy while the corpus stayed empty.
+    # NOT YET WIRED HERE. The generation logic these jobs need (curriculum pass,
+    # card generation) is implemented and tested — generation/pipeline.py's
+    # run_generation_pipeline() — but nothing here calls it yet; see
+    # docs/tasks/0008-wire-generation-job-worker.md. Deliberately not stubbed with
+    # something that half-works: a worker that silently marks jobs complete
+    # without generating anything is worse than one that does nothing, because
+    # the queue would look healthy while the corpus stayed empty. (The batch
+    # judge and question-bank generation are separately unbuilt altogether —
+    # see docs/architecture/generation-pipeline.md.)
     logger.warning(
-        "%d job(s) queued but no job handlers are implemented yet; leaving them pending",
+        "%d job(s) queued but no job handlers are wired up yet; leaving them pending",
         len(pending),
     )
     return 0

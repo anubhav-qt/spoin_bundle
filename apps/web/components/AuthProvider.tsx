@@ -57,32 +57,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   const load = useCallback(async () => {
+    // Re-arm the blocking loader on every navigation — otherwise a `loading`
+    // left over `false` from the PREVIOUS pathname lets this render's
+    // children (e.g. AppShell, which fires its own API calls on mount) paint
+    // for one frame before a redirect below actually lands.
+    setLoading(true);
+
     if (!localStorage.getItem("spoin_access_token")) {
       setUser(null);
+      if (!PUBLIC_PATHS.has(pathname)) {
+        router.replace("/signup");
+        return; // stay "loading" — nothing here should render at this pathname
+      }
       setLoading(false);
-      if (!PUBLIC_PATHS.has(pathname)) router.replace("/signup");
       return;
     }
 
     try {
       const me = await api.me();
       setUser(me);
-      setLoading(false);
       const exempt = REDIRECT_EXEMPT_PATHS.has(pathname);
       if (!me.onboarding_complete && pathname !== ONBOARDING_PATH && !exempt) {
         router.replace(ONBOARDING_PATH);
-      } else if (
-        me.onboarding_complete &&
-        !exempt &&
-        (PUBLIC_PATHS.has(pathname) || pathname === ONBOARDING_PATH)
-      ) {
-        router.replace("/");
+        return;
       }
+      if (me.onboarding_complete && !exempt && (PUBLIC_PATHS.has(pathname) || pathname === ONBOARDING_PATH)) {
+        router.replace("/");
+        return;
+      }
+      setLoading(false);
     } catch {
       clearTokens();
       setUser(null);
+      if (!PUBLIC_PATHS.has(pathname)) {
+        router.replace("/signup");
+        return;
+      }
       setLoading(false);
-      if (!PUBLIC_PATHS.has(pathname)) router.replace("/signup");
     }
   }, [pathname, router]);
 

@@ -135,10 +135,13 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
         }
       } catch (e) {}
     }
-    // Refresh failed or no refresh token, log out
+    // Refresh failed or no refresh token, log out. A hard reload rather than
+    // client-side navigation: AuthProvider isn't reachable from this module
+    // (it's a transport layer, see the file header), so this is the fallback
+    // for a session that expires mid-use, not the normal signed-out path.
     localStorage.removeItem("spoin_access_token");
     localStorage.removeItem("spoin_refresh_token");
-    window.location.href = "/login";
+    window.location.href = "/signup";
   }
 
   if (!response.ok) {

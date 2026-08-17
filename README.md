@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="apps/web/public/logo.svg" alt="spoin" width="160" />
+</p>
+
 # Spoin
 
 A scrollable feed of cards with bite sized knowledge, for topics you want to learn (choose either from the presets or your own choice of topics), with an entire planned curriculum and a road to mastery. Pick topics, get bite-sized

@@ -364,13 +364,26 @@ something the card body actually teaches, with a short explanation. Exactly \
 one question in the batch — for the card with the highest index — should \
 instead be free-text (kind="free_text"): an open-ended prompt with a 0-3 level \
 grading rubric (0 none / 1 surface / 2 solid / 3 deep) and a reference answer.
+
+If cards already covered by this subtopic's EXISTING quiz questions are shown \
+below, write something that tests a genuinely different angle of the card, \
+matching that existing quiz's style and depth — never a near-restatement of a \
+question already asked.
+
+Some or all of the cards below may be marked BACKFILL: these are cards that \
+were already written and accepted into the app in an earlier run — they are \
+not new, unproven content you are seeing for the first time, they simply never \
+got a question written for them (an earlier run was interrupted, crashed, or \
+hit a transient failure after the card was already accepted). Write with the \
+same confidence and rigor you would for any other card; do not hedge, and do \
+not treat the card's content as still under review.
 """
 
 _QUESTIONS_USER = """\
 Difficulty: {difficulty}
 Write one question per card below, in order, following the mcq/free_text split \
 described above.
-
+{existing_stems_block}
 {cards_block}
 """
 
@@ -459,6 +472,21 @@ def _format_rejection_feedback(rejection_feedback: list[tuple[str, str]]) -> str
         "\nThese were REJECTED in an earlier run by the reviewer, with its stated "
         "reason -- fix the actual problem the reason describes, don't just reword "
         "the same card:\n" + blocks + "\n"
+    )
+
+
+def _format_existing_question_stems(existing_stems: list[str]) -> str:
+    """`existing_stems` is every OTHER active question already written for this
+    exact subtopic-tier -- shown so the writer doesn't repeat a question angle
+    already covered, same "show what exists" principle `_format_existing_titles`
+    already applies to card generation."""
+
+    if not existing_stems:
+        return ""
+    lines = "\n".join(f"- {stem}" for stem in existing_stems)
+    return (
+        "\nThis subtopic's quiz already asks (do not repeat any of these, even "
+        f"reworded):\n{lines}\n"
     )
 
 
@@ -808,25 +836,38 @@ class GeminiContentGenerator(ContentGenerator):
         return BatchResult(items=items, failures=failures)
 
     async def generate_questions(
-        self, cards: list[tuple[str, str]], difficulty: Difficulty
+        self,
+        cards: list[tuple[str, str]],
+        difficulty: Difficulty,
+        *,
+        existing_stems: list[str],
+        is_backfill: bool,
     ) -> BatchResult[QuestionDraft]:
         if not cards:
             return BatchResult(items=[])
 
+        backfill_tag = " [BACKFILL -- already accepted, just missing a question]" if is_backfill else ""
         cards_block = "\n\n".join(
-            f"{index}. {title}\n{body}" for index, (title, body) in enumerate(cards)
+            f"{index}. {title}{backfill_tag}\n{body}" for index, (title, body) in enumerate(cards)
         )
         prompt = [
             ("system", _QUESTIONS_SYSTEM),
             (
                 "human",
-                _QUESTIONS_USER.format(difficulty=difficulty.value, cards_block=cards_block),
+                _QUESTIONS_USER.format(
+                    difficulty=difficulty.value,
+                    existing_stems_block=_format_existing_question_stems(existing_stems),
+                    cards_block=cards_block,
+                ),
             ),
         ]
         try:
             wire_result = await self._invoke_with_retry(self._generator, _WireQuestionBatch, prompt)
         except Exception as exc:
-            return BatchResult(items=[], failures=[f"generate_questions call failed: {exc}"])
+            return BatchResult(
+                items=[],
+                failures=[f"generate_questions call failed: {type(exc).__name__}: {exc}"],
+            )
 
         items: list[QuestionDraft] = []
         failures: list[str] = []

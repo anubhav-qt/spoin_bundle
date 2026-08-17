@@ -57,6 +57,38 @@ so those sections serialize through a new `session_lock` instead of being pulled
 separate global phase. Each tier commits as soon as its own cards (and then its questions)
 are written, not at one shared end-of-batch commit.
 
+### Addendum 2026-08-18: backfill-aware question prompts
+
+Two gaps showed up once the missing-question backfill above was live-tested against real
+Gemini keys across several reruns:
+
+1. **The writer had no idea a call was a backfill.** `_generate_questions_for_group` already
+   combined newly-drafted cards and `cards_missing_questions` backfill cards into one
+   undifferentiated list before this addendum, so `generate_questions` prompted the model as
+   if every card were brand-new, unproven content — even for a card that had already cleared
+   the full gate in an earlier run and simply lost its question to an interrupted or failed
+   prior call.
+2. **The writer had no visibility into a subtopic-tier's existing questions.** Nothing told
+   the model what quiz angles this subtopic already covers, so a backfill or a later
+   generation round could plausibly repeat a question already asked (in spirit if not
+   verbatim) — the same blind-spot `existing_titles` already solves for card generation, just
+   never extended to questions.
+
+`_process_gate_item` now calls `_generate_questions_for_group` (and, underneath it,
+`ContentGenerator.generate_questions`) up to twice per subtopic-tier, never mixing the two
+cases in one call: once for cards drafted THIS run (`is_backfill=False`), once for
+`cards_missing_questions` backfill cards (`is_backfill=True`). Both calls receive
+`existing_stems` — this subtopic-tier's already-active question stems, capped at
+`settings.max_existing_question_stems` (loaded once in `_load_subtopic_plans`, same query
+shape as every other feedback list this ADR and ADR-0030 already load there) — and the SECOND
+call's `existing_stems` additionally includes whatever the FIRST call just wrote, so a
+two-call tier doesn't duplicate against itself within the same run, not just against prior
+runs.
+
+`_QUESTIONS_SYSTEM` explains what `[BACKFILL]`-tagged cards mean (already accepted, simply
+missing a question — write with full confidence, don't hedge or re-review) and instructs the
+model not to repeat any stem shown in the existing-questions block.
+
 ## Consequences
 
 **Easier**

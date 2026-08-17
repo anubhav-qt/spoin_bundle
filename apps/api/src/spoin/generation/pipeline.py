@@ -208,6 +208,13 @@ class SubtopicPlan(TypedDict):
     #: `{"card_id", "title", "body"}` (JSON-safe strings, matching every
     #: other field on this TypedDict).
     cards_missing_questions: list[dict[str, str]]
+    #: This EXACT subtopic-tier's already-active `Question.stem`s (capped at
+    #: `settings.max_existing_question_stems`), shown to `generate_questions`
+    #: so it doesn't repeat a question angle already asked -- and, combined
+    #: with the BACKFILL framing `cards_missing_questions` triggers, gives the
+    #: writer a sense of what this subtopic-tier's quiz already looks like
+    #: rather than writing each batch as if it were the first.
+    existing_question_stems: list[str]
 
 
 class SubtopicGroupPlan(TypedDict):
@@ -245,6 +252,9 @@ class SubtopicCardsResult(TypedDict):
     #: Passed straight through from `SubtopicPlan` regardless of whether this
     #: tier drafted any new cards this run -- see that field's docstring.
     cards_missing_questions: list[dict[str, str]]
+    #: Passed straight through from `SubtopicPlan`, same reasoning as
+    #: `cards_missing_questions` above.
+    existing_question_stems: list[str]
 
 
 class PipelineState(TypedDict, total=False):
@@ -535,6 +545,7 @@ async def _load_subtopic_plans(
     *,
     max_duplicate_feedback_bodies: int,
     max_verification_feedback_bodies: int,
+    max_existing_question_stems: int,
 ) -> list[SubtopicPlan]:
     subtopics = (
         (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic.id)))
@@ -590,6 +601,17 @@ async def _load_subtopic_plans(
                 )
             )
         ).all()
+        existing_question_stems = (
+            await session.execute(
+                select(Question.stem)
+                .where(
+                    Question.subtopic_id == subtopic.id,
+                    Question.status == QuestionStatus.ACTIVE,
+                )
+                .order_by(Question.created_at.desc())
+                .limit(max_existing_question_stems)
+            )
+        ).scalars().all()
         plans.append(
             SubtopicPlan(
                 topic_id=str(topic.id),
@@ -610,6 +632,7 @@ async def _load_subtopic_plans(
                     {"card_id": str(card_id), "title": title, "body": body}
                     for card_id, title, body in missing_question_cards
                 ],
+                existing_question_stems=list(existing_question_stems),
             )
         )
     return plans
@@ -711,6 +734,7 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
             topic,
             max_duplicate_feedback_bodies=runtime.settings.max_duplicate_feedback_bodies,
             max_verification_feedback_bodies=runtime.settings.max_verification_feedback_bodies,
+            max_existing_question_stems=runtime.settings.max_existing_question_stems,
         )
 
     plan = TopicPlanResult(
@@ -796,6 +820,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                     generator_failures=[],
                     is_standalone=is_standalone,
                     cards_missing_questions=tier["cards_missing_questions"],
+                    existing_question_stems=tier["existing_question_stems"],
                 )
             )
             # Nothing generated THIS run for this tier, so it contributes no
@@ -860,6 +885,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 generator_failures=failures,
                 is_standalone=is_standalone,
                 cards_missing_questions=tier["cards_missing_questions"],
+                existing_question_stems=tier["existing_question_stems"],
             )
         )
         lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
@@ -1041,6 +1067,8 @@ async def _generate_questions_for_group(
     subtopic_id: str,
     difficulty: str,
     cards: list[tuple[uuid.UUID, str, str]],
+    existing_stems: list[str],
+    is_backfill: bool,
 ) -> tuple[str, str, str, list[tuple[Any, uuid.UUID]], list[str]]:
     """Concurrent, no DB writes -- `cards` is `(id, title, body)` rather than
     ORM `Card` rows so this works identically whether the cards were just
@@ -1048,7 +1076,14 @@ async def _generate_questions_for_group(
     missing-question backfill (see `SubtopicPlan.cards_missing_questions`).
     One subtopic/difficulty's worth of questions, batched per
     `question_batch_size` same as card generation batches per
-    `generation_batch_size`."""
+    `generation_batch_size`.
+
+    `is_backfill` applies to the WHOLE call, never per-card -- callers (see
+    `_process_gate_item`) always call this once for newly-drafted cards and,
+    separately, once for `cards_missing_questions` backfill, never a mix of
+    both in one call. `existing_stems` grows across the two calls within one
+    tier (see `_process_gate_item`) so the SECOND call also avoids repeating
+    whatever the first one just wrote, not just prior runs' questions."""
 
     batch_size = runtime.settings.question_batch_size
     parsed_difficulty = Difficulty(difficulty)
@@ -1061,6 +1096,8 @@ async def _generate_questions_for_group(
             result = await runtime.generator.generate_questions(
                 cards=[(title, body) for _card_id, title, body in chunk],
                 difficulty=parsed_difficulty,
+                existing_stems=existing_stems,
+                is_backfill=is_backfill,
             )
         failures.extend(result.failures)
         for draft in result.items:
@@ -1092,6 +1129,10 @@ class _GateItem:
     #: these IN ADDITION TO any cards accepted by the gate this run, so a
     #: tier that already has all its cards still gets its questions backfilled.
     existing_cards_missing_questions: list[dict[str, str]] = field(default_factory=list)
+    #: This tier's already-active question stems (see
+    #: `SubtopicPlan.existing_question_stems`) -- shown to `generate_questions`
+    #: so it doesn't repeat a question angle already asked.
+    existing_question_stems: list[str] = field(default_factory=list)
     #: Filled in by later phases.
     corrected: list[CardDraft] = field(default_factory=list)
     correction_failure_count: int = 0
@@ -1284,23 +1325,48 @@ async def _process_gate_item(
     # Question generation runs on cards accepted THIS run plus any existing
     # active cards under this tier still missing a question (backfill --
     # see SubtopicPlan.cards_missing_questions) -- a tier that was already
-    # fully carded (new_cards empty) can still have work to do here.
-    cards_for_questions: list[tuple[uuid.UUID, str, str]] = [
+    # fully carded (new_cards empty) can still have work to do here. Kept as
+    # TWO separate calls (never mixed in one) so `is_backfill` is accurate for
+    # the whole call -- the writer needs to know whether it's looking at
+    # brand-new content or already-accepted cards that just lack a question,
+    # and those two cases genuinely call for different framing (see
+    # `generate_questions`'s docstring in base.py).
+    new_cards_for_questions: list[tuple[uuid.UUID, str, str]] = [
         (card.id, card.title, card.body) for card in new_cards
-    ] + [
+    ]
+    backfill_cards_for_questions: list[tuple[uuid.UUID, str, str]] = [
         (uuid.UUID(entry["card_id"]), entry["title"], entry["body"])
         for entry in item.existing_cards_missing_questions
     ]
-    if cards_for_questions:
+    all_question_drafts: list[tuple[Any, uuid.UUID]] = []
+    all_question_failures: list[str] = []
+    # Grows across the two calls below so the SECOND call also avoids
+    # repeating whatever the FIRST just wrote, not just prior runs' stems.
+    running_existing_stems = list(item.existing_question_stems)
+    for cards_batch, is_backfill in (
+        (new_cards_for_questions, False),
+        (backfill_cards_for_questions, True),
+    ):
+        if not cards_batch:
+            continue
         _, _, _, question_drafts, question_failures = await _generate_questions_for_group(
             runtime,
             topic_id=item.topic_id,
             subtopic_id=item.subtopic_id,
             difficulty=item.difficulty,
-            cards=cards_for_questions,
+            cards=cards_batch,
+            existing_stems=running_existing_stems,
+            is_backfill=is_backfill,
         )
+        all_question_drafts.extend(question_drafts)
+        all_question_failures.extend(question_failures)
+        running_existing_stems = running_existing_stems + [
+            draft.stem for draft, _card_id in question_drafts
+        ]
+
+    if all_question_drafts or all_question_failures:
         parsed_difficulty = Difficulty(item.difficulty)
-        stems = [draft.stem for draft, _card_id in question_drafts]
+        stems = [draft.stem for draft, _card_id in all_question_drafts]
         embeddings = runtime.embedder.embed(stems) if stems else []
         new_questions = [
             Question(
@@ -1322,19 +1388,19 @@ async def _process_gate_item(
                     "batch_id": str(runtime.batch_id),
                 },
             )
-            for (draft, card_id), embedding in zip(question_drafts, embeddings, strict=True)
+            for (draft, card_id), embedding in zip(all_question_drafts, embeddings, strict=True)
         ]
         async with runtime.session_lock:
             runtime.session.add_all(new_questions)
             await runtime.session.flush()
             await runtime.session.commit()
         questions_accepted = len(new_questions)
-        questions_rejected = len(question_failures)
-        if question_failures:
+        questions_rejected = len(all_question_failures)
+        if all_question_failures:
             logger.info(
                 "subtopic %s [%s]: %d question failure(s): %s",
-                item.subtopic_id, item.difficulty, len(question_failures),
-                "; ".join(question_failures),
+                item.subtopic_id, item.difficulty, len(all_question_failures),
+                "; ".join(all_question_failures),
             )
 
     return {
@@ -1404,6 +1470,7 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                     structural_rejects=structural_rejects,
                     generator_failure_count=len(result["generator_failures"]),
                     existing_cards_missing_questions=result["cards_missing_questions"],
+                    existing_question_stems=result["existing_question_stems"],
                 )
             )
 

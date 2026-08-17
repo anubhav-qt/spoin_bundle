@@ -118,6 +118,13 @@ class Settings(BaseSettings):
     #: similarity score), fed back into the next `generate_cards` call so the
     #: writer fixes the actual problem instead of rewording into it again.
     max_verification_feedback_bodies: int = 10
+    #: How many of a subtopic-tier's already-active question stems get shown to
+    #: `generate_questions` as "don't repeat any of these" context -- unlike the
+    #: two settings above (rejected content), this is ACCEPTED content, so the
+    #: cap can be looser: stems are short one-liners, not full card bodies, and
+    #: a subtopic-tier's whole question set (target_cards-bounded, ADR-0026) is
+    #: already a naturally small number.
+    max_existing_question_stems: int = 30
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

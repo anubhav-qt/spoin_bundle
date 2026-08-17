@@ -408,7 +408,10 @@ async def test_generate_questions_maps_mcq_and_free_text() -> None:
         ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
     ):
         result = await generator.generate_questions(
-            [("Card A", "body a"), ("Card B", "body b")], Difficulty.BEGINNER
+            [("Card A", "body a"), ("Card B", "body b")],
+            Difficulty.BEGINNER,
+            existing_stems=[],
+            is_backfill=False,
         )
 
     assert len(result.items) == 2
@@ -460,7 +463,10 @@ async def test_generate_questions_survives_null_explanation_in_batch() -> None:
         ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
     ):
         result = await generator.generate_questions(
-            [("Card A", "body a"), ("Card B", "body b")], Difficulty.BEGINNER
+            [("Card A", "body a"), ("Card B", "body b")],
+            Difficulty.BEGINNER,
+            existing_stems=[],
+            is_backfill=False,
         )
 
     assert len(result.items) == 2
@@ -489,7 +495,10 @@ async def test_generate_questions_drops_duplicate_card_index() -> None:
         ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
     ):
         result = await generator.generate_questions(
-            [("Card A", "body a"), ("Card B", "body b")], Difficulty.BEGINNER
+            [("Card A", "body a"), ("Card B", "body b")],
+            Difficulty.BEGINNER,
+            existing_stems=[],
+            is_backfill=False,
         )
 
     assert len(result.items) == 1

@@ -397,10 +397,34 @@ class ContentGenerator(ABC):
 
     @abstractmethod
     async def generate_questions(
-        self, cards: list[tuple[str, str]], difficulty: Difficulty
+        self,
+        cards: list[tuple[str, str]],
+        difficulty: Difficulty,
+        *,
+        existing_stems: list[str],
+        is_backfill: bool,
     ) -> BatchResult[QuestionDraft]:
         """Questions come FROM cards, so the quiz structurally cannot test material
-        the corpus never taught. `cards` is (title, body)."""
+        the corpus never taught. `cards` is (title, body).
+
+        `existing_stems` is every OTHER active question already written for this
+        exact subtopic-tier (other cards, possibly other runs) -- shown so the
+        writer doesn't repeat a question angle already covered and calibrates
+        style/depth against what the subtopic's quiz already looks like, the
+        same "show what exists, don't just ask for something new" principle
+        `existing_titles` already applies to card generation.
+
+        `is_backfill` is true when EVERY card in this call is an existing,
+        already-accepted card that simply never got a question (a prior run's
+        gate persisted the card but was interrupted, crashed, or hit a whole-
+        batch failure before questions were written -- see
+        `SubtopicPlan.cards_missing_questions`), as opposed to a card drafted
+        THIS run. The writer should know this so it doesn't hedge or write as
+        if re-reviewing unproven content -- these cards already cleared the
+        gate; the only gap is the missing question. `cards_for_questions` in
+        `pipeline.py`'s `_process_gate_item` always calls this once per mode
+        (never a mix of both in one call) so `is_backfill` applies to the
+        WHOLE batch, not per-card."""
 
     @abstractmethod
     async def grade_free_text(

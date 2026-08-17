@@ -198,7 +198,12 @@ class FakeContentGenerator(ContentGenerator):
         return BatchResult(items=items)
 
     async def generate_questions(
-        self, cards: list[tuple[str, str]], difficulty: Difficulty
+        self,
+        cards: list[tuple[str, str]],
+        difficulty: Difficulty,
+        *,
+        existing_stems: list[str],
+        is_backfill: bool,
     ) -> BatchResult[QuestionDraft]:
         items: list[QuestionDraft] = []
         for index, (title, _body) in enumerate(cards):

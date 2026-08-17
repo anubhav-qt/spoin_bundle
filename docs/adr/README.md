@@ -73,3 +73,4 @@ useful than the decision itself.
 | [0034](0034-per-topic-accent-color.md) | Per-topic accent color, composed with the active palette via relative color hue rotation | Accepted |
 | [0035](0035-hero-card-tutorial-overlay.md) | First-time hero-card tutorial overlay; no new SEEN mechanism needed | Accepted |
 | [0036](0036-topic-discovery-modal.md) | Topic discovery modal replaces the inline Discover list | Accepted |
+| [0037](0037-site-wide-font-picker.md) | Implement ADR-0023's font picker, site-wide, with live-preview/revert | Accepted |

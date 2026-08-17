@@ -14,6 +14,7 @@ import { useState } from "react";
 import type { Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
 import { FocusToggle } from "./FocusToggle";
+import { FontPicker } from "./FontPicker";
 import { RequestTopicBox } from "./RequestTopicBox";
 import { ThemePicker } from "./ThemePicker";
 import { TopicDiscoveryModal } from "./TopicDiscoveryModal";
@@ -49,6 +50,9 @@ export function RightRail({
         <ThemePicker />
         <FocusToggle focused={false} onToggle={onEnterFocus} />
       </div>
+
+      {/* ADR-0037: right after the color-theme picker, per how it was asked for. */}
+      <FontPicker />
 
       {topics.length > 0 ? <TopicRail topics={topics} selected={selected} onToggle={onToggle} /> : null}
 

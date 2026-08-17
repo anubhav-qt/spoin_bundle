@@ -2,7 +2,7 @@
 
 Adds `card.archetype`, a text array of content-shape tags ("code", "diagram",
 "comparison", any subset, `[]` for plain prose) — see
-slocho/content/archetype.py and ADR-0017. It is derived deterministically from
+spoin/content/archetype.py and ADR-0017. It is derived deterministically from
 `body` itself, never LLM-authored, so there is nothing to backfill from a
 generation-time field: existing rows simply get the empty-array default until
 something re-derives it (seed.py does this on every run for fixture cards).

@@ -34,17 +34,17 @@ first. Same reason: both define rules whose violation is *silent*. Free-form ASC
 a single playful `title` both look fine on the handful of cards anyone actually eyeballs,
 and degrade everywhere else.
 
-## The name is Spoin; the tree still says Slocho
+## The name is Spoin; the tree still says Spoin
 
 Deliberate, not stale. [ADR-0020](docs/adr/0020-rename-to-spoin.md) commits the rename to
 one atomic sweep (task [0007](docs/tasks/0007-rename-to-spoin.md)) covering the package
 path, imports, database name, docs, and mockups together.
 
-**Until that task runs, `slocho` is correct in code and config.** Do not rename the files
+**Until that task runs, `spoin` is correct in code and config.** Do not rename the files
 you happen to be touching — a half-renamed tree costs every future session more than
 either end state, because "which name is current?" stops being answerable from the docs.
 If you are asked to do the rename, do all of it in one commit and verify with
-`grep -ri slocho` returning zero.
+`grep -ri spoin` returning zero.
 
 ## The rules that generalize
 

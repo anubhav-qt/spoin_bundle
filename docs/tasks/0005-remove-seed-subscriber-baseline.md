@@ -9,7 +9,7 @@
 
 ## The problem
 
-`apps/api/src/slocho/seed.py` sets `Topic.subscriber_count` directly from a
+`apps/api/src/spoin/seed.py` sets `Topic.subscriber_count` directly from a
 `seed_subscriber_count` fixture field in `corpus.json`, because with essentially one real
 user, an honestly-counted value ties every topic at 0 or 1 — useless for demonstrating the
 Discover box's "popular" ranking. This was always meant to be temporary (see the comment

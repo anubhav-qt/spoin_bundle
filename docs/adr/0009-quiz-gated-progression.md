@@ -115,7 +115,7 @@ failed attempt.
 
 ## The free-text grader
 
-This is the only place in Slocho where **user-controlled text influences an
+This is the only place in Spoin where **user-controlled text influences an
 authorization-shaped outcome**, and it is treated accordingly.
 
 **A rubric, not a vibe.** Explicit levels, so grading is reproducible:

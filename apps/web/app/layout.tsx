@@ -13,7 +13,7 @@ import "./globals.css";
 const APPLY_PALETTE_SCRIPT = `
 (function () {
   try {
-    var palette = localStorage.getItem("slocho-palette");
+    var palette = localStorage.getItem("spoin-palette");
     if (palette) document.body.setAttribute("data-palette", palette);
   } catch (e) {}
 })();
@@ -27,7 +27,7 @@ const APPLY_PALETTE_SCRIPT = `
  * reads as *the system talking to you*, proportional sans as the content.
  */
 export const metadata: Metadata = {
-  title: "Slocho",
+  title: "Spoin",
   description: "A swipeable feed of AI-generated knowledge flash cards.",
 };
 

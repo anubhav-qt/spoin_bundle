@@ -14,12 +14,12 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from slocho.core.config import get_settings
-from slocho.domain.base import Base
+from spoin.core.config import get_settings
+from spoin.domain.base import Base
 
 # Importing the package registers every model on Base.metadata. Without this,
 # autogenerate produces an empty migration and nobody notices until deploy.
-import slocho.domain.models  # noqa: F401  isort:skip
+import spoin.domain.models  # noqa: F401  isort:skip
 
 config = context.config
 if config.config_file_name is not None:

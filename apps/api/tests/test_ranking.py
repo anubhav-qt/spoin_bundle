@@ -7,8 +7,8 @@ from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 from uuid import uuid4
 
-from slocho.core.config import Settings
-from slocho.feed.ranking import Candidate, diversify, freshness, rank, score
+from spoin.core.config import Settings
+from spoin.feed.ranking import Candidate, diversify, freshness, rank, score
 
 NOW = datetime(2026, 8, 15, tzinfo=UTC)
 

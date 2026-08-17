@@ -73,7 +73,7 @@ ADR-0010's rule rather than quietly dropping it. The two options not taken:
   the same risk.
 - Keep it pre-expansion-reachable but weight it as a third, weaker tier of completion signal
   in ranking. Rejected for now: it's a backend change (`EngagementKind`,
-  `apps/api/src/slocho/domain/enums.py`) with no clear benefit over just requiring expansion,
+  `apps/api/src/spoin/domain/enums.py`) with no clear benefit over just requiring expansion,
   which is free.
 
 ### Typography: system stacks, mono for chrome

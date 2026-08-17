@@ -14,7 +14,7 @@
 
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "slocho-palette";
+const STORAGE_KEY = "spoin-palette";
 const DEFAULT_PALETTE = "notebook";
 
 const PALETTES = [

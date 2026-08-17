@@ -20,7 +20,7 @@ The first three are implemented in `generation/pipeline.py` (a LangGraph graph â
 [generation-pipeline.md](../../docs/architecture/generation-pipeline.md)), but this
 package's own entrypoint (`worker/__main__.py`) doesn't call it yet â€” see task
 [0008](../../docs/tasks/0008-wire-generation-job-worker.md). Today the pipeline only
-runs via `python -m slocho.generate_topics`.
+runs via `python -m spoin.generate_topics`.
 
 ## How it runs
 

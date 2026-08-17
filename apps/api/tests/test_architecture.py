@@ -12,7 +12,7 @@ import pathlib
 
 import pytest
 
-SRC = pathlib.Path(__file__).resolve().parents[1] / "src" / "slocho"
+SRC = pathlib.Path(__file__).resolve().parents[1] / "src" / "spoin"
 
 #: Hard rule 3 / ADR-0002. The one module allowed to import LangChain.
 LANGCHAIN_MODULE = SRC / "generation" / "langchain_impl.py"
@@ -26,7 +26,7 @@ LLM_MARKERS = (
     "google_genai",
     "openai",
     "anthropic",
-    "slocho.generation",
+    "spoin.generation",
 )
 
 
@@ -90,7 +90,7 @@ def test_generation_interfaces_take_collections() -> None:
     no `generate_card` to retrofit later.
     """
 
-    from slocho.generation.base import ContentGenerator
+    from spoin.generation.base import ContentGenerator
 
     assert not hasattr(ContentGenerator, "generate_card")
     assert hasattr(ContentGenerator, "generate_cards")
@@ -101,8 +101,8 @@ def test_difficulty_mix_is_config_not_code() -> None:
     """content-model.md: the percentages will be tuned against engagement data,
     and tuning must not require a deploy."""
 
-    from slocho.core.config import DIFFICULTY_MIX
-    from slocho.domain.enums import Difficulty
+    from spoin.core.config import DIFFICULTY_MIX
+    from spoin.domain.enums import Difficulty
 
     for tier, mix in DIFFICULTY_MIX.items():
         assert abs(sum(mix.values()) - 1.0) < 1e-9, f"{tier} mix must sum to 1"
@@ -115,6 +115,6 @@ def test_difficulty_mix_is_config_not_code() -> None:
 def test_pool_thresholds_have_a_gap() -> None:
     """ADR-0006 §3: one threshold flaps. The gap is what makes the state stable."""
 
-    from slocho.core.config import Settings
+    from spoin.core.config import Settings
 
     assert Settings().pool_thresholds_are_sane

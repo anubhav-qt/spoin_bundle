@@ -6,8 +6,8 @@
 
 `generation/pipeline.py` (`run_generation_pipeline`) is built, tested, and runnable —
 see [`docs/architecture/generation-pipeline.md`](../architecture/generation-pipeline.md).
-But the only thing that calls it today is `python -m slocho.generate_topics`, a manual
-CLI. `apps/worker/src/slocho/worker/__main__.py` still claims pending `GenerationJob`
+But the only thing that calls it today is `python -m spoin.generate_topics`, a manual
+CLI. `apps/worker/src/spoin/worker/__main__.py` still claims pending `GenerationJob`
 rows and then does nothing with them (`run_once()` logs a warning and leaves them
 `pending`) — the production trigger (cron-dispatched worker claims a job, runs the
 pipeline, records the result) doesn't exist.

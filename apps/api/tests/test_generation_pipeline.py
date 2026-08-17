@@ -10,11 +10,11 @@ from __future__ import annotations
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from slocho.core.config import Settings
-from slocho.domain.models import Card, Subtopic, Topic, TopicAlias
-from slocho.embeddings import HashEmbedder
-from slocho.generation.fake import FakeContentGenerator
-from slocho.generation.pipeline import TopicRequest, run_generation_pipeline
+from spoin.core.config import Settings
+from spoin.domain.models import Card, Subtopic, Topic, TopicAlias
+from spoin.embeddings import HashEmbedder
+from spoin.generation.fake import FakeContentGenerator
+from spoin.generation.pipeline import TopicRequest, run_generation_pipeline
 
 
 async def _run(session: AsyncSession, settings: Settings, *names: str) -> dict[str, object]:

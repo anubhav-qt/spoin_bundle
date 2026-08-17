@@ -55,7 +55,7 @@ import {
   SparkIcon,
 } from "./icons";
 
-/** Mirrors SLOCHO_DWELL_COMPLETE_MS. The server stays the authority; this only
+/** Mirrors SPOIN_DWELL_COMPLETE_MS. The server stays the authority; this only
  *  decides when the client stops waiting and reports. */
 const DWELL_COMPLETE_MS = 8000;
 

@@ -13,8 +13,8 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from slocho.domain.models.quiz import QuotaLedger
-from slocho.generation.quota import QuotaExhaustedError, QuotaGovernor
+from spoin.domain.models.quiz import QuotaLedger
+from spoin.generation.quota import QuotaExhaustedError, QuotaGovernor
 
 
 async def test_stays_on_first_key_while_under_target(session: AsyncSession) -> None:

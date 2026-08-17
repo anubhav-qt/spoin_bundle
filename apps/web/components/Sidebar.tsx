@@ -28,8 +28,8 @@ interface Props {
 export function Sidebar({ onReset }: Props) {
   return (
     <nav className="rail-left" aria-label="Primary">
-      <button type="button" className="sidebar-mark mono" onClick={onReset} aria-label="slocho">
-        slocho
+      <button type="button" className="sidebar-mark mono" onClick={onReset} aria-label="spoin">
+        spoin
       </button>
 
       <a className="nav-item" href="/" aria-current="page">

@@ -20,7 +20,7 @@ progress updates.
 
 Two things were checked before deciding how to source topic-to-topic edges:
 
-- `TopicEdge` (`apps/api/src/slocho/domain/models/topic.py`) is modeled for exactly this —
+- `TopicEdge` (`apps/api/src/spoin/domain/models/topic.py`) is modeled for exactly this —
   its own docstring says "Edges are for discovery only" — but **nothing writes a row
   anywhere**: not generation, not `seed.py`. Zero rows exist today. Building the graph
   against it would ship an always-empty graph.
@@ -30,7 +30,7 @@ Two things were checked before deciding how to source topic-to-topic edges:
   needs no new generation-time work or storage.
 
 The catch: the default embedder
-(`apps/api/src/slocho/core/config.py`, `embedder: EmbedderBackend = "hash"`) is
+(`apps/api/src/spoin/core/config.py`, `embedder: EmbedderBackend = "hash"`) is
 `HashEmbedder`, whose own docstring states it is "not semantically meaningful... any
 threshold measured against this is meaningless." Task
 [0001](../tasks/0001-topic-threshold-calibration.md) exists precisely because thresholds

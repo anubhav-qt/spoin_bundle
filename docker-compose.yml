@@ -12,21 +12,21 @@
 #   web     Next.js                          http://localhost:3000
 #   worker  batch job, `--profile worker`    (cron in production, not always-on)
 
-name: slocho
+name: spoin
 
 services:
   db:
     image: pgvector/pgvector:pg17
     environment:
-      POSTGRES_USER: slocho
-      POSTGRES_PASSWORD: slocho
-      POSTGRES_DB: slocho
+      POSTGRES_USER: spoin
+      POSTGRES_PASSWORD: spoin
+      POSTGRES_DB: spoin
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U slocho -d slocho"]
+      test: ["CMD-SHELL", "pg_isready -U spoin -d spoin"]
       interval: 3s
       timeout: 3s
       retries: 20
@@ -38,7 +38,7 @@ services:
     build:
       context: ./apps/api
     environment:
-      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
     depends_on:
       db:
         condition: service_healthy
@@ -47,15 +47,15 @@ services:
     volumes:
       - ./apps/api/src:/app/src
       - ./apps/api/alembic:/app/alembic
-    command: ["sh", "-c", "alembic upgrade head && python -m slocho.seed && python -m slocho.seed_generated"]
+    command: ["sh", "-c", "alembic upgrade head && python -m spoin.seed && python -m spoin.seed_generated"]
 
   api:
     build:
       context: ./apps/api
     environment:
-      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
-      SLOCHO_ENV: local
-      SLOCHO_CORS_ORIGINS: http://localhost:3000
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
+      SPOIN_ENV: local
+      SPOIN_CORS_ORIGINS: http://localhost:3000
     ports:
       - "8000:8000"
     depends_on:
@@ -67,7 +67,7 @@ services:
       # whatever was baked into the image at build time.
       - ./apps/api/tests:/app/tests
     command:
-      ["uvicorn", "slocho.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+      ["uvicorn", "spoin.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
   web:
     build:
@@ -85,15 +85,15 @@ services:
     command: ["npm", "run", "dev"]
 
   # Its own database, because the test fixtures drop and recreate every table.
-  # Sharing `slocho` would silently wipe the seeded corpus every time anyone ran
+  # Sharing `spoin` would silently wipe the seeded corpus every time anyone ran
   # the suite, which is a confusing way to lose your dev data.
   test:
     profiles: ["test"]
     build:
       context: ./apps/api
     environment:
-      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
-      SLOCHO_TEST_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho_test
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
+      SPOIN_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_test
     depends_on:
       db:
         condition: service_healthy
@@ -106,9 +106,9 @@ services:
         python - <<'PY'
         import asyncio, asyncpg
         async def main():
-            conn = await asyncpg.connect("postgresql://slocho:slocho@db:5432/slocho")
+            conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/spoin")
             try:
-                await conn.execute("CREATE DATABASE slocho_test")
+                await conn.execute("CREATE DATABASE spoin_test")
             except asyncpg.DuplicateDatabaseError:
                 pass
             await conn.close()
@@ -124,14 +124,14 @@ services:
     build:
       context: ./apps/api
     environment:
-      SLOCHO_DATABASE_URL: postgresql+asyncpg://slocho:slocho@db:5432/slocho
-      SLOCHO_GENERATOR: fake
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
+      SPOIN_GENERATOR: fake
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./apps/api/src:/app/src
-    command: ["python", "-m", "slocho.worker"]
+    command: ["python", "-m", "spoin.worker"]
 
 volumes:
   db-data:

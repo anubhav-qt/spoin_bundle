@@ -30,7 +30,7 @@ packages/api-types/schema.d.ts
 # ---- local model / generation artifacts ----
 # Anchored to the repo root (leading slash) — a bare `models/` matches a
 # directory of that name at ANY depth, which was silently excluding
-# apps/api/src/slocho/domain/models/ (the actual SQLAlchemy schema,
+# apps/api/src/spoin/domain/models/ (the actual SQLAlchemy schema,
 # content-model.md's "highest-leverage" code) from version control entirely.
 /models/
 *.gguf

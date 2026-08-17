@@ -16,14 +16,14 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.sql import text
 
-from slocho.core.config import Settings
-from slocho.domain.base import Base
-from slocho.domain.enums import CardStatus, Difficulty
-from slocho.domain.models import Card, CardStats, Subtopic, Topic, User, UserTopic
+from spoin.core.config import Settings
+from spoin.domain.base import Base
+from spoin.domain.enums import CardStatus, Difficulty
+from spoin.domain.models import Card, CardStats, Subtopic, Topic, User, UserTopic
 
 TEST_DATABASE_URL = os.environ.get(
-    "SLOCHO_TEST_DATABASE_URL",
-    os.environ.get("SLOCHO_DATABASE_URL", ""),
+    "SPOIN_TEST_DATABASE_URL",
+    os.environ.get("SPOIN_DATABASE_URL", ""),
 )
 
 
@@ -35,7 +35,7 @@ def settings() -> Settings:
 @pytest_asyncio.fixture
 async def session() -> AsyncIterator[AsyncSession]:
     if not TEST_DATABASE_URL:
-        pytest.skip("No database configured; set SLOCHO_TEST_DATABASE_URL")
+        pytest.skip("No database configured; set SPOIN_TEST_DATABASE_URL")
 
     engine = create_async_engine(TEST_DATABASE_URL)
     try:

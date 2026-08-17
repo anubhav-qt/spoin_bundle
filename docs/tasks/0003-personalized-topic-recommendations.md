@@ -4,7 +4,7 @@
 - **Timebox:** ~2 days
 - **Depends on:** [ADR-0015](../adr/0015-topic-progress-and-discovery.md) (the Discover
   box and its `mode=popular|for_you` toggle, which this task gives real teeth).
-- **Background reading:** [`apps/api/src/slocho/feed/service.py`](../../apps/api/src/slocho/feed/service.py)
+- **Background reading:** [`apps/api/src/spoin/feed/service.py`](../../apps/api/src/spoin/feed/service.py)
   (how `UserTopicAffinity` is read for feed ranking today).
 
 ## The problem

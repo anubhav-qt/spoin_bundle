@@ -6,7 +6,7 @@
 
 ## Context
 
-Slocho is a self-funded two-person project shipping to real users. The rule set by
+Spoin is a self-funded two-person project shipping to real users. The rule set by
 the team: **pay nothing until there is traction, then pay.** This is not a permanent
 austerity constraint — it is a deferral. That distinction drives the entire decision.
 

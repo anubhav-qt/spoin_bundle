@@ -6,7 +6,7 @@
 
 ## Context
 
-Slocho needs a backend that serves a web client now and a React Native client later,
+Spoin needs a backend that serves a web client now and a React Native client later,
 plus background workers doing substantial LLM orchestration.
 
 Two forces pointed in opposite directions:

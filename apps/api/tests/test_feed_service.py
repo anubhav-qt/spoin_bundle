@@ -15,11 +15,11 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from slocho.core.config import Settings
-from slocho.domain.enums import Difficulty, EngagementKind, SeenState
-from slocho.domain.models import Card, UserCardState, UserTopicCycle
-from slocho.engagement.service import EngagementService, IncomingEvent
-from slocho.feed.service import FeedService
+from spoin.core.config import Settings
+from spoin.domain.enums import Difficulty, EngagementKind, SeenState
+from spoin.domain.models import Card, UserCardState, UserTopicCycle
+from spoin.engagement.service import EngagementService, IncomingEvent
+from spoin.feed.service import FeedService
 
 pytestmark = pytest.mark.asyncio
 
@@ -211,7 +211,7 @@ async def test_user_with_no_subscriptions_gets_an_empty_feed(
 ) -> None:
     """An ordinary state, not an error."""
 
-    from slocho.domain.models import User
+    from spoin.domain.models import User
 
     stranger = User(email="stranger@test.local", display_name="Stranger")
     session.add(stranger)

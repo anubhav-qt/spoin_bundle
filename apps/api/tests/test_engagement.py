@@ -15,10 +15,10 @@ import pytest
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from slocho.core.config import Settings
-from slocho.domain.enums import EngagementKind, SeenState
-from slocho.domain.models import CardLike, EngagementEvent, UserCardState
-from slocho.engagement.service import EngagementService, IncomingEvent
+from spoin.core.config import Settings
+from spoin.domain.enums import EngagementKind, SeenState
+from spoin.domain.models import CardLike, EngagementEvent, UserCardState
+from spoin.engagement.service import EngagementService, IncomingEvent
 
 pytestmark = pytest.mark.asyncio
 

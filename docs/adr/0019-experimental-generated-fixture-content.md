@@ -37,7 +37,7 @@ with its own header stating plainly what it is and isn't. A second loader,
 it tags every card `gen_meta.backend = "opus_sonnet_experiment"`, never `"fixture"`.
 
 `docker compose`'s `seed` service runs both loaders in sequence
-(`python -m slocho.seed && python -m slocho.seed_generated`), so `docker compose up` /
+(`python -m spoin.seed && python -m spoin.seed_generated`), so `docker compose up` /
 `make setup` still bring up a fully seeded stack in one command — the "convenient for
 others" property is preserved — while keeping the two content provenances
 distinguishable in the data itself, not just in a comment.

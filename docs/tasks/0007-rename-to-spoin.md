@@ -1,5 +1,6 @@
 # Task 0007: Execute the Slocho → Spoin rename
 
+- **Status:** Done — executed 2026-08-17
 - **Owner:** unassigned
 - **Timebox:** ~2 hours, including verification
 - **Depends on:** nothing outstanding in flight — this touches nearly every file in

@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import pytest
 
-from slocho.core.config import DIFFICULTY_MIX
-from slocho.domain.enums import Difficulty
-from slocho.feed.strata import allocate, resolve_mix
+from spoin.core.config import DIFFICULTY_MIX
+from spoin.domain.enums import Difficulty
+from spoin.feed.strata import allocate, resolve_mix
 
 
 @pytest.mark.parametrize("size", [1, 5, 7, 10, 25, 33, 50])

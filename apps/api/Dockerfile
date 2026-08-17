@@ -12,7 +12,7 @@ WORKDIR /app
 
 # Dependency layer first so source edits do not reinstall the world.
 COPY pyproject.toml README.md ./
-RUN mkdir -p src/slocho && touch src/slocho/__init__.py \
+RUN mkdir -p src/spoin && touch src/spoin/__init__.py \
     && pip install --no-cache-dir -e ".[dev]"
 
 COPY alembic.ini ./
@@ -22,4 +22,4 @@ COPY tests ./tests
 
 EXPOSE 8000
 
-CMD ["uvicorn", "slocho.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "spoin.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,13 +1,13 @@
-# Slocho — Architecture Overview
+# Spoin — Architecture Overview
 
 > Read this first. It is the mental model everything else assumes.
 > If you only read one document before touching the codebase, read this one.
 
-> **On the name:** the product is **Spoin**; the codebase is still `slocho` until the
+> **On the name:** the product is **Spoin**; the codebase is still `spoin` until the
 > single-sweep rename in [ADR-0020](../adr/0020-rename-to-spoin.md) / task
 > [0007](../tasks/0007-rename-to-spoin.md) runs. Nothing in this document changes with it.
 
-## What Slocho is
+## What Spoin is
 
 A swipeable feed of AI-generated knowledge flash cards. Users pick topics, receive
 bite-sized cards calibrated to their difficulty level, and can go deeper on any card
@@ -20,7 +20,7 @@ Web first. A React Native app comes later and shares this exact backend.
 > **The feed read path must never touch an LLM.**
 
 A swipe is a ~50ms interaction. An LLM call is 2–10 seconds. These cannot coexist on
-one code path. Therefore Slocho is not "an app that calls an LLM" — it is:
+one code path. Therefore Spoin is not "an app that calls an LLM" — it is:
 
 - a **content factory** (slow, async, batched, expensive), feeding
 - a **content warehouse** (Postgres), read by

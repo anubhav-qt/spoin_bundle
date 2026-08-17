@@ -30,7 +30,7 @@ cron batch worker to a persistent pool must be a process-type change, not a rewr
 ## Layout
 
 ```
-src/slocho/
+src/spoin/
   core/         config, database session
   domain/       enums, SQLAlchemy models — the schema everything inherits
   api/          FastAPI app, routers, wire schemas
@@ -59,14 +59,14 @@ Interactive API docs at `/docs` once running.
 Use the root `docker compose up` / `make dev`. Directly:
 
 ```bash
-pip install -e ".[dev]" && alembic upgrade head && python -m slocho.seed
+pip install -e ".[dev]" && alembic upgrade head && python -m spoin.seed
 ```
 
 ## Optional extras
 
 Both are excluded from the default install on purpose.
 
-- `.[embeddings]` — `fastembed` / BGE-small. Without it, `SLOCHO_EMBEDDER=hash`
+- `.[embeddings]` — `fastembed` / BGE-small. Without it, `SPOIN_EMBEDDER=hash`
   gives a deterministic stand-in that keeps the image small and the tests fast.
   It is **not semantically meaningful**; install this before trusting any
   similarity number.

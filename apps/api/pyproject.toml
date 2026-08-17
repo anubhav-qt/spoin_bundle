@@ -1,7 +1,7 @@
 [project]
-name = "slocho"
+name = "spoin"
 version = "0.1.0"
-description = "Slocho API and workers — one codebase, two entrypoints"
+description = "Spoin API and workers — one codebase, two entrypoints"
 requires-python = ">=3.13"
 
 dependencies = [
@@ -26,11 +26,11 @@ embeddings = [
 
 # ADR-0002: langchain is a dependency of exactly one module. Keeping it optional
 # makes the boundary physical rather than merely conventional — a stray import
-# outside src/slocho/generation/langchain_impl.py fails to resolve at all in the
+# outside src/spoin/generation/langchain_impl.py fails to resolve at all in the
 # default install, before the CI lint rule ever has to catch it.
 #
 # ADR-0024: langgraph joins this extra for the same reason, confined to
-# src/slocho/generation/pipeline.py instead — it orchestrates ONE job's control
+# src/spoin/generation/pipeline.py instead — it orchestrates ONE job's control
 # flow (curriculum -> per-subtopic generation -> gate), never scheduling or
 # cross-run retry, which stays the worker/GenerationJob's job.
 generation = [
@@ -56,7 +56,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-slocho = ["fixtures/*.json", "py.typed"]
+spoin = ["fixtures/*.json", "py.typed"]
 
 # ------------------------------------------------------------------- ruff -----
 [tool.ruff]
@@ -71,18 +71,18 @@ ignore = [
 ]
 
 # ADR-0002, enforced rather than documented: nothing outside
-# src/slocho/generation/langchain_impl.py may import langchain.
+# src/spoin/generation/langchain_impl.py may import langchain.
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"langchain".msg = "Only src/slocho/generation/langchain_impl.py may import langchain (ADR-0002)."
-"langchain_core".msg = "Only src/slocho/generation/langchain_impl.py may import langchain (ADR-0002)."
-"langchain_google_genai".msg = "Only src/slocho/generation/langchain_impl.py may import langchain (ADR-0002)."
-"langgraph".msg = "Only src/slocho/generation/pipeline.py may import langgraph (ADR-0024)."
+"langchain".msg = "Only src/spoin/generation/langchain_impl.py may import langchain (ADR-0002)."
+"langchain_core".msg = "Only src/spoin/generation/langchain_impl.py may import langchain (ADR-0002)."
+"langchain_google_genai".msg = "Only src/spoin/generation/langchain_impl.py may import langchain (ADR-0002)."
+"langgraph".msg = "Only src/spoin/generation/pipeline.py may import langgraph (ADR-0024)."
 
 [tool.ruff.lint.per-file-ignores]
-"src/slocho/generation/langchain_impl.py" = ["TID251"]
-"src/slocho/generation/pipeline.py" = ["TID251"]
+"src/spoin/generation/langchain_impl.py" = ["TID251"]
+"src/spoin/generation/pipeline.py" = ["TID251"]
 # Mocks ChatGoogleGenerativeAI directly — doesn't touch the real API, and
-# tests/test_architecture.py's AST-level check only scans src/slocho, not this
+# tests/test_architecture.py's AST-level check only scans src/spoin, not this
 # file, so the real architectural boundary is unaffected by this exemption.
 "tests/test_langchain_impl.py" = ["TID251"]
 "tests/*" = ["E501"]

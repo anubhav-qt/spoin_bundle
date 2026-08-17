@@ -68,7 +68,7 @@ state on demand: clears seen-state (coverage back to 0%), clears the feed's
 pagination cursor (`FeedPlan`/`FeedSlate` — this also fixes the "exhausted feed"
 problem repeated manual testing kept running into this session), resets every
 followed topic's progress to beginner/nothing-unlocked, and unfollows two randomly
-chosen topics so Discover has something to show again. Wired to the "slocho"
+chosen topics so Discover has something to show again. Wired to the "spoin"
 wordmark in the left rail as a click — an easter egg, not a labeled button in any of
 the three rails, per how it was asked for. **Explicitly flagged in the router's own
 docstring as dev-only** — it mutates a user's entire state behind nothing but the

@@ -16,9 +16,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from slocho.core.config import Settings
-from slocho.domain.enums import Difficulty
-from slocho.generation.langchain_impl import (
+from spoin.core.config import Settings
+from spoin.domain.enums import Difficulty
+from spoin.generation.langchain_impl import (
     GeminiContentGenerator,
     _WireCard,
     _WireCardBatch,
@@ -57,7 +57,7 @@ def _generator(**settings_overrides: object) -> GeminiContentGenerator:
 
 
 def test_construction_requires_at_least_one_key() -> None:
-    with pytest.raises(ValueError, match="SLOCHO_GEMINI_API_KEYS"):
+    with pytest.raises(ValueError, match="SPOIN_GEMINI_API_KEYS"):
         GeminiContentGenerator(_settings(gemini_api_keys=""))
 
 
@@ -170,7 +170,7 @@ async def test_generate_questions_maps_mcq_and_free_text() -> None:
 
 
 async def test_generate_curriculum_threads_related_hints_into_prompt() -> None:
-    from slocho.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
+    from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
 
     generator = _generator()
     draft = CurriculumDraft(
@@ -202,7 +202,7 @@ async def test_generate_curriculum_threads_related_hints_into_prompt() -> None:
 
 
 async def test_generate_curriculum_threads_existing_subtopics_into_prompt() -> None:
-    from slocho.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
+    from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
 
     generator = _generator()
     draft = CurriculumDraft(
@@ -235,7 +235,7 @@ async def test_generate_curriculum_threads_existing_subtopics_into_prompt() -> N
 
 
 async def test_judge_topic_match_returns_verdict_directly() -> None:
-    from slocho.generation.base import TopicMatchVerdict
+    from spoin.generation.base import TopicMatchVerdict
 
     generator = _generator()
     verdict = TopicMatchVerdict(same_topic=True, relevant_subtopic_titles=["X"])

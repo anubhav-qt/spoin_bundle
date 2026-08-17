@@ -5,7 +5,7 @@
 - **Depends on:** nothing structurally, but is blocked in practice by the gap described
   here.
 - **Background reading:** [ADR-0015](../adr/0015-topic-progress-and-discovery.md)'s
-  engagement-stats section; `apps/api/src/slocho/domain/models/engagement.py`'s
+  engagement-stats section; `apps/api/src/spoin/domain/models/engagement.py`'s
   `CardNote` model.
 
 ## The problem

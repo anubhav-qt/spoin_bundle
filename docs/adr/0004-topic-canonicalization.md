@@ -9,7 +9,7 @@
 Users can add custom topics beyond the predetermined list. Taken naively, this breaks
 the economics the whole architecture rests on.
 
-Slocho's cost model works because **cards are shared**: one card about Kubernetes
+Spoin's cost model works because **cards are shared**: one card about Kubernetes
 serves every user interested in Kubernetes. But if 1,000 users each add 3 unique
 custom topics, we get 3,000 topics with one reader each — and generation cost silently
 converts from _shared_ to _per-user_, which is precisely what the architecture exists

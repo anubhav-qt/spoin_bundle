@@ -6,7 +6,7 @@ from collections import Counter
 from itertools import groupby, pairwise
 from uuid import UUID, uuid4
 
-from slocho.feed.interleave import build_plan, filter_key
+from spoin.feed.interleave import build_plan, filter_key
 
 A = UUID("00000000-0000-0000-0000-0000000000aa")
 B = UUID("00000000-0000-0000-0000-0000000000bb")

@@ -15,7 +15,7 @@ production trigger: nothing yet creates a `GenerationJob` row or calls this from
 `apps/worker`. The only way to run it today is the CLI:
 
 ```bash
-python -m slocho.generate_topics "Topic Name" "Another Topic::with a description"
+python -m spoin.generate_topics "Topic Name" "Another Topic::with a description"
 ```
 
 This calls `generation.pipeline.run_generation_pipeline(...)` directly, synchronously,
@@ -60,9 +60,9 @@ gate_and_persist
 ```
 
 Every real generator call (curriculum, topic-match judge, card generation) goes through
-a shared `asyncio.Semaphore` (`SLOCHO_MAX_CONCURRENT_GENERATION_CALLS`) — without it, a
+a shared `asyncio.Semaphore` (`SPOIN_MAX_CONCURRENT_GENERATION_CALLS`) — without it, a
 run with several topics times many subtopics each would fire dozens of simultaneous
-calls, well past `SLOCHO_QUOTA_RPM`.
+calls, well past `SPOIN_QUOTA_RPM`.
 
 ## Subtopic reuse: prevention, not detection
 
@@ -85,14 +85,14 @@ same request, the same trust level as everything else in that call.
 
 ## Two generator backends
 
-`SLOCHO_GENERATOR` selects which `ContentGenerator` implementation
+`SPOIN_GENERATOR` selects which `ContentGenerator` implementation
 `generation.get_content_generator()` returns:
 
 - **`fake`** (default, everywhere except a deliberate switch) — `generation/fake.py`.
   Deterministic, in-memory, no network, no quota. This is what every automated test and
   the CLI examples above run against.
 - **`gemini`** — `generation/langchain_impl.py`. The only module allowed to import
-  `langchain*` (ADR-0002/0024). Requires `SLOCHO_GEMINI_API_KEYS` (comma-separated); raises
+  `langchain*` (ADR-0002/0024). Requires `SPOIN_GEMINI_API_KEYS` (comma-separated); raises
   a clear config error at construction if unset, rather than failing mid-run.
   **Not live-verified** — built and covered by mocked unit tests
   (`tests/test_langchain_impl.py`: structured-output parsing, per-item validation,
@@ -105,10 +105,10 @@ which one is behind the interface.
 
 ### Quota governance
 
-`generation/quota.py`'s `QuotaGovernor` rotates through `SLOCHO_GEMINI_API_KEYS`,
+`generation/quota.py`'s `QuotaGovernor` rotates through `SPOIN_GEMINI_API_KEYS`,
 tracking spend per key per day in the existing `QuotaLedger` table
 (`backend=f"gemini:{key_index}"`, `exhausted_at` set the moment a key hits
-`SLOCHO_QUOTA_DAILY_REQUESTS` for the day). It opens its own short-lived DB session per
+`SPOIN_QUOTA_DAILY_REQUESTS` for the day). It opens its own short-lived DB session per
 call rather than sharing the pipeline's — the pipeline's session is deliberately
 single-writer/lock-guarded (see ADR-0024's "Harder" section), and quota bookkeeping has
 no reason to be tied to that transaction. Tested standalone

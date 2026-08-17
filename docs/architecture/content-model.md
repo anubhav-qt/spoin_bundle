@@ -252,8 +252,15 @@ difficulty user-selected, but do not discard the data needed to make it adaptive
 
 ### When the pool cannot satisfy the mix
 
+**Partially superseded by [ADR-0026](../adr/0026-one-shot-generation-to-completion.md):**
+point 2 below (the async fill trigger) no longer applies — generation is now a one-shot
+run per topic to a fixed budget, not an ongoing refill loop, so there is no recurring
+"starved slot" to trigger a fill for. Whether points 1/3/4 (degraded mode, hysteresis,
+end-of-feed copy) still apply during a topic's *initial* one-shot run — the window before
+its cards exist at all — is flagged as an open question in ADR-0026 and not resolved here.
+
 The mix is a **target, not a guarantee**. With a thin corpus under free-tier quota,
-this will fire constantly. Policy:
+this will fire constantly. Policy (see the note above on which parts still hold):
 
 1. **Keep the mix honest.** Do not silently backfill with the current difficulty.
    Serve a shorter page instead.
@@ -430,11 +437,14 @@ new entries in the shared corpus.
 ## Open questions
 
 - `title` character cap: pick N, and check it against the longest realistic render.
-- Duplicate threshold for `content_embedding`: needs the same calibration treatment as
-  the topic thresholds in ADR-0004. Different vectors, different numbers — the topic
-  threshold does **not** transfer.
-- `POOL_LOW` / `POOL_HIGH` values: cannot be chosen sensibly until we observe real
-  consumption rates.
+- Duplicate threshold for `content_embedding`: needs the same calibration treatment
+  the topic thresholds in ADR-0004 originally used — note ADR-0004's own topic-matching
+  thresholds are gone as of ADR-0025, so this is no longer "the same technique reused,"
+  just a separately-needed calibration for a different check (near-duplicate card
+  detection, not topic matching).
+- `POOL_LOW` / `POOL_HIGH` values: only meaningful if ADR-0026's open question resolves
+  in favor of keeping degraded-mode serving for a topic's initial one-shot generation
+  window. Do not implement against these until that's decided.
 - `min_cards` as a fraction of `target_cards`: needs a default. Somewhere around 50-60%
   is the intuition, but it should be checked against real rejection rates.
 - Whether `position` on subtopics is ever used. Cards are standalone and unordered by

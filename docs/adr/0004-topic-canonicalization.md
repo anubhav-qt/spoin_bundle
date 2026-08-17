@@ -3,6 +3,11 @@
 - **Status:** Accepted
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0025](0025-batched-llm-topic-matching.md) — the "Matching is
+  banded, not a single threshold" section below is superseded (no more auto-merge/
+  auto-new thresholds; every topic gets an LLM opinion, batched). The canonical-topic /
+  alias / shared-entity model in the rest of this ADR is unaffected. The body below is
+  left as originally written; read ADR-0025 alongside it.
 
 ## Context
 

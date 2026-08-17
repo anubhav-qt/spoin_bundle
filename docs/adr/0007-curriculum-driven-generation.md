@@ -4,6 +4,12 @@
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0006](0006-demand-driven-pool-fill.md) (lock key and starvation signal)
+- **Amended by:** [ADR-0026](0026-one-shot-generation-to-completion.md) — the
+  `subtopic_id` coalescing lock and starvation signal this ADR introduced (see "Amendment
+  to ADR-0006" below) are dropped along with the demand-driven refill they existed to
+  coalesce. Curriculum-driven generation itself (the subtopic model, the card budget, the
+  tier/survey/deep-dive structure) is unaffected. The body below is left as originally
+  written; read ADR-0026 alongside it.
 
 ## Context
 

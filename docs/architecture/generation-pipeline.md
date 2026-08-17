@@ -7,6 +7,15 @@
 > it does and doesn't own), and [ADR-0004](../adr/0004-topic-canonicalization.md) (topic
 > merging). Read those for *why*; this doc is *what exists and how to run it*.
 
+> **A redesign is decided but not yet built.**
+> [ADR-0025](../adr/0025-batched-llm-topic-matching.md) replaces the topic-matching
+> logic below with a batched LLM call, and
+> [ADR-0026](../adr/0026-one-shot-generation-to-completion.md) adds a questions node,
+> threads linked-difficulty-tier content forward, and moves cross-topic concurrency to
+> the worker. Everything below still describes what's actually in the code today — see
+> tasks [0009](../tasks/0009-batched-topic-matching.md) and
+> [0010](../tasks/0010-one-shot-pipeline-redesign.md) for the pending implementation.
+
 ## What's actually built
 
 The generation logic — curriculum planning, topic resolution/merging, card generation,

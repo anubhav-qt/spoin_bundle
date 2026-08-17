@@ -5,6 +5,13 @@
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0002](0002-langchain-behind-an-interface.md) ("LangGraph for generation
   flows" was deferred there, not rejected)
+- **Amended by:** [ADR-0026](0026-one-shot-generation-to-completion.md) — the graph gains
+  a questions node and an ordering dependency between linked difficulty tiers; the worker
+  now always calls `run_generation_pipeline` with a single topic per job (own DB session,
+  own failure handling), rather than relying on the graph's own multi-topic `Send` fan-out
+  for cross-job concurrency. This doesn't change the boundary below ("LangGraph owns
+  control flow inside one job's execution") — it clarifies that one job now means one
+  topic. The body below is left as originally written; read ADR-0026 alongside it.
 
 ## Context
 

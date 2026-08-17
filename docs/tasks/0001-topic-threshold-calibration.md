@@ -1,5 +1,10 @@
 # Task 0001: Topic similarity threshold calibration
 
+> **Obsolete as of 2026-08-17 —** [ADR-0025](../adr/0025-batched-llm-topic-matching.md)
+> replaced the three-band threshold system this task calibrates with a batched LLM call
+> that judges every incoming topic, no thresholds involved. There is nothing left to
+> calibrate. Left below as written for the record; do not pick this up.
+
 - **Owner:** Mayank
 - **Timebox:** ~1 day
 - **Depends on:** nothing. This is fully self-contained.

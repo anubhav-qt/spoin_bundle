@@ -7,6 +7,7 @@ import type { Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
 import { DiscoverBox } from "./DiscoverBox";
 import { FocusToggle } from "./FocusToggle";
+import { FontPicker } from "./FontPicker";
 import { RequestTopicBox } from "./RequestTopicBox";
 import { ThemePicker } from "./ThemePicker";
 import { TopicRail } from "./TopicRail";
@@ -28,6 +29,9 @@ export function RightRail({ topics, progress, selected, onToggle, onFollowed, on
         <ThemePicker />
         <FocusToggle focused={false} onToggle={onEnterFocus} />
       </div>
+
+      {/* ADR-0037: right after the color-theme picker, per how it was asked for. */}
+      <FontPicker />
 
       {topics.length > 0 ? <TopicRail topics={topics} selected={selected} onToggle={onToggle} /> : null}
 

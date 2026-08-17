@@ -57,7 +57,13 @@
      disappearing. */
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(38,42,34,0.05)' stroke-width='1'/%3E%3C/svg%3E");
 
-  --font-sans: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  /* ADR-0023/0037: five selectable faces, switched by [data-font] on body
+     (below) — --font-sans itself always resolves to whichever one is active
+     plus a system fallback, so nothing downstream needs to know a picker
+     exists. Literata is the default (no [data-font] set), matching
+     Notebook being the default palette (ADR-0023's reasoning: the product
+     reads closer to a textbook than a dashboard). */
+  --font-sans: var(--font-literata), ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 
   --r-card: 14px;
@@ -152,6 +158,26 @@
   --good: #38c6d9;
   --shadow: rgba(0, 0, 0, 0.5);
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(227,236,242,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* -- font selection (ADR-0023, wired up by ADR-0037) --------------------
+   `literata` has no rule of its own — it's :root's default above, same
+   pattern as `notebook` needing no [data-palette] block. --font-mono is
+   never touched here: ADR-0021's ASCII scenes depend on it staying fixed. */
+[data-font="inter"] {
+  --font-sans: var(--font-inter), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="grotesk"] {
+  --font-sans: var(--font-grotesk), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="plex"] {
+  --font-sans: var(--font-plex), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="hyperlegible"] {
+  --font-sans: var(--font-hyperlegible), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -1529,6 +1555,102 @@ body.custom-cursor-active textarea {
 .theme-pill:hover::after,
 .theme-pill:focus-visible::after {
   opacity: 1;
+}
+
+/* -- font picker (ADR-0023, wired up by ADR-0037) -- */
+.font-picker {
+  padding: 0 4px 8px;
+}
+
+.font-picker-row {
+  display: flex;
+  gap: 6px;
+}
+
+.font-pill {
+  position: relative;
+  flex: 1 1 0;
+  height: 30px;
+  border-radius: 8px;
+  border: 2px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.font-pill:hover,
+.font-pill:focus-visible {
+  border-color: var(--line-strong);
+}
+
+.font-pill[data-active="true"] {
+  border-color: var(--accent);
+}
+
+.font-pill::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-1) var(--ease);
+  z-index: 10;
+}
+
+.font-pill:hover::after,
+.font-pill:focus-visible::after {
+  opacity: 1;
+}
+
+.font-picker-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--bg-3);
+}
+
+.font-picker-confirm span {
+  flex: 1 1 auto;
+  font-size: 10.5px;
+  color: var(--fg-2);
+}
+
+.font-picker-keep,
+.font-picker-revert {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.font-picker-keep:hover {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.font-picker-revert:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* Topic rail, relocated here from the feed's own masthead. Name-only pills

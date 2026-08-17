@@ -3,15 +3,15 @@
 - **Status:** Accepted
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
-- **Amended by:** [ADR-0007](0007-curriculum-driven-generation.md) — the coalescing lock key
+- **Amended by:** [ADR-0007](0007-curriculum-driven-generation.md) -- the coalescing lock key
   becomes `(subtopic_id)` rather than `(topic_id, difficulty)`, and the starvation signal
   becomes "this subtopic is below `min_cards`" rather than "this topic's pool is low".
-  Further amended by [ADR-0026](0026-one-shot-generation-to-completion.md) — the fill-
+  Further amended by [ADR-0026](0026-one-shot-generation-to-completion.md) -- the fill-
   triggering mechanism itself (point 2 in the Decision below, and ADR-0007's coalescing
   lock) is dropped: generation is now a one-shot run per topic to a fixed card+question
   budget, not an ongoing refill loop. **What ADR-0026 does NOT resolve:** whether the
   feed-serving behavior described here (degraded mode, hysteresis, points 1/3/4 below)
-  still applies during a topic's initial one-shot run — see ADR-0026's "Open question."
+  still applies during a topic's initial one-shot run -- see ADR-0026's "Open question."
   The body below is left as originally written; read ADR-0026 alongside it.
 
 ## Context

@@ -15,7 +15,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 
 | # | Task | Owner |
 |---|---|---|
-| [0002](0002-palette-selection-ui.md) | Palette selection UI — onboarding picker + settings switcher | unassigned |
+| [0002](0002-palette-selection-ui.md) | Palette selection UI -- onboarding picker + settings switcher | unassigned |
 | [0003](0003-personalized-topic-recommendations.md) | Personalized "for you" topic recommendations | unassigned |
 | [0004](0004-notes-in-one-place.md) | A single view of all your notes | unassigned |
 | [0005](0005-remove-seed-subscriber-baseline.md) | Remove the seeded `subscriber_count` baseline | unassigned |
@@ -27,8 +27,8 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 
 | # | Task | Outcome |
 |---|---|---|
-| [0007](0007-rename-to-spoin.md) | Execute the Slocho → Spoin rename | Done — 2026-08-17 |
-| [0001](0001-topic-threshold-calibration.md) | Topic similarity threshold calibration | Obsolete — 2026-08-17, superseded by ADR-0025 |
-| [0009](0009-batched-topic-matching.md) | Implement batched LLM topic matching (ADR-0025) | Done — 2026-08-17 |
-| [0010](0010-one-shot-pipeline-redesign.md) | Redesign the generation pipeline for one-shot completion (ADR-0026) | Done — 2026-08-17 |
-| [0008](0008-wire-generation-job-worker.md) | Wire `apps/worker` to the generation pipeline | Done — 2026-08-17 |
+| [0007](0007-rename-to-spoin.md) | Execute the Slocho → Spoin rename | Done -- 2026-08-17 |
+| [0001](0001-topic-threshold-calibration.md) | Topic similarity threshold calibration | Obsolete -- 2026-08-17, superseded by ADR-0025 |
+| [0009](0009-batched-topic-matching.md) | Implement batched LLM topic matching (ADR-0025) | Done -- 2026-08-17 |
+| [0010](0010-one-shot-pipeline-redesign.md) | Redesign the generation pipeline for one-shot completion (ADR-0026) | Done -- 2026-08-17 |
+| [0008](0008-wire-generation-job-worker.md) | Wire `apps/worker` to the generation pipeline | Done -- 2026-08-17 |

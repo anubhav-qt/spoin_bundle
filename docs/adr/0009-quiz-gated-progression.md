@@ -4,14 +4,14 @@
   [ADR-0029](0029-questions-join-generator-pool.md))
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
-- **Amends:** [content-model.md](../architecture/content-model.md) — difficulty is earned,
+- **Amends:** [content-model.md](../architecture/content-model.md) -- difficulty is earned,
   not chosen
-- **Amended by:** [ADR-0027](0027-self-selected-entry-tier.md) — the `placement` row below
+- **Amended by:** [ADR-0027](0027-self-selected-entry-tier.md) -- the `placement` row below
   no longer gates entry. Entry tier is now trusted unconditionally at subscribe time;
   `placement`-kind attempts are unlimited practice retries that never change
   `current_difficulty`. Promotion and mastery, and everything else on this page, are
   unchanged.
-- **Amended by:** [ADR-0029](0029-questions-join-generator-pool.md) — the "strongest
+- **Amended by:** [ADR-0029](0029-questions-join-generator-pool.md) -- the "strongest
   available model" claim for question generation, below, no longer holds. Questions now
   share a model tier with card writing.
 
@@ -32,12 +32,12 @@ natural place to put the gate.
 
 | Kind        | When                               | Effect                              |
 | ----------- | ----------------------------------- | ----------------------------------- |
-| `placement` | Below-`current_difficulty` practice | Nothing — scored, never progresses  |
+| `placement` | Below-`current_difficulty` practice | Nothing -- scored, never progresses  |
 | `promotion` | Unlocked at 80% tier coverage       | Advances to the next tier           |
 | `mastery`   | At advanced tier                    | Confers mastery                     |
 
 **Superseded by [ADR-0027](0027-self-selected-entry-tier.md):** the paragraph below
-described starting above beginner as requiring a passed placement quiz. It does not —
+described starting above beginner as requiring a passed placement quiz. It does not --
 entry tier is now trusted unconditionally at subscribe time, and `placement` is a
 retitled-in-meaning practice attempt for any tier at or below the one the user is
 currently at. Kept here, struck through in spirit rather than in text per this repo's
@@ -95,7 +95,7 @@ Cost is modest: questions are short and batch well (~25 per request), so a topic
 is roughly 10-15 extra requests.
 
 **Superseded by [ADR-0029](0029-questions-join-generator-pool.md):** the paragraph below
-claimed questions always get the strongest available model. They don't — questions are
+claimed questions always get the strongest available model. They don't -- questions are
 high-volume, per-item writing, same shape as card generation, and now share its (cheaper)
 model tier. Kept here, not edited, per this repo's "don't edit history" ADR rule:
 
@@ -111,7 +111,7 @@ The bank is sampled across the whole tier, so a user may be asked about a card t
 seen (they only need 80% coverage). This is **deliberate and surfaced**: the results screen
 identifies those questions explicitly and links to the cards.
 
-The quiz therefore doubles as a **discovery tool** — it shows the user precisely what they
+The quiz therefore doubles as a **discovery tool** -- it shows the user precisely what they
 did not know and takes them straight to it, rather than merely scoring them.
 
 ### Failure is remediation, not cooldown

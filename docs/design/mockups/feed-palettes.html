@@ -1,10 +1,10 @@
 <title>Feed Palettes</title>
 <style>
 /* ============================================================
-   Base tokens — palette A (Copper Board) is the default on :root;
+   Base tokens -- palette A (Copper Board) is the default on :root;
    each palette overrides the same token set on [data-palette="x"].
    Every one of these five is a deliberate single-world commitment,
-   not a light/dark pair — see the rationale under each tab.
+   not a light/dark pair -- see the rationale under each tab.
    ============================================================ */
 :root {
   --bg: #0B1613;
@@ -20,15 +20,15 @@
   --good: #7FBF95;
   --shadow: rgba(0, 0, 0, 0.45);
   /* Single crisp SVG tile, not two overlapping repeating-linear-gradient
-     layers — ADR-0017's follow-up fix: two independently-antialiased hard-1px
+     layers -- ADR-0017's follow-up fix: two independently-antialiased hard-1px
      gradients disagree with each other at their crossings under fractional
      display scaling, producing a wobbly, not-quite-connected grid. */
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(231,237,231,0.04)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
-/* Cyanotype — redefined by ADR-0016 as the soft light-blue counterpart to
+/* Cyanotype -- redefined by ADR-0016 as the soft light-blue counterpart to
    Notebook, replacing the original deep-Prussian-blue "actual blueprint
-   print" identity (superseded — see ADR-0016). */
+   print" identity (superseded -- see ADR-0016). */
 body[data-palette="cyanotype"] {
   --bg: #E8F0F7;
   --bg-2: #DCE8F2;
@@ -45,8 +45,8 @@ body[data-palette="cyanotype"] {
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(30,52,72,0.045)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
-/* Phosphor — redefined by ADR-0016 as a strictly monochrome black/gray dark
-   theme, replacing the original CRT-green-glow identity (superseded — see
+/* Phosphor -- redefined by ADR-0016 as a strictly monochrome black/gray dark
+   theme, replacing the original CRT-green-glow identity (superseded -- see
    ADR-0016), which had converged visually with Copper Board. */
 body[data-palette="phosphor"] {
   --bg: #0B0B0C;
@@ -152,7 +152,7 @@ body {
   width: 380px; height: 720px; background: var(--bg-2); border: 1px solid var(--line-strong);
   border-radius: 26px; box-shadow: 0 24px 60px -20px var(--shadow); overflow: hidden; position: relative;
   display: flex; flex-direction: column; background-image: var(--texture);
-  /* Forces its own compositing layer with paint containment — without this the
+  /* Forces its own compositing layer with paint containment -- without this the
      sticky station label (two levels down, inside the scrolling thread) can
      paint a ghost sliver of the element above it, because its clipping
      ancestor has both border-radius and overflow:hidden. */
@@ -188,7 +188,7 @@ body {
 .tcard-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding-top: 2px; }
 .tcard-actions button { background: none; border: none; padding: 0; cursor: pointer; }
 
-/* Every action is the same circular outline shape — quiet until touched, no
+/* Every action is the same circular outline shape -- quiet until touched, no
    label needed once the glyph itself is legible at a glance. */
 .tcard-action-icon {
   width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
@@ -201,7 +201,7 @@ body {
 .tcard-actions-spacer { flex: 1; }
 
 /* The only action that skips reading and marks the card seen directly, so it
-   sits apart from the rest by both position and spacing — extreme right, its
+   sits apart from the rest by both position and spacing -- extreme right, its
    own circular shape, not just another item in the row. */
 .tcard-gotit-icon {
   width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
@@ -223,9 +223,9 @@ body {
 </style>
 
 <div class="intro">
-  <div class="eyebrow">Spoin — thread, five color directions</div>
+  <div class="eyebrow">Spoin -- thread, five color directions</div>
   <h1>Same thread, five color systems</h1>
-  <p>Layout and type stay exactly as chosen. Only color changes — each one is a
+  <p>Layout and type stay exactly as chosen. Only color changes -- each one is a
   full commitment to a real engineering material or instrument, not a light/dark
   pair, so you can judge each on its own terms.</p>
 </div>
@@ -250,7 +250,7 @@ body {
       <h3>A pod is the unit of scheduling</h3>
       <p class="summary">Kubernetes never schedules a container. It schedules a pod.</p>
       <div class="tcard-body"><div class="tcard-body-inner">
-        <p>Kubernetes never schedules a container — it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on <code>localhost</code> and are always placed on the same node, together, or not at all.</p>
+        <p>Kubernetes never schedules a container -- it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on <code>localhost</code> and are always placed on the same node, together, or not at all.</p>
         <p>This matters the moment you try to scale: you scale pods, not containers. If you put two things in one pod that need to scale independently, you have made a mistake that is awkward to undo later.</p>
       </div></div>
       <div class="tcard-actions">
@@ -284,7 +284,7 @@ body {
       <h3>The scheduler filters, then scores</h3>
       <p class="summary">Placement is two phases, and only the first one can fail outright.</p>
       <div class="tcard-body"><div class="tcard-body-inner">
-        <p><strong>Filtering</strong> removes nodes that cannot run the pod at all — insufficient CPU or memory, a taint the pod does not tolerate. If filtering removes every node, the pod stays <code>Pending</code>.</p>
+        <p><strong>Filtering</strong> removes nodes that cannot run the pod at all -- insufficient CPU or memory, a taint the pod does not tolerate. If filtering removes every node, the pod stays <code>Pending</code>.</p>
         <p><strong>Scoring</strong> ranks whatever survived, preferring spread across nodes and better resource fit. Scoring never fails; it only picks a winner.</p>
       </div></div>
       <div class="tcard-actions">
@@ -321,7 +321,7 @@ body {
       <p class="summary">A single machine is up or down. A distributed system is neither.</p>
       <div class="tcard-body"><div class="tcard-body-inner">
         <p>On one machine, a component is working or it is not, and your process usually finds out immediately. Across machines, some parts work and others do not, and <strong>you cannot reliably tell which</strong>.</p>
-        <p>Almost every complication in distributed systems — retries, idempotency, consensus, timeouts — exists to cope with that one ambiguity.</p>
+        <p>Almost every complication in distributed systems -- retries, idempotency, consensus, timeouts -- exists to cope with that one ambiguity.</p>
       </div></div>
       <div class="tcard-actions">
         <button class="tcard-action-icon" aria-label="Like">
@@ -355,7 +355,7 @@ body {
       <p class="summary">It is a guess with a deadline attached.</p>
       <div class="tcard-body"><div class="tcard-body-inner">
         <p>You cannot distinguish a crashed node from a slow one. All you can do is wait a while and give up. That makes every timeout a tradeoff: too short and healthy nodes look dead; too long and real failures go unnoticed.</p>
-        <p>There is no correct value, only one tuned to a specific latency distribution — which is why a timeout copied from another system is usually wrong.</p>
+        <p>There is no correct value, only one tuned to a specific latency distribution -- which is why a timeout copied from another system is usually wrong.</p>
       </div></div>
       <div class="tcard-actions">
         <button class="tcard-action-icon" aria-label="Like">
@@ -380,7 +380,7 @@ body {
       </div>
     </article>
 
-    <div class="eof"><b>That's everything fresh</b> for these topics right now.<br>More is generating — check back soon.</div>
+    <div class="eof"><b>That's everything fresh</b> for these topics right now.<br>More is generating -- check back soon.</div>
   </div>
 </div>
 
@@ -389,7 +389,7 @@ const PALETTES = [
   {
     key: "notebook", name: "Notebook", dot: "#C1442B",
     tagline: "Squared engineering paper",
-    copy: "The shipped default: pale grid paper with a graphite ink for text and a red-pencil accent for the moments that matter — like margin corrections in a real engineering notebook.",
+    copy: "The shipped default: pale grid paper with a graphite ink for text and a red-pencil accent for the moments that matter -- like margin corrections in a real engineering notebook.",
     swatches: [
       { name: "Paper", hex: "#EDF0EA" }, { name: "Grid", hex: "#D6DDD1" },
       { name: "Graphite", hex: "#262A22" }, { name: "Red pencil", hex: "#C1442B" },
@@ -398,7 +398,7 @@ const PALETTES = [
   {
     key: "copper", name: "Copper Board", dot: "#E2985F",
     tagline: "Populated circuit board",
-    copy: "Near-black board laminate with copper trace as the only warm note — like looking down at a populated PCB under work light. Signals feel etched in, not decorated on.",
+    copy: "Near-black board laminate with copper trace as the only warm note -- like looking down at a populated PCB under work light. Signals feel etched in, not decorated on.",
     swatches: [
       { name: "Board", hex: "#0B1613" }, { name: "Panel", hex: "#10201B" },
       { name: "Ink", hex: "#E7EDE7" }, { name: "Copper", hex: "#E2985F" },
@@ -407,7 +407,7 @@ const PALETTES = [
   {
     key: "cyanotype", name: "Skylight", dot: "#3F7EA3",
     tagline: "Soft blueprint wash",
-    copy: "A light second option next to Notebook, with its own personality: pale blueprint-blue paper, muted ink-blue text, and a soft blue accent instead of graphite and red pencil. (ADR-0016 — redefined from the original deep Prussian-blue \"Cyanotype\" print identity, which was dark-native; renamed to match, `data-palette` key unchanged.)",
+    copy: "A light second option next to Notebook, with its own personality: pale blueprint-blue paper, muted ink-blue text, and a soft blue accent instead of graphite and red pencil. (ADR-0016 -- redefined from the original deep Prussian-blue \"Cyanotype\" print identity, which was dark-native; renamed to match, `data-palette` key unchanged.)",
     swatches: [
       { name: "Wash", hex: "#E8F0F7" }, { name: "Paper", hex: "#DCE8F2" },
       { name: "Ink", hex: "#1E3448" }, { name: "Blue", hex: "#3F7EA3" },
@@ -416,7 +416,7 @@ const PALETTES = [
   {
     key: "phosphor", name: "Obsidian", dot: "#F4F4F5",
     tagline: "Black and shades of gray",
-    copy: "A strictly monochrome dark theme — no hue anywhere, just a black ground and a grayscale ramp from body text up to a near-white accent. (ADR-0016 — redefined from the original CRT \"Phosphor\" green identity, which read too close to Copper Board; renamed to match, `data-palette` key unchanged.)",
+    copy: "A strictly monochrome dark theme -- no hue anywhere, just a black ground and a grayscale ramp from body text up to a near-white accent. (ADR-0016 -- redefined from the original CRT \"Phosphor\" green identity, which read too close to Copper Board; renamed to match, `data-palette` key unchanged.)",
     swatches: [
       { name: "Black", hex: "#0B0B0C" }, { name: "Panel", hex: "#141415" },
       { name: "Text", hex: "#E6E6E7" }, { name: "White", hex: "#F4F4F5" },
@@ -425,7 +425,7 @@ const PALETTES = [
   {
     key: "scope", name: "Oscilloscope", dot: "#38C6D9",
     tagline: "Dual-trace readout",
-    copy: "Charcoal-slate ground like an oscilloscope bezel, with cyan as the primary trace and amber reserved for a second channel — difficulty, or anything that needs to read as a distinct signal from the main accent.",
+    copy: "Charcoal-slate ground like an oscilloscope bezel, with cyan as the primary trace and amber reserved for a second channel -- difficulty, or anything that needs to read as a distinct signal from the main accent.",
     swatches: [
       { name: "Bezel", hex: "#0D1116" }, { name: "Screen", hex: "#141B22" },
       { name: "Trace", hex: "#38C6D9" }, { name: "Ch. 2", hex: "#E8A33D" },
@@ -451,14 +451,14 @@ function selectPalette(key) {
   const p = PALETTES.find(x => x.key === key);
   document.body.setAttribute("data-palette", key === "copper" ? "" : key);
   [...tabsEl.children].forEach((btn, i) => btn.setAttribute("aria-selected", PALETTES[i].key === key ? "true" : "false"));
-  copyEl.innerHTML = `<h2>${p.name} — ${p.tagline}</h2><p>${p.copy}</p>`;
+  copyEl.innerHTML = `<h2>${p.name} -- ${p.tagline}</h2><p>${p.copy}</p>`;
   swatchEl.innerHTML = p.swatches.map(s =>
     `<div class="swatch"><div class="chip" style="background:${s.hex}"></div><div class="label"><b>${s.name}</b>${s.hex}</div></div>`
   ).join("");
 }
 
 // re-collapse all cards when switching palettes, so each look is judged fresh
-// Toggleable — a stray tap on a 28px circle is easy to make, so tapping it
+// Toggleable -- a stray tap on a 28px circle is easy to make, so tapping it
 // again undoes the local indicator.
 function markSeenIcon(btn, e) {
   e.stopPropagation();
@@ -466,7 +466,7 @@ function markSeenIcon(btn, e) {
   btn.setAttribute("data-done", done ? "false" : "true");
 }
 
-// Cards toggle independently — opening one never closes another. Only a
+// Cards toggle independently -- opening one never closes another. Only a
 // click that lands outside every card closes whatever is open.
 document.querySelectorAll(".tcard").forEach(card => {
   card.addEventListener("click", (e) => {
@@ -474,7 +474,7 @@ document.querySelectorAll(".tcard").forEach(card => {
     const isOpen = card.getAttribute("data-open") === "true";
     card.setAttribute("data-open", isOpen ? "false" : "true");
     // The Got it icon unlocks the first time a card opens, and stays
-    // unlocked after it closes again — it confirms a look already taken,
+    // unlocked after it closes again -- it confirms a look already taken,
     // it doesn't let you skip taking one.
     if (!isOpen) {
       const gotIt = card.querySelector(".tcard-gotit-icon");

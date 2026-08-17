@@ -10,7 +10,7 @@
 or anyone outside the two of us, and it has no meaning that helps a first-time visitor
 guess what the product does.
 
-The cost of renaming is not flat over time — it rises sharply and permanently at three
+The cost of renaming is not flat over time -- it rises sharply and permanently at three
 points we have not yet crossed:
 
 1. **Users.** Every rename after real accounts exist is a comms exercise, not a
@@ -23,7 +23,7 @@ points we have not yet crossed:
    production database exists that cannot simply be dropped and re-seeded.
 
 We are currently before all three. That makes this a now-or-never decision rather than a
-someday one — deferring it is equivalent to deciding to keep "Slocho" forever.
+someday one -- deferring it is equivalent to deciding to keep "Slocho" forever.
 
 ## Decision
 
@@ -71,14 +71,14 @@ answer by reading code.
   parked before it runs.
 - Local developer databases named `slocho` stop matching the new default and need to be
   dropped and re-seeded. Acceptable precisely because the data is fixtures.
-- `git log -S` and `git blame` across the rename commit get noisier — the usual price of
+- `git log -S` and `git blame` across the rename commit get noisier -- the usual price of
   a mechanical sweep.
 - Committing to the name means the domain and a trademark check are now blocking on
   _this_ name specifically, not a shortlist.
 
 ## Alternatives considered
 
-**Keep Slocho and revisit after launch.** Rejected — this is the alternative that
+**Keep Slocho and revisit after launch.** Rejected -- this is the alternative that
 silently decides the question. Every week of delay adds surface (deployments, links,
 data) and there is no future point at which renaming is _cheaper_ than today.
 
@@ -87,7 +87,7 @@ permanently splits the product's identity from its code, which means every new s
 has to learn that the package name is historical. That is exactly the kind of
 undocumented trivia CLAUDE.md exists to eliminate.
 
-**Ship a `slocho` compatibility alias.** Rejected — see "Decision". There is no consumer
+**Ship a `slocho` compatibility alias.** Rejected -- see "Decision". There is no consumer
 to keep working, and the alias's only real effect would be letting a stale import survive
 code review.
 

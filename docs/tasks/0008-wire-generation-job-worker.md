@@ -1,9 +1,9 @@
 # Task 0008: Wire `apps/worker` to the generation pipeline
 
-**Status:** Done — executed 2026-08-17. `worker/__main__.py`'s `run_once()`
+**Status:** Done -- executed 2026-08-17. `worker/__main__.py`'s `run_once()`
 claims pending jobs, marks them `running` in the claiming transaction, then
 fires one `asyncio` task per job (own `session_scope()` each) gathered
-together — one job's exception only marks that job `failed`. `GenerationJob`
+together -- one job's exception only marks that job `failed`. `GenerationJob`
 migrated (`alembic/versions/a3f0c1b8d4e2_*.py`): `kind`/`subtopic_id` dropped,
 coalescing key moved to `topic_id`. Verified against a live `docker compose`
 Postgres with `SPOIN_GENERATOR=fake`: a seeded `GenerationJob` row went from
@@ -23,23 +23,23 @@ task implements), [generation-pipeline.md](../architecture/generation-pipeline.m
 
 ## The problem
 
-`generation/pipeline.py` (`run_generation_pipeline`) is built, tested, and runnable —
+`generation/pipeline.py` (`run_generation_pipeline`) is built, tested, and runnable --
 but the only thing that calls it today is `python -m spoin.generate_topics`, a manual
 CLI. `apps/worker/src/spoin/worker/__main__.py` still claims pending `GenerationJob` rows
-and then does nothing with them (`run_once()` logs a warning and leaves them `pending`) —
+and then does nothing with them (`run_once()` logs a warning and leaves them `pending`) --
 the production trigger (cron-dispatched worker claims a job, runs the pipeline, records
 the result) doesn't exist.
 
 ## Why it matters
 
 Nothing upstream of the CLI creates `GenerationJob` rows either (no demand-driven fill,
-no admin trigger) — but even once something does, there's no handler to pick them up.
+no admin trigger) -- but even once something does, there's no handler to pick them up.
 Without this, the corpus can only ever grow by someone manually running the CLI.
 
-## What to do — per ADR-0026's execution model
+## What to do -- per ADR-0026's execution model
 
 - `GenerationJob` simplifies: it's "run the one-shot pipeline for this `topic_id`," full
-  stop — `kind` and the old `subtopic_id` coalescing lock stop being load-bearing (see
+  stop -- `kind` and the old `subtopic_id` coalescing lock stop being load-bearing (see
   ADR-0026's "`GenerationJob` simplifies" section). Write the schema migration: drop or
   stop reading `kind`, change the coalescing key to `topic_id`.
 - In `run_once()`, after selecting pending jobs, mark them `running` in the same
@@ -52,10 +52,10 @@ Without this, the corpus can only ever grow by someone manually running the CLI.
   `topic_requests` list, call `run_generation_pipeline(session, generator, embedder,
   settings, topic_requests=[...])` inside that task's own session.
 - Write back `status` (`completed`/`failed`), `completed_at`, `last_error`, and increment
-  `attempts` from the pipeline's report or the caught exception — this is what makes the
+  `attempts` from the pipeline's report or the caught exception -- this is what makes the
   job queue's bookkeeping mean anything; right now nothing writes back to the job row at
   all.
-- A completed job is terminal — per ADR-0026, no new `GenerationJob` is ever created for
+- A completed job is terminal -- per ADR-0026, no new `GenerationJob` is ever created for
   a `topic_id` that already has one completed. (Nothing currently creates jobs at all;
   this is a note for whoever builds that trigger later, not something to enforce here.)
 
@@ -68,6 +68,6 @@ questions) from a `GenerationJob` row rather than the CLI.
 
 ## Timebox
 
-Not started. Depends on 0009/0010 landing first. Rough guess once unblocked: half a day —
+Not started. Depends on 0009/0010 landing first. Rough guess once unblocked: half a day --
 the hard part (the pipeline itself) is done elsewhere; this is wiring, the schema
 migration, and the per-job `asyncio` fan-out.

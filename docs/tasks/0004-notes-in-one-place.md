@@ -1,7 +1,7 @@
 # Task 0004: A single view of all your notes
 
 - **Owner:** unassigned
-- **Timebox:** ~1 day, once note-taking itself exists (see below — this may be two tasks)
+- **Timebox:** ~1 day, once note-taking itself exists (see below -- this may be two tasks)
 - **Depends on:** nothing structurally, but is blocked in practice by the gap described
   here.
 - **Background reading:** [ADR-0015](../adr/0015-topic-progress-and-discovery.md)'s
@@ -10,11 +10,11 @@
 
 ## The problem
 
-The Note button on a card (`Card.tsx`) fires a bare `EngagementEvent` of kind `note` —
+The Note button on a card (`Card.tsx`) fires a bare `EngagementEvent` of kind `note` --
 that's it. `CardNote` (`user_id`, `card_id`, `body: Text`, per-user and private) is
 modeled in the schema but **has zero writers anywhere in the codebase**. No UI captures
 note text, no endpoint saves it. The count shown in the new topic-stats modal
-(`GET /topics/{id}/stats`'s `notes` field) is real — it's counting `note` events — but
+(`GET /topics/{id}/stats`'s `notes` field) is real -- it's counting `note` events -- but
 there is no note *content* behind that count anywhere to show.
 
 The ask: "I'd want all my saved notes shown later in one place." That view can't exist
@@ -26,7 +26,7 @@ Two pieces, probably worth splitting:
 
 1. **Note-taking itself.** The Note button needs to open some kind of text input (inline,
    a small popover, whatever fits the card's interaction model) and persist it via a new
-   endpoint that writes to `CardNote` — upsert semantics, since a user should be able to
+   endpoint that writes to `CardNote` -- upsert semantics, since a user should be able to
    edit a note they already wrote on a card, not just append.
 2. **The "all my notes" view.** Once (1) exists: a new route/surface listing every
    `CardNote` a user has written, presumably with enough card context (title, topic) to be

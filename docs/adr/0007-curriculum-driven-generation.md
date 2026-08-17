@@ -4,7 +4,7 @@
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0006](0006-demand-driven-pool-fill.md) (lock key and starvation signal)
-- **Amended by:** [ADR-0026](0026-one-shot-generation-to-completion.md) — the
+- **Amended by:** [ADR-0026](0026-one-shot-generation-to-completion.md) -- the
   `subtopic_id` coalescing lock and starvation signal this ADR introduced (see "Amendment
   to ADR-0006" below) are dropped along with the demand-driven refill they existed to
   coalesce. Curriculum-driven generation itself (the subtopic model, the card budget, the
@@ -155,8 +155,8 @@ The planner guesses before any generation happens and has no knowledge of qualit
 rejection rates. If coverage were defined against `target_cards`, users would sit at 94%
 indefinitely whenever quota is tight.
 
-- `min_cards` — the coverage threshold. Completion is defined against this.
-- `target_cards` — a ceiling and a priority weight. Cards beyond `min_cards` are enrichment.
+- `min_cards` -- the coverage threshold. Completion is defined against this.
+- `target_cards` -- a ceiling and a priority weight. Cards beyond `min_cards` are enrichment.
 
 ### Generation is sequential within a subtopic, parallel across subtopics
 

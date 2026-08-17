@@ -122,16 +122,16 @@ This ADR commits to the cloud/local *split*, not to specific model names.
 
 **Cloud side: resolved by [ADR-0028](0028-key-model-quota-ladder.md)/[0029](0029-questions-join-generator-pool.md).**
 Rather than one fixed `gemini_model`, cloud generation walks an ordered fallback ladder of
-models per call — see those ADRs for the mechanism. The specific model ids were
+models per call -- see those ADRs for the mechanism. The specific model ids were
 **live-verified 2026-08-17** against 9 real Gemini keys (one call per candidate model,
-checked for a real 200 response, not just presence in the API's model list — which is
+checked for a real 200 response, not just presence in the API's model list -- which is
 what caught `gemini-2.5-flash`/`gemini-2.5-flash-lite` looking fine in the list while
 actually 404ing as "retired for new accounts"). `core/config.py`'s default ladders reflect
 what was actually confirmed working on that account, not the original screenshot-derived
-guess. Prompt *quality* from these models is still unverified — this only confirms the
+guess. Prompt *quality* from these models is still unverified -- this only confirms the
 models respond at all.
 
-**Local side: still fully open.** `qwen3:14b` remains a placeholder in `core/config.py` —
+**Local side: still fully open.** `qwen3:14b` remains a placeholder in `core/config.py` --
 picked in code, never discussed. Needs a real pass (VRAM fit on the RTX 5070, quality,
 structured-output reliability) before it should be treated as settled.
 

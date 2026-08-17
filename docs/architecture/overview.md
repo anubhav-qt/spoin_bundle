@@ -1,4 +1,4 @@
-# Spoin — Architecture Overview
+# Spoin -- Architecture Overview
 
 > Read this first. It is the mental model everything else assumes.
 > If you only read one document before touching the codebase, read this one.
@@ -16,7 +16,7 @@ Web first. A React Native app comes later and shares this exact backend.
 > **The feed read path must never touch an LLM.**
 
 A swipe is a ~50ms interaction. An LLM call is 2–10 seconds. These cannot coexist on
-one code path. Therefore Spoin is not "an app that calls an LLM" — it is:
+one code path. Therefore Spoin is not "an app that calls an LLM" -- it is:
 
 - a **content factory** (slow, async, batched, expensive), feeding
 - a **content warehouse** (Postgres), read by
@@ -30,7 +30,7 @@ Generation costs money and is rate-limited. So we do **not** generate
 "Anubhav's card about Kubernetes." We generate "a card about Kubernetes at
 difficulty 3", store it once, and serve it to everyone who qualifies.
 
-**Personalization is selection and ranking over a shared corpus — not generation.**
+**Personalization is selection and ranking over a shared corpus -- not generation.**
 
 This is the same shape as a real recommender system, and it is the single most
 important thing to internalise before reading any other doc.
@@ -64,12 +64,12 @@ important thing to internalise before reading any other doc.
    LOOP             │  taste vector + difficulty calibration│
                     └──────────────────────────────────────┘
 
-   SIDE PATH:  Card Chat — synchronous, streaming, per-user, rate-limited.
+   SIDE PATH:  Card Chat -- synchronous, streaming, per-user, rate-limited.
                Deliberately separate from the feed: different latency budget,
                different cost profile, different failure mode.
 ```
 
-Each subsystem has a **different performance and cost profile**. That — not tidiness —
+Each subsystem has a **different performance and cost profile**. That -- not tidiness --
 is why they are separated. You cannot tune them together.
 
 ## Subsystem responsibilities
@@ -114,10 +114,10 @@ These are not style preferences. Breaking any of them breaks the architecture.
 
 ## Where to go next
 
-- [ADR index](../adr/) — every significant decision and *why*
-- [content-model.md](content-model.md) — what a card actually is
-- [ADR-0021](../adr/0021-ascii-scene-library.md) / [ADR-0022](../adr/0022-dual-titles.md) —
+- [ADR index](../adr/) -- every significant decision and *why*
+- [content-model.md](content-model.md) -- what a card actually is
+- [ADR-0021](../adr/0021-ascii-scene-library.md) / [ADR-0022](../adr/0022-dual-titles.md) --
   how cards get a personality (ASCII scenes, playful titles) without the write path losing
   the literal, machine-readable version of what a card teaches
-- [generation-pipeline.md](generation-pipeline.md) — how the corpus gets filled
-- `docs/architecture/feed-algorithm.md` — candidate → filter → rank *(not yet written)*
+- [generation-pipeline.md](generation-pipeline.md) -- how the corpus gets filled
+- `docs/architecture/feed-algorithm.md` -- candidate → filter → rank *(not yet written)*

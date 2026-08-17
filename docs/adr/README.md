@@ -1,14 +1,14 @@
 # Architecture Decision Records
 
 An ADR captures **one significant decision and the reasoning behind it**, at the moment
-it was made. The value is not the decision — it's the *why*, which is otherwise lost
+it was made. The value is not the decision -- it's the *why*, which is otherwise lost
 within weeks.
 
 ## Why we bother
 
 Two people, one codebase. Six months from now neither of us will remember why we
 picked `procrastinate` over Celery, and we will waste an afternoon re-litigating it.
-An ADR is how you disagree with a past decision *productively* — you read the original
+An ADR is how you disagree with a past decision *productively* -- you read the original
 reasoning, check whether its assumptions still hold, and supersede it if they don't.
 
 ## When to write one
@@ -30,7 +30,7 @@ Copy `TEMPLATE.md`. Number sequentially. Never renumber.
 
 An ADR is immutable once **Accepted**. If a decision changes, write a *new* ADR that
 supersedes the old one, and add a `Superseded by ADR-NNNN` line to the original.
-Do not edit history — the record of a decision we later reversed is often more
+Do not edit history -- the record of a decision we later reversed is often more
 useful than the decision itself.
 
 ## Index

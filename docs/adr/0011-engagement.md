@@ -1,4 +1,4 @@
-# ADR-0011: Engagement — append-only events, mutable state, derived aggregates
+# ADR-0011: Engagement -- append-only events, mutable state, derived aggregates
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
@@ -73,7 +73,7 @@ recorded **separately** because they are very different quality signals:
 | `dwell_complete`    | Tab was open past the threshold | Weak. They may have been making tea             |
 
 For the progression gate they are equivalent. For **ranking and topic affinity they are
-weighted differently** — an explicit completion is among the highest-quality positive
+weighted differently** -- an explicit completion is among the highest-quality positive
 signals available, arguably better than a like since it reports understanding rather than
 enjoyment.
 
@@ -163,8 +163,8 @@ lowest-latency path.
 
 ## Revisit when
 
-- Event log storage approaches the free-tier limit — then implement retention (roll up to
+- Event log storage approaches the free-tier limit -- then implement retention (roll up to
   daily aggregates, prune raw rows beyond N days).
-- Write volume exceeds what the API instance can absorb — then a queue in front of ingest.
+- Write volume exceeds what the API instance can absorb -- then a queue in front of ingest.
 - Reconciliation regularly finds drift, indicating a bug in dual-write rather than a
   tolerable race.

@@ -8,7 +8,7 @@
 
 Spoin is a self-funded two-person project shipping to real users. The rule set by
 the team: **pay nothing until there is traction, then pay.** This is not a permanent
-austerity constraint — it is a deferral. That distinction drives the entire decision.
+austerity constraint -- it is a deferral. That distinction drives the entire decision.
 
 The binding constraint is **not** CPU, storage, or bandwidth. It is **LLM generation
 quota**, which free tiers meter in requests-per-day. A previous attempt at this product
@@ -39,12 +39,12 @@ paying must be configuration:
 ### 3. Generation runs as a scheduled batch job, not a persistent worker
 
 At free-tier quota (order of tens of generations/day) a persistent worker pool has
-nothing to do 99% of the time — and free hosting tiers sleep idle services anyway.
+nothing to do 99% of the time -- and free hosting tiers sleep idle services anyway.
 So generation runs on a **GitHub Actions cron** (~every 15 min): claim pending jobs,
 spend that slice of quota, exit.
 
 This also paces the daily quota across the day instead of exhausting it by 9am.
-The same job functions run as a persistent loop later — different entrypoint, same code.
+The same job functions run as a persistent loop later -- different entrypoint, same code.
 
 ### 4. No Redis in v1
 
@@ -52,7 +52,7 @@ Redis's three jobs here were queue, cache, and rate limiting. With a batch worke
 there is no poller to serve; at our scale Postgres handles caching and rate limiting
 fine; and `procrastinate` puts the queue in Postgres with proper locking and retries.
 Managed Redis free tiers also meter _per command_, so a polling queue burns quota while
-idle. Redis returns as a pure addition when cache pressure is measured — not before.
+idle. Redis returns as a pure addition when cache pressure is measured -- not before.
 
 ### 5. Embeddings run locally
 
@@ -81,7 +81,7 @@ hits a warm shelf.
 **Easier**
 
 - £0/month to run. Scaling up is a billing change, not a project.
-- The quota governor and priority queue are things we would need at scale anyway —
+- The quota governor and priority queue are things we would need at scale anyway --
   the constraint forces us to build them early, correctly.
 
 **Harder**
@@ -104,18 +104,18 @@ hits a warm shelf.
 
 ## Alternatives considered
 
-**Self-hosted on an always-free VM (Oracle Cloud).** More capable — no sleeping, ample
+**Self-hosted on an always-free VM (Oracle Cloud).** More capable -- no sleeping, ample
 RAM, free Redis. Lost because scaling up means a migration at the worst possible time,
 and because it makes two developers responsible for backups, TLS, patching, and
 monitoring instead of building the product.
 
 **Paying a small amount from day one (~$20/mo).** Would remove cold starts and quota
-pressure immediately. Rejected by the team as premature before traction — and note
+pressure immediately. Rejected by the team as premature before traction -- and note
 that the quota governor and priority queue are worth building regardless.
 
 ## Revisit when
 
-- **Traction arrives** — sustained daily active users, or generation quota is the
+- **Traction arrives** -- sustained daily active users, or generation quota is the
   measured reason users see a stale feed. Then execute the table in §2.
 - Any provider changes free tier terms in a way that breaks an assumption above.
 - Cold starts show up in user-reported latency complaints.

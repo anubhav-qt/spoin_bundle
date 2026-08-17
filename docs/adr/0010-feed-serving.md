@@ -1,4 +1,4 @@
-# ADR-0010: Feed serving — stratified selection, linear ranking, slate pagination
+# ADR-0010: Feed serving -- stratified selection, linear ranking, slate pagination
 
 - **Status:** Accepted
 - **Date:** 2026-08-15
@@ -7,7 +7,7 @@
 ## Context
 
 The feed is the product. It must serve in **under 100ms with no LLM call** (hard rule 1)
-and, in v1, with **no Redis** (ADR-0003) — Postgres only.
+and, in v1, with **no Redis** (ADR-0003) -- Postgres only.
 
 ## Decision
 
@@ -31,7 +31,7 @@ Instead, **stratified sampling**: the 80% is pulled from beginner candidates and
 from intermediate as separate queries, then ranked _within_ each stratum. The mix becomes
 exact and provable.
 
-Diversity works the same way — a post-ranking interleave, not a score. Five excellent cards
+Diversity works the same way -- a post-ranking interleave, not a score. Five excellent cards
 from one subtopic is a worse page than five good cards from five subtopics, and that cannot
 be expressed per-card because it depends on what preceded it.
 
@@ -58,7 +58,7 @@ SEEN       expanded AND ("Got it" tapped OR dwell >= threshold)
 
 An earlier version of this ADR made expansion-plus-dwell the only path, justified as making
 progression un-gameable. That justification was overstated: **the coverage gate was never
-the real gate — the quiz is.** Someone who taps their way to 80% coverage takes the quiz,
+the real gate -- the quiz is.** Someone who taps their way to 80% coverage takes the quiz,
 fails, and receives a remediation list pointing at the cards they skipped. The system
 self-corrects and the only cost falls on them.
 
@@ -163,7 +163,7 @@ explicit and tunable instead of buried in score arithmetic.
 
 **The difficulty mix composes correctly.** Each slate is stratified for _that topic's_ tier,
 so any interleave preserves every topic's mix. This matters because a user can be beginner
-in one topic and advanced in another — which one combined slate handles awkwardly.
+in one topic and advanced in another -- which one combined slate handles awkwardly.
 
 **Filtering never causes repeats or skips.** Per-topic slate positions persist across filter
 changes, so a user can filter to one topic, read, unfilter, and resume exactly where they
@@ -251,12 +251,12 @@ from a broken gate.
 
 **Treating explicit and dwell completion as the same signal.** Rejected for ranking purposes.
 They both satisfy the progression gate, but an explicit tap is strong evidence of
-comprehension while dwell only means a tab was open. Merging them discards that permanently —
+comprehension while dwell only means a tab was open. Merging them discards that permanently --
 and unlike most mistakes it is not recoverable from the event log if never recorded.
 
 ## Revisit when
 
-- Expansion rate proves too low for the 80% gate to be reachable — then either the gate or
+- Expansion rate proves too low for the 80% gate to be reachable -- then either the gate or
   the SEEN definition needs adjusting, informed by data rather than argument.
 - The anti-join or slate computation shows up in latency measurements.
 - There is enough engagement data that a learned ranker could beat tuned weights.

@@ -9,12 +9,12 @@
 
 A stack of title + summary cards, even with the archetype-varied teasers from
 [ADR-0017](0017-card-archetypes.md), still reads as text all the way down. We want cards
-that stop a scroll and are worth screenshotting — a silly stickman delivering a real fact, or
+that stop a scroll and are worth screenshotting -- a silly stickman delivering a real fact, or
 a two-panel scene that _shows_ a concept rather than describing it. The canonical example:
 weight classes in wrestling, panel one two stick figures facing off, panel two the heavy
 one sitting on the light one, who says "shouldn't have done this".
 
-The obvious implementation — ask the generator to draw the art — does not survive contact
+The obvious implementation -- ask the generator to draw the art -- does not survive contact
 with two facts about this system:
 
 1. **Models are unreliable at ASCII art.** Line-art rendered as a character grid is a
@@ -23,7 +23,7 @@ with two facts about this system:
    broken rather than as charming.
 2. **Our quality gate cannot catch the failure.** The gate
    (content-model.md, "Quality gate") is near-duplicate embedding comparison, topic
-   conformance, an independent difficulty re-rating, and a factual-accuracy pass — all of
+   conformance, an independent difficulty re-rating, and a factual-accuracy pass -- all of
    them operating on _text as meaning_. None of them can tell whether a grid of characters
    looks like anything. We would be adding a content dimension with no detector, into a
    **shared** corpus, which is the failure shape ADR-0007 and the gate exist to prevent.
@@ -31,7 +31,7 @@ with two facts about this system:
 Two smaller constraints that also kill free-form generation:
 
 - **Width.** A phone renders roughly 38-42 monospace columns. Models do not reliably
-  respect a column budget, and ASCII art that wraps is unrecoverable — not degraded,
+  respect a column budget, and ASCII art that wraps is unrecoverable -- not degraded,
   destroyed.
 - **It is not prose.** Art in `body` inherits the reader's prose font, prose line-height,
   and prose wrapping, all three of which break it.
@@ -44,7 +44,7 @@ generator's job is selection and dialogue, never drawing.
 ### The scene library
 
 A version-controlled catalog of hand-authored scenes (target ~40 at launch), living as
-data in the API package rather than in the database — it is content we author and review,
+data in the API package rather than in the database -- it is content we author and review,
 not content the system produces.
 
 Each scene declares:
@@ -68,8 +68,8 @@ In the same structured-output call that produces `title`/`summary`/`body`, the m
 additionally return a `visual_id` (a key from the catalog, whose `description` list is
 supplied in the prompt) and the text for that scene's slots. It never returns art.
 
-This is a task models are actually good at — pick the fitting item from a described list,
-write a one-line joke that lands — and it inherits the batching economics of
+This is a task models are actually good at -- pick the fitting item from a described list,
+write a one-line joke that lands -- and it inherits the batching economics of
 [ADR-0005](0005-batch-llm-calls.md) for free: no extra request, just extra fields.
 
 ### Card schema
@@ -93,7 +93,7 @@ The model is trusted for taste, never for constraints:
    overflow.
 2. **A `visual_id` not in the catalog is dropped.** Same fallback.
 3. **A scene may appear on at most two active cards within a topic.** Checked by
-   counting active cards in the topic at insert/activation time — _not_ trusted to the
+   counting active cards in the topic at insert/activation time -- _not_ trusted to the
    prompt. The model generates in batches of ~10 and cannot see the rest of the corpus,
    which is exactly the reasoning behind requiring intra-batch dedup on top of
    corpus dedup (content-model.md, "Near-duplicate detection"). The third and later
@@ -110,8 +110,8 @@ Every one of these degrades to "a card with no art", never to "a broken card".
 - `ascii` joins the derived `archetype` set (ADR-0017), derived trivially from
   `visual_id is not null`. It stays consistent with that ADR's rule: derived, never
   self-reported.
-- Art is expected **primarily on hero cards** — the one-per-subtopic anchors of
-  [ADR-0018](0018-hero-mechanism-and-teaser-refinements.md) — not uniformly. A joke
+- Art is expected **primarily on hero cards** -- the one-per-subtopic anchors of
+  [ADR-0018](0018-hero-mechanism-and-teaser-refinements.md) -- not uniformly. A joke
   format used on all ~750 cards of a topic is not a joke format, it is a layout.
 
 ### Accessibility
@@ -145,11 +145,11 @@ screen reader gets a sentence rather than a character grid.
 
 **Let the generator draw the art, gate it with a vision model.** Rejected on cost and on
 honesty: it adds a per-card cloud request to a project whose entire generation economics
-(ADR-0003, ADR-0005) rest on one request validating twenty cards — and "does this look
+(ADR-0003, ADR-0005) rest on one request validating twenty cards -- and "does this look
 like a fat stickman" is a judgment we would then be trusting a model to make about
 another model's spatial output, with no ground truth.
 
-**Generate art freely and eyeball a sample.** Rejected — this is the trap. Five
+**Generate art freely and eyeball a sample.** Rejected -- this is the trap. Five
 hand-checked cards look fine; the failures land in the other 745 where nobody looks.
 Shared corpus, no detector.
 
@@ -157,7 +157,7 @@ Shared corpus, no detector.
 freezes every drawing at generation time, so fixing a scene means a regeneration pass and
 new `version` rows for a change that has nothing to do with the card's content.
 
-**Put the art in `body` as a fenced block.** Rejected — it inherits prose typography and
+**Put the art in `body` as a fenced block.** Rejected -- it inherits prose typography and
 wrapping, and it makes width a text-generation problem again rather than a layout one.
 
 **No cap on scene reuse, rely on the prompt to vary.** Rejected for the batching reason
@@ -166,7 +166,7 @@ above: a model generating ten cards cannot know what the other seventy-four alre
 ## Revisit when
 
 - The library is large enough, or a topic broad enough, that the two-per-topic cap starts
-  stripping visuals from cards that would benefit — the signal to grow the catalog or
+  stripping visuals from cards that would benefit -- the signal to grow the catalog or
   reconsider the cap.
 - Engagement data shows art-bearing cards are _not_ outperforming plain ones, which would
   mean the authoring cost is buying charm we like and users don't.

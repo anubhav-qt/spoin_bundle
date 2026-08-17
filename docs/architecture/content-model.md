@@ -1,4 +1,4 @@
-# Content Model — what a card is
+# Content Model -- what a card is
 
 > Prerequisite: [`overview.md`](overview.md). This document assumes you understand
 > that cards are **generated once and shared across users**, and that the feed read
@@ -44,12 +44,12 @@ card
 | Field | Origin |
 |---|---|
 | `title`, `canonical_title`, `summary`, `body` | **Generated** (or authored, for user-submitted cards) |
-| `visual_id`, `visual_slots` | **Selected** by the generator from a curated catalog — never drawn by it, and validated deterministically after (see [ADR-0021](../adr/0021-ascii-scene-library.md)) |
+| `visual_id`, `visual_slots` | **Selected** by the generator from a curated catalog -- never drawn by it, and validated deterministically after (see [ADR-0021](../adr/0021-ascii-scene-library.md)) |
 | `difficulty` | **Requested** at generation time, then **independently verified** by the quality gate |
 | `topic_id` | Requested at generation time, verified by the quality gate |
 | `content_embedding` | **Derived** locally, post-generation |
-| `archetype` | **Derived** locally from `body`, post-generation — never requested, never LLM-self-reported (see [ADR-0017](../adr/0017-card-archetypes.md)) |
-| `is_hero` | **Planned** by a curriculum/content step, one per subtopic — today set by the fixture seeder only (see below); never a per-card LLM self-report |
+| `archetype` | **Derived** locally from `body`, post-generation -- never requested, never LLM-self-reported (see [ADR-0017](../adr/0017-card-archetypes.md)) |
+| `is_hero` | **Planned** by a curriculum/content step, one per subtopic -- today set by the fixture seeder only (see below); never a per-card LLM self-report |
 | `status`, `version`, `family_id` | **System-owned**. Never set by the generator |
 
 ### On `title` / `canonical_title`
@@ -61,13 +61,13 @@ path). `canonical_title` is the literal, descriptive name of the concept and is 
 present. `CardDraft.canonical_title` is a required field (`generation/base.py`), and
 `langchain_impl.py`'s card-writing prompt explicitly instructs the model not to make it
 identical to `title` every time. What's still open: whether the *proportion* of playful
-titles the prompt actually produces matches ADR-0022's intent — unverified without a
+titles the prompt actually produces matches ADR-0022's intent -- unverified without a
 live Gemini key.
 
 **`canonical_title` is the default for every consumer except the feed face.** Quiz stems,
 remediation links, progress and coverage lists, and search all read it. The one that is
 easy to get wrong and silent when you do: the generation prompt's already-covered list
-takes **both** — canonical so the model can tell a subject is taken, display so it doesn't
+takes **both** -- canonical so the model can tell a subject is taken, display so it doesn't
 invent the same joke twice.
 
 `content_embedding` stays derived from `body`. Neither title feeds dedup.
@@ -78,10 +78,10 @@ invent the same joke twice.
 does not.** Cards may carry an ASCII scene. The generator **selects** a scene from a
 curated, hand-authored catalog and writes its dialogue slots; it never draws art. Models
 are unreliable at ASCII art and none of the four quality-gate checks below can detect a
-broken drawing — the catalog is what replaces the missing detector.
+broken drawing -- the catalog is what replaces the missing detector.
 `card.visual_id`/`visual_slots` and `CardDraft.visual_id`/`visual_slots` exist (so a
 future catalog needs no migration or corpus regeneration to land), but with no catalog to
-select from, nothing populates them today — see
+select from, nothing populates them today -- see
 [generation-pipeline.md](generation-pipeline.md).
 
 The card stores a reference plus text, never rendered art, so fixing a scene improves
@@ -107,30 +107,30 @@ is the safety net, not the design.
 
 ### On `archetype`
 
-A set of content-shape tags — `code`, `diagram`, `comparison`, `ascii`, any subset, `[]`
-for plain prose — used by the web client to pick a collapsed-state preview shape (a code
+A set of content-shape tags -- `code`, `diagram`, `comparison`, `ascii`, any subset, `[]`
+for plain prose -- used by the web client to pick a collapsed-state preview shape (a code
 snippet gets a language badge + first line, a diagram gets a breadcrumb, and so on).
 Full reasoning in [ADR-0017](../adr/0017-card-archetypes.md); the one thing worth
 repeating here: it is **derived, not requested**. Unlike `difficulty`, whether a body
 contains a fenced code block is objectively checkable from the text itself, so there is
-no self-report to independently verify — the classifier (`content/archetype.py`) just
+no self-report to independently verify -- the classifier (`content/archetype.py`) just
 runs on `body` after it exists. The generation prompt is still expected to *use* these
 markdown shapes where a subtopic calls for it (same spirit as `summary` below), it just
 never emits `archetype` as a field.
 
 `ascii` follows the same rule and is the easiest case of all: it is derived from
 `visual_id is not null` (see [ADR-0021](../adr/0021-ascii-scene-library.md)). Note it is
-derived from the *field*, not from `body` — ASCII scenes deliberately live outside the
+derived from the *field*, not from `body` -- ASCII scenes deliberately live outside the
 markdown so the renderer owns their monospace box and column width.
 
 ### On `is_hero`
 
 The card the web client renders as a never-collapsed visual anchor, with distinct
-typography and a border treatment. Real mechanism (not yet built — see
+typography and a border treatment. Real mechanism (not yet built -- see
 [docs/tasks/0006](../tasks/0006-curated-hero-cards.md)): a content-planning step
 designates exactly one hero per subtopic. Until that exists, the fixture seeder marks
 the first card listed per subtopic. Either way this is a **planning decision**, not a
-per-card judgment the generator makes about its own output — same category of thing as
+per-card judgment the generator makes about its own output -- same category of thing as
 `status`/`version`, just not fully automated yet.
 
 ### On `source` / `author_id`
@@ -176,7 +176,7 @@ Two self-correcting rules follow:
 topic_edge(from_topic_id, to_topic_id, kind='deep_dive')
 ```
 
-A **flat edge, not a tree** — hierarchy would rebuild the unbounded-nesting problem one
+A **flat edge, not a tree** -- hierarchy would rebuild the unbounded-nesting problem one
 level up. Deep-dive topics are created as canonical topics immediately but get curricula
 lazily, on first subscription. This seeds the topic graph and helps ADR-0004: a user
 typing "linear algebra" later matches an existing topic instead of minting a new one.
@@ -195,14 +195,14 @@ Full reasoning in [ADR-0009](../adr/0009-quiz-gated-progression.md), entry tier 
 [ADR-0027](../adr/0027-self-selected-entry-tier.md).
 
 **Difficulty past your entry tier is earned; the entry tier itself is trusted.** The user
-picks their entry tier at subscribe time and starts there immediately — no quiz gates it.
+picks their entry tier at subscribe time and starts there immediately -- no quiz gates it.
 Quizzes at or below that tier are open for unlimited practice retries (never change
 progression); promotion past it still requires the same 80%-coverage-gated quiz described
 below.
 
 ```
 seen 80% of cards in EVERY subtopic of a tier
-   └──▶ tier quiz unlocks   (LATCHED — never recomputed)
+   └──▶ tier quiz unlocks   (LATCHED -- never recomputed)
          └──▶ pass at 80% ──▶ promoted to next tier
                └──▶ ... ──▶ advanced ──▶ mastery quiz
 ```
@@ -243,7 +243,7 @@ current tier (earned via quiz, see above) and the feed mixes levels around it.
 
 | User level | Current | Lower | Higher |
 |---|---|---|---|
-| Beginner | 80% | — | 20% (intermediate) |
+| Beginner | 80% | -- | 20% (intermediate) |
 | Intermediate | 70% | 20% (beginner) | 10% (advanced) |
 | Advanced | 90% | 8% (intermediate) | 2% (beginner) |
 
@@ -257,11 +257,11 @@ difficulty user-selected, but do not discard the data needed to make it adaptive
 ### When the pool cannot satisfy the mix
 
 **Partially superseded by [ADR-0026](../adr/0026-one-shot-generation-to-completion.md):**
-point 2 below (the async fill trigger) no longer applies — generation is now a one-shot
+point 2 below (the async fill trigger) no longer applies -- generation is now a one-shot
 run per topic to a fixed budget, not an ongoing refill loop, so there is no recurring
 "starved slot" to trigger a fill for. Whether points 1/3/4 (degraded mode, hysteresis,
-end-of-feed copy) still apply during a topic's *initial* one-shot run — the window before
-its cards exist at all — is flagged as an open question in ADR-0026 and not resolved here.
+end-of-feed copy) still apply during a topic's *initial* one-shot run -- the window before
+its cards exist at all -- is flagged as an open question in ADR-0026 and not resolved here.
 
 The mix is a **target, not a guarantee**. With a thin corpus under free-tier quota,
 this will fire constantly. Policy (see the note above on which parts still hold):
@@ -320,7 +320,7 @@ Note the division of labour established in [ADR-0007](../adr/0007-curriculum-dri
 **detection** (below) guarantees *correctness*. We keep both. A cheap preventive layer never
 earns the right to remove the check.
 
-### Near-duplicate detection — unchanged by ADR-0030
+### Near-duplicate detection -- unchanged by ADR-0030
 
 Embed the card body locally (`fastembed`, free and unlimited) and compare against
 existing cards **within the same subtopic**. Above the duplicate threshold, reject.
@@ -333,25 +333,25 @@ earlier in the same batch), before insert. See `generation/dedup.py`.
 Note this is a **different embedding** from the topic embedding used for canonicalization
 in ADR-0004. Same technique, different vectors, different thresholds.
 
-`card_duplicate_threshold` is **`0.9`, explicitly provisional** — never calibrated against
+`card_duplicate_threshold` is **`0.9`, explicitly provisional** -- never calibrated against
 real embeddings (only the deterministic `HashEmbedder` is exercised in tests, and it is "not
 semantically meaningful" by its own docstring). Shipped more conservative than the original
 `0.93` guess pending real `fastembed` data.
 
 **A near-duplicate rejection feeds forward.** A subtopic-tier's most recent near-duplicate
 `rejected_card` bodies (capped by `max_duplicate_feedback_bodies`) are shown to the NEXT
-`generate_cards` call for that same subtopic-tier as content to avoid reproducing — prevention
+`generate_cards` call for that same subtopic-tier as content to avoid reproducing -- prevention
 learning from a detection failure, not just a one-off discard. See ADR-0030's "Duplicate-
 content feedback loop" section for the exact scope and the same-run limitation.
 
-### Topic conformance — folded into pass 1, not a separate embedding check
+### Topic conformance -- folded into pass 1, not a separate embedding check
 
 ADR-0030 replaced the standalone topic-conformance embedding comparison with something more
 direct: pass 1 is shown the card's canonical topic and **edits the content** to actually
 belong to it, rather than a cosine threshold merely flagging drift for disposal. `topic_id`
-itself is never changed — only whether the content earns that assignment.
+itself is never changed -- only whether the content earns that assignment.
 
-### Difficulty conformance — independent judgment, now a two-pass correction+verification
+### Difficulty conformance -- independent judgment, now a two-pass correction+verification
 
 The subtlety that makes or breaks this check, unchanged from the original design:
 
@@ -361,19 +361,19 @@ The subtlety that makes or breaks this check, unchanged from the original design
   disagree, and disagreement is the entire point of a gate.
 
 What changed: rather than one reject-only judge call, difficulty is confirmed in **pass 2**
-(`verify_cards`) — pass 1 never sees the requested difficulty, so it can't anchor an edit
+(`verify_cards`) -- pass 1 never sees the requested difficulty, so it can't anchor an edit
 toward it; pass 2 sees it and gives a final, independent `confirmed_difficulty`, stored on
 `Card.judged_difficulty` alongside the requested `Card.difficulty`. Both passes batch ~20
 cards per request (`judge_batch_size`), same batching principle as
-[ADR-0005](../adr/0005-batch-llm-calls.md) — affordable to run on everything.
+[ADR-0005](../adr/0005-batch-llm-calls.md) -- affordable to run on everything.
 
 Both the card writer (`generate_cards`) and both gate passes also accept
-`difficulty_examples` — a few example bodies per tier, hand-curated (not yet authored, see
+`difficulty_examples` -- a few example bodies per tier, hand-curated (not yet authored, see
 [docs/tasks/0011](../tasks/0011-difficulty-example-catalog.md)), used only for a **standalone**
 subtopic-tier. A **linked** tier (multiple difficulties sharing a `subtopic_group_id`)
 already gets real, concept-specific calibration from `builds_on` instead.
 
-### Factual accuracy — fixed in pass 1, not just flagged
+### Factual accuracy -- fixed in pass 1, not just flagged
 
 The original design ran this as a reject-only check alongside difficulty. ADR-0030 makes it
 correctable: pass 1 fixes a confidently-wrong fact **in the body directly**, the same pass
@@ -452,12 +452,12 @@ SEEN       expanded AND ("Got it" tapped OR dwell >= threshold)
 ```
 
 Scrolling past never counts. Beyond that, either an explicit **"Got it"** tap or a dwell
-threshold marks the card seen — fast readers tap, everyone else is covered by dwell with no
+threshold marks the card seen -- fast readers tap, everyone else is covered by dwell with no
 friction. The two are recorded as **separate events**: explicit completion is a much stronger
 signal for ranking than elapsed time.
 
 **Superseded by [ADR-0012](../adr/0012-feed-visual-design.md):** "Got it" no longer lives at
-the end of the expanded body — it moved to a toggleable circular icon in the action row, the
+the end of the expanded body -- it moved to a toggleable circular icon in the action row, the
 only "Got it" affordance now. The icon stays disabled until the card has been expanded at
 least once this session, so "expanded AND" above still holds: the icon is a faster way to
 confirm completion after a look, not a way to skip the look.
@@ -476,7 +476,7 @@ new entries in the shared corpus.
 - `title` character cap: pick N, and check it against the longest realistic render.
 - Duplicate threshold for `content_embedding`: shipped at `0.9` (ADR-0030) as an explicit,
   more-conservative-than-the-original-`0.93` placeholder. Still needs the same calibration
-  treatment the topic thresholds in ADR-0004 originally used — note ADR-0004's own
+  treatment the topic thresholds in ADR-0004 originally used -- note ADR-0004's own
   topic-matching thresholds are gone as of ADR-0025, so this is no longer "the same
   technique reused," just a separately-needed calibration for a different check
   (near-duplicate card detection, not topic matching).

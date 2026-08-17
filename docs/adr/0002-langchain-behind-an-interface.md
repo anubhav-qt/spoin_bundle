@@ -14,7 +14,7 @@ Two things needed clarifying before committing:
 
 **1. LangChain is not an orchestrator.** An early framing was that "LangChain will
 deploy 3 workers in parallel" for 3 custom topics. It will not. LangChain is an
-in-process composition library — it has no scheduler, no durable state, no
+in-process composition library -- it has no scheduler, no durable state, no
 retry-across-restart, and no distributed execution. If the process dies mid-chain,
 the work is gone. Parallelism and durability come from the job queue, not LangChain.
 
@@ -29,7 +29,7 @@ to equivalent and simpler to debug. LangChain also has a well-earned reputation 
 API churn across versions.
 
 What it does genuinely buy us: provider abstraction, retry/fallback chains, and
-**LangSmith tracing** — full visibility into every prompt, completion, token count,
+**LangSmith tracing** -- full visibility into every prompt, completion, token count,
 latency, and failure. That last item is the difference between debugging prompts and
 guessing at them, and on its own justifies the dependency.
 
@@ -39,7 +39,7 @@ guessing at them, and on its own justifies the dependency.
 
 ```
 src/generation/
-  base.py          # ContentGenerator — our interface. Pydantic in, Pydantic out.
+  base.py          # ContentGenerator -- our interface. Pydantic in, Pydantic out.
   langchain_impl.py # the ONLY module in the codebase that imports langchain
   fake.py          # deterministic in-memory impl for tests and local dev
 ```
@@ -98,7 +98,7 @@ Today it is a single structured call and LangGraph would be overhead.
 **Update:** the "multi-step stateful workflow" condition above was hit by the first
 vertical slice (curriculum → per-subtopic generation → gate) and revisited in
 [ADR-0024](0024-langgraph-for-card-generation-pipeline.md). LangGraph is now used, but
-scoped to _inside_ one job's execution — the worker/`GenerationJob` split this ADR
+scoped to _inside_ one job's execution -- the worker/`GenerationJob` split this ADR
 describes for orchestration vs. composition is unchanged; LangGraph lives entirely on
 the composition side of that line, confined to `generation/pipeline.py` the same way
 `langchain*` is confined to `langchain_impl.py`.

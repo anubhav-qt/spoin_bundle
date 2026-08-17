@@ -16,7 +16,7 @@ What we are doing. Stated in the active voice, as a commitment.
 ## Consequences
 
 What becomes easier. What becomes harder. What we are now committed to.
-Be honest about the costs — an ADR with no downsides listed is an ADR nobody trusts.
+Be honest about the costs -- an ADR with no downsides listed is an ADR nobody trusts.
 
 ## Alternatives considered
 

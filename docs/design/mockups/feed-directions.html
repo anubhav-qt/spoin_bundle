@@ -1,7 +1,7 @@
 <title>Feed Directions</title>
 <style>
 /* ============================================================
-   TOKENS — two engineering-diagram idioms, one accent
+   TOKENS -- two engineering-diagram idioms, one accent
    dark  = populated circuit board (copper trace on board laminate)
    light = schematic / blueprint sheet (same copper as annotation ink)
    ============================================================ */
@@ -177,8 +177,8 @@ body {
   display: flex;
   flex-direction: column;
   /* A position:sticky descendant (the station label, two levels down inside
-     the scrolling thread) glitches — Chromium/WebKit will occasionally paint
-     a ghost sliver of the previous element above it — when its clipping
+     the scrolling thread) glitches -- Chromium/WebKit will occasionally paint
+     a ghost sliver of the previous element above it -- when its clipping
      ancestor has both border-radius and overflow:hidden. Forcing this element
      onto its own compositing layer and giving it paint containment is the
      documented workaround: it stops the sticky repaint from needing to
@@ -209,7 +209,7 @@ body {
 .pips i[data-on="true"] { background: var(--copper); }
 
 /* ============================================================
-   VARIANT A — thread (scroll, stations, expand in place)
+   VARIANT A -- thread (scroll, stations, expand in place)
    ============================================================ */
 .thread-scroll {
   flex: 1;
@@ -302,7 +302,7 @@ body {
 }
 .tcard-actions button:hover { color: var(--ink); }
 
-/* Every action is the same circular outline shape — quiet until touched, no
+/* Every action is the same circular outline shape -- quiet until touched, no
    label needed once the glyph itself is legible at a glance. */
 .tcard-action-icon {
   width: 28px; height: 28px; flex: 0 0 auto;
@@ -321,7 +321,7 @@ body {
 .tcard-actions-spacer { flex: 1; }
 
 /* The only action that skips reading and marks the card seen directly, so it
-   sits apart from the rest by both position and spacing — extreme right,
+   sits apart from the rest by both position and spacing -- extreme right,
    its own circular shape, not just another item in the row. */
 .tcard-gotit-icon {
   width: 26px; height: 26px;
@@ -342,7 +342,7 @@ body {
 .tcard-gotit-icon:disabled:hover { border-color: var(--line-strong); color: var(--ink-3); }
 
 /* ============================================================
-   VARIANT B — one-at-a-time deck (swipe)
+   VARIANT B -- one-at-a-time deck (swipe)
    ============================================================ */
 .deck-wrap {
   flex: 1;
@@ -457,7 +457,7 @@ body {
 .deck-nav svg { width: 15px; height: 15px; }
 
 /* ============================================================
-   VARIANT C — hybrid (thread + focused sheet)
+   VARIANT C -- hybrid (thread + focused sheet)
    ============================================================ */
 .hybrid-scroll {
   flex: 1;
@@ -597,10 +597,10 @@ body {
 </style>
 
 <div class="intro">
-  <div class="eyebrow">Spoin — feed shell, three directions</div>
+  <div class="eyebrow">Spoin -- feed shell, three directions</div>
   <h1>Same cards, three ways to read them</h1>
   <p>Real content from the Kubernetes and Distributed Systems corpus, laid into each
-  interaction shape. Everything here is disposable throwaway markup for comparison —
+  interaction shape. Everything here is disposable throwaway markup for comparison --
   pick a direction and the real build starts from zero.</p>
 </div>
 
@@ -611,17 +611,17 @@ body {
 </div>
 
 <!-- ============================================================ -->
-<!-- STAGE A — THREAD                                              -->
+<!-- STAGE A -- THREAD                                              -->
 <!-- ============================================================ -->
 <div class="stage" data-active="true" id="stage-thread">
   <div class="stage-copy">
-    <h2>Thread — a scroll of stations</h2>
+    <h2>Thread -- a scroll of stations</h2>
     <p>Every card is on screen at once, grouped under sticky station labels
     (topic, or subtopic when filtered to one topic). Tap a card to expand it
     in place; the rest of the thread doesn't move.</p>
     <p class="tradeoff"><b>Good for:</b> skimming several topics, comparing cards,
     a session with no fixed shape. <b>Costs:</b> nothing forces you to actually
-    read — expansion is a click of intent, easy to give without meaning it.</p>
+    read -- expansion is a click of intent, easy to give without meaning it.</p>
   </div>
 
   <div class="frame">
@@ -640,7 +640,7 @@ body {
         <h3>A pod is the unit of scheduling</h3>
         <p class="summary">Kubernetes never schedules a container. It schedules a pod.</p>
         <div class="tcard-body"><div class="tcard-body-inner">
-          <p>Kubernetes never schedules a container — it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on <code>localhost</code> and are always placed on the same node, together, or not at all.</p>
+          <p>Kubernetes never schedules a container -- it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on <code>localhost</code> and are always placed on the same node, together, or not at all.</p>
           <p>This matters the moment you try to scale: you scale pods, not containers. If you put two things in one pod that need to scale independently, you have made a mistake that is awkward to undo later.</p>
         </div></div>
         <div class="tcard-actions">
@@ -674,7 +674,7 @@ body {
         <h3>The scheduler filters, then scores</h3>
         <p class="summary">Placement is two phases, and only the first one can fail outright.</p>
         <div class="tcard-body"><div class="tcard-body-inner">
-          <p><strong>Filtering</strong> removes nodes that cannot run the pod at all — insufficient CPU or memory, a taint the pod does not tolerate. If filtering removes every node, the pod stays <code>Pending</code>.</p>
+          <p><strong>Filtering</strong> removes nodes that cannot run the pod at all -- insufficient CPU or memory, a taint the pod does not tolerate. If filtering removes every node, the pod stays <code>Pending</code>.</p>
           <p><strong>Scoring</strong> ranks whatever survived, preferring spread across nodes and better resource fit. Scoring never fails; it only picks a winner.</p>
         </div></div>
         <div class="tcard-actions">
@@ -711,7 +711,7 @@ body {
         <p class="summary">A single machine is up or down. A distributed system is neither.</p>
         <div class="tcard-body"><div class="tcard-body-inner">
           <p>On one machine, a component is working or it is not, and your process usually finds out immediately. Across machines, some parts work and others do not, and <strong>you cannot reliably tell which</strong>.</p>
-          <p>Almost every complication in distributed systems — retries, idempotency, consensus, timeouts — exists to cope with that one ambiguity.</p>
+          <p>Almost every complication in distributed systems -- retries, idempotency, consensus, timeouts -- exists to cope with that one ambiguity.</p>
         </div></div>
         <div class="tcard-actions">
           <button class="tcard-action-icon" aria-label="Like">
@@ -745,7 +745,7 @@ body {
         <p class="summary">It is a guess with a deadline attached.</p>
         <div class="tcard-body"><div class="tcard-body-inner">
           <p>You cannot distinguish a crashed node from a slow one. All you can do is wait a while and give up. That makes every timeout a tradeoff: too short and healthy nodes look dead; too long and real failures go unnoticed.</p>
-          <p>There is no correct value, only one tuned to a specific latency distribution — which is why a timeout copied from another system is usually wrong.</p>
+          <p>There is no correct value, only one tuned to a specific latency distribution -- which is why a timeout copied from another system is usually wrong.</p>
         </div></div>
         <div class="tcard-actions">
           <button class="tcard-action-icon" aria-label="Like">
@@ -770,17 +770,17 @@ body {
         </div>
       </article>
 
-      <div class="eof"><b>That's everything fresh</b> for these topics right now.<br>More is generating — check back soon.</div>
+      <div class="eof"><b>That's everything fresh</b> for these topics right now.<br>More is generating -- check back soon.</div>
     </div>
   </div>
 </div>
 
 <!-- ============================================================ -->
-<!-- STAGE B — DECK / SWIPE                                        -->
+<!-- STAGE B -- DECK / SWIPE                                        -->
 <!-- ============================================================ -->
 <div class="stage" id="stage-deck">
   <div class="stage-copy">
-    <h2>Swipe — one card fills the screen</h2>
+    <h2>Swipe -- one card fills the screen</h2>
     <p>Every card gets full attention by construction; there's nothing to skim
     past. Swipe or use the arrows to move; a filled dot means read, the bright
     one is where you are.</p>
@@ -814,12 +814,12 @@ body {
 </div>
 
 <!-- ============================================================ -->
-<!-- STAGE C — HYBRID                                              -->
+<!-- STAGE C -- HYBRID                                              -->
 <!-- ============================================================ -->
 <div class="stage" id="stage-hybrid">
   <div class="stage-copy">
-    <h2>Hybrid — thread to browse, sheet to read</h2>
-    <p>The thread stays a scroll of collapsed cards — title, hook, topic — so
+    <h2>Hybrid -- thread to browse, sheet to read</h2>
+    <p>The thread stays a scroll of collapsed cards -- title, hook, topic -- so
     you can see what's coming. Tapping one opens a focused reading sheet where
     dwell, "Got it", notes and Ask AI live. Two different jobs, two surfaces.</p>
     <p class="tradeoff"><b>Good for:</b> keeping the overview thread lightweight
@@ -861,7 +861,7 @@ body {
         <p class="summary">Two numbers, two completely different audiences.</p>
       </div>
 
-      <div class="eof"><b>Degraded mix right now</b> — thin pool at your level.<br>Showing what's ready; the rest fills in over the next few hours.</div>
+      <div class="eof"><b>Degraded mix right now</b> -- thin pool at your level.<br>Showing what's ready; the rest fills in over the next few hours.</div>
     </div>
 
     <div class="sheet-backdrop" id="sheet-backdrop" onclick="closeSheet()"></div>
@@ -894,7 +894,7 @@ tabs.forEach(t => t.addEventListener("click", () => {
 }));
 
 // ---------- thread: expand in place ----------
-// Cards toggle independently — opening one never closes another. Only a
+// Cards toggle independently -- opening one never closes another. Only a
 // click that lands outside every card (the empty gaps, the frame's own
 // background) closes whatever is open, matching the real app.
 document.querySelectorAll("#thread-scroll .tcard").forEach(card => {
@@ -903,7 +903,7 @@ document.querySelectorAll("#thread-scroll .tcard").forEach(card => {
     const isOpen = card.getAttribute("data-open") === "true";
     card.setAttribute("data-open", isOpen ? "false" : "true");
     // The Got it icon unlocks the first time a card opens, and stays
-    // unlocked after it closes again — it confirms a look already taken,
+    // unlocked after it closes again -- it confirms a look already taken,
     // it doesn't let you skip taking one.
     if (!isOpen) {
       const gotIt = card.querySelector(".tcard-gotit-icon");
@@ -918,7 +918,7 @@ document.getElementById("thread-scroll").addEventListener("click", (e) => {
     .forEach(card => card.setAttribute("data-open", "false"));
 });
 
-// The icon-only "got it" in the action row — reachable on a collapsed card,
+// The icon-only "got it" in the action row -- reachable on a collapsed card,
 // no expansion required, and toggleable: a stray tap on a 28px circle is
 // easy to make, so tapping it again undoes the local indicator.
 function markSeenIcon(btn, e) {
@@ -931,7 +931,7 @@ function markSeenIcon(btn, e) {
 const deckCards = [
   { topic: "Pods & scheduler", diff: 1, title: "A pod is the unit of scheduling",
     summary: "Kubernetes never schedules a container. It schedules a pod.",
-    body: "<p>Kubernetes never schedules a container — it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on localhost and are always placed on the same node, together, or not at all.</p><p>This matters the moment you try to scale: you scale pods, not containers.</p>" },
+    body: "<p>Kubernetes never schedules a container -- it schedules a <strong>pod</strong>. A pod is one or more containers that share a network namespace and storage volumes; containers in the same pod reach each other on localhost and are always placed on the same node, together, or not at all.</p><p>This matters the moment you try to scale: you scale pods, not containers.</p>" },
   { topic: "Failure & partial failure", diff: 1, title: "A timeout is not a failure detector",
     summary: "It is a guess with a deadline attached.",
     body: "<p>You cannot distinguish a crashed node from a slow one. All you can do is wait a while and give up.</p><p>That makes every timeout a tradeoff rather than a setting: too short and you declare healthy nodes dead; too long and real failures go unnoticed while requests pile up.</p><p>There is no correct value, only one tuned to a specific latency distribution.</p>" },
@@ -940,7 +940,7 @@ const deckCards = [
     body: "<p>A <strong>Lamport clock</strong> is a counter incremented on each event and carried on every message; the receiver takes max(local, received) + 1. If A causally precedes B, A's counter is lower.</p><p>The converse does not hold: a lower counter does not prove causality, only that no causal link was recorded. <strong>Vector clocks</strong> recover that, at the cost of storage proportional to the number of participants.</p>" },
   { topic: "Failure & partial failure", diff: 1, title: "Retries need backoff and jitter, not just backoff",
     summary: "Synchronised retries turn a blip into an outage.",
-    body: "<p>When a service degrades, every client fails at once, and if they all retry on the same schedule they arrive together — repeatedly.</p><p><strong>Exponential backoff</strong> spreads retries out over time. <strong>Jitter</strong> — randomising each delay — spreads them out relative to each other, which is the part that actually breaks the synchronisation.</p>" },
+    body: "<p>When a service degrades, every client fails at once, and if they all retry on the same schedule they arrive together -- repeatedly.</p><p><strong>Exponential backoff</strong> spreads retries out over time. <strong>Jitter</strong> -- randomising each delay -- spreads them out relative to each other, which is the part that actually breaks the synchronisation.</p>" },
   { topic: "Pods & scheduler", diff: 1, title: "Labels are the only way things find each other",
     summary: "There are no pointers in Kubernetes. There are label selectors.",
     body: "<p>Nothing in Kubernetes holds a reference to a pod. A Service does not contain a list of its pods; it holds a <strong>label selector</strong>, and membership is recomputed continuously.</p><p>That is why a typo in a label breaks routing silently: the selector matches nothing, and no error is raised anywhere.</p>" },
@@ -975,11 +975,11 @@ renderDeck();
 // ---------- hybrid sheet ----------
 const sheetCards = [
   { topic: "Time & ordering", title: "Wall clocks are not ordering",
-    body: "<p>Comparing timestamps from different machines to order events is unsound. Clocks drift, NTP corrections can move a clock <strong>backwards</strong>, and skew between machines routinely reaches milliseconds — an eternity next to a network round trip.</p><p>Use a monotonic clock for measuring elapsed time on one machine, and logical clocks for ordering across machines. Reserve wall-clock time for displaying to humans.</p><p>\"Last write wins, by timestamp\" is a data-loss bug wearing a conflict-resolution costume.</p>" },
+    body: "<p>Comparing timestamps from different machines to order events is unsound. Clocks drift, NTP corrections can move a clock <strong>backwards</strong>, and skew between machines routinely reaches milliseconds -- an eternity next to a network round trip.</p><p>Use a monotonic clock for measuring elapsed time on one machine, and logical clocks for ordering across machines. Reserve wall-clock time for displaying to humans.</p><p>\"Last write wins, by timestamp\" is a data-loss bug wearing a conflict-resolution costume.</p>" },
   { topic: "Time & ordering", title: "Logical clocks order what actually matters",
     body: "<p>A <strong>Lamport clock</strong> is a counter incremented on each event and carried on every message; the receiver takes max(local, received) + 1.</p><p>Vector clocks recover full causality, at the cost of storage proportional to the number of participants.</p>" },
   { topic: "Time & ordering", title: "Read-your-writes is a real guarantee with a real cost",
-    body: "<p>Under plain eventual consistency, a user can post a comment, reload, and not see it — because the read hit a replica that has not caught up.</p><p><strong>Session guarantees</strong> patch the worst of this: read-your-writes, monotonic reads, monotonic writes.</p>" },
+    body: "<p>Under plain eventual consistency, a user can post a comment, reload, and not see it -- because the read hit a replica that has not caught up.</p><p><strong>Session guarantees</strong> patch the worst of this: read-your-writes, monotonic reads, monotonic writes.</p>" },
   { topic: "Pods & scheduler", title: "Requests are for the scheduler, limits are for the kernel",
     body: "<p>A resource <strong>request</strong> is what the scheduler reserves when deciding placement. A <strong>limit</strong> is what the kernel enforces at runtime.</p><p>Exceeding a CPU limit gets you throttled. Exceeding a memory limit gets you OOM-killed. Not slow. Dead.</p>" },
 ];

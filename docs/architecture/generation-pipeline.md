@@ -93,7 +93,7 @@ gate_and_persist
 Every real generator call (curriculum, topic matching, card generation, question
 generation) goes through a shared `asyncio.Semaphore` (`SPOIN_MAX_CONCURRENT_GENERATION_CALLS`)
 — without it, a run with several topics times many subtopics each would fire dozens of
-simultaneous calls, well past `SPOIN_QUOTA_RPM`.
+simultaneous calls, well past any ladder rung's per-minute limit (ADR-0028).
 
 ## Worker: per-job isolation, not graph-level fan-out
 
@@ -142,8 +142,11 @@ same request, the same trust level as everything else in that call.
   **Not live-verified** — built and covered by mocked unit tests
   (`tests/test_langchain_impl.py`: structured-output parsing, per-item validation,
   partial-failure handling, the batched matching call), but no real Gemini key has been
-  used to confirm prompt *quality*, and no model choice has actually been evaluated
-  (ADR-0008's open question). Treat the prompts in that file as a first draft.
+  used to confirm prompt *quality*. The model **rotation mechanism** is decided
+  ([ADR-0028](../adr/0028-key-model-quota-ladder.md)); the specific model ids in the
+  default ladders are a first draft read off a rate-limit screenshot, not yet confirmed
+  against a real key (ADR-0008's still-open half). Treat the prompts in that file as a
+  first draft too.
 - **`local`** — not implemented (ADR-0008).
 
 Switching backends is a `.env` change only; nothing else in the pipeline knows or cares
@@ -151,16 +154,21 @@ which one is behind the interface.
 
 ### Quota governance
 
-`generation/quota.py`'s `QuotaGovernor` rotates through `SPOIN_GEMINI_API_KEYS`,
-tracking spend per key per day in the existing `QuotaLedger` table
-(`backend=f"gemini:{key_index}"`, `exhausted_at` set the moment a key hits
-`SPOIN_QUOTA_DAILY_REQUESTS` for the day). It opens its own short-lived DB session per
-call rather than sharing the pipeline's — the pipeline's session is deliberately
-single-writer/lock-guarded (see ADR-0024's "Harder" section), and quota bookkeeping has
-no reason to be tied to that transaction. Tested standalone
-(`tests/test_quota_governor.py`); **not wired to anything yet**, since it's only
-meaningful once real Gemini calls exist to wrap — `langchain_impl.py` calls it before
-every actual API call.
+**Redesigned in [ADR-0028](../adr/0028-key-model-quota-ladder.md)** — read that for the
+full reasoning; this is the short version. `generation/quota.py`'s `QuotaGovernor` tracks a
+grid of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits are per
+*project* (so each `SPOIN_GEMINI_API_KEYS` entry only helps if it's a genuinely separate
+project) and per *model* independently (so exhausting one model's daily quota doesn't touch
+another's). `GeminiContentGenerator` holds TWO governors — a "thinking" pool (curriculum,
+topic matching, judging, questions, quiz grading — `SPOIN_GEMINI_THINKING_LADDER`) and a
+"cards" pool (`generate_cards` only — `SPOIN_GEMINI_CARDS_LADDER`), each an ordered
+model-fallback ladder. RPD is persisted in `QuotaLedger`
+(`backend=f"gemini:{key_index}:{model}"`); RPM is in-process only and resets each worker
+run. `QuotaExhaustedError` is caught specifically at the worker's job boundary and requeues
+the job as `pending` rather than `failed` (safe because the pipeline is idempotent per
+topic, ADR-0026). Wired end to end and unit-tested (`tests/test_quota_governor.py`,
+`tests/test_worker.py`'s requeue test) — **still not live-verified against a real key**,
+same caveat as the `gemini` backend generally.
 
 ## What's missing
 

@@ -56,7 +56,7 @@ from spoin.generation.base import (
     TopicMatchQuery,
     TopicMatchResult,
 )
-from spoin.generation.quota import QuotaGovernor
+from spoin.generation.quota import QuotaGovernor, parse_ladder
 
 # ------------------------------------------------------------- wire schemas --
 
@@ -322,8 +322,15 @@ def _format_topic_match_query(query: TopicMatchQuery) -> str:
 
 
 class GeminiContentGenerator(ContentGenerator):
-    """ADR-0008: cloud, quota-bound. Always the strongest available model for the
-    curriculum pass; also generates cards until a local backend exists.
+    """ADR-0008/ADR-0028: cloud, quota-bound, two independently-rotating pools.
+
+    `_thinking` covers every call where a weak model has real consequences —
+    curriculum, topic matching, difficulty/factual judging, question
+    generation, quiz grading — and walks the (newer, better) thinking ladder.
+    `_cards` covers only `generate_cards`, pure prose that the quality gate
+    independently checks afterward, and walks the cheaper, higher-volume lite
+    ladder. Each pool has its own key x model quota grid (ADR-0028) — a call
+    to one never affects the other's remaining budget.
     """
 
     def __init__(self, settings: Settings) -> None:
@@ -334,22 +341,31 @@ class GeminiContentGenerator(ContentGenerator):
                 "(comma-separated) — none configured."
             )
         self._keys = keys
-        self._model_name = settings.gemini_model
-        self._quota = QuotaGovernor(key_count=len(keys), daily_target=settings.quota_daily_requests)
-        self._clients: dict[int, ChatGoogleGenerativeAI] = {}
+        self._thinking = QuotaGovernor(
+            key_count=len(keys), ladder=parse_ladder(settings.gemini_thinking_ladder)
+        )
+        self._cards = QuotaGovernor(
+            key_count=len(keys), ladder=parse_ladder(settings.gemini_cards_ladder)
+        )
+        self._clients: dict[tuple[int, str], ChatGoogleGenerativeAI] = {}
 
-    def _client(self, key_index: int) -> ChatGoogleGenerativeAI:
-        if key_index not in self._clients:
-            self._clients[key_index] = ChatGoogleGenerativeAI(
-                model=self._model_name,
+    def _client(self, key_index: int, model: str) -> ChatGoogleGenerativeAI:
+        cache_key = (key_index, model)
+        if cache_key not in self._clients:
+            self._clients[cache_key] = ChatGoogleGenerativeAI(
+                model=model,
                 google_api_key=self._keys[key_index],
                 temperature=0.7,
             )
-        return self._clients[key_index]
+        return self._clients[cache_key]
 
-    async def _next_client(self) -> ChatGoogleGenerativeAI:
-        index = await self._quota.acquire_key(now=datetime.now(UTC))
-        return self._client(index)
+    async def _thinking_client(self) -> ChatGoogleGenerativeAI:
+        key_index, model = await self._thinking.acquire(now=datetime.now(UTC))
+        return self._client(key_index, model)
+
+    async def _cards_client(self) -> ChatGoogleGenerativeAI:
+        key_index, model = await self._cards.acquire(now=datetime.now(UTC))
+        return self._client(key_index, model)
 
     # --------------------------------------------------------------- curriculum --
 
@@ -359,7 +375,7 @@ class GeminiContentGenerator(ContentGenerator):
         description: str,
         existing_subtopics: list[str] | None = None,
     ) -> CurriculumDraft:
-        client = await self._next_client()
+        client = await self._thinking_client()
         structured = client.with_structured_output(CurriculumDraft)
         existing_subtopics_block = ""
         if existing_subtopics:
@@ -387,7 +403,7 @@ class GeminiContentGenerator(ContentGenerator):
         if not queries:
             return BatchResult(items=[])
 
-        client = await self._next_client()
+        client = await self._thinking_client()
         structured = client.with_structured_output(_WireTopicMatchBatch)
         queries_block = "\n\n".join(_format_topic_match_query(query) for query in queries)
         prompt = [
@@ -426,7 +442,7 @@ class GeminiContentGenerator(ContentGenerator):
         existing_titles: list[str],
         builds_on: list[str],
     ) -> BatchResult[CardDraft]:
-        client = await self._next_client()
+        client = await self._cards_client()
         structured = client.with_structured_output(_WireCardBatch)
         prompt = [
             ("system", _CARDS_SYSTEM),
@@ -473,7 +489,7 @@ class GeminiContentGenerator(ContentGenerator):
         if not bodies:
             return BatchResult(items=[])
 
-        client = await self._next_client()
+        client = await self._thinking_client()
         structured = client.with_structured_output(_WireDifficultyBatch)
         bodies_block = "\n\n".join(f"{index}. {body}" for index, body in enumerate(bodies))
         prompt = [
@@ -508,7 +524,7 @@ class GeminiContentGenerator(ContentGenerator):
         if not cards:
             return BatchResult(items=[])
 
-        client = await self._next_client()
+        client = await self._thinking_client()
         structured = client.with_structured_output(_WireQuestionBatch)
         cards_block = "\n\n".join(
             f"{index}. {title}\n{body}" for index, (title, body) in enumerate(cards)
@@ -551,7 +567,7 @@ class GeminiContentGenerator(ContentGenerator):
         if not items:
             return BatchResult(items=[])
 
-        client = await self._next_client()
+        client = await self._thinking_client()
         structured = client.with_structured_output(_WireFreeTextGradeBatch)
         items_block = "\n\n".join(_format_free_text_grade_query(item) for item in items)
         prompt = [

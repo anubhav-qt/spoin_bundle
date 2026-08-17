@@ -1,12 +1,12 @@
 """Mocked unit tests for langchain_impl.py — no real Gemini key, no network.
 
 Patches `ChatGoogleGenerativeAI.with_structured_output` so every call returns a
-scripted response, and patches `QuotaGovernor.acquire_key` so nothing here opens
-a real database connection (key-rotation correctness itself is already fully
-covered by test_quota_governor.py — these tests are about the LangChain/pydantic
-plumbing one layer up). See langchain_impl.py's module docstring for why prompt
-QUALITY (does the model write good cards) is explicitly NOT covered here — there
-is no real key to verify that against.
+scripted response, and patches both quota pools' `acquire` so nothing here
+opens a real database connection (key/model-rotation correctness itself is
+already fully covered by test_quota_governor.py — these tests are about the
+LangChain/pydantic plumbing one layer up). See langchain_impl.py's module
+docstring for why prompt QUALITY (does the model write good cards) is
+explicitly NOT covered here — there is no real key to verify that against.
 """
 
 from __future__ import annotations
@@ -28,12 +28,16 @@ from spoin.generation.langchain_impl import (
     _WireQuestionBatch,
 )
 
+_THINKING_MODEL = "gemini-thinking-test"
+_CARDS_MODEL = "gemini-cards-test"
+
 
 def _settings(**overrides: object) -> Settings:
     values: dict[str, object] = {
         "_env_file": None,
         "gemini_api_keys": "key-a,key-b",
-        "quota_daily_requests": 1500,
+        "gemini_thinking_ladder": f"{_THINKING_MODEL}:20:5",
+        "gemini_cards_ladder": f"{_CARDS_MODEL}:500:15",
     }
     values.update(overrides)
     return Settings(**values)  # type: ignore[arg-type]
@@ -52,7 +56,12 @@ def _mock_structured(return_value: object, side_effect: object = None) -> AsyncM
 
 def _generator(**settings_overrides: object) -> GeminiContentGenerator:
     generator = GeminiContentGenerator(_settings(**settings_overrides))
-    generator._quota.acquire_key = AsyncMock(return_value=0)  # type: ignore[method-assign]
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        return_value=(0, _THINKING_MODEL)
+    )
+    generator._cards.acquire = AsyncMock(  # type: ignore[method-assign]
+        return_value=(0, _CARDS_MODEL)
+    )
     return generator
 
 
@@ -61,13 +70,15 @@ def test_construction_requires_at_least_one_key() -> None:
         GeminiContentGenerator(_settings(gemini_api_keys=""))
 
 
-def test_client_is_cached_per_key_index() -> None:
+def test_client_is_cached_per_key_and_model() -> None:
     generator = _generator()
-    first = generator._client(0)
-    second = generator._client(0)
-    third = generator._client(1)
+    first = generator._client(0, "model-a")
+    second = generator._client(0, "model-a")
+    third_key = generator._client(1, "model-a")
+    third_model = generator._client(0, "model-b")
     assert first is second
-    assert first is not third
+    assert first is not third_key
+    assert first is not third_model
 
 
 async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:

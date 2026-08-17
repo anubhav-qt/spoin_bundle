@@ -34,6 +34,7 @@ from spoin.embeddings import Embedder, get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline import run_generation_pipeline
+from spoin.generation.quota import QuotaExhaustedError
 
 logger = logging.getLogger("spoin.worker")
 
@@ -64,6 +65,19 @@ async def _run_job(
         topics = report.get("topics", [])
         accepted = topics[0].get("accepted", 0) if topics else 0
         logger.info("job %s completed (topic=%s, cards_accepted=%s)", job_id, topic_id, accepted)
+    except QuotaExhaustedError as exc:
+        # ADR-0028: not a bug, an expected daily ceiling. Requeue rather than
+        # fail -- run_generation_pipeline is idempotent (ADR-0026), so the next
+        # cron pass (after tomorrow's quota resets) just picks up wherever this
+        # one stopped, instead of the topic being stuck "failed" forever next
+        # to jobs that failed for a real reason.
+        logger.info("job %s paused: quota exhausted (topic=%s): %s", job_id, topic_id, exc)
+        async with session_scope() as session:
+            job = await session.get(GenerationJob, job_id)
+            if job is not None:
+                job.status = "pending"
+                job.attempts += 1
+                job.last_error = f"quota exhausted, requeued: {exc}"[:2000]
     except Exception as exc:
         logger.exception("job %s failed (topic=%s)", job_id, topic_id)
         async with session_scope() as session:

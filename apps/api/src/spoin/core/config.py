@@ -37,24 +37,41 @@ class Settings(BaseSettings):
     #: Read it through `cors_origin_list`.
     cors_origins: str = "http://localhost:3000"
 
-    # -- generation (ADR-0002, ADR-0008) --------------------------------------
+    # -- generation (ADR-0002, ADR-0008, ADR-0028) -----------------------------
     # `fake` everywhere except production: tests and local dev must never call a
     # real model, never burn quota, and run in milliseconds.
     generator: GeneratorBackend = "fake"
-    gemini_model: str = "gemini-2.5-flash"
-    #: Comma-separated, same plain-string reasoning as `cors_origins` (a list-typed
-    #: setting would make pydantic-settings JSON-parse the env var). One free-tier
-    #: Gemini key per project; the quota governor (generation/quota.py) rotates
-    #: through these when the active one hits `quota_daily_requests` for the day.
+    #: Comma-separated. Each entry is assumed to be its OWN Google Cloud project
+    #: (a key does NOT get its own quota pool otherwise — Gemini rate limits are
+    #: per-project, not per-key; see ADR-0028). The quota governor
+    #: (generation/quota.py) treats each entry as one row in its key x model grid.
     gemini_api_keys: str = ""
+    #: "model:rpd:rpm,model:rpd:rpm,..." — an ORDERED fallback ladder, strongest
+    #: model first. Used for every call except `generate_cards`: curriculum,
+    #: topic matching, difficulty/factual judging, question generation, and quiz
+    #: grading are all high-stakes enough to want the best model available
+    #: (ADR-0008's "trusted for taste, never for constraints" rule — these are
+    #: the calls with real consequences if the model is weak). A model is only
+    #: skipped once every configured key is exhausted for it (ADR-0028).
+    gemini_thinking_ladder: str = (
+        "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,gemini-3.5-flash:20:5,"
+        "gemini-3.0-flash:20:5,gemini-2.5-flash:20:5"
+    )
+    #: Same shape, for `generate_cards` only — pure prose/taste, independently
+    #: gated afterward by the quality gate, so it gets the cheap high-volume
+    #: "lite" ladder instead of competing with the thinking pool for quota.
+    gemini_cards_ladder: str = (
+        "gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15,"
+        "gemini-2.5-flash-lite:20:10"
+    )
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
 
     #: Caps requests in flight at once across an ENTIRE generation run, regardless
     #: of how many subtopics (or topics) fan out concurrently — without this, a
     #: topic with 20 subtopics dispatches 20 simultaneous calls, blowing through
-    #: `quota_rpm` and turning key exhaustion into a burst of simultaneous
-    #: failures instead of a predictable, one-at-a-time rotation.
+    #: every ladder rung's RPM and turning key/model exhaustion into a burst of
+    #: simultaneous failures instead of a predictable, one-at-a-time rotation.
     max_concurrent_generation_calls: int = 5
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
@@ -68,10 +85,6 @@ class Settings(BaseSettings):
     # rejection rates"). Config so it can be retuned without a deploy once real
     # quality-gate rejection rates exist.
     min_cards_fraction: float = 0.6
-
-    # -- quota governor (ADR-0003 §6) ------------------------------------------
-    quota_daily_requests: int = 1500
-    quota_rpm: int = 15
 
     # -- embeddings (hard rule 5) ----------------------------------------------
     embedder: EmbedderBackend = "hash"
@@ -131,8 +144,8 @@ class Settings(BaseSettings):
     #: Per-USER daily cap on LLM-graded free-text submissions. Unlike every other
     #: quota in this system, this one scales with user behavior, not corpus size
     #: (overview.md, Quiz Grading's cost profile) — a separate axis from the
-    #: generation quota governor, so it is its own setting rather than borrowing
-    #: `quota_daily_requests`.
+    #: generation quota governor's per-(key, model) ladder, so it is its own
+    #: setting rather than borrowing from `gemini_thinking_ladder`.
     quiz_free_text_grades_per_user_per_day: int = 20
     #: Server-side length cap (ADR-0009): nominally unlimited, capped generously
     #: so a pasted answer cannot blow the grading call's context window.

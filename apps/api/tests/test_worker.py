@@ -21,6 +21,7 @@ from spoin.core.config import Settings
 from spoin.domain.models import Card, GenerationJob, Topic
 from spoin.embeddings import HashEmbedder
 from spoin.generation.fake import FakeContentGenerator
+from spoin.generation.quota import QuotaExhaustedError
 from spoin.worker import __main__ as worker_module
 
 _TEST_DATABASE_URL = os.environ.get(
@@ -40,6 +41,20 @@ class _FlakyGenerator(FakeContentGenerator):
     async def generate_curriculum(self, topic_name, description, existing_subtopics=None):  # type: ignore[no-untyped-def]
         if topic_name == self._fail_topic_name:
             raise RuntimeError("simulated generation failure")
+        return await super().generate_curriculum(topic_name, description, existing_subtopics)
+
+
+class _QuotaExhaustedGenerator(FakeContentGenerator):
+    """Simulates the whole key x model grid (ADR-0028) being spent for the
+    day — the case the worker is supposed to requeue rather than fail."""
+
+    def __init__(self, exhausted_topic_name: str) -> None:
+        super().__init__()
+        self._exhausted_topic_name = exhausted_topic_name
+
+    async def generate_curriculum(self, topic_name, description, existing_subtopics=None):  # type: ignore[no-untyped-def]
+        if topic_name == self._exhausted_topic_name:
+            raise QuotaExhaustedError("all keys exhausted for today (simulated)")
         return await super().generate_curriculum(topic_name, description, existing_subtopics)
 
 
@@ -132,6 +147,34 @@ async def test_run_once_isolates_one_jobs_failure_from_others(
     ).scalars().all()
     assert len(good_cards) > 0
     assert len(bad_cards) == 0
+
+
+async def test_quota_exhausted_requeues_the_job_instead_of_failing_it(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    topic = Topic(slug="quota-topic", canonical_name="Quota Topic")
+    session.add(topic)
+    await session.flush()
+    job = GenerationJob(topic_id=topic.id, status="pending")
+    session.add(job)
+    await session.commit()
+
+    monkeypatch.setattr(
+        worker_module, "get_content_generator", lambda: _QuotaExhaustedGenerator("Quota Topic")
+    )
+
+    processed = await worker_module.run_once()
+    assert processed == 1
+
+    await session.refresh(job)
+    # ADR-0028: quota exhaustion is an expected daily ceiling, not a bug --
+    # the job goes back to "pending" (idempotent per ADR-0026) so tomorrow's
+    # cron pass just continues, rather than being stuck "failed" forever next
+    # to jobs that failed for a real reason.
+    assert job.status == "pending"
+    assert job.attempts == 1
+    assert job.last_error is not None
+    assert "quota exhausted" in job.last_error
 
 
 async def test_run_once_returns_zero_when_nothing_pending(session: AsyncSession) -> None:

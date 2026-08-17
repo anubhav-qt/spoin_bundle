@@ -118,11 +118,19 @@ this ADR adds generation on top.
 
 ## Open question: specific model choice
 
-This ADR commits to the cloud/local *split*, not to specific model names. `gemini-2.5-flash`
-and `qwen3:14b` currently appear as defaults in `core/config.py`, but neither was actually
-discussed — they were picked in code, not decided. Both need a real discussion (cost,
-quality, structured-output reliability, VRAM fit for the local model) before they should be
-treated as settled rather than placeholders.
+This ADR commits to the cloud/local *split*, not to specific model names.
+
+**Cloud side: resolved by [ADR-0028](0028-key-model-quota-ladder.md).** Rather than one fixed
+`gemini_model`, cloud generation now walks an ordered fallback ladder of models per call —
+see that ADR for the mechanism. What ADR-0028 does NOT resolve: the actual model ids in
+`core/config.py`'s default ladders were read off a free-tier rate-limit screenshot, not
+verified against a real key — treat the specific model strings as a first draft pending
+live confirmation, same caveat `generation-pipeline.md` already carries for the whole
+`gemini` backend.
+
+**Local side: still fully open.** `qwen3:14b` remains a placeholder in `core/config.py` —
+picked in code, never discussed. Needs a real pass (VRAM fit on the RTX 5070, quality,
+structured-output reliability) before it should be treated as settled.
 
 ## Revisit when
 

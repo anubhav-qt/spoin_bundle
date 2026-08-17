@@ -64,3 +64,4 @@ useful than the decision itself.
 | [0025](0025-batched-llm-topic-matching.md) | Batched LLM topic matching, no thresholds | Accepted |
 | [0026](0026-one-shot-generation-to-completion.md) | One-shot generation to completion, amends 0006 | Accepted (amends 0006) |
 | [0027](0027-self-selected-entry-tier.md) | Self-selected entry tier; the placement quiz gate is dropped | Accepted (amends 0009) |
+| [0028](0028-key-model-quota-ladder.md) | Per-key-per-model quota grid, with a two-pool model fallback ladder | Accepted (resolves part of 0008) |

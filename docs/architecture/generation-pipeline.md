@@ -81,9 +81,13 @@ generate_subtopic_cards
   | fan-in (every branch's results merge, across every topic in the run)
   v
 gate_and_persist
-  - the ONLY writer node. Persists cards (minimal gate, generation/gate.py —
-    see "What's missing"), embeds body, derives archetype, bootstraps
-    CardStats — same as before.
+  - the ONLY writer node. Runs the two-pass quality gate (ADR-0030): a
+    structural check (generation/gate.py), pass 1 correction and pass 2
+    verification (both thinking-pool LLM calls, concurrent across
+    subtopic-tiers), and near-duplicate detection (local embeddings,
+    sequential, between the two passes) — every draft becomes exactly one of
+    an active `Card` or a `rejected_card` row. Accepted cards get embedded,
+    archetype-derived, and bootstrap `CardStats` — same as before.
   - THEN: concurrently (asyncio.gather, same semaphore as every other
     generator call) generates questions FROM the cards just persisted, per
     subtopic/difficulty, and persists those too (Question rows). A topic's
@@ -181,10 +185,12 @@ out has never been triggered end to end, only simulated in tests).
   ADR-0025's matcher — that's the only trigger that exists. Nothing yet refills an
   existing topic that's running thin (ADR-0026 §"open question"), and there's no
   admin-triggered path either.
-- **The real quality gate.** `generation/gate.py` is structural validation only (non-empty
-  body). Near-duplicate detection, topic conformance, and the independent
-  difficulty/factual-accuracy judge (content-model.md's "Quality gate" section) are
-  unbuilt — every card that reaches `gate_and_persist` becomes `active` immediately.
+- **The quality gate is built** (ADR-0030, content-model.md's "Quality gate" section):
+  structural check, pass 1 correction, near-duplicate detection, pass 2 verification, all
+  wired into `gate_and_persist`. `card_duplicate_threshold` (0.9) remains an explicit,
+  uncalibrated placeholder — see content-model.md's open questions — and the hand-curated
+  `difficulty_examples` catalog is unauthored (docs/tasks/0011), so standalone
+  subtopic-tiers currently get no calibration examples in practice.
 - **The ASCII scene catalog** (ADR-0021). `CardDraft.visual_id`/`visual_slots` exist in
   the schema and the interface, but there's no catalog for a generator to select from, so
   nothing populates them in practice yet.

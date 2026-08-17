@@ -100,7 +100,18 @@ class Settings(BaseSettings):
 
     # Card near-duplicate threshold. Different vectors, different numbers — the
     # topic threshold does not transfer (content-model.md, open questions).
-    card_duplicate_threshold: float = 0.93
+    # PROVISIONAL: never calibrated against real embeddings (only the
+    # deterministic HashEmbedder is exercised in tests, and content-model.md
+    # already calls that "not semantically meaningful"). Shipped deliberately
+    # more conservative than the original 0.93 guess until real fastembed
+    # data justifies a specific number (ADR-0030).
+    card_duplicate_threshold: float = 0.9
+    #: How many of a subtopic's most-recent near-duplicate `rejected_card` rows
+    #: get fed back into the NEXT `generate_cards` call for that subtopic as
+    #: "don't write anything like this again" context (ADR-0030 addendum).
+    #: Bounded for the same reason `existing_titles` is bounded -- prevention
+    #: context must stay small enough that the attention argument holds.
+    max_duplicate_feedback_bodies: int = 10
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

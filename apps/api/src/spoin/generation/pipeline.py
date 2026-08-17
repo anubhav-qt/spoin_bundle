@@ -88,12 +88,21 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.content.archetype import classify_archetype
+from spoin.content.difficulty_examples import get_difficulty_examples
 from spoin.core.config import Settings
-from spoin.domain.enums import CardStatus, Difficulty, QuestionKind, QuestionStatus, TopicEdgeKind
+from spoin.domain.enums import (
+    CardStatus,
+    Difficulty,
+    QuestionKind,
+    QuestionStatus,
+    RejectionStage,
+    TopicEdgeKind,
+)
 from spoin.domain.models import (
     Card,
     CardStats,
     Question,
+    RejectedCard,
     Subtopic,
     Topic,
     TopicAlias,
@@ -101,13 +110,20 @@ from spoin.domain.models import (
 )
 from spoin.embeddings import Embedder, normalize_topic_text
 from spoin.generation.base import (
+    CardCorrectionQuery,
     CardDraft,
+    CardVerificationQuery,
     ContentGenerator,
     TopicMatchCandidate,
     TopicMatchQuery,
     TopicMatchResult,
 )
+from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
+
+#: ADR-0030: no calibration examples for a linked subtopic-tier -- it gets
+#: real, concept-specific calibration from `builds_on` instead.
+_NO_DIFFICULTY_EXAMPLES: dict[Difficulty, list[str]] = {difficulty: [] for difficulty in Difficulty}
 
 _SLUG_KEEP = "abcdefghijklmnopqrstuvwxyz0123456789-"
 
@@ -165,6 +181,13 @@ class SubtopicPlan(TypedDict):
     #: sibling subtopic in the same subtopic_group_id (ADR-0007's cross-tier ask).
     existing_titles: list[str]
     existing_count: int
+    #: Bodies of this EXACT subtopic-tier's (not group-wide -- near-dup
+    #: detection is subtopic-scoped, see generation/dedup.py) most recent
+    #: `rejected_card` rows with stage=near_duplicate, from a prior run.
+    #: Prevention feedback (ADR-0030 addendum): the writer sees actual
+    #: rejected content and is told not to reproduce it, rather than
+    #: rediscovering the same duplicate only to have it rejected again.
+    avoid_duplicate_bodies: list[str]
 
 
 class SubtopicGroupPlan(TypedDict):
@@ -179,6 +202,10 @@ class SubtopicGroupPlan(TypedDict):
 class TopicPlanResult(TypedDict):
     topic_id: str
     topic_name: str
+    #: Fed to the quality gate's correction pass as the canonical topic
+    #: description (ADR-0030) -- pulled from `Topic.description`, not stored
+    #: anywhere else in the plan.
+    topic_description: str
     is_survey: bool
     deep_dive_topic_names: list[str]
     subtopics: list[SubtopicPlan]
@@ -190,6 +217,11 @@ class SubtopicCardsResult(TypedDict):
     difficulty: str
     drafts: list[CardDraft]
     generator_failures: list[str]
+    #: True iff this subtopic-tier has no sibling tiers in its
+    #: `subtopic_group_id` -- decides whether the quality gate's two passes
+    #: get the hand-curated difficulty example catalog (ADR-0030) instead of
+    #: relying on `builds_on`'s real sibling-tier context.
+    is_standalone: bool
 
 
 class PipelineState(TypedDict, total=False):
@@ -463,7 +495,9 @@ async def _reuse_or_create_subtopic(
     return subtopic, False
 
 
-async def _load_subtopic_plans(session: AsyncSession, topic: Topic) -> list[SubtopicPlan]:
+async def _load_subtopic_plans(
+    session: AsyncSession, topic: Topic, *, max_duplicate_feedback_bodies: int
+) -> list[SubtopicPlan]:
     subtopics = (
         (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic.id)))
         .scalars()
@@ -483,6 +517,19 @@ async def _load_subtopic_plans(session: AsyncSession, topic: Topic) -> list[Subt
             )
         ).all()
         this_subtopic_count = sum(1 for _, _, d in existing if d == subtopic.difficulty)
+        # Subtopic-scoped, not group-scoped -- matches where the near-dup
+        # check itself is scoped (generation/dedup.py's find_corpus_duplicate).
+        avoid_bodies = (
+            await session.execute(
+                select(RejectedCard.body)
+                .where(
+                    RejectedCard.subtopic_id == subtopic.id,
+                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+                )
+                .order_by(RejectedCard.created_at.desc())
+                .limit(max_duplicate_feedback_bodies)
+            )
+        ).scalars().all()
         plans.append(
             SubtopicPlan(
                 topic_id=str(topic.id),
@@ -495,6 +542,7 @@ async def _load_subtopic_plans(session: AsyncSession, topic: Topic) -> list[Subt
                 target_cards=subtopic.target_cards,
                 existing_titles=[_existing_title_tag(c, t, d) for c, t, d in existing],
                 existing_count=this_subtopic_count,
+                avoid_duplicate_bodies=list(avoid_bodies),
             )
         )
     return plans
@@ -577,11 +625,16 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
             is_survey = draft.is_survey
 
     async with runtime.topic_plan_lock:
-        subtopic_plans = await _load_subtopic_plans(runtime.session, topic)
+        subtopic_plans = await _load_subtopic_plans(
+            runtime.session,
+            topic,
+            max_duplicate_feedback_bodies=runtime.settings.max_duplicate_feedback_bodies,
+        )
 
     plan = TopicPlanResult(
         topic_id=str(topic.id),
         topic_name=topic.canonical_name,
+        topic_description=topic.description or "",
         is_survey=is_survey,
         deep_dive_topic_names=deep_dive_names,
         subtopics=subtopic_plans,
@@ -638,6 +691,11 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     runtime = _runtime(config)
     job = state["subtopic_group_job"]
     batch_size = runtime.settings.generation_batch_size
+    #: A tier with sibling tiers gets real calibration from `builds_on`
+    #: instead of the generic catalog (ADR-0030) -- see this function's
+    #: docstring: groups with one tier are the common case.
+    is_standalone = len(job["tiers"]) == 1
+    difficulty_examples = get_difficulty_examples() if is_standalone else _NO_DIFFICULTY_EXAMPLES
 
     results: list[SubtopicCardsResult] = []
     lower_tier_bodies: list[str] = []
@@ -654,6 +712,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                     difficulty=tier["difficulty"],
                     drafts=[],
                     generator_failures=[],
+                    is_standalone=is_standalone,
                 )
             )
             # Nothing generated THIS run for this tier, so it contributes no
@@ -684,6 +743,8 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                     count=min(batch_size, remaining),
                     existing_titles=existing_titles,
                     builds_on=lower_tier_bodies,
+                    difficulty_examples=difficulty_examples,
+                    avoid_bodies=tier["avoid_duplicate_bodies"],
                 )
             failures.extend(result.failures)
             if not result.items:
@@ -700,6 +761,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 difficulty=tier["difficulty"],
                 drafts=drafts,
                 generator_failures=failures,
+                is_standalone=is_standalone,
             )
         )
         lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
@@ -708,6 +770,139 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 
 
 # ------------------------------------------------------- persist cards + questions --
+
+
+def _rejected_card(
+    *,
+    topic_id: str,
+    subtopic_id: str,
+    draft: CardDraft,
+    stage: RejectionStage,
+    reason: str,
+    generated_at: str,
+    backend: str,
+    batch_id: uuid.UUID,
+) -> RejectedCard:
+    return RejectedCard(
+        topic_id=uuid.UUID(topic_id),
+        subtopic_id=uuid.UUID(subtopic_id),
+        requested_difficulty=draft.difficulty,
+        title=draft.title,
+        canonical_title=draft.canonical_title,
+        summary=draft.summary,
+        body=draft.body,
+        stage=stage,
+        reason=reason,
+        gen_meta={"backend": backend, "generated_at": generated_at, "batch_id": str(batch_id)},
+    )
+
+
+async def _correct_subtopic_drafts(
+    runtime: _Runtime,
+    *,
+    subtopic_id: str,
+    topic_name: str,
+    topic_description: str,
+    difficulty_examples: dict[Difficulty, list[str]],
+    drafts: list[CardDraft],
+) -> tuple[str, list[CardDraft], list[str]]:
+    """ADR-0030 pass 1. Concurrent across subtopics (no DB access -- pure
+    generator calls, same principle as `_generate_questions_for_group`).
+    Returns corrected drafts in receipt order; a draft whose correction never
+    came back (malformed/missing item) is DROPPED and reported as a failure --
+    there is nothing safe to persist without a corrected body."""
+
+    batch_size = runtime.settings.judge_batch_size
+    corrected: list[CardDraft] = []
+    failures: list[str] = []
+
+    for start in range(0, len(drafts), batch_size):
+        chunk = drafts[start : start + batch_size]
+        queries = [
+            CardCorrectionQuery(
+                index=index,
+                topic_name=topic_name,
+                topic_description=topic_description,
+                title=draft.title,
+                canonical_title=draft.canonical_title,
+                summary=draft.summary,
+                body=draft.body,
+            )
+            for index, draft in enumerate(chunk)
+        ]
+        async with runtime.semaphore:
+            result = await runtime.generator.correct_cards(
+                queries, difficulty_examples=difficulty_examples
+            )
+        failures.extend(result.failures)
+        by_index = {item.index: item for item in result.items}
+        for index, draft in enumerate(chunk):
+            correction = by_index.get(index)
+            if correction is None:
+                failures.append(f"correction pass returned no result for card {index}")
+                continue
+            corrected.append(
+                draft.model_copy(
+                    update={
+                        "title": correction.title,
+                        "canonical_title": correction.canonical_title,
+                        "summary": correction.summary,
+                        "body": correction.body,
+                    }
+                )
+            )
+
+    return subtopic_id, corrected, failures
+
+
+async def _verify_subtopic_drafts(
+    runtime: _Runtime,
+    *,
+    subtopic_id: str,
+    difficulty_examples: dict[Difficulty, list[str]],
+    items: list[tuple[CardDraft, list[float]]],
+) -> tuple[
+    str, list[tuple[CardDraft, list[float], Difficulty]], list[tuple[CardDraft, str]], list[str]
+]:
+    """ADR-0030 pass 2. `items` is (corrected draft, its post-correction
+    embedding) for every card that survived dedup. Concurrent across
+    subtopics, same reasoning as `_correct_subtopic_drafts`. Returns
+    (subtopic_id, accepted[(draft, embedding, confirmed_difficulty)],
+    rejected[(draft, reason)], failures)."""
+
+    batch_size = runtime.settings.judge_batch_size
+    accepted: list[tuple[CardDraft, list[float], Difficulty]] = []
+    rejected: list[tuple[CardDraft, str]] = []
+    failures: list[str] = []
+
+    for start in range(0, len(items), batch_size):
+        chunk = items[start : start + batch_size]
+        queries = [
+            CardVerificationQuery(
+                index=index,
+                canonical_title=draft.canonical_title,
+                body=draft.body,
+                requested_difficulty=draft.difficulty,
+            )
+            for index, (draft, _embedding) in enumerate(chunk)
+        ]
+        async with runtime.semaphore:
+            result = await runtime.generator.verify_cards(
+                queries, difficulty_examples=difficulty_examples
+            )
+        failures.extend(result.failures)
+        by_index = {item.index: item for item in result.items}
+        for index, (draft, embedding) in enumerate(chunk):
+            verdict = by_index.get(index)
+            if verdict is None:
+                failures.append(f"verification pass returned no result for card {index}")
+                continue
+            if not verdict.accepted:
+                rejected.append((draft, verdict.reason or "failed verification"))
+                continue
+            accepted.append((draft, embedding, verdict.confirmed_difficulty))
+
+    return subtopic_id, accepted, rejected, failures
 
 
 async def _generate_questions_for_group(
@@ -736,89 +931,280 @@ async def _generate_questions_for_group(
     return topic_id, subtopic_id, difficulty, drafts, failures
 
 
+@dataclass
+class _GateItem:
+    """One subtopic-tier's worth of drafts, tracked through the whole gate
+    (ADR-0030) so the two concurrent LLM phases and the sequential DB phase
+    can all find their way back to the right subtopic/topic report."""
+
+    topic_id: str
+    subtopic_id: str
+    difficulty: str
+    topic_name: str
+    topic_description: str
+    difficulty_examples: dict[Difficulty, list[str]]
+    survivors: list[CardDraft]
+    #: (draft, reason) for cards that never made it past structural
+    #: validation -- kept as the ORIGINAL draft, since correction never ran.
+    structural_rejects: list[tuple[CardDraft, str]]
+    generator_failure_count: int
+    #: Filled in by later phases.
+    corrected: list[CardDraft] = field(default_factory=list)
+    correction_failure_count: int = 0
+    dedup_survivors: list[tuple[CardDraft, list[float]]] = field(default_factory=list)
+    #: (draft, reason) for near-duplicate rejects, post-correction.
+    dedup_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
+    verified: list[tuple[CardDraft, list[float], Difficulty]] = field(default_factory=list)
+    #: (draft, reason) for pass-2 rejects, post-correction.
+    verification_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
+    verification_failure_count: int = 0
+
+
 async def gate_and_persist(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> dict[str, object]:
-    """The only writer node. Persists cards (minimal gate), then generates and
-    persists questions FROM the cards just written -- a topic isn't done
-    (ADR-0026) until both exist. Question generation across subtopics/topics
-    runs concurrently (`asyncio.gather`, same semaphore governing every other
-    generator call), but the actual DB writes stay sequential in this one node,
-    same as cards."""
+    """The only writer node. Runs the two-pass quality gate (ADR-0030) --
+    structural check, then pass 1 correction, then near-duplicate detection,
+    then pass 2 verification -- persisting every draft as exactly one of an
+    ACTIVE `Card` or a `RejectedCard` row, then generates and persists
+    questions FROM the accepted cards -- a topic isn't done (ADR-0026) until
+    both exist.
+
+    The two LLM phases (correction, verification) run concurrently across
+    every subtopic-tier in this batch (`asyncio.gather`, same semaphore
+    governing every other generator call) since neither touches the DB.
+    Near-duplicate detection sits between them and DOES touch the DB (a
+    corpus lookup per card), so it stays sequential, same as every other
+    write in this node.
+    """
 
     runtime = _runtime(config)
     generated_at = datetime.now(UTC).isoformat()
+    backend = runtime.settings.generator
+    threshold = runtime.settings.card_duplicate_threshold
 
     by_topic: dict[str, list[SubtopicCardsResult]] = {}
     for result in state.get("card_results", []):
         by_topic.setdefault(result["topic_id"], []).append(result)
 
+    # ---- assemble one _GateItem per subtopic-tier, structural gate first --
+    items: list[_GateItem] = []
+    for plan in state.get("topic_plans", []):
+        for result in by_topic.get(plan["topic_id"], []):
+            survivors: list[CardDraft] = []
+            structural_rejects: list[tuple[CardDraft, str]] = []
+            for draft in result["drafts"]:
+                ok, reason = passes_minimal_gate(draft)
+                if ok:
+                    survivors.append(draft)
+                else:
+                    structural_rejects.append((draft, reason or "failed structural gate"))
+
+            examples = (
+                get_difficulty_examples() if result["is_standalone"] else _NO_DIFFICULTY_EXAMPLES
+            )
+            items.append(
+                _GateItem(
+                    topic_id=result["topic_id"],
+                    subtopic_id=result["subtopic_id"],
+                    difficulty=result["difficulty"],
+                    topic_name=plan["topic_name"],
+                    topic_description=plan["topic_description"],
+                    difficulty_examples=examples,
+                    survivors=survivors,
+                    structural_rejects=structural_rejects,
+                    generator_failure_count=len(result["generator_failures"]),
+                )
+            )
+
+    # ---- phase 1: correction, concurrent across subtopic-tiers ------------
+    correction_results = (
+        await asyncio.gather(
+            *(
+                _correct_subtopic_drafts(
+                    runtime,
+                    subtopic_id=item.subtopic_id,
+                    topic_name=item.topic_name,
+                    topic_description=item.topic_description,
+                    difficulty_examples=item.difficulty_examples,
+                    drafts=item.survivors,
+                )
+                for item in items
+                if item.survivors
+            )
+        )
+        if any(item.survivors for item in items)
+        else []
+    )
+    corrections_by_subtopic = {
+        subtopic_id: (corrected, failures)
+        for subtopic_id, corrected, failures in correction_results
+    }
+    for item in items:
+        corrected, failures = corrections_by_subtopic.get(item.subtopic_id, ([], []))
+        item.corrected = corrected
+        item.correction_failure_count = len(failures)
+
+    # ---- phase 2: near-duplicate detection, sequential (DB reads) --------
+    for item in items:
+        if not item.corrected:
+            continue
+        bodies = [draft.body for draft in item.corrected]
+        embeddings = runtime.embedder.embed(bodies)
+        accepted_embeddings: list[list[float]] = []
+        subtopic_uuid = uuid.UUID(item.subtopic_id)
+        for draft, embedding in zip(item.corrected, embeddings, strict=True):
+            corpus_hit = await find_corpus_duplicate(
+                runtime.session, subtopic_id=subtopic_uuid, embedding=embedding, threshold=threshold
+            )
+            if corpus_hit is not None:
+                item.dedup_rejects.append(
+                    (draft, f"near-duplicate of an existing card (similarity {corpus_hit:.3f})")
+                )
+                continue
+            batch_hit = find_batch_duplicate(embedding, accepted_embeddings, threshold=threshold)
+            if batch_hit is not None:
+                item.dedup_rejects.append(
+                    (draft, f"near-duplicate within this batch (similarity {batch_hit:.3f})")
+                )
+                continue
+            accepted_embeddings.append(embedding)
+            item.dedup_survivors.append((draft, embedding))
+
+    # ---- phase 3: verification, concurrent across subtopic-tiers ---------
+    verification_results = (
+        await asyncio.gather(
+            *(
+                _verify_subtopic_drafts(
+                    runtime,
+                    subtopic_id=item.subtopic_id,
+                    difficulty_examples=item.difficulty_examples,
+                    items=item.dedup_survivors,
+                )
+                for item in items
+                if item.dedup_survivors
+            )
+        )
+        if any(item.dedup_survivors for item in items)
+        else []
+    )
+    verification_by_subtopic = {
+        subtopic_id: (accepted, rejected, failures)
+        for subtopic_id, accepted, rejected, failures in verification_results
+    }
+    for item in items:
+        verified, verify_rejects, verify_failures = verification_by_subtopic.get(
+            item.subtopic_id, ([], [], [])
+        )
+        item.verified = verified
+        item.verification_rejects = verify_rejects
+        item.verification_failure_count = len(verify_failures)
+
+    # ---- phase 4: persist, sequential (the only writer) -------------------
     topic_reports: list[dict[str, object]] = []
     pending_questions: list[tuple[str, str, str, list[Card]]] = []
+    reports_by_topic: dict[str, list[dict[str, object]]] = {}
+    totals_by_topic: dict[str, tuple[int, int]] = {}
+
+    for item in items:
+        rejected_rows = [
+            _rejected_card(
+                topic_id=item.topic_id,
+                subtopic_id=item.subtopic_id,
+                draft=draft,
+                stage=RejectionStage.STRUCTURAL,
+                reason=reason,
+                generated_at=generated_at,
+                backend=backend,
+                batch_id=runtime.batch_id,
+            )
+            for draft, reason in item.structural_rejects
+        ]
+        rejected_rows += [
+            _rejected_card(
+                topic_id=item.topic_id,
+                subtopic_id=item.subtopic_id,
+                draft=draft,
+                stage=RejectionStage.NEAR_DUPLICATE,
+                reason=reason,
+                generated_at=generated_at,
+                backend=backend,
+                batch_id=runtime.batch_id,
+            )
+            for draft, reason in item.dedup_rejects
+        ]
+        rejected_rows += [
+            _rejected_card(
+                topic_id=item.topic_id,
+                subtopic_id=item.subtopic_id,
+                draft=draft,
+                stage=RejectionStage.VERIFICATION,
+                reason=reason,
+                generated_at=generated_at,
+                backend=backend,
+                batch_id=runtime.batch_id,
+            )
+            for draft, reason in item.verification_rejects
+        ]
+        runtime.session.add_all(rejected_rows)
+
+        new_cards = [
+            Card(
+                family_id=uuid.uuid4(),
+                topic_id=uuid.UUID(item.topic_id),
+                subtopic_id=uuid.UUID(item.subtopic_id),
+                difficulty=draft.difficulty,
+                judged_difficulty=confirmed_difficulty,
+                status=CardStatus.ACTIVE,
+                title=draft.title,
+                canonical_title=draft.canonical_title,
+                summary=draft.summary,
+                body=draft.body,
+                visual_id=draft.visual_id,
+                visual_slots=draft.visual_slots,
+                content_embedding=embedding,
+                gen_meta={
+                    "backend": backend,
+                    "generated_at": generated_at,
+                    "batch_id": str(runtime.batch_id),
+                },
+            )
+            for draft, embedding, confirmed_difficulty in item.verified
+        ]
+        runtime.session.add_all(new_cards)
+        await runtime.session.flush()
+        for card in new_cards:
+            card.archetype = classify_archetype(card.body)
+            runtime.session.add(CardStats(card_id=card.id))
+
+        if new_cards:
+            pending_questions.append((item.topic_id, item.subtopic_id, item.difficulty, new_cards))
+
+        total_rejected = (
+            len(item.structural_rejects)
+            + item.correction_failure_count
+            + len(item.dedup_rejects)
+            + len(item.verification_rejects)
+            + item.verification_failure_count
+            + item.generator_failure_count
+        )
+        reports_by_topic.setdefault(item.topic_id, []).append(
+            {
+                "subtopic_id": item.subtopic_id,
+                "difficulty": item.difficulty,
+                "accepted": len(new_cards),
+                "rejected": total_rejected,
+            }
+        )
+        prev_accepted, prev_rejected = totals_by_topic.get(item.topic_id, (0, 0))
+        totals_by_topic[item.topic_id] = (
+            prev_accepted + len(new_cards),
+            prev_rejected + total_rejected,
+        )
 
     for plan in state.get("topic_plans", []):
         topic_id = plan["topic_id"]
-        total_accepted = 0
-        total_rejected = 0
-        subtopic_reports: list[dict[str, object]] = []
-
-        for result in by_topic.get(topic_id, []):
-            subtopic_id = uuid.UUID(result["subtopic_id"])
-            drafts = result["drafts"]
-            bodies = [draft.body for draft in drafts]
-            embeddings = runtime.embedder.embed(bodies) if bodies else []
-
-            new_cards: list[Card] = []
-            rejected_reasons: list[str] = list(result["generator_failures"])
-            for draft, embedding in zip(drafts, embeddings, strict=True):
-                ok, reason = passes_minimal_gate(draft)
-                if not ok:
-                    rejected_reasons.append(reason or "failed minimal gate")
-                    continue
-                new_cards.append(
-                    Card(
-                        family_id=uuid.uuid4(),
-                        topic_id=uuid.UUID(topic_id),
-                        subtopic_id=subtopic_id,
-                        difficulty=draft.difficulty,
-                        status=CardStatus.ACTIVE,
-                        title=draft.title,
-                        canonical_title=draft.canonical_title,
-                        summary=draft.summary,
-                        body=draft.body,
-                        visual_id=draft.visual_id,
-                        visual_slots=draft.visual_slots,
-                        content_embedding=embedding,
-                        gen_meta={
-                            "backend": runtime.settings.generator,
-                            "generated_at": generated_at,
-                            "batch_id": str(runtime.batch_id),
-                        },
-                    )
-                )
-
-            runtime.session.add_all(new_cards)
-            await runtime.session.flush()
-            for card in new_cards:
-                card.archetype = classify_archetype(card.body)
-                runtime.session.add(CardStats(card_id=card.id))
-
-            if new_cards:
-                pending_questions.append(
-                    (topic_id, result["subtopic_id"], result["difficulty"], new_cards)
-                )
-
-            total_accepted += len(new_cards)
-            total_rejected += len(rejected_reasons)
-            subtopic_reports.append(
-                {
-                    "subtopic_id": result["subtopic_id"],
-                    "difficulty": result["difficulty"],
-                    "accepted": len(new_cards),
-                    "rejected": len(rejected_reasons),
-                }
-            )
-
+        total_accepted, total_rejected = totals_by_topic.get(topic_id, (0, 0))
         topic_reports.append(
             {
                 "topic_id": topic_id,
@@ -827,7 +1213,7 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 "deep_dive_topic_names": plan["deep_dive_topic_names"],
                 "accepted": total_accepted,
                 "rejected": total_rejected,
-                "subtopics": subtopic_reports,
+                "subtopics": reports_by_topic.get(topic_id, []),
                 "questions_accepted": 0,
                 "questions_rejected": 0,
             }

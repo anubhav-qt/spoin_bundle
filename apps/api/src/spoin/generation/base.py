@@ -140,13 +140,57 @@ class TopicMatchResult(BaseModel):
     matched_topic_id: str | None = None
 
 
-class DifficultyVerdict(BaseModel):
-    """One batch-judge rating. See `judge_difficulty` for why it is independent."""
+class CardCorrectionQuery(BaseModel):
+    """One draft, offered to the quality gate's pass 1 (ADR-0030). Difficulty is
+    deliberately absent -- pass 1 fixes topic fit and factual errors without
+    knowing which tier the card was requested at, so it has nothing to anchor
+    an edit toward except the content and the topic itself."""
 
     index: int
-    difficulty: Difficulty
-    factually_sound: bool
+    topic_name: str
+    topic_description: str
+    title: str
+    canonical_title: str
+    summary: str
+    body: str
+
+
+class CardCorrectionResult(BaseModel):
+    """Pass 1's output for one card. Always returned -- pass 1 never rejects,
+    see `correct_cards`. If nothing needed fixing, these fields equal the
+    input verbatim."""
+
+    index: int
+    title: str
+    canonical_title: str
+    summary: str
+    body: str
+    was_edited: bool = False
     note: str = ""
+
+
+class CardVerificationQuery(BaseModel):
+    """One pass-1-corrected card, offered to pass 2 with its requested
+    difficulty now visible (ADR-0030)."""
+
+    index: int
+    canonical_title: str
+    body: str
+    requested_difficulty: Difficulty
+
+
+class CardVerificationResult(BaseModel):
+    """Pass 2's final verdict for one card. `accepted=False` is a real,
+    terminal rejection -- routed to the `rejected_card` table, never silently
+    dropped (see `generation/pipeline.py`'s `gate_and_persist`)."""
+
+    index: int
+    accepted: bool
+    #: The judge's own confirmed (or corrected) rating -- independent of what
+    #: was requested, same reasoning `DifficultyVerdict` used to carry before
+    #: ADR-0030 split it into two passes.
+    confirmed_difficulty: Difficulty
+    reason: str = ""
 
 
 class QuestionDraft(BaseModel):
@@ -254,6 +298,8 @@ class ContentGenerator(ABC):
         count: int,
         existing_titles: list[str],
         builds_on: list[str],
+        difficulty_examples: dict[Difficulty, list[str]],
+        avoid_bodies: list[str],
     ) -> BatchResult[CardDraft]:
         """`existing_titles` is every card already in this subtopic **across all
         difficulties, tagged with their level**. Cross-difficulty inclusion is
@@ -267,6 +313,21 @@ class ContentGenerator(ABC):
         the common case (curricula are not forced to give every concept all
         three tiers).
 
+        `difficulty_examples` (ADR-0030) is a few example bodies per tier, shown
+        together so beginner/intermediate/advanced have a concrete contrast to
+        write against instead of just a label. Only populated for a standalone
+        subtopic-tier -- a linked one already gets real, concept-specific
+        calibration from `builds_on`, which is strictly better, so callers pass
+        this empty whenever `builds_on` is non-empty.
+
+        `avoid_bodies` (ADR-0030 addendum) is the actual body text of this
+        SAME subtopic-tier's most recent near-duplicate rejections, from a
+        PRIOR run -- prevention feedback so the writer doesn't rediscover the
+        same duplicate only to have the gate reject it again. Unlike
+        `existing_titles` (titles of cards that WERE accepted), this is full
+        body text of cards that were NOT, specifically so the model can see
+        what content to avoid, not just what title to avoid.
+
         Calls to one subtopic-tier are sequential so each prompt sees what the
         last produced; different subtopics (and different tiers of an unlinked
         group) run concurrently. Tiers within the SAME linked group run
@@ -275,17 +336,32 @@ class ContentGenerator(ABC):
         """
 
     @abstractmethod
-    async def judge_difficulty(self, bodies: list[str]) -> BatchResult[DifficultyVerdict]:
-        """Rate cards **without** being told what level was requested.
+    async def correct_cards(
+        self,
+        queries: list[CardCorrectionQuery],
+        *,
+        difficulty_examples: dict[Difficulty, list[str]],
+    ) -> BatchResult[CardCorrectionResult]:
+        """Quality gate pass 1 (ADR-0030): fix topic drift and factual errors
+        IN PLACE, without being told the requested difficulty. Never rejects —
+        every input index gets a result, edited or not. `difficulty_examples`
+        is the same three-tier calibration set described on `generate_cards`.
 
-        This is the subtlety that makes or breaks the gate. Ask for a beginner card
-        and you get one tagged `beginner` because that is what was asked — the tag
-        echoes the request and validates nothing. Only an independent rating can
-        disagree, and disagreement is the entire point.
-
-        ~20 cards per request, so one call validates twenty cards and the gate is
-        affordable on everything rather than on a sample.
+        `~judge_batch_size` cards per request, same batching principle as
+        `generate_cards`.
         """
+
+    @abstractmethod
+    async def verify_cards(
+        self,
+        queries: list[CardVerificationQuery],
+        *,
+        difficulty_examples: dict[Difficulty, list[str]],
+    ) -> BatchResult[CardVerificationResult]:
+        """Quality gate pass 2 (ADR-0030): the corrected cards, now WITH their
+        requested difficulty visible, get a final accept/reject and a
+        confirmed difficulty rating. This is the terminal check — a card that
+        fails here is a real rejection, not an edit."""
 
     @abstractmethod
     async def generate_questions(

@@ -298,66 +298,97 @@ retiring old text) is deliberately deferred.
 
 ## Quality gate
 
-A generated card is `draft` until it passes. It never reaches the corpus otherwise.
+A generated card either becomes an `active` `Card` row, or a `rejected_card` row. It never
+vanishes silently, and it never reaches the corpus without passing the gate.
 
-**This is the target design; only structural validation exists today**
-(`generation/gate.py`: non-empty body, nothing else) — cards go straight to `active`.
-None of the four checks below (dedup, topic conformance, difficulty, factual accuracy)
-are built. See [generation-pipeline.md](generation-pipeline.md).
+**Built and wired up as of [ADR-0030](../adr/0030-two-pass-quality-gate.md).** That ADR
+replaced the four-independent-check design this section originally specified (below, kept
+for history in the ADR itself) with a **two-pass, self-correcting** gate. The short version:
+
+```
+draft
+  -> structural check         (generation/gate.py -- non-empty body; cheap, local)
+  -> pass 1: correction       (LLM, thinking pool -- fixes topic drift + factual errors
+                                IN PLACE; never rejects)
+  -> near-duplicate check     (local embeddings, unchanged from the original design below)
+  -> pass 2: verification     (LLM, thinking pool -- confirms difficulty, final accept/reject)
+  -> active Card | rejected_card row
+```
 
 Note the division of labour established in [ADR-0007](../adr/0007-curriculum-driven-generation.md):
 **prevention** (curriculum targeting + title lists in the prompt) optimizes *cost*;
 **detection** (below) guarantees *correctness*. We keep both. A cheap preventive layer never
 earns the right to remove the check.
 
-### 1. Near-duplicate detection
+### Near-duplicate detection — unchanged by ADR-0030
 
 Embed the card body locally (`fastembed`, free and unlimited) and compare against
-existing cards **within the same subtopic**. Above the duplicate threshold, mark `rejected`.
+existing cards **within the same subtopic**. Above the duplicate threshold, reject.
 
 **Intra-batch dedup is also required.** Comparing against the stored corpus does not catch
-a model writing three near-identical cards *within a single response of ten*. The batch must
-be compared against itself before insert.
+a model writing near-identical cards *within a single response*. The batch is compared
+against itself, as a **running set** (each new card compared against cards already accepted
+earlier in the same batch), before insert. See `generation/dedup.py`.
 
 Note this is a **different embedding** from the topic embedding used for canonicalization
-in ADR-0004. Same technique, different vectors, different thresholds. Calibrate
-separately.
+in ADR-0004. Same technique, different vectors, different thresholds.
 
-### 2. Topic conformance
+`card_duplicate_threshold` is **`0.9`, explicitly provisional** — never calibrated against
+real embeddings (only the deterministic `HashEmbedder` is exercised in tests, and it is "not
+semantically meaningful" by its own docstring). Shipped more conservative than the original
+`0.93` guess pending real `fastembed` data.
 
-Compare `content_embedding` against the topic embedding. Cheap, local, catches drift
-where the generator wandered off subject.
+**A near-duplicate rejection feeds forward.** A subtopic-tier's most recent near-duplicate
+`rejected_card` bodies (capped by `max_duplicate_feedback_bodies`) are shown to the NEXT
+`generate_cards` call for that same subtopic-tier as content to avoid reproducing — prevention
+learning from a detection failure, not just a one-off discard. See ADR-0030's "Duplicate-
+content feedback loop" section for the exact scope and the same-run limitation.
 
-### 3. Difficulty conformance — must be an independent judgment
+### Topic conformance — folded into pass 1, not a separate embedding check
 
-The subtlety that makes or breaks this check:
+ADR-0030 replaced the standalone topic-conformance embedding comparison with something more
+direct: pass 1 is shown the card's canonical topic and **edits the content** to actually
+belong to it, rather than a cosine threshold merely flagging drift for disposal. `topic_id`
+itself is never changed — only whether the content earns that assignment.
+
+### Difficulty conformance — independent judgment, now a two-pass correction+verification
+
+The subtlety that makes or breaks this check, unchanged from the original design:
 
 - "Generate a **beginner** card about X" returns a card tagged `beginner` **because that
   is what was asked**. The tag echoes the request and validates nothing.
 - Only an **independent** rating, made without knowledge of the requested level, can
   disagree, and disagreement is the entire point of a gate.
 
-Models are unreliable at critiquing their own output inside the same call, so the
-self-report is not sufficient.
+What changed: rather than one reject-only judge call, difficulty is confirmed in **pass 2**
+(`verify_cards`) — pass 1 never sees the requested difficulty, so it can't anchor an edit
+toward it; pass 2 sees it and gives a final, independent `confirmed_difficulty`, stored on
+`Card.judged_difficulty` alongside the requested `Card.difficulty`. Both passes batch ~20
+cards per request (`judge_batch_size`), same batching principle as
+[ADR-0005](../adr/0005-batch-llm-calls.md) — affordable to run on everything.
 
-**Implementation:** a **batch judge**. Collect ~20 `draft` cards, strip their requested
-difficulty, send them in one request, receive 20 independent ratings, flag only the
-disagreements for review. One request validates twenty cards, which makes it affordable
-to run on everything. See [ADR-0005](../adr/0005-batch-llm-calls.md).
+Both the card writer (`generate_cards`) and both gate passes also accept
+`difficulty_examples` — a few example bodies per tier, hand-curated (not yet authored, see
+[docs/tasks/0011](../tasks/0011-difficulty-example-catalog.md)), used only for a **standalone**
+subtopic-tier. A **linked** tier (multiple difficulties sharing a `subtopic_group_id`)
+already gets real, concept-specific calibration from `builds_on` instead.
 
-### 4. Factual accuracy
+### Factual accuracy — fixed in pass 1, not just flagged
 
-Checks 1-3 all pass a confidently-wrong card. For a product whose value is teaching people
-true things, a hallucinated fact in a **shared** corpus reaches every subscriber of that
-topic — the most serious failure mode in the system.
+The original design ran this as a reject-only check alongside difficulty. ADR-0030 makes it
+correctable: pass 1 fixes a confidently-wrong fact **in the body directly**, the same pass
+that fixes topic drift. Pass 2's final accept/reject is the backstop for anything pass 1's
+edit didn't actually resolve.
 
-This check runs in the same batch judge pass, and matters most for locally-generated cards
-([ADR-0008](../adr/0008-local-gpu-generation.md)), where the generating model is weaker.
-The scarce cloud model is deliberately spent here, on *judgment*, rather than on prose:
-one cloud request verifies twenty locally-generated cards.
+This matters most for locally-generated cards ([ADR-0008](../adr/0008-local-gpu-generation.md)),
+where the generating model is weaker. The scarce cloud model is deliberately spent here, on
+*judgment*, rather than on prose: two cloud requests (correction + verification) validate
+twenty locally-generated cards.
 
 `gen_meta` records which backend produced each card, so quality can be compared across
-backends and a bad batch can be traced and retired.
+backends and a bad batch can be traced and retired. `rejected_card` rows carry the same
+`gen_meta` shape, plus `stage` (`structural` | `near_duplicate` | `verification`) and
+`reason`, so rejection rates are queryable per backend and per failure mode.
 
 ## Quiz schema
 
@@ -443,11 +474,12 @@ new entries in the shared corpus.
 ## Open questions
 
 - `title` character cap: pick N, and check it against the longest realistic render.
-- Duplicate threshold for `content_embedding`: needs the same calibration treatment
-  the topic thresholds in ADR-0004 originally used — note ADR-0004's own topic-matching
-  thresholds are gone as of ADR-0025, so this is no longer "the same technique reused,"
-  just a separately-needed calibration for a different check (near-duplicate card
-  detection, not topic matching).
+- Duplicate threshold for `content_embedding`: shipped at `0.9` (ADR-0030) as an explicit,
+  more-conservative-than-the-original-`0.93` placeholder. Still needs the same calibration
+  treatment the topic thresholds in ADR-0004 originally used — note ADR-0004's own
+  topic-matching thresholds are gone as of ADR-0025, so this is no longer "the same
+  technique reused," just a separately-needed calibration for a different check
+  (near-duplicate card detection, not topic matching).
 - `POOL_LOW` / `POOL_HIGH` values: only meaningful if ADR-0026's open question resolves
   in favor of keeping degraded-mode serving for a topic's initial one-shot generation
   window. Do not implement against these until that's decided.

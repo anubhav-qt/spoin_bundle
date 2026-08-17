@@ -22,10 +22,12 @@ from spoin.generation.langchain_impl import (
     GeminiContentGenerator,
     _WireCard,
     _WireCardBatch,
-    _WireDifficultyBatch,
-    _WireDifficultyVerdict,
+    _WireCorrection,
+    _WireCorrectionBatch,
     _WireQuestion,
     _WireQuestionBatch,
+    _WireVerification,
+    _WireVerificationBatch,
 )
 
 _THINKING_MODEL = "gemini-thinking-test"
@@ -102,6 +104,8 @@ async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:
             count=2,
             existing_titles=[],
             builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
         )
 
     assert len(result.items) == 1
@@ -126,6 +130,8 @@ async def test_generate_cards_whole_call_failure_degrades_to_empty_batch() -> No
             count=5,
             existing_titles=[],
             builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
         )
 
     assert result.items == []
@@ -155,27 +161,132 @@ async def test_generate_cards_threads_builds_on_into_prompt() -> None:
             count=1,
             existing_titles=[],
             builds_on=["Lower-tier card body about the basics."],
+            difficulty_examples={},
+            avoid_bodies=[],
         )
 
     prompt_text = str(captured_prompt[0])
     assert "Lower-tier card body about the basics." in prompt_text
 
 
-async def test_judge_difficulty_parses_verdicts_and_rejects_bad_enum() -> None:
+async def test_generate_cards_threads_difficulty_examples_into_prompt() -> None:
     generator = _generator()
-    wire = _WireDifficultyBatch(
-        verdicts=[
-            _WireDifficultyVerdict(index=0, difficulty="advanced", factually_sound=True, note=""),
-            _WireDifficultyVerdict(index=1, difficulty="not-a-real-tier", factually_sound=False),
+    wire = _WireCardBatch(cards=[_WireCard(title="T", canonical_title="T", summary="s", body="b")])
+    captured_prompt: list[object] = []
+
+    async def _capture(prompt: object) -> _WireCardBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        await generator.generate_cards(
+            topic_name="T",
+            subtopic_title="S",
+            subtopic_description="d",
+            difficulty=Difficulty.BEGINNER,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={Difficulty.ADVANCED: ["An example advanced-tier card body."]},
+            avoid_bodies=[],
+        )
+
+    prompt_text = str(captured_prompt[0])
+    assert "An example advanced-tier card body." in prompt_text
+
+
+async def test_generate_cards_threads_avoid_bodies_into_prompt() -> None:
+    generator = _generator()
+    wire = _WireCardBatch(cards=[_WireCard(title="T", canonical_title="T", summary="s", body="b")])
+    captured_prompt: list[object] = []
+
+    async def _capture(prompt: object) -> _WireCardBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        await generator.generate_cards(
+            topic_name="T",
+            subtopic_title="S",
+            subtopic_description="d",
+            difficulty=Difficulty.BEGINNER,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=["A body that was rejected as a near-duplicate last run."],
+        )
+
+    prompt_text = str(captured_prompt[0])
+    assert "A body that was rejected as a near-duplicate last run." in prompt_text
+
+
+async def test_correct_cards_passes_through_edits_and_rejects_bad_item() -> None:
+    generator = _generator()
+    wire = _WireCorrectionBatch(
+        corrections=[
+            _WireCorrection(
+                index=0, title="Fixed", canonical_title="Fixed Title", summary="s", body="b",
+                was_edited=True, note="fixed topic drift",
+            ),
         ]
     )
     with patch.object(
         ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
     ):
-        result = await generator.judge_difficulty(["body one", "body two"])
+        from spoin.generation.base import CardCorrectionQuery
+
+        result = await generator.correct_cards(
+            [
+                CardCorrectionQuery(
+                    index=0, topic_name="T", topic_description="d", title="Orig",
+                    canonical_title="Orig Title", summary="s", body="off-topic body",
+                )
+            ],
+            difficulty_examples={},
+        )
 
     assert len(result.items) == 1
-    assert result.items[0].difficulty == Difficulty.ADVANCED
+    assert result.items[0].was_edited is True
+    assert result.items[0].body == "b"
+
+
+async def test_verify_cards_parses_verdicts_and_rejects_bad_enum() -> None:
+    generator = _generator()
+    wire = _WireVerificationBatch(
+        verdicts=[
+            _WireVerification(index=0, accepted=True, confirmed_difficulty="advanced", reason=""),
+            _WireVerification(
+                index=1, accepted=False, confirmed_difficulty="not-a-real-tier", reason="mismatch"
+            ),
+        ]
+    )
+    with patch.object(
+        ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
+    ):
+        from spoin.generation.base import CardVerificationQuery
+
+        result = await generator.verify_cards(
+            [
+                CardVerificationQuery(
+                    index=0, canonical_title="A", body="body one",
+                    requested_difficulty=Difficulty.ADVANCED,
+                ),
+                CardVerificationQuery(
+                    index=1, canonical_title="B", body="body two",
+                    requested_difficulty=Difficulty.BEGINNER,
+                ),
+            ],
+            difficulty_examples={},
+        )
+
+    assert len(result.items) == 1
+    assert result.items[0].accepted is True
+    assert result.items[0].confirmed_difficulty == Difficulty.ADVANCED
     assert len(result.failures) == 1
 
 

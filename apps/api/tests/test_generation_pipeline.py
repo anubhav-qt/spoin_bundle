@@ -13,8 +13,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
-from spoin.domain.models import Card, Question, Subtopic, Topic, TopicAlias
+from spoin.domain.enums import RejectionStage
+from spoin.domain.models import Card, Question, RejectedCard, Subtopic, Topic, TopicAlias
 from spoin.embeddings import HashEmbedder
+from spoin.generation.base import BatchResult, ContentGenerator
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.pipeline import (
     TopicRequest,
@@ -24,13 +26,16 @@ from spoin.generation.pipeline import (
 
 
 async def _plan_and_generate(
-    session: AsyncSession, settings: Settings, *names: str
+    session: AsyncSession,
+    settings: Settings,
+    *names: str,
+    generator: ContentGenerator | None = None,
 ) -> dict[str, object]:
     """Test convenience: run both phases in one (transaction-per-call semantics
     don't matter for these tests — only production's worker/CLI care about
     committing between them, see pipeline.py's module docstring)."""
 
-    generator = FakeContentGenerator()
+    generator = generator if generator is not None else FakeContentGenerator()
     embedder = HashEmbedder(settings.embedding_dim)
     requests = [TopicRequest(name=name, description="") for name in names]
 
@@ -196,3 +201,128 @@ async def test_first_topic_ever_skips_the_llm_call_when_no_candidates_exist(
 
     assert calls == []
     assert outcomes[0]["matched_existing"] is False
+
+
+async def test_verification_rejection_is_persisted_to_rejected_card(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """ADR-0030: pass 2 can reject, and a rejection is stored, never silently
+    dropped."""
+
+    generator = FakeContentGenerator(reject_one_per_verify_batch=True)
+    report = await _plan_and_generate(session, settings, "Cell Biology", generator=generator)
+    topic_report = report["topics"][0]
+
+    assert topic_report["rejected"] > 0
+
+    rejected_rows = (
+        await session.execute(
+            select(RejectedCard).where(RejectedCard.topic_id == topic_report["topic_id"])
+        )
+    ).scalars().all()
+    assert len(rejected_rows) > 0
+    assert all(row.stage == RejectionStage.VERIFICATION for row in rejected_rows)
+    assert all(row.reason for row in rejected_rows)
+    # A rejected draft never becomes an active Card, ever, for the same family.
+    active_bodies = {
+        card.body
+        for card in (
+            await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"]))
+        ).scalars().all()
+    }
+    assert not active_bodies & {row.body for row in rejected_rows}
+
+
+class _DuplicateCardsGenerator(FakeContentGenerator):
+    """Forces an exact intra-batch near-duplicate: the second card in every
+    `generate_cards` batch of >=2 gets the first card's body verbatim, so the
+    dedup running-set check (ADR-0030) has something real to catch."""
+
+    async def generate_cards(self, **kwargs: object) -> BatchResult:  # type: ignore[override]
+        result = await super().generate_cards(**kwargs)  # type: ignore[arg-type]
+        if len(result.items) >= 2:
+            items = list(result.items)
+            items[1] = items[1].model_copy(update={"body": items[0].body})
+            result = BatchResult(items=items, failures=result.failures)
+        return result
+
+
+async def test_near_duplicate_cards_are_rejected_and_persisted(
+    session: AsyncSession, settings: Settings
+) -> None:
+    report = await _plan_and_generate(
+        session, settings, "Marine Biology", generator=_DuplicateCardsGenerator()
+    )
+    topic_report = report["topics"][0]
+
+    assert topic_report["rejected"] > 0
+
+    rejected_rows = (
+        await session.execute(
+            select(RejectedCard).where(
+                RejectedCard.topic_id == topic_report["topic_id"],
+                RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+            )
+        )
+    ).scalars().all()
+    assert len(rejected_rows) > 0
+
+
+class _RecordingDuplicateGenerator(FakeContentGenerator):
+    """Forces exactly one intra-batch near-duplicate on its FIRST
+    `generate_cards` call only (so the topic's first run produces a real
+    `rejected_card` row), and records every call's `avoid_bodies` kwarg so a
+    later run can be asserted to have seen it."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.avoid_bodies_seen: list[list[str]] = []
+        self._forced = False
+
+    async def generate_cards(self, **kwargs: object) -> BatchResult:  # type: ignore[override]
+        self.avoid_bodies_seen.append(list(kwargs["avoid_bodies"]))  # type: ignore[arg-type]
+        result = await super().generate_cards(**kwargs)  # type: ignore[arg-type]
+        if not self._forced and len(result.items) >= 2:
+            self._forced = True
+            items = list(result.items)
+            items[1] = items[1].model_copy(update={"body": items[0].body})
+            result = BatchResult(items=items, failures=result.failures)
+        return result
+
+
+async def test_rejected_duplicate_body_feeds_forward_into_next_run(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """ADR-0030 addendum: a near-duplicate rejection is fed back as
+    `avoid_bodies` on the NEXT run's `generate_cards` call for the same
+    subtopic-tier, so the writer sees the actual rejected content."""
+
+    generator = _RecordingDuplicateGenerator()
+    embedder = HashEmbedder(settings.embedding_dim)
+    outcomes = await match_and_create_topics(
+        session, generator, embedder, settings,
+        topic_requests=[TopicRequest(name="Ornithology", description="")],
+    )
+    topic_id = uuid.UUID(outcomes[0]["topic_id"])
+
+    await run_generation_pipeline(session, generator, embedder, settings, topic_ids=[topic_id])
+
+    rejected_rows = (
+        await session.execute(
+            select(RejectedCard).where(
+                RejectedCard.topic_id == topic_id, RejectedCard.stage == RejectionStage.NEAR_DUPLICATE
+            )
+        )
+    ).scalars().all()
+    assert len(rejected_rows) > 0
+    rejected_body = rejected_rows[0].body
+
+    calls_before = len(generator.avoid_bodies_seen)
+    second_report = await run_generation_pipeline(
+        session, generator, embedder, settings, topic_ids=[topic_id]
+    )
+    # The under-target subtopic actually got topped up in this second run.
+    assert second_report["topics"][0]["accepted"] > 0  # type: ignore[index]
+
+    calls_after = generator.avoid_bodies_seen[calls_before:]
+    assert any(rejected_body in seen for seen in calls_after)

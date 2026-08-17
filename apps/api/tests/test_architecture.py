@@ -94,7 +94,8 @@ def test_generation_interfaces_take_collections() -> None:
 
     assert not hasattr(ContentGenerator, "generate_card")
     assert hasattr(ContentGenerator, "generate_cards")
-    assert hasattr(ContentGenerator, "judge_difficulty")
+    assert hasattr(ContentGenerator, "correct_cards")
+    assert hasattr(ContentGenerator, "verify_cards")
 
 
 def test_difficulty_mix_is_config_not_code() -> None:

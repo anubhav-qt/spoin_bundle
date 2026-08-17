@@ -31,7 +31,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from spoin.core.config import get_settings
 from spoin.domain.base import Base, CreatedAt, UUIDPrimaryKey, pg_enum
-from spoin.domain.enums import CardSource, CardStatus, Difficulty
+from spoin.domain.enums import CardSource, CardStatus, Difficulty, RejectionStage
 from spoin.domain.models.topic import Subtopic
 
 _EMBEDDING_DIM = get_settings().embedding_dim
@@ -198,3 +198,51 @@ class CardStats(Base, CreatedAt):
     recomputed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     card: Mapped[Card] = relationship(back_populates="stats")
+
+
+class RejectedCard(Base, UUIDPrimaryKey, CreatedAt):
+    """A draft that never became a `Card` row (ADR-0030).
+
+    Kept, not discarded. Every draft that reaches the gate becomes exactly one of:
+    an ACTIVE `Card`, or a row here -- never silently dropped. The gate is
+    judgment, not proof, so a rejected draft plus the specific reason it failed
+    is a labeled example, potentially useful later for evaluating gate accuracy
+    or the generator itself -- a plain log line would throw that away for free.
+
+    `title`/`canonical_title`/`summary`/`body` here are the content AT THE TIME
+    OF REJECTION -- post pass-1-correction for both near-duplicate and
+    verification rejects, since correction runs first (ADR-0030).
+    """
+
+    __tablename__ = "rejected_card"
+    __table_args__ = (Index("ix_rejected_card_subtopic_id", "subtopic_id"),)
+
+    topic_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), nullable=False
+    )
+    subtopic_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("subtopic.id", ondelete="CASCADE"), nullable=False
+    )
+    #: What was ASKED for -- there is no independently-judged difficulty to
+    #: store alongside it, unlike `Card.judged_difficulty`, since a rejected
+    #: draft never reached a confirmed verdict.
+    requested_difficulty: Mapped[Difficulty] = mapped_column(
+        pg_enum(Difficulty, "difficulty"), nullable=False
+    )
+
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    canonical_title: Mapped[str] = mapped_column(String(160), nullable=False)
+    summary: Mapped[str] = mapped_column(Text, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+
+    #: Where in the gate this draft was thrown out -- a `GROUP BY`, not string
+    #: parsing on `reason`.
+    stage: Mapped[RejectionStage] = mapped_column(
+        pg_enum(RejectionStage, "rejection_stage"), nullable=False
+    )
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+
+    #: Same shape as `Card.gen_meta` -- backend, generated_at, batch_id.
+    gen_meta: Mapped[dict[str, object]] = mapped_column(
+        JSONB().with_variant(JSON(), "sqlite"), default=dict, nullable=False
+    )

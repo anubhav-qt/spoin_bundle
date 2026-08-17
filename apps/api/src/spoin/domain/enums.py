@@ -47,6 +47,16 @@ class CardSource(StrEnum):
     AUTHORED = "authored"
 
 
+class RejectionStage(StrEnum):
+    """Where in the quality gate a draft was thrown out (ADR-0030). Kept on the
+    row rather than inferred from `reason` text, so rejection rates per stage
+    are a `GROUP BY`, not string parsing."""
+
+    STRUCTURAL = "structural"
+    NEAR_DUPLICATE = "near_duplicate"
+    VERIFICATION = "verification"
+
+
 class SeenState(StrEnum):
     """Three states, not a boolean (ADR-0010).
 

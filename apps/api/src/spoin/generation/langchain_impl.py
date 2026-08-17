@@ -15,7 +15,7 @@ first draft to iterate on once a key exists.
 
 ## Wire schemas vs. domain schemas
 
-For every BATCH-returning method (`generate_cards`, `judge_difficulty`,
+For every BATCH-returning method (`generate_cards`, `correct_cards`, `verify_cards`,
 `generate_questions`), the LangChain call target is a
 "wire" schema — a loose Pydantic model with the same shape as the domain type
 (`CardDraft`, etc.) but no strict field constraints (no `min_length`, no enum
@@ -46,10 +46,13 @@ from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
 from spoin.generation.base import (
     BatchResult,
+    CardCorrectionQuery,
+    CardCorrectionResult,
     CardDraft,
+    CardVerificationQuery,
+    CardVerificationResult,
     ContentGenerator,
     CurriculumDraft,
-    DifficultyVerdict,
     FreeTextGradeQuery,
     FreeTextGradeResult,
     QuestionDraft,
@@ -87,15 +90,29 @@ class _WireQuestionBatch(BaseModel):
     questions: list[_WireQuestion] = Field(default_factory=list)
 
 
-class _WireDifficultyVerdict(BaseModel):
+class _WireCorrection(BaseModel):
     index: int = -1
-    difficulty: str = ""
-    factually_sound: bool = True
+    title: str = ""
+    canonical_title: str = ""
+    summary: str = ""
+    body: str = ""
+    was_edited: bool = False
     note: str = ""
 
 
-class _WireDifficultyBatch(BaseModel):
-    verdicts: list[_WireDifficultyVerdict] = Field(default_factory=list)
+class _WireCorrectionBatch(BaseModel):
+    corrections: list[_WireCorrection] = Field(default_factory=list)
+
+
+class _WireVerification(BaseModel):
+    index: int = -1
+    accepted: bool = True
+    confirmed_difficulty: str = ""
+    reason: str = ""
+
+
+class _WireVerificationBatch(BaseModel):
+    verdicts: list[_WireVerification] = Field(default_factory=list)
 
 
 class _WireTopicMatchResult(BaseModel):
@@ -183,6 +200,10 @@ list below — write about something genuinely different within this subtopic. T
 list is tagged with the difficulty each existing card was written at; a card at a \
 DIFFERENT difficulty on the same idea must differ in DEPTH, not just wording.
 
+If any cards are shown below as previously REJECTED for being near-duplicates, \
+treat their content as off-limits too — the problem was the content itself, not \
+just its title, so rewording it is not a fix.
+
 If cards from a LOWER difficulty tier of this same subtopic are shown below \
 ("builds on"), these new cards should genuinely build on them — assume the \
 reader already knows that material, and go deeper rather than re-explaining it.
@@ -194,10 +215,10 @@ Subtopic: {subtopic_title}
 Subtopic description: {subtopic_description}
 Difficulty: {difficulty}
 Write exactly {count} NEW cards at this difficulty for this subtopic.
-
+{difficulty_examples_block}
 Already covered in this subtopic (do not repeat any of these):
 {existing_titles_block}
-{builds_on_block}"""
+{avoid_bodies_block}{builds_on_block}"""
 
 _TOPIC_BATCH_MATCH_SYSTEM = """\
 You decide, for each candidate topic below, whether it refers to the SAME \
@@ -217,19 +238,59 @@ _TOPIC_BATCH_MATCH_USER = """\
 Return one verdict per candidate topic above, referencing its request_index.
 """
 
-_DIFFICULTY_SYSTEM = """\
-You are independently rating flashcard bodies by difficulty (beginner, \
-intermediate, or advanced) and by factual accuracy. You are NOT told what \
-difficulty was originally requested for each card — rate strictly from the \
-content itself. Also flag any card containing a confidently-stated but incorrect \
-fact (factually_sound = false) — this is the single most important check, since \
-a wrong fact in this corpus is served to everyone who reads this subtopic.
+_CORRECTION_SYSTEM = """\
+You are pass 1 of a two-pass quality gate for flashcard-style learning content \
+(ADR-0030). For each card below, check two things against the TOPIC it is \
+assigned to (given as its canonical name and description, not whatever topic \
+phrasing might appear inside the card's own text):
+
+1. Does the card's content genuinely belong to this topic? If it has drifted \
+   off-subject, REWRITE title/canonical_title/summary/body so it actually \
+   belongs — never change which topic it is assigned to, only make the content \
+   earn that assignment.
+2. Does the card state any confidently-wrong fact? If so, correct it in body \
+   directly.
+
+You are NOT told what difficulty this card was requested at — do not try to \
+infer or preserve one; a difficulty examples block below (if present) is only \
+there to calibrate what "beginner" vs "advanced" writing generally looks like, \
+not to tell you this specific card's tier.
+
+If a card needs no changes, return it EXACTLY as given with was_edited=false. \
+If you change anything, set was_edited=true and give a one-line note on what \
+you fixed. Never reject a card here — that only happens in a later pass.
 """
 
-_DIFFICULTY_USER = """\
-Rate each of the following {count} card bodies independently.
+_CORRECTION_USER = """\
+Topic: {topic_name}
+Description: {topic_description}
+{difficulty_examples_block}
+Review each of the following {count} cards.
 
-{bodies_block}
+{cards_block}
+"""
+
+_VERIFICATION_SYSTEM = """\
+You are pass 2 of a two-pass quality gate for flashcard-style learning content \
+(ADR-0030) — the final check on cards already corrected by pass 1. For each \
+card, you are now shown the difficulty it was requested at. Confirm whether \
+the card's content genuinely matches that difficulty (rate independently from \
+the label — a card tagged "beginner" only because that's what was asked \
+validates nothing) and give your own confirmed_difficulty rating regardless of \
+whether you accept the card.
+
+Set accepted=false only for a real, final problem the correction pass didn't \
+already fix: a genuine difficulty mismatch, remaining factual error, or \
+content that still doesn't belong to its topic. Give a short reason whenever \
+accepted=false.
+"""
+
+_VERIFICATION_USER = """\
+{difficulty_examples_block}
+Give a final verdict on each of the following {count} cards, now that you know \
+what difficulty each was requested at.
+
+{cards_block}
 """
 
 _QUESTIONS_SYSTEM = """\
@@ -283,6 +344,42 @@ def _format_existing_titles(existing_titles: list[str]) -> str:
     return "\n".join(f"- {title}" for title in existing_titles)
 
 
+def _format_difficulty_examples(examples: dict[Difficulty, list[str]]) -> str:
+    """ADR-0030: a few example bodies per tier, shown together so the tiers
+    have a concrete contrast rather than just a label. Empty (returns "") for
+    a linked subtopic-tier, which gets real calibration from `builds_on`
+    instead -- see `generate_cards`'s docstring in base.py."""
+
+    blocks = []
+    for difficulty in Difficulty:
+        bodies = examples.get(difficulty) or []
+        if not bodies:
+            continue
+        rendered = "\n".join(f"  - {body}" for body in bodies)
+        blocks.append(f"{difficulty.value}:\n{rendered}")
+    if not blocks:
+        return ""
+    header = "\nExample cards at each difficulty, for calibration only:\n"
+    return header + "\n\n".join(blocks) + "\n"
+
+
+def _format_avoid_bodies(avoid_bodies: list[str]) -> str:
+    """ADR-0030 addendum: full body text of this subtopic-tier's most recent
+    near-duplicate rejections from a prior run -- shown as content to avoid
+    reproducing, not as titles already covered."""
+
+    if not avoid_bodies:
+        return ""
+    bodies = "\n\n".join(
+        f"--- rejected as a near-duplicate {n + 1} ---\n{body}"
+        for n, body in enumerate(avoid_bodies)
+    )
+    return (
+        "\nThese were REJECTED in an earlier run as near-duplicates of other cards -- "
+        "do not write anything this similar again, even reworded:\n" + bodies + "\n"
+    )
+
+
 def _format_builds_on(builds_on: list[str]) -> str:
     if not builds_on:
         return ""
@@ -322,18 +419,19 @@ def _format_topic_match_query(query: TopicMatchQuery) -> str:
 
 
 class GeminiContentGenerator(ContentGenerator):
-    """ADR-0008/ADR-0028/ADR-0029: cloud, quota-bound, two independently-
-    rotating pools.
+    """ADR-0008/ADR-0028/ADR-0029/ADR-0030: cloud, quota-bound, two
+    independently-rotating pools.
 
-    `_thinking` covers curriculum, topic matching, difficulty/factual judging,
-    and quiz grading — calls where a weak model has a real consequence
-    (ADR-0008's "trusted for taste, never for constraints" rule) — and walks
-    the (newer, better) thinking ladder. `_generator` covers `generate_cards`
-    AND `generate_questions` (ADR-0029): both are high-volume, one-per-item
-    prose calls, so they share the cheaper, higher-throughput lite ladder
-    instead of competing with the thinking pool's much smaller daily budget.
-    Each pool has its own key x model quota grid (ADR-0028) — a call to one
-    never affects the other's remaining budget.
+    `_thinking` covers curriculum, topic matching, the two-pass quality gate
+    (`correct_cards`/`verify_cards`, ADR-0030), and quiz grading — calls where
+    a weak model has a real consequence (ADR-0008's "trusted for taste, never
+    for constraints" rule) — and walks the (newer, better) thinking ladder.
+    `_generator` covers `generate_cards` AND `generate_questions` (ADR-0029):
+    both are high-volume, one-per-item prose calls, so they share the cheaper,
+    higher-throughput lite ladder instead of competing with the thinking
+    pool's much smaller daily budget. Each pool has its own key x model quota
+    grid (ADR-0028) — a call to one never affects the other's remaining
+    budget.
     """
 
     def __init__(self, settings: Settings) -> None:
@@ -444,6 +542,8 @@ class GeminiContentGenerator(ContentGenerator):
         count: int,
         existing_titles: list[str],
         builds_on: list[str],
+        difficulty_examples: dict[Difficulty, list[str]],
+        avoid_bodies: list[str],
     ) -> BatchResult[CardDraft]:
         client = await self._generator_client()
         structured = client.with_structured_output(_WireCardBatch)
@@ -457,7 +557,9 @@ class GeminiContentGenerator(ContentGenerator):
                     subtopic_description=subtopic_description,
                     difficulty=difficulty.value,
                     count=count,
+                    difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
                     existing_titles_block=_format_existing_titles(existing_titles),
+                    avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
                     builds_on_block=_format_builds_on(builds_on),
                 ),
             ),
@@ -488,37 +590,112 @@ class GeminiContentGenerator(ContentGenerator):
                 failures.append(f"malformed card: {exc}")
         return BatchResult(items=items, failures=failures)
 
-    async def judge_difficulty(self, bodies: list[str]) -> BatchResult[DifficultyVerdict]:
-        if not bodies:
+    async def correct_cards(
+        self,
+        queries: list[CardCorrectionQuery],
+        *,
+        difficulty_examples: dict[Difficulty, list[str]],
+    ) -> BatchResult[CardCorrectionResult]:
+        if not queries:
             return BatchResult(items=[])
 
         client = await self._thinking_client()
-        structured = client.with_structured_output(_WireDifficultyBatch)
-        bodies_block = "\n\n".join(f"{index}. {body}" for index, body in enumerate(bodies))
+        structured = client.with_structured_output(_WireCorrectionBatch)
+        topic_name = queries[0].topic_name
+        topic_description = queries[0].topic_description
+        cards_block = "\n\n".join(
+            f"{q.index}. title: {q.title}\n"
+            f"   canonical_title: {q.canonical_title}\n"
+            f"   summary: {q.summary}\n"
+            f"   body: {q.body}"
+            for q in queries
+        )
         prompt = [
-            ("system", _DIFFICULTY_SYSTEM),
-            ("human", _DIFFICULTY_USER.format(count=len(bodies), bodies_block=bodies_block)),
+            ("system", _CORRECTION_SYSTEM),
+            (
+                "human",
+                _CORRECTION_USER.format(
+                    topic_name=topic_name,
+                    topic_description=topic_description or "(no additional description given)",
+                    difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
+                    count=len(queries),
+                    cards_block=cards_block,
+                ),
+            ),
         ]
         try:
             wire_result = await structured.ainvoke(prompt)
         except Exception as exc:
-            return BatchResult(items=[], failures=[f"judge_difficulty call failed: {exc}"])
-        assert isinstance(wire_result, _WireDifficultyBatch)
+            return BatchResult(items=[], failures=[f"correct_cards call failed: {exc}"])
+        assert isinstance(wire_result, _WireCorrectionBatch)
 
-        items: list[DifficultyVerdict] = []
+        items: list[CardCorrectionResult] = []
+        failures: list[str] = []
+        for wire_correction in wire_result.corrections:
+            try:
+                items.append(
+                    CardCorrectionResult(
+                        index=wire_correction.index,
+                        title=wire_correction.title,
+                        canonical_title=wire_correction.canonical_title,
+                        summary=wire_correction.summary,
+                        body=wire_correction.body,
+                        was_edited=wire_correction.was_edited,
+                        note=wire_correction.note,
+                    )
+                )
+            except ValidationError as exc:
+                failures.append(f"malformed correction: {exc}")
+        return BatchResult(items=items, failures=failures)
+
+    async def verify_cards(
+        self,
+        queries: list[CardVerificationQuery],
+        *,
+        difficulty_examples: dict[Difficulty, list[str]],
+    ) -> BatchResult[CardVerificationResult]:
+        if not queries:
+            return BatchResult(items=[])
+
+        client = await self._thinking_client()
+        structured = client.with_structured_output(_WireVerificationBatch)
+        cards_block = "\n\n".join(
+            f"{q.index}. Requested difficulty: {q.requested_difficulty.value}\n"
+            f"   canonical_title: {q.canonical_title}\n"
+            f"   body: {q.body}"
+            for q in queries
+        )
+        prompt = [
+            ("system", _VERIFICATION_SYSTEM),
+            (
+                "human",
+                _VERIFICATION_USER.format(
+                    difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
+                    count=len(queries),
+                    cards_block=cards_block,
+                ),
+            ),
+        ]
+        try:
+            wire_result = await structured.ainvoke(prompt)
+        except Exception as exc:
+            return BatchResult(items=[], failures=[f"verify_cards call failed: {exc}"])
+        assert isinstance(wire_result, _WireVerificationBatch)
+
+        items: list[CardVerificationResult] = []
         failures: list[str] = []
         for wire_verdict in wire_result.verdicts:
             try:
                 items.append(
-                    DifficultyVerdict(
+                    CardVerificationResult(
                         index=wire_verdict.index,
-                        difficulty=Difficulty(wire_verdict.difficulty),
-                        factually_sound=wire_verdict.factually_sound,
-                        note=wire_verdict.note,
+                        accepted=wire_verdict.accepted,
+                        confirmed_difficulty=Difficulty(wire_verdict.confirmed_difficulty),
+                        reason=wire_verdict.reason,
                     )
                 )
             except (ValidationError, ValueError) as exc:
-                failures.append(f"malformed difficulty verdict: {exc}")
+                failures.append(f"malformed verification verdict: {exc}")
         return BatchResult(items=items, failures=failures)
 
     async def generate_questions(

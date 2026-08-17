@@ -1,6 +1,7 @@
 # ADR-0028: Per-key-per-model quota grid, with a two-pool model fallback ladder
 
-- **Status:** Accepted (amended by [ADR-0029](0029-questions-join-generator-pool.md))
+- **Status:** Accepted (amended by [ADR-0029](0029-questions-join-generator-pool.md),
+  [ADR-0030](0030-two-pass-quality-gate.md))
 - **Date:** 2026-08-17
 - **Deciders:** Anubhav
 - **Resolves:** [ADR-0008](0008-local-gpu-generation.md)'s open question on cloud model choice
@@ -10,6 +11,10 @@
   moved from the thinking pool to the (renamed) generator pool, below. The table's
   "questions in thinking" row and its reasoning are superseded; the rest of this ADR
   (the grid mechanism, RPD/RPM split, requeue-on-exhaustion) is unchanged.
+- **Amended by:** [ADR-0030](0030-two-pass-quality-gate.md) — the thinking-pool row's
+  `judge_difficulty` entry is replaced by two calls, `correct_cards` and `verify_cards`.
+  Still the same pool, same "always the strongest available model" rule, and this ADR's
+  grid/ladder mechanism is otherwise unaffected — only the shape of that one call changed.
 
 ## Context
 

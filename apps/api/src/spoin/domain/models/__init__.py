@@ -4,7 +4,7 @@ Alembic autogenerate only sees what has been imported, so a model that is not
 re-exported here silently never gets a migration. Add new models to `__all__`.
 """
 
-from spoin.domain.models.card import Card, CardStats
+from spoin.domain.models.card import Card, CardStats, RejectedCard
 from spoin.domain.models.engagement import (
     CardBookmark,
     CardLike,
@@ -50,6 +50,7 @@ __all__ = [
     "QuizAttempt",
     "QuizAttemptQuestion",
     "QuotaLedger",
+    "RejectedCard",
     "Subtopic",
     "Topic",
     "TopicAlias",

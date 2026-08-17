@@ -12,20 +12,27 @@ from spoin.api.schemas import (
     ProgressOut,
     TopicDiscoverOut,
     TopicOut,
+    TopicRequestIn,
+    TopicRequestOut,
     TopicStatsOut,
 )
+from spoin.core.config import get_settings
 from spoin.domain.enums import CardStatus, Difficulty, EngagementKind, SeenState
 from spoin.domain.models import (
     Card,
     CardBookmark,
     CardLike,
     EngagementEvent,
+    GenerationJob,
     Subtopic,
     Topic,
     UserCardState,
     UserTopic,
     UserTopicProgress,
 )
+from spoin.embeddings import get_embedder
+from spoin.generation import get_content_generator
+from spoin.generation.pipeline import TopicRequest, match_and_create_topics
 
 #: Notes/shares have no mutable-state table (ADR-0015) — these are the only two
 #: kinds `/topics/{id}/stats` aggregates from the raw event log rather than a
@@ -38,6 +45,105 @@ router = APIRouter(prefix="/topics", tags=["topics"])
 #: to whatever the corpus actually holds — a thin subtopic cannot strand a user at
 #: an unreachable bar.
 COVERAGE_GATE = 0.80
+
+#: content-model.md's "Custom topics" section. Enforced here, server-side, on
+#: `UserTopic.is_custom` rows -- a custom topic that canonicalizes onto an
+#: existing topic still consumes a slot (ADR-0004): users are buying slots in
+#: their own topic list, not new entries in the shared corpus.
+CUSTOM_TOPIC_LIMIT = 3
+
+
+def _entry_tier_unlock(entry: Difficulty) -> list[bool]:
+    """ADR-0027: entry tier is trusted unconditionally, so the tier chosen at
+    subscribe time -- and every tier below it -- starts unlocked for practice.
+    Coverage-gated promotion past the entry tier is untouched by this; it still
+    only unlocks by reading (see `_progress_snapshot`)."""
+
+    return [rank <= entry.rank for rank in range(len(Difficulty))]
+
+
+@router.post("", response_model=TopicRequestOut, status_code=status.HTTP_201_CREATED)
+async def request_topic(
+    payload: TopicRequestIn, session: SessionDep, user_id: UserDep
+) -> TopicRequestOut:
+    """A user typing a topic name, as opposed to picking one from Discover.
+
+    Runs the name through ADR-0025's batched matcher: a match onto an existing
+    topic just subscribes the user (no generation triggered here). A genuine
+    miss mints a new `Topic` row and enqueues a `GenerationJob` -- generation
+    is never synchronous (ADR-0003), so the response reports which case
+    happened rather than returning cards.
+    """
+
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Topic name is required")
+
+    custom_count = await session.scalar(
+        select(func.count())
+        .select_from(UserTopic)
+        .where(UserTopic.user_id == user_id, UserTopic.is_custom.is_(True))
+    )
+    if (custom_count or 0) >= CUSTOM_TOPIC_LIMIT:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=f"Custom topic limit reached ({CUSTOM_TOPIC_LIMIT})",
+        )
+
+    outcomes = await match_and_create_topics(
+        session,
+        get_content_generator(),
+        get_embedder(),
+        get_settings(),
+        topic_requests=[TopicRequest(name=name, description=(payload.description or "").strip())],
+    )
+    outcome = outcomes[0]
+    topic_id = UUID(outcome["topic_id"])
+
+    existing = await session.scalar(
+        select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+    )
+    if existing is not None:
+        # Already following the topic this name resolved to -- no slot spent,
+        # no second job. Whatever match_and_create_topics did above (at most
+        # a new alias row) is still worth keeping, so commit rather than
+        # rolling back.
+        await session.commit()
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="Already subscribed")
+
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+
+    # The user's own label, same as subscribe_topic -- but here it's what
+    # they actually typed, not the canonical name they picked from a list.
+    user_topic = UserTopic(user_id=user_id, topic_id=topic_id, display_name=name, is_custom=True)
+    session.add(user_topic)
+    topic.subscriber_count += 1
+    session.add(
+        UserTopicProgress(
+            user_id=user_id,
+            topic_id=topic_id,
+            current_difficulty=payload.entry_difficulty,
+            tier_unlocked=_entry_tier_unlock(payload.entry_difficulty),
+        )
+    )
+
+    is_new_topic = not outcome["matched_existing"]
+    if is_new_topic:
+        session.add(GenerationJob(topic_id=topic_id, status="pending"))
+
+    await session.commit()
+
+    return TopicRequestOut(
+        topic=TopicOut(
+            id=topic.id,
+            display_name=user_topic.display_name,
+            slug=topic.slug,
+            is_custom=True,
+            current_difficulty=payload.entry_difficulty,
+        ),
+        status="generating" if is_new_topic else "subscribed",
+    )
 
 
 @router.get("", response_model=list[TopicOut])
@@ -103,7 +209,12 @@ async def discover_topics(
 
 
 @router.post("/{topic_id}/subscribe", response_model=TopicOut, status_code=status.HTTP_201_CREATED)
-async def subscribe_topic(topic_id: UUID, session: SessionDep, user_id: UserDep) -> TopicOut:
+async def subscribe_topic(
+    topic_id: UUID,
+    session: SessionDep,
+    user_id: UserDep,
+    entry_difficulty: Difficulty = Difficulty.BEGINNER,
+) -> TopicOut:
     topic = await session.get(Topic, topic_id)
     if topic is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unknown topic")
@@ -121,7 +232,16 @@ async def subscribe_topic(topic_id: UUID, session: SessionDep, user_id: UserDep)
     )
     session.add(user_topic)
     topic.subscriber_count += 1
-    session.add(UserTopicProgress(user_id=user_id, topic_id=topic_id))
+    # ADR-0027: the chosen entry tier (and every tier below it) starts
+    # unlocked for practice, trusted unconditionally -- no quiz gates it.
+    session.add(
+        UserTopicProgress(
+            user_id=user_id,
+            topic_id=topic_id,
+            current_difficulty=entry_difficulty,
+            tier_unlocked=_entry_tier_unlock(entry_difficulty),
+        )
+    )
     await session.commit()
 
     return TopicOut(
@@ -129,7 +249,7 @@ async def subscribe_topic(topic_id: UUID, session: SessionDep, user_id: UserDep)
         display_name=user_topic.display_name,
         slug=topic.slug,
         is_custom=False,
-        current_difficulty=Difficulty.BEGINNER,
+        current_difficulty=entry_difficulty,
     )
 
 
@@ -185,11 +305,33 @@ async def get_topic_stats(topic_id: UUID, session: SessionDep, user_id: UserDep)
 
 @router.get("/{topic_id}/progress", response_model=ProgressOut)
 async def get_progress(topic_id: UUID, session: SessionDep, user_id: UserDep) -> ProgressOut:
-    tier, coverage, unlocked, mastered = await _progress_snapshot(session, user_id, topic_id)
+    progress, tier, coverage, unlocked, mastered = await ensure_unlock_latched(
+        session, user_id, topic_id
+    )
 
-    # The latch. Once unlocked, it stays unlocked: recomputing would let background
-    # generation revoke earned progress, dropping a user from 8/10 (80%) to 8/20
-    # (40%) the moment ten more cards land.
+    return ProgressOut(
+        topic_id=topic_id,
+        current_difficulty=tier,
+        coverage=coverage,
+        quiz_unlocked=unlocked,
+        tier_quiz_passed=list(progress.tier_quiz_passed) if progress else [False] * 3,
+        mastered=mastered,
+    )
+
+
+async def ensure_unlock_latched(
+    session: SessionDep, user_id: UUID, topic_id: UUID
+) -> tuple[UserTopicProgress | None, Difficulty, float, bool, bool]:
+    """Read the coverage snapshot, then write the tier_unlocked latch if newly
+    earned. Shared by `get_progress` and quiz.py's start-quiz check, so both
+    agree on what's unlocked without duplicating the write.
+
+    The latch itself: once unlocked, it stays unlocked. Recomputing would let
+    background generation revoke earned progress, dropping a user from 8/10
+    (80%, unlocked) to 8/20 (40%, locked) the moment ten more cards land.
+    """
+
+    tier, coverage, unlocked, mastered = await _progress_snapshot(session, user_id, topic_id)
     progress = await session.scalar(
         select(UserTopicProgress).where(
             UserTopicProgress.user_id == user_id,
@@ -202,15 +344,7 @@ async def get_progress(topic_id: UUID, session: SessionDep, user_id: UserDep) ->
         latched[tier.rank] = True
         progress.tier_unlocked = latched
         await session.commit()
-
-    return ProgressOut(
-        topic_id=topic_id,
-        current_difficulty=tier,
-        coverage=coverage,
-        quiz_unlocked=unlocked,
-        tier_quiz_passed=list(progress.tier_quiz_passed) if progress else [False] * 3,
-        mastered=mastered,
-    )
+    return progress, tier, coverage, unlocked, mastered
 
 
 async def _progress_snapshot(

@@ -20,6 +20,8 @@ from spoin.generation.base import (
     ContentGenerator,
     CurriculumDraft,
     DifficultyVerdict,
+    FreeTextGradeQuery,
+    FreeTextGradeResult,
     QuestionDraft,
     SubtopicGroupDraft,
     SubtopicTierDraft,
@@ -155,3 +157,29 @@ class FakeContentGenerator(ContentGenerator):
                     )
                 )
         return BatchResult(items=items)
+
+    async def grade_free_text(
+        self, items: list[FreeTextGradeQuery]
+    ) -> BatchResult[FreeTextGradeResult]:
+        # Deterministic stand-in for judgment: length of the (stripped) answer
+        # is a stable, inspectable proxy for "did they write something real,"
+        # which is all a fake grader needs to be useful in tests — an empty or
+        # near-empty answer always grades 0, never a coincidence of hashing.
+        results = []
+        for item in items:
+            answer = item.user_answer.strip()
+            if not answer:
+                level = 0
+            else:
+                level = 1 + _stable_index(item.stem, answer, modulo=3)
+            results.append(
+                FreeTextGradeResult(
+                    index=item.index,
+                    rubric_level=level,
+                    justification=(
+                        f"Placeholder grade referencing '{item.stem[:40]}': "
+                        f"answer length {len(answer)} chars."
+                    ),
+                )
+            )
+        return BatchResult(items=results)

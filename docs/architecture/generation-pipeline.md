@@ -164,9 +164,11 @@ every actual API call.
 
 ## What's missing
 
-- **Anything that actually creates `GenerationJob` rows.** The worker processes them once
-  they exist; nothing yet decides a new topic should be generated and inserts the row —
-  that's a demand-signal or admin-trigger question, unbuilt.
+- **Only one thing creates `GenerationJob` rows so far.** `POST /topics`
+  (`api/routers/topics.py`) enqueues one when a user-typed topic name genuinely misses
+  ADR-0025's matcher — that's the only trigger that exists. Nothing yet refills an
+  existing topic that's running thin (ADR-0026 §"open question"), and there's no
+  admin-triggered path either.
 - **The real quality gate.** `generation/gate.py` is structural validation only (non-empty
   body). Near-duplicate detection, topic conformance, and the independent
   difficulty/factual-accuracy judge (content-model.md's "Quality gate" section) are

@@ -86,6 +86,17 @@ export interface EngagementEvent {
   session_id?: string;
 }
 
+/** Carries the HTTP status so callers that need to branch on it (409 already
+ *  subscribed vs. 403 limit reached, say) don't have to parse the message. */
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`, {
     ...init,
@@ -94,7 +105,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`${init?.method ?? "GET"} ${path} failed: ${response.status}`);
+    const detail = await response
+      .json()
+      .then((body: { detail?: string }) => body.detail)
+      .catch(() => undefined);
+    throw new ApiError(response.status, detail ?? `${init?.method ?? "GET"} ${path} failed`);
   }
 
   return (await response.json()) as T;
@@ -119,6 +134,15 @@ export interface TopicDiscover {
 }
 
 export type DiscoverMode = "popular" | "for_you";
+
+export interface TopicRequestResult {
+  topic: Topic;
+  /** "generating" means a brand-new topic was minted and generation was just
+   *  enqueued — no cards yet, could take a while (ADR-0003: free-tier
+   *  generation is minutes-to-hours, never synchronous). "subscribed" means
+   *  the name matched an existing topic, which may already have cards. */
+  status: "subscribed" | "generating";
+}
 
 export interface TopicStats {
   topic_id: string;
@@ -151,6 +175,12 @@ export const api = {
 
   subscribeTopic: (topicId: string) =>
     request<Topic>(`/topics/${topicId}/subscribe`, { method: "POST" }),
+
+  requestTopic: (name: string, description?: string) =>
+    request<TopicRequestResult>("/topics", {
+      method: "POST",
+      body: JSON.stringify({ name, description: description || undefined }),
+    }),
 
   topicStats: (topicId: string) => request<TopicStats>(`/topics/${topicId}/stats`),
 

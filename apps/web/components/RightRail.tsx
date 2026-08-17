@@ -7,6 +7,7 @@ import type { Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
 import { DiscoverBox } from "./DiscoverBox";
 import { FocusToggle } from "./FocusToggle";
+import { RequestTopicBox } from "./RequestTopicBox";
 import { ThemePicker } from "./ThemePicker";
 import { TopicRail } from "./TopicRail";
 import { TopicsProgressBox } from "./TopicsProgressBox";
@@ -33,6 +34,8 @@ export function RightRail({ topics, progress, selected, onToggle, onFollowed, on
       <TopicsProgressBox topics={topics} progress={progress} />
 
       <DiscoverBox onFollowed={onFollowed} />
+
+      <RequestTopicBox onFollowed={onFollowed} />
     </aside>
   );
 }

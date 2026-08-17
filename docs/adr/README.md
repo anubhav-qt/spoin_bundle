@@ -45,7 +45,7 @@ useful than the decision itself.
 | [0006](0006-demand-driven-pool-fill.md) | Demand-driven pool fill with degraded serving and hysteresis | Accepted (amended by 0007) |
 | [0007](0007-curriculum-driven-generation.md) | Curriculum-driven generation with a bounded, completable corpus | Accepted |
 | [0008](0008-local-gpu-generation.md) | Local GPU generation for seed content, cloud verification | Accepted |
-| [0009](0009-quiz-gated-progression.md) | Quiz-gated difficulty progression | Accepted |
+| [0009](0009-quiz-gated-progression.md) | Quiz-gated difficulty progression | Accepted (amended by 0027) |
 | [0010](0010-feed-serving.md) | Feed serving: stratified selection, linear ranking, slate pagination | Accepted |
 | [0011](0011-engagement.md) | Engagement: append-only events, mutable state, derived aggregates | Accepted |
 | [0012](0012-feed-visual-design.md) | Feed visual design: Thread layout, five committed palettes | Accepted |
@@ -61,3 +61,6 @@ useful than the decision itself.
 | [0022](0022-dual-titles.md) | Every card carries a display title and a canonical title | Accepted |
 | [0023](0023-reader-font-selection.md) | Five selectable reader fonts, with the monospace face locked | Accepted |
 | [0024](0024-langgraph-for-card-generation-pipeline.md) | LangGraph for the card-generation pipeline, worker stays the scheduler | Accepted (amends 0002) |
+| [0025](0025-batched-llm-topic-matching.md) | Batched LLM topic matching, no thresholds | Accepted |
+| [0026](0026-one-shot-generation-to-completion.md) | One-shot generation to completion, amends 0006 | Accepted (amends 0006) |
+| [0027](0027-self-selected-entry-tier.md) | Self-selected entry tier; the placement quiz gate is dropped | Accepted (amends 0009) |

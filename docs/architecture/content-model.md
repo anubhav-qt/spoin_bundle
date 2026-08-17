@@ -191,10 +191,14 @@ against its aspirational number leaves users stuck at 94% forever.
 
 ## Progression, quizzes and mastery
 
-Full reasoning in [ADR-0009](../adr/0009-quiz-gated-progression.md).
+Full reasoning in [ADR-0009](../adr/0009-quiz-gated-progression.md), entry tier amended by
+[ADR-0027](../adr/0027-self-selected-entry-tier.md).
 
-**Difficulty is earned, not chosen.** The user picks only their *entry* tier, and entering
-above beginner requires passing that tier's quiz (the same quiz, used as a placement test).
+**Difficulty past your entry tier is earned; the entry tier itself is trusted.** The user
+picks their entry tier at subscribe time and starts there immediately — no quiz gates it.
+Quizzes at or below that tier are open for unlimited practice retries (never change
+progression); promotion past it still requires the same 80%-coverage-gated quiz described
+below.
 
 ```
 seen 80% of cards in EVERY subtopic of a tier

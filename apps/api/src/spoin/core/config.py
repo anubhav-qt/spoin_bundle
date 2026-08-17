@@ -118,6 +118,26 @@ class Settings(BaseSettings):
     dwell_complete_ms: int = 8000
     dwell_max_ms: int = 300_000  # a tab open overnight is not a nine-hour read
 
+    # -- quiz (ADR-0009, entry tier amended by ADR-0027) -------------------------
+    quiz_mcq_count: int = 9
+    quiz_free_text_count: int = 1
+    quiz_pass_threshold: float = 0.80
+    #: 70/30 (ADR-0009) split across quiz_mcq_count/quiz_free_text_count items.
+    quiz_mcq_weight: float = 0.70
+    quiz_free_text_weight: float = 0.30
+    #: content-model.md's rubric: "0 none / 1 surface / 2 solid / 3 deep" — this
+    #: level or above counts the free-text answer as correct.
+    quiz_free_text_pass_level: int = 2
+    #: Per-USER daily cap on LLM-graded free-text submissions. Unlike every other
+    #: quota in this system, this one scales with user behavior, not corpus size
+    #: (overview.md, Quiz Grading's cost profile) — a separate axis from the
+    #: generation quota governor, so it is its own setting rather than borrowing
+    #: `quota_daily_requests`.
+    quiz_free_text_grades_per_user_per_day: int = 20
+    #: Server-side length cap (ADR-0009): nominally unlimited, capped generously
+    #: so a pasted answer cannot blow the grading call's context window.
+    quiz_free_text_answer_max_chars: int = 12_000
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

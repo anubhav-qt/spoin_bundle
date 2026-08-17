@@ -1903,6 +1903,48 @@ body.custom-cursor-active textarea {
   cursor: default;
 }
 
+/* -- request-a-topic box -- mirrors .discover-box, see RequestTopicBox.tsx */
+.request-topic-box {
+  margin-top: 12px;
+  padding-bottom: 12px;
+}
+
+.request-topic-form {
+  display: flex;
+  gap: 8px;
+}
+
+.request-topic-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+  color: var(--fg);
+  font-size: 12.5px;
+}
+
+.request-topic-input:focus {
+  outline: none;
+  border-color: var(--line-strong);
+}
+
+.request-topic-input:disabled {
+  opacity: 0.6;
+}
+
+.request-topic-notice,
+.request-topic-hint {
+  margin: 8px 0 0;
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.request-topic-notice.error {
+  color: var(--accent);
+}
+
 /* -- modal (ADR-0015; the app's first) -- */
 .modal-overlay {
   position: fixed;

@@ -9,6 +9,7 @@ the intended feedback loop, so treat a rename here as a breaking change.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -24,6 +25,29 @@ class TopicOut(BaseModel):
     slug: str
     is_custom: bool
     current_difficulty: Difficulty
+
+
+class TopicRequestIn(BaseModel):
+    """A user typing a topic by name, not picking from Discover. ADR-0025's
+    batched matching decides whether this canonicalizes onto an existing topic
+    or mints a new one -- the caller never chooses which."""
+
+    name: str = Field(min_length=1, max_length=120)
+    description: str | None = None
+    #: ADR-0027: trusted unconditionally, no quiz gates it. Defaults to
+    #: beginner, same as every other subscribe path.
+    entry_difficulty: Difficulty = Difficulty.BEGINNER
+
+
+class TopicRequestOut(BaseModel):
+    topic: TopicOut
+    #: "subscribed" -- the name matched an existing topic (or one already
+    #: minted by an earlier request); cards may already exist, no job was
+    #: enqueued. "generating" -- a brand-new Topic was minted and a
+    #: GenerationJob enqueued; the client must show a "building this topic"
+    #: state rather than expecting cards immediately (ADR-0003: generation is
+    #: minutes-to-hours on free tier, never synchronous).
+    status: Literal["subscribed", "generating"]
 
 
 class CardOut(BaseModel):
@@ -127,3 +151,99 @@ class TopicStatsOut(BaseModel):
     saves: int
     notes: int
     shares: int
+
+
+# ------------------------------------------------------------------------ quiz --
+# ADR-0009 (quiz shape, grading), amended by ADR-0027 (entry tier / `placement`'s
+# meaning). See api/routers/quiz.py for the actual flow these wire up.
+
+
+class QuizStartIn(BaseModel):
+    difficulty: Difficulty
+
+
+class QuizMcqQuestionOut(BaseModel):
+    question_id: UUID
+    stem: str
+    #: Never `correct_index` — that would let the client grade itself.
+    options: list[str]
+
+
+class QuizFreeTextQuestionOut(BaseModel):
+    question_id: UUID
+    stem: str
+
+
+class QuizStartOut(BaseModel):
+    attempt_id: UUID
+    topic_id: UUID
+    difficulty: Difficulty
+    #: "placement" is ADR-0027's repurposed meaning: a below-current-tier
+    #: practice attempt that never changes progression. "promotion"/"mastery"
+    #: are unchanged from ADR-0009.
+    kind: Literal["placement", "promotion", "mastery"]
+    mcq: list[QuizMcqQuestionOut]
+    free_text: QuizFreeTextQuestionOut
+
+
+class McqAnswerIn(BaseModel):
+    question_id: UUID
+    selected_index: int = Field(ge=0)
+
+
+class QuizSubmitMcqIn(BaseModel):
+    answers: list[McqAnswerIn]
+
+
+class McqResultOut(BaseModel):
+    question_id: UUID
+    correct: bool
+    correct_index: int
+    explanation: str
+
+
+class QuizSubmitMcqOut(BaseModel):
+    """Immediate, deterministic (ADR-0009) — the free-text answer is a separate
+    call (`QuizSubmitFreeTextIn`) precisely so this one never waits on an LLM."""
+
+    attempt_id: UUID
+    results: list[McqResultOut]
+    #: Fraction correct, 0-1. Final `score` isn't known until the free-text
+    #: call also lands (70/30 weighting).
+    mcq_score: float
+
+
+class QuizSubmitFreeTextIn(BaseModel):
+    answer: str
+
+
+class QuizFreeTextResultOut(BaseModel):
+    question_id: UUID
+    #: 0-3 (content-model.md's rubric).
+    rubric_level: int
+    correct: bool
+    justification: str
+
+
+class RemediationCardOut(BaseModel):
+    """A card behind a question the user got wrong — content-model.md's
+    "discovery tool" framing: a failed attempt points at exactly what to
+    review, not just a score."""
+
+    card_id: UUID
+    title: str
+    subtopic_title: str
+
+
+class QuizSubmitFreeTextOut(BaseModel):
+    attempt_id: UUID
+    free_text: QuizFreeTextResultOut
+    #: Weighted 70% MCQ / 30% free text (ADR-0009).
+    score: float
+    passed: bool
+    #: Empty unless `passed` is False.
+    remediation: list[RemediationCardOut]
+    #: True if this attempt actually advanced `current_difficulty` or conferred
+    #: mastery — always False for a `placement`-kind (practice) attempt, and
+    #: for any attempt that didn't pass.
+    progressed: bool

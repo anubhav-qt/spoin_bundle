@@ -1,10 +1,15 @@
 # ADR-0009: Quiz-gated difficulty progression
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by [ADR-0027](0027-self-selected-entry-tier.md))
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
 - **Amends:** [content-model.md](../architecture/content-model.md) — difficulty is earned,
   not chosen
+- **Amended by:** [ADR-0027](0027-self-selected-entry-tier.md) — the `placement` row below
+  no longer gates entry. Entry tier is now trusted unconditionally at subscribe time;
+  `placement`-kind attempts are unlimited practice retries that never change
+  `current_difficulty`. Promotion and mastery, and everything else on this page, are
+  unchanged.
 
 ## Context
 
@@ -21,14 +26,22 @@ natural place to put the gate.
 
 ### Entry, promotion, mastery: one mechanism, three uses
 
-| Kind        | When                               | Effect                    |
-| ----------- | ---------------------------------- | ------------------------- |
-| `placement` | User wants to start above beginner | Skips them to that tier   |
-| `promotion` | Unlocked at 80% tier coverage      | Advances to the next tier |
-| `mastery`   | At advanced tier                   | Confers mastery           |
+| Kind        | When                               | Effect                              |
+| ----------- | ----------------------------------- | ----------------------------------- |
+| `placement` | Below-`current_difficulty` practice | Nothing — scored, never progresses  |
+| `promotion` | Unlocked at 80% tier coverage       | Advances to the next tier           |
+| `mastery`   | At advanced tier                    | Confers mastery                     |
 
-Starting above beginner is not self-assessment: it requires passing that tier's quiz. It is
-the same quiz used as a placement test, so there is one mechanism to build and maintain.
+**Superseded by [ADR-0027](0027-self-selected-entry-tier.md):** the paragraph below
+described starting above beginner as requiring a passed placement quiz. It does not —
+entry tier is now trusted unconditionally at subscribe time, and `placement` is a
+retitled-in-meaning practice attempt for any tier at or below the one the user is
+currently at. Kept here, struck through in spirit rather than in text per this repo's
+"don't edit history" ADR rule; read ADR-0027 for the actual current behavior:
+
+> ~~Starting above beginner is not self-assessment: it requires passing that tier's
+> quiz. It is the same quiz used as a placement test, so there is one mechanism to
+> build and maintain.~~
 
 ### Unlock condition: 80% of cards seen per subtopic, latched
 

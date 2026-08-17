@@ -19,10 +19,11 @@
  * instead of trying to out-layer it with `transform`/`will-change` hacks.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
 import { api, type Difficulty, type SubtopicProgress, type TopicStats } from "@/lib/api";
+import { defaultTopicHue } from "@/lib/topicColor";
 import { CheckIcon, HeartIcon, BookmarkIcon, NoteIcon, ShareIcon } from "./icons";
 import { QuizModal } from "./QuizModal";
 
@@ -43,7 +44,23 @@ interface Props {
    *  (right-rail rows, InsightsPanel) picks up the change immediately
    *  instead of only this modal's own `stats`. */
   onProgressChanged?: (topicId: string) => void;
+  /** ADR-0034. Present only for an already-followed topic (there's no
+   *  UserTopic row to color for a Discover preview) — omitted from Discover's
+   *  call, same pattern as `onFollow` being absent there in reverse. */
+  accentHue?: number | null;
+  onColorChanged?: (hue: number | null) => void;
+  /** This topic's position in the followed-topics list (subscription order)
+   *  — feeds the same curated first-10 default `Feed.tsx` uses, so the
+   *  swatch highlighted as "current" here matches what's actually rendered
+   *  on the card. Omitted from Discover's call (no ordered membership yet). */
+  topicIndex?: number;
 }
+
+/** 8 preset hues, evenly spaced — a discrete swatch picker (ThemePicker's
+ *  pattern) rather than a continuous color wheel, since the actual rendered
+ *  color is always derived from the active palette (ADR-0034), not this
+ *  swatch's own color. */
+const HUE_PRESETS = [355, 25, 45, 90, 150, 200, 230, 280];
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   beginner: "Beginner",
@@ -65,6 +82,9 @@ export function TopicStatsModal({
   onFollow,
   following = false,
   onProgressChanged,
+  accentHue,
+  onColorChanged,
+  topicIndex,
 }: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
   const [subtopics, setSubtopics] = useState<SubtopicProgress[] | null>(null);
@@ -79,6 +99,10 @@ export function TopicStatsModal({
 
   const loadStats = () => {
     void api.topicStats(topicId).then(setStats);
+  };
+
+  const selectHue = (hue: number) => {
+    void api.setTopicColor(topicId, hue).then((topic) => onColorChanged?.(topic.accent_hue));
   };
 
   useEffect(loadStats, [topicId]);
@@ -137,6 +161,25 @@ export function TopicStatsModal({
           >
             {following ? "Following…" : "Follow this topic"}
           </button>
+        ) : null}
+
+        {onColorChanged !== undefined ? (
+          <div className="modal-color-picker">
+            <span className="modal-color-picker-label mono">Card color</span>
+            <div className="modal-color-swatches" role="group" aria-label="Topic accent color">
+              {HUE_PRESETS.map((hue) => (
+                <button
+                  key={hue}
+                  type="button"
+                  className="modal-color-swatch"
+                  data-active={(accentHue ?? defaultTopicHue(topicId, topicIndex)) === hue}
+                  style={{ "--swatch-hue": hue } as CSSProperties}
+                  aria-label={`Set accent hue ${hue}`}
+                  onClick={() => selectHue(hue)}
+                />
+              ))}
+            </div>
+          </div>
         ) : null}
 
         {stats === null ? (

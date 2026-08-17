@@ -133,6 +133,13 @@ export function AppShell() {
     setProgress((current) => ({ ...current, [topic.id]: toTopicProgress(p) }));
   }, []);
 
+  // TopicStatsModal's color picker (ADR-0034) calls this after a successful
+  // PATCH — updates the local topics list so the feed re-renders that
+  // topic's cards with the new hue immediately, no full reload.
+  const onTopicColorChanged = useCallback((topicId: string, accentHue: number | null) => {
+    setTopics((current) => current.map((t) => (t.id === topicId ? { ...t, accent_hue: accentHue } : t)));
+  }, []);
+
   const onReset = useCallback(async () => {
     const list = await api.resetDemo();
     setTopics(list);
@@ -175,6 +182,7 @@ export function AppShell() {
             onFollowed={onFollowed}
             onEnterFocus={() => setFocusModeAnimated(true)}
             onProgressChanged={refreshProgress}
+            onTopicColorChanged={onTopicColorChanged}
           />
         )}
       </div>

@@ -56,6 +56,8 @@ export interface Topic {
   slug: string;
   is_custom: boolean;
   current_difficulty: Difficulty;
+  /** 0-359, or null to use the deterministic default (ADR-0034). */
+  accent_hue: number | null;
 }
 
 export type EngagementKind =
@@ -366,6 +368,12 @@ export const api = {
   topicCurriculum: (topicId: string) => request<TopicCurriculum>(`/topics/${topicId}/curriculum`),
 
   customTopics: () => request<CustomTopicStatus[]>("/topics/custom"),
+
+  setTopicColor: (topicId: string, hue: number | null) =>
+    request<Topic>(`/topics/${topicId}/color`, {
+      method: "PATCH",
+      body: JSON.stringify({ hue }),
+    }),
 
   /** Dev-only (see api/routers/dev.py) — resets this user's progress and
    *  unfollows a couple of topics back to Discover. Returns the refreshed

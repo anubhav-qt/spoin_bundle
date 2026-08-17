@@ -20,6 +20,7 @@ interface Props {
   onFollowed: (topic: Topic) => void;
   onEnterFocus: () => void;
   onProgressChanged: (topicId: string) => void;
+  onTopicColorChanged: (topicId: string, accentHue: number | null) => void;
 }
 
 export function RightRail({
@@ -30,6 +31,7 @@ export function RightRail({
   onFollowed,
   onEnterFocus,
   onProgressChanged,
+  onTopicColorChanged,
 }: Props) {
   return (
     <aside className="rail-right" aria-label="Filters and insights">
@@ -40,7 +42,12 @@ export function RightRail({
 
       {topics.length > 0 ? <TopicRail topics={topics} selected={selected} onToggle={onToggle} /> : null}
 
-      <TopicsProgressBox topics={topics} progress={progress} onProgressChanged={onProgressChanged} />
+      <TopicsProgressBox
+        topics={topics}
+        progress={progress}
+        onProgressChanged={onProgressChanged}
+        onTopicColorChanged={onTopicColorChanged}
+      />
 
       <DiscoverBox onFollowed={onFollowed} />
 

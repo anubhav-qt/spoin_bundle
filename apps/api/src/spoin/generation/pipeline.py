@@ -74,6 +74,7 @@ gate_and_persist          The ONLY card/question-writing node, one writer, no
 from __future__ import annotations
 
 import asyncio
+import logging
 import math
 import operator
 import uuid
@@ -120,6 +121,8 @@ from spoin.generation.base import (
 )
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
+
+logger = logging.getLogger("spoin.generation.pipeline")
 
 #: ADR-0030: no calibration examples for a linked subtopic-tier -- it gets
 #: real, concept-specific calibration from `builds_on` instead.
@@ -390,6 +393,10 @@ async def match_and_create_topics(
             await _ensure_alias(
                 session, topic, request["name"], decided_by="llm_batch_match", similarity=similarity
             )
+            logger.info(
+                "topic '%s': matched existing topic '%s' (id=%s, similarity=%s)",
+                request["name"], topic.canonical_name, topic.id, similarity,
+            )
             outcomes.append(
                 TopicMatchOutcome(
                     topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=True
@@ -404,6 +411,7 @@ async def match_and_create_topics(
             session.add(topic)
             await session.flush()
             topic.embedding = embedding
+            logger.info("topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id)
             outcomes.append(
                 TopicMatchOutcome(
                     topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=False
@@ -576,12 +584,20 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
     is_survey = topic.is_survey
 
     if need_curriculum:
+        logger.info("topic '%s': generating curriculum...", topic.canonical_name)
         async with runtime.topic_plan_lock:
             existing_subtopic_hints = await _existing_subtopic_hints(runtime.session, topic.id)
         async with runtime.semaphore:
             draft = await runtime.generator.generate_curriculum(
                 topic.canonical_name, topic.description or "", existing_subtopic_hints or None
             )
+        total_tiers = sum(len(group.tiers) for group in draft.subtopics)
+        logger.info(
+            "topic '%s': curriculum generated -- %d subtopic group(s), %d tier(s) total, "
+            "survey=%s, %d deep-dive topic(s) proposed",
+            topic.canonical_name, len(draft.subtopics), total_tiers, draft.is_survey,
+            len(draft.deep_dive_topics),
+        )
         async with runtime.topic_plan_lock:
             topic.is_survey = draft.is_survey
             await _create_deep_dive_stubs(
@@ -730,22 +746,33 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         # still reach target.
         max_rounds = math.ceil(target / batch_size) + 1
 
-        for _ in range(max_rounds):
+        for round_number in range(1, max_rounds + 1):
             remaining = target - len(drafts)
             if remaining <= 0:
                 break
+            request_count = min(batch_size, remaining)
+            logger.info(
+                "subtopic '%s' [%s]: round %d/%d -- requesting %d card(s) (%d/%d so far)",
+                tier["title"], difficulty.value, round_number, max_rounds, request_count,
+                len(drafts), target,
+            )
             async with runtime.semaphore:
                 result = await runtime.generator.generate_cards(
                     topic_name=job["topic_name"],
                     subtopic_title=tier["title"],
                     subtopic_description=tier["description"],
                     difficulty=difficulty,
-                    count=min(batch_size, remaining),
+                    count=request_count,
                     existing_titles=existing_titles,
                     builds_on=lower_tier_bodies,
                     difficulty_examples=difficulty_examples,
                     avoid_bodies=tier["avoid_duplicate_bodies"],
                 )
+            logger.info(
+                "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
+                tier["title"], difficulty.value, round_number, len(result.items),
+                len(result.failures),
+            )
             failures.extend(result.failures)
             if not result.items:
                 break  # no usable progress this round -- stop
@@ -836,11 +863,18 @@ async def _correct_subtopic_drafts(
             )
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
+        edited_count = 0
         for index, draft in enumerate(chunk):
             correction = by_index.get(index)
             if correction is None:
                 failures.append(f"correction pass returned no result for card {index}")
                 continue
+            if correction.was_edited:
+                edited_count += 1
+                logger.info(
+                    "gate: pass 1 edited '%s' (subtopic %s) -- %s",
+                    correction.canonical_title, subtopic_id, correction.note or "no note given",
+                )
             corrected.append(
                 draft.model_copy(
                     update={
@@ -851,6 +885,11 @@ async def _correct_subtopic_drafts(
                     }
                 )
             )
+        logger.info(
+            "gate: pass 1 correction for subtopic %s -- %d/%d card(s) edited this chunk, "
+            "%d failure(s)",
+            subtopic_id, edited_count, len(chunk), len(result.failures),
+        )
 
     return subtopic_id, corrected, failures
 
@@ -892,15 +931,34 @@ async def _verify_subtopic_drafts(
             )
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
+        chunk_accepted = 0
         for index, (draft, embedding) in enumerate(chunk):
             verdict = by_index.get(index)
             if verdict is None:
                 failures.append(f"verification pass returned no result for card {index}")
                 continue
             if not verdict.accepted:
-                rejected.append((draft, verdict.reason or "failed verification"))
+                reason = verdict.reason or "failed verification"
+                logger.info(
+                    "gate: pass 2 REJECTED '%s' (subtopic %s) -- %s",
+                    draft.canonical_title, subtopic_id, reason,
+                )
+                rejected.append((draft, reason))
                 continue
+            if verdict.confirmed_difficulty != draft.difficulty:
+                logger.info(
+                    "gate: pass 2 accepted '%s' (subtopic %s) but re-rated difficulty "
+                    "%s -> %s",
+                    draft.canonical_title, subtopic_id, draft.difficulty.value,
+                    verdict.confirmed_difficulty.value,
+                )
+            chunk_accepted += 1
             accepted.append((draft, embedding, verdict.confirmed_difficulty))
+        logger.info(
+            "gate: pass 2 verification for subtopic %s -- %d/%d accepted this chunk, "
+            "%d failure(s)",
+            subtopic_id, chunk_accepted, len(chunk), len(result.failures),
+        )
 
     return subtopic_id, accepted, rejected, failures
 
@@ -1017,6 +1075,13 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 )
             )
 
+    total_drafts = sum(len(item.survivors) + len(item.structural_rejects) for item in items)
+    total_structural_rejects = sum(len(item.structural_rejects) for item in items)
+    logger.info(
+        "gate: %d draft(s) across %d subtopic-tier(s) -- %d failed the structural check",
+        total_drafts, len(items), total_structural_rejects,
+    )
+
     # ---- phase 1: correction, concurrent across subtopic-tiers ------------
     correction_results = (
         await asyncio.gather(
@@ -1058,15 +1123,21 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 runtime.session, subtopic_id=subtopic_uuid, embedding=embedding, threshold=threshold
             )
             if corpus_hit is not None:
-                item.dedup_rejects.append(
-                    (draft, f"near-duplicate of an existing card (similarity {corpus_hit:.3f})")
+                reason = f"near-duplicate of an existing card (similarity {corpus_hit:.3f})"
+                logger.info(
+                    "gate: near-dup REJECTED '%s' (subtopic %s) -- %s",
+                    draft.canonical_title, item.subtopic_id, reason,
                 )
+                item.dedup_rejects.append((draft, reason))
                 continue
             batch_hit = find_batch_duplicate(embedding, accepted_embeddings, threshold=threshold)
             if batch_hit is not None:
-                item.dedup_rejects.append(
-                    (draft, f"near-duplicate within this batch (similarity {batch_hit:.3f})")
+                reason = f"near-duplicate within this batch (similarity {batch_hit:.3f})"
+                logger.info(
+                    "gate: near-dup REJECTED '%s' (subtopic %s) -- %s",
+                    draft.canonical_title, item.subtopic_id, reason,
                 )
+                item.dedup_rejects.append((draft, reason))
                 continue
             accepted_embeddings.append(embedding)
             item.dedup_survivors.append((draft, embedding))
@@ -1188,6 +1259,12 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
             + item.verification_failure_count
             + item.generator_failure_count
         )
+        logger.info(
+            "subtopic %s [%s]: persisted %d card(s), rejected %d "
+            "(structural=%d near_dup=%d verification=%d)",
+            item.subtopic_id, item.difficulty, len(new_cards), total_rejected,
+            len(item.structural_rejects), len(item.dedup_rejects), len(item.verification_rejects),
+        )
         reports_by_topic.setdefault(item.topic_id, []).append(
             {
                 "subtopic_id": item.subtopic_id,
@@ -1221,6 +1298,11 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
 
     await runtime.session.flush()
 
+    if pending_questions:
+        logger.info(
+            "gate: generating questions for %d subtopic-tier(s) with newly accepted cards...",
+            len(pending_questions),
+        )
     question_results = (
         await asyncio.gather(
             *(
@@ -1275,6 +1357,12 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
         accepted, rejected = question_counts_by_topic.get(topic_report["topic_id"], (0, 0))
         topic_report["questions_accepted"] = accepted
         topic_report["questions_rejected"] = rejected
+        logger.info(
+            "topic '%s' done -- %d card(s) accepted, %d rejected, %d question(s) accepted, "
+            "%d rejected",
+            topic_report["topic_name"], topic_report["accepted"], topic_report["rejected"],
+            accepted, rejected,
+        )
 
     return {"report": {"topics": topic_reports}}
 

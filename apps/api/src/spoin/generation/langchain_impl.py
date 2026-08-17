@@ -33,12 +33,31 @@ ADR-0007's framing of the curriculum pass as the highest-stakes single point of
 failure. `match_topics` (ADR-0025) does use the wire/domain split, same as the
 other batch methods, since a malformed verdict for one topic in the batch
 shouldn't fail matching for every other topic in it.
+
+## Real 429s vs. local ledger drift
+
+ADR-0028's grid tracks OUR OWN belief about what's been spent, hand-copied from a
+rate-limit screenshot -- it can drift from what the provider actually enforces
+(confirmed live: a fresh key 0/gemini-3.7-flash cell our ledger believed had room
+429'd immediately, quota already spent by out-of-band verification work). Every
+call in this module goes through `_invoke_with_retry`, which treats a real
+`ResourceExhausted` from the provider as ground truth: it marks that exact
+`(key, model)` cell exhausted in the ledger (`QuotaGovernor.mark_exhausted`, so a
+concurrent caller also stops retrying it) and retries the NEXT cell in the grid,
+bounded at one attempt per cell. Only once every cell has been tried does the
+final exception (a `QuotaExhaustedError` from `acquire()`, or a non-quota error)
+propagate to the caller -- generate_curriculum lets it raise hard (see above);
+every other method's existing `except Exception` already converts it to a
+`BatchResult` failure.
 """
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
+from typing import TypeVar
 
+from google.api_core.exceptions import ResourceExhausted
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field, ValidationError
 
@@ -60,6 +79,10 @@ from spoin.generation.base import (
     TopicMatchResult,
 )
 from spoin.generation.quota import QuotaGovernor, parse_ladder
+
+logger = logging.getLogger("spoin.generation.langchain_impl")
+
+_SchemaT = TypeVar("_SchemaT", bound=BaseModel)
 
 # ------------------------------------------------------------- wire schemas --
 
@@ -460,13 +483,39 @@ class GeminiContentGenerator(ContentGenerator):
             )
         return self._clients[cache_key]
 
-    async def _thinking_client(self) -> ChatGoogleGenerativeAI:
-        key_index, model = await self._thinking.acquire(now=datetime.now(UTC))
-        return self._client(key_index, model)
+    async def _invoke_with_retry(
+        self, pool: QuotaGovernor, schema: type[_SchemaT], prompt: list[tuple[str, str]]
+    ) -> _SchemaT:
+        """Acquire a `(key, model)` cell from `pool` and call it; a REAL 429
+        means our local ledger's belief disagreed with the provider's actual
+        state (see this module's docstring). Mark that exact cell exhausted
+        and retry the next cell in the grid, bounded at one attempt per
+        `(key, model)`."""
 
-    async def _generator_client(self) -> ChatGoogleGenerativeAI:
-        key_index, model = await self._generator.acquire(now=datetime.now(UTC))
-        return self._client(key_index, model)
+        max_attempts = pool.key_count * len(pool.ladder)
+        for attempt in range(1, max_attempts + 1):
+            key_index, model = await pool.acquire(now=datetime.now(UTC))
+            client = self._client(key_index, model)
+            structured = client.with_structured_output(schema)
+            try:
+                result = await structured.ainvoke(prompt)
+            except ResourceExhausted as exc:
+                logger.warning(
+                    "quota: key=%d model=%s got a REAL 429 from the provider despite our "
+                    "ledger showing room -- marking exhausted, trying next cell "
+                    "(attempt %d/%d): %s",
+                    key_index, model, attempt, max_attempts, exc,
+                )
+                await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
+                continue
+            assert isinstance(result, schema)
+            return result
+        # Every cell in the grid has now been marked exhausted by the loop
+        # above -- this raises QuotaExhaustedError, the same error acquire()
+        # would have raised directly had our ledger been accurate from the
+        # start, and propagates to the caller like any other failure.
+        await pool.acquire(now=datetime.now(UTC))
+        raise AssertionError("unreachable: acquire() should have raised QuotaExhaustedError")
 
     # --------------------------------------------------------------- curriculum --
 
@@ -476,8 +525,6 @@ class GeminiContentGenerator(ContentGenerator):
         description: str,
         existing_subtopics: list[str] | None = None,
     ) -> CurriculumDraft:
-        client = await self._thinking_client()
-        structured = client.with_structured_output(CurriculumDraft)
         existing_subtopics_block = ""
         if existing_subtopics:
             existing_subtopics_block = (
@@ -496,26 +543,23 @@ class GeminiContentGenerator(ContentGenerator):
                 ),
             ),
         ]
-        result = await structured.ainvoke(prompt)
-        assert isinstance(result, CurriculumDraft)
-        return result
+        return await self._invoke_with_retry(self._thinking, CurriculumDraft, prompt)
 
     async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
         if not queries:
             return BatchResult(items=[])
 
-        client = await self._thinking_client()
-        structured = client.with_structured_output(_WireTopicMatchBatch)
         queries_block = "\n\n".join(_format_topic_match_query(query) for query in queries)
         prompt = [
             ("system", _TOPIC_BATCH_MATCH_SYSTEM),
             ("human", _TOPIC_BATCH_MATCH_USER.format(queries_block=queries_block)),
         ]
         try:
-            wire_result = await structured.ainvoke(prompt)
+            wire_result = await self._invoke_with_retry(
+                self._thinking, _WireTopicMatchBatch, prompt
+            )
         except Exception as exc:
             return BatchResult(items=[], failures=[f"match_topics call failed: {exc}"])
-        assert isinstance(wire_result, _WireTopicMatchBatch)
 
         items: list[TopicMatchResult] = []
         failures: list[str] = []
@@ -545,8 +589,6 @@ class GeminiContentGenerator(ContentGenerator):
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
     ) -> BatchResult[CardDraft]:
-        client = await self._generator_client()
-        structured = client.with_structured_output(_WireCardBatch)
         prompt = [
             ("system", _CARDS_SYSTEM),
             (
@@ -565,10 +607,9 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await structured.ainvoke(prompt)
+            wire_result = await self._invoke_with_retry(self._generator, _WireCardBatch, prompt)
         except Exception as exc:
             return BatchResult(items=[], failures=[f"generate_cards call failed: {exc}"])
-        assert isinstance(wire_result, _WireCardBatch)
 
         items: list[CardDraft] = []
         failures: list[str] = []
@@ -599,8 +640,6 @@ class GeminiContentGenerator(ContentGenerator):
         if not queries:
             return BatchResult(items=[])
 
-        client = await self._thinking_client()
-        structured = client.with_structured_output(_WireCorrectionBatch)
         topic_name = queries[0].topic_name
         topic_description = queries[0].topic_description
         cards_block = "\n\n".join(
@@ -624,10 +663,11 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await structured.ainvoke(prompt)
+            wire_result = await self._invoke_with_retry(
+                self._thinking, _WireCorrectionBatch, prompt
+            )
         except Exception as exc:
             return BatchResult(items=[], failures=[f"correct_cards call failed: {exc}"])
-        assert isinstance(wire_result, _WireCorrectionBatch)
 
         items: list[CardCorrectionResult] = []
         failures: list[str] = []
@@ -657,8 +697,6 @@ class GeminiContentGenerator(ContentGenerator):
         if not queries:
             return BatchResult(items=[])
 
-        client = await self._thinking_client()
-        structured = client.with_structured_output(_WireVerificationBatch)
         cards_block = "\n\n".join(
             f"{q.index}. Requested difficulty: {q.requested_difficulty.value}\n"
             f"   canonical_title: {q.canonical_title}\n"
@@ -677,10 +715,11 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await structured.ainvoke(prompt)
+            wire_result = await self._invoke_with_retry(
+                self._thinking, _WireVerificationBatch, prompt
+            )
         except Exception as exc:
             return BatchResult(items=[], failures=[f"verify_cards call failed: {exc}"])
-        assert isinstance(wire_result, _WireVerificationBatch)
 
         items: list[CardVerificationResult] = []
         failures: list[str] = []
@@ -704,8 +743,6 @@ class GeminiContentGenerator(ContentGenerator):
         if not cards:
             return BatchResult(items=[])
 
-        client = await self._generator_client()
-        structured = client.with_structured_output(_WireQuestionBatch)
         cards_block = "\n\n".join(
             f"{index}. {title}\n{body}" for index, (title, body) in enumerate(cards)
         )
@@ -717,10 +754,9 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await structured.ainvoke(prompt)
+            wire_result = await self._invoke_with_retry(self._generator, _WireQuestionBatch, prompt)
         except Exception as exc:
             return BatchResult(items=[], failures=[f"generate_questions call failed: {exc}"])
-        assert isinstance(wire_result, _WireQuestionBatch)
 
         items: list[QuestionDraft] = []
         failures: list[str] = []
@@ -747,18 +783,17 @@ class GeminiContentGenerator(ContentGenerator):
         if not items:
             return BatchResult(items=[])
 
-        client = await self._thinking_client()
-        structured = client.with_structured_output(_WireFreeTextGradeBatch)
         items_block = "\n\n".join(_format_free_text_grade_query(item) for item in items)
         prompt = [
             ("system", _FREE_TEXT_GRADE_SYSTEM),
             ("human", _FREE_TEXT_GRADE_USER.format(items_block=items_block)),
         ]
         try:
-            wire_result = await structured.ainvoke(prompt)
+            wire_result = await self._invoke_with_retry(
+                self._thinking, _WireFreeTextGradeBatch, prompt
+            )
         except Exception as exc:
             return BatchResult(items=[], failures=[f"grade_free_text call failed: {exc}"])
-        assert isinstance(wire_result, _WireFreeTextGradeBatch)
 
         results: list[FreeTextGradeResult] = []
         failures: list[str] = []

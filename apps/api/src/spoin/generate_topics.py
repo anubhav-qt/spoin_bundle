@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import sys
 import uuid
 
@@ -44,6 +45,11 @@ def _parse_args(argv: list[str]) -> list[TopicRequest]:
 async def main(argv: list[str]) -> None:
     topic_requests = _parse_args(argv)
     settings = get_settings()
+    logging.basicConfig(
+        level=settings.log_level,
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+        stream=sys.stderr,
+    )
     generator = get_content_generator()
     embedder = get_embedder()
 

@@ -11,13 +11,15 @@ explicitly NOT covered here — there is no real key to verify that against.
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
+from google.api_core.exceptions import ResourceExhausted
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
+from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
 from spoin.generation.langchain_impl import (
     GeminiContentGenerator,
     _WireCard,
@@ -29,6 +31,7 @@ from spoin.generation.langchain_impl import (
     _WireVerification,
     _WireVerificationBatch,
 )
+from spoin.generation.quota import QuotaExhaustedError
 
 _THINKING_MODEL = "gemini-thinking-test"
 _GENERATOR_MODEL = "gemini-generator-test"
@@ -81,6 +84,61 @@ def test_client_is_cached_per_key_and_model() -> None:
     assert first is second
     assert first is not third_key
     assert first is not third_model
+
+
+async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> None:
+    """ADR-0028's drift risk, confirmed live: a real 429 from the provider
+    means our local ledger disagreed with reality. The retry path must mark
+    that exact cell exhausted and try the next one, not just fail outright."""
+
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(0, _THINKING_MODEL), (1, _THINKING_MODEL)]
+    )
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+
+    draft = CurriculumDraft(
+        subtopics=[
+            SubtopicGroupDraft(
+                title="G",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
+                    )
+                ],
+            )
+        ]
+    )
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=[ResourceExhausted("quota exceeded"), draft])
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_curriculum("Topic", "desc")
+
+    assert result is draft
+    generator._thinking.mark_exhausted.assert_awaited_once_with(0, _THINKING_MODEL, now=ANY)
+    assert generator._thinking.acquire.await_count == 2
+
+
+async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[
+            (0, _THINKING_MODEL),
+            (1, _THINKING_MODEL),
+            QuotaExhaustedError("all exhausted"),
+        ]
+    )
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=ResourceExhausted("quota exceeded"))
+    with (
+        patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
+        pytest.raises(QuotaExhaustedError),
+    ):
+        await generator.generate_curriculum("Topic", "desc")
+
+    assert generator._thinking.mark_exhausted.await_count == 2
 
 
 async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:

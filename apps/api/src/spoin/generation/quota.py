@@ -29,6 +29,7 @@ access). Each `acquire()` call instead opens its OWN short-lived session via
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
@@ -39,6 +40,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.db import session_scope
 from spoin.domain.models.quiz import QuotaLedger
+
+logger = logging.getLogger("spoin.generation.quota")
 
 #: The trailing window RPM is measured over. Fixed at 60s (what "requests per
 #: minute" means) — not a setting, since it isn't a tuning knob.
@@ -135,20 +138,68 @@ class QuotaGovernor:
         async with self._lock:
             return await self._acquire_locked(session, now=now)
 
+    async def mark_exhausted(self, key_index: int, model: str, *, now: datetime) -> None:
+        """A REAL 429 from the provider disagreed with our local ledger, which
+        believed this cell had room (ADR-0028's documented drift risk,
+        confirmed live rather than theoretical). Force the ledger to treat
+        this cell as exhausted for the rest of today, so the NEXT `acquire()`
+        -- ours or a concurrent caller's -- skips it immediately instead of
+        rediscovering the same 429 on every subsequent call.
+
+        Unknown model (not in this pool's ladder) is a caller bug, not a
+        runtime condition to degrade from -- raises rather than silently
+        no-op-ing, same posture as `parse_ladder` on a malformed ladder string."""
+
+        rung = next((r for r in self.ladder if r.model == model), None)
+        if rung is None:
+            raise ValueError(f"mark_exhausted: {model!r} is not in this pool's ladder")
+
+        day = _day_start(now)
+        async with self._lock, session_scope() as session:
+            ledger = await self._ledger_row(session, day, key_index, model)
+            ledger.requests_spent = max(ledger.requests_spent, rung.rpd)
+            ledger.exhausted_at = now
+            await session.flush()
+        logger.warning(
+            "quota: key %d model %s marked exhausted after a REAL 429 from the provider "
+            "(local ledger believed it had room)",
+            key_index, model,
+        )
+
     async def _acquire_locked(self, session: AsyncSession, *, now: datetime) -> tuple[int, str]:
         day = _day_start(now)
         for rung in self.ladder:
             for key_index in range(self.key_count):
                 if not self._rpm_has_room(key_index, rung):
+                    logger.debug(
+                        "quota: key %d model %s at RPM ceiling (%d/min), trying next",
+                        key_index, rung.model, rung.rpm,
+                    )
                     continue
                 ledger = await self._ledger_row(session, day, key_index, rung.model)
                 if ledger.requests_spent < rung.rpd:
                     ledger.requests_spent += 1
                     if ledger.requests_spent >= rung.rpd:
                         ledger.exhausted_at = now
+                        logger.info(
+                            "quota: key %d model %s just hit its RPD ceiling (%d/day) for %s",
+                            key_index, rung.model, rung.rpd, day.date(),
+                        )
                     await session.flush()
                     self._record_rpm(key_index, rung)
+                    logger.info(
+                        "quota: acquired key=%d model=%s (%d/%d spent today)",
+                        key_index, rung.model, ledger.requests_spent, rung.rpd,
+                    )
                     return key_index, rung.model
+                logger.debug(
+                    "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
+                    key_index, rung.model, day.date(), ledger.requests_spent, rung.rpd,
+                )
+        logger.warning(
+            "quota: ALL %d key(s) x %d model(s) exhausted for %s",
+            self.key_count, len(self.ladder), day.date(),
+        )
         raise QuotaExhaustedError(
             f"All {self.key_count} key(s) x {len(self.ladder)} model(s) exhausted for {day.date()}"
         )

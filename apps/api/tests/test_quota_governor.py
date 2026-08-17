@@ -74,6 +74,26 @@ async def test_rpm_ceiling_skips_to_the_next_key_without_waiting(session: AsyncS
     assert second == (1, "model-a")
 
 
+async def test_mark_exhausted_forces_a_cell_off_the_ladder(session: AsyncSession) -> None:
+    """A real 429 from the provider disagreeing with our local ledger (the
+    ADR-0028 drift risk) -- mark_exhausted must make the NEXT acquire() skip
+    that cell, even though the ledger only recorded 0 requests against it."""
+
+    governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 20, 100)))
+    now = datetime.now(UTC)
+
+    await governor.mark_exhausted(0, "model-a", now=now)
+    ledger = await session.scalar(
+        select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
+    )
+    assert ledger is not None
+    assert ledger.requests_spent >= 20
+    assert ledger.exhausted_at is not None
+
+    result = await governor.acquire_with_session(session, now=now)
+    assert result == (1, "model-a")
+
+
 async def test_raises_once_every_key_and_model_exhausted(session: AsyncSession) -> None:
     governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 1, 100)))
     now = datetime.now(UTC)

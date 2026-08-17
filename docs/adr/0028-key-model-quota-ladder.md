@@ -1,11 +1,15 @@
 # ADR-0028: Per-key-per-model quota grid, with a two-pool model fallback ladder
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by [ADR-0029](0029-questions-join-generator-pool.md))
 - **Date:** 2026-08-17
 - **Deciders:** Anubhav
 - **Resolves:** [ADR-0008](0008-local-gpu-generation.md)'s open question on cloud model choice
   (the *rotation mechanism*, not the specific model ids — those are still a first draft, see
   that ADR's updated "Open question" section)
+- **Amended by:** [ADR-0029](0029-questions-join-generator-pool.md) — `generate_questions`
+  moved from the thinking pool to the (renamed) generator pool, below. The table's
+  "questions in thinking" row and its reasoning are superseded; the rest of this ADR
+  (the grid mechanism, RPD/RPM split, requeue-on-exhaustion) is unchanged.
 
 ## Context
 
@@ -41,6 +45,11 @@ of keys. `QuotaLedger` rows are keyed `backend=f"gemini:{key_index}:{model}"` in
 |---|---|---|
 | **thinking** | `generate_curriculum`, `match_topics`, `judge_difficulty`, `generate_questions`, `grade_free_text` | baseline Flash models, newest→oldest |
 | **cards** | `generate_cards` only | "lite" Flash models, newest→oldest |
+
+> **Superseded by [ADR-0029](0029-questions-join-generator-pool.md):** `generate_questions`
+> moved out of the thinking row into the cards row, and the pool itself was renamed
+> `cards` → `generator` since it's no longer card-specific. Kept here, not edited, per this
+> repo's "don't edit history" ADR rule — read ADR-0029 for the current assignment and why.
 
 The split follows the rule already established across this codebase (content-model.md, ADR-
 0008): the thinking pool covers every call where a weak model has a real consequence — a

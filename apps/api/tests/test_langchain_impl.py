@@ -29,7 +29,7 @@ from spoin.generation.langchain_impl import (
 )
 
 _THINKING_MODEL = "gemini-thinking-test"
-_CARDS_MODEL = "gemini-cards-test"
+_GENERATOR_MODEL = "gemini-generator-test"
 
 
 def _settings(**overrides: object) -> Settings:
@@ -37,7 +37,7 @@ def _settings(**overrides: object) -> Settings:
         "_env_file": None,
         "gemini_api_keys": "key-a,key-b",
         "gemini_thinking_ladder": f"{_THINKING_MODEL}:20:5",
-        "gemini_cards_ladder": f"{_CARDS_MODEL}:500:15",
+        "gemini_generator_ladder": f"{_GENERATOR_MODEL}:500:15",
     }
     values.update(overrides)
     return Settings(**values)  # type: ignore[arg-type]
@@ -59,8 +59,8 @@ def _generator(**settings_overrides: object) -> GeminiContentGenerator:
     generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
         return_value=(0, _THINKING_MODEL)
     )
-    generator._cards.acquire = AsyncMock(  # type: ignore[method-assign]
-        return_value=(0, _CARDS_MODEL)
+    generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
+        return_value=(0, _GENERATOR_MODEL)
     )
     return generator
 

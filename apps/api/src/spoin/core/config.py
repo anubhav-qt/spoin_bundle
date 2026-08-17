@@ -47,20 +47,20 @@ class Settings(BaseSettings):
     #: (generation/quota.py) treats each entry as one row in its key x model grid.
     gemini_api_keys: str = ""
     #: "model:rpd:rpm,model:rpd:rpm,..." — an ORDERED fallback ladder, strongest
-    #: model first. Used for every call except `generate_cards`: curriculum,
-    #: topic matching, difficulty/factual judging, question generation, and quiz
-    #: grading are all high-stakes enough to want the best model available
-    #: (ADR-0008's "trusted for taste, never for constraints" rule — these are
-    #: the calls with real consequences if the model is weak). A model is only
-    #: skipped once every configured key is exhausted for it (ADR-0028).
+    #: model first. Used for curriculum, topic matching, difficulty/factual
+    #: judging, and quiz grading — the calls with a real consequence if the
+    #: model is weak (ADR-0008's "trusted for taste, never for constraints"
+    #: rule). A model is only skipped once every configured key is exhausted
+    #: for it (ADR-0028).
     gemini_thinking_ladder: str = (
         "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,gemini-3.5-flash:20:5,"
         "gemini-3.0-flash:20:5,gemini-2.5-flash:20:5"
     )
-    #: Same shape, for `generate_cards` only — pure prose/taste, independently
-    #: gated afterward by the quality gate, so it gets the cheap high-volume
-    #: "lite" ladder instead of competing with the thinking pool for quota.
-    gemini_cards_ladder: str = (
+    #: Same shape, for `generate_cards` AND `generate_questions` (ADR-0029) —
+    #: both are high-VOLUME, taste-shaped calls (one per card/question), so
+    #: they share the cheap high-volume "lite" ladder instead of competing
+    #: with the thinking pool's much smaller daily budget.
+    gemini_generator_ladder: str = (
         "gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15,"
         "gemini-2.5-flash-lite:20:10"
     )

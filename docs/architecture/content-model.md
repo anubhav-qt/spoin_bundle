@@ -376,7 +376,9 @@ question
   explanation
   status            draft | active | rejected
   embedding         dedup within subtopic
-  gen_meta          always cloud + strongest model (see ADR-0009)
+  gen_meta          cloud, generator pool -- shares its model tier with card
+                    generation, not the strongest available model (ADR-0029
+                    amends ADR-0009's original "always strongest" claim)
 
 quiz_attempt
   id, user_id, topic_id, difficulty

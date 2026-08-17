@@ -154,16 +154,18 @@ which one is behind the interface.
 
 ### Quota governance
 
-**Redesigned in [ADR-0028](../adr/0028-key-model-quota-ladder.md)** — read that for the
-full reasoning; this is the short version. `generation/quota.py`'s `QuotaGovernor` tracks a
-grid of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits are per
-*project* (so each `SPOIN_GEMINI_API_KEYS` entry only helps if it's a genuinely separate
-project) and per *model* independently (so exhausting one model's daily quota doesn't touch
-another's). `GeminiContentGenerator` holds TWO governors — a "thinking" pool (curriculum,
-topic matching, judging, questions, quiz grading — `SPOIN_GEMINI_THINKING_LADDER`) and a
-"cards" pool (`generate_cards` only — `SPOIN_GEMINI_CARDS_LADDER`), each an ordered
-model-fallback ladder. RPD is persisted in `QuotaLedger`
-(`backend=f"gemini:{key_index}:{model}"`); RPM is in-process only and resets each worker
+**Redesigned in [ADR-0028](../adr/0028-key-model-quota-ladder.md), pool assignment amended
+in [ADR-0029](../adr/0029-questions-join-generator-pool.md)** — read those for the full
+reasoning; this is the short version. `generation/quota.py`'s `QuotaGovernor` tracks a grid
+of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits are per *project*
+(so each `SPOIN_GEMINI_API_KEYS` entry only helps if it's a genuinely separate project) and
+per *model* independently (so exhausting one model's daily quota doesn't touch another's).
+`GeminiContentGenerator` holds TWO governors — a "thinking" pool (curriculum, topic
+matching, judging, quiz grading — `SPOIN_GEMINI_THINKING_LADDER`) and a "generator" pool
+(`generate_cards` AND `generate_questions`, both high-volume per-item prose —
+`SPOIN_GEMINI_GENERATOR_LADDER`), each an ordered model-fallback ladder. RPD is persisted in
+`QuotaLedger` (`backend=f"gemini:{key_index}:{model}"`); RPM is in-process only and resets
+each worker
 run. `QuotaExhaustedError` is caught specifically at the worker's job boundary and requeues
 the job as `pending` rather than `failed` (safe because the pipeline is idempotent per
 topic, ADR-0026). Wired end to end and unit-tested (`tests/test_quota_governor.py`,

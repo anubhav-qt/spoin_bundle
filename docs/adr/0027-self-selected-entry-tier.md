@@ -5,6 +5,12 @@
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0009](0009-quiz-gated-progression.md) -- drops the placement-quiz gate
   described there; promotion and mastery are unchanged.
+- **Amended by:** [ADR-0032](0032-entry-tier-quiz-still-earned.md) -- narrows the "tier
+  chosen at subscribe time -- and every tier below it -- starts unlocked" line below.
+  Only tiers strictly *below* the entry tier pre-unlock; the entry tier itself still earns
+  its quiz through the normal coverage gate, same as every other tier. The `[True, True,
+  False]` example a few lines down is now `[True, False, False]` for an Intermediate
+  entry -- read ADR-0032 for the corrected table.
 
 ## Context
 

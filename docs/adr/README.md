@@ -63,6 +63,9 @@ useful than the decision itself.
 | [0024](0024-langgraph-for-card-generation-pipeline.md) | LangGraph for the card-generation pipeline, worker stays the scheduler | Accepted (amends 0002) |
 | [0025](0025-batched-llm-topic-matching.md) | Batched LLM topic matching, no thresholds | Accepted |
 | [0026](0026-one-shot-generation-to-completion.md) | One-shot generation to completion, amends 0006 | Accepted (amends 0006) |
-| [0027](0027-self-selected-entry-tier.md) | Self-selected entry tier; the placement quiz gate is dropped | Accepted (amends 0009) |
+| [0027](0027-self-selected-entry-tier.md) | Self-selected entry tier; the placement quiz gate is dropped | Accepted (amends 0009; amended by 0032) |
 | [0028](0028-key-model-quota-ladder.md) | Per-key-per-model quota grid, with a two-pool model fallback ladder | Accepted (resolves part of 0008; amended by 0029) |
 | [0029](0029-questions-join-generator-pool.md) | Question generation moves to the generator (formerly "cards") pool | Accepted (amends 0009, 0028) |
+| [0030](0030-two-pass-quality-gate.md) | Two-pass, self-correcting quality gate | Accepted (amends 0008, 0028) |
+| [0031](0031-verification-feedback-and-per-tier-gate-durability.md) | Verification rejection feedback, and a per-tier durable gate | Accepted (amends 0030) |
+| [0032](0032-entry-tier-quiz-still-earned.md) | The entry tier's own quiz is still earned, not free | Accepted (amends 0027) |

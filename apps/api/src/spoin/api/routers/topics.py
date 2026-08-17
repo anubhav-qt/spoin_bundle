@@ -54,12 +54,15 @@ CUSTOM_TOPIC_LIMIT = 3
 
 
 def _entry_tier_unlock(entry: Difficulty) -> list[bool]:
-    """ADR-0027: entry tier is trusted unconditionally, so the tier chosen at
-    subscribe time -- and every tier below it -- starts unlocked for practice.
-    Coverage-gated promotion past the entry tier is untouched by this; it still
-    only unlocks by reading (see `_progress_snapshot`)."""
+    """ADR-0032 (amends ADR-0027): only tiers STRICTLY BELOW the chosen entry
+    tier start pre-unlocked, as unlimited practice -- trusted unconditionally,
+    same as before. The entry tier itself is never free: it still earns its
+    own quiz through the normal 80% coverage gate, exactly like every other
+    tier (see `_progress_snapshot`). A Beginner entry therefore starts fully
+    locked, same as a user who was promoted there the hard way -- there is
+    nothing below Beginner to trust for free."""
 
-    return [rank <= entry.rank for rank in range(len(Difficulty))]
+    return [rank < entry.rank for rank in range(len(Difficulty))]
 
 
 @router.post("", response_model=TopicRequestOut, status_code=status.HTTP_201_CREATED)
@@ -232,8 +235,9 @@ async def subscribe_topic(
     )
     session.add(user_topic)
     topic.subscriber_count += 1
-    # ADR-0027: the chosen entry tier (and every tier below it) starts
-    # unlocked for practice, trusted unconditionally -- no quiz gates it.
+    # ADR-0027, amended by ADR-0032: tiers below the chosen entry tier start
+    # unlocked for practice, trusted unconditionally. The entry tier itself
+    # still earns its quiz through the normal coverage gate.
     session.add(
         UserTopicProgress(
             user_id=user_id,

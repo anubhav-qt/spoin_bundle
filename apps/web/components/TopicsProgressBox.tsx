@@ -9,10 +9,9 @@
  * opens — not a button sitting in a scannable list where a stray tap could
  * trigger it.
  *
- * Structurally mirrors DiscoverBox on purpose (head + toggle, flat rows
- * separated by a hairline, a text block per row) rather than having its own
- * bespoke layout — two boxes doing the same job (a titled, filterable list
- * in the right rail) should look like the same kind of thing. The All/
+ * Structurally mirrors TopicDiscoveryModal's row layout on purpose (head +
+ * toggle, flat rows separated by a hairline, a text block per row) rather
+ * than having its own bespoke layout. The All/
  * Mastered/In Progress toggle filters the already-loaded `progress` map
  * client-side — no new request, since `mastered` is already a fact the
  * server sent for every followed topic.
@@ -33,18 +32,20 @@ const DIFFICULTY_LABEL: Record<Difficulty, string> = {
 type FilterMode = "all" | "mastered" | "active";
 
 const FILTERS: { key: FilterMode; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "mastered", label: "Completed" },
   { key: "active", label: "In Progress" },
+  { key: "mastered", label: "Completed" },
+  { key: "all", label: "All" },
 ];
 
 interface Props {
   topics: Topic[];
   progress: Record<string, TopicProgress>;
+  onProgressChanged: (topicId: string) => void;
+  onTopicColorChanged: (topicId: string, accentHue: number | null) => void;
 }
 
-export function TopicsProgressBox({ topics, progress }: Props) {
-  const [mode, setMode] = useState<FilterMode>("all");
+export function TopicsProgressBox({ topics, progress, onProgressChanged, onTopicColorChanged }: Props) {
+  const [mode, setMode] = useState<FilterMode>("active");
   const [openTopicId, setOpenTopicId] = useState<string | null>(null);
   const openTopic = topics.find((t) => t.id === openTopicId) ?? null;
 
@@ -88,7 +89,11 @@ export function TopicsProgressBox({ topics, progress }: Props) {
         <TopicStatsModal
           topicId={openTopic.id}
           topicName={openTopic.display_name}
+          accentHue={openTopic.accent_hue}
+          topicIndex={topics.indexOf(openTopic)}
+          onColorChanged={(hue) => onTopicColorChanged(openTopic.id, hue)}
           onClose={() => setOpenTopicId(null)}
+          onProgressChanged={onProgressChanged}
         />
       ) : null}
     </div>

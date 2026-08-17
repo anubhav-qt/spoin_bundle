@@ -56,6 +56,8 @@ export interface Topic {
   slug: string;
   is_custom: boolean;
   current_difficulty: Difficulty;
+  /** 0-359, or null to use the deterministic default (ADR-0034). */
+  accent_hue: number | null;
 }
 
 export type EngagementKind =
@@ -212,6 +214,31 @@ export interface TopicStats {
   shares: number;
 }
 
+export interface SubtopicProgress {
+  subtopic_id: string;
+  title: string;
+  difficulty: Difficulty;
+  total_cards: number;
+  seen_cards: number;
+  coverage: number;
+  covered: boolean;
+}
+
+export interface TopicCurriculum {
+  topic_id: string;
+  subtopics: SubtopicProgress[];
+}
+
+export interface CustomTopicStatus {
+  topic_id: string;
+  display_name: string;
+  slug: string;
+  /** null when the requested name matched an existing, already-generated
+   *  topic and no job was ever enqueued — nothing to poll for that one. */
+  generation_status: "pending" | "running" | "completed" | "failed" | null;
+  requested_at: string;
+}
+
 export interface QuizMcqQuestion {
   question_id: string;
   stem: string;
@@ -337,6 +364,16 @@ export const api = {
     }),
 
   topicStats: (topicId: string) => request<TopicStats>(`/topics/${topicId}/stats`),
+
+  topicCurriculum: (topicId: string) => request<TopicCurriculum>(`/topics/${topicId}/curriculum`),
+
+  customTopics: () => request<CustomTopicStatus[]>("/topics/custom"),
+
+  setTopicColor: (topicId: string, hue: number | null) =>
+    request<Topic>(`/topics/${topicId}/color`, {
+      method: "PATCH",
+      body: JSON.stringify({ hue }),
+    }),
 
   /** Dev-only (see api/routers/dev.py) — resets this user's progress and
    *  unfollows a couple of topics back to Discover. Returns the refreshed

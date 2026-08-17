@@ -157,6 +157,13 @@ class UserTopic(Base, UUIDPrimaryKey, Timestamps):
     )
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     is_custom: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    #: 0-359 hue angle, or null for "use the deterministic default"
+    #: (`hash(topic_id) % 360`, computed identically on both sides so no
+    #: write is needed just to have a default) -- see ADR-0034. Per
+    #: subscription, not on `Topic` itself: same shared-entity/personal-label
+    #: split as `display_name`, so two users can color the same topic
+    #: differently in their own feed.
+    accent_hue: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     user: Mapped[User] = relationship(back_populates="topics")
     topic: Mapped[Topic] = relationship()

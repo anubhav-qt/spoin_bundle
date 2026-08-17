@@ -1,0 +1,102 @@
+"use client";
+
+/**
+ * ADR-0023's five faces, wired up by ADR-0037. Sits next to ThemePicker,
+ * same [data-*] + localStorage mechanism — but unlike ThemePicker's
+ * click-and-it's-saved behavior, a selection here previews live without
+ * persisting, and the row shows a Keep/Revert confirmation until resolved.
+ * Legibility is harder to judge from a small swatch than color is, so this
+ * lets a reader try a face against real content before committing.
+ */
+
+import { useEffect, useState } from "react";
+
+const STORAGE_KEY = "spoin-font";
+const DEFAULT_FONT = "literata";
+
+const FONTS = [
+  { key: "literata", name: "Literata" },
+  { key: "inter", name: "Inter" },
+  { key: "grotesk", name: "Space Grotesk" },
+  { key: "plex", name: "IBM Plex Sans" },
+  { key: "hyperlegible", name: "Atkinson Hyperlegible" },
+] as const;
+
+function applyFont(key: string) {
+  if (key === DEFAULT_FONT) {
+    document.body.removeAttribute("data-font");
+  } else {
+    document.body.dataset.font = key;
+  }
+}
+
+function persistedFont(): string {
+  return localStorage.getItem(STORAGE_KEY) ?? DEFAULT_FONT;
+}
+
+export function FontPicker() {
+  const [active, setActive] = useState(DEFAULT_FONT);
+  // The persisted value being previewed away from — null while there is no
+  // pending preview (the row shows no Keep/Revert). Set the moment a
+  // different face is clicked, cleared on Keep or Revert.
+  const [pendingFrom, setPendingFrom] = useState<string | null>(null);
+
+  useEffect(() => {
+    setActive(document.body.dataset.font ?? DEFAULT_FONT);
+  }, []);
+
+  const preview = (key: string) => {
+    const saved = persistedFont();
+    applyFont(key);
+    setActive(key);
+    // Selecting the already-persisted face is not a preview — nothing to
+    // confirm or revert.
+    setPendingFrom(key === saved ? null : saved);
+  };
+
+  const keep = () => {
+    localStorage.setItem(STORAGE_KEY, active);
+    setPendingFrom(null);
+  };
+
+  const revert = () => {
+    if (pendingFrom === null) return;
+    applyFont(pendingFrom);
+    setActive(pendingFrom);
+    setPendingFrom(null);
+  };
+
+  return (
+    <div className="font-picker">
+      <div className="font-picker-row" role="group" aria-label="Font">
+        {FONTS.map(({ key, name }) => (
+          <button
+            key={key}
+            type="button"
+            className="font-pill"
+            data-active={active === key}
+            data-tooltip={name}
+            aria-pressed={active === key}
+            aria-label={name}
+            style={{ fontFamily: `var(--font-${key})` }}
+            onClick={() => preview(key)}
+          >
+            Aa
+          </button>
+        ))}
+      </div>
+
+      {pendingFrom !== null ? (
+        <div className="font-picker-confirm">
+          <span className="mono">Keep this font?</span>
+          <button type="button" className="font-picker-keep" onClick={keep}>
+            Keep
+          </button>
+          <button type="button" className="font-picker-revert" onClick={revert}>
+            Revert
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}

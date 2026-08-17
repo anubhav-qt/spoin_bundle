@@ -25,6 +25,14 @@ class TopicOut(BaseModel):
     slug: str
     is_custom: bool
     current_difficulty: Difficulty
+    #: 0-359 hue, or null to use the deterministic default (ADR-0034). Per
+    #: subscription, same personal-label split as `display_name`.
+    accent_hue: int | None = None
+
+
+class TopicColorIn(BaseModel):
+    #: null resets to the deterministic default.
+    hue: int | None = Field(default=None, ge=0, le=359)
 
 
 class TopicRequestIn(BaseModel):
@@ -138,6 +146,18 @@ class TopicDiscoverOut(BaseModel):
     subscriber_count: int
 
 
+class CustomTopicStatusOut(BaseModel):
+    topic_id: UUID
+    display_name: str
+    slug: str
+    #: The topic's most recent GenerationJob status: "pending" | "running" |
+    #: "completed" | "failed". Null when the requested name matched an
+    #: existing, already-generated topic and no job was ever enqueued for it
+    #: (`request_topic`'s "subscribed" outcome) -- there is nothing to poll.
+    generation_status: str | None
+    requested_at: datetime
+
+
 class TopicStatsOut(BaseModel):
     topic_id: UUID
     current_difficulty: Difficulty
@@ -151,6 +171,25 @@ class TopicStatsOut(BaseModel):
     saves: int
     notes: int
     shares: int
+
+
+class SubtopicProgressOut(BaseModel):
+    subtopic_id: UUID
+    title: str
+    difficulty: Difficulty
+    #: Active cards in this subtopic. 0 means nothing has generated yet — the
+    #: client should render "not generated yet", not 0% coverage.
+    total_cards: int
+    seen_cards: int
+    #: `seen_cards / total_cards`, or 0.0 when `total_cards` is 0.
+    coverage: float
+    #: Same 80% bar as the tier-level gate, applied per subtopic.
+    covered: bool
+
+
+class TopicCurriculumOut(BaseModel):
+    topic_id: UUID
+    subtopics: list[SubtopicProgressOut]
 
 
 # ------------------------------------------------------------------------ quiz --

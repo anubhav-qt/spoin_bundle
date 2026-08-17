@@ -37,12 +37,13 @@
  *   dwell_complete    -> they stayed past the threshold
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { motion, type PanInfo } from "framer-motion";
 
 import type { ArchetypeTag, Card as CardModel, Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
+import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
 import {
   BookmarkIcon,
   CheckIcon,
@@ -54,6 +55,11 @@ import {
   ShareIcon,
   SparkIcon,
 } from "./icons";
+
+/** ADR-0035. Per-browser, matching ThemePicker's `spoin-palette` precedent —
+ *  presentation-only state, no product consequence if lost or duplicated
+ *  across devices. */
+const HERO_TUTORIAL_KEY = "spoin-hero-tutorial-seen";
 
 /** Mirrors SPOIN_DWELL_COMPLETE_MS. The server stays the authority; this only
  *  decides when the client stops waiting and reports. */
@@ -72,6 +78,10 @@ const DIFFICULTY_RANK: Record<Difficulty, number> = {
 interface Props {
   card: CardModel;
   topicName: string;
+  /** 0-359, or undefined for a mixed/unknown topic — omitted entirely rather
+   *  than defaulted here, so --topic-accent falls back to the plain palette
+   *  accent (ADR-0034) instead of every card converging on hue 0 (red). */
+  accentHue: number | undefined;
   seen: boolean;
   onSeen: (cardId: string) => void;
   onUnseen: (cardId: string) => void;
@@ -81,7 +91,7 @@ interface Props {
   isHero: boolean;
 }
 
-export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHero }: Props) {
+export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDismiss, isHero }: Props) {
   // Hero never collapses: starting `expanded` (and `everExpanded`) true and
   // making `toggle` a no-op for hero reuses every bit of existing dwell/reveal
   // logic below instead of forking a parallel code path for it.
@@ -90,12 +100,31 @@ export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHer
   const [bookmarked, setBookmarked] = useState(false);
   const [everExpanded, setEverExpanded] = useState(isHero);
   const [focused, setFocused] = useState(true);
+  // ADR-0035: only the very first hero card mounted while the flag is unset
+  // shows the tutorial — read once at mount, not reactively, so it can't
+  // flip back on for a second hero card later in the same session.
+  const [showTutorial, setShowTutorial] = useState(
+    () => isHero && typeof window !== "undefined" && localStorage.getItem(HERO_TUTORIAL_KEY) === null,
+  );
 
   const dwell = useRef(new DwellTimer());
   const article = useRef<HTMLElement>(null);
   const node = useRef<HTMLDivElement>(null);
+  const gotItButton = useRef<HTMLButtonElement>(null);
   const impressed = useRef(false);
   const dragging = useRef(false);
+
+  const dismissTutorial = useCallback(() => {
+    localStorage.setItem(HERO_TUTORIAL_KEY, "1");
+    setShowTutorial(false);
+  }, []);
+
+  // Auto-dismiss if the card gets marked seen through any path while the
+  // tutorial is up — no separate dismiss click needed once the thing it was
+  // pointing at is already done.
+  useEffect(() => {
+    if (seen && showTutorial) dismissTutorial();
+  }, [seen, showTutorial, dismissTutorial]);
 
   const collapse = useCallback(() => {
     if (isHero) return;
@@ -323,6 +352,7 @@ export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHer
           data-hero={isHero}
           onClick={toggle}
           aria-expanded={expanded}
+          style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as CSSProperties) : undefined}
         >
           <div className="card-head">
             {/* Always this user's own name for the topic (ADR-0004). */}
@@ -437,6 +467,7 @@ export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHer
                 "I already know this" after a look, not a way to skip reading
                 altogether. */}
             <button
+              ref={gotItButton}
               className="action action-gotit"
               data-done={seen}
               aria-label={everExpanded ? "Got it" : "Got it (open the card first)"}
@@ -449,6 +480,8 @@ export function Card({ card, topicName, seen, onSeen, onUnseen, onDismiss, isHer
           </div>
         </article>
       </div>
+
+      {showTutorial ? <HeroTutorialOverlay targetRef={gotItButton} onDismiss={dismissTutorial} /> : null}
     </motion.div>
   );
 }

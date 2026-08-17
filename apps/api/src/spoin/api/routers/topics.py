@@ -9,8 +9,12 @@ from sqlalchemy import func, select
 
 from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
+    CustomTopicStatusOut,
     OnboardingCompleteIn,
     ProgressOut,
+    SubtopicProgressOut,
+    TopicColorIn,
+    TopicCurriculumOut,
     TopicDiscoverOut,
     TopicOut,
     TopicRequestIn,
@@ -175,9 +179,87 @@ async def list_topics(session: SessionDep, user_id: UserDep) -> list[TopicOut]:
             slug=topic.slug,
             is_custom=user_topic.is_custom,
             current_difficulty=tier or Difficulty.BEGINNER,
+            accent_hue=user_topic.accent_hue,
         )
         for user_topic, topic, tier in rows
     ]
+
+
+@router.get("/custom", response_model=list[CustomTopicStatusOut])
+async def list_custom_topics(session: SessionDep, user_id: UserDep) -> list[CustomTopicStatusOut]:
+    """This user's custom (self-requested) topics, each with its most recent
+    `GenerationJob` status -- the piece item 6/dsa-style confusion is missing
+    today: a user has no way to tell "still generating" from "broken" from
+    "nothing was ever queued" for a topic they typed in themselves.
+
+    A topic can in principle have more than one `GenerationJob` row over its
+    lifetime (retried failures, say) even though at most one is ever
+    pending/running at once (the model's coalescing index) -- so this reads
+    the latest by `created_at`, not an unqualified join.
+    """
+
+    rows = (
+        await session.execute(
+            select(UserTopic, Topic)
+            .join(Topic, Topic.id == UserTopic.topic_id)
+            .where(UserTopic.user_id == user_id, UserTopic.is_custom.is_(True))
+            .order_by(UserTopic.created_at)
+        )
+    ).all()
+
+    result: list[CustomTopicStatusOut] = []
+    for user_topic, topic in rows:
+        latest_job = await session.scalar(
+            select(GenerationJob)
+            .where(GenerationJob.topic_id == topic.id)
+            .order_by(GenerationJob.created_at.desc())
+            .limit(1)
+        )
+        result.append(
+            CustomTopicStatusOut(
+                topic_id=topic.id,
+                display_name=user_topic.display_name,
+                slug=topic.slug,
+                generation_status=latest_job.status if latest_job else None,
+                requested_at=user_topic.created_at,
+            )
+        )
+    return result
+
+
+@router.patch("/{topic_id}/color", response_model=TopicOut)
+async def set_topic_color(
+    topic_id: UUID, payload: TopicColorIn, session: SessionDep, user_id: UserDep
+) -> TopicOut:
+    """ADR-0034: per-subscription accent hue, not a shared `Topic` property --
+    two users may color the same topic differently. `hue=null` resets to the
+    deterministic default the client computes itself, so this only ever needs
+    to be called for an explicit override."""
+
+    user_topic = await session.scalar(
+        select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+    )
+    if user_topic is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not subscribed to this topic")
+
+    user_topic.accent_hue = payload.hue
+    progress = await session.scalar(
+        select(UserTopicProgress).where(
+            UserTopicProgress.user_id == user_id, UserTopicProgress.topic_id == topic_id
+        )
+    )
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+    await session.commit()
+
+    return TopicOut(
+        id=topic.id,
+        display_name=user_topic.display_name,
+        slug=topic.slug,
+        is_custom=user_topic.is_custom,
+        current_difficulty=progress.current_difficulty if progress else Difficulty.BEGINNER,
+        accent_hue=user_topic.accent_hue,
+    )
 
 
 @router.get("/discover", response_model=list[TopicDiscoverOut])
@@ -361,6 +443,56 @@ async def get_topic_stats(topic_id: UUID, session: SessionDep, user_id: UserDep)
         notes=event_counts.get(EngagementKind.NOTE, 0),
         shares=event_counts.get(EngagementKind.SHARE, 0),
     )
+
+
+@router.get("/{topic_id}/curriculum", response_model=TopicCurriculumOut)
+async def get_topic_curriculum(
+    topic_id: UUID, session: SessionDep, user_id: UserDep
+) -> TopicCurriculumOut:
+    """Every subtopic across all three tiers, with this user's per-subtopic
+    coverage — the detail TopicStatsModal's aggregate numbers are rolled up
+    from. Ordered by difficulty then `position`, matching curriculum-authoring
+    order (content-model.md), not insertion order.
+    """
+
+    rows = (
+        await session.execute(
+            select(
+                Subtopic.id,
+                Subtopic.title,
+                Subtopic.difficulty,
+                func.count(Card.id).filter(Card.status == CardStatus.ACTIVE),
+                func.count(UserCardState.card_id).filter(UserCardState.state == SeenState.SEEN),
+            )
+            .select_from(Subtopic)
+            .outerjoin(Card, Card.subtopic_id == Subtopic.id)
+            .outerjoin(
+                UserCardState,
+                (UserCardState.card_id == Card.id) & (UserCardState.user_id == user_id),
+            )
+            .where(Subtopic.topic_id == topic_id)
+            .group_by(Subtopic.id, Subtopic.title, Subtopic.difficulty, Subtopic.position)
+            .order_by(Subtopic.difficulty, Subtopic.position)
+        )
+    ).all()
+
+    subtopics = [
+        SubtopicProgressOut(
+            subtopic_id=subtopic_id,
+            title=title,
+            difficulty=difficulty,
+            total_cards=total,
+            seen_cards=seen,
+            coverage=(seen / total) if total else 0.0,
+            # Same gate `_tier_coverage` uses for tier unlock: seen/total >=
+            # COVERAGE_GATE, applied here per subtopic instead of only at the
+            # thinnest one.
+            covered=(total > 0 and seen / total >= COVERAGE_GATE),
+        )
+        for subtopic_id, title, difficulty, total, seen in rows
+    ]
+
+    return TopicCurriculumOut(topic_id=topic_id, subtopics=subtopics)
 
 
 @router.get("/{topic_id}/progress", response_model=ProgressOut)

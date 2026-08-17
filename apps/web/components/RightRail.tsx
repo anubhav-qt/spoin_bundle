@@ -19,9 +19,18 @@ interface Props {
   onToggle: (topicId: string) => void;
   onFollowed: (topic: Topic) => void;
   onEnterFocus: () => void;
+  onProgressChanged: (topicId: string) => void;
 }
 
-export function RightRail({ topics, progress, selected, onToggle, onFollowed, onEnterFocus }: Props) {
+export function RightRail({
+  topics,
+  progress,
+  selected,
+  onToggle,
+  onFollowed,
+  onEnterFocus,
+  onProgressChanged,
+}: Props) {
   return (
     <aside className="rail-right" aria-label="Filters and insights">
       <div className="rail-top-row">
@@ -31,7 +40,7 @@ export function RightRail({ topics, progress, selected, onToggle, onFollowed, on
 
       {topics.length > 0 ? <TopicRail topics={topics} selected={selected} onToggle={onToggle} /> : null}
 
-      <TopicsProgressBox topics={topics} progress={progress} />
+      <TopicsProgressBox topics={topics} progress={progress} onProgressChanged={onProgressChanged} />
 
       <DiscoverBox onFollowed={onFollowed} />
 

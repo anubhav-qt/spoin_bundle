@@ -39,6 +39,10 @@ interface Props {
    *  the user hasn't started. */
   onFollow?: () => void | Promise<void>;
   following?: boolean;
+  /** Called after a quiz attempt is graded, so the app-wide progress map
+   *  (right-rail rows, InsightsPanel) picks up the change immediately
+   *  instead of only this modal's own `stats`. */
+  onProgressChanged?: (topicId: string) => void;
 }
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -52,7 +56,14 @@ const TIERS: { key: Difficulty; label: string }[] = [
   { key: "advanced", label: "Advanced quiz" },
 ];
 
-export function TopicStatsModal({ topicId, topicName, onClose, onFollow, following = false }: Props) {
+export function TopicStatsModal({
+  topicId,
+  topicName,
+  onClose,
+  onFollow,
+  following = false,
+  onProgressChanged,
+}: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
   // The tier being quizzed, frozen at the moment the quiz opens — NOT read
   // live from `stats.current_difficulty` while the modal is open. A pass
@@ -68,6 +79,14 @@ export function TopicStatsModal({ topicId, topicName, onClose, onFollow, followi
   };
 
   useEffect(loadStats, [topicId]);
+
+  // QuizModal's onGraded: refresh this modal's own stats, and also the
+  // app-wide progress map (right-rail rows, InsightsPanel), which otherwise
+  // stays stale until a full reload — see AppShell's `refreshProgress`.
+  const onQuizGraded = () => {
+    loadStats();
+    onProgressChanged?.(topicId);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -177,7 +196,7 @@ export function TopicStatsModal({ topicId, topicName, onClose, onFollow, followi
           topicName={topicName}
           difficulty={quizDifficulty}
           onClose={() => setQuizDifficulty(null)}
-          onGraded={loadStats}
+          onGraded={onQuizGraded}
         />
       ) : null}
     </div>,

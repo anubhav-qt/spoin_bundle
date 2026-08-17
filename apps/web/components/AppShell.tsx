@@ -174,6 +174,7 @@ export function AppShell() {
             onToggle={toggleTopic}
             onFollowed={onFollowed}
             onEnterFocus={() => setFocusModeAnimated(true)}
+            onProgressChanged={refreshProgress}
           />
         )}
       </div>

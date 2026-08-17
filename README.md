@@ -133,5 +133,8 @@ a failing CI check does not.
 
 ## Team
 
-A two-person project. Anubhav owns architecture, planning, and design; implementation
-is split between Anubhav and Mayank.
+Spoin is open source, and we'd genuinely welcome contributors. Right now it's a
+two-person project — [Anubhav](https://github.com/anubhav-qt), who owns architecture,
+planning, and design, and [Mayank](https://github.com/mayanks0ni), who shares
+implementation with Anubhav — but that's a starting point, not a ceiling. If something
+here is interesting to you, open an issue or a PR.

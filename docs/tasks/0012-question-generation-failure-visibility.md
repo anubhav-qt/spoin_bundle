@@ -111,3 +111,58 @@ existed yet for this freshly-generated content) so they'd get picked up by
 proper script/task, not copy-pasted ad hoc again** — the 0.72 threshold and batch-of-8 LLM
 check shape are what worked for `dsa`'s specific content mix; recalibrate before trusting it
 on a different topic's embedding distribution.
+
+One leftover garbage row (`f6e3190f-…`, an empty `stem` predating this session's fixes) was
+missed by the above pass — the verification script's `stem or rubric or reference_answer`
+fallback fed the *rubric* text to the judge when `stem` was empty, so it got judged against
+that instead of being flagged as broken. Deleted directly once noticed (2026-08-18); if this
+technique gets formalized into a real script per the note above, don't reuse that fallback —
+an empty required field should always be an automatic mismatch, not fall through to sibling
+fields.
+
+## Update 2026-08-18: root cause found — a `null` string field sinking whole batches, fixed
+
+The actual root cause (not just a contributing factor) of the two named subtopics'
+persistent zero/near-zero question counts: **`_WireQuestion.explanation` was a plain `str`
+field, but `gemini-3.5-flash-lite` sometimes returns `null` for it** — plausibly because
+"explanation" reads as optional/less-applicable for the free-text question in a batch.
+Since `with_structured_output` validates an entire batch as ONE Pydantic object, that single
+`null` failed validation for the WHOLE call (`generate_questions call failed: 1 validation
+error for _WireQuestionBatch`), discarding every other valid question in the same batch —
+not a per-item loss, a whole-batch wipe, every time that subtopic's batch happened to include
+a free-text item (which it always does, per `_QUESTIONS_SYSTEM`'s "last question is
+free-text" rule).
+
+Fixed via `_LenientWireModel` (a `model_validator(mode="before")` that coerces `null` to a
+field's own default for any plain-`str` field, applied to every wire model in
+`langchain_impl.py`, not just `_WireQuestion` — the same fragility exists wherever a wire
+model has a plain-`str` field, so this closes the whole class, not just the one caught
+instance). See the commit "fix(generation): stop a null string field from sinking a whole
+wire batch".
+
+**Live-verified fixed**, 2026-08-18: reran `generate_topics "dsa"` after the fix. Whole-batch
+`_WireQuestionBatch` validation failures are gone from the log entirely — remaining failures
+are legitimate per-item `QuestionDraft` rejections (e.g. `stem` too short), exactly the
+per-item isolation ADR-0005 intends. Both named subtopics improved sharply:
+*Bit Manipulation & Elementary Number Theory [intermediate]* closed completely (15/15).
+*Graph Foundations, Traversals & Connectivity [advanced]* went from 11 cards/0 questions to
+13 cards/7 questions — no longer catastrophic, just a normal remaining gap that should close
+on a routine rerun via the existing backfill.
+
+**One unexplained failure to watch for, not yet chased down:** the same verification run
+logged `subtopic 320f963a-… [advanced]: 1 question failure(s): generate_questions call
+failed: ` with a **completely empty exception message**. Plausible guess: a bare
+`asyncio.TimeoutError()` (empty `str()` by default on a raised-with-no-args timeout), i.e. a
+transient network stall rather than a code bug — but this wasn't confirmed. If this recurs on
+a future run, it's worth adding `exc.__class__.__name__` to the failure string in
+`langchain_impl.py`'s `except Exception as exc: return BatchResult(..., failures=[f"...{exc}"])`
+handlers so an empty message at least names its exception type.
+
+## Status: mostly resolved
+
+The whole-batch-wipe root cause is fixed and live-verified; the two subtopics originally
+named are no longer stuck. Remaining before this can move to Closed:
+
+- 5 subtopics topic-wide still have small (1-9) card/question gaps — expected to self-heal
+  via the existing backfill on a routine rerun, not yet re-verified after one.
+- The empty-message exception above is unexplained (low-confidence guess only).

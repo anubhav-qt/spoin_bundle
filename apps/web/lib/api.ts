@@ -97,12 +97,49 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, retry = true): Promise<T> {
+  const headers = new Headers(init?.headers);
+  if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  // Inject token
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("spoin_access_token");
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+  }
+
   const response = await fetch(`${BASE_URL}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers,
     cache: "no-store",
   });
+
+  if (response.status === 401 && retry && typeof window !== "undefined" && !path.startsWith("/auth/")) {
+    const refreshToken = localStorage.getItem("spoin_refresh_token");
+    if (refreshToken) {
+      try {
+        const refreshResp = await fetch(`${BASE_URL}/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken })
+        });
+        if (refreshResp.ok) {
+          const data = await refreshResp.json();
+          localStorage.setItem("spoin_access_token", data.access_token);
+          localStorage.setItem("spoin_refresh_token", data.refresh_token);
+          // Retry original request
+          return request<T>(path, init, false);
+        }
+      } catch (e) {}
+    }
+    // Refresh failed or no refresh token, log out
+    localStorage.removeItem("spoin_access_token");
+    localStorage.removeItem("spoin_refresh_token");
+    window.location.href = "/login";
+  }
 
   if (!response.ok) {
     const detail = await response
@@ -113,6 +150,19 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   return (await response.json()) as T;
+}
+
+export interface AuthTokens {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  display_name: string;
+  created_at: string;
 }
 
 export interface Progress {
@@ -219,6 +269,22 @@ export interface QuizFreeTextSubmitResult {
 }
 
 export const api = {
+  // -- Auth -----------------------------------------------------------------
+  login: (credentials: Record<string, string>) =>
+    request<AuthTokens>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    }),
+
+  register: (details: Record<string, string>) =>
+    request<AuthTokens>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(details),
+    }),
+
+  me: () => request<User>("/auth/me"),
+
+  // -- Feed -----------------------------------------------------------------
   feed: (position?: number, topics?: string[]) => {
     const query = new URLSearchParams();
     if (position !== undefined) query.set("position", String(position));

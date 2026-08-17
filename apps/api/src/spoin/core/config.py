@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     #: Read it through `cors_origin_list`.
     cors_origins: str = "http://localhost:3000"
 
+    # -- auth ---------------------------------------------------------------
+    jwt_secret_key: str = "CHANGE-ME-IN-PRODUCTION-KEY-MUST-BE-32-BYTES"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
+    google_client_id: str = ""
+
     # -- generation (ADR-0002, ADR-0008, ADR-0028) -----------------------------
     # `fake` everywhere except production: tests and local dev must never call a
     # real model, never burn quota, and run in milliseconds.

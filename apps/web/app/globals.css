@@ -2487,3 +2487,169 @@ body.custom-cursor-active textarea {
     padding: 0 18px 24px;
   }
 }
+
+/* ============================================================================
+   Authentication Layout
+   ========================================================================= */
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg);
+  background-image: var(--texture);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  padding: 24px;
+}
+
+.auth-panel {
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 12px 40px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-header {
+  margin-bottom: 32px;
+}
+
+.auth-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  color: var(--fg-2);
+  margin: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-2);
+}
+
+.auth-input {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  transition: border-color var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.auth-input::placeholder {
+  color: var(--fg-3);
+}
+
+.auth-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-button {
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.auth-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.auth-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  color: var(--accent);
+  font-size: 13px;
+  margin-top: -8px;
+  font-weight: 500;
+}
+
+.auth-footer {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--fg-2);
+}
+
+.auth-link {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  transition: color var(--dur-1) var(--ease);
+}
+
+.auth-link:hover {
+  color: var(--accent-2);
+}
+
+.auth-loader {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bg-3);
+  border-top-color: var(--bg);
+  border-radius: 50%;
+  animation: auth-spin 0.8s linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

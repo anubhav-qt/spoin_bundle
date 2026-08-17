@@ -247,3 +247,38 @@ class QuizSubmitFreeTextOut(BaseModel):
     #: mastery — always False for a `placement`-kind (practice) attempt, and
     #: for any attempt that didn't pass.
     progressed: bool
+
+
+# ------------------------------------------------------------------------ auth --
+
+
+class RegisterIn(BaseModel):
+    email: str = Field(max_length=320)
+    password: str = Field(min_length=8, max_length=128)
+    display_name: str = Field(min_length=1, max_length=80)
+
+
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
+
+class GoogleAuthIn(BaseModel):
+    id_token: str
+
+
+class TokenOut(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshIn(BaseModel):
+    refresh_token: str
+
+
+class UserOut(BaseModel):
+    id: UUID
+    email: str
+    display_name: str
+

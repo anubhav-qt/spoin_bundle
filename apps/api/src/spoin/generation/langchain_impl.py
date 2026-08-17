@@ -480,6 +480,15 @@ class GeminiContentGenerator(ContentGenerator):
                 model=model,
                 google_api_key=self._keys[key_index],
                 temperature=0.7,
+                # LangChain's own client retries a 429 in-place with
+                # exponential backoff (default max_retries=6, ~2 minutes of
+                # wall time) before ever raising ResourceExhausted up to
+                # _invoke_with_retry -- that defeats the whole point of this
+                # module's own cross-cell fallback (see module docstring),
+                # which wants to move to the next (key, model) immediately on
+                # a real 429, not sit retrying a cell it's about to mark
+                # exhausted anyway.
+                max_retries=0,
             )
         return self._clients[cache_key]
 

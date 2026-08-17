@@ -10,7 +10,7 @@
  * discoverable only by clicking the thing that's always on screen anyway.
  */
 
-import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon } from "./icons";
+import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon, CloseIcon } from "./icons";
 
 const STUBS = [
   { label: "Profile", icon: UserIcon },
@@ -47,6 +47,22 @@ export function Sidebar({ onReset }: Props) {
           <span className="nav-item-label">{label}</span>
         </span>
       ))}
+
+      <button 
+        type="button" 
+        className="nav-item" 
+        onClick={() => {
+          localStorage.removeItem("spoin_access_token");
+          localStorage.removeItem("spoin_refresh_token");
+          window.location.href = "/login";
+        }}
+        style={{ background: "none", border: "none", width: "100%", textAlign: "left", cursor: "pointer", fontFamily: "inherit", marginTop: "auto", paddingTop: "24px" }}
+      >
+        <span className="nav-item-icon">
+          <CloseIcon />
+        </span>
+        <span className="nav-item-label">Log out</span>
+      </button>
     </nav>
   );
 }

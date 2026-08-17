@@ -54,10 +54,11 @@ async def seed() -> None:
             user = User(
                 email=fixture["user"]["email"],
                 display_name=fixture["user"]["display_name"],
-                password_hash=hash_password(os.environ.get("SPOIN_SEED_USER_PASSWORD", "demo1234")),
             )
             session.add(user)
-            await session.flush()
+            
+        user.password_hash = hash_password(os.environ.get("SPOIN_SEED_USER_PASSWORD", "demo1234"))
+        await session.flush()
 
         for topic_data in fixture["topics"]:
             topic = await session.scalar(select(Topic).where(Topic.slug == topic_data["slug"]))

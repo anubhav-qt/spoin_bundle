@@ -46,6 +46,8 @@ class User(Base, UUIDPrimaryKey, Timestamps):
 
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
     display_name: Mapped[str] = mapped_column(String(80), nullable=False)
+    password_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    google_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
 
     topics: Mapped[list[UserTopic]] = relationship(back_populates="user")
 

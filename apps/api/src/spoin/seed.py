@@ -14,12 +14,14 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import uuid
 from importlib import resources
 from typing import Any
 
 from sqlalchemy import func, select
 
+from spoin.auth.passwords import hash_password
 from spoin.content.archetype import classify_archetype
 from spoin.core.db import session_scope
 from spoin.domain.enums import CardStatus, Difficulty, GenerationBackend
@@ -52,6 +54,7 @@ async def seed() -> None:
             user = User(
                 email=fixture["user"]["email"],
                 display_name=fixture["user"]["display_name"],
+                password_hash=hash_password(os.environ.get("SPOIN_SEED_USER_PASSWORD", "demo1234")),
             )
             session.add(user)
             await session.flush()

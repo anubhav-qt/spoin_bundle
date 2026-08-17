@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from spoin.api.routers import dev, engagement, feed, quiz, topics
+from spoin.api.routers import auth, dev, engagement, feed, quiz, topics
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine
 
@@ -49,6 +49,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.include_router(auth.router)
     app.include_router(feed.router)
     app.include_router(topics.router)
     app.include_router(quiz.router)

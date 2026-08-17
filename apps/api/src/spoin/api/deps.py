@@ -5,10 +5,13 @@ from __future__ import annotations
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, Header, HTTPException, status
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from spoin.auth.tokens import decode_token
 from spoin.core.config import Settings, get_settings
 from spoin.core.db import get_session
 from spoin.domain.models import User
@@ -16,33 +19,35 @@ from spoin.domain.models import User
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
+_bearer = HTTPBearer()
+
 
 async def current_user_id(
     session: SessionDep,
-    x_user_id: Annotated[UUID | None, Header(alias="X-User-Id")] = None,
+    settings: SettingsDep,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(_bearer)],
 ) -> UUID:
-    """Resolve the acting user.
+    """Resolve the acting user via JWT Bearer token."""
+    try:
+        payload = decode_token(credentials.credentials, settings)
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.PyJWTError:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-    **Placeholder auth.** A header is not authentication and this must be replaced
-    before anything is exposed publicly. It is a header rather than a hardcoded id
-    so that every downstream signature already takes a `user_id` — swapping in real
-    token verification then changes this function and nothing else.
-    """
+    if payload.get("type") != "access":
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
 
-    if x_user_id is None:
-        # Single-user convenience for local development and the seeded demo.
-        user_id = await session.scalar(select(User.id).order_by(User.created_at).limit(1))
-        if user_id is None:
-            raise HTTPException(
-                status.HTTP_401_UNAUTHORIZED,
-                detail="No users exist. Run the seed job first.",
-            )
-        return user_id
+    try:
+        user_id = UUID(payload["sub"])
+    except (KeyError, ValueError):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject")
 
-    exists = await session.scalar(select(User.id).where(User.id == x_user_id))
+    exists = await session.scalar(select(User.id).where(User.id == user_id))
     if exists is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Unknown user")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return exists
 
 
 UserDep = Annotated[UUID, Depends(current_user_id)]
+

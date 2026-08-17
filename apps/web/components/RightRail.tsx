@@ -1,14 +1,22 @@
+"use client";
+
 /**
  * The right rail (ADR-0015), top to bottom: theme switcher + focus toggle,
- * topic filter, per-topic progress + quiz, discover.
+ * topic filter, per-topic progress + quiz, request a topic, browse topics.
+ *
+ * ADR-0036: the inline Discover list moved into `TopicDiscoveryModal`
+ * (opened from the "View all topics" button below), and RequestTopicBox
+ * moved up to sit directly below the topic filter box.
  */
+
+import { useState } from "react";
 
 import type { Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
-import { DiscoverBox } from "./DiscoverBox";
 import { FocusToggle } from "./FocusToggle";
 import { RequestTopicBox } from "./RequestTopicBox";
 import { ThemePicker } from "./ThemePicker";
+import { TopicDiscoveryModal } from "./TopicDiscoveryModal";
 import { TopicRail } from "./TopicRail";
 import { TopicsProgressBox } from "./TopicsProgressBox";
 
@@ -22,6 +30,8 @@ interface Props {
 }
 
 export function RightRail({ topics, progress, selected, onToggle, onFollowed, onEnterFocus }: Props) {
+  const [discoveryOpen, setDiscoveryOpen] = useState(false);
+
   return (
     <aside className="rail-right" aria-label="Filters and insights">
       <div className="rail-top-row">
@@ -33,9 +43,15 @@ export function RightRail({ topics, progress, selected, onToggle, onFollowed, on
 
       <TopicsProgressBox topics={topics} progress={progress} />
 
-      <DiscoverBox onFollowed={onFollowed} />
-
       <RequestTopicBox onFollowed={onFollowed} />
+
+      <button type="button" className="discover-follow view-all-topics" onClick={() => setDiscoveryOpen(true)}>
+        View all topics
+      </button>
+
+      {discoveryOpen ? (
+        <TopicDiscoveryModal onFollowed={onFollowed} onClose={() => setDiscoveryOpen(false)} />
+      ) : null}
     </aside>
   );
 }

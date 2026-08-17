@@ -1913,6 +1913,50 @@ body.custom-cursor-active textarea {
   cursor: default;
 }
 
+/* -- "View all topics" rail entry point (ADR-0036) -- */
+.view-all-topics {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 12px;
+  text-align: center;
+}
+
+/* -- TopicDiscoveryModal (ADR-0036) -- */
+.discover-modal-view-toggle {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.discover-modal-view-toggle button {
+  flex: 1;
+}
+
+.discover-modal-list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.custom-topic-status {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--bg-3);
+  color: var(--fg-3);
+}
+
+.custom-topic-status[data-status="completed"],
+.custom-topic-status[data-status="ready"] {
+  background: color-mix(in srgb, var(--good) 16%, var(--bg-3));
+  color: var(--good);
+}
+
+.custom-topic-status[data-status="failed"] {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-3));
+  color: var(--accent);
+}
+
 /* -- request-a-topic box -- mirrors .discover-box, see RequestTopicBox.tsx */
 .request-topic-box {
   margin-top: 12px;

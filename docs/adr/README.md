@@ -70,3 +70,4 @@ useful than the decision itself.
 | [0031](0031-verification-feedback-and-per-tier-gate-durability.md) | Verification rejection feedback, and a per-tier durable gate | Accepted (amends 0030) |
 | [0032](0032-entry-tier-quiz-still-earned.md) | The entry tier's own quiz is still earned, not free | Accepted (amends 0027) |
 | [0033](0033-jwt-auth-and-guest-identity.md) | JWT auth, localStorage token storage, and guest identity via a nullable-email User row | Accepted |
+| [0036](0036-topic-discovery-modal.md) | Topic discovery modal replaces the inline Discover list | Accepted |

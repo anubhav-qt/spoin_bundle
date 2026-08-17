@@ -47,7 +47,7 @@ services:
     volumes:
       - ./apps/api/src:/app/src
       - ./apps/api/alembic:/app/alembic
-    command: ["sh", "-c", "alembic upgrade head && python -m spoin.seed && python -m spoin.seed_generated"]
+    command: ["sh", "-c", "alembic upgrade head && python -m spoin.seed && python -m spoin.seed_generated && python -m spoin.seed_quiz"]
 
   api:
     build:

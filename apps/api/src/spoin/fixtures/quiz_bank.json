@@ -1,0 +1,283 @@
+{
+  "_comment": "Hand-written question bank for local quiz testing (seed_quiz.py). Covers only the kubernetes topic's beginner tier -- enough to run a full quiz end to end against seeded data. Not the real generator output (task 0012).",
+  "topics": [
+    {
+      "slug": "kubernetes",
+      "subtopics": [
+        {
+          "title": "Pods and the scheduler",
+          "difficulty": "beginner",
+          "questions": [
+            {
+              "kind": "mcq",
+              "card_title": "A kubectl apply doesn't talk to the scheduler directly",
+              "stem": "When you run `kubectl apply`, what does the client actually talk to?",
+              "options": [
+                "The scheduler directly",
+                "The API server",
+                "Whichever node has capacity",
+                "etcd directly"
+              ],
+              "correct_index": 1,
+              "explanation": "Every actor in the system, including the scheduler itself, only ever talks to the API server, which is backed by etcd."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "A pod is the unit of scheduling",
+              "stem": "What is the smallest unit Kubernetes schedules onto a node?",
+              "options": [
+                "A container",
+                "A pod",
+                "A deployment",
+                "A namespace"
+              ],
+              "correct_index": 1,
+              "explanation": "Kubernetes never schedules a container directly -- it schedules a pod, which may hold one or more containers that always land together."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "The scheduler filters, then scores",
+              "stem": "What happens if the scheduler's filtering phase removes every node as a candidate?",
+              "options": [
+                "The pod is scheduled onto a random node anyway",
+                "The pod stays Pending",
+                "The pod crashes with CrashLoopBackOff",
+                "The API server retries filtering with looser constraints"
+              ],
+              "correct_index": 1,
+              "explanation": "If filtering removes every node, the pod stays Pending -- that is the failure you actually see, before scoring ever runs."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Requests are for the scheduler, limits are for the kernel",
+              "stem": "What's the practical consequence of exceeding a container's memory limit, versus its CPU limit?",
+              "options": [
+                "Both get throttled the same way",
+                "Exceeding CPU gets you OOM-killed; memory just throttles",
+                "Exceeding memory gets you OOM-killed; CPU just throttles",
+                "Neither is enforced by the kernel"
+              ],
+              "correct_index": 2,
+              "explanation": "Exceeding a CPU limit gets you throttled (slow, but alive); exceeding a memory limit gets you OOM-killed."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Pending is a scheduling problem, CrashLoopBackOff is yours",
+              "stem": "A pod is stuck in CrashLoopBackOff. Where's the problem?",
+              "options": [
+                "The scheduler couldn't place it",
+                "Placement worked; something in your container is failing after it starts",
+                "The node ran out of IP addresses",
+                "The API server is unreachable"
+              ],
+              "correct_index": 1,
+              "explanation": "CrashLoopBackOff means placement worked fine -- the problem is inside your container, not the scheduler."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Labels are the only way things find each other",
+              "stem": "How does a Service know which pods belong to it?",
+              "options": [
+                "It holds a static list of pod IPs",
+                "It holds a label selector, recomputed continuously",
+                "Pods register themselves with the Service on startup",
+                "It reads a pointer stored in etcd"
+              ],
+              "correct_index": 1,
+              "explanation": "A Service holds a label selector, not a list of pods -- membership is recomputed continuously, which is also why a label typo breaks routing silently."
+            },
+            {
+              "kind": "free_text",
+              "card_title": "The scheduler filters, then scores",
+              "stem": "Explain the two phases the Kubernetes scheduler uses to place a pod, and why only one of them can cause the pod to stay Pending.",
+              "rubric": "0: no mention of two phases. 1: names filtering and/or scoring but doesn't explain the failure mode. 2: correctly explains filtering removes ineligible nodes and scoring ranks the rest. 3: level 2 plus a correct, specific reason only filtering can leave the pod Pending (scoring only ranks nodes that already passed filtering, so it can't reduce the candidate set to zero).",
+              "reference_answer": "Placing a pod happens in two phases. Filtering removes nodes that cannot run the pod at all -- insufficient CPU or memory, an intolerable taint, an unsatisfiable node selector. Scoring then ranks whatever nodes are left. If filtering removes every node, the pod stays Pending; scoring never gets a chance to run because there is nothing left to score."
+            }
+          ]
+        },
+        {
+          "title": "Services and networking",
+          "difficulty": "beginner",
+          "questions": [
+            {
+              "kind": "mcq",
+              "card_title": "A Service is a stable name for an unstable set",
+              "stem": "Why does Kubernetes need a Service in front of a set of pods, rather than callers just addressing pod IPs directly?",
+              "options": [
+                "Pod IPs are ephemeral and change when a pod restarts",
+                "Pods don't have IP addresses at all",
+                "Direct pod-to-pod traffic is disabled by default",
+                "Services are required for DNS to work at all"
+              ],
+              "correct_index": 0,
+              "explanation": "Pod IPs are ephemeral -- a pod restarts and gets a new one. A Service provides a stable virtual IP and DNS name in front of a continuously re-evaluated set of pods."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "ClusterIP, NodePort, LoadBalancer are layers, not alternatives",
+              "stem": "How do the three common Service types relate to each other?",
+              "options": [
+                "They are three independent, mutually exclusive choices",
+                "NodePort is a ClusterIP plus a port opened on every node; LoadBalancer adds a cloud load balancer on top",
+                "LoadBalancer is the base type that the others restrict",
+                "ClusterIP only works outside the cluster"
+              ],
+              "correct_index": 1,
+              "explanation": "The three types stack: ClusterIP is the base, NodePort is a ClusterIP plus a node-level port, and LoadBalancer is a NodePort plus a cloud load balancer."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "kube-proxy does not proxy much any more",
+              "stem": "In its usual iptables/IPVS mode, what does kube-proxy actually do to Service traffic?",
+              "options": [
+                "It sits in the data path as a userspace proxy for every request",
+                "It programs kernel rules that rewrite Service IP traffic to a pod IP, then steps aside",
+                "It forwards every packet through a Go process",
+                "It does nothing -- the name is entirely vestigial"
+              ],
+              "correct_index": 1,
+              "explanation": "Despite the name, kube-proxy mostly doesn't sit in the data path -- it programs kernel rules once, and the kernel handles traffic from then on."
+            },
+            {
+              "kind": "free_text",
+              "card_title": "A Service is a stable name for an unstable set",
+              "stem": "A teammate says \"I'll just hardcode this pod's IP in our config, it's simpler.\" Explain what will break, and why a Service avoids the problem.",
+              "rubric": "0: no understanding of the problem. 1: vague mention that IPs change, without connecting it to a concrete failure. 2: correctly explains pod IPs are ephemeral and hardcoding breaks on restart/rescheduling. 3: level 2 plus explains how a Service's label-selector-based, continuously re-evaluated membership fixes it (stable virtual IP/DNS name in front of a changing pod set).",
+              "reference_answer": "Pod IPs are ephemeral: the moment that pod restarts or gets rescheduled, it gets a new IP, and the hardcoded config now points at nothing. A Service avoids this by giving callers a stable virtual IP and DNS name in front of a set of pods that is continuously re-evaluated from a label selector, so the caller never needs to learn or track individual pod IPs."
+            }
+          ]
+        },
+        {
+          "title": "Controllers and reconciliation",
+          "difficulty": "intermediate",
+          "questions": [
+            {
+              "kind": "mcq",
+              "card_title": "Everything is a reconciliation loop",
+              "stem": "You delete a pod that's owned by a Deployment. What happens, and why?",
+              "options": [
+                "Nothing comes back -- deleting a pod removes it from the desired state too",
+                "A new pod comes back, because you deleted an observation, not the underlying intention",
+                "The Deployment itself is deleted along with it",
+                "It comes back only if you also restart the controller manager"
+              ],
+              "correct_index": 1,
+              "explanation": "Kubernetes controllers declare desired state, not commands. Deleting a pod removes an observation, not the intention that three should exist, so the controller replaces it."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Everything is a reconciliation loop",
+              "stem": "What does a Kubernetes controller fundamentally do, on a loop?",
+              "options": [
+                "Executes a queue of commands in order",
+                "Compares desired state to observed state and acts to close the gap",
+                "Waits for an admin to approve each change",
+                "Replays the cluster's event log from the beginning"
+              ],
+              "correct_index": 1,
+              "explanation": "A controller repeatedly compares desired state to observed state and acts to close the gap -- it is not a command executor."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Level-triggered, not edge-triggered",
+              "stem": "Why is Kubernetes robust against a controller missing a single notification?",
+              "options": [
+                "Notifications are delivered over a guaranteed-once channel",
+                "Controllers act on current state, not on events, so the next resync fixes any missed discrepancy anyway",
+                "Missed notifications are automatically retried by etcd",
+                "Every controller keeps its own persistent event log"
+              ],
+              "correct_index": 1,
+              "explanation": "Controllers are level-triggered: they act on current state, not on individual events, so a missed notification is caught by the next resync instead of being lost."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Level-triggered, not edge-triggered",
+              "stem": "What would an edge-triggered design require that a distributed system can't promise?",
+              "options": [
+                "That every node has the same clock",
+                "That every event arrives exactly once",
+                "That the API server never restarts",
+                "That etcd is single-node"
+              ],
+              "correct_index": 1,
+              "explanation": "An edge-triggered design would need every event to arrive exactly once -- not something a distributed system can promise -- which is why controllers are level-triggered instead."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Deployments do not manage pods",
+              "stem": "What sits between a Deployment and the pods it's ultimately responsible for?",
+              "options": [
+                "Nothing -- a Deployment manages pods directly",
+                "A ReplicaSet",
+                "A DaemonSet",
+                "A ConfigMap"
+              ],
+              "correct_index": 1,
+              "explanation": "A Deployment manages ReplicaSets, and a ReplicaSet manages pods -- that middle layer is what makes rollbacks work."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Deployments do not manage pods",
+              "stem": "Why does the ReplicaSet layer make a Deployment rollback simple?",
+              "options": [
+                "Each revision gets its own ReplicaSet, so rolling back is just scaling the old one back up",
+                "Rollbacks reconstruct the previous spec from Kubernetes' audit log",
+                "ReplicaSets store no state, so there is nothing to roll back",
+                "Rollbacks always require deleting and recreating the Deployment"
+              ],
+              "correct_index": 0,
+              "explanation": "Each Deployment revision gets its own ReplicaSet. A rollback just scales the old ReplicaSet back up -- its spec still exists, so nothing needs to be reconstructed."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Deployments do not manage pods",
+              "stem": "What is the intermediate object between a Deployment and its pods?",
+              "options": [
+                "ReplicaSet",
+                "StatefulSet",
+                "Ingress",
+                "PersistentVolumeClaim"
+              ],
+              "correct_index": 0,
+              "explanation": "A Deployment manages ReplicaSets, and a ReplicaSet manages the pods -- that intermediate object is what makes rollback simple."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Readiness and liveness answer different questions",
+              "stem": "A pod fails its readiness probe. What happens?",
+              "options": [
+                "The container is killed and restarted",
+                "The pod is removed from Service endpoints; nothing is killed",
+                "The whole Deployment is rolled back",
+                "The node is cordoned"
+              ],
+              "correct_index": 1,
+              "explanation": "Readiness controls traffic, not restarts: failing it just removes the pod from Service endpoints."
+            },
+            {
+              "kind": "mcq",
+              "card_title": "Readiness and liveness answer different questions",
+              "stem": "What's the risk of using a liveness probe where you actually meant readiness?",
+              "options": [
+                "There is no risk, they're interchangeable",
+                "A slow startup or brief dependency outage turns into a restart loop, potentially cascading under load",
+                "The pod would simply never restart",
+                "It would silently disable health checking entirely"
+              ],
+              "correct_index": 1,
+              "explanation": "Liveness controls restarts. Using it for what should be a readiness check turns a transient slow-start or dependency blip into a restart loop -- and under load, that can cascade as every restart makes the remaining pods busier."
+            },
+            {
+              "kind": "free_text",
+              "card_title": "Everything is a reconciliation loop",
+              "stem": "Explain what \"level-triggered, not edge-triggered\" means for how Kubernetes controllers behave, and why that design choice matters for a distributed system.",
+              "rubric": "0: no understanding. 1: repeats the terms without explaining the mechanism. 2: correctly explains controllers act on current observed state rather than individual events. 3: level 2 plus explains why this matters -- a missed event is self-healing on the next resync, whereas an edge-triggered design would require exactly-once event delivery, which a distributed system cannot guarantee.",
+              "reference_answer": "Level-triggered means a controller acts on current state -- what is actually true right now -- rather than reacting to individual events. It repeatedly compares desired state to observed state and closes the gap. This matters because it makes the system robust to missed messages: if a controller misses a notification, the next resync still sees the same discrepancy and fixes it. An edge-triggered design would instead require every event to arrive exactly once, which no distributed system can promise."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

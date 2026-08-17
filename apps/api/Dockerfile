@@ -13,7 +13,7 @@ WORKDIR /app
 # Dependency layer first so source edits do not reinstall the world.
 COPY pyproject.toml README.md ./
 RUN mkdir -p src/spoin && touch src/spoin/__init__.py \
-    && pip install --no-cache-dir -e ".[dev]"
+    && pip install --no-cache-dir -e ".[dev,generation]"
 
 COPY alembic.ini ./
 COPY alembic ./alembic

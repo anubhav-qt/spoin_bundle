@@ -2167,6 +2167,277 @@ body.custom-cursor-active textarea {
   color: var(--fg-3);
 }
 
+/* -- quiz (ADR-0009) -- */
+.quiz-panel {
+  max-height: 88vh;
+}
+
+.quiz-blocked {
+  padding: 20px 0;
+  color: var(--fg-2);
+  font-size: 12.5px;
+}
+
+.quiz-mcq-tally {
+  margin: 0 0 14px;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.quiz-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-question {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.quiz-question:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.quiz-question-stem {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--fg);
+}
+
+.quiz-question-index {
+  flex: 0 0 auto;
+  color: var(--fg-3);
+  font-size: 11px;
+  padding-top: 2px;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.quiz-option {
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+  color: var(--fg-2);
+  font-size: 12.5px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.quiz-option[data-selected="true"] {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
+.quiz-option[data-correct="true"] {
+  border-color: var(--good);
+  background: color-mix(in srgb, var(--good) 16%, var(--bg-3));
+  color: var(--fg);
+}
+
+.quiz-option[data-wrong="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-3));
+  color: var(--fg);
+}
+
+.quiz-explanation {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.quiz-explanation[data-correct="true"] {
+  color: var(--good);
+}
+
+.quiz-explanation[data-correct="false"] {
+  color: var(--accent);
+}
+
+.quiz-freetext-input {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg-3);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.quiz-freetext-input:focus {
+  outline: none;
+  border-color: var(--line-strong);
+}
+
+.quiz-freetext-input:disabled {
+  opacity: 0.7;
+}
+
+.quiz-grading {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.quiz-error {
+  margin: 0 0 12px;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* -- quiz results -- */
+.quiz-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiz-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-3);
+}
+
+.quiz-score-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.quiz-score-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-3);
+}
+
+.quiz-score[data-passed="true"] .quiz-score-label {
+  color: var(--good);
+}
+
+.quiz-score[data-passed="false"] .quiz-score-label {
+  color: var(--accent);
+}
+
+.quiz-progressed {
+  margin: -6px 0 0;
+  font-size: 11.5px;
+  color: var(--good);
+}
+
+.quiz-freetext-result {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-3);
+}
+
+.quiz-freetext-result-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.quiz-freetext-result-head svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.quiz-freetext-result[data-correct="true"] .quiz-freetext-result-head {
+  color: var(--good);
+}
+
+.quiz-freetext-result[data-correct="false"] .quiz-freetext-result-head {
+  color: var(--accent);
+}
+
+.quiz-freetext-result p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+.quiz-remediation h3 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-3);
+}
+
+.quiz-remediation ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-remediation li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--bg-3);
+}
+
+.quiz-remediation-title {
+  font-size: 12.5px;
+  color: var(--fg);
+}
+
+.quiz-remediation-subtopic {
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.quiz-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quiz-actions .modal-follow,
+.quiz-actions .modal-quiz {
+  margin-bottom: 0;
+}
+
 /* ------------------------------ breakpoints ------------------------------- */
 
 /* The three fixed/capped tracks (275 + up to 640 + 350) plus gaps and padding

@@ -157,6 +157,67 @@ export interface TopicStats {
   shares: number;
 }
 
+export interface QuizMcqQuestion {
+  question_id: string;
+  stem: string;
+  /** Never `correct_index` — the client can't grade itself. */
+  options: string[];
+}
+
+export interface QuizFreeTextQuestion {
+  question_id: string;
+  stem: string;
+}
+
+export interface QuizStart {
+  attempt_id: string;
+  topic_id: string;
+  difficulty: Difficulty;
+  kind: "placement" | "promotion" | "mastery";
+  mcq: QuizMcqQuestion[];
+  free_text: QuizFreeTextQuestion;
+}
+
+export interface McqResult {
+  question_id: string;
+  correct: boolean;
+  correct_index: number;
+  explanation: string;
+}
+
+export interface QuizMcqSubmitResult {
+  attempt_id: string;
+  results: McqResult[];
+  /** Fraction correct, 0-1. Final score isn't known until free text is graded too. */
+  mcq_score: number;
+}
+
+export interface QuizFreeTextResult {
+  question_id: string;
+  /** 0-3 rubric level. */
+  rubric_level: number;
+  correct: boolean;
+  justification: string;
+}
+
+export interface RemediationCard {
+  card_id: string;
+  title: string;
+  subtopic_title: string;
+}
+
+export interface QuizFreeTextSubmitResult {
+  attempt_id: string;
+  free_text: QuizFreeTextResult;
+  /** Weighted 70% MCQ / 30% free text. */
+  score: number;
+  passed: boolean;
+  /** Empty unless `passed` is false. */
+  remediation: RemediationCard[];
+  /** True only if this attempt actually advanced the tier or conferred mastery. */
+  progressed: boolean;
+}
+
 export const api = {
   feed: (position?: number, topics?: string[]) => {
     const query = new URLSearchParams();
@@ -194,4 +255,22 @@ export const api = {
       "/engagement/events",
       { method: "POST", body: JSON.stringify({ events }) },
     ),
+
+  startQuiz: (topicId: string, difficulty: Difficulty) =>
+    request<QuizStart>(`/topics/${topicId}/quiz/start`, {
+      method: "POST",
+      body: JSON.stringify({ difficulty }),
+    }),
+
+  submitMcq: (attemptId: string, answers: { question_id: string; selected_index: number }[]) =>
+    request<QuizMcqSubmitResult>(`/quiz/attempts/${attemptId}/submit-mcq`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    }),
+
+  submitFreeText: (attemptId: string, answer: string) =>
+    request<QuizFreeTextSubmitResult>(`/quiz/attempts/${attemptId}/submit-free-text`, {
+      method: "POST",
+      body: JSON.stringify({ answer }),
+    }),
 };

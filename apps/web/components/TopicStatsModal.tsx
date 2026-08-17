@@ -24,6 +24,7 @@ import { createPortal } from "react-dom";
 
 import { api, type Difficulty, type TopicStats } from "@/lib/api";
 import { CheckIcon, HeartIcon, BookmarkIcon, NoteIcon, ShareIcon } from "./icons";
+import { QuizModal } from "./QuizModal";
 
 interface Props {
   topicId: string;
@@ -53,14 +54,20 @@ const TIERS: { key: Difficulty; label: string }[] = [
 
 export function TopicStatsModal({ topicId, topicName, onClose, onFollow, following = false }: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
-  // The quiz itself isn't built yet — this only announces intent, same
-  // placeholder behavior the row's old Quiz button had (ADR-0017 moved it
-  // here rather than building the quiz flow as a side effect of this fix).
-  const [announced, setAnnounced] = useState(false);
+  // The tier being quizzed, frozen at the moment the quiz opens — NOT read
+  // live from `stats.current_difficulty` while the modal is open. A pass
+  // advances that field via `loadStats` (below), and QuizModal keys its
+  // fetch off its `difficulty` prop: if that prop tracked `stats` live, a
+  // promotion mid-quiz would silently restart QuizModal against the newly
+  // (and still-locked) next tier, wiping the results screen the user just
+  // earned.
+  const [quizDifficulty, setQuizDifficulty] = useState<Difficulty | null>(null);
 
-  useEffect(() => {
+  const loadStats = () => {
     void api.topicStats(topicId).then(setStats);
-  }, [topicId]);
+  };
+
+  useEffect(loadStats, [topicId]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -131,13 +138,11 @@ export function TopicStatsModal({ topicId, topicName, onClose, onFollow, followi
               className="modal-quiz"
               data-locked={!stats.quiz_unlocked}
               disabled={!stats.quiz_unlocked}
-              onClick={() => setAnnounced(true)}
+              onClick={() => setQuizDifficulty(stats.current_difficulty)}
             >
               {!stats.quiz_unlocked
                 ? "Quiz locked — reach 80% coverage"
-                : announced
-                  ? "Quiz coming soon"
-                  : `Take the ${DIFFICULTY_LABEL[stats.current_difficulty]} quiz`}
+                : `Take the ${DIFFICULTY_LABEL[stats.current_difficulty]} quiz`}
             </button>
 
             <div className="modal-engagement">
@@ -165,6 +170,16 @@ export function TopicStatsModal({ topicId, topicName, onClose, onFollow, followi
           </>
         )}
       </div>
+
+      {quizDifficulty !== null ? (
+        <QuizModal
+          topicId={topicId}
+          topicName={topicName}
+          difficulty={quizDifficulty}
+          onClose={() => setQuizDifficulty(null)}
+          onGraded={loadStats}
+        />
+      ) : null}
     </div>,
     document.body,
   );

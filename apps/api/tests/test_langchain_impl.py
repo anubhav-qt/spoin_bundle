@@ -416,6 +416,57 @@ async def test_generate_questions_maps_mcq_and_free_text() -> None:
     assert result.items[1].rubric == "0/1/2/3"
 
 
+def test_wire_question_tolerates_null_explanation() -> None:
+    """Regression test for a real failure seen against live Gemini: a null
+    `explanation` on one item in a batch failed Pydantic validation for the
+    ENTIRE `_WireQuestionBatch`, silently discarding every other question in
+    that call. `_LenientWireModel` coerces the null to the field's default
+    before validation instead of letting it propagate."""
+
+    wire_question = _WireQuestion.model_validate(
+        {
+            "card_index": 0,
+            "stem": "What is X?",
+            "options": ["a", "b", "c", "d"],
+            "correct_index": 0,
+            "explanation": None,
+        }
+    )
+    assert wire_question.explanation == ""
+
+
+async def test_generate_questions_survives_null_explanation_in_batch() -> None:
+    generator = _generator()
+    wire = _WireQuestionBatch.model_validate(
+        {
+            "questions": [
+                {
+                    "card_index": 0,
+                    "stem": "Which is correct?",
+                    "options": ["a", "b", "c", "d"],
+                    "correct_index": 2,
+                    "explanation": None,
+                },
+                {
+                    "card_index": 1,
+                    "stem": "Explain it",
+                    "rubric": "0/1/2/3",
+                    "reference_answer": "a correct account",
+                },
+            ]
+        }
+    )
+    with patch.object(
+        ChatGoogleGenerativeAI, "with_structured_output", return_value=_mock_structured(wire)
+    ):
+        result = await generator.generate_questions(
+            [("Card A", "body a"), ("Card B", "body b")], Difficulty.BEGINNER
+        )
+
+    assert len(result.items) == 2
+    assert result.items[0].explanation == ""
+
+
 async def test_generate_questions_drops_duplicate_card_index() -> None:
     generator = _generator()
     wire = _WireQuestionBatch(

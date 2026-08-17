@@ -59,7 +59,7 @@ from typing import TypeVar
 
 from google.api_core.exceptions import ResourceExhausted
 from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
@@ -87,7 +87,31 @@ _SchemaT = TypeVar("_SchemaT", bound=BaseModel)
 # ------------------------------------------------------------- wire schemas --
 
 
-class _WireCard(BaseModel):
+class _LenientWireModel(BaseModel):
+    """Gemini's structured output has been observed sending null for a plain
+    `str` field the schema declares as always-present (`_WireQuestion.explanation`
+    -- see the commit fixing the wrong-card-question bug for the log evidence).
+    Because `with_structured_output` validates an entire batch as ONE Pydantic
+    object, that single null fails validation for the WHOLE call, silently
+    discarding every other valid item in the same batch, not just the bad one.
+
+    Coerce null to the field's own default for any field declared as a plain
+    `str` (never for `str | None`, which already tolerates null on purpose --
+    that annotation means the model is EXPECTED to sometimes omit it) before
+    validation runs, so one null string doesn't sink an otherwise-good batch."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def _null_str_to_default(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+        for name, field in cls.model_fields.items():
+            if data.get(name) is None and field.annotation is str:
+                data[name] = field.default if isinstance(field.default, str) else ""
+        return data
+
+
+class _WireCard(_LenientWireModel):
     title: str = ""
     canonical_title: str = ""
     summary: str = ""
@@ -98,7 +122,7 @@ class _WireCardBatch(BaseModel):
     cards: list[_WireCard] = Field(default_factory=list)
 
 
-class _WireQuestion(BaseModel):
+class _WireQuestion(_LenientWireModel):
     card_index: int = Field(
         default=-1,
         description=(
@@ -121,7 +145,7 @@ class _WireQuestionBatch(BaseModel):
     questions: list[_WireQuestion] = Field(default_factory=list)
 
 
-class _WireCorrection(BaseModel):
+class _WireCorrection(_LenientWireModel):
     index: int = -1
     title: str = ""
     canonical_title: str = ""
@@ -135,7 +159,7 @@ class _WireCorrectionBatch(BaseModel):
     corrections: list[_WireCorrection] = Field(default_factory=list)
 
 
-class _WireVerification(BaseModel):
+class _WireVerification(_LenientWireModel):
     index: int = -1
     accepted: bool = True
     confirmed_difficulty: str = ""
@@ -155,7 +179,7 @@ class _WireTopicMatchBatch(BaseModel):
     results: list[_WireTopicMatchResult] = Field(default_factory=list)
 
 
-class _WireFreeTextGrade(BaseModel):
+class _WireFreeTextGrade(_LenientWireModel):
     index: int = -1
     rubric_level: int = 0
     justification: str = ""

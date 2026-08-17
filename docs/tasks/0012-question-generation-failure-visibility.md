@@ -62,3 +62,52 @@ this is:
 
 Not started. Step 1 (logging) is small, under an hour. Steps 2-3 depend entirely on what the
 logging reveals — could be a five-minute fix or a real prompt/schema problem.
+
+## Update 2026-08-17: found and fixed a related bug (wrong-card questions), technique noted
+
+While doing a content-quality read pass, a *different* bug was found and fixed in the same
+session: `generate_questions` was cross-wiring questions to the wrong card because
+`card_index` was a self-reported model field with no instruction telling the model what it
+meant or that it had to match (see the commit fixing `langchain_impl.py`'s `_QUESTIONS_SYSTEM`
+and `_WireQuestion.card_index`). This is a plausible *contributing* cause for subtopics that
+"fail to produce enough questions" too — if `_generate_questions_for_group`'s bounds check
+(`0 <= draft.card_index < len(chunk)`) rejects a mislabeled item as out-of-range, that's a
+silent per-item loss that would show up as exactly this task's symptom (cards with fewer
+questions than expected) without necessarily being a whole-call failure. Worth checking
+whether the two named subtopics' failures correlate with this once the logging from step 1
+lands — they might turn out to be the same root cause wearing a different symptom.
+
+### Detecting existing wrong-card questions: an embedding-similarity technique
+
+Both `Card.content_embedding` (body) and `Question.embedding` (stem) already exist in the
+DB, so a mismatch can be screened for cheaply via pgvector cosine similarity, without an LLM
+call per pair:
+
+```sql
+SELECT q.id, 1 - (q.embedding <=> c.content_embedding) AS sim
+FROM question q JOIN card c ON c.id = q.card_id
+WHERE q.status='active' AND c.status='active'
+ORDER BY sim ASC;
+```
+
+**Distribution observed on the `dsa` topic (813 active questions, post this session's live
+run):** `sim < 0.50`: 4, `< 0.60`: 12, `< 0.65`: 27, `< 0.70`: 52, `< 0.72`: 61.
+
+**This threshold alone is not a safe cutoff for automated deletion** — an LLM verification
+pass (ask a cheap model "does this question test content actually in this card's body,
+yes/no, for each pair" batched ~8 at a time) on the 61 candidates under 0.72 found both false
+positives (10 of 61 were genuinely correct pairs the embedding score simply undervalued —
+e.g. "Building a Huffman Tree" paired with a question about its greedy step, or "Egg Drop
+State Inversion DP" correctly paired despite phrasing drift) and confirmed 51 real
+mismatches. A pure body-vs-stem embedding comparison conflates "different phrasing of the
+same idea" with "different idea entirely" — it's a decent triage filter to shrink an LLM
+verification pass from 813 pairs to ~60, not a standalone detector.
+
+The 51 confirmed mismatches were deleted from `question` (cascades are clean —
+`UserQuestionSeen`/`QuizAttemptQuestion` FKs are `ondelete=CASCADE`, and no real user answers
+existed yet for this freshly-generated content) so they'd get picked up by
+`cards_missing_questions` backfill and regenerated with the `card_index` fix in place.
+**If this technique gets reused for real (not just a one-off cleanup), it belongs as a
+proper script/task, not copy-pasted ad hoc again** — the 0.72 threshold and batch-of-8 LLM
+check shape are what worked for `dsa`'s specific content mix; recalibrate before trusting it
+on a different topic's embedding distribution.

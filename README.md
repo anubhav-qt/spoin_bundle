@@ -1,6 +1,6 @@
 # Spoin
 
-A swipeable feed of AI-generated knowledge flash cards. Pick topics, get bite-sized
+A scrollable feed of cards with bite sized knowledge, for topics you want to learn (choose either from the presets or your own choice of topics), with an entire planned curriculum and a road to mastery. Pick topics, get bite-sized
 cards at your difficulty level, dig deeper with inline AI chat or personal notes.
 
 Web first; a React Native app comes later and shares this backend.

@@ -138,6 +138,18 @@ class TopicDiscoverOut(BaseModel):
     subscriber_count: int
 
 
+class CustomTopicStatusOut(BaseModel):
+    topic_id: UUID
+    display_name: str
+    slug: str
+    #: The topic's most recent GenerationJob status: "pending" | "running" |
+    #: "completed" | "failed". Null when the requested name matched an
+    #: existing, already-generated topic and no job was ever enqueued for it
+    #: (`request_topic`'s "subscribed" outcome) -- there is nothing to poll.
+    generation_status: str | None
+    requested_at: datetime
+
+
 class TopicStatsOut(BaseModel):
     topic_id: UUID
     current_difficulty: Difficulty

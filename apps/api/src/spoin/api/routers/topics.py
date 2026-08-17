@@ -9,6 +9,7 @@ from sqlalchemy import func, select
 
 from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
+    CustomTopicStatusOut,
     OnboardingCompleteIn,
     ProgressOut,
     SubtopicProgressOut,
@@ -180,6 +181,48 @@ async def list_topics(session: SessionDep, user_id: UserDep) -> list[TopicOut]:
         )
         for user_topic, topic, tier in rows
     ]
+
+
+@router.get("/custom", response_model=list[CustomTopicStatusOut])
+async def list_custom_topics(session: SessionDep, user_id: UserDep) -> list[CustomTopicStatusOut]:
+    """This user's custom (self-requested) topics, each with its most recent
+    `GenerationJob` status -- the piece item 6/dsa-style confusion is missing
+    today: a user has no way to tell "still generating" from "broken" from
+    "nothing was ever queued" for a topic they typed in themselves.
+
+    A topic can in principle have more than one `GenerationJob` row over its
+    lifetime (retried failures, say) even though at most one is ever
+    pending/running at once (the model's coalescing index) -- so this reads
+    the latest by `created_at`, not an unqualified join.
+    """
+
+    rows = (
+        await session.execute(
+            select(UserTopic, Topic)
+            .join(Topic, Topic.id == UserTopic.topic_id)
+            .where(UserTopic.user_id == user_id, UserTopic.is_custom.is_(True))
+            .order_by(UserTopic.created_at)
+        )
+    ).all()
+
+    result: list[CustomTopicStatusOut] = []
+    for user_topic, topic in rows:
+        latest_job = await session.scalar(
+            select(GenerationJob)
+            .where(GenerationJob.topic_id == topic.id)
+            .order_by(GenerationJob.created_at.desc())
+            .limit(1)
+        )
+        result.append(
+            CustomTopicStatusOut(
+                topic_id=topic.id,
+                display_name=user_topic.display_name,
+                slug=topic.slug,
+                generation_status=latest_job.status if latest_job else None,
+                requested_at=user_topic.created_at,
+            )
+        )
+    return result
 
 
 @router.get("/discover", response_model=list[TopicDiscoverOut])

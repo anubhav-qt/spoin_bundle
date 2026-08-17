@@ -227,6 +227,16 @@ export interface TopicCurriculum {
   subtopics: SubtopicProgress[];
 }
 
+export interface CustomTopicStatus {
+  topic_id: string;
+  display_name: string;
+  slug: string;
+  /** null when the requested name matched an existing, already-generated
+   *  topic and no job was ever enqueued — nothing to poll for that one. */
+  generation_status: "pending" | "running" | "completed" | "failed" | null;
+  requested_at: string;
+}
+
 export interface QuizMcqQuestion {
   question_id: string;
   stem: string;
@@ -354,6 +364,8 @@ export const api = {
   topicStats: (topicId: string) => request<TopicStats>(`/topics/${topicId}/stats`),
 
   topicCurriculum: (topicId: string) => request<TopicCurriculum>(`/topics/${topicId}/curriculum`),
+
+  customTopics: () => request<CustomTopicStatus[]>("/topics/custom"),
 
   /** Dev-only (see api/routers/dev.py) — resets this user's progress and
    *  unfollows a couple of topics back to Discover. Returns the refreshed

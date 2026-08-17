@@ -153,16 +153,36 @@ on a routine rerun via the existing backfill.
 logged `subtopic 320f963a-… [advanced]: 1 question failure(s): generate_questions call
 failed: ` with a **completely empty exception message**. Plausible guess: a bare
 `asyncio.TimeoutError()` (empty `str()` by default on a raised-with-no-args timeout), i.e. a
-transient network stall rather than a code bug -- but this wasn't confirmed. If this recurs on
-a future run, it's worth adding `exc.__class__.__name__` to the failure string in
-`langchain_impl.py`'s `except Exception as exc: return BatchResult(..., failures=[f"...{exc}"])`
-handlers so an empty message at least names its exception type.
+transient network stall rather than a code bug -- but this wasn't confirmed. **Fixed
+2026-08-18 (see the backfill-aware prompt commit below): `generate_questions`'s
+`except Exception as exc` handler now includes `type(exc).__name__` in the failure string,
+so if this recurs it'll actually name the exception type instead of an empty message** -- not
+yet observed again to confirm what it was.
 
-## Status: mostly resolved
+## Update 2026-08-18 (later): backfill-aware prompts shipped, NOT yet live-verified
+
+A further change landed the same day (ADR-0031's addendum, see the commit "feat(generation):
+make question generation backfill-aware and dedup-aware"): `generate_questions` now tags
+backfill cards as `[BACKFILL]` and shows the subtopic's existing question stems so the writer
+doesn't repeat itself. **This shipped on unit tests only** -- the decision at the time was to
+push rather than spend another live run confirming it. Next time `generate_topics` runs for
+real, check:
+
+- Does the `[BACKFILL]` framing actually read sensibly in practice, or does the model ignore
+  it / get confused by cards mixing backfill and non-backfill framing across rounds?
+- Does the existing-stems block actually suppress repeat questions, or is it too weakly worded
+  to matter?
+- Any regressions in accept/reject rate vs. the pre-backfill-aware baseline (the last known-good
+  numbers: 899 cards, 878 questions, 39/44 subtopics fully matched, 5 with 1-9 gaps).
+- Whether the empty-message exception above recurs, and if so, what `type(exc).__name__` says.
+
+## Status: mostly resolved, one change unverified
 
 The whole-batch-wipe root cause is fixed and live-verified; the two subtopics originally
 named are no longer stuck. Remaining before this can move to Closed:
 
+- The backfill-aware prompt change above needs a live run to confirm it actually helps (or at
+  least doesn't hurt).
 - 5 subtopics topic-wide still have small (1-9) card/question gaps -- expected to self-heal
   via the existing backfill on a routine rerun, not yet re-verified after one.
-- The empty-message exception above is unexplained (low-confidence guess only).
+- Whether the empty-message exception recurs, now that it'll self-identify if it does.

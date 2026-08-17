@@ -51,19 +51,21 @@ class Settings(BaseSettings):
     #: judging, and quiz grading — the calls with a real consequence if the
     #: model is weak (ADR-0008's "trusted for taste, never for constraints"
     #: rule). A model is only skipped once every configured key is exhausted
-    #: for it (ADR-0028).
+    #: for it (ADR-0028). Live-verified 2026-08-17 against 9 real keys —
+    #: `gemini-2.5-flash` is retired for new accounts (404) and dropped;
+    #: `gemini-3.0-flash` never existed as a stable name (only the `-preview`
+    #: suffixed one does).
     gemini_thinking_ladder: str = (
-        "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,gemini-3.5-flash:20:5,"
-        "gemini-3.0-flash:20:5,gemini-2.5-flash:20:5"
+        "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,"
+        "gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5"
     )
     #: Same shape, for `generate_cards` AND `generate_questions` (ADR-0029) —
     #: both are high-VOLUME, taste-shaped calls (one per card/question), so
     #: they share the cheap high-volume "lite" ladder instead of competing
-    #: with the thinking pool's much smaller daily budget.
-    gemini_generator_ladder: str = (
-        "gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15,"
-        "gemini-2.5-flash-lite:20:10"
-    )
+    #: with the thinking pool's much smaller daily budget. Live-verified
+    #: 2026-08-17 — `gemini-2.5-flash-lite` is retired for new accounts (404,
+    #: same as `gemini-2.5-flash` above) and dropped.
+    gemini_generator_ladder: str = "gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15"
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
 

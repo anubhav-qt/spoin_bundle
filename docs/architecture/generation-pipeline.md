@@ -139,14 +139,14 @@ same request, the same trust level as everything else in that call.
 - **`gemini`** — `generation/langchain_impl.py`. The only module allowed to import
   `langchain*` (ADR-0002/0024). Requires `SPOIN_GEMINI_API_KEYS` (comma-separated); raises
   a clear config error at construction if unset, rather than failing mid-run.
-  **Not live-verified** — built and covered by mocked unit tests
-  (`tests/test_langchain_impl.py`: structured-output parsing, per-item validation,
-  partial-failure handling, the batched matching call), but no real Gemini key has been
-  used to confirm prompt *quality*. The model **rotation mechanism** is decided
-  ([ADR-0028](../adr/0028-key-model-quota-ladder.md)); the specific model ids in the
-  default ladders are a first draft read off a rate-limit screenshot, not yet confirmed
-  against a real key (ADR-0008's still-open half). Treat the prompts in that file as a
-  first draft too.
+  **Connectivity live-verified 2026-08-17, prompt quality still not.** Covered by mocked
+  unit tests (`tests/test_langchain_impl.py`: structured-output parsing, per-item
+  validation, partial-failure handling, the batched matching call), and the model
+  **rotation mechanism** ([ADR-0028](../adr/0028-key-model-quota-ladder.md)/[0029](../adr/0029-questions-join-generator-pool.md))
+  now has its ladder model ids confirmed live against 9 real keys — see ADR-0008's
+  updated "Open question" section. What's still unverified: whether the prompts in this
+  file produce *good* output. Treat the prompts as a first draft even though the models
+  behind them are now confirmed reachable.
 - **`local`** — not implemented (ADR-0008).
 
 Switching backends is a `.env` change only; nothing else in the pipeline knows or cares
@@ -169,8 +169,10 @@ each worker
 run. `QuotaExhaustedError` is caught specifically at the worker's job boundary and requeues
 the job as `pending` rather than `failed` (safe because the pipeline is idempotent per
 topic, ADR-0026). Wired end to end and unit-tested (`tests/test_quota_governor.py`,
-`tests/test_worker.py`'s requeue test) — **still not live-verified against a real key**,
-same caveat as the `gemini` backend generally.
+`tests/test_worker.py`'s requeue test). Each key's connectivity and each ladder model id
+is now live-confirmed (see above) — what's still unverified is the grid's actual rotation
+behavior under real exhaustion (a genuine `QuotaExhaustedError` from real quota running
+out has never been triggered end to end, only simulated in tests).
 
 ## What's missing
 

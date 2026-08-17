@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from spoin.domain.enums import Difficulty
 
@@ -195,12 +195,33 @@ class CardVerificationResult(BaseModel):
 
 class QuestionDraft(BaseModel):
     card_index: int
-    stem: str
+    stem: str = Field(min_length=1)
     options: list[str] | None = None
     correct_index: int | None = None
     rubric: str | None = None
     reference_answer: str | None = None
     explanation: str = ""
+
+    @model_validator(mode="after")
+    def _check_kind_fields(self) -> "QuestionDraft":
+        """Mirrors `ck_question_kind_fields_present` (the DB check constraint
+        on `question`) so a malformed item is caught HERE -- turned into a
+        `BatchResult.failures` entry, same as any other per-item validation
+        failure (ADR-0005) -- rather than reaching `gate_and_persist`'s
+        insert and crashing the whole node on a constraint violation. Live
+        Gemini calls have been observed returning a batch item with garbled,
+        truncated-looking fields (fragments of a neighboring item's JSON
+        bleeding into `options`) that satisfied every individual field's own
+        type but not this cross-field invariant."""
+
+        if self.options is not None:
+            if not self.options or any(not option.strip() for option in self.options):
+                raise ValueError("mcq question has no options or a blank option")
+            if self.correct_index is None or not (0 <= self.correct_index < len(self.options)):
+                raise ValueError("mcq question is missing a valid correct_index")
+        elif not self.rubric or not self.rubric.strip():
+            raise ValueError("free-text question is missing a rubric")
+        return self
 
 
 class FreeTextGradeQuery(BaseModel):

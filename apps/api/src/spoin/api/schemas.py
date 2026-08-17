@@ -279,6 +279,17 @@ class RefreshIn(BaseModel):
 
 class UserOut(BaseModel):
     id: UUID
-    email: str
+    #: None for a guest — see `User.is_guest` (domain/models/topic.py).
+    email: str | None
     display_name: str
+    is_guest: bool
+    onboarding_complete: bool
+
+
+class OnboardingCompleteIn(BaseModel):
+    #: Topics chosen during onboarding (from /topics/discover), subscribed to
+    #: server-side. IDs, not slugs -- matches what discover already returns,
+    #: no extra lookup needed on either side.
+    topic_ids: list[UUID] = Field(default_factory=list, max_length=10)
+    entry_difficulty: Difficulty = Difficulty.BEGINNER
 

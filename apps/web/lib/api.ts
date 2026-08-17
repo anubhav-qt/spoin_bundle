@@ -160,9 +160,11 @@ export interface AuthTokens {
 
 export interface User {
   id: string;
-  email: string;
+  /** null for a guest — see api/routers/auth.py's `_user_out`. */
+  email: string | null;
   display_name: string;
-  created_at: string;
+  is_guest: boolean;
+  onboarding_complete: boolean;
 }
 
 export interface Progress {
@@ -270,19 +272,41 @@ export interface QuizFreeTextSubmitResult {
 
 export const api = {
   // -- Auth -----------------------------------------------------------------
-  login: (credentials: Record<string, string>) =>
+  login: (credentials: { email: string; password: string }) =>
     request<AuthTokens>("/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     }),
 
-  register: (details: Record<string, string>) =>
+  register: (details: { email: string; password: string; display_name: string }) =>
     request<AuthTokens>("/auth/register", {
       method: "POST",
       body: JSON.stringify(details),
     }),
 
+  /** Mints a fresh anonymous user + token pair — see docs/adr on guest identity. */
+  guest: () => request<AuthTokens>("/auth/guest", { method: "POST" }),
+
+  /** Attaches email/password to the CALLER's own guest account in place. */
+  claim: (details: { email: string; password: string; display_name: string }) =>
+    request<AuthTokens>("/auth/claim", {
+      method: "POST",
+      body: JSON.stringify(details),
+    }),
+
+  googleAuth: (idToken: string) =>
+    request<AuthTokens>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ id_token: idToken }),
+    }),
+
   me: () => request<User>("/auth/me"),
+
+  completeOnboarding: (topicIds: string[], entryDifficulty: Difficulty) =>
+    request<Topic[]>("/topics/onboarding/complete", {
+      method: "POST",
+      body: JSON.stringify({ topic_ids: topicIds, entry_difficulty: entryDifficulty }),
+    }),
 
   // -- Feed -----------------------------------------------------------------
   feed: (position?: number, topics?: string[]) => {

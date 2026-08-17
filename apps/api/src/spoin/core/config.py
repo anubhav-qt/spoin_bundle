@@ -12,12 +12,19 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from spoin.domain.enums import Difficulty
 
 GeneratorBackend = Literal["fake", "gemini", "local"]
 EmbedderBackend = Literal["hash", "fastembed"]
+
+#: Ships as the field default so `local`/`ci` never need a `.env` entry to boot.
+#: A `production` process still carrying this value means the real secret was
+#: never set, which `Settings._require_real_jwt_secret_in_production` below
+#: turns into a startup failure rather than a silently-forgeable token.
+_INSECURE_DEFAULT_JWT_SECRET = "CHANGE-ME-IN-PRODUCTION-KEY-MUST-BE-32-BYTES"
 
 
 class Settings(BaseSettings):
@@ -38,11 +45,22 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
 
     # -- auth ---------------------------------------------------------------
-    jwt_secret_key: str = "CHANGE-ME-IN-PRODUCTION-KEY-MUST-BE-32-BYTES"
+    jwt_secret_key: str = _INSECURE_DEFAULT_JWT_SECRET
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
     google_client_id: str = ""
+
+    @model_validator(mode="after")
+    def _require_real_jwt_secret_in_production(self) -> "Settings":
+        """The default signing key is checked into git and public. A `production`
+        process still carrying it would sign every token with a guessable secret,
+        so this fails startup loudly instead of falling back silently."""
+        if self.env == "production" and self.jwt_secret_key == _INSECURE_DEFAULT_JWT_SECRET:
+            raise ValueError(
+                "SPOIN_JWT_SECRET_KEY must be set to a real secret when SPOIN_ENV=production"
+            )
+        return self
 
     # -- generation (ADR-0002, ADR-0008, ADR-0028) -----------------------------
     # `fake` everywhere except production: tests and local dev must never call a

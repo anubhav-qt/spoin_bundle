@@ -10,6 +10,7 @@
  * discoverable only by clicking the thing that's always on screen anyway.
  */
 
+import { useAuth } from "./AuthProvider";
 import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon, CloseIcon } from "./icons";
 
 const STUBS = [
@@ -26,6 +27,8 @@ interface Props {
 }
 
 export function Sidebar({ onReset }: Props) {
+  const { logout } = useAuth();
+
   return (
     <nav className="rail-left" aria-label="Primary">
       <button type="button" className="sidebar-mark mono" onClick={onReset} aria-label="spoin">
@@ -48,16 +51,7 @@ export function Sidebar({ onReset }: Props) {
         </span>
       ))}
 
-      <button 
-        type="button" 
-        className="nav-item" 
-        onClick={() => {
-          localStorage.removeItem("spoin_access_token");
-          localStorage.removeItem("spoin_refresh_token");
-          window.location.href = "/login";
-        }}
-        style={{ background: "none", border: "none", width: "100%", textAlign: "left", cursor: "pointer", fontFamily: "inherit", marginTop: "auto", paddingTop: "24px" }}
-      >
+      <button type="button" className="nav-item nav-item-logout" onClick={logout}>
         <span className="nav-item-icon">
           <CloseIcon />
         </span>

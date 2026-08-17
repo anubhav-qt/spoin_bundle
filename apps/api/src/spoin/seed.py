@@ -56,8 +56,12 @@ async def seed() -> None:
                 display_name=fixture["user"]["display_name"],
             )
             session.add(user)
-            
+
         user.password_hash = hash_password(os.environ.get("SPOIN_SEED_USER_PASSWORD", "demo1234"))
+        # The fixture below subscribes this user to topics directly, bypassing
+        # the onboarding endpoint -- mark onboarding done so the seeded demo
+        # user lands on the feed, not the onboarding gate, on first login.
+        user.onboarding_complete = True
         await session.flush()
 
         for topic_data in fixture["topics"]:

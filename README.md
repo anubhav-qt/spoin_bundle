@@ -1,4 +1,4 @@
-# Spoin → Spoin
+# Spoin
 
 A swipeable feed of AI-generated knowledge flash cards. Pick topics, get bite-sized
 cards at your difficulty level, dig deeper with inline AI chat or personal notes.
@@ -6,13 +6,6 @@ cards at your difficulty level, dig deeper with inline AI chat or personal notes
 Web first; a React Native app comes later and shares this backend.
 
 ---
-
-> **The product is named Spoin.** The tree still says Spoin everywhere, and that is
-> deliberate: [ADR-0020](docs/adr/0020-rename-to-spoin.md) commits the rename to a single
-> mechanical sweep — package path, imports, database name, docs, mockups — because a
-> half-renamed tree makes "which name is current?" a question every future session has to
-> answer by reading code. Until task [0007](docs/tasks/0007-rename-to-spoin.md) runs,
-> **Spoin is the correct name to use in code and config.** Don't rename opportunistically.
 
 > **Status: early build.** Feed serving, engagement, and the web app's feed (visual design
 > in [ADR-0012](docs/adr/0012-feed-visual-design.md)) are live against seeded data. The
@@ -74,11 +67,10 @@ it costs:
 | [ADR-0021](docs/adr/0021-ascii-scene-library.md) — ASCII scenes | Cards can carry a stickman scene. The generator **picks from a hand-authored catalog and writes the dialogue; it never draws.** Models are unreliable at ASCII art and no quality-gate check can detect a broken drawing — the catalog is what replaces the missing detector. |
 | [ADR-0022](docs/adr/0022-dual-titles.md) — two titles | `title` is playful and shown on the feed face; `canonical_title` is literal and is what quizzes, progress lists, search, and the generation prompt read. Make the title playful without this and ADR-0007's duplicate prevention silently stops working. **Built** — schema and generation prompt (not live-verified, see [generation-pipeline.md](docs/architecture/generation-pipeline.md)). |
 | [ADR-0023](docs/adr/0023-reader-font-selection.md) — five reader fonts | Same mechanism as the five palettes. `--font-mono` is deliberately **not** part of the choice: ADR-0021's 40-column scenes are only real if the characters are fixed-width. |
-| [ADR-0020](docs/adr/0020-rename-to-spoin.md) — the name | Spoin → Spoin, as one atomic sweep. See the banner at the top. |
 
-ADR-0021's scene catalog, ADR-0023's font picker, and ADR-0020's rename are not
-implemented. ADR-0022 is. The schema fields ADR-0021 adds exist regardless (so a future
-catalog needs no regeneration) — see [content-model.md](docs/architecture/content-model.md).
+ADR-0021's scene catalog and ADR-0023's font picker are not implemented. ADR-0022 is. The
+schema fields ADR-0021 adds exist regardless (so a future catalog needs no regeneration) —
+see [content-model.md](docs/architecture/content-model.md).
 
 ## Stack
 

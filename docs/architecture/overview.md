@@ -3,10 +3,6 @@
 > Read this first. It is the mental model everything else assumes.
 > If you only read one document before touching the codebase, read this one.
 
-> **On the name:** the product is **Spoin**; the codebase is still `spoin` until the
-> single-sweep rename in [ADR-0020](../adr/0020-rename-to-spoin.md) / task
-> [0007](../tasks/0007-rename-to-spoin.md) runs. Nothing in this document changes with it.
-
 ## What Spoin is
 
 A swipeable feed of AI-generated knowledge flash cards. Users pick topics, receive

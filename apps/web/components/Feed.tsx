@@ -38,11 +38,6 @@ interface Props {
 export function Feed({ topics, selected, onCardSeen }: Props) {
   const [cards, setCards] = useState<CardModel[]>([]);
   const [seen, setSeen] = useState<Set<string>>(new Set());
-  // Swipe-to-dismiss removes a card from THIS render only (ADR-0017) — the
-  // seen/state data underneath is untouched, this is purely "what's currently
-  // in the DOM for this scroll session." Tapping the checkmark instead of
-  // swiping still leaves the card in place, unlike a swipe.
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -175,10 +170,6 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
     });
   }, []);
 
-  const dismissCard = useCallback((cardId: string) => {
-    setDismissed((current) => new Set(current).add(cardId));
-  }, []);
-
   return (
     <>
       <main className="track">
@@ -212,7 +203,6 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
             <AnimatePresence initial={false}>
               {station.cards
-                .filter((card) => !dismissed.has(card.id))
                 .map((card) => (
                   <Card
                     key={card.id}
@@ -222,7 +212,6 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
                     seen={seen.has(card.id)}
                     onSeen={markSeen}
                     onUnseen={unmarkSeen}
-                    onDismiss={dismissCard}
                     // Server-owned (ADR-0017) — at most one true per subtopic.
                     // No client heuristic here anymore.
                     isHero={card.is_hero}

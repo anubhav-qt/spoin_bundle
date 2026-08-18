@@ -23,23 +23,20 @@
  * inside it (selecting text, hitting a code block's copy button), and a tap
  * that closes the whole card by accident there is a real annoyance, not a
  * shortcut. Instead, an explicit × at the far right of the head row, tapping
- * anywhere OUTSIDE the card, or Escape all close it.  Swiping right is
- * an ALTERNATE gesture for the same "mark seen" action as the checkmark
- * (ADR-0017) — not a new business rule — but it additionally removes the
- * card from view (`onDismiss`), which tapping the checkmark does not do.
+ * anywhere OUTSIDE the card, or Escape all close it.
  *
  * This component owns the interaction, never the rules. What counts as SEEN and
  * what the dwell threshold means belong to the API. It reports what happened,
  * honestly and separately:
  *
  *   expand            -> sent promptly; progression depends on it
- *   explicit_complete -> they tapped "Got it" OR swiped to dismiss
+ *   explicit_complete -> they tapped "Got it"
  *   dwell_complete    -> they stayed past the threshold
  */
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { motion, type PanInfo } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { ArchetypeTag, Card as CardModel, Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
@@ -80,10 +77,6 @@ function claimHeroTutorial(): boolean {
  *  decides when the client stops waiting and reports. */
 const DWELL_COMPLETE_MS = 8000;
 
-/** Swipe-right threshold to count as a dismiss rather than an incidental drag. */
-const DISMISS_OFFSET_X = 120;
-const DISMISS_VELOCITY_X = 500;
-
 const DIFFICULTY_RANK: Record<Difficulty, number> = {
   beginner: 1,
   intermediate: 2,
@@ -100,13 +93,12 @@ interface Props {
   seen: boolean;
   onSeen: (cardId: string) => void;
   onUnseen: (cardId: string) => void;
-  onDismiss: (cardId: string) => void;
   /** "First card in this station" — a feed-layout placeholder for real
    *  curation, not a property of the card (ADR-0017, docs/tasks/0006). */
   isHero: boolean;
 }
 
-export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDismiss, isHero }: Props) {
+export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, isHero }: Props) {
   // Hero never collapses: starting `expanded` (and `everExpanded`) true and
   // making `toggle` a no-op for hero reuses every bit of existing dwell/reveal
   // logic below instead of forking a parallel code path for it.
@@ -127,7 +119,6 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
   const node = useRef<HTMLDivElement>(null);
   const gotItButton = useRef<HTMLButtonElement>(null);
   const impressed = useRef(false);
-  const dragging = useRef(false);
 
   const dismissTutorial = useCallback(() => {
     localStorage.setItem(HERO_TUTORIAL_KEY, "1");
@@ -289,13 +280,11 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
   // Clicking the card anywhere outside the action row toggles it — open if
   // collapsed, closed if already expanded. Symmetric with the click-outside
   // and Escape handlers above, which cover the "closed by something other
-  // than the card itself" cases this doesn't. No-op for hero (never collapses)
-  // and swallowed right after a genuine drag release, so a swipe doesn't also
-  // register as a tap.
+  // than the card itself" cases this doesn't. No-op for hero (never collapses).
   const toggle = () => {
     // Opens a collapsed card. Once expanded, a tap on the body is a no-op —
     // closing happens only via the explicit × (below) or clicking outside.
-    if (isHero || dragging.current || expanded) return;
+    if (isHero || expanded) return;
     setExpanded(true);
     setEverExpanded(true);
     engagement.record(card.id, "expand");
@@ -329,25 +318,6 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
     run();
   };
 
-  const onDragEnd = (_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
-    const wasDragging = dragging.current;
-    // Cleared on a delay rather than immediately — the synthetic click that
-    // follows a drag release fires right after this, and `toggle` checks the
-    // ref synchronously in that click's handler.
-    setTimeout(() => {
-      dragging.current = false;
-    }, 0);
-    if (!wasDragging) return;
-
-    if (info.offset.x > DISMISS_OFFSET_X || info.velocity.x > DISMISS_VELOCITY_X) {
-      if (!seen) {
-        engagement.record(card.id, "explicit_complete", dwell.current.elapsedMs);
-        onSeen(card.id);
-      }
-      onDismiss(card.id);
-    }
-  };
-
   const archetype = getPrimaryArchetype(card.archetype);
 
   return (
@@ -356,14 +326,6 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
       className="node"
       data-read={seen}
       layout
-      drag={isHero ? false : "x"}
-      dragDirectionLock
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={{ left: 0.15, right: 0.6 }}
-      onDragStart={() => {
-        dragging.current = true;
-      }}
-      onDragEnd={onDragEnd}
       exit={{ x: "100%", opacity: 0, transition: { duration: 0.22 } }}
       transition={{ layout: { duration: 0.22, ease: [0.16, 1, 0.3, 1] } }}
     >

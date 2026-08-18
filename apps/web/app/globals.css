@@ -678,7 +678,7 @@ body {
 }
 
 /* Focus pull (ADR-0017) — a separate element from `.node` deliberately: Card.tsx
-   puts Framer Motion's own transform (layout/drag) on `.node` itself, and a
+   puts Framer Motion's own transform (`layout`) on `.node` itself, and a
    competing CSS `transform` on that same element would fight Framer's inline
    style management. This wrapper is plain CSS, one layer in. */
 .card-focus {

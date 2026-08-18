@@ -3,6 +3,10 @@
 - **Status:** Accepted
 - **Amended by:** [ADR-0021](0021-ascii-scene-library.md) -- adds `ascii` to the archetype
   set, derived from `card.visual_id` rather than from `body`
+- **Partially superseded by:** [ADR-0039](0039-remove-swipe-to-dismiss.md) -- the
+  swipe-right dismiss gesture described below (and the "Alternatives considered"
+  inconsistency it flags) was removed; cards are no longer draggable at all. Hybrid
+  disclosure and the `layout` motion described here are unaffected.
 - **Date:** 2026-08-16
 - **Deciders:** Anubhav
 

@@ -53,7 +53,7 @@ useful than the decision itself.
 | [0014](0014-progress-insights-panel.md) | Right-rail insights: a progress-stats panel, not a relationship graph | Accepted |
 | [0015](0015-topic-progress-and-discovery.md) | Per-topic progress box, engagement-stats modal, and topic discovery | Accepted |
 | [0016](0016-theme-consolidation.md) | Replace Phosphor with a monochrome dark palette, Cyanotype with a light one | Accepted |
-| [0017](0017-card-archetypes.md) | Archetype-based card rendering, color-only highlighting, motion | Accepted (amended by 0021) |
+| [0017](0017-card-archetypes.md) | Archetype-based card rendering, color-only highlighting, motion | Accepted (amended by 0021; partially superseded by 0039) |
 | [0018](0018-hero-mechanism-and-teaser-refinements.md) | Real hero mechanism, teaser refinements, block-expand modal | Accepted |
 | [0019](0019-experimental-generated-fixture-content.md) | A second, honestly-tagged fixture for AI-generated content | Accepted |
 | [0020](0020-rename-to-spoin.md) | Rename the product from Slocho to Spoin | Accepted |
@@ -75,3 +75,4 @@ useful than the decision itself.
 | [0036](0036-topic-discovery-modal.md) | Topic discovery modal replaces the inline Discover list | Partially superseded by 0038 |
 | [0037](0037-site-wide-font-picker.md) | Implement ADR-0023's font picker, site-wide, with live-preview/revert | Accepted |
 | [0038](0038-restore-inline-discover-box.md) | Restore the inline Discover box below "Your topics" | Accepted (partially supersedes 0036) |
+| [0039](0039-remove-swipe-to-dismiss.md) | Remove swipe-to-dismiss; cards are not draggable | Accepted (partially supersedes 0017) |

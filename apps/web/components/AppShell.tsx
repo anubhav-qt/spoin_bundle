@@ -20,8 +20,9 @@ import { CustomCursor } from "./CustomCursor";
 import { Feed } from "./Feed";
 import { FocusToggle } from "./FocusToggle";
 import { GuestNotice } from "./GuestNotice";
+import { NotesView } from "./NotesView";
 import { RightRail } from "./RightRail";
-import { Sidebar } from "./Sidebar";
+import { Sidebar, type ShellView } from "./Sidebar";
 
 function toTopicProgress(p: {
   current_difficulty: Difficulty;
@@ -57,6 +58,7 @@ export function AppShell() {
   // position, Discover's fetched list, in-flight card sets) gets thrown away
   // rather than trying to individually invalidate each one.
   const [resetCount, setResetCount] = useState(0);
+  const [view, setView] = useState<ShellView>("feed");
 
   const loadTopics = useCallback(async () => {
     const list = await api.topics();
@@ -177,9 +179,17 @@ export function AppShell() {
         {/* Both rails keep reserving their grid track even when hidden — an
             empty spacer, not a removed column — so toggling focus mode never
             reflows the center column sideways. */}
-        {focusMode ? <div className="rail-left" aria-hidden="true" /> : <Sidebar onReset={() => void onReset()} />}
+        {focusMode ? (
+          <div className="rail-left" aria-hidden="true" />
+        ) : (
+          <Sidebar onReset={() => void onReset()} view={view} onNavigate={setView} />
+        )}
         <div className="shell">
-          <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
+          {view === "notes" ? (
+            <NotesView />
+          ) : (
+            <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
+          )}
         </div>
         {focusMode ? (
           <>

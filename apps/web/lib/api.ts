@@ -38,6 +38,8 @@ export interface Card {
    *  never-collapsed with anchor styling; it does not decide for itself. */
   is_hero: boolean;
   created_at: string;
+  /** This user's private note on this card, or null if they never wrote one. */
+  note: string | null;
 }
 
 export interface Feed {
@@ -152,6 +154,10 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
       .then((body: { detail?: string }) => body.detail)
       .catch(() => undefined);
     throw new ApiError(response.status, detail ?? `${init?.method ?? "GET"} ${path} failed`);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return (await response.json()) as T;
@@ -312,6 +318,21 @@ export interface RemediationCard {
   subtopic_title: string;
 }
 
+export interface Note {
+  card_id: string;
+  body: string;
+  updated_at: string;
+}
+
+/** One row of the "all my notes" view -- the note plus enough card/topic
+ *  context to render a full card without a per-note follow-up request. */
+export interface NoteWithCard {
+  note: Note;
+  card: Card;
+  /** This user's own name for the card's topic (ADR-0004). */
+  topic_name: string;
+}
+
 export interface QuizFreeTextSubmitResult {
   attempt_id: string;
   free_text: QuizFreeTextResult;
@@ -436,4 +457,15 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ answer }),
     }),
+
+  // -- Notes ------------------------------------------------------------------
+  saveNote: (cardId: string, body: string) =>
+    request<Note>(`/cards/${cardId}/note`, {
+      method: "PUT",
+      body: JSON.stringify({ body }),
+    }),
+
+  deleteNote: (cardId: string) => request<void>(`/cards/${cardId}/note`, { method: "DELETE" }),
+
+  listNotes: () => request<NoteWithCard[]>("/notes"),
 };

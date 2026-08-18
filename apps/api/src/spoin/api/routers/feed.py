@@ -14,6 +14,7 @@ from spoin.api.deps import SessionDep, SettingsDep, UserDep
 from spoin.api.schemas import CardOut, FeedOut
 from spoin.domain.models import Card, Subtopic
 from spoin.feed.service import FeedService
+from spoin.notes.service import NotesService
 
 router = APIRouter(prefix="/feed", tags=["feed"])
 
@@ -44,6 +45,11 @@ async def get_feed(
 
         # Preserve the ranked order — SELECT ... IN does not.
         by_id = {row[0].id: row for row in rows}
+        # A second, small query rather than a join into the ranked query above —
+        # notes are private, per-user state (CardNote's own contract: "never fed
+        # to ranking"), so keeping it out of the candidate/ranking query is
+        # deliberate, not an oversight.
+        notes_by_card = await NotesService(session).get_for_cards(user_id, list(page.card_ids))
         cards = [
             CardOut(
                 id=card.id,
@@ -57,6 +63,7 @@ async def get_feed(
                 archetype=card.archetype,
                 is_hero=card.is_hero,
                 created_at=card.created_at,
+                note=notes_by_card.get(card_id),
             )
             for card_id in page.card_ids
             if (row := by_id.get(card_id)) is not None

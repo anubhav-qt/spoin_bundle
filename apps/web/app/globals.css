@@ -96,10 +96,33 @@
 }
 
 /* -- the other four palettes, ready for docs/tasks/0002 to wire up --------
-   Notebook is the default and lives on :root above, so it has no block of
-   its own here — `[data-palette="notebook"]` still resolves correctly (it
-   just falls through to :root with nothing to override), this only avoids
-   a block that would be a byte-for-byte duplicate of :root. */
+   Notebook is the default and lives on :root above. It ALSO gets its own
+   `[data-palette="notebook"]` block below, byte-for-byte the same values —
+   duplicate on purpose. `:root`-only worked fine back when `[data-palette]`
+   only ever appeared on <body>: on <body>, "falls through to :root" and "is
+   actually notebook" were the same thing. task 0002's live preview swatches
+   broke that assumption by putting `data-palette="x"` on a DESCENDANT of an
+   already-themed <body> — a `notebook` swatch nested inside a `twilight`
+   body has no rule of its own to override the custom properties it
+   inherits, so it silently rendered in the ambient (wrong) palette instead
+   of its own. An explicit block makes every palette self-contained
+   regardless of where in the tree `[data-palette]` is set. */
+[data-palette="notebook"] {
+  --bg: #edf0ea;
+  --bg-2: #e2e7de;
+  --bg-3: #d6ddd1;
+  --fg: #262a22;
+  --fg-2: #565f51;
+  --fg-3: #838c7d;
+  --accent: #c1442b;
+  --accent-2: #a83a24;
+  --accent-syntax: #2f6b78;
+  --line: rgba(38, 42, 34, 0.14);
+  --line-strong: rgba(38, 42, 34, 0.26);
+  --good: #4c7a5a;
+  --shadow: rgba(38, 42, 34, 0.18);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(38,42,34,0.05)' stroke-width='1'/%3E%3C/svg%3E");
+}
 
 /* Twilight (ADR-0038) -- replaces Copper Board, matching what
    `CustomThemeModal`'s own default 4 colors already looked like: a deep
@@ -979,31 +1002,28 @@ body {
   color: var(--fg-2);
 }
 
-/* The outer `.node` (Card.tsx) carries Framer Motion's `layout` prop, which
- * FLIP-animates the height change this display toggle causes — solving the
- * problem this comment used to describe fighting with pure CSS: Chrome won't
- * interpolate `grid-template-rows: 0fr -> 1fr`, and a measured-height + rAF
- * animation breaks under React's development double-invocation. Framer's
- * `layout` prop handles the outer reflow; this local opacity/translate fade
- * is just the newly-revealed content's own entrance, not the height change. */
+/* Grid-template-rows 0fr/1fr collapse, not display:none -> block: the latter
+   changes height in a single instant frame, which gives the outer `.node`'s
+   Framer Motion `layout` (it compensates the whole card's position/size
+   against this every frame) nothing gradual to track — it reads as the old
+   card vanishing and a new one dropping in from a slightly different
+   position instead of one continuous resize. Same fix, same reasoning, as
+   `.card-note` below. */
 .card-reveal {
-  display: none;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease);
 }
 
-.card[data-expanded="true"] .card-reveal {
-  display: block;
-  animation: reveal var(--dur-2) var(--ease) both;
+.card-reveal[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
 
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.card-reveal-body {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .card-body {
@@ -1608,10 +1628,16 @@ body.custom-cursor-active textarea {
   display: flex;
   align-items: center;
   gap: 14px;
+  width: 100%;
+  margin: 0;
   padding: 11px 14px;
+  border: none;
   border-radius: var(--r-pill);
+  background: none;
   color: var(--fg-2);
   text-decoration: none;
+  text-align: left;
+  font: inherit;
   font-size: 15px;
   cursor: pointer;
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
@@ -1622,7 +1648,12 @@ body.custom-cursor-active textarea {
   color: var(--fg);
 }
 
+/* A step darker/stronger than the plain hover above — Home/Notes are real
+   nav items now (not just `<a>`s with no default chrome), so the selected
+   one needs to read as visibly "more" than a hovered-but-unselected one,
+   the same bg-2 -> bg-3 step other selected/active states in this file use. */
 .nav-item[aria-current="page"] {
+  background: var(--bg-3);
   color: var(--fg);
   font-weight: 600;
 }
@@ -3777,4 +3808,260 @@ body.custom-cursor-active textarea {
 
 .onboarding-custom-topic-row .request-topic-input {
   flex: 1;
+}
+
+/* ============================================================================
+   Onboarding — theme step */
+
+.onboarding-step-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.onboarding-step-actions .auth-button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.onboarding-back {
+  flex: 0 0 auto;
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-2);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.onboarding-back:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.theme-picker-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin: 20px 0 8px;
+}
+
+.theme-preview-option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-preview-card {
+  display: block;
+  border-radius: 14px;
+  border: 2px solid var(--line);
+  padding: 3px;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.theme-preview-option:hover .theme-preview-card,
+.theme-preview-option:focus-visible .theme-preview-card {
+  border-color: var(--line-strong);
+}
+
+.theme-preview-option[data-active="true"] .theme-preview-card {
+  border-color: var(--accent);
+}
+
+/* Scoped, not global — `[data-palette]` sets custom properties on whatever
+   element carries it (ADR-0012's tokens aren't `body`-scoped), so this one
+   swatch resolves its own --bg/--fg/--accent without touching the page's
+   actual palette until the option is actually chosen. */
+.theme-preview-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 14px;
+  border-radius: 11px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.theme-preview-card-topic {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.theme-preview-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.theme-preview-card-summary {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fg-2);
+}
+
+.theme-preview-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: center;
+  color: var(--fg-2);
+}
+
+/* ============================================================================
+   Card — private notes */
+
+/* Always mounted (Card.tsx never conditionally renders this) — collapsed via
+   the grid-template-rows 0fr/1fr trick rather than display:none, so height
+   is a real, continuously-interpolated CSS transition instead of an instant
+   flip. The outer `.node`'s Framer Motion `layout` prop compensates the
+   whole card's position/size against whatever this element is doing every
+   frame; give it a single-frame jump (display:none -> block, or the note
+   panel being inserted/removed by React entirely) and it has nothing
+   gradual to track, which read as the old card vanishing and a new one
+   dropping in from a slightly different position instead of one continuous
+   resize. A gradual native transition fixes that at the source. */
+.card-note {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  opacity: 0;
+  border-radius: 10px;
+  background: var(--bg-2);
+  transition: grid-template-rows var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease),
+    margin-top var(--dur-2) var(--ease);
+}
+
+.card-note[data-open="true"] {
+  grid-template-rows: 1fr;
+  margin-top: 10px;
+  opacity: 1;
+}
+
+.card-note-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 10px;
+  transition: padding var(--dur-2) var(--ease);
+}
+
+.card-note[data-open="true"] .card-note-body {
+  padding: 10px;
+}
+
+.card-note-input {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.card-note-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.card-note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.card-note-save,
+.card-note-delete {
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.card-note-save {
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+}
+
+.card-note-save:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.card-note-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.card-note-delete {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-3);
+}
+
+.card-note-delete:hover:not(:disabled) {
+  border-color: var(--bad, #c1442b);
+  color: var(--bad, #c1442b);
+}
+
+/* ============================================================================
+   Notes view — "all my notes" (docs/tasks/0004) */
+
+.notes-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 16px 80px;
+}
+
+.notes-view-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notes-view-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.notes-view-subtitle {
+  font-size: 13px;
+  color: var(--fg-3);
+}
+
+.notes-view-empty {
+  padding: 24px 0;
+  color: var(--fg-3);
+  font-size: 14px;
+}
+
+.notes-view-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }

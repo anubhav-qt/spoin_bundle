@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError, api, type Difficulty, type TopicDiscover } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
+import { ThemePicker } from "@/components/ThemePicker";
+
+type Step = "topics" | "theme";
 
 const DIFFICULTIES: { value: Difficulty; label: string }[] = [
   { value: "beginner", label: "Beginner" },
@@ -24,6 +27,7 @@ const DIFFICULTIES: { value: Difficulty; label: string }[] = [
 const CUSTOM_TOPIC_MAX_WORDS = 5;
 
 export default function OnboardingPage() {
+  const [step, setStep] = useState<Step>("topics");
   const [topics, setTopics] = useState<TopicDiscover[] | null>(null);
   const [selected, setSelected] = useState<Record<string, Difficulty>>({});
   const [loading, setLoading] = useState(false);
@@ -86,12 +90,18 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleSubmit = async () => {
+  const continueToTheme = () => {
     const chosen = Object.entries(selected);
     if (chosen.length === 0 && customAdded.length === 0) {
       setError("Pick at least one topic to get started.");
       return;
     }
+    setError("");
+    setStep("theme");
+  };
+
+  const handleSubmit = async () => {
+    const chosen = Object.entries(selected);
     setError("");
     setLoading(true);
     try {
@@ -112,6 +122,38 @@ export default function OnboardingPage() {
       setLoading(false);
     }
   };
+
+  if (step === "theme") {
+    return (
+      <div className="auth-layout">
+        <div className="auth-panel onboarding-panel">
+          <div className="auth-header">
+            <h1 className="auth-title">Pick your style.</h1>
+            <p className="auth-subtitle">You can change this anytime from the right rail.</p>
+          </div>
+
+          <ThemePicker variant="previews" />
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <div className="onboarding-step-actions">
+            <button
+              type="button"
+              className="onboarding-back"
+              onClick={() => setStep("topics")}
+              disabled={loading}
+            >
+              Back
+            </button>
+            <button type="button" className="auth-button" onClick={() => void handleSubmit()} disabled={loading}>
+              {loading && <span className="auth-loader" />}
+              {loading ? "Setting up..." : "Start exploring"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-layout">
@@ -216,9 +258,8 @@ export default function OnboardingPage() {
 
         {error && <div className="auth-error">{error}</div>}
 
-        <button type="button" className="auth-button" onClick={handleSubmit} disabled={loading}>
-          {loading && <span className="auth-loader" />}
-          {loading ? "Setting up..." : "Start exploring"}
+        <button type="button" className="auth-button" onClick={continueToTheme} disabled={loading}>
+          Continue
         </button>
       </div>
     </div>

@@ -18,16 +18,19 @@ const STUBS = [
   { label: "Profile", icon: UserIcon },
   { label: "Liked", icon: HeartIcon },
   { label: "Saved", icon: BookmarkIcon },
-  { label: "Notes", icon: NoteIcon },
   { label: "Deep Dive", icon: LayersIcon },
   { label: "Settings", icon: GearIcon },
 ] as const;
 
+export type ShellView = "feed" | "notes";
+
 interface Props {
   onReset: () => void;
+  view: ShellView;
+  onNavigate: (view: ShellView) => void;
 }
 
-export function Sidebar({ onReset }: Props) {
+export function Sidebar({ onReset, view, onNavigate }: Props) {
   const { logout } = useAuth();
 
   return (
@@ -36,12 +39,29 @@ export function Sidebar({ onReset }: Props) {
         sp<span className="sidebar-mark-accent">o</span>in
       </button>
 
-      <a className="nav-item" href="/" aria-current="page">
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "feed" ? "page" : undefined}
+        onClick={() => onNavigate("feed")}
+      >
         <span className="nav-item-icon">
           <HomeIcon />
         </span>
         <span className="nav-item-label">Home</span>
-      </a>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "notes" ? "page" : undefined}
+        onClick={() => onNavigate("notes")}
+      >
+        <span className="nav-item-icon">
+          <NoteIcon />
+        </span>
+        <span className="nav-item-label">Notes</span>
+      </button>
 
       {STUBS.map(({ label, icon: Icon }) => (
         <span key={label} className="nav-item" aria-disabled="true">

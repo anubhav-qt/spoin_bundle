@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from spoin.api.routers import auth, dev, engagement, feed, quiz, topics
+from spoin.api.routers import auth, dev, engagement, feed, notes, quiz, topics
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine
 
@@ -54,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(topics.router)
     app.include_router(quiz.router)
     app.include_router(engagement.router)
+    app.include_router(notes.router)
     app.include_router(dev.router)
 
     @app.get("/health", tags=["ops"])

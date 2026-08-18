@@ -38,7 +38,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 
-import type { ArchetypeTag, Card as CardModel, Difficulty } from "@/lib/api";
+import { api, type ArchetypeTag, type Card as CardModel, type Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
 import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
 import {
@@ -96,15 +96,37 @@ interface Props {
   /** "First card in this station" — a feed-layout placeholder for real
    *  curation, not a property of the card (ADR-0017, docs/tasks/0006). */
   isHero: boolean;
+  /** Opens the note editor pre-expanded — used by NotesView so a note is
+   *  visible/editable immediately instead of requiring an extra click. */
+  initialNoteOpen?: boolean;
+  /** Fired after a note save/delete completes, so a caller holding its own
+   *  copy of this card's note (NotesView's list) can update without
+   *  refetching the whole list. Omitted by the feed, which has nothing of
+   *  its own to keep in sync beyond this card's own state. */
+  onNoteChange?: (cardId: string, body: string | null) => void;
 }
 
-export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, isHero }: Props) {
+export function Card({
+  card,
+  topicName,
+  accentHue,
+  seen,
+  onSeen,
+  onUnseen,
+  isHero,
+  initialNoteOpen,
+  onNoteChange,
+}: Props) {
   // Hero never collapses: starting `expanded` (and `everExpanded`) true and
   // making `toggle` a no-op for hero reuses every bit of existing dwell/reveal
   // logic below instead of forking a parallel code path for it.
   const [expanded, setExpanded] = useState(isHero);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(initialNoteOpen ?? false);
+  const [noteDraft, setNoteDraft] = useState(card.note ?? "");
+  const [savedNote, setSavedNote] = useState(card.note ?? null);
+  const [noteSaving, setNoteSaving] = useState(false);
   const [everExpanded, setEverExpanded] = useState(isHero);
   const [focused, setFocused] = useState(true);
   // ADR-0035: only the very first hero card mounted while the flag is unset
@@ -318,6 +340,41 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, isHer
     run();
   };
 
+  const saveNote = async () => {
+    const trimmed = noteDraft.trim();
+    if (noteSaving) return;
+    setNoteSaving(true);
+    try {
+      if (trimmed === "") {
+        if (savedNote !== null) {
+          await api.deleteNote(card.id);
+          setSavedNote(null);
+          onNoteChange?.(card.id, null);
+        }
+      } else {
+        const result = await api.saveNote(card.id, trimmed);
+        setSavedNote(result.body);
+        onNoteChange?.(card.id, result.body);
+        engagement.record(card.id, "note");
+      }
+    } finally {
+      setNoteSaving(false);
+    }
+  };
+
+  const deleteNote = async () => {
+    if (noteSaving) return;
+    setNoteSaving(true);
+    try {
+      await api.deleteNote(card.id);
+      setSavedNote(null);
+      setNoteDraft("");
+      onNoteChange?.(card.id, null);
+    } finally {
+      setNoteSaving(false);
+    }
+  };
+
   const archetype = getPrimaryArchetype(card.archetype);
 
   return (
@@ -375,8 +432,8 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, isHer
           {/* `inert` while collapsed. Clipping to zero height hides the body
               visually but leaves it in the tab order, so keyboard users would
               otherwise tab through every collapsed card's hidden content. */}
-          <div className="card-reveal" inert={!expanded}>
-            <div>
+          <div className="card-reveal" data-open={expanded} inert={!expanded}>
+            <div className="card-reveal-body">
               <div className="card-body">
                 <Markdown source={card.body} />
               </div>
@@ -418,8 +475,10 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, isHer
 
             <button
               className="action"
+              data-on={savedNote !== null}
+              aria-pressed={noteOpen}
               aria-label="Note"
-              onClick={(e) => act(e, () => engagement.record(card.id, "note"))}
+              onClick={(e) => act(e, () => setNoteOpen((open) => !open))}
               type="button"
             >
               <NoteIcon />
@@ -462,6 +521,49 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, isHer
             >
               <CheckIcon />
             </button>
+          </div>
+
+          {/* Always mounted, height driven by a real CSS transition (the
+              grid-template-rows 0fr/1fr trick) rather than a conditional
+              `noteOpen ? ... : null` or a display:none/block flip — both of
+              those change height in one instant frame, which is what made
+              Framer Motion's `layout` on the outer .node (compensating by
+              animating the WHOLE card's transform between its old and new
+              bounding box) look like a discontinuous jump instead of one
+              continuous grow/shrink: framer had a real, gradual height
+              change to track against every frame instead of a single jump
+              to react to. */}
+          <div className="card-note" data-open={noteOpen} inert={!noteOpen} onClick={(e) => e.stopPropagation()}>
+            <div className="card-note-body">
+              <textarea
+                className="card-note-input"
+                placeholder="Private note — only you can see this."
+                value={noteDraft}
+                onChange={(e) => setNoteDraft(e.target.value)}
+                disabled={noteSaving}
+                rows={3}
+              />
+              <div className="card-note-actions">
+                {savedNote !== null ? (
+                  <button
+                    type="button"
+                    className="card-note-delete"
+                    onClick={() => void deleteNote()}
+                    disabled={noteSaving}
+                  >
+                    Delete
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="card-note-save"
+                  onClick={() => void saveNote()}
+                  disabled={noteSaving || noteDraft.trim() === (savedNote ?? "")}
+                >
+                  {noteSaving ? "Saving…" : "Save"}
+                </button>
+              </div>
+            </div>
           </div>
         </article>
       </div>

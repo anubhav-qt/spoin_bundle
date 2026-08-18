@@ -22,6 +22,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0006](0006-curated-hero-cards.md) | A real curated `is_hero` flag, replacing the "first in station" heuristic | unassigned |
 | [0011](0011-difficulty-example-catalog.md) | Author the difficulty example catalog (ADR-0030) | unassigned |
 | [0012](0012-question-generation-failure-visibility.md) | Diagnose silent question-generation failures for specific subtopics | mostly resolved, see doc |
+| [0013](0013-card-preview-swap-not-animated.md) | Collapsed-state preview swaps instantly while the body around it animates | unassigned |
 
 ## Closed
 

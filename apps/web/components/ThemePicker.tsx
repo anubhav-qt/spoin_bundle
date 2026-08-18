@@ -38,7 +38,18 @@ const PALETTES = [
 //: tinted by whatever custom colors were set last.
 const CUSTOM_PROPERTIES = ["--bg", "--fg", "--accent", "--accent-2"];
 
-export function ThemePicker() {
+interface Props {
+  /** "pills" (default): the compact right-rail swatch row. "previews": the
+   *  large onboarding layout with a live miniature card per palette (task
+   *  0002 — "not just color swatches"). Same component, same persistence,
+   *  per that task's "do not build two different pickers" requirement. */
+  variant?: "pills" | "previews";
+  /** Called after a palette is applied — onboarding uses this to know it's
+   *  safe to advance past the step, without re-deriving it from localStorage. */
+  onChoose?: (key: string) => void;
+}
+
+export function ThemePicker({ variant = "pills", onChoose }: Props) {
   const [active, setActive] = useState(DEFAULT_PALETTE);
   const [customOpen, setCustomOpen] = useState(false);
 
@@ -51,7 +62,36 @@ export function ThemePicker() {
     document.body.dataset.palette = key;
     localStorage.setItem(STORAGE_KEY, key);
     setActive(key);
+    onChoose?.(key);
   };
+
+  if (variant === "previews") {
+    return (
+      <div className="theme-picker theme-picker-previews" role="group" aria-label="Theme">
+        {PALETTES.map(({ key, name }) => (
+          <button
+            key={key}
+            type="button"
+            className="theme-preview-option"
+            data-active={active === key}
+            aria-pressed={active === key}
+            onClick={() => choose(key)}
+          >
+            <span className="theme-preview-card" data-palette={key}>
+              <span className="theme-preview-card-inner">
+                <span className="theme-preview-card-topic">Sample topic</span>
+                <span className="theme-preview-card-title">A card looks like this</span>
+                <span className="theme-preview-card-summary">
+                  Swipe, read, and quiz through cards styled in {name}.
+                </span>
+              </span>
+            </span>
+            <span className="theme-preview-name">{name}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="theme-picker" role="group" aria-label="Theme">

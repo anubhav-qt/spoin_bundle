@@ -82,6 +82,10 @@ class CardOut(BaseModel):
     #: which card that is.
     is_hero: bool
     created_at: datetime
+    #: This user's private `CardNote.body`, or null if they never wrote one.
+    #: Populated by a second query keyed on the feed page's card_ids — never
+    #: joined into ranking, per `CardNote`'s "never fed to ranking" contract.
+    note: str | None = None
 
 
 class FeedOut(BaseModel):
@@ -375,4 +379,30 @@ class OnboardingTopicChoice(BaseModel):
 class OnboardingCompleteIn(BaseModel):
     #: Topics chosen during onboarding, each with its own entry difficulty.
     topics: list[OnboardingTopicChoice] = Field(default_factory=list, max_length=10)
+
+
+# ------------------------------------------------------------------------ notes --
+# CardNote (domain/models/engagement.py): per-user, per-card, private, never fed
+# to ranking. See docs/tasks/0004-notes-in-one-place.md.
+
+
+class NoteIn(BaseModel):
+    body: str = Field(min_length=1, max_length=10000)
+
+
+class NoteOut(BaseModel):
+    card_id: UUID
+    body: str
+    updated_at: datetime
+
+
+class NoteWithCardOut(BaseModel):
+    """One row of the "all my notes" view -- enough card context to be useful
+    without opening the card individually (task 0004's ask)."""
+
+    note: NoteOut
+    card: CardOut
+    #: This user's own name for the card's topic (ADR-0004) -- same split as
+    #: `TopicOut.display_name`, sourced from `UserTopic` rather than `Topic`.
+    topic_name: str
 

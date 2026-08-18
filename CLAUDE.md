@@ -1,8 +1,69 @@
 # Working in this repo
 
 Read this first, every session — it is the bootstrap. It doesn't restate what the docs
-already say; it tells you which docs to read and in what order, so a new chat gets useful
-fast instead of re-deriving context that already exists on disk.
+already say; it tells you which docs to read and in what order, gives you the shape of the
+codebase fast, and states the rules that don't have a natural home in any one doc. A new
+chat should be useful immediately from this file, not spend its first ten minutes
+re-deriving context that already exists on disk.
+
+## The database
+
+**`spoin_db` is the only database this project uses.** Read-only access — `SELECT`,
+inspecting a row, checking whether a migration applied — is fine and often necessary.
+**Anything else needs the project owner's explicit approval first, every time, agent
+sessions included.** That covers the obvious destructive operations (`alembic downgrade`,
+`TRUNCATE`/`DELETE`, `docker compose down -v`, editing a row by hand, pointing the stack at
+a different database, re-enabling fixture seeding) and the ones that sound harmless because
+they don't feel destructive: a soft-delete, clearing an archive or trash table, a bulk
+`UPDATE` framed as cleanup, resetting one user's state to "fix" it. **"It's just trash" or
+"it's just one row" is not an exception** — ask first, even when asking feels like
+overhead and even when the task would obviously be easier without asking.
+
+`spoin_db` starts and stays blank by design: `docker compose up`'s `seed` service now runs
+migrations only, no fixture loading (`docker-compose.yml` used to also run
+`seed.py`/`seed_generated.py`/`seed_quiz.py` — removed on purpose, see the README's
+"Developer experience" section). If a task seems to need touching real data, stop and ask
+instead of proceeding — don't route around the question by finding a technically-different
+way to get the same effect.
+
+## The codebase at a glance
+
+```
+apps/api      FastAPI (Python 3.13, async). The single source of truth for every client —
+              owns all business logic, the DB schema, auth, the quota governor, the feed
+              read path, and the generation write path. apps/worker imports this package
+              directly; apps/web never does — it only ever speaks HTTP to it, exactly as
+              the future React Native app will. If the web client can do something the
+              mobile client can't, that's a bug, not a shortcut.
+apps/worker   Background jobs. Same codebase as apps/api, a different entrypoint
+              (worker/__main__.py) — not a second project. Claims GenerationJob rows and
+              runs generation/pipeline.py. Nothing here is ever in a user-facing request.
+apps/web      Next.js + TypeScript, deployed to Cloudflare Pages. Rendering and client
+              state ONLY, zero business logic — see "rules that generalize" below.
+docs/         Everything durable that isn't code: architecture, ADRs, tasks, mockups.
+              This is where "why" lives; see "Read before doing anything" below.
+```
+
+Inside `apps/api/src/spoin/`, roughly in dependency order: `core` (config, DB session) →
+`domain` (SQLAlchemy models — the schema everything else inherits) → `api` (routers, wire
+schemas, the HTTP surface). Two independent verticals sit on top of that shared base:
+
+- **Read path** — `feed` (candidate generation, seen-filtering, ranking, pagination) and
+  `engagement` (event ingest, the seen-state machine). **No LLM call may appear anywhere
+  in here, ever** — enforced by `tests/test_architecture.py`, not just stated.
+- **Write path** — `generation` (`ContentGenerator`, the LangGraph pipeline, the quota
+  governor — the only package allowed to import LangChain/LangGraph, one file each) and
+  `embeddings` (local, never a quota'd API). `worker` is the batch entrypoint that drives
+  it; `generate_topics.py` is a direct CLI entrypoint that bypasses the job queue.
+
+**Why those two verticals are worth keeping structurally apart:** a swipe is ~50ms; an LLM
+call is 2–10 seconds. Cards are generated once by the write path and served to everyone who
+qualifies by the read path — personalization is ranking over a shared corpus, never
+per-user generation. That single fact is the reason the rest of the architecture looks the
+way it does. Full diagram and reasoning:
+[`docs/architecture/overview.md`](docs/architecture/overview.md). Per-package depth: each
+of `apps/api/README.md`, `apps/worker/README.md`, `apps/web/README.md` states what it owns,
+what it doesn't, and where to start reading inside it.
 
 ## Read before doing anything
 
@@ -15,7 +76,8 @@ fast instead of re-deriving context that already exists on disk.
 3. [`docs/adr/`](docs/adr/) — skim the index, read any ADR whose title touches what you're
    about to change. **Do not re-litigate a decision that has an ADR** without reading its
    "Alternatives considered" first — the reason something looks suboptimal is usually
-   written down.
+   written down. An ADR's own header says whether it's been amended or superseded; follow
+   that chain before trusting an older one at face value.
 4. [`docs/tasks/`](docs/tasks/) — open, self-contained work. Check here before assuming
    something is unstarted or unowned.
 5. [`docs/design/mockups/`](docs/design/mockups/) — the feed's visual design is real,
@@ -33,6 +95,13 @@ If a task touches **card content, titles, or generation prompts**, read
 first. Same reason: both define rules whose violation is *silent*. Free-form ASCII art and
 a single playful `title` both look fine on the handful of cards anyone actually eyeballs,
 and degrade everywhere else.
+
+If a task touches **generation reliability** (quota, retries, the LLM call boundary), read
+[`docs/architecture/generation-pipeline.md`](docs/architecture/generation-pipeline.md) and
+[ADR-0028](docs/adr/0028-key-model-quota-ladder.md) first. The quota ladder has failure
+modes that look like content-quality problems until you trace them back — see the "gate:
+... failed" log lines' distinction between a genuine rejection and a call that never
+returned a verdict at all.
 
 ## The rules that generalize
 
@@ -57,17 +126,58 @@ product's claim is quiz-gated mastery of true things. A joke in the line that st
 scroll is charm; a joke in the explanation someone is tested on is noise, and it
 undermines the gate checks that operate on `body` as meaning.
 
-**`spoin_db` is the only database this project uses, and nothing touches its data
-without the project owner's explicit approval first — agent sessions included.** As of
-2026-08-18 it starts and stays blank: `docker compose up`'s `seed` service runs
-migrations only, no fixture loading (`docker-compose.yml` used to also run
-`seed.py`/`seed_generated.py`/`seed_quiz.py`; that line was removed on purpose, not an
-oversight — see README's "Developer experience" section). Never run anything
-destructive or state-changing against it — `alembic downgrade`, `TRUNCATE`/`DELETE`,
-`docker compose down -v`, re-enabling fixture seeding, pointing the stack at a
-different database, editing rows by hand — without asking first, even if the task at
-hand would clearly be easier that way. If a task seems to need it, stop and ask instead
-of proceeding.
+**A "failed" outcome and a "rejected" outcome are never the same number.** A generation
+call that never returned a verdict (quota exhaustion, a malformed whole-batch response, a
+transient provider overload) is not the same fact as content that was judged and found
+bad — folding the two together makes a quota-exhausted run misread as a content-quality
+catastrophe in a report or a log. Keep them as separate counts, and log the actual failure
+reason, not just how many. This bit the generation pipeline for real once (pass-2
+verification's failure count silently included call failures); see `pipeline.py`'s
+`_process_gate_item` for the fix and the reasoning.
+
+## Code style & conventions
+
+**Python (`apps/api`, `apps/worker`).** `mypy --strict` and `ruff` (line length 100 —
+`pyproject.toml`'s `[tool.ruff.lint]` select list) are non-negotiable; `make check` runs
+both plus the test suite, and CI runs the same. Fix the type error rather than reaching for
+`# type: ignore`.
+
+- **Comments explain *why*, never *what*** — this codebase is rigorous about it. SQLAlchemy
+  model fields carry `#:` (Sphinx-style) comments that record provenance and cite the ADR
+  behind a field's shape; `domain/models/card.py` is the canonical example. A module
+  docstring names the doc that explains the file's purpose rather than re-explaining it
+  inline. If a comment restates the line under it, delete the comment.
+- **A hard architectural rule gets enforced twice, never documented once.** A `ruff`
+  `banned-api` entry stops a stray import before the code even runs; an AST-level test in
+  `tests/test_architecture.py` catches it in CI even if lint gets bypassed locally.
+  ADR-0002's "only `langchain_impl.py` imports LangChain" and hard rule 1 ("no LLM in the
+  feed read path") are both wired this way. When you add a rule of this shape, wire it the
+  same way — a rule stated only in a doc is a wish, same principle as "generator trusted for
+  taste, not constraints" above.
+- **Tests prefer the real Postgres `session` fixture over mocking the database** whenever
+  the database's own behavior — a unique constraint, a `day`-scoped ledger row, an
+  `ondelete=CASCADE` — is the actual thing under test (see `test_quota_governor.py`). Mock
+  the generator (`fake.py`, or a mocked `ChatGoogleGenerativeAI`), not the database whose
+  behavior you're trying to verify.
+- **Every LLM-facing interface method takes a collection, never a single item**
+  ([ADR-0005](docs/adr/0005-batch-llm-calls.md)), enforced in `test_architecture.py`. Don't
+  add a single-item convenience wrapper "just this once" — the free tier meters requests,
+  not tokens, and that's the whole reason the rule exists.
+
+**TypeScript (`apps/web`).** `apps/web/lib/api.ts` is the **only** file that knows the API
+exists — every HTTP call goes through the `api` object, grouped by domain
+(`// -- Auth --`, `// -- Feed --`, …). Never call `fetch()` from a component. Interface
+fields get a `/** ... */` comment when their meaning isn't obvious from the name alone,
+usually citing the ADR or invariant behind it (see `TopicRequestResult.status`,
+`EngagementEvent.id` for examples) — same "why, not what" discipline as the Python side.
+Hand-written types in `lib/api.ts` are placeholders; `packages/api-types` (generated from
+the live OpenAPI schema, `make api-types`) is the real source, CI-checked for drift. Don't
+hand-maintain a type the generator already owns.
+
+**Everywhere.** No comment a competent reader wouldn't need — the exception this codebase
+leans on hardest is a hidden constraint, a subtle invariant, or the ADR that explains why
+the obvious-looking alternative was rejected. Grep for `see ADR-` or `content-model.md` in
+the source to calibrate the density expected.
 
 ## Keep the loop closed
 
@@ -101,4 +211,4 @@ Postgres/pgvector, Next.js + TypeScript on the web side, generation behind a
 `ContentGenerator` interface, everything free-tier-first (ADR-0003) until it isn't.
 
 `docker compose up` brings up the full stack against `spoin_db`, blank by default — see
-the DB rule above before assuming you can reset or repopulate it yourself.
+"The database" above before assuming you can reset or repopulate it yourself.

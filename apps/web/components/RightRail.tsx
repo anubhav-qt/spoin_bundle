@@ -3,20 +3,16 @@
 /**
  * The right rail (ADR-0015), top to bottom: theme switcher + focus toggle,
  * font picker, topic filter, "View all topics" (opens `TopicDiscoveryModal`
- * on its request-a-topic tab), per-topic progress ("Your topics"), then a
- * second "Discover" entry into the same modal, opened on its Discover tab.
- *
- * ADR-0036 originally folded the standalone Discover list and RequestTopicBox
- * into one modal reached from a single "View all topics" button. This splits
- * that one button into two entry points at different rail positions (per how
- * it was asked for), both opening the same `TopicDiscoveryModal` on whichever
- * tab makes sense from where the reader clicked.
+ * on its Topics tab -- the full, unfiltered corpus), per-topic progress
+ * ("Your topics"), then the inline `DiscoverBox` (ADR-0038 -- restored below
+ * "Your topics", where it lived before ADR-0036 folded it into the modal).
  */
 
 import { useState } from "react";
 
 import type { Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
+import { DiscoverBox } from "./DiscoverBox";
 import { FocusToggle } from "./FocusToggle";
 import { FontPicker } from "./FontPicker";
 import { ThemePicker } from "./ThemePicker";
@@ -46,9 +42,9 @@ export function RightRail({
   onTopicColorChanged,
 }: Props) {
   const [discoveryOpen, setDiscoveryOpen] = useState(false);
-  const [discoveryView, setDiscoveryView] = useState<"discover" | "request" | "custom">("discover");
+  const [discoveryView, setDiscoveryView] = useState<"topics" | "custom" | "request">("topics");
 
-  const openDiscovery = (view: "discover" | "request" | "custom") => {
+  const openDiscovery = (view: "topics" | "custom" | "request") => {
     setDiscoveryView(view);
     setDiscoveryOpen(true);
   };
@@ -65,10 +61,9 @@ export function RightRail({
 
       {topics.length > 0 ? <TopicRail topics={topics} selected={selected} onToggle={onToggle} /> : null}
 
-      {/* Right below the topic filters — opens on the "everything you can
-          follow" tab, including the request-a-topic form (moved in here
-          rather than living inline in the rail). */}
-      <button type="button" className="discover-follow view-all-topics" onClick={() => openDiscovery("request")}>
+      {/* Right below the topic filters — opens straight to the full topic
+          list (ADR-0038), not the 5-row-capped inline box below. */}
+      <button type="button" className="discover-follow view-all-topics" onClick={() => openDiscovery("topics")}>
         View all topics
       </button>
 
@@ -79,12 +74,9 @@ export function RightRail({
         onTopicColorChanged={onTopicColorChanged}
       />
 
-      {/* Re-added below "Your topics" (ADR-0036 had folded this into the
-          modal above only) — same modal, opened straight to Discover so
-          finding something new is one click after checking your progress. */}
-      <button type="button" className="discover-follow discover-entry" onClick={() => openDiscovery("discover")}>
-        Discover
-      </button>
+      {/* The inline Discover box (ADR-0038), restored below "Your topics" --
+          where it lived before ADR-0036 deleted it in favor of the modal. */}
+      <DiscoverBox onFollowed={onFollowed} />
 
       {discoveryOpen ? (
         <TopicDiscoveryModal

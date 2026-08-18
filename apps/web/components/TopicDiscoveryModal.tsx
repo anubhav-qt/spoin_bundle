@@ -1,15 +1,23 @@
 "use client";
 
 /**
- * ADR-0036. Replaces the old inline `DiscoverBox` list — same Popular/For You
- * data and per-row Follow/detail behavior, just with room to browse more than
- * 5 rows, plus a second mode surfacing this user's own custom-topic
- * generation status (GenerationJob.status via GET /topics/custom), which
- * nothing in the UI exposed before.
+ * ADR-0036, restructured by ADR-0038.
+ *
+ * The "Discover" tab (Popular/For You, top 5 unfollowed) is gone from here —
+ * that's what the always-visible inline `DiscoverBox` in the right rail
+ * covers now (ADR-0038 restored it), so keeping a second copy of the exact
+ * same top-5 list inside this modal was pure duplication.
+ *
+ * What replaces it: a **Topics** tab that is the actual "browse everything"
+ * surface — every topic in the corpus, via `GET /topics/all`, not a
+ * 5-row-capped slice. Tab order is Topics -> Your custom topics -> Request a
+ * topic, and every tab renders inside the same fixed-height, internally
+ * scrolling body (`.discovery-modal-body`) so switching tabs never resizes
+ * the modal panel itself — it used to grow/shrink per tab (a bare few-line
+ * form vs. a long topic list), which reads as the modal "jumping."
  *
  * Reuses the .modal-overlay/.modal-panel-wide chrome ADR-0018's block-expand
- * modal established, and TopicStatsModal for the per-row detail view — same
- * pattern DiscoverBox already used.
+ * modal established, and TopicStatsModal for the per-row detail view.
  */
 
 import { useEffect, useState } from "react";
@@ -18,7 +26,6 @@ import { createPortal } from "react-dom";
 import {
   api,
   type CustomTopicStatus,
-  type DiscoverMode,
   type Topic,
   type TopicDiscover,
 } from "@/lib/api";
@@ -34,7 +41,7 @@ interface Props {
   initialView?: ViewMode;
 }
 
-type ViewMode = "discover" | "request" | "custom";
+type ViewMode = "topics" | "custom" | "request";
 
 const STATUS_LABEL: Record<NonNullable<CustomTopicStatus["generation_status"]>, string> = {
   pending: "Pending",
@@ -43,9 +50,8 @@ const STATUS_LABEL: Record<NonNullable<CustomTopicStatus["generation_status"]>, 
   failed: "Failed",
 };
 
-export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "discover" }: Props) {
+export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "topics" }: Props) {
   const [view, setView] = useState<ViewMode>(initialView);
-  const [mode, setMode] = useState<DiscoverMode>("popular");
   const [items, setItems] = useState<TopicDiscover[]>([]);
   const [customTopics, setCustomTopics] = useState<CustomTopicStatus[] | null>(null);
   const [followingId, setFollowingId] = useState<string | null>(null);
@@ -53,9 +59,9 @@ export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "discov
   const openTopic = items.find((t) => t.topic_id === openTopicId) ?? null;
 
   useEffect(() => {
-    if (view !== "discover") return;
-    void api.discoverTopics(mode).then(setItems);
-  }, [view, mode]);
+    if (view !== "topics") return;
+    void api.allTopics().then(setItems);
+  }, [view]);
 
   useEffect(() => {
     if (view !== "custom") return;
@@ -83,7 +89,9 @@ export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "discov
     try {
       const topic = await api.subscribeTopic(topicId);
       onFollowed(topic);
-      setItems((current) => current.filter((t) => t.topic_id !== topicId));
+      setItems((current) =>
+        current.map((t) => (t.topic_id === topicId ? { ...t, followed: true } : t)),
+      );
       setOpenTopicId((current) => (current === topicId ? null : current));
     } finally {
       setFollowingId(null);
@@ -107,35 +115,27 @@ export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "discov
         </div>
 
         <div className="discover-toggle discover-modal-view-toggle" role="group" aria-label="View">
-          <button type="button" data-active={view === "discover"} onClick={() => setView("discover")}>
-            Discover
-          </button>
-          <button type="button" data-active={view === "request"} onClick={() => setView("request")}>
-            Request a topic
+          <button type="button" data-active={view === "topics"} onClick={() => setView("topics")}>
+            Topics
           </button>
           <button type="button" data-active={view === "custom"} onClick={() => setView("custom")}>
             Your custom topics
           </button>
+          <button type="button" data-active={view === "request"} onClick={() => setView("request")}>
+            Request a topic
+          </button>
         </div>
 
-        {view === "discover" ? (
-          <>
-            <div className="discover-toggle" role="group" aria-label="Discover ranking">
-              <button type="button" data-active={mode === "popular"} onClick={() => setMode("popular")}>
-                Popular
-              </button>
-              <button type="button" data-active={mode === "for_you"} onClick={() => setMode("for_you")}>
-                For You
-              </button>
-            </div>
-
-            {mode === "for_you" ? <p className="discover-note mono">Personalizing soon</p> : null}
-
-            <div className="discover-box-list discover-modal-list">
-              {items.length === 0 ? (
-                <p className="discover-empty mono">Nothing new to discover right now</p>
-              ) : (
-                items.map((item) => (
+        {/* Fixed height across every tab (ADR-0038) -- switching tabs used to
+            resize the whole modal panel because each view's content was a
+            different natural height (a five-field form vs. a long list). */}
+        <div className="discovery-modal-body">
+          {view === "topics" ? (
+            items.length === 0 ? (
+              <p className="discover-empty mono">No topics in the corpus yet</p>
+            ) : (
+              <div className="discover-box-list discover-modal-list">
+                {items.map((item) => (
                   <div key={item.topic_id} className="discover-row">
                     <div
                       className="discover-row-text"
@@ -149,47 +149,47 @@ export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "discov
                     <button
                       type="button"
                       className="discover-follow"
-                      disabled={followingId === item.topic_id}
+                      disabled={item.followed || followingId === item.topic_id}
                       onClick={(e) => {
                         e.stopPropagation();
                         void follow(item.topic_id);
                       }}
                     >
-                      Follow
+                      {item.followed ? "Following" : "Follow"}
                     </button>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : view === "custom" ? (
+            <div className="discover-box-list discover-modal-list">
+              {customTopics === null ? (
+                <p className="modal-loading mono">Loading…</p>
+              ) : customTopics.length === 0 ? (
+                <p className="discover-empty mono">You haven't requested any custom topics yet</p>
+              ) : (
+                customTopics.map((topic) => (
+                  <div key={topic.topic_id} className="discover-row custom-topic-row">
+                    <div className="discover-row-text">
+                      <span className="discover-row-name">{topic.display_name}</span>
+                      <span className="discover-row-meta mono">
+                        Requested {new Date(topic.requested_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <span
+                      className="custom-topic-status mono"
+                      data-status={topic.generation_status ?? "ready"}
+                    >
+                      {topic.generation_status ? STATUS_LABEL[topic.generation_status] : "Ready"}
+                    </span>
                   </div>
                 ))
               )}
             </div>
-          </>
-        ) : view === "request" ? (
-          <RequestTopicBox onFollowed={onFollowed} />
-        ) : (
-          <div className="discover-box-list discover-modal-list">
-            {customTopics === null ? (
-              <p className="modal-loading mono">Loading…</p>
-            ) : customTopics.length === 0 ? (
-              <p className="discover-empty mono">You haven't requested any custom topics yet</p>
-            ) : (
-              customTopics.map((topic) => (
-                <div key={topic.topic_id} className="discover-row custom-topic-row">
-                  <div className="discover-row-text">
-                    <span className="discover-row-name">{topic.display_name}</span>
-                    <span className="discover-row-meta mono">
-                      Requested {new Date(topic.requested_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <span
-                    className="custom-topic-status mono"
-                    data-status={topic.generation_status ?? "ready"}
-                  >
-                    {topic.generation_status ? STATUS_LABEL[topic.generation_status] : "Ready"}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+          ) : (
+            <RequestTopicBox onFollowed={onFollowed} />
+          )}
+        </div>
       </div>
 
       {openTopic !== null ? (

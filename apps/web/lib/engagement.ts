@@ -27,6 +27,15 @@ const URGENT: ReadonlySet<EngagementKind> = new Set([
 class EngagementBuffer {
   private queue: EngagementEvent[] = [];
   private timer: ReturnType<typeof setInterval> | null = null;
+  // The most recent urgent flush's promise (ADR-0038) -- lets a caller that
+  // just recorded a seen-triggering event (dwell_complete/explicit_complete)
+  // wait for that write to actually land server-side before reading back a
+  // derived aggregate like topic coverage, without weakening ADR-0011's
+  // "don't read your own writes" rule for anything ranking/serving-critical.
+  // `flush()` drains `this.queue` synchronously before its first `await`, so
+  // by the time `record()` returns, this already points at the in-flight
+  // request for the event just pushed.
+  private flushing: Promise<void> = Promise.resolve();
 
   start(): void {
     if (this.timer !== null) return;
@@ -51,7 +60,12 @@ class EngagementBuffer {
       client_occurred_at: new Date().toISOString(),
     });
 
-    if (URGENT.has(kind)) void this.flush();
+    if (URGENT.has(kind)) this.flushing = this.flush();
+  }
+
+  /** Resolves once the most recent urgent flush (if any) has settled. */
+  whenIdle(): Promise<void> {
+    return this.flushing;
   }
 
   async flush(): Promise<void> {

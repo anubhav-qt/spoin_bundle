@@ -188,6 +188,10 @@ export interface TopicDiscover {
   /** canonical_name, not a personal label — see ADR-0015. */
   display_name: string;
   subscriber_count: number;
+  /** Always false from `discoverTopics`. Set per-topic from `allTopics`
+   *  (ADR-0038) so the modal can grey out Follow on a topic already
+   *  followed instead of offering a second subscribe. */
+  followed: boolean;
 }
 
 export type DiscoverMode = "popular" | "for_you";
@@ -353,6 +357,8 @@ export const api = {
 
   discoverTopics: (mode: DiscoverMode) =>
     request<TopicDiscover[]>(`/topics/discover?mode=${mode}`),
+
+  allTopics: () => request<TopicDiscover[]>("/topics/all"),
 
   subscribeTopic: (topicId: string) =>
     request<Topic>(`/topics/${topicId}/subscribe`, { method: "POST" }),

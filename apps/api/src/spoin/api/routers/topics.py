@@ -295,6 +295,43 @@ async def set_topic_color(
     )
 
 
+@router.get("/all", response_model=list[TopicDiscoverOut])
+async def list_all_topics(session: SessionDep, user_id: UserDep) -> list[TopicDiscoverOut]:
+    """Every topic in the corpus, not just the top-5 unfollowed slice
+    `/topics/discover` returns (ADR-0038: the modal's "Topics" tab is meant
+    to be the actual browse-everything surface now that the always-visible
+    inline Discover box already covers the fast "what's new" glance).
+
+    `followed` lets the client grey out Follow on a row instead of offering a
+    second subscribe -- cheaper than filtering those rows out entirely, since
+    "browse everything" should still show what you're already following.
+    """
+
+    followed_ids = set(
+        (
+            await session.execute(
+                select(UserTopic.topic_id).where(UserTopic.user_id == user_id)
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    rows = (
+        await session.execute(select(Topic).order_by(Topic.subscriber_count.desc()))
+    ).scalars().all()
+
+    return [
+        TopicDiscoverOut(
+            topic_id=topic.id,
+            display_name=topic.canonical_name,
+            subscriber_count=topic.subscriber_count,
+            followed=topic.id in followed_ids,
+        )
+        for topic in rows
+    ]
+
+
 @router.get("/discover", response_model=list[TopicDiscoverOut])
 async def discover_topics(
     session: SessionDep, user_id: UserDep, mode: str = "popular"

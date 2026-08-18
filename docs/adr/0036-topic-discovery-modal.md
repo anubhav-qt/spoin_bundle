@@ -1,8 +1,13 @@
 # ADR-0036: Topic discovery modal replaces the inline Discover list
 
-- **Status:** Accepted
+- **Status:** Partially superseded by [ADR-0038](0038-restore-inline-discover-box.md)
 - **Date:** 2026-08-18
 - **Deciders:** Anubhav
+
+> **2026-08-18 update:** [ADR-0038](0038-restore-inline-discover-box.md) restores
+> `DiscoverBox` as an always-visible rail box below "Your topics." The modal (and its
+> Discover/custom-topics tabs) is kept for browsing past 5 rows and for custom-topic
+> status -- only the "delete the inline box" half of this decision was reversed.
 
 ## Context
 

@@ -104,6 +104,70 @@ const courierPrime = Courier_Prime({
 });
 const comfortaa = Comfortaa({ subsets: ["latin"], variable: "--font-comfortaa", display: "swap" });
 
+/**
+ * The 46 extra faces behind CustomFontModal's "More fonts" list (ADR-0038:
+ * over 50 faces total, counting the 5 presets + 5 original extras above).
+ * Loaded as one Google Fonts CSS2 stylesheet request rather than 46
+ * next/font/google imports -- next/font validates the requested `weight`
+ * array against each family's actually-published static cuts at build time
+ * and hard-fails the whole app if one is wrong; the CSS2 API is tolerant of
+ * a requested weight a family doesn't ship (it just omits it), which is the
+ * right trade for a long, rarely-audited list like this one. Referenced by
+ * literal family name in each `[data-font="…"]` rule in globals.css, not by
+ * a `--font-*` custom property -- there's no local @font-face to point at.
+ */
+const EXTRA_GOOGLE_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?" +
+  [
+    "family=Merriweather:wght@400;700",
+    "family=Playfair+Display:wght@400;700",
+    "family=Lora:wght@400;700",
+    "family=Crimson+Text:wght@400;700",
+    "family=EB+Garamond:wght@400;700",
+    "family=Bitter:wght@400;700",
+    "family=PT+Serif:wght@400;700",
+    "family=Source+Serif+4:wght@400;700",
+    "family=Libre+Baskerville:wght@400;700",
+    "family=Cormorant:wght@400;700",
+    "family=Spectral:wght@400;700",
+    "family=Noto+Serif:wght@400;700",
+    "family=Vollkorn:wght@400;700",
+    "family=Domine:wght@400;700",
+    "family=Alegreya:wght@400;700",
+    "family=Roboto:wght@400;700",
+    "family=Open+Sans:wght@400;700",
+    "family=Lato:wght@400;700",
+    "family=Montserrat:wght@400;700",
+    "family=Poppins:wght@400;700",
+    "family=Nunito:wght@400;700",
+    "family=Work+Sans:wght@400;700",
+    "family=Rubik:wght@400;700",
+    "family=Karla:wght@400;700",
+    "family=Mulish:wght@400;700",
+    "family=DM+Sans:wght@400;700",
+    "family=Sora:wght@400;700",
+    "family=Outfit:wght@400;700",
+    "family=Plus+Jakarta+Sans:wght@400;700",
+    "family=Public+Sans:wght@400;700",
+    "family=Barlow:wght@400;700",
+    "family=Urbanist:wght@400;700",
+    "family=Figtree:wght@400;700",
+    "family=IBM+Plex+Sans:wght@400;700",
+    "family=Raleway:wght@400;700",
+    "family=Roboto+Slab:wght@400;700",
+    "family=Arvo:wght@400;700",
+    "family=Bevan:wght@400",
+    "family=Fira+Code:wght@400;700",
+    "family=Source+Code+Pro:wght@400;700",
+    "family=IBM+Plex+Mono:wght@400;700",
+    "family=Space+Mono:wght@400;700",
+    "family=Roboto+Mono:wght@400;700",
+    "family=Inconsolata:wght@400;700",
+    "family=Caveat:wght@400;700",
+    "family=Bebas+Neue:wght@400",
+  ].join("&") +
+  "&display=swap";
+
 const FONT_VARIABLES = [
   literata,
   inter,
@@ -138,6 +202,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           hydrates, so client and server markup legitimately differ on those
           two attributes. This is the standard fix for that pattern. */}
       <body suppressHydrationWarning>
+        {/* The 46-face "more fonts" catalog (CustomFontModal) -- one batched
+            stylesheet request rather than 46 individual next/font/google
+            imports. The 10 faces above stay self-hosted per-family (the fast
+            path: 5 presets + the 5 original extras); this covers only the
+            expanded list a reader opts into from the "More fonts" modal.
+            Next hoists <link> tags into <head> on every page regardless of
+            whether that modal is ever opened, so this does cost one request
+            up front -- accepted as the simplest correct thing given how
+            rarely this list changes; revisit with a dynamically-injected
+            <link> on modal-open only if that request becomes a real
+            first-paint cost. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={EXTRA_GOOGLE_FONTS_HREF} />
         <Script id="apply-palette" strategy="beforeInteractive">
           {APPLY_PALETTE_SCRIPT}
         </Script>

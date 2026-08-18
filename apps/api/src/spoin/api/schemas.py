@@ -144,6 +144,11 @@ class TopicDiscoverOut(BaseModel):
     #: `UserTopic` row exists, and a topic surfaced here by definition has none yet.
     display_name: str
     subscriber_count: int
+    #: Always false from `/topics/discover` (it excludes followed topics by
+    #: definition). `/topics/all` (ADR-0038) reuses this same shape and sets it
+    #: per-topic, so the modal can grey out "Follow" instead of offering a
+    #: second subscribe on a topic the reader already follows.
+    followed: bool = False
 
 
 class CustomTopicStatusOut(BaseModel):

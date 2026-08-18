@@ -101,21 +101,26 @@
    just falls through to :root with nothing to override), this only avoids
    a block that would be a byte-for-byte duplicate of :root. */
 
-[data-palette="copper"] {
-  --bg: #0b1613;
-  --bg-2: #10201b;
-  --bg-3: #162b23;
-  --fg: #e7ede7;
-  --fg-2: #a9b8ae;
-  --fg-3: #6d8078;
-  --accent: #e2985f;
-  --accent-2: #c97a4a;
-  --accent-syntax: #5fb4d9;
-  --line: rgba(231, 237, 231, 0.12);
-  --line-strong: rgba(231, 237, 231, 0.22);
-  --good: #7fbf95;
-  --shadow: rgba(0, 0, 0, 0.45);
-  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(231,237,231,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+/* Twilight (ADR-0038) -- replaces Copper Board, matching what
+   `CustomThemeModal`'s own default 4 colors already looked like: a deep
+   near-black ground, cool off-white text, a periwinkle primary accent and a
+   peach secondary one. Committed as a real preset rather than leaving it
+   reachable only via the custom-theme picker. */
+[data-palette="twilight"] {
+  --bg: #12141a;
+  --bg-2: #191c24;
+  --bg-3: #22262f;
+  --fg: #e8eaf0;
+  --fg-2: #a8adba;
+  --fg-3: #6e7484;
+  --accent: #7c9eff;
+  --accent-2: #ff9d7c;
+  --accent-syntax: #ff9d7c;
+  --line: rgba(232, 234, 240, 0.12);
+  --line-strong: rgba(232, 234, 240, 0.24);
+  --good: #83d9a3;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(232,234,240,0.045)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 /* Cyanotype — the light counterpart to Phosphor below: soft, pale blueprint
@@ -243,6 +248,194 @@
   --font-sans: var(--font-comfortaa), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
+/* -- 46 more extra faces (ADR-0038), loaded via the single Google Fonts
+   stylesheet request in layout.tsx rather than individual next/font/google
+   imports -- so these reference the literal family name directly, not a
+   --font-* custom property backed by a local @font-face. */
+[data-font="merriweather"] {
+  --font-sans: "Merriweather", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="playfair"] {
+  --font-sans: "Playfair Display", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="lora"] {
+  --font-sans: "Lora", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="crimson"] {
+  --font-sans: "Crimson Text", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="garamond"] {
+  --font-sans: "EB Garamond", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="bitter"] {
+  --font-sans: "Bitter", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="ptserif"] {
+  --font-sans: "PT Serif", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="sourceserif"] {
+  --font-sans: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="baskerville"] {
+  --font-sans: "Libre Baskerville", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="cormorant"] {
+  --font-sans: "Cormorant", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="spectral"] {
+  --font-sans: "Spectral", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="notoserif"] {
+  --font-sans: "Noto Serif", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="vollkorn"] {
+  --font-sans: "Vollkorn", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="domine"] {
+  --font-sans: "Domine", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="alegreya"] {
+  --font-sans: "Alegreya", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="roboto"] {
+  --font-sans: "Roboto", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="opensans"] {
+  --font-sans: "Open Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="lato"] {
+  --font-sans: "Lato", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="montserrat"] {
+  --font-sans: "Montserrat", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="poppins"] {
+  --font-sans: "Poppins", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="nunito"] {
+  --font-sans: "Nunito", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="worksans"] {
+  --font-sans: "Work Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="rubik"] {
+  --font-sans: "Rubik", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="karla"] {
+  --font-sans: "Karla", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="mulish"] {
+  --font-sans: "Mulish", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="dmsans"] {
+  --font-sans: "DM Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="sora"] {
+  --font-sans: "Sora", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="outfit"] {
+  --font-sans: "Outfit", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="plusjakarta"] {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="publicsans"] {
+  --font-sans: "Public Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="barlow"] {
+  --font-sans: "Barlow", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="urbanist"] {
+  --font-sans: "Urbanist", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="figtree"] {
+  --font-sans: "Figtree", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="ibmplexsans"] {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="raleway"] {
+  --font-sans: "Raleway", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="robotoslab"] {
+  --font-sans: "Roboto Slab", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="arvo"] {
+  --font-sans: "Arvo", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="bevan"] {
+  --font-sans: "Bevan", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="firacode"] {
+  --font-sans: "Fira Code", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="sourcecodepro"] {
+  --font-sans: "Source Code Pro", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="ibmplexmono"] {
+  --font-sans: "IBM Plex Mono", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="spacemono"] {
+  --font-sans: "Space Mono", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="robotomono"] {
+  --font-sans: "Roboto Mono", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="inconsolata"] {
+  --font-sans: "Inconsolata", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="caveat"] {
+  --font-sans: "Caveat", "Segoe Script", cursive;
+}
+
+[data-font="bebasneue"] {
+  --font-sans: "Bebas Neue", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
 *,
 *::before,
 *::after {
@@ -258,6 +451,16 @@ html {
      "cards resize slightly" report traced back to this, not the cards
      themselves. */
   scrollbar-gutter: stable;
+  /* The app has no design that ever needs horizontal scroll at the document
+     level. Without this, the fixed-position `.custom-cursor-pos` (moved via
+     `translate3d` to the raw pointer position on every move) can push the
+     document's scrollable overflow region past the viewport's right edge as
+     the pointer nears it, which some browsers then correct for by shifting
+     the horizontal scroll position — the whole page (both rails, all three
+     columns) visibly sliding left with the start of every line clipped.
+     Hard-clipping at the root is the robust fix: it holds regardless of
+     which descendant (cursor, a rail box, a modal) is the one overflowing. */
+  overflow-x: hidden;
 }
 
 body {
@@ -312,6 +515,7 @@ body {
      change. `max-width` still caps it in the single-column fallback below
      680px, where `.app-grid` stops being a grid at all. */
   max-width: 640px;
+  min-width: 0;
   padding: 0 18px 140px;
 }
 
@@ -726,30 +930,34 @@ body {
 .card-close {
   margin-left: auto;
   flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--fg-3);
+  /* Visible at rest, not just on hover -- at the old 18px/11px-icon size
+     with a fully transparent border and --fg-3 stroke, this read as an
+     unlabeled dot rather than a close control. A resting border plus a
+     bigger, higher-contrast X fixes that without waiting for hover. */
+  border: 1px solid var(--line-strong);
+  background: var(--bg-3);
+  color: var(--fg-2);
   cursor: pointer;
   transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
 
 .card-close svg {
-  width: 11px;
-  height: 11px;
+  width: 13px;
+  height: 13px;
   stroke: currentColor;
   fill: none;
-  stroke-width: 1.8;
+  stroke-width: 2.2;
   stroke-linecap: round;
 }
 
 .card-close:hover {
-  border-color: var(--line-strong);
+  border-color: var(--accent);
   background: var(--bg-3);
   color: var(--fg);
 }
@@ -1344,6 +1552,13 @@ body.custom-cursor-active textarea {
   top: 0;
   max-height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  /* Grid items default to `min-width: auto`, which resolves to the item's
+     min-content size and refuses to shrink below it even inside a
+     fixed-width track (275px/350px above) -- any non-wrapping child wider
+     than that (a long, unbroken row of pills, say) would otherwise blow the
+     column out past its track and overflow the whole `.app-grid`. */
+  min-width: 0;
   scrollbar-width: none;
   padding: 20px 0 24px;
 }
@@ -1644,10 +1859,10 @@ body.custom-cursor-active textarea {
    reach them. Each palette's four swatches are its --bg, --accent,
    --accent-2, --good, in that order (ADR-0012's table; the quadrant order
    here is otherwise arbitrary). */
-.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(1) { background: #0b1613; }
-.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(2) { background: #e2985f; }
-.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(3) { background: #c97a4a; }
-.theme-pill-swatch[data-palette-preview="copper"] i:nth-child(4) { background: #7fbf95; }
+.theme-pill-swatch[data-palette-preview="twilight"] i:nth-child(1) { background: #12141a; }
+.theme-pill-swatch[data-palette-preview="twilight"] i:nth-child(2) { background: #7c9eff; }
+.theme-pill-swatch[data-palette-preview="twilight"] i:nth-child(3) { background: #ff9d7c; }
+.theme-pill-swatch[data-palette-preview="twilight"] i:nth-child(4) { background: #83d9a3; }
 
 .theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(1) { background: #e8f0f7; }
 .theme-pill-swatch[data-palette-preview="cyanotype"] i:nth-child(2) { background: #3f7ea3; }
@@ -2238,7 +2453,7 @@ body.custom-cursor-active textarea {
   text-align: center;
 }
 
-/* -- TopicDiscoveryModal (ADR-0036) -- */
+/* -- TopicDiscoveryModal (ADR-0036, restructured by ADR-0038) -- */
 .discover-modal-view-toggle {
   width: 100%;
   margin-bottom: 14px;
@@ -2248,9 +2463,20 @@ body.custom-cursor-active textarea {
   flex: 1;
 }
 
-.discover-modal-list {
-  max-height: 50vh;
+/* Fixed across all three tabs (ADR-0038) -- switching between a long topic
+   list and a five-field form used to resize the whole modal panel, since
+   each tab's natural content height differed. A constant height plus
+   internal scroll means the panel itself never moves; only this pane's
+   content scrolls when it's taller than the box. */
+.discovery-modal-body {
+  height: 50vh;
   overflow-y: auto;
+}
+
+.discover-modal-list {
+  /* No height of its own -- fills and scrolls with .discovery-modal-body,
+     the shared fixed-height wrapper around every tab. */
+  height: auto;
 }
 
 .custom-topic-status {

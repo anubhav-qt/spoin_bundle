@@ -20,7 +20,9 @@ const DEFAULT_PALETTE = "notebook";
 
 const PALETTES = [
   { key: "notebook", name: "Notebook" },
-  { key: "copper", name: "Copper Board" },
+  // ADR-0038: replaces Copper Board with the colors CustomThemeModal already
+  // shipped as its own defaults, committed as a real preset.
+  { key: "twilight", name: "Twilight" },
   // Display names, not the `data-palette`/localStorage keys (ADR-0016 kept
   // the keys "cyanotype"/"phosphor" stable for persistence, but their
   // identities changed entirely, so the name shown on hover is renamed to

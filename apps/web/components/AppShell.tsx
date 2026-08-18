@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 
 import { api, type Difficulty, type Topic } from "@/lib/api";
+import { engagement } from "@/lib/engagement";
 import type { TopicProgress } from "@/lib/types";
 import { CustomCursor } from "./CustomCursor";
 import { Feed } from "./Feed";
@@ -82,12 +83,24 @@ export function AppShell() {
   // Called when a card gets marked seen, so InsightsPanel's session count and
   // the topic's progress both reflect it immediately instead of only as of
   // the last full page load.
+  //
+  // The seen-triggering event (dwell_complete/explicit_complete) is sent via
+  // `lib/engagement`'s fire-and-forget buffer, not awaited by Card.tsx before
+  // it calls this. Fetching `/topics/{id}/progress` right away used to race
+  // that write: the GET would frequently land and resolve before the POST
+  // had been processed, so the coverage bar read back the OLD number and
+  // only self-corrected on a full reload minutes later (by which point the
+  // write had long since landed). Waiting on `engagement.whenIdle()` first
+  // sequences this refetch after that write actually completes, without
+  // making the read itself synchronous with the write (ADR-0011's "don't
+  // read your own writes" is about ranking/serving decisions, not this kind
+  // of explicit, idempotent "refresh what I just did" UI action).
   const onCardSeen = useCallback(
     (cardId: string, topicId: string) => {
       setReadCardIds((current) => {
         if (current.has(cardId)) return current;
         const next = new Set(current).add(cardId);
-        void refreshProgress(topicId);
+        void engagement.whenIdle().then(() => refreshProgress(topicId));
         return next;
       });
     },

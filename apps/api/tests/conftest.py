@@ -21,10 +21,33 @@ from spoin.domain.base import Base
 from spoin.domain.enums import CardStatus, Difficulty
 from spoin.domain.models import Card, CardStats, Subtopic, Topic, User, UserTopic
 
-TEST_DATABASE_URL = os.environ.get(
-    "SPOIN_TEST_DATABASE_URL",
-    os.environ.get("SPOIN_DATABASE_URL", ""),
-)
+# Deliberately NOT falling back to SPOIN_DATABASE_URL: that fallback is what
+# let this fixture silently target a real dev database when only
+# SPOIN_DATABASE_URL happened to be set in the environment. SPOIN_TEST_DATABASE_URL
+# must be set explicitly, every time -- `make test` / `docker compose --profile
+# test run --rm test` (see docker-compose.yml's `test` service) sets it for you,
+# pointed at the dedicated `spoin_test` database.
+TEST_DATABASE_URL = os.environ.get("SPOIN_TEST_DATABASE_URL", "")
+
+
+def _reject_unsafe_test_database(url: str) -> None:
+    """Hard-stop, not a skip: this fixture is about to DROP AND RECREATE every
+    table on `url` below. A skip is silent and easy to miss; a real database
+    getting wiped because of it is not something to fail quietly on. Requires
+    the database name to end in `_test` -- `spoin_test`, never `spoin` (the
+    dev/prod name) -- as a second line of defense on top of "use `make test`",
+    for whoever (human or agent) runs pytest directly with a hand-built URL
+    instead."""
+
+    db_name = url.rsplit("/", 1)[-1].split("?", 1)[0]
+    if not db_name.endswith("_test"):
+        raise RuntimeError(
+            f"SPOIN_TEST_DATABASE_URL points at database {db_name!r}, which does not "
+            "end in `_test`. This fixture drops and recreates every table it touches "
+            "-- refusing to run against what looks like a real database. Use `make "
+            "test` (or `docker compose --profile test run --rm test`), which points "
+            "at the dedicated `spoin_test` database instead."
+        )
 
 
 @pytest.fixture(scope="session")
@@ -36,6 +59,7 @@ def settings() -> Settings:
 async def session() -> AsyncIterator[AsyncSession]:
     if not TEST_DATABASE_URL:
         pytest.skip("No database configured; set SPOIN_TEST_DATABASE_URL")
+    _reject_unsafe_test_database(TEST_DATABASE_URL)
 
     engine = create_async_engine(TEST_DATABASE_URL)
     try:

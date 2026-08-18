@@ -184,6 +184,16 @@ export function ExpandIcon(_: IconProps) {
   );
 }
 
+export function LogoutIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10 4.5H6.5A2.5 2.5 0 0 0 4 7v10a2.5 2.5 0 0 0 2.5 2.5H10" />
+      <path d="M15.5 16 20 12l-4.5-4" />
+      <path d="M9.5 12H20" />
+    </svg>
+  );
+}
+
 export function GearIcon(_: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

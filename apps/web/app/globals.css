@@ -163,6 +163,26 @@
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(230,230,231,0.045)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
+/* Custom palette (right rail's CustomThemeModal): the user picks exactly
+   four colors -- --bg, --fg, --accent, --accent-2, set inline on <body> by
+   the modal (localStorage-restored pre-hydration, same script pattern as
+   the five presets). Everything else derives from those four via
+   color-mix, same technique --topic-accent already uses elsewhere, so a
+   user only ever has to think about "the 4 colors," never a11y-tuning
+   eight more variants by hand. */
+[data-palette="custom"] {
+  --bg-2: color-mix(in srgb, var(--fg) 6%, var(--bg));
+  --bg-3: color-mix(in srgb, var(--fg) 12%, var(--bg));
+  --fg-2: color-mix(in srgb, var(--bg) 30%, var(--fg));
+  --fg-3: color-mix(in srgb, var(--bg) 55%, var(--fg));
+  --accent-syntax: var(--accent-2);
+  --line: color-mix(in srgb, var(--fg) 14%, transparent);
+  --line-strong: color-mix(in srgb, var(--fg) 26%, transparent);
+  --good: var(--accent-2);
+  --shadow: color-mix(in srgb, var(--fg) 18%, transparent);
+  --texture: none;
+}
+
 [data-palette="scope"] {
   --bg: #0d1116;
   --bg-2: #141b22;
@@ -194,12 +214,33 @@
   --font-sans: var(--font-grotesk), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
-[data-font="plex"] {
-  --font-sans: var(--font-plex), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+[data-font="jetbrains"] {
+  --font-sans: var(--font-jetbrains), ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 }
 
 [data-font="hyperlegible"] {
   --font-sans: var(--font-hyperlegible), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* -- extra faces, reachable only via the custom font picker's list -- */
+[data-font="fraunces"] {
+  --font-sans: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="manrope"] {
+  --font-sans: var(--font-manrope), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+[data-font="zilla"] {
+  --font-sans: var(--font-zilla), ui-serif, Georgia, "Times New Roman", serif;
+}
+
+[data-font="courier"] {
+  --font-sans: var(--font-courier), ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-font="comfortaa"] {
+  --font-sans: var(--font-comfortaa), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -1344,6 +1385,10 @@ body.custom-cursor-active textarea {
   padding: 8px 12px 20px;
 }
 
+.sidebar-mark-accent {
+  color: var(--accent);
+}
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -1395,14 +1440,17 @@ body.custom-cursor-active textarea {
   stroke-linejoin: round;
 }
 
+.nav-item-logout-wrap {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
 .nav-item-logout {
   background: none;
   border: none;
   width: 100%;
   text-align: left;
   font-family: inherit;
-  margin-top: auto;
-  padding-top: 24px;
 }
 
 /* ------------------------------ right rail -------------------------------- */
@@ -1510,6 +1558,73 @@ body.custom-cursor-active textarea {
 
 .theme-pill[data-active="true"] {
   border-color: var(--accent);
+}
+
+.theme-pill-swatch-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg-2);
+  background: var(--bg-2);
+}
+
+.custom-theme-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.custom-theme-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.custom-theme-field-label {
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+.custom-theme-field-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-theme-field-input input[type="color"] {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.custom-theme-field-hex {
+  font-size: 11px;
+  color: var(--fg-3);
+  min-width: 62px;
+}
+
+.custom-theme-apply {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.custom-theme-apply:hover {
+  background: var(--accent-2);
 }
 
 .theme-pill-swatch {
@@ -1673,6 +1788,64 @@ body.custom-cursor-active textarea {
 .font-picker-revert:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.font-pill-custom {
+  flex: 0 0 30px;
+  font-weight: 700;
+  color: var(--fg-2);
+}
+
+.custom-font-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.custom-font-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+}
+
+.custom-font-row:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-3);
+}
+
+.custom-font-row[data-active="true"] {
+  border-color: var(--accent);
+}
+
+.custom-font-row-sample {
+  flex: 0 0 auto;
+  width: 34px;
+  font-size: 18px;
+  color: var(--fg);
+}
+
+.custom-font-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.custom-font-row-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.custom-font-row-hint {
+  font-size: 10.5px;
+  color: var(--fg-3);
 }
 
 /* Topic rail, relocated here from the feed's own masthead. Name-only pills
@@ -2780,7 +2953,20 @@ body.custom-cursor-active textarea {
    let the grid attempt three columns in a width that didn't actually fit,
    silently shrinking the center column (and its cards) by a few px depending
    on exactly how much overflow there was — the "cards resize slightly" bug. */
-@media (max-width: 1400px) {
+/* Between 1150-1400px there's still room for three columns if the center
+   and right tracks give up some of their max width -- hiding the right
+   rail here would take the theme/font pickers (and everything else in it)
+   out of reach on very common laptop viewports (1366x768 and similar),
+   which is indistinguishable from "the picker doesn't work" to a user who
+   never sees it. Only collapse to two columns once there genuinely isn't
+   room, at the same 1150px floor the old 1100px cutoff aimed for. */
+@media (max-width: 1400px) and (min-width: 1151px) {
+  .app-grid {
+    grid-template-columns: 275px minmax(0, 480px) 280px;
+  }
+}
+
+@media (max-width: 1150px) {
   .app-grid {
     grid-template-columns: 275px minmax(0, 640px);
   }
@@ -3117,4 +3303,51 @@ body.custom-cursor-active textarea {
 .onboarding-topic-chip:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.onboarding-selected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+}
+
+.onboarding-selected-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.onboarding-selected-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.onboarding-difficulty-row-compact {
+  margin: 0;
+}
+
+.onboarding-difficulty-row-compact .onboarding-topic-chip {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+.onboarding-custom-topic {
+  margin-bottom: 24px;
+  padding-top: 4px;
+}
+
+.onboarding-custom-topic-row {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 10px;
+}
+
+.onboarding-custom-topic-row .request-topic-input {
+  flex: 1;
 }

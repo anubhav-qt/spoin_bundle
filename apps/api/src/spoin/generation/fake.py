@@ -30,6 +30,8 @@ from spoin.generation.base import (
     SubtopicTierDraft,
     TopicMatchQuery,
     TopicMatchResult,
+    TopicNameQuery,
+    TopicNameVerdict,
 )
 
 
@@ -113,6 +115,22 @@ class FakeContentGenerator(ContentGenerator):
             items.append(
                 TopicMatchResult(request_index=query.request_index, matched_topic_id=matched)
             )
+        return BatchResult(items=items)
+
+    async def validate_topic_names(
+        self, queries: list[TopicNameQuery]
+    ) -> BatchResult[TopicNameVerdict]:
+        # Deterministic stand-in for the LLM's judgment call: accepts
+        # everything except a fixed marker string, so a test can exercise
+        # the rejection path without depending on real model behavior.
+        items = [
+            TopicNameVerdict(
+                request_index=query.request_index,
+                acceptable="trolltest" not in query.name.lower(),
+                reason="" if "trolltest" not in query.name.lower() else "simulated rejection",
+            )
+            for query in queries
+        ]
         return BatchResult(items=items)
 
     async def generate_cards(

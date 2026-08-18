@@ -22,14 +22,19 @@ import {
   type Topic,
   type TopicDiscover,
 } from "@/lib/api";
+import { RequestTopicBox } from "./RequestTopicBox";
 import { TopicStatsModal } from "./TopicStatsModal";
 
 interface Props {
   onFollowed: (topic: Topic) => void;
   onClose: () => void;
+  /** Which tab opens first — lets the two rail entry points (below the topic
+   *  filters vs. below "Your topics") land on the view that made sense for
+   *  where the reader clicked from, without needing two separate modals. */
+  initialView?: ViewMode;
 }
 
-type ViewMode = "discover" | "custom";
+type ViewMode = "discover" | "request" | "custom";
 
 const STATUS_LABEL: Record<NonNullable<CustomTopicStatus["generation_status"]>, string> = {
   pending: "Pending",
@@ -38,8 +43,8 @@ const STATUS_LABEL: Record<NonNullable<CustomTopicStatus["generation_status"]>, 
   failed: "Failed",
 };
 
-export function TopicDiscoveryModal({ onFollowed, onClose }: Props) {
-  const [view, setView] = useState<ViewMode>("discover");
+export function TopicDiscoveryModal({ onFollowed, onClose, initialView = "discover" }: Props) {
+  const [view, setView] = useState<ViewMode>(initialView);
   const [mode, setMode] = useState<DiscoverMode>("popular");
   const [items, setItems] = useState<TopicDiscover[]>([]);
   const [customTopics, setCustomTopics] = useState<CustomTopicStatus[] | null>(null);
@@ -105,6 +110,9 @@ export function TopicDiscoveryModal({ onFollowed, onClose }: Props) {
           <button type="button" data-active={view === "discover"} onClick={() => setView("discover")}>
             Discover
           </button>
+          <button type="button" data-active={view === "request"} onClick={() => setView("request")}>
+            Request a topic
+          </button>
           <button type="button" data-active={view === "custom"} onClick={() => setView("custom")}>
             Your custom topics
           </button>
@@ -154,6 +162,8 @@ export function TopicDiscoveryModal({ onFollowed, onClose }: Props) {
               )}
             </div>
           </>
+        ) : view === "request" ? (
+          <RequestTopicBox onFollowed={onFollowed} />
         ) : (
           <div className="discover-box-list discover-modal-list">
             {customTopics === null ? (

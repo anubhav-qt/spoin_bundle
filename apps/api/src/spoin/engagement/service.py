@@ -29,6 +29,7 @@ from spoin.domain.models import (
     UserCardState,
     UserSubtopicProgress,
     UserTopicCycle,
+    UserTopicDifficultyProgress,
 )
 
 
@@ -258,6 +259,56 @@ class EngagementService:
             )
             .on_conflict_do_update(
                 index_elements=["user_id", "subtopic_id"],
+                set_={"seen_count": seen_count or 0, "total_count": total_count or 0},
+            )
+        )
+
+        await self._bump_difficulty_progress(user_id, row)
+
+    async def _bump_difficulty_progress(self, user_id: UUID, row: dict[str, object]) -> None:
+        """Keep `user_topic_difficulty_progress` current -- the dynamic
+        difficulty mix ramp's input (feed/strata.py `dynamic_mix`). Same
+        incremental-aggregate pattern as `_bump_progress` just above, scoped
+        to the whole topic+tier instead of one subtopic."""
+
+        difficulty = await self._session.scalar(
+            select(Card.difficulty).where(Card.id == row["card_id"])
+        )
+        if difficulty is None:
+            return
+
+        seen_count = await self._session.scalar(
+            select(func.count())
+            .select_from(UserCardState)
+            .join(Card, Card.id == UserCardState.card_id)
+            .where(
+                UserCardState.user_id == user_id,
+                Card.topic_id == row["topic_id"],
+                Card.difficulty == difficulty,
+                UserCardState.state == SeenState.SEEN,
+            )
+        )
+        total_count = await self._session.scalar(
+            select(func.count())
+            .select_from(Card)
+            .where(
+                Card.topic_id == row["topic_id"],
+                Card.difficulty == difficulty,
+                Card.status == CardStatus.ACTIVE,
+            )
+        )
+
+        await self._session.execute(
+            pg_insert(UserTopicDifficultyProgress)
+            .values(
+                user_id=user_id,
+                topic_id=row["topic_id"],
+                difficulty=difficulty,
+                seen_count=seen_count or 0,
+                total_count=total_count or 0,
+            )
+            .on_conflict_do_update(
+                index_elements=["user_id", "topic_id", "difficulty"],
                 set_={"seen_count": seen_count or 0, "total_count": total_count or 0},
             )
         )

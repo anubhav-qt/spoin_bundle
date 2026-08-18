@@ -332,10 +332,10 @@ export const api = {
 
   me: () => request<User>("/auth/me"),
 
-  completeOnboarding: (topicIds: string[], entryDifficulty: Difficulty) =>
+  completeOnboarding: (topics: { topic_id: string; entry_difficulty: Difficulty }[]) =>
     request<Topic[]>("/topics/onboarding/complete", {
       method: "POST",
-      body: JSON.stringify({ topic_ids: topicIds, entry_difficulty: entryDifficulty }),
+      body: JSON.stringify({ topics }),
     }),
 
   // -- Feed -----------------------------------------------------------------
@@ -357,10 +357,14 @@ export const api = {
   subscribeTopic: (topicId: string) =>
     request<Topic>(`/topics/${topicId}/subscribe`, { method: "POST" }),
 
-  requestTopic: (name: string, description?: string) =>
+  requestTopic: (name: string, entryDifficulty?: Difficulty, description?: string) =>
     request<TopicRequestResult>("/topics", {
       method: "POST",
-      body: JSON.stringify({ name, description: description || undefined }),
+      body: JSON.stringify({
+        name,
+        description: description || undefined,
+        entry_difficulty: entryDifficulty,
+      }),
     }),
 
   topicStats: (topicId: string) => request<TopicStats>(`/topics/${topicId}/stats`),

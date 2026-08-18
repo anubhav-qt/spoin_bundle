@@ -1,6 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Atkinson_Hyperlegible, IBM_Plex_Sans, Inter, Literata, Space_Grotesk } from "next/font/google";
+import {
+  Atkinson_Hyperlegible,
+  Comfortaa,
+  Courier_Prime,
+  Fraunces,
+  Inter,
+  JetBrains_Mono,
+  Literata,
+  Manrope,
+  Space_Grotesk,
+  Zilla_Slab,
+} from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 
@@ -17,6 +28,15 @@ const APPLY_PALETTE_SCRIPT = `
   try {
     var palette = localStorage.getItem("spoin-palette");
     if (palette) document.body.setAttribute("data-palette", palette);
+    if (palette === "custom") {
+      var colors = JSON.parse(localStorage.getItem("spoin-custom-colors") || "null");
+      if (colors) {
+        document.body.style.setProperty("--bg", colors.bg);
+        document.body.style.setProperty("--fg", colors.fg);
+        document.body.style.setProperty("--accent", colors.accent);
+        document.body.style.setProperty("--accent-2", colors.accent2);
+      }
+    }
   } catch (e) {}
 })();
 `;
@@ -33,21 +53,31 @@ const APPLY_FONT_SCRIPT = `
 `;
 
 /**
- * ADR-0023's five faces, self-hosted via next/font/google (ADR-0037) — no
+ * The five PRESET faces, self-hosted via next/font/google (ADR-0037) — no
  * runtime CDN request, and a browser only fetches the @font-face a reader's
  * `data-font` selection actually resolves to (see globals.css), so declaring
- * all five here doesn't mean all five download. Two roles otherwise (see
+ * every face here doesn't mean every face downloads. Two roles otherwise (see
  * ADR-0012): these variables feed `--font-sans` only. Monospace stays a
  * fixed system stack, locked out of the choice — ADR-0021's ASCII scenes
- * depend on it staying fixed-width.
+ * depend on it staying fixed-width. (`jetbrains` below is a --font-sans
+ * option that happens to be a monospace TYPEFACE, not a change to that
+ * separate --font-mono variable — the two are unrelated.)
+ *
+ * IBM Plex Sans was dropped from the preset five: visually it read as a
+ * near-duplicate of Inter at a glance, which was the actual "these all look
+ * the same" complaint — swapped for JetBrains Mono, a genuinely different
+ * texture (a "terminal" reading face fits this app's technical content).
+ * The five extra faces below (Fraunces/Manrope/Zilla Slab/Courier
+ * Prime/Comfortaa) back the custom font picker's expanded list, not the
+ * five-pill row.
  */
 const literata = Literata({ subsets: ["latin"], variable: "--font-literata", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", display: "swap" });
-const plex = IBM_Plex_Sans({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plex",
+  weight: ["400", "500", "700"],
+  variable: "--font-jetbrains",
   display: "swap",
 });
 const hyperlegible = Atkinson_Hyperlegible({
@@ -56,7 +86,38 @@ const hyperlegible = Atkinson_Hyperlegible({
   variable: "--font-hyperlegible",
   display: "swap",
 });
-const FONT_VARIABLES = `${literata.variable} ${inter.variable} ${grotesk.variable} ${plex.variable} ${hyperlegible.variable}`;
+
+// -- extra faces, custom font picker only ------------------------------
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
+const zillaSlab = Zilla_Slab({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-zilla",
+  display: "swap",
+});
+const courierPrime = Courier_Prime({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-courier",
+  display: "swap",
+});
+const comfortaa = Comfortaa({ subsets: ["latin"], variable: "--font-comfortaa", display: "swap" });
+
+const FONT_VARIABLES = [
+  literata,
+  inter,
+  grotesk,
+  jetbrains,
+  hyperlegible,
+  fraunces,
+  manrope,
+  zillaSlab,
+  courierPrime,
+  comfortaa,
+]
+  .map((f) => f.variable)
+  .join(" ");
 
 export const metadata: Metadata = {
   title: "Spoin",

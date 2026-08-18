@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty, EngagementKind, SeenState
-from spoin.domain.models import Card, UserCardState, UserTopicCycle
+from spoin.domain.models import Card, UserCardState, UserTopicCycle, UserTopicDifficultyProgress
 from spoin.engagement.service import EngagementService, IncomingEvent
 from spoin.feed.service import FeedService
 
@@ -26,11 +26,46 @@ pytestmark = pytest.mark.asyncio
 RNG = random.Random(1234)
 
 
-async def test_slate_respects_the_difficulty_mix(
+async def _seed_read_fraction(
+    session: AsyncSession, user_id: Any, topic_id: Any, difficulty: Difficulty, *, seen: int, total: int
+) -> None:
+    """Directly seeds the dynamic-mix ramp's input aggregate, bypassing the
+    engagement ingest pipeline — these tests care about what `build_slate`
+    does with a given read fraction, not how that fraction gets produced."""
+
+    session.add(
+        UserTopicDifficultyProgress(
+            user_id=user_id, topic_id=topic_id, difficulty=difficulty, seen_count=seen, total_count=total
+        )
+    )
+    await session.flush()
+
+
+async def test_fresh_tier_is_entirely_the_current_difficulty(
     session: AsyncSession, corpus: dict[str, Any], settings: Settings
 ) -> None:
-    """A beginner's slate is 80/20, exactly — not approximately."""
+    """Before the ramp starts (0% of this difficulty read), the mix is 100%
+    the current tier — no promotion-signal cards yet, per the dynamic mix
+    ramp (feed/strata.py `dynamic_mix`)."""
 
+    service = FeedService(session, Settings(slate_size=10, rank_epsilon=0.0))
+    slate = await service.build_slate(corpus["user"].id, corpus["topic"].id, rng=RNG)
+
+    assert slate is not None
+    difficulties = await _difficulties(session, slate.card_ids)
+    assert difficulties.count(Difficulty.BEGINNER) == 10
+    assert difficulties.count(Difficulty.INTERMEDIATE) == 0
+
+
+async def test_slate_respects_the_difficulty_mix_past_the_ramp(
+    session: AsyncSession, corpus: dict[str, Any], settings: Settings
+) -> None:
+    """Once read_fraction reaches `mix_ramp_end`, the mix is the configured
+    80/20, exactly — not approximately."""
+
+    await _seed_read_fraction(
+        session, corpus["user"].id, corpus["topic"].id, Difficulty.BEGINNER, seen=8, total=12
+    )
     service = FeedService(session, Settings(slate_size=10, rank_epsilon=0.0))
     slate = await service.build_slate(corpus["user"].id, corpus["topic"].id, rng=RNG)
 
@@ -43,11 +78,15 @@ async def test_slate_respects_the_difficulty_mix(
 async def test_short_pool_serves_short_rather_than_wrong(
     session: AsyncSession, corpus: dict[str, Any]
 ) -> None:
-    """The intermediate pool holds 2 cards; a 25-slot slate wants 5.
+    """The intermediate pool holds 2 cards; a 25-slot slate wants 5 (once past
+    the ramp, so intermediate is actually requested at all).
 
     We serve 2, never 3 beginner cards wearing an intermediate slot.
     """
 
+    await _seed_read_fraction(
+        session, corpus["user"].id, corpus["topic"].id, Difficulty.BEGINNER, seen=8, total=12
+    )
     service = FeedService(session, Settings(slate_size=25, rank_epsilon=0.0))
     slate = await service.build_slate(corpus["user"].id, corpus["topic"].id, rng=RNG)
 

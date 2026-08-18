@@ -219,6 +219,30 @@ class UserSubtopicProgress(Base, Timestamps):
     total_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
 
+class UserTopicDifficultyProgress(Base, Timestamps):
+    """seen_count / total_count across ALL of one topic's cards at one
+    difficulty tier -- the dynamic difficulty mix ramp's input (feed/strata.py
+    `dynamic_mix`). Distinct from `UserSubtopicProgress`: that one is scoped
+    to a single subtopic (the 80% quiz gate's input), this one is scoped to a
+    whole tier across every subtopic under the topic (how "done" a difficulty
+    is overall, which is what decides how fast the mix ramps toward the next
+    tier up)."""
+
+    __tablename__ = "user_topic_difficulty_progress"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("app_user.id", ondelete="CASCADE"), primary_key=True
+    )
+    topic_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), primary_key=True
+    )
+    difficulty: Mapped[Difficulty] = mapped_column(
+        pg_enum(Difficulty, "difficulty"), primary_key=True
+    )
+    seen_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+
 class UserSeenBitmap(Base, Timestamps):
     """Derived read model over `user_card_state` (ADR-0010).
 

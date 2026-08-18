@@ -61,6 +61,21 @@ import {
  *  across devices. */
 const HERO_TUTORIAL_KEY = "spoin-hero-tutorial-seen";
 
+/** Module-scope, not component state: every Card in the feed shares one flag
+ *  so that when several hero cards mount in the same render pass (multiple
+ *  stations, each with its own hero), only the first to claim it shows the
+ *  tutorial instead of every one of them stacking overlays. Resets on full
+ *  reload, same as the in-memory-only parts of feed state elsewhere — the
+ *  localStorage flag above is what actually makes it a once-ever tutorial. */
+let heroTutorialClaimed = false;
+
+function claimHeroTutorial(): boolean {
+  if (typeof window === "undefined" || localStorage.getItem(HERO_TUTORIAL_KEY) !== null) return false;
+  if (heroTutorialClaimed) return false;
+  heroTutorialClaimed = true;
+  return true;
+}
+
 /** Mirrors SPOIN_DWELL_COMPLETE_MS. The server stays the authority; this only
  *  decides when the client stops waiting and reports. */
 const DWELL_COMPLETE_MS = 8000;
@@ -102,10 +117,10 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
   const [focused, setFocused] = useState(true);
   // ADR-0035: only the very first hero card mounted while the flag is unset
   // shows the tutorial — read once at mount, not reactively, so it can't
-  // flip back on for a second hero card later in the same session.
-  const [showTutorial, setShowTutorial] = useState(
-    () => isHero && typeof window !== "undefined" && localStorage.getItem(HERO_TUTORIAL_KEY) === null,
-  );
+  // flip back on for a second hero card later in the same session. Claims
+  // via the shared `heroTutorialClaimed` flag so simultaneous hero cards
+  // (multiple stations) don't all show it at once.
+  const [showTutorial, setShowTutorial] = useState(() => isHero && claimHeroTutorial());
 
   const dwell = useRef(new DwellTimer());
   const article = useRef<HTMLElement>(null);
@@ -220,7 +235,11 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
   // scroll-past/scroll-back cycles still adds up correctly instead of either
   // firing early or never re-arming.
   useEffect(() => {
-    if (!expanded) return;
+    // Hero cards are only marked seen by the explicit "mark as read" action
+    // (see the explicit_complete handler below) — never by dwell time, since
+    // they start pre-expanded and would otherwise self-mark within seconds
+    // of appearing, before the reader has actually read anything.
+    if (!expanded || isHero) return;
 
     const timer = dwell.current;
     let completeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -280,6 +299,10 @@ export function Card({ card, topicName, accentHue, seen, onSeen, onUnseen, onDis
     setExpanded(true);
     setEverExpanded(true);
     engagement.record(card.id, "expand");
+    // Fallback for a feed with no hero card in it: nothing has claimed the
+    // mark-as-read tutorial yet, so the first regular card the reader opens
+    // takes the slot instead of the tutorial silently never showing.
+    if (claimHeroTutorial()) setShowTutorial(true);
   };
 
   // Toggleable: a stray tap is easy to make on a circular icon this small, so

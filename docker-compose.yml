@@ -10,7 +10,11 @@
 #   seed    runs migrations + loads fixtures, then exits
 #   api     FastAPI                          http://localhost:8000/docs
 #   web     Next.js                          http://localhost:3000
-#   worker  batch job, `--profile worker`    (cron in production, not always-on)
+#   worker  polls for pending GenerationJob rows every few seconds (--watch)
+#           so a topic typed into the app locally actually gets generated.
+#           Production runs the same code once per cron invocation instead
+#           (worker/README.md, ADR-0003 §3) -- this always-on loop is a
+#           local-dev convenience, not how it deploys.
 
 name: spoin
 
@@ -120,22 +124,26 @@ services:
         PY
         pytest -q "$@"
 
-  # Not always-on by design (ADR-0003 §3): at free-tier quota a persistent pool has
-  # nothing to do 99% of the time. Production runs this on a GitHub Actions cron.
-  #     docker compose --profile worker run --rm worker
+  # Always-on here (local dev only) so a topic typed into the app actually
+  # gets generated -- `--watch` polls for pending GenerationJob rows every
+  # `SPOIN_WORKER_POLL_SECONDS` instead of the single cron pass production
+  # uses (ADR-0003 §3: at free-tier quota a persistent pool has nothing to do
+  # 99% of the time in PRODUCTION, which is not the same constraint as "does
+  # a developer want to wait or manually rerun a one-shot command locally").
+  # For the cron-shaped single pass this mirrors:
+  #     docker compose run --rm worker python -m spoin.worker
   worker:
-    profiles: ["worker"]
     build:
       context: ./apps/api
     environment:
       SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
       SPOIN_GENERATOR: fake
     depends_on:
-      db:
-        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
     volumes:
       - ./apps/api/src:/app/src
-    command: ["python", "-m", "spoin.worker"]
+    command: ["python", "-m", "spoin.worker", "--watch"]
 
 volumes:
   db-data:

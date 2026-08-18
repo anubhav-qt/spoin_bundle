@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { CustomFontModal } from "./CustomFontModal";
 
 const STORAGE_KEY = "spoin-font";
 const DEFAULT_FONT = "literata";
@@ -18,16 +19,20 @@ const FONTS = [
   { key: "literata", name: "Literata" },
   { key: "inter", name: "Inter" },
   { key: "grotesk", name: "Space Grotesk" },
-  { key: "plex", name: "IBM Plex Sans" },
+  { key: "jetbrains", name: "JetBrains Mono" },
   { key: "hyperlegible", name: "Atkinson Hyperlegible" },
 ] as const;
 
-function applyFont(key: string) {
+export function applyFont(key: string) {
   if (key === DEFAULT_FONT) {
     document.body.removeAttribute("data-font");
   } else {
     document.body.dataset.font = key;
   }
+}
+
+export function persistFont(key: string) {
+  localStorage.setItem(STORAGE_KEY, key);
 }
 
 function persistedFont(): string {
@@ -40,6 +45,7 @@ export function FontPicker() {
   // pending preview (the row shows no Keep/Revert). Set the moment a
   // different face is clicked, cleared on Keep or Revert.
   const [pendingFrom, setPendingFrom] = useState<string | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
 
   useEffect(() => {
     setActive(document.body.dataset.font ?? DEFAULT_FONT);
@@ -66,6 +72,8 @@ export function FontPicker() {
     setPendingFrom(null);
   };
 
+  const isPreset = FONTS.some((f) => f.key === active);
+
   return (
     <div className="font-picker">
       <div className="font-picker-row" role="group" aria-label="Font">
@@ -84,6 +92,17 @@ export function FontPicker() {
             Aa
           </button>
         ))}
+        <button
+          type="button"
+          className="font-pill font-pill-custom"
+          data-active={!isPreset}
+          data-tooltip="Custom font"
+          aria-pressed={!isPreset}
+          aria-label="Custom font"
+          onClick={() => setCustomOpen(true)}
+        >
+          +
+        </button>
       </div>
 
       {pendingFrom !== null ? (
@@ -96,6 +115,17 @@ export function FontPicker() {
             Revert
           </button>
         </div>
+      ) : null}
+
+      {customOpen ? (
+        <CustomFontModal
+          active={active}
+          onSelect={(key) => {
+            setActive(key);
+            setPendingFrom(null);
+          }}
+          onClose={() => setCustomOpen(false)}
+        />
       ) : null}
     </div>
   );

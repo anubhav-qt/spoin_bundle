@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import sys
 import uuid
 from datetime import UTC, datetime
 
@@ -137,13 +138,44 @@ async def run_once() -> int:
     return len(claimed)
 
 
+async def _watch() -> None:
+    """Local-dev-only persistent loop: `run_once()` repeatedly, on
+    `settings.worker_poll_seconds`, instead of the single pass production's
+    cron entrypoint takes. Same function, same per-job isolation, same
+    quota/failure handling — the only difference is what calls it and how
+    often. This is what makes a topic typed into the app during local dev
+    actually get generated without a developer re-running the worker by hand
+    (docker-compose.yml's `worker` service runs this mode)."""
+
+    settings = get_settings()
+    logger.info(
+        "worker watching for jobs every %.1fs (generator=%s)",
+        settings.worker_poll_seconds,
+        settings.generator,
+    )
+    while True:
+        try:
+            await run_once()
+        except Exception:
+            # A pass-level failure (e.g. a transient DB hiccup) must not kill
+            # the loop -- individual job failures are already isolated inside
+            # run_once/_run_job; this is the outer safety net for everything
+            # else.
+            logger.exception("worker pass raised; continuing to watch")
+        await asyncio.sleep(settings.worker_poll_seconds)
+
+
 async def main() -> None:
     logging.basicConfig(
         level=get_settings().log_level,
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
+    watch = "--watch" in sys.argv
     try:
-        await run_once()
+        if watch:
+            await _watch()
+        else:
+            await run_once()
     finally:
         await get_engine().dispose()
 

@@ -325,10 +325,17 @@ class UserOut(BaseModel):
     onboarding_complete: bool
 
 
-class OnboardingCompleteIn(BaseModel):
-    #: Topics chosen during onboarding (from /topics/discover), subscribed to
-    #: server-side. IDs, not slugs -- matches what discover already returns,
-    #: no extra lookup needed on either side.
-    topic_ids: list[UUID] = Field(default_factory=list, max_length=10)
+class OnboardingTopicChoice(BaseModel):
+    #: From /topics/discover -- an ID, not a slug, matches what discover
+    #: already returns, no extra lookup needed on either side.
+    topic_id: UUID
+    #: Per-topic now (was one global difficulty for every topic chosen) --
+    #: each topic in onboarding gets its own starting difficulty, same as a
+    #: topic picked up later via Discover or a custom request already could.
     entry_difficulty: Difficulty = Difficulty.BEGINNER
+
+
+class OnboardingCompleteIn(BaseModel):
+    #: Topics chosen during onboarding, each with its own entry difficulty.
+    topics: list[OnboardingTopicChoice] = Field(default_factory=list, max_length=10)
 

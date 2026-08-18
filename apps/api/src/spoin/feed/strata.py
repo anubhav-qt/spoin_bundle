@@ -18,15 +18,58 @@ from spoin.core.config import DIFFICULTY_MIX
 from spoin.domain.enums import Difficulty
 
 
-def allocate(size: int, tier: Difficulty) -> dict[Difficulty, int]:
+def dynamic_mix(
+    tier: Difficulty,
+    read_fraction: float,
+    *,
+    ramp_start: float,
+    ramp_end: float,
+) -> dict[Difficulty, float]:
+    """The mix for one topic+tier right now, given how much of THAT tier's own
+    cards this user has already read (`read_fraction`, 0-1).
+
+    Below `ramp_start`: 100% `tier` -- a difficulty a user just started shows
+    only itself, since there is no promotion signal to collect yet and diving
+    straight to the preset mix would spend early slots on cards at a level the
+    reader hasn't earned context for.
+
+    Between `ramp_start` and `ramp_end`: linearly interpolated from all-`tier`
+    toward DIFFICULTY_MIX[tier] -- the preset is the ceiling this ramps
+    TOWARD, not the starting point.
+
+    At/above `ramp_end`: DIFFICULTY_MIX[tier] exactly, same as before this
+    existed.
+    """
+
+    target = DIFFICULTY_MIX[tier]
+    if read_fraction <= ramp_start:
+        return {tier: 1.0}
+    if read_fraction >= ramp_end or ramp_end <= ramp_start:
+        return dict(target)
+
+    t = (read_fraction - ramp_start) / (ramp_end - ramp_start)
+    difficulties = {tier, *target}
+    return {
+        difficulty: (1.0 if difficulty == tier else 0.0) * (1 - t) + target.get(difficulty, 0.0) * t
+        for difficulty in difficulties
+    }
+
+
+def allocate(
+    size: int, tier: Difficulty, mix_override: dict[Difficulty, float] | None = None
+) -> dict[Difficulty, int]:
     """Split `size` slots across difficulties for a user at `tier`.
 
     Largest-remainder apportionment, so the parts always sum to exactly `size`.
     Naive rounding loses or gains a slot and turns "exactly 80%" back into
     "roughly 80%", which is the thing this whole approach exists to avoid.
+
+    `mix_override` swaps in a dynamically-ramped mix (see `dynamic_mix`)
+    instead of the static `DIFFICULTY_MIX[tier]` -- `None` (the default)
+    keeps every existing caller's behavior unchanged.
     """
 
-    mix = DIFFICULTY_MIX[tier]
+    mix = mix_override if mix_override is not None else DIFFICULTY_MIX[tier]
     exact = {difficulty: size * share for difficulty, share in mix.items()}
     counts = {difficulty: int(value) for difficulty, value in exact.items()}
 
@@ -87,6 +130,7 @@ def resolve_mix(
     was_degraded: bool,
     pool_low: int,
     pool_high: int,
+    mix_override: dict[Difficulty, float] | None = None,
 ) -> MixOutcome:
     """Decide what to serve when the pool cannot satisfy the mix.
 
@@ -102,9 +146,13 @@ def resolve_mix(
        `pool_high`. Two thresholds deliberately — with one, the pool sits on the
        line, a card generates, degraded exits, the user consumes that card, and
        degraded re-enters. Every crossing re-triggers work.
+
+    `mix_override` (see `dynamic_mix`) is forwarded straight to `allocate` —
+    `None` keeps the static `DIFFICULTY_MIX[tier]` behavior every existing
+    caller already expects.
     """
 
-    requested = allocate(size, tier)
+    requested = allocate(size, tier, mix_override)
     fills = tuple(
         StratumFill(
             difficulty=difficulty,

@@ -38,11 +38,12 @@ from spoin.domain.models import (
     UserTopic,
     UserTopicAffinity,
     UserTopicCycle,
+    UserTopicDifficultyProgress,
     UserTopicProgress,
 )
 from spoin.feed.interleave import build_plan, filter_key
 from spoin.feed.ranking import Candidate, diversify, rank
-from spoin.feed.strata import MixOutcome, resolve_mix
+from spoin.feed.strata import MixOutcome, dynamic_mix, resolve_mix
 
 
 @dataclass(frozen=True)
@@ -247,6 +248,14 @@ class FeedService:
             found = await self._candidates(user_id, topic_id, difficulty)
             candidates_by_tier[difficulty] = [c for c in found if c.card_id not in blocked]
 
+        read_fraction = await self._tier_read_fraction(user_id, topic_id, tier)
+        mix_override = dynamic_mix(
+            tier,
+            read_fraction,
+            ramp_start=settings.mix_ramp_start,
+            ramp_end=settings.mix_ramp_end,
+        )
+
         outcome: MixOutcome = resolve_mix(
             settings.slate_size,
             tier,
@@ -254,6 +263,7 @@ class FeedService:
             was_degraded=was_degraded,
             pool_low=settings.pool_low,
             pool_high=settings.pool_high,
+            mix_override=mix_override,
         )
 
         picked: list[Candidate] = []
@@ -399,6 +409,30 @@ class FeedService:
             )
         )
         return tier or Difficulty.BEGINNER
+
+    async def _tier_read_fraction(self, user_id: UUID, topic_id: UUID, tier: Difficulty) -> float:
+        """How much of THIS topic's `tier` cards this user has already read —
+        `dynamic_mix`'s input. A single row read against the precomputed
+        `UserTopicDifficultyProgress` aggregate (kept current by
+        `engagement/service.py`'s `_bump_difficulty_progress`), not a COUNT at
+        request time (ADR-0011). No row yet (nothing read at this tier) or a
+        tier with no cards at all both read as 0 -- the ramp's own start,
+        which is exactly right for "hasn't started this difficulty."
+        """
+
+        row = await self._session.execute(
+            select(
+                UserTopicDifficultyProgress.seen_count, UserTopicDifficultyProgress.total_count
+            ).where(
+                UserTopicDifficultyProgress.user_id == user_id,
+                UserTopicDifficultyProgress.topic_id == topic_id,
+                UserTopicDifficultyProgress.difficulty == tier,
+            )
+        )
+        found = row.first()
+        if found is None or not found[1]:
+            return 0.0
+        return found[0] / found[1]
 
     async def _starved_slots(
         self, user_id: UUID, topic_ids: list[UUID]

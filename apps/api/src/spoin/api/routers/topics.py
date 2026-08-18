@@ -38,6 +38,7 @@ from spoin.domain.models import (
 )
 from spoin.embeddings import get_embedder
 from spoin.generation import get_content_generator
+from spoin.generation.base import TopicNameQuery
 from spoin.generation.pipeline import TopicRequest, match_and_create_topics
 
 #: Notes/shares have no mutable-state table (ADR-0015) — these are the only two
@@ -57,6 +58,11 @@ COVERAGE_GATE = 0.80
 #: existing topic still consumes a slot (ADR-0004): users are buying slots in
 #: their own topic list, not new entries in the shared corpus.
 CUSTOM_TOPIC_LIMIT = 3
+
+#: A constraint, not taste -- enforced here in code rather than asked of the
+#: model, per the "generator is trusted for taste, never for constraints"
+#: rule. Keeps the box a topic name, not a sentence describing one.
+CUSTOM_TOPIC_MAX_WORDS = 5
 
 
 def _entry_tier_unlock(entry: Difficulty) -> list[bool]:
@@ -82,11 +88,38 @@ async def request_topic(
     miss mints a new `Topic` row and enqueues a `GenerationJob` -- generation
     is never synchronous (ADR-0003), so the response reports which case
     happened rather than returning cards.
+
+    Custom topics are gated to non-guest users -- a guest's account is
+    ephemeral, so letting it spend one of the three custom-topic slots (and
+    trigger a real generation job) has no durable payoff and is easy to abuse
+    anonymously. Signing up (or signing back in) is what unlocks this.
     """
+
+    user = await session.get(User, user_id)
+    assert user is not None
+    if user.is_guest:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="Sign up to request a custom topic"
+        )
 
     name = payload.name.strip()
     if not name:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Topic name is required")
+    if len(name.split()) > CUSTOM_TOPIC_MAX_WORDS:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=f"Keep it short -- {CUSTOM_TOPIC_MAX_WORDS} words or fewer",
+        )
+
+    verdicts = await get_content_generator().validate_topic_names(
+        [TopicNameQuery(request_index=0, name=name)]
+    )
+    verdict = next((v for v in verdicts.items if v.request_index == 0), None)
+    if verdict is not None and not verdict.acceptable:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=verdict.reason or "That doesn't look like a learnable topic",
+        )
 
     custom_count = await session.scalar(
         select(func.count())
@@ -345,13 +378,14 @@ async def subscribe_topic(
 async def complete_onboarding(
     payload: OnboardingCompleteIn, session: SessionDep, user_id: UserDep
 ) -> list[TopicOut]:
-    """First-run setup: subscribe to the chosen topics at the chosen entry tier,
-    then flip the gate the root route checks (see docs/adr on auth/onboarding).
-    Unknown IDs are skipped rather than failing the whole request -- onboarding
-    should not strand a user over one stale entry in the picker's list."""
+    """First-run setup: subscribe to the chosen topics, each at its own entry
+    tier, then flip the gate the root route checks (see docs/adr on
+    auth/onboarding). Unknown IDs are skipped rather than failing the whole
+    request -- onboarding should not strand a user over one stale entry in
+    the picker's list."""
     subscribed: list[TopicOut] = []
-    for topic_id in payload.topic_ids:
-        topic = await session.get(Topic, topic_id)
+    for choice in payload.topics:
+        topic = await session.get(Topic, choice.topic_id)
         if topic is None:
             continue
 
@@ -373,8 +407,8 @@ async def complete_onboarding(
             UserTopicProgress(
                 user_id=user_id,
                 topic_id=topic.id,
-                current_difficulty=payload.entry_difficulty,
-                tier_unlocked=_entry_tier_unlock(payload.entry_difficulty),
+                current_difficulty=choice.entry_difficulty,
+                tier_unlocked=_entry_tier_unlock(choice.entry_difficulty),
             )
         )
         subscribed.append(
@@ -383,7 +417,7 @@ async def complete_onboarding(
                 display_name=user_topic.display_name,
                 slug=topic.slug,
                 is_custom=False,
-                current_difficulty=payload.entry_difficulty,
+                current_difficulty=choice.entry_difficulty,
             )
         )
 

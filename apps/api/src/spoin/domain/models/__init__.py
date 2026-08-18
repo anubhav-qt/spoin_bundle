@@ -17,6 +17,7 @@ from spoin.domain.models.engagement import (
     UserSubtopicProgress,
     UserTopicAffinity,
     UserTopicCycle,
+    UserTopicDifficultyProgress,
 )
 from spoin.domain.models.quiz import (
     GenerationJob,
@@ -63,5 +64,6 @@ __all__ = [
     "UserTopic",
     "UserTopicAffinity",
     "UserTopicCycle",
+    "UserTopicDifficultyProgress",
     "UserTopicProgress",
 ]

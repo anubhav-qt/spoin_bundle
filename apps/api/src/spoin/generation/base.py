@@ -140,6 +140,29 @@ class TopicMatchResult(BaseModel):
     matched_topic_id: str | None = None
 
 
+class TopicNameQuery(BaseModel):
+    """One user-typed custom topic name, awaiting a sanity check before it is
+    allowed to mint a `Topic` and enqueue generation. Word count is enforced
+    in code (a constraint), not asked of the model here -- this call only
+    judges the thing that genuinely needs taste: is this a real, learnable
+    subject, or trolling/nonsense typed into the box."""
+
+    request_index: int
+    name: str
+
+
+class TopicNameVerdict(BaseModel):
+    """Deliberately permissive by default: `acceptable=True` unless the model
+    says otherwise, so a failed/malformed call never silently blocks a
+    legitimate niche topic. `reason` is only meaningful when rejected -- shown
+    back to the user so a rejection reads as a specific objection, not a
+    silent wall."""
+
+    request_index: int = -1
+    acceptable: bool = True
+    reason: str = ""
+
+
 class CardCorrectionQuery(BaseModel):
     """One draft, offered to the quality gate's pass 1 (ADR-0030). Difficulty is
     deliberately absent -- pass 1 fixes topic fit and factual errors without
@@ -306,6 +329,21 @@ class ContentGenerator(ABC):
         per-mid-band-topic `judge_topic_match` — every topic gets an opinion now,
         batched instead of gated by a threshold. Cached permanently in
         `topic_alias` once decided — a pair is never paid for again.
+        """
+
+    @abstractmethod
+    async def validate_topic_names(
+        self, queries: list[TopicNameQuery]
+    ) -> BatchResult[TopicNameVerdict]:
+        """Runs on the `_thinking` ladder, same tier as `match_topics` and
+        `generate_curriculum` — this is a judgment call, not a mechanical
+        check, so it gets the model that's actually good at judgment calls.
+
+        The bar is deliberately low: reject only names that are trolling,
+        joke/nonsense entries, or not really a learnable subject at all. Stay
+        permissive of genuinely niche or obscure topics — "is this trolling",
+        not "is this a good topic idea." A user typing something earnest but
+        obscure should never see a rejection.
         """
 
     @abstractmethod

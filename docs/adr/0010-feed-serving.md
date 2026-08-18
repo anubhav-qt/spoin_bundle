@@ -4,6 +4,18 @@
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
 
+> **Update (2026-08-18):** `DIFFICULTY_MIX[tier]` below is now the *ceiling* a
+> user's mix ramps toward, not a flat value from card one. A topic+tier starts
+> at 100% that difficulty; between `mix_ramp_start` and `mix_ramp_end` fraction
+> of that difficulty's own cards read, the mix eases toward `DIFFICULTY_MIX`
+> linearly; at/above `mix_ramp_end` it applies exactly, same as originally
+> decided here. The stratified-sampling mechanism this ADR establishes is
+> unchanged -- `feed/strata.py`'s `dynamic_mix` only computes a different
+> input `dict[Difficulty, float]` per user per request, still fed through the
+> same exact/provable `allocate`/`resolve_mix`. See `UserTopicDifficultyProgress`
+> (`domain/models/engagement.py`) for the precomputed aggregate this reads,
+> maintained the same incremental way as `UserSubtopicProgress`.
+
 ## Context
 
 The feed is the product. It must serve in **under 100ms with no LLM call** (hard rule 1)

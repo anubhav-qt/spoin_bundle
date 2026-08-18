@@ -1,5 +1,9 @@
 <p align="left">
-  <img src="apps/web/public/logo.svg" alt="spoin" width="160" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="apps/web/public/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="apps/web/public/logo-light.svg">
+    <img src="apps/web/public/logo-light.svg" alt="spoin" width="160">
+  </picture>
 </p>
 
 # Spoin

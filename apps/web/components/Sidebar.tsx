@@ -12,7 +12,7 @@
  */
 
 import { useAuth } from "./AuthProvider";
-import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon, CloseIcon } from "./icons";
+import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon, LogoutIcon } from "./icons";
 
 const STUBS = [
   { label: "Profile", icon: UserIcon },
@@ -33,7 +33,7 @@ export function Sidebar({ onReset }: Props) {
   return (
     <nav className="rail-left" aria-label="Primary">
       <button type="button" className="sidebar-mark mono" onClick={onReset} aria-label="spoin">
-        spoin
+        sp<span className="sidebar-mark-accent">o</span>in
       </button>
 
       <a className="nav-item" href="/" aria-current="page">
@@ -52,12 +52,14 @@ export function Sidebar({ onReset }: Props) {
         </span>
       ))}
 
-      <button type="button" className="nav-item nav-item-logout" onClick={logout}>
-        <span className="nav-item-icon">
-          <CloseIcon />
-        </span>
-        <span className="nav-item-label">Log out</span>
-      </button>
+      <div className="nav-item-logout-wrap">
+        <button type="button" className="nav-item nav-item-logout" onClick={logout}>
+          <span className="nav-item-icon">
+            <LogoutIcon />
+          </span>
+          <span className="nav-item-label">Log out</span>
+        </button>
+      </div>
     </nav>
   );
 }

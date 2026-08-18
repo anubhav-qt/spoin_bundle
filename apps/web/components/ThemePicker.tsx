@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { CustomThemeModal } from "./CustomThemeModal";
 
 const STORAGE_KEY = "spoin-palette";
 const DEFAULT_PALETTE = "notebook";
@@ -29,14 +30,22 @@ const PALETTES = [
   { key: "scope", name: "Oscilloscope" },
 ] as const;
 
+//: A custom palette's 4 colors live as inline styles on <body> (see
+//: CustomThemeModal) -- inline style beats any attribute-selector rule, so
+//: switching to a PRESET must clear them or the preset would silently stay
+//: tinted by whatever custom colors were set last.
+const CUSTOM_PROPERTIES = ["--bg", "--fg", "--accent", "--accent-2"];
+
 export function ThemePicker() {
   const [active, setActive] = useState(DEFAULT_PALETTE);
+  const [customOpen, setCustomOpen] = useState(false);
 
   useEffect(() => {
     setActive(document.body.dataset.palette ?? DEFAULT_PALETTE);
   }, []);
 
   const choose = (key: string) => {
+    for (const prop of CUSTOM_PROPERTIES) document.body.style.removeProperty(prop);
     document.body.dataset.palette = key;
     localStorage.setItem(STORAGE_KEY, key);
     setActive(key);
@@ -63,6 +72,22 @@ export function ThemePicker() {
           </span>
         </button>
       ))}
+
+      <button
+        type="button"
+        className="theme-pill theme-pill-custom"
+        data-active={active === "custom"}
+        data-tooltip="Custom theme"
+        aria-pressed={active === "custom"}
+        aria-label="Custom theme"
+        onClick={() => setCustomOpen(true)}
+      >
+        <span className="theme-pill-swatch theme-pill-swatch-custom">+</span>
+      </button>
+
+      {customOpen ? (
+        <CustomThemeModal onApplied={() => setActive("custom")} onClose={() => setCustomOpen(false)} />
+      ) : null}
     </div>
   );
 }

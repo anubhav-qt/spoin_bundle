@@ -107,6 +107,14 @@ class Settings(BaseSettings):
     judge_batch_size: int = 20
     question_batch_size: int = 25
 
+    #: Local-dev-only persistent loop (`python -m spoin.worker --watch`,
+    #: wired into docker-compose.yml's `worker` service). Production still
+    #: runs `run_once()` once per cron invocation (worker/README.md, ADR-0003
+    #: §3) — this setting only paces the LOOP that calls the same function
+    #: repeatedly, so a topic typed into the app during local dev actually
+    #: gets generated without a developer manually re-running the worker.
+    worker_poll_seconds: float = 4.0
+
     # Coverage threshold as a fraction of target_cards (content-model.md, open
     # questions: "somewhere around 50-60% is the intuition, check against real
     # rejection rates"). Config so it can be retuned without a deploy once real
@@ -177,6 +185,17 @@ class Settings(BaseSettings):
     # single one flaps as the pool sits on the line.
     pool_low: int = 5
     pool_high: int = 15
+
+    # Dynamic difficulty mix ramp (extends ADR-0010's DIFFICULTY_MIX below).
+    # A topic+tier starts at 100% the current difficulty; between
+    # `mix_ramp_start` and `mix_ramp_end` fraction of that difficulty's cards
+    # read, the mix eases toward DIFFICULTY_MIX[tier], which is the ceiling
+    # this ramps TOWARD, not a fixed value from card one. Below start, a user
+    # who just began a difficulty sees only that difficulty -- no diluting a
+    # brand-new tier with promotion-signal cards before there is any signal to
+    # collect. At/above end, DIFFICULTY_MIX[tier] applies exactly, unchanged.
+    mix_ramp_start: float = 0.20
+    mix_ramp_end: float = 0.60
 
     # -- engagement (ADR-0011) --------------------------------------------------
     dwell_complete_ms: int = 8000

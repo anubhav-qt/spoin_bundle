@@ -48,6 +48,17 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
   const sentinel = useRef<HTMLDivElement>(null);
   const position = useRef<number | undefined>(undefined);
   const loadingMoreRef = useRef(false);
+  // Guards against React StrictMode's dev-only double-invoked mount effect
+  // (and any other overlapping calls, e.g. a fast topic-filter change) firing
+  // two concurrent `loadPage(true)` calls. The feed endpoint's stratified
+  // selection isn't guaranteed identical between two back-to-back calls, so
+  // without this, whichever response lands second fully replaces `cards` —
+  // any card present in the first response but missing from the second
+  // unmounts under AnimatePresence and plays Card.tsx's exit animation, which
+  // reads as a random, unexplained "swipe right" on a card that was never
+  // touched. Only the response matching the most recently issued request id
+  // is ever applied.
+  const loadRequestId = useRef(0);
 
   const topicName = useCallback(
     (topicId: string) => topics.find((t) => t.id === topicId)?.display_name ?? "",
@@ -87,8 +98,14 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
         setLoadingMore(true);
       }
 
+      const requestId = ++loadRequestId.current;
+
       try {
         const page = await api.feed(position.current, selected);
+        // A newer loadPage call was issued while this one was in flight —
+        // its result (or the one still pending) is authoritative instead.
+        if (requestId !== loadRequestId.current) return;
+
         position.current = page.next_position;
 
         setCards((current) => {
@@ -103,11 +120,14 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
         setExhausted(page.exhausted);
         setError(null);
       } catch (cause) {
+        if (requestId !== loadRequestId.current) return;
         setError(cause instanceof Error ? cause.message : "Unknown error");
       } finally {
-        setLoading(false);
-        setLoadingMore(false);
-        loadingMoreRef.current = false;
+        if (requestId === loadRequestId.current) {
+          setLoading(false);
+          setLoadingMore(false);
+          loadingMoreRef.current = false;
+        }
       }
     },
     [selected],

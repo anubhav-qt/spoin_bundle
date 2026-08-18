@@ -25,8 +25,7 @@ export function FocusToggle({ focused, onToggle }: Props) {
       aria-label={focused ? "Exit focus mode" : "Enter focus mode"}
       onClick={onToggle}
     >
-      <FocusIcon />
-      {focused ? null : <span>Focus</span>}
+      {focused ? <FocusIcon /> : <span>Focus</span>}
     </button>
   );
 }

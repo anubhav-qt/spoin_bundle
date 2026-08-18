@@ -2230,6 +2230,8 @@ body.custom-cursor-active textarea {
 .progress-box-list {
   height: 230px;
   overflow-y: auto;
+  /* See `.discover-box-list` -- same latent horizontal-scroll bug. */
+  overflow-x: hidden;
   scrollbar-width: none;
 }
 
@@ -2364,6 +2366,12 @@ body.custom-cursor-active textarea {
 .discover-box-list {
   height: 290px;
   overflow-y: auto;
+  /* Without an explicit overflow-x, the used value computes to `auto` too
+     (per spec, whenever one axis is a scrolling value and the other isn't
+     set) -- meaning this box quietly grows a horizontal scrollbar the
+     moment any row content is a pixel wider than it (a long topic name, a
+     hover state's negative margins). Same fix as `.rail-left`/`.rail-right`. */
+  overflow-x: hidden;
   scrollbar-width: none;
 }
 
@@ -2471,12 +2479,17 @@ body.custom-cursor-active textarea {
 .discovery-modal-body {
   height: 50vh;
   overflow-y: auto;
+  /* See `.discover-box-list` -- an unset overflow-x next to overflow-y:auto
+     computes to auto, not visible, so this silently gains a horizontal
+     scrollbar on any row wider than the panel. */
+  overflow-x: hidden;
 }
 
 .discover-modal-list {
   /* No height of its own -- fills and scrolls with .discovery-modal-body,
      the shared fixed-height wrapper around every tab. */
   height: auto;
+  overflow-x: hidden;
 }
 
 .custom-topic-status {
@@ -2609,6 +2622,10 @@ body.custom-cursor-active textarea {
   max-width: 380px;
   max-height: 84vh;
   overflow-y: auto;
+  /* See `.discover-box-list` -- an unset overflow-x next to overflow-y:auto
+     computes to auto, letting any modal's content grow a horizontal
+     scrollbar instead of wrapping/clipping. */
+  overflow-x: hidden;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-card);
   background: var(--bg-2);

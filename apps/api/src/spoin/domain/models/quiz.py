@@ -232,6 +232,17 @@ class GenerationJob(Base, UUIDPrimaryKey, Timestamps):
     )
 
     status: Mapped[str] = mapped_column(String(16), default="pending", nullable=False)
+    #: Live progress for the request-a-topic streaming UI (docs/adr, generation
+    #: progress). Written incrementally by generation/pipeline.py as curriculum,
+    #: cards, and questions land -- shape is `{"stage", "topic_name",
+    #: "subtopics": [{"subtopic_id", "group_title", "difficulty", "cards_target",
+    #: "cards_done", "questions_target", "questions_done"}, ...]}`. Null until
+    #: the worker actually picks the job up. Best-effort only -- a missing or
+    #: stale value never blocks generation itself, only degrades the UI to a
+    #: coarser "still working" state.
+    progress: Mapped[dict[str, object] | None] = mapped_column(
+        JSONB().with_variant(JSON(), "sqlite"), nullable=True
+    )
     #: Higher runs first. Work is prioritised, not FIFO (ADR-0003 §6): refilling a
     #: starved popular topic outranks one user's niche custom topic, and a
     #: demand-triggered fill (a real user is waiting) outranks speculative

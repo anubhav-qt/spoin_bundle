@@ -40,7 +40,7 @@ src/spoin/
                 ONLY place LangChain/LangGraph may be imported (one file each)
   embeddings/   local embedders; never a quota'd API
   worker/       batch job entrypoint
-  fixtures/     the pre-generated card corpus used by `make seed`
+  fixtures/     the pre-generated card corpus, loaded by `python -m spoin.seed` (manual, not run by default)
 ```
 
 ## Start reading
@@ -59,8 +59,13 @@ Interactive API docs at `/docs` once running.
 Use the root `docker compose up` / `make dev`. Directly:
 
 ```bash
-pip install -e ".[dev]" && alembic upgrade head && python -m spoin.seed
+pip install -e ".[dev]" && alembic upgrade head
 ```
+
+`spoin_db` (see root `CLAUDE.md`) starts and stays blank -- `python -m spoin.seed`
+still works if you want the fixture corpus loaded on your own machine, but it's no
+longer run by default and shouldn't be run against the shared dev database without
+asking first.
 
 ## Optional extras
 

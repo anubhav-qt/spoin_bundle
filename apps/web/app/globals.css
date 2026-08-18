@@ -2483,6 +2483,33 @@ body.custom-cursor-active textarea {
      computes to auto, not visible, so this silently gains a horizontal
      scrollbar on any row wider than the panel. */
   overflow-x: hidden;
+  /* Minimal scrollbar: a bare thin thumb, no track outline, no up/down
+     buttons -- the browser default here is a full gray rectangle with
+     arrow buttons, which reads as chrome the modal doesn't otherwise have
+     anywhere else. Firefox honors `scrollbar-width`/`scrollbar-color`
+     directly; the `::-webkit-scrollbar*` rules below do the same for
+     Chrome/Edge/Safari, which ignore those two properties entirely. */
+  scrollbar-width: thin;
+  scrollbar-color: #000 transparent;
+}
+
+.discovery-modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.discovery-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.discovery-modal-body::-webkit-scrollbar-thumb {
+  background: #000;
+  border-radius: 4px;
+}
+
+.discovery-modal-body::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .discover-modal-list {
@@ -2552,6 +2579,163 @@ body.custom-cursor-active textarea {
 }
 
 .request-topic-notice.error {
+  color: var(--accent);
+}
+
+/* -- request-a-topic live generation progress (GenerationProgressPanel) -- */
+.generation-progress {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.generation-progress-message {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--fg-2);
+}
+
+.generation-progress-message[data-tone="error"] {
+  color: var(--accent);
+}
+
+.generation-progress-note {
+  margin: -4px 0 0;
+  font-size: 10px;
+  color: var(--fg-3);
+}
+
+.generation-progress-error {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-3));
+  color: var(--fg-2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.generation-curriculum {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.generation-curriculum li {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.generation-curriculum li::before {
+  content: "— ";
+  color: var(--fg-3);
+  font-weight: 400;
+}
+
+.generation-subtopics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #000 transparent;
+}
+
+.generation-subtopics::-webkit-scrollbar {
+  width: 4px;
+}
+
+.generation-subtopics::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.generation-subtopics::-webkit-scrollbar-thumb {
+  background: #000;
+  border-radius: 4px;
+}
+
+.generation-subtopics::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.generation-subtopic-row {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.generation-subtopic-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.generation-subtopic-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.generation-subtopic-difficulty {
+  font-size: 9.5px;
+  letter-spacing: 0.03em;
+  color: var(--fg-3);
+  text-transform: uppercase;
+}
+
+.generation-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.generation-bar-label {
+  flex: 0 0 auto;
+  width: 52px;
+  font-size: 9.5px;
+  color: var(--fg-3);
+}
+
+.generation-bar-row .meter {
+  flex: 1 1 auto;
+}
+
+.generation-bar-count {
+  flex: 0 0 auto;
+  font-size: 9.5px;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+.generation-request-another {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.generation-request-another:hover {
+  border-color: var(--accent);
   color: var(--accent);
 }
 

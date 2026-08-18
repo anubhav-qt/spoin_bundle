@@ -62,9 +62,9 @@ switch ($Target) {
     default {
         Write-Host 'Targets:'
         @(
-            'setup       Build images and bring up a seeded stack (first-run entrypoint)'
+            'setup       Build images and bring up the stack, blank spoin_db (first-run entrypoint)'
             'dev         Run the whole stack with hot reload'
-            'seed        Migrate and load the fixture corpus (idempotent)'
+            'seed        Apply migrations to spoin_db (no fixtures -- see CLAUDE.md)'
             'test        Run the test suite'
             'lint        ruff check'
             'fmt         ruff format'

@@ -13,7 +13,7 @@ help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
-setup: ## Build images and bring up a seeded stack (first-run entrypoint)
+setup: ## Build images and bring up the stack, blank spoin_db (first-run entrypoint)
 	$(COMPOSE) build
 	$(COMPOSE) up -d db
 	$(COMPOSE) run --rm seed
@@ -26,7 +26,7 @@ setup: ## Build images and bring up a seeded stack (first-run entrypoint)
 dev: ## Run the whole stack with hot reload
 	$(COMPOSE) up
 
-seed: ## Migrate and load the fixture corpus (idempotent)
+seed: ## Apply migrations to spoin_db (no fixtures -- see CLAUDE.md)
 	$(COMPOSE) run --rm seed
 
 test: ## Run the test suite (against its own database)

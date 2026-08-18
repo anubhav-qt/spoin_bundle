@@ -23,6 +23,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import Float, Select, and_, cast, delete, func, or_, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import DIFFICULTY_MIX, Settings
@@ -161,8 +162,23 @@ class FeedService:
         )
 
         if existing is None:
-            existing = FeedPlan(user_id=user_id, topic_order=order, position=0, filter_key=key)
-            self._session.add(existing)
+            # Upsert, not a plain INSERT: two concurrent requests for a user with
+            # no plan yet (e.g. a double-fired feed fetch) can both reach this
+            # branch having seen `existing is None`, and both attempt to insert,
+            # racing `uq_feed_plan_user_id`. ON CONFLICT makes the second writer
+            # update in place instead of crashing with a 500.
+            statement = (
+                pg_insert(FeedPlan)
+                .values(user_id=user_id, topic_order=order, position=0, filter_key=key)
+                .on_conflict_do_update(
+                    index_elements=["user_id"],
+                    set_={"topic_order": order, "position": 0, "filter_key": key},
+                )
+            )
+            await self._session.execute(statement)
+            existing = await self._session.scalar(
+                select(FeedPlan).where(FeedPlan.user_id == user_id)
+            )
         else:
             # A filter change regenerates the plan only. Slates are retained, not
             # discarded, so unfiltering resumes every topic exactly where it was.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Literal, cast
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -10,6 +11,8 @@ from sqlalchemy import func, select
 from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
     CustomTopicStatusOut,
+    GenerationProgressOut,
+    GenerationSubtopicProgressOut,
     OnboardingCompleteIn,
     ProgressOut,
     SubtopicProgressOut,
@@ -258,6 +261,43 @@ async def list_custom_topics(session: SessionDep, user_id: UserDep) -> list[Cust
             )
         )
     return result
+
+
+@router.get("/{topic_id}/generation-progress", response_model=GenerationProgressOut)
+async def generation_progress(
+    topic_id: UUID, session: SessionDep, user_id: UserDep
+) -> GenerationProgressOut:
+    """Polled by the request-a-topic streaming UI (roughly once a second)
+    while a custom topic's `GenerationJob` is in flight. Same "latest job by
+    created_at" lookup as `list_custom_topics`, since a topic can in
+    principle have more than one job over its lifetime even though at most
+    one is ever pending/running.
+
+    No ownership check beyond authentication -- `GenerationJob`/`Topic` carry
+    nothing user-specific, so this is no more sensitive than the corpus data
+    every other topic-reading endpoint already returns to any signed-in user.
+    """
+
+    job = await session.scalar(
+        select(GenerationJob)
+        .where(GenerationJob.topic_id == topic_id)
+        .order_by(GenerationJob.created_at.desc())
+        .limit(1)
+    )
+    if job is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No generation job for this topic")
+
+    progress = job.progress or {}
+    stage = None if job.status == "pending" else progress.get("stage", "curriculum")
+    raw_subtopics = cast("list[dict[str, object]]", progress.get("subtopics", []))
+
+    return GenerationProgressOut(
+        status=cast(Literal["pending", "running", "completed", "failed"], job.status),
+        stage=cast("Literal['curriculum', 'cards', 'done'] | None", stage),
+        topic_name=cast("str | None", progress.get("topic_name")),
+        subtopics=[GenerationSubtopicProgressOut(**entry) for entry in raw_subtopics],
+        error=job.last_error if job.status == "failed" else None,
+    )
 
 
 @router.patch("/{topic_id}/color", response_model=TopicOut)

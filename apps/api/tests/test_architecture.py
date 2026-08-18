@@ -23,7 +23,11 @@ READ_PATH = [SRC / "feed", SRC / "api" / "routers" / "feed.py"]
 LLM_MARKERS = (
     "langchain",
     "google.generativeai",
-    "google_genai",
+    # The old SDK (`google.generativeai`, above) and the current one
+    # `langchain-google-genai` actually depends on (`google.genai`, ADR-0002's
+    # langchain_impl.py) -- both listed since either could show up depending
+    # on which SDK generation is wired to at the time.
+    "google.genai",
     "openai",
     "anthropic",
     "spoin.generation",

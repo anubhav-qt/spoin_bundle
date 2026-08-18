@@ -1,13 +1,11 @@
-# One command brings up the whole stack with seeded data:
+# One command brings up the whole stack:
 #
 #     docker compose up
 #
-# That is the promise in the README, and it is a CI-checked one. If you ever need
-# to say "first install X, then...", something here is broken.
-#
 # Services:
 #   db      Postgres 17 + pgvector          (Neon in production)
-#   seed    runs migrations + loads fixtures, then exits
+#   seed    runs migrations only, then exits -- see the note on `spoin_db`
+#           below. NOT "+ loads fixtures" anymore (see CLAUDE.md).
 #   api     FastAPI                          http://localhost:8000/docs
 #   web     Next.js                          http://localhost:3000
 #   worker  polls for pending GenerationJob rows every few seconds (--watch)
@@ -15,6 +13,12 @@
 #           Production runs the same code once per cron invocation instead
 #           (worker/README.md, ADR-0003 §3) -- this always-on loop is a
 #           local-dev convenience, not how it deploys.
+#
+# `spoin_db` (the `db` service's database) is the ONE dev database this
+# project uses -- no seed fixtures, blank until the app itself writes to it.
+# See CLAUDE.md's "Working in this repo": nothing may reset, reseed, migrate-
+# experiment on, or otherwise mutate its data without the user's explicit
+# approval first, agent sessions included.
 
 name: spoin
 
@@ -24,25 +28,26 @@ services:
     environment:
       POSTGRES_USER: spoin
       POSTGRES_PASSWORD: spoin
-      POSTGRES_DB: spoin
+      POSTGRES_DB: spoin_db
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U spoin -d spoin"]
+      test: ["CMD-SHELL", "pg_isready -U spoin -d spoin_db"]
       interval: 3s
       timeout: 3s
       retries: 20
 
-  # Migrations and fixtures run as their own service rather than in the API's
-  # entrypoint. An API container that migrates on boot races itself the moment
-  # there is more than one replica.
+  # Migrations only -- no fixture loading (see the `spoin_db` note above).
+  # Its own service rather than the API's entrypoint regardless: an API
+  # container that migrates on boot races itself the moment there is more
+  # than one replica.
   seed:
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
     depends_on:
       db:
         condition: service_healthy
@@ -51,16 +56,27 @@ services:
     volumes:
       - ./apps/api/src:/app/src
       - ./apps/api/alembic:/app/alembic
-    command: ["sh", "-c", "alembic upgrade head && python -m spoin.seed && python -m spoin.seed_generated && python -m spoin.seed_quiz"]
+    command: ["sh", "-c", "alembic upgrade head"]
 
   api:
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
       SPOIN_ENV: local
       SPOIN_CORS_ORIGINS: http://localhost:3000
       SPOIN_JWT_SECRET_KEY: dev-secret-not-for-prod
+      # From the root .env (docker compose auto-loads it for ${...} substitution
+      # in this file -- it does NOT inject the whole file into containers on its
+      # own, only vars explicitly referenced here, which is why this and the
+      # `worker` service below need it spelled out even though `.env` already
+      # has it). Defaults to `fake` so a fresh clone with no `.env` still meets
+      # the "docker compose up, no API key needed" promise. The API needs the
+      # real generator too, not just the worker -- `request_topic`'s
+      # `validate_topic_names`/`match_and_create_topics` calls run inline in
+      # the request, before any GenerationJob exists for the worker to pick up.
+      SPOIN_GENERATOR: ${SPOIN_GENERATOR:-fake}
+      SPOIN_GEMINI_API_KEYS: ${SPOIN_GEMINI_API_KEYS:-}
     ports:
       - "8000:8000"
     depends_on:
@@ -93,15 +109,17 @@ services:
     command: ["npm", "run", "dev"]
 
   # Its own database, because the test fixtures drop and recreate every table.
-  # Sharing `spoin` would silently wipe the seeded corpus every time anyone ran
-  # the suite, which is a confusing way to lose your dev data.
+  # Sharing `spoin_db` would silently wipe it every time anyone ran the suite
+  # -- and `spoin_db` is the one dev database this project keeps (see the
+  # note at the top of this file), so that's never acceptable, not even for
+  # tests.
   test:
     profiles: ["test"]
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
-      SPOIN_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_test
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
+      SPOIN_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_test
     depends_on:
       db:
         condition: service_healthy
@@ -114,9 +132,9 @@ services:
         python - <<'PY'
         import asyncio, asyncpg
         async def main():
-            conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/spoin")
+            conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/spoin_db")
             try:
-                await conn.execute("CREATE DATABASE spoin_test")
+                await conn.execute("CREATE DATABASE spoin_db_test")
             except asyncpg.DuplicateDatabaseError:
                 pass
             await conn.close()
@@ -136,8 +154,11 @@ services:
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin
-      SPOIN_GENERATOR: fake
+      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
+      # See the `api` service's identical two lines above for why this reads
+      # from `.env` via `${...}` instead of a literal -- same reasoning here.
+      SPOIN_GENERATOR: ${SPOIN_GENERATOR:-fake}
+      SPOIN_GEMINI_API_KEYS: ${SPOIN_GEMINI_API_KEYS:-}
     depends_on:
       seed:
         condition: service_completed_successfully

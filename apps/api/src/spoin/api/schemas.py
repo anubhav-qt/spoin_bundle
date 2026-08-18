@@ -163,6 +163,38 @@ class CustomTopicStatusOut(BaseModel):
     requested_at: datetime
 
 
+class GenerationSubtopicProgressOut(BaseModel):
+    subtopic_id: UUID
+    #: The curriculum concept's title -- shared by every difficulty tier of
+    #: the same subtopic group (see `SubtopicPlan.title` in pipeline.py).
+    group_title: str
+    difficulty: Difficulty
+    cards_target: int
+    cards_done: int
+    #: Null until the cards phase has committed for this tier -- exactly how
+    #: many cards ended up needing a question isn't known until then (see
+    #: pipeline.py's `_process_gate_item`).
+    questions_target: int | None
+    questions_done: int
+
+
+class GenerationProgressOut(BaseModel):
+    #: The GenerationJob's own status. "pending" -- queued, not yet claimed by
+    #: a worker pass. "running" -- `subtopics` fills in live as it proceeds.
+    #: "completed"/"failed" -- terminal; poll no further.
+    status: Literal["pending", "running", "completed", "failed"]
+    #: "curriculum" -- the curriculum call hasn't returned yet, no subtopics to
+    #: show. "cards" -- subtopics known, cards/questions still filling in
+    #: (which of the two is per-subtopic, from cards_done vs cards_target and
+    #: questions_done vs questions_target). "done" -- every subtopic finished.
+    #: Null only while `status` is still "pending".
+    stage: Literal["curriculum", "cards", "done"] | None
+    topic_name: str | None
+    subtopics: list[GenerationSubtopicProgressOut]
+    #: Set only when `status == "failed"` -- `GenerationJob.last_error`.
+    error: str | None
+
+
 class TopicStatsOut(BaseModel):
     topic_id: UUID
     current_difficulty: Difficulty

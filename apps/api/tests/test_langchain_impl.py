@@ -14,7 +14,7 @@ from __future__ import annotations
 from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
-from google.api_core.exceptions import ResourceExhausted
+from google.genai.errors import ClientError
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from spoin.core.config import Settings
@@ -35,6 +35,15 @@ from spoin.generation.quota import QuotaExhaustedError
 
 _THINKING_MODEL = "gemini-thinking-test"
 _GENERATOR_MODEL = "gemini-generator-test"
+
+
+def _real_429(message: str = "quota exceeded") -> ClientError:
+    """A real 429 from the provider, in the shape `google-genai` actually
+    raises it -- `ClientError(code, response_json)`, code/status pulled from
+    the API's `{"error": {...}}` envelope. Mirrors what
+    `GeminiContentGenerator._invoke_with_retry` matches on (`exc.code == 429`)."""
+
+    return ClientError(429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "message": message}})
 
 
 def _settings(**overrides: object) -> Settings:
@@ -110,7 +119,7 @@ async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> Non
         ]
     )
     runnable = AsyncMock()
-    runnable.ainvoke = AsyncMock(side_effect=[ResourceExhausted("quota exceeded"), draft])
+    runnable.ainvoke = AsyncMock(side_effect=[_real_429(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
         result = await generator.generate_curriculum("Topic", "desc")
 
@@ -131,7 +140,7 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
     generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
 
     runnable = AsyncMock()
-    runnable.ainvoke = AsyncMock(side_effect=ResourceExhausted("quota exceeded"))
+    runnable.ainvoke = AsyncMock(side_effect=_real_429())
     with (
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
         pytest.raises(QuotaExhaustedError),
@@ -139,6 +148,29 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
         await generator.generate_curriculum("Topic", "desc")
 
     assert generator._thinking.mark_exhausted.await_count == 2
+
+
+async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() -> None:
+    """The new SDK folds every 4xx into one `ClientError` class -- a non-quota
+    one (bad request, auth failure, ...) must still propagate on the first
+    attempt rather than being mistaken for a retryable 429 and burning the
+    whole grid on an error key rotation can never fix."""
+
+    generator = _generator()
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(
+        side_effect=ClientError(400, {"error": {"code": 400, "status": "INVALID_ARGUMENT"}})
+    )
+    with (
+        patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
+        pytest.raises(ClientError),
+    ):
+        await generator.generate_curriculum("Topic", "desc")
+
+    generator._thinking.mark_exhausted.assert_not_awaited()
+    assert generator._thinking.acquire.await_count == 1
 
 
 async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:

@@ -14,6 +14,7 @@
 import { useState } from "react";
 
 import { ApiError, api, type Topic } from "@/lib/api";
+import { GenerationProgressPanel } from "./GenerationProgressPanel";
 
 interface Props {
   onFollowed: (topic: Topic) => void;
@@ -25,6 +26,13 @@ export function RequestTopicBox({ onFollowed }: Props) {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<{ tone: "info" | "error"; text: string } | null>(null);
+  // Set only for the "generating" outcome -- a brand-new topic with a job to
+  // stream progress for. The "subscribed" outcome (matched an existing,
+  // already-generated topic) has nothing to stream, so it stays on the plain
+  // `notice` text below instead.
+  const [generating, setGenerating] = useState<{ topicId: string; displayName: string } | null>(
+    null,
+  );
 
   const submit = async () => {
     const trimmed = name.trim();
@@ -36,11 +44,11 @@ export function RequestTopicBox({ onFollowed }: Props) {
       const result = await api.requestTopic(trimmed);
       onFollowed(result.topic);
       setName("");
-      setNotice(
-        result.status === "generating"
-          ? { tone: "info", text: `Building "${result.topic.display_name}" — check back soon` }
-          : { tone: "info", text: `Following "${result.topic.display_name}"` },
-      );
+      if (result.status === "generating") {
+        setGenerating({ topicId: result.topic.id, displayName: result.topic.display_name });
+      } else {
+        setNotice({ tone: "info", text: `Following "${result.topic.display_name}"` });
+      }
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 403) {
         setNotice({ tone: "error", text: CUSTOM_TOPIC_LIMIT_MESSAGE });
@@ -62,39 +70,49 @@ export function RequestTopicBox({ onFollowed }: Props) {
         <h3 className="discover-title mono">Request a topic</h3>
       </div>
 
-      <form
-        className="request-topic-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void submit();
-        }}
-      >
-        <input
-          type="text"
-          className="request-topic-input"
-          placeholder="e.g. Quantum computing"
-          value={name}
-          maxLength={120}
-          onChange={(e) => setName(e.target.value)}
-          disabled={submitting}
+      {generating !== null ? (
+        <GenerationProgressPanel
+          topicId={generating.topicId}
+          topicDisplayName={generating.displayName}
+          onRequestAnother={() => setGenerating(null)}
         />
-        <button
-          type="submit"
-          className="discover-follow"
-          disabled={submitting || name.trim().length === 0}
-        >
-          {submitting ? "Adding…" : "Add"}
-        </button>
-      </form>
-
-      {notice ? (
-        <p className={`request-topic-notice mono${notice.tone === "error" ? " error" : ""}`}>
-          {notice.text}
-        </p>
       ) : (
-        <p className="discover-note request-topic-hint">
-          Up to 3 custom topics. New topics take a while to generate.
-        </p>
+        <>
+          <form
+            className="request-topic-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void submit();
+            }}
+          >
+            <input
+              type="text"
+              className="request-topic-input"
+              placeholder="e.g. Quantum computing"
+              value={name}
+              maxLength={120}
+              onChange={(e) => setName(e.target.value)}
+              disabled={submitting}
+            />
+            <button
+              type="submit"
+              className="discover-follow"
+              disabled={submitting || name.trim().length === 0}
+            >
+              {submitting ? "Adding…" : "Add"}
+            </button>
+          </form>
+
+          {notice ? (
+            <p className={`request-topic-notice mono${notice.tone === "error" ? " error" : ""}`}>
+              {notice.text}
+            </p>
+          ) : (
+            <p className="discover-note request-topic-hint">
+              Up to 3 custom topics. New topics take a while to generate.
+            </p>
+          )}
+        </>
       )}
     </div>
   );

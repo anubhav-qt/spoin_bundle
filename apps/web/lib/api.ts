@@ -243,6 +243,26 @@ export interface CustomTopicStatus {
   requested_at: string;
 }
 
+export interface GenerationSubtopicProgress {
+  subtopic_id: string;
+  group_title: string;
+  difficulty: Difficulty;
+  cards_target: number;
+  cards_done: number;
+  /** Null until the cards phase has committed for this tier — see the API's
+   *  GenerationSubtopicProgressOut docstring. */
+  questions_target: number | null;
+  questions_done: number;
+}
+
+export interface GenerationProgress {
+  status: "pending" | "running" | "completed" | "failed";
+  stage: "curriculum" | "cards" | "done" | null;
+  topic_name: string | null;
+  subtopics: GenerationSubtopicProgress[];
+  error: string | null;
+}
+
 export interface QuizMcqQuestion {
   question_id: string;
   stem: string;
@@ -378,6 +398,9 @@ export const api = {
   topicCurriculum: (topicId: string) => request<TopicCurriculum>(`/topics/${topicId}/curriculum`),
 
   customTopics: () => request<CustomTopicStatus[]>("/topics/custom"),
+
+  generationProgress: (topicId: string) =>
+    request<GenerationProgress>(`/topics/${topicId}/generation-progress`),
 
   setTopicColor: (topicId: string, hue: number | null) =>
     request<Topic>(`/topics/${topicId}/color`, {

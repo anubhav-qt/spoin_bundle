@@ -38,7 +38,13 @@ embeddings = [
 # cross-run retry, which stays the worker/GenerationJob's job.
 generation = [
     "langchain-core>=0.3",
-    "langchain-google-genai>=2.0",
+    # Capped, not just floored: 4.x is confirmed to depend on the `google-genai`
+    # SDK (`google.genai.errors.ClientError`, langchain_impl.py's real-429
+    # detection) rather than the older `google-generativeai`/`google-api-core`
+    # stack 2.x/3.x used. An unpinned upper bound let a plain rebuild silently
+    # jump SDKs and break that import with no code change on our side (2026-08-18)
+    # -- re-verify langchain_impl.py's error handling before raising this cap.
+    "langchain-google-genai>=4.0,<5.0",
     "langgraph>=0.6",
 ]
 

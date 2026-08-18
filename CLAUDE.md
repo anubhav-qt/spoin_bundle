@@ -57,6 +57,18 @@ product's claim is quiz-gated mastery of true things. A joke in the line that st
 scroll is charm; a joke in the explanation someone is tested on is noise, and it
 undermines the gate checks that operate on `body` as meaning.
 
+**`spoin_db` is the only database this project uses, and nothing touches its data
+without the project owner's explicit approval first — agent sessions included.** As of
+2026-08-18 it starts and stays blank: `docker compose up`'s `seed` service runs
+migrations only, no fixture loading (`docker-compose.yml` used to also run
+`seed.py`/`seed_generated.py`/`seed_quiz.py`; that line was removed on purpose, not an
+oversight — see README's "Developer experience" section). Never run anything
+destructive or state-changing against it — `alembic downgrade`, `TRUNCATE`/`DELETE`,
+`docker compose down -v`, re-enabling fixture seeding, pointing the stack at a
+different database, editing rows by hand — without asking first, even if the task at
+hand would clearly be easier that way. If a task seems to need it, stop and ask instead
+of proceeding.
+
 ## Keep the loop closed
 
 This file and the docs it points at are what make a *new* chat efficient — there is no
@@ -88,5 +100,5 @@ See the README for the full table. The short version: FastAPI + SQLAlchemy async
 Postgres/pgvector, Next.js + TypeScript on the web side, generation behind a
 `ContentGenerator` interface, everything free-tier-first (ADR-0003) until it isn't.
 
-`docker compose up` brings up the full stack with seeded data — the fastest way to see
-real cards render rather than guessing from schema alone.
+`docker compose up` brings up the full stack against `spoin_db`, blank by default — see
+the DB rule above before assuming you can reset or repopulate it yourself.

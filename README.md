@@ -14,7 +14,9 @@ Web first; a React Native app comes later and shares this backend.
 
 > **Status: early build.** Feed serving, engagement, the quiz-taking UI, and real JWT
 > auth (email/password + Google OAuth + guest sessions; see
-> [ADR-0033](docs/adr/0033-jwt-auth-and-guest-identity.md)) are live against seeded data.
+> [ADR-0033](docs/adr/0033-jwt-auth-and-guest-identity.md)) are live against `spoin_db`,
+> the one dev database this project keeps -- blank by default, not seeded (see
+> "Developer experience" below and `CLAUDE.md`).
 > The web app's feed visual design is in [ADR-0012](docs/adr/0012-feed-visual-design.md).
 > The generation pipeline (curriculum, topic merging, card generation, the two-pass
 > quality gate; see [generation-pipeline.md](docs/architecture/generation-pipeline.md) and
@@ -112,8 +114,8 @@ can't, that's a bug.
 Treated as a first-class requirement, not a cleanup task; the previous iteration of
 this project was criticised for exactly this. Two measurable goals:
 
-> **Clone → running app with seeded data: one command, under 10 minutes,** on a
-> machine that has only Docker and git.
+> **Clone → running app, one command, under 10 minutes,** on a machine that has
+> only Docker and git.
 >
 > **Clone → merged meaningful change: under a day,** without needing to ask the other
 > developer anything.
@@ -122,12 +124,17 @@ To hold that line, built in from the start rather than retrofitted:
 
 - `docker compose up` brings up everything. No "first install Python 3.13, then…" prose.
 - `make setup` / `make dev` / `make seed` / `make test`: nobody memorizes commands.
-- Seed data includes a **pre-generated card corpus fixture**, so a new developer sees a
-  working feed without burning LLM quota or waiting on generation. Also seeded: two
-  topics from a manual multi-agent generation experiment (`fixtures/generated_corpus.json`,
-  loaded by `seed_generated.py`), a proof-of-concept preview of what the real generation
-  pipeline should eventually produce, tagged with its own `gen_meta.backend` so it stays
-  distinguishable from the hand-written fixture.
+- **`spoin_db` is the one dev database this project uses, and it starts and stays
+  blank** -- `docker compose up`'s `seed` service only runs migrations now, no
+  fixture loading. This reverses the project's earlier "seeded data out of the
+  box" onboarding promise: a fresh `docker compose up` gets you an empty feed,
+  not a pre-populated one, until real requests populate it. `fixtures/*` and
+  `seed_generated.py`/`seed_quiz.py` still exist and still work (`make seed`'s
+  old fixture-loading behavior can be run by hand if you want that back for
+  your own machine) but are no longer wired into the default flow. See
+  `CLAUDE.md` for the reasoning and the rule that goes with it: nobody resets,
+  reseeds, or otherwise mutates `spoin_db`'s data without the project owner's
+  explicit approval first -- that includes AI agent sessions.
 - `.env.example` documents every variable, with safe local defaults.
 - FastAPI serves interactive API docs at `/docs`.
 - A `README.md` in each package: what it is, what it owns, where to start reading.

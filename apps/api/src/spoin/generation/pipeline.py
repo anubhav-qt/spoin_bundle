@@ -80,12 +80,12 @@ import operator
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Annotated, Any, TypedDict
+from typing import Annotated, Any, TypedDict, cast
 
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command, Send
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.content.archetype import classify_archetype
@@ -102,6 +102,7 @@ from spoin.domain.enums import (
 from spoin.domain.models import (
     Card,
     CardStats,
+    GenerationJob,
     Question,
     RejectedCard,
     Subtopic,
@@ -638,6 +639,83 @@ async def _load_subtopic_plans(
     return plans
 
 
+# ------------------------------------------------------------- live progress --
+# Best-effort progress for the request-a-topic streaming UI. "Best-effort"
+# because a job's DB row is looked up fresh each call rather than threaded
+# through graph state (LangGraph's Send-based fan-out has no per-topic slot
+# for it that survives a Command.goto) -- a job that's already moved past
+# "running" (raced by the time this runs, or this is a topic backfill with no
+# job at all) just means the write silently no-ops. Never a reason to fail
+# the actual generation. Callers are already inside `topic_plan_lock` or
+# `session_lock` at every call site below, so `runtime.session` is safe to
+# use here without a lock of its own.
+
+
+async def _running_job(runtime: _Runtime, topic_id: uuid.UUID) -> GenerationJob | None:
+    job: GenerationJob | None = await runtime.session.scalar(
+        select(GenerationJob).where(
+            GenerationJob.topic_id == topic_id, GenerationJob.status == "running"
+        )
+    )
+    return job
+
+
+async def _seed_progress(
+    runtime: _Runtime, topic_id: uuid.UUID, topic_name: str, subtopic_plans: list[SubtopicPlan]
+) -> None:
+    """Called once per topic, right after this run's subtopic-tier plans are
+    loaded (whether or not curriculum generation ran THIS call -- a resumed
+    topic already has one). `cards_done`/`questions_done` start from what's
+    already active from a prior run, not zero, so a resumed job's bars don't
+    visibly regress."""
+
+    job = await _running_job(runtime, topic_id)
+    if job is None:
+        return
+    job.progress = {
+        "stage": "cards",
+        "topic_name": topic_name,
+        "subtopics": [
+            {
+                "subtopic_id": sp["subtopic_id"],
+                "group_title": sp["title"],
+                "difficulty": sp["difficulty"],
+                "cards_target": sp["target_cards"],
+                "cards_done": sp["existing_count"],
+                "questions_target": None,
+                "questions_done": sp["existing_count"] - len(sp["cards_missing_questions"]),
+            }
+            for sp in subtopic_plans
+        ],
+    }
+
+
+async def _update_subtopic_progress(
+    runtime: _Runtime, topic_id: uuid.UUID, subtopic_id: str, **fields: object
+) -> None:
+    job = await _running_job(runtime, topic_id)
+    if job is None or not job.progress:
+        return
+    progress = dict(job.progress)
+    raw_subtopics = cast("list[dict[str, object]]", progress.get("subtopics", []))
+    subtopics = [dict(entry) for entry in raw_subtopics]
+    for entry in subtopics:
+        if entry.get("subtopic_id") == subtopic_id:
+            entry.update(fields)
+            break
+    progress["subtopics"] = subtopics
+    job.progress = progress
+
+
+async def _mark_progress_done(runtime: _Runtime, topic_id: uuid.UUID) -> None:
+    job = await _running_job(runtime, topic_id)
+    if job is None:
+        return
+    progress = dict(job.progress or {})
+    progress["stage"] = "done"
+    job.progress = progress
+
+
 async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> Command[Any]:
@@ -736,6 +814,8 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
             max_verification_feedback_bodies=runtime.settings.max_verification_feedback_bodies,
             max_existing_question_stems=runtime.settings.max_existing_question_stems,
         )
+        await _seed_progress(runtime, topic.id, topic.canonical_name, subtopic_plans)
+        await runtime.session.commit()
 
     plan = TopicPlanResult(
         topic_id=str(topic.id),
@@ -958,13 +1038,16 @@ async def _correct_subtopic_drafts(
             result = await runtime.generator.correct_cards(
                 queries, difficulty_examples=difficulty_examples
             )
+        chunk_failures = list(result.failures)
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
         edited_count = 0
         for index, draft in enumerate(chunk):
             correction = by_index.get(index)
             if correction is None:
-                failures.append(f"correction pass returned no result for card {index}")
+                reason = f"correction pass returned no result for card {index}"
+                failures.append(reason)
+                chunk_failures.append(reason)
                 continue
             if correction.was_edited:
                 edited_count += 1
@@ -987,6 +1070,16 @@ async def _correct_subtopic_drafts(
             "%d failure(s)",
             subtopic_id, edited_count, len(chunk), len(result.failures),
         )
+        if chunk_failures:
+            # The count above says HOW MANY; this says WHY -- same gap task
+            # 0012 already found and fixed for question generation, applied
+            # here too. Without this, a whole-call failure (e.g. quota
+            # exhaustion) is indistinguishable in the log from N genuinely
+            # malformed per-card corrections.
+            logger.warning(
+                "gate: pass 1 correction for subtopic %s had failure(s): %s",
+                subtopic_id, "; ".join(chunk_failures),
+            )
 
     return subtopic_id, corrected, failures
 
@@ -1026,13 +1119,16 @@ async def _verify_subtopic_drafts(
             result = await runtime.generator.verify_cards(
                 queries, difficulty_examples=difficulty_examples
             )
+        chunk_failures = list(result.failures)
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
         chunk_accepted = 0
         for index, (draft, embedding) in enumerate(chunk):
             verdict = by_index.get(index)
             if verdict is None:
-                failures.append(f"verification pass returned no result for card {index}")
+                reason = f"verification pass returned no result for card {index}"
+                failures.append(reason)
+                chunk_failures.append(reason)
                 continue
             if not verdict.accepted:
                 reason = verdict.reason or "failed verification"
@@ -1056,6 +1152,16 @@ async def _verify_subtopic_drafts(
             "%d failure(s)",
             subtopic_id, chunk_accepted, len(chunk), len(result.failures),
         )
+        if chunk_failures:
+            # Same reasoning as pass 1's warning above: a whole-call failure
+            # (e.g. quota exhaustion) must not read the same as "every card
+            # in this chunk was judged bad content" -- the two get folded
+            # together downstream into one "rejected" number, so the actual
+            # reason has to survive here in the log or it's lost entirely.
+            logger.warning(
+                "gate: pass 2 verification for subtopic %s had failure(s): %s",
+                subtopic_id, "; ".join(chunk_failures),
+            )
 
     return subtopic_id, accepted, rejected, failures
 
@@ -1304,20 +1410,52 @@ async def _process_gate_item(
         # anywhere else in this batch (a different tier, question
         # generation) no longer discards cards already gated here.
         await runtime.session.commit()
+        # Recomputed via COUNT rather than trusted as a delta on top of
+        # whatever `_seed_progress` wrote -- same reasoning as
+        # `EngagementService._bump_progress`: a real, cheap read beats a
+        # running total that can drift out of sync with the table it
+        # describes. `questions_target` becomes exactly this count: every
+        # active card gets exactly one question, backfill included.
+        cards_done = await runtime.session.scalar(
+            select(func.count())
+            .select_from(Card)
+            .where(
+                Card.subtopic_id == uuid.UUID(item.subtopic_id),
+                Card.status == CardStatus.ACTIVE,
+            )
+        )
+        await _update_subtopic_progress(
+            runtime,
+            uuid.UUID(item.topic_id),
+            item.subtopic_id,
+            cards_done=cards_done or 0,
+            questions_target=cards_done or 0,
+        )
+        await runtime.session.commit()
 
+    # Genuinely REJECTED (a check ran and judged the content bad) is kept
+    # separate from FAILED (the check never ran at all -- e.g. quota
+    # exhaustion, a malformed whole-batch response). Folding these together
+    # previously made a run that hit quota exhaustion mid-gate look like a
+    # content-quality catastrophe in the persisted report, when in fact
+    # nothing had been judged bad -- see the pass 1/2 failure-reason
+    # warnings above for where to find out WHY a call failed.
     total_rejected = (
-        len(item.structural_rejects)
-        + item.correction_failure_count
-        + len(item.dedup_rejects)
-        + len(item.verification_rejects)
+        len(item.structural_rejects) + len(item.dedup_rejects) + len(item.verification_rejects)
+    )
+    total_failed = (
+        item.correction_failure_count
         + item.verification_failure_count
         + item.generator_failure_count
     )
     logger.info(
         "subtopic %s [%s]: persisted %d card(s), rejected %d "
-        "(structural=%d near_dup=%d verification=%d)",
+        "(structural=%d near_dup=%d verification=%d), failed %d "
+        "(correction=%d verification=%d generator=%d)",
         item.subtopic_id, item.difficulty, len(new_cards), total_rejected,
         len(item.structural_rejects), len(item.dedup_rejects), len(item.verification_rejects),
+        total_failed, item.correction_failure_count, item.verification_failure_count,
+        item.generator_failure_count,
     )
 
     questions_accepted = 0
@@ -1394,6 +1532,18 @@ async def _process_gate_item(
             runtime.session.add_all(new_questions)
             await runtime.session.flush()
             await runtime.session.commit()
+            questions_done = await runtime.session.scalar(
+                select(func.count())
+                .select_from(Question)
+                .where(Question.subtopic_id == uuid.UUID(item.subtopic_id))
+            )
+            await _update_subtopic_progress(
+                runtime,
+                uuid.UUID(item.topic_id),
+                item.subtopic_id,
+                questions_done=questions_done or 0,
+            )
+            await runtime.session.commit()
         questions_accepted = len(new_questions)
         questions_rejected = len(all_question_failures)
         if all_question_failures:
@@ -1409,6 +1559,7 @@ async def _process_gate_item(
         "difficulty": item.difficulty,
         "accepted": len(new_cards),
         "rejected": total_rejected,
+        "failed": total_failed,
         "questions_accepted": questions_accepted,
         "questions_rejected": questions_rejected,
     }
@@ -1495,7 +1646,7 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
     )
 
     reports_by_topic: dict[str, list[dict[str, object]]] = {}
-    totals_by_topic: dict[str, tuple[int, int, int, int]] = {}
+    totals_by_topic: dict[str, tuple[int, int, int, int, int]] = {}
     for report in item_reports:
         topic_id = report["topic_id"]
         reports_by_topic.setdefault(topic_id, []).append(
@@ -1504,14 +1655,16 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 "difficulty": report["difficulty"],
                 "accepted": report["accepted"],
                 "rejected": report["rejected"],
+                "failed": report["failed"],
             }
         )
-        prev_accepted, prev_rejected, prev_q_accepted, prev_q_rejected = totals_by_topic.get(
-            topic_id, (0, 0, 0, 0)
+        prev_accepted, prev_rejected, prev_failed, prev_q_accepted, prev_q_rejected = (
+            totals_by_topic.get(topic_id, (0, 0, 0, 0, 0))
         )
         totals_by_topic[topic_id] = (
             prev_accepted + report["accepted"],
             prev_rejected + report["rejected"],
+            prev_failed + report["failed"],
             prev_q_accepted + report["questions_accepted"],
             prev_q_rejected + report["questions_rejected"],
         )
@@ -1519,8 +1672,8 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
     topic_reports: list[dict[str, object]] = []
     for plan in state.get("topic_plans", []):
         topic_id = plan["topic_id"]
-        total_accepted, total_rejected, q_accepted, q_rejected = totals_by_topic.get(
-            topic_id, (0, 0, 0, 0)
+        total_accepted, total_rejected, total_failed, q_accepted, q_rejected = (
+            totals_by_topic.get(topic_id, (0, 0, 0, 0, 0))
         )
         topic_reports.append(
             {
@@ -1530,16 +1683,24 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 "deep_dive_topic_names": plan["deep_dive_topic_names"],
                 "accepted": total_accepted,
                 "rejected": total_rejected,
+                "failed": total_failed,
                 "subtopics": reports_by_topic.get(topic_id, []),
                 "questions_accepted": q_accepted,
                 "questions_rejected": q_rejected,
             }
         )
         logger.info(
-            "topic '%s' done -- %d card(s) accepted, %d rejected, %d question(s) accepted, "
-            "%d rejected",
-            plan["topic_name"], total_accepted, total_rejected, q_accepted, q_rejected,
+            "topic '%s' done -- %d card(s) accepted, %d rejected, %d failed (not judged -- "
+            "e.g. quota exhaustion), %d question(s) accepted, %d rejected",
+            plan["topic_name"], total_accepted, total_rejected, total_failed, q_accepted,
+            q_rejected,
         )
+
+    if topic_reports:
+        async with runtime.session_lock:
+            for plan in state.get("topic_plans", []):
+                await _mark_progress_done(runtime, uuid.UUID(plan["topic_id"]))
+            await runtime.session.commit()
 
     return {"report": {"topics": topic_reports}}
 

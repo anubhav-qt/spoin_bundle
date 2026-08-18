@@ -123,12 +123,14 @@ class QuotaGovernor:
         if not self.ladder:
             raise ValueError("QuotaGovernor needs at least one ladder rung")
 
-    async def acquire(self, *, now: datetime) -> tuple[int, str]:
+    async def acquire(
+        self, *, now: datetime, exclude_models: frozenset[str] = frozenset()
+    ) -> tuple[int, str]:
         async with self._lock, session_scope() as session:
-            return await self._acquire_locked(session, now=now)
+            return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
 
     async def acquire_with_session(
-        self, session: AsyncSession, *, now: datetime
+        self, session: AsyncSession, *, now: datetime, exclude_models: frozenset[str] = frozenset()
     ) -> tuple[int, str]:
         """Same as `acquire`, but reuses a caller-supplied session instead of
         opening its own — for tests, where the fixture session IS the
@@ -136,7 +138,7 @@ class QuotaGovernor:
         uncommitted rows."""
 
         async with self._lock:
-            return await self._acquire_locked(session, now=now)
+            return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
 
     async def mark_exhausted(self, key_index: int, model: str, *, now: datetime) -> None:
         """A REAL 429 from the provider disagreed with our local ledger, which
@@ -166,9 +168,23 @@ class QuotaGovernor:
             key_index, model,
         )
 
-    async def _acquire_locked(self, session: AsyncSession, *, now: datetime) -> tuple[int, str]:
+    async def _acquire_locked(
+        self, session: AsyncSession, *, now: datetime, exclude_models: frozenset[str] = frozenset()
+    ) -> tuple[int, str]:
+        """`exclude_models` skips entire ladder rungs (every key) rather than
+        one `(key, model)` cell. A real 429 is per-key (ADR-0028's ledger
+        tracks it that way), but a 503 "high demand" overload is per-MODEL --
+        every key hits the same wall on that model, so cycling through keys
+        one at a time on an overloaded model just burns real per-key quota
+        for no chance of success. Callers pass the models they've already
+        found persistently unavailable this call so acquire() jumps straight
+        to the next model instead."""
+
         day = _day_start(now)
         for rung in self.ladder:
+            if rung.model in exclude_models:
+                logger.debug("quota: model %s excluded (persistently unavailable), skipping", rung.model)
+                continue
             for key_index in range(self.key_count):
                 if not self._rpm_has_room(key_index, rung):
                     logger.debug(

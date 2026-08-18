@@ -40,9 +40,10 @@ ADR-0028's grid tracks OUR OWN belief about what's been spent, hand-copied from 
 rate-limit screenshot -- it can drift from what the provider actually enforces
 (confirmed live: a fresh key 0/gemini-3.7-flash cell our ledger believed had room
 429'd immediately, quota already spent by out-of-band verification work). Every
-call in this module goes through `_invoke_with_retry`, which treats a real
-`ResourceExhausted` from the provider as ground truth: it marks that exact
-`(key, model)` cell exhausted in the ledger (`QuotaGovernor.mark_exhausted`, so a
+call in this module goes through `_invoke_with_retry`, which treats a real 429
+(`google.genai.errors.ClientError` with `.code == 429`) from the provider as ground
+truth: it marks that exact `(key, model)` cell exhausted in the ledger
+(`QuotaGovernor.mark_exhausted`, so a
 concurrent caller also stops retrying it) and retries the NEXT cell in the grid,
 bounded at one attempt per cell. Only once every cell has been tried does the
 final exception (a `QuotaExhaustedError` from `acquire()`, or a non-quota error)
@@ -53,12 +54,14 @@ every other method's existing `except Exception` already converts it to a
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import UTC, datetime
 from typing import TypeVar
 
-from google.api_core.exceptions import ResourceExhausted
+from google.genai.errors import ClientError, ServerError
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from spoin.core.config import Settings
@@ -80,11 +83,16 @@ from spoin.generation.base import (
     TopicNameQuery,
     TopicNameVerdict,
 )
-from spoin.generation.quota import QuotaGovernor, parse_ladder
+from spoin.generation.quota import QuotaExhaustedError, QuotaGovernor, parse_ladder
 
 logger = logging.getLogger("spoin.generation.langchain_impl")
 
 _SchemaT = TypeVar("_SchemaT", bound=BaseModel)
+
+#: Retries for a transient 503 (`ServerError`, "high demand") on one (key, model)
+#: cell before `_invoke_with_retry` moves on to the next cell in the ladder.
+_SERVER_ERROR_RETRIES = 3
+_SERVER_ERROR_BASE_DELAY_S = 2.0
 
 # ------------------------------------------------------------- wire schemas --
 
@@ -610,7 +618,7 @@ class GeminiContentGenerator(ContentGenerator):
                 temperature=0.7,
                 # LangChain's own client retries a 429 in-place with
                 # exponential backoff (default max_retries=6, ~2 minutes of
-                # wall time) before ever raising ResourceExhausted up to
+                # wall time) before ever raising a ClientError up to
                 # _invoke_with_retry -- that defeats the whole point of this
                 # module's own cross-cell fallback (see module docstring),
                 # which wants to move to the next (key, model) immediately on
@@ -619,6 +627,37 @@ class GeminiContentGenerator(ContentGenerator):
                 max_retries=0,
             )
         return self._clients[cache_key]
+
+    async def _invoke_with_backoff(
+        self,
+        structured: object,
+        prompt: list[tuple[str, str]],
+        *,
+        key_index: int,
+        model: str,
+    ):
+        """A 503 (`ServerError`, status `UNAVAILABLE`) means the model itself is
+        overloaded -- Google's own docs describe this as "usually temporary."
+        It has nothing to do with OUR quota, so unlike a real 429 it does not
+        mark the cell exhausted; instead retry the SAME cell a few times with
+        exponential backoff before `_invoke_with_retry` gives up on it and
+        rotates to the next cell in the ladder."""
+
+        delay = _SERVER_ERROR_BASE_DELAY_S
+        for attempt in range(1, _SERVER_ERROR_RETRIES + 1):
+            try:
+                return await structured.ainvoke(prompt)  # type: ignore[attr-defined]
+            except ServerError:
+                if attempt == _SERVER_ERROR_RETRIES:
+                    raise
+                logger.warning(
+                    "quota: key=%d model=%s got a transient 503 (high demand, attempt "
+                    "%d/%d) -- retrying in %.0fs",
+                    key_index, model, attempt, _SERVER_ERROR_RETRIES, delay,
+                )
+                await asyncio.sleep(delay)
+                delay *= 2
+        raise AssertionError("unreachable: loop always returns or raises on its last attempt")
 
     async def _invoke_with_retry(
         self, pool: QuotaGovernor, schema: type[_SchemaT], prompt: list[tuple[str, str]]
@@ -630,13 +669,49 @@ class GeminiContentGenerator(ContentGenerator):
         `(key, model)`."""
 
         max_attempts = pool.key_count * len(pool.ladder)
+        last_server_error: ServerError | None = None
+        # A 503 overload is per-MODEL, not per-key (every key hits the same
+        # wall) -- once a model has stayed UNAVAILABLE through its own
+        # backoff, exclude it entirely so the next acquire() jumps straight
+        # to the next model in the ladder instead of burning through every
+        # remaining key on a model that's already proven overloaded.
+        unavailable_models: set[str] = set()
         for attempt in range(1, max_attempts + 1):
-            key_index, model = await pool.acquire(now=datetime.now(UTC))
+            try:
+                key_index, model = await pool.acquire(
+                    now=datetime.now(UTC), exclude_models=frozenset(unavailable_models)
+                )
+            except QuotaExhaustedError:
+                # Every remaining rung was excluded as overloaded, not actually
+                # quota-exhausted -- surface the real 503 instead of a
+                # misleading "quota exhausted" when no cell was ever marked so.
+                if last_server_error is not None:
+                    raise last_server_error from None
+                raise
             client = self._client(key_index, model)
             structured = client.with_structured_output(schema)
             try:
-                result = await structured.ainvoke(prompt)
-            except ResourceExhausted as exc:
+                result = await self._invoke_with_backoff(
+                    structured, prompt, key_index=key_index, model=model
+                )
+            except (ClientError, ChatGoogleGenerativeAIError) as exc:
+                # The new `google-genai` SDK (langchain-google-genai>=4.0) has no
+                # dedicated ResourceExhausted class -- every 4xx is a ClientError,
+                # distinguished by `.code`/`.status` from the API's error envelope
+                # (`{"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", ...}}`).
+                # BUT `ChatGoogleGenerativeAI._agenerate` catches that `ClientError`
+                # itself and unconditionally re-wraps it as a generic
+                # `ChatGoogleGenerativeAIError` (langchain_google_genai's own
+                # `_handle_client_error`) before it ever reaches this method -- a
+                # raw `ClientError` from `structured.ainvoke()` essentially never
+                # happens in practice. The real error survives as `__cause__`, so
+                # unwrap that to find the actual `.code` this branch needs.
+                real_error = exc if isinstance(exc, ClientError) else exc.__cause__
+                # Anything that isn't actually a 429 re-raises immediately rather
+                # than burning a retry attempt on an error no amount of key
+                # rotation fixes (a malformed request, an auth failure, ...).
+                if not isinstance(real_error, ClientError) or real_error.code != 429:
+                    raise
                 logger.warning(
                     "quota: key=%d model=%s got a REAL 429 from the provider despite our "
                     "ledger showing room -- marking exhausted, trying next cell "
@@ -645,8 +720,26 @@ class GeminiContentGenerator(ContentGenerator):
                 )
                 await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
                 continue
+            except ServerError as exc:
+                # Persistently UNAVAILABLE even after _invoke_with_backoff's own
+                # retries -- this cell's ledger entry is untouched (503 isn't a
+                # quota condition). Exclude the whole MODEL (not just this key)
+                # since the overload applies to every key alike.
+                logger.warning(
+                    "quota: model=%s still UNAVAILABLE after backoff on key=%d -- "
+                    "excluding this model, trying next one (attempt %d/%d): %s",
+                    model, key_index, attempt, max_attempts, exc,
+                )
+                unavailable_models.add(model)
+                last_server_error = exc
+                continue
             assert isinstance(result, schema)
             return result
+        if last_server_error is not None:
+            # Every cell in the grid stayed UNAVAILABLE -- NOT a quota exhaustion
+            # (no cell was marked exhausted), so re-raise the actual 503 rather
+            # than the misleading "unreachable" assertion below.
+            raise last_server_error
         # Every cell in the grid has now been marked exhausted by the loop
         # above -- this raises QuotaExhaustedError, the same error acquire()
         # would have raised directly had our ledger been accurate from the

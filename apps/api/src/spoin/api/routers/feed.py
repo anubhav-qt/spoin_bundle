@@ -62,6 +62,8 @@ async def get_feed(
                 body=card.body,
                 archetype=card.archetype,
                 is_hero=card.is_hero,
+                visual_id=card.visual_id,
+                visual_slots=card.visual_slots,
                 created_at=card.created_at,
                 note=notes_by_card.get(card_id),
             )

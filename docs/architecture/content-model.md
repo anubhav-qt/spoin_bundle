@@ -44,12 +44,12 @@ card
 | Field | Origin |
 |---|---|
 | `title`, `canonical_title`, `summary`, `body` | **Generated** (or authored, for user-submitted cards) |
-| `visual_id`, `visual_slots` | **Selected** by the generator from a curated catalog -- never drawn by it, and validated deterministically after (see [ADR-0021](../adr/0021-ascii-scene-library.md)) |
+| `visual_id`, `visual_slots` | **Drawn** by the generator directly, validated deterministically after (see [ADR-0042](../adr/0042-freeform-ascii-and-real-hero-mechanism.md), superseding [ADR-0021](../adr/0021-ascii-scene-library.md)) |
 | `difficulty` | **Requested** at generation time, then **independently verified** by the quality gate |
 | `topic_id` | Requested at generation time, verified by the quality gate |
 | `content_embedding` | **Derived** locally, post-generation |
 | `archetype` | **Derived** locally from `body`, post-generation -- never requested, never LLM-self-reported (see [ADR-0017](../adr/0017-card-archetypes.md)) |
-| `is_hero` | **Planned** by a curriculum/content step, one per subtopic -- today set by the fixture seeder only (see below); never a per-card LLM self-report |
+| `is_hero` | **Set at generation time**, one per subtopic-tier, by a dedicated call the model never sees framed as optional -- never a per-card LLM self-report (see [ADR-0042](../adr/0042-freeform-ascii-and-real-hero-mechanism.md)) |
 | `status`, `version`, `family_id` | **System-owned**. Never set by the generator |
 
 ### On `title` / `canonical_title`
@@ -74,21 +74,21 @@ invent the same joke twice.
 
 ### On `visual_id` / `visual_slots`
 
-**Decided in [ADR-0021](../adr/0021-ascii-scene-library.md); schema fields exist, catalog
-does not.** Cards may carry an ASCII scene. The generator **selects** a scene from a
-curated, hand-authored catalog and writes its dialogue slots; it never draws art. Models
-are unreliable at ASCII art and none of the four quality-gate checks below can detect a
-broken drawing -- the catalog is what replaces the missing detector.
-`card.visual_id`/`visual_slots` and `CardDraft.visual_id`/`visual_slots` exist (so a
-future catalog needs no migration or corpus regeneration to land), but with no catalog to
-select from, nothing populates them today -- see
-[generation-pipeline.md](generation-pipeline.md).
+**Decided in [ADR-0042](../adr/0042-freeform-ascii-and-real-hero-mechanism.md), superseding
+[ADR-0021](../adr/0021-ascii-scene-library.md)'s catalog approach (never authored -- the
+premise went untested).** Cards may carry an ASCII scene, drawn by the generator directly
+in the same call that produces `title`/`summary`/`body` -- `visual_id` holds a short
+model-given label, `visual_slots` holds `{"art": ..., "alt": ...}`. Models being unreliable
+at ASCII art (ADR-0021's original concern) is not disproven, only untested at the scale
+this reopens it at -- see [generation-pipeline.md](generation-pipeline.md) for the current
+prompt and guardrails.
 
-The card stores a reference plus text, never rendered art, so fixing a scene improves
-every card using it with no regeneration. Three constraints are enforced server-side, not
-prompted: slot text over the scene's `max_chars`, an unknown `visual_id`, and a scene
-already used on two active cards in the topic all cause the **visual to be dropped and the
-card kept**. Failure degrades to "no art", never to "broken art".
+The card stores the art inline (not a reference into a catalog, unlike ADR-0021's design --
+fixing one card's art means regenerating that card, there is nothing shared to fix once).
+One constraint is enforced server-side, not prompted: any art line over the 40-column
+width budget causes the **visual to be dropped and the card kept**. Failure degrades to
+"no art", never to "broken art" -- same posture ADR-0021 established, just checked against
+freehand output instead of a catalog.
 
 ### On `summary`
 
@@ -119,19 +119,21 @@ markdown shapes where a subtopic calls for it (same spirit as `summary` below), 
 never emits `archetype` as a field.
 
 `ascii` follows the same rule and is the easiest case of all: it is derived from
-`visual_id is not null` (see [ADR-0021](../adr/0021-ascii-scene-library.md)). Note it is
-derived from the *field*, not from `body` -- ASCII scenes deliberately live outside the
-markdown so the renderer owns their monospace box and column width.
+`visual_id is not null` (see [ADR-0042](../adr/0042-freeform-ascii-and-real-hero-mechanism.md)).
+Note it is derived from the *field*, not from `body` -- ASCII scenes deliberately live
+outside the markdown so the renderer owns their monospace box and column width.
 
 ### On `is_hero`
 
 The card the web client renders as a never-collapsed visual anchor, with distinct
-typography and a border treatment. Real mechanism (not yet built -- see
-[docs/tasks/0006](../tasks/0006-curated-hero-cards.md)): a content-planning step
-designates exactly one hero per subtopic. Until that exists, the fixture seeder marks
-the first card listed per subtopic. Either way this is a **planning decision**, not a
-per-card judgment the generator makes about its own output -- same category of thing as
-`status`/`version`, just not fully automated yet.
+typography and a border treatment. Real mechanism, per
+[ADR-0042](../adr/0042-freeform-ascii-and-real-hero-mechanism.md) (resolving
+[docs/tasks/0006](../tasks/0006-curated-hero-cards.md)): `generate_subtopic_cards` issues
+one dedicated, `is_hero`-framed call per subtopic-tier -- the subtopic's single most
+important idea, written for that framing specifically, not the best of cards that weren't.
+`is_hero` is stamped by which call produced the draft, never read from the model's own
+output. The fixture seeder's "first card listed" placeholder is unchanged for fixture-
+seeded data, which never goes through generation.
 
 ### On `source` / `author_id`
 

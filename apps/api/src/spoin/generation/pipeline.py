@@ -51,23 +51,30 @@ resolve_and_plan_topic     Per topic (already exists; ADR-0025 decided that
   | Send fan-out, one branch per subtopic GROUP (not per subtopic-tier --
   | see generate_subtopic_cards for why)
   v
-generate_subtopic_cards   No DB access (concurrent across groups AND topics).
-                          Within one group, tiers run SEQUENTIALLY, lowest
-                          difficulty first, because a linked higher tier's
-                          card generation receives the lower tier's actual
-                          card BODIES as context (ADR-0026) -- it has to exist
+generate_subtopic_cards   Concurrent across groups AND topics. Within one
+                          group, tiers run SEQUENTIALLY, lowest difficulty
+                          first, because a linked higher tier's card
+                          generation receives the lower tier's actual card
+                          BODIES as context (ADR-0026) -- it has to exist
                           first. Groups with only one tier (the common case)
-                          are unaffected: nothing to sequence.
+                          are unaffected: nothing to sequence. Gates+persists
+                          its OWN group's cards (minimal gate, then the
+                          correction/verification passes -- see
+                          generation/gate.py and ADR-0030) and questions
+                          itself, right here, before returning -- cards go
+                          live in the feed as soon as THIS group is done
+                          (ADR-0026), not held back for every other group or
+                          topic in the run to also finish.
   |
-  | fan-in (every branch's results merge, across every topic in the run)
+  | fan-in (every branch's item_reports merge, across every topic in the run)
   v
-gate_and_persist          The ONLY card/question-writing node, one writer, no
-                           concurrency to reason about for the DB itself.
-                           Persists cards (minimal gate -- see generation/gate.py),
-                           THEN concurrently (asyncio.gather, same semaphore as
-                           everywhere else) generates questions FROM the cards
-                           just written, per subtopic/difficulty, and persists
-                           those too. A topic isn't done until both exist.
+gate_and_persist          Everything is ALREADY persisted by this point --
+                           this is just final aggregation: builds the run's
+                           per-topic report from every group's item_reports,
+                           and marks each topic's GenerationJob done. Fan-in
+                           is correct HERE (unlike for the writes themselves)
+                           because the final report and "done" marking
+                           genuinely do need everything finished.
 ```
 """
 
@@ -216,6 +223,12 @@ class SubtopicPlan(TypedDict):
     #: writer a sense of what this subtopic-tier's quiz already looks like
     #: rather than writing each batch as if it were the first.
     existing_question_stems: list[str]
+    #: Pre-fetched, same reasoning as `existing_titles` -- whether THIS
+    #: subtopic-tier already has an active `is_hero` card (task 0006 / ADR-
+    #: 0018's real hero mechanism). `generate_subtopic_cards` uses this,
+    #: together with `existing_count == 0`, to decide whether to issue the
+    #: one-time hero call before its normal rounds.
+    has_hero: bool
 
 
 class SubtopicGroupPlan(TypedDict):
@@ -224,6 +237,11 @@ class SubtopicGroupPlan(TypedDict):
 
     topic_id: str
     topic_name: str
+    #: Threaded through so `generate_subtopic_cards` can gate+persist its own
+    #: group immediately without needing the full `topic_plans` state (a
+    #: `Send`-invoked branch only sees its own payload, not the graph's
+    #: accumulated state -- see `PipelineState.topic_plans`'s docstring).
+    topic_description: str
     tiers: list[SubtopicPlan]
 
 
@@ -274,7 +292,14 @@ class PipelineState(TypedDict, total=False):
     topic_plans: Annotated[list[TopicPlanResult], operator.add]
     #: Only set on a per-branch Send invocation (inner fan-out).
     subtopic_group_job: SubtopicGroupPlan
-    card_results: Annotated[list[SubtopicCardsResult], operator.add]
+    #: One dict per subtopic-tier gated THIS run (topic_id, subtopic_id,
+    #: difficulty, accepted/rejected/failed, questions_accepted/rejected) --
+    #: written by `generate_subtopic_cards` itself now (it gates+persists its
+    #: own group immediately, ADR-0026), not by a separate global writer node.
+    #: `gate_and_persist` only reads this to build the final per-topic report
+    #: and mark topics done; every card/question this run wrote is already
+    #: committed by the time it runs.
+    item_reports: Annotated[list[dict[str, object]], operator.add]
     report: dict[str, object]
 
 
@@ -613,6 +638,19 @@ async def _load_subtopic_plans(
                 .limit(max_existing_question_stems)
             )
         ).scalars().all()
+        # Subtopic-scoped (not group-wide, unlike `existing` above) -- a hero
+        # is one-per-subtopic-tier, matching `CardDraft.is_hero`'s scope.
+        has_hero = (
+            await session.execute(
+                select(Card.id)
+                .where(
+                    Card.subtopic_id == subtopic.id,
+                    Card.status == CardStatus.ACTIVE,
+                    Card.is_hero.is_(True),
+                )
+                .limit(1)
+            )
+        ).first() is not None
         plans.append(
             SubtopicPlan(
                 topic_id=str(topic.id),
@@ -634,6 +672,7 @@ async def _load_subtopic_plans(
                     for card_id, title, body in missing_question_cards
                 ],
                 existing_question_stems=list(existing_question_stems),
+                has_hero=has_hero,
             )
         )
     return plans
@@ -833,6 +872,7 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         SubtopicGroupPlan(
             topic_id=plan["topic_id"],
             topic_name=plan["topic_name"],
+            topic_description=plan["topic_description"],
             tiers=sorted(tiers, key=lambda sp: Difficulty(sp["difficulty"]).rank),
         )
         for tiers in groups.values()
@@ -865,13 +905,23 @@ def fan_out_topics(state: PipelineState) -> list[Send]:
 async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> dict[str, object]:
-    """No DB access -- see module docstring. Runs once per subtopic GROUP that
-    still needs cards, potentially concurrently with every other such group,
-    across every topic in this run. Tiers WITHIN one group run sequentially,
-    lowest difficulty first, so a linked higher tier's `generate_cards` call can
-    receive the lower tier's actual card bodies as `builds_on` (ADR-0026) --
-    groups with only one tier (the common case; curricula are never forced to
-    give a concept all three tiers) are unaffected, there's nothing to sequence.
+    """Runs once per subtopic GROUP that still needs cards, potentially
+    concurrently with every other such group, across every topic in this run.
+    Tiers WITHIN one group run sequentially, lowest difficulty first, so a
+    linked higher tier's `generate_cards` call can receive the lower tier's
+    actual card bodies as `builds_on` (ADR-0026) -- groups with only one tier
+    (the common case; curricula are never forced to give a concept all three
+    tiers) are unaffected, there's nothing to sequence.
+
+    DOES have DB access, via `_gate_and_persist_results` at the end -- ADR-
+    0026's decision is that cards persist and go live in the feed as soon as
+    their own subtopic/tier's batch completes, not held back until every
+    OTHER group/topic in this run also finishes drafting. This function used
+    to just return drafts for a separate global writer node to pick up later;
+    now it gates+persists its OWN group's cards and questions itself, before
+    returning. `gate_and_persist` (still the only function containing the
+    actual gate/persist logic -- this just calls it earlier and more often)
+    is left as a final, lightweight aggregation-and-mark-done step.
     """
 
     runtime = _runtime(config)
@@ -913,6 +963,56 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         drafts: list[CardDraft] = []
         failures: list[str] = []
         existing_titles = list(tier["existing_titles"])
+
+        # One-time hero call (task 0006 / ADR-0018), before this tier's
+        # normal rounds. Gated on `existing_count == 0` (not just `has_hero`)
+        # so it only fires the first time this subtopic-tier is ever
+        # generated -- literally its first card -- rather than retrofitting
+        # a late hero onto a tier that already accumulated ordinary cards
+        # under the old (no-op) `is_hero` behavior.
+        if tier["existing_count"] == 0 and not tier["has_hero"]:
+            async with runtime.semaphore:
+                hero_result = await runtime.generator.generate_cards(
+                    topic_name=job["topic_name"],
+                    subtopic_title=tier["title"],
+                    subtopic_description=tier["description"],
+                    difficulty=difficulty,
+                    count=1,
+                    existing_titles=existing_titles,
+                    builds_on=lower_tier_bodies,
+                    difficulty_examples=difficulty_examples,
+                    avoid_bodies=tier["avoid_duplicate_bodies"],
+                    rejection_feedback=[
+                        (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
+                    ],
+                    want_hero=True,
+                )
+            # The model is asked for exactly 1 card here but is trusted for
+            # taste, never for constraints (CLAUDE.md) -- a batch call can
+            # still return more than one despite `count=1`. Every item in
+            # this result is stamped `is_hero=True` (langchain_impl.py), so
+            # letting extras through would mint more than one hero for this
+            # subtopic-tier, violating the one-hero invariant. Keep only the
+            # first; the rest are dropped, not persisted anywhere.
+            hero_items = hero_result.items[:1]
+            if len(hero_result.items) > 1:
+                logger.warning(
+                    "subtopic '%s' [%s]: hero call returned %d cards for a count=1 "
+                    "request -- keeping only the first, dropping %d extra(s)",
+                    tier["title"], difficulty.value, len(hero_result.items),
+                    len(hero_result.items) - 1,
+                )
+            logger.info(
+                "subtopic '%s' [%s]: hero card -- %d card(s), %d generator failure(s)",
+                tier["title"], difficulty.value, len(hero_items), len(hero_result.failures),
+            )
+            failures.extend(hero_result.failures)
+            drafts.extend(hero_items)
+            existing_titles.extend(
+                _existing_title_tag(d.canonical_title, d.title, d.difficulty)
+                for d in hero_items
+            )
+
         # +1 round of slack: a batch that comes back short of `count` (partial
         # failure, ADR-0005) shouldn't need a perfectly-sized final call to
         # still reach target.
@@ -970,7 +1070,19 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         )
         lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
 
-    return {"card_results": results}
+    # Gate+persist THIS group's results right now (ADR-0026) rather than
+    # handing them to a later global writer -- see this function's docstring.
+    generated_at = datetime.now(UTC).isoformat()
+    item_reports = await _gate_and_persist_results(
+        runtime,
+        topic_name=job["topic_name"],
+        topic_description=job["topic_description"],
+        results=results,
+        generated_at=generated_at,
+        backend=runtime.settings.generator,
+        threshold=runtime.settings.card_duplicate_threshold,
+    )
+    return {"item_reports": item_reports}
 
 
 # ------------------------------------------------------- persist cards + questions --
@@ -1388,6 +1500,7 @@ async def _process_gate_item(
             body=draft.body,
             visual_id=draft.visual_id,
             visual_slots=draft.visual_slots,
+            is_hero=draft.is_hero,
             content_embedding=embedding,
             gen_meta={
                 "backend": backend,
@@ -1565,74 +1678,79 @@ async def _process_gate_item(
     }
 
 
-async def gate_and_persist(  # type: ignore[no-untyped-def]
-    state: PipelineState, config
-) -> dict[str, object]:
-    """The only writer node. Runs the two-pass quality gate (ADR-0030) --
-    structural check, then pass 1 correction, then near-duplicate detection,
-    then pass 2 verification -- persisting every draft as exactly one of an
-    ACTIVE `Card` or a `RejectedCard` row, then generates and persists
-    questions FROM the accepted cards -- a topic isn't done (ADR-0026) until
-    both exist.
+async def _gate_and_persist_results(
+    runtime: _Runtime,
+    *,
+    topic_name: str,
+    topic_description: str,
+    results: list[SubtopicCardsResult],
+    generated_at: str,
+    backend: str,
+    threshold: float,
+) -> list[dict[str, object]]:
+    """The actual gate+persist work (ADR-0030's two-pass quality gate --
+    structural check, pass 1 correction, near-duplicate detection, pass 2
+    verification -- persisting every draft as exactly one of an ACTIVE
+    `Card` or a `RejectedCard` row, then questions FROM the cards just
+    accepted). Called from `generate_subtopic_cards`, once per subtopic
+    GROUP, immediately after that group finishes drafting -- NOT from a
+    later global writer node, so cards go live in the feed (ADR-0026) as
+    soon as their own group is done rather than waiting on every other
+    group/topic in the run. Still the only function containing this logic --
+    "one writer" (ADR-0026/0030) describes this function's exclusivity, not
+    how many times or when it's called.
 
-    Every subtopic-tier runs `_process_gate_item` -- its whole gate, start to
-    finish -- concurrently with every other tier, instead of four global
-    correct-everything / dedup-everything / verify-everything / persist-
-    everything barriers. See that function's docstring for why: a crash
-    partway through a large batch should only cost the tiers still in
-    flight, not every tier's already-spent LLM calls sitting uncommitted
-    behind the slowest one.
+    Every subtopic-tier in `results` (all belonging to one group, so at most
+    three -- one per difficulty) runs `_process_gate_item` concurrently with
+    its siblings, instead of four global correct-everything / dedup-
+    everything / verify-everything / persist-everything barriers. See that
+    function's docstring for why: a crash partway through a large batch
+    should only cost the tiers still in flight, not every tier's already-
+    spent LLM calls sitting uncommitted behind the slowest one.
     """
 
-    runtime = _runtime(config)
-    generated_at = datetime.now(UTC).isoformat()
-    backend = runtime.settings.generator
-    threshold = runtime.settings.card_duplicate_threshold
-
-    by_topic: dict[str, list[SubtopicCardsResult]] = {}
-    for result in state.get("card_results", []):
-        by_topic.setdefault(result["topic_id"], []).append(result)
-
-    # ---- assemble one _GateItem per subtopic-tier, structural gate first --
     items: list[_GateItem] = []
-    for plan in state.get("topic_plans", []):
-        for result in by_topic.get(plan["topic_id"], []):
-            survivors: list[CardDraft] = []
-            structural_rejects: list[tuple[CardDraft, str]] = []
-            for draft in result["drafts"]:
-                ok, reason = passes_minimal_gate(draft)
-                if ok:
-                    survivors.append(draft)
-                else:
-                    structural_rejects.append((draft, reason or "failed structural gate"))
+    for result in results:
+        survivors: list[CardDraft] = []
+        structural_rejects: list[tuple[CardDraft, str]] = []
+        for draft in result["drafts"]:
+            ok, reason = passes_minimal_gate(draft)
+            if ok:
+                survivors.append(draft)
+            else:
+                structural_rejects.append((draft, reason or "failed structural gate"))
 
-            examples = (
-                get_difficulty_examples() if result["is_standalone"] else _NO_DIFFICULTY_EXAMPLES
+        examples = (
+            get_difficulty_examples() if result["is_standalone"] else _NO_DIFFICULTY_EXAMPLES
+        )
+        items.append(
+            _GateItem(
+                topic_id=result["topic_id"],
+                subtopic_id=result["subtopic_id"],
+                difficulty=result["difficulty"],
+                topic_name=topic_name,
+                topic_description=topic_description,
+                difficulty_examples=examples,
+                survivors=survivors,
+                structural_rejects=structural_rejects,
+                generator_failure_count=len(result["generator_failures"]),
+                existing_cards_missing_questions=result["cards_missing_questions"],
+                existing_question_stems=result["existing_question_stems"],
             )
-            items.append(
-                _GateItem(
-                    topic_id=result["topic_id"],
-                    subtopic_id=result["subtopic_id"],
-                    difficulty=result["difficulty"],
-                    topic_name=plan["topic_name"],
-                    topic_description=plan["topic_description"],
-                    difficulty_examples=examples,
-                    survivors=survivors,
-                    structural_rejects=structural_rejects,
-                    generator_failure_count=len(result["generator_failures"]),
-                    existing_cards_missing_questions=result["cards_missing_questions"],
-                    existing_question_stems=result["existing_question_stems"],
-                )
-            )
+        )
 
     total_drafts = sum(len(item.survivors) + len(item.structural_rejects) for item in items)
     total_structural_rejects = sum(len(item.structural_rejects) for item in items)
     logger.info(
-        "gate: %d draft(s) across %d subtopic-tier(s) -- %d failed the structural check",
-        total_drafts, len(items), total_structural_rejects,
+        "gate: topic '%s' -- %d draft(s) across %d subtopic-tier(s) -- %d failed the "
+        "structural check",
+        topic_name, total_drafts, len(items), total_structural_rejects,
     )
 
-    item_reports = (
+    if not items:
+        return []
+
+    return list(
         await asyncio.gather(
             *(
                 _process_gate_item(
@@ -1641,14 +1759,29 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 for item in items
             )
         )
-        if items
-        else []
     )
+
+
+async def gate_and_persist(  # type: ignore[no-untyped-def]
+    state: PipelineState, config
+) -> dict[str, object]:
+    """Final, lightweight step: every group's cards/questions are ALREADY
+    persisted by the time this runs (`generate_subtopic_cards` does that
+    itself now, via `_gate_and_persist_results`, per ADR-0026 -- see its
+    docstring). This node only aggregates `item_reports` into the run's final
+    per-topic report and marks each topic's `GenerationJob.progress` done.
+    Still a fan-in (every group/topic branch merges here) -- that's correct
+    for THIS purpose, since the final report and "done" marking genuinely do
+    need everything finished, unlike the card/question writes themselves.
+    """
+
+    runtime = _runtime(config)
+    item_reports = state.get("item_reports", [])
 
     reports_by_topic: dict[str, list[dict[str, object]]] = {}
     totals_by_topic: dict[str, tuple[int, int, int, int, int]] = {}
     for report in item_reports:
-        topic_id = report["topic_id"]
+        topic_id = cast(str, report["topic_id"])
         reports_by_topic.setdefault(topic_id, []).append(
             {
                 "subtopic_id": report["subtopic_id"],
@@ -1662,11 +1795,11 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
             totals_by_topic.get(topic_id, (0, 0, 0, 0, 0))
         )
         totals_by_topic[topic_id] = (
-            prev_accepted + report["accepted"],
-            prev_rejected + report["rejected"],
-            prev_failed + report["failed"],
-            prev_q_accepted + report["questions_accepted"],
-            prev_q_rejected + report["questions_rejected"],
+            prev_accepted + cast(int, report["accepted"]),
+            prev_rejected + cast(int, report["rejected"]),
+            prev_failed + cast(int, report["failed"]),
+            prev_q_accepted + cast(int, report["questions_accepted"]),
+            prev_q_rejected + cast(int, report["questions_rejected"]),
         )
 
     topic_reports: list[dict[str, object]] = []
@@ -1753,7 +1886,7 @@ async def run_generation_pipeline(
     initial_state: PipelineState = {
         "topic_ids": [str(topic_id) for topic_id in topic_ids],
         "topic_plans": [],
-        "card_results": [],
+        "item_reports": [],
     }
     final_state = await graph.ainvoke(initial_state, config={"configurable": {"runtime": runtime}})
     report: dict[str, object] = final_state["report"]

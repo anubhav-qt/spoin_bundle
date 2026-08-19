@@ -11,6 +11,10 @@
   [ADR-0024](0024-langgraph-for-card-generation-pipeline.md) (the graph gains a questions
   node and an ordering dependency between difficulty tiers; cross-topic concurrency and
   per-job failure isolation move to the worker, not the graph)
+- **Fixed by:** [ADR-0041](0041-per-group-gate-and-persist.md) -- this ADR's own Decision
+  section already says cards should persist as soon as their subtopic/tier's batch
+  completes, but the actual graph wiring implemented a global fan-in barrier instead. ADR-
+  0041 closes that gap; nothing else in this ADR changes.
 
 ## Context
 

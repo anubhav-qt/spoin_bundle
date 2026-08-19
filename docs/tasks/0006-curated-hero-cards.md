@@ -1,5 +1,9 @@
 # Task 0006: A real curated `is_hero` flag
 
+**Done -- 2026-08-20.** See [ADR-0042](../adr/0042-freeform-ascii-and-real-hero-mechanism.md):
+a dedicated per-subtopic-tier generation call, not a human/LLM curation step over
+already-generated cards as sketched below. Left unedited below for the original reasoning.
+
 **Owner:** unassigned
 
 ## The problem

@@ -55,12 +55,31 @@ class CardDraft(BaseModel):
     #: What the model was ASKED for. The gate re-rates this independently, because
     #: a self-reported difficulty just echoes the request and validates nothing.
     difficulty: Difficulty
-    #: Selected from the ASCII scene catalog, never drawn (ADR-0021). None until the
-    #: catalog exists — `langchain_impl.py`'s prompt has nothing to select from yet,
-    #: so this stays unset there too. Present now so the schema and CardDraft shape
-    #: don't change again once the catalog lands (no regeneration needed to backfill).
+    #: TESTING BRANCH (non-ascii-library-generation-testing): ADR-0021 chose a
+    #: curated scene library over free-form generation because models were
+    #: unreliable at ASCII art and the quality gate has no detector for "does
+    #: this look like anything" — but the library was never actually authored,
+    #: so `visual_id`/`visual_slots` have sat unused since. This branch tests
+    #: ADR-0021's own "revisit when" condition (model ASCII-art quality may
+    #: have changed) by having the generator draw directly instead of
+    #: selecting from a catalog. Reusing these two field names/DB columns
+    #: rather than adding new ones — `visual_id` now holds a short model-given
+    #: label (doubles as archetype-derivation input, same as before) and
+    #: `visual_slots` holds {"art": <the ascii block>, "alt": <alt text>}
+    #: instead of {slot_name: text}. If this experiment doesn't pan out,
+    #: reverting this branch's diff is enough; nothing outside `generate_cards`
+    #: and this docstring needs to change back.
     visual_id: str | None = None
     visual_slots: dict[str, str] | None = None
+    #: True for at most one card per subtopic-tier (task 0006 / ADR-0018's
+    #: real hero mechanism, replacing the fixture seeder's "first card
+    #: listed" placeholder) -- "the one thing to remember about this
+    #: subtopic," rendered larger and never collapsed. NEVER self-reported:
+    #: set entirely by which `generate_cards` call produced this draft
+    #: (`want_hero=True` or not), the same "derived, never requested"
+    #: posture as `archetype` (ADR-0017) -- trusting the model to say "yes
+    #: I'm the hero" would just echo back whatever the prompt implied.
+    is_hero: bool = False
 
 
 class SubtopicTierDraft(BaseModel):
@@ -360,6 +379,7 @@ class ContentGenerator(ABC):
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
+        want_hero: bool = False,
     ) -> BatchResult[CardDraft]:
         """`existing_titles` is every card already in this subtopic **across all
         difficulties, tagged with their level**. Cross-difficulty inclusion is
@@ -403,6 +423,14 @@ class ContentGenerator(ABC):
         group) run concurrently. Tiers within the SAME linked group run
         sequentially, lowest first, so `builds_on` is available by the time a
         higher tier's call happens.
+
+        `want_hero`: the caller (`generate_subtopic_cards`, exactly once per
+        subtopic-tier, before its normal rounds) is asking for this
+        subtopic-tier's ONE hero card instead of an ordinary one -- a
+        different framing entirely (see `CardDraft.is_hero`), not a flag on
+        an otherwise-normal batch. Callers making this call use `count=1`;
+        implementations should ignore/reject a hero call with `count != 1`
+        rather than returning several drafts all claiming to be THE hero.
         """
 
     @abstractmethod

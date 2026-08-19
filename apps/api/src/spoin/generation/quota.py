@@ -116,6 +116,16 @@ class QuotaGovernor:
     _rpm_windows: dict[tuple[int, str], deque[float]] = field(
         default_factory=lambda: defaultdict(deque), init=False, repr=False
     )
+    #: (key_index, model) -> a lock serializing the actual network calls on
+    #: that ONE cell. `acquire()` grants a cell and returns immediately, so
+    #: concurrent tasks routed to the same cell would otherwise all fire their
+    #: HTTP calls at once -- a burst the provider's own limiter can reject even
+    #: though our sliding window shows room over the full 60s. Cell locks make
+    #: same-cell calls queue and wait for the previous one to finish before the
+    #: next fires; different cells (independent quota) still run concurrently.
+    _cell_locks: dict[tuple[int, str], asyncio.Lock] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         if self.key_count < 1:
@@ -219,6 +229,19 @@ class QuotaGovernor:
         raise QuotaExhaustedError(
             f"All {self.key_count} key(s) x {len(self.ladder)} model(s) exhausted for {day.date()}"
         )
+
+    def cell_lock(self, key_index: int, model: str) -> asyncio.Lock:
+        """Returns the lock for this `(key, model)` cell, creating it on first
+        use. Callers hold this around the actual network call (NOT around
+        `acquire()`, which has its own lock) so same-cell calls queue one at a
+        time while different cells stay concurrent."""
+
+        cell = (key_index, model)
+        lock = self._cell_locks.get(cell)
+        if lock is None:
+            lock = asyncio.Lock()
+            self._cell_locks[cell] = lock
+        return lock
 
     def _rpm_has_room(self, key_index: int, rung: LadderRung) -> bool:
         window = self._rpm_windows[(key_index, rung.model)]

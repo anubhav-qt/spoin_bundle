@@ -1,6 +1,11 @@
 # ADR-0021: ASCII art from a curated scene library, not from the generator
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0042](0042-freeform-ascii-and-real-hero-mechanism.md) --
+  the catalog this ADR depends on was never authored, so this decision's premise went
+  untested for the entire time it was nominally in effect. ADR-0042 has the generator
+  draw art directly instead, with the width/degradation guarantees below re-enforced
+  server-side against freehand output rather than a catalog. Kept here, not edited, per
+  this repo's "don't edit history" rule.
 - **Amends:** [ADR-0017](0017-card-archetypes.md) (adds `ascii` to the archetype set)
 - **Date:** 2026-08-16
 - **Deciders:** Anubhav

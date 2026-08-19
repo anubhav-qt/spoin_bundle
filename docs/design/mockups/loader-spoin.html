@@ -1,0 +1,230 @@
+<title>Spoin — Wordmark Loader</title>
+<style>
+:root {
+  --bg: #EDF0EA; --bg-2: #E2E7DE; --bg-3: #D6DDD1;
+  --fg: #262A22; --fg-2: #565F51; --fg-3: #838C7D;
+  --accent: #C1442B; --accent-2: #A83A24;
+  --line: rgba(38, 42, 34, 0.14); --line-strong: rgba(38, 42, 34, 0.26);
+  --shadow: rgba(38, 42, 34, 0.18);
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+}
+body[data-palette="copper"] {
+  --bg: #0B1613; --bg-2: #10201B; --bg-3: #162B23;
+  --fg: #E7EDE7; --fg-2: #A9B8AE; --fg-3: #6D8078;
+  --accent: #E2985F; --accent-2: #C97A4A;
+  --line: rgba(231, 237, 231, 0.12); --line-strong: rgba(231, 237, 231, 0.22);
+  --shadow: rgba(0, 0, 0, 0.45);
+}
+body[data-palette="cyanotype"] {
+  --bg: #E8F0F7; --bg-2: #DCE8F2; --bg-3: #CDDFEC;
+  --fg: #1E3448; --fg-2: #4C6478; --fg-3: #7891A3;
+  --accent: #3F7EA3; --accent-2: #2F6486;
+  --line: rgba(30, 52, 72, 0.12); --line-strong: rgba(30, 52, 72, 0.24);
+  --shadow: rgba(30, 52, 72, 0.16);
+}
+body[data-palette="phosphor"] {
+  --bg: #0B0B0C; --bg-2: #141415; --bg-3: #1E1E1F;
+  --fg: #E6E6E7; --fg-2: #A3A3A5; --fg-3: #6C6C6F;
+  --accent: #F4F4F5; --accent-2: #D4D4D6;
+  --line: rgba(230, 230, 231, 0.12); --line-strong: rgba(230, 230, 231, 0.24);
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+body[data-palette="scope"] {
+  --bg: #0D1116; --bg-2: #141B22; --bg-3: #1C2730;
+  --fg: #E3ECF2; --fg-2: #98ADBB; --fg-3: #5E7180;
+  --accent: #38C6D9; --accent-2: #E8A33D;
+  --line: rgba(227, 236, 242, 0.12); --line-strong: rgba(227, 236, 242, 0.22);
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); margin: 0; padding: 40px 20px 96px;
+  font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.mono { font-family: var(--font-mono); }
+
+.intro { max-width: 640px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.intro h1 { font-size: 1.7rem; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
+.intro p { color: var(--fg-2); font-size: 0.94rem; line-height: 1.55; margin: 0; }
+
+.tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; flex-wrap: wrap; justify-content: center; }
+.tab { font-family: var(--font-mono); font-size: 0.72rem; padding: 7px 12px; border-radius: 7px; border: none; background: transparent; color: var(--fg-2); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.tab .dot { width: 7px; height: 7px; border-radius: 50%; }
+.tab[aria-selected="true"] { background: var(--bg); color: var(--accent); }
+
+/* ============================================================
+   THE LOADER
+
+   'o' is a completely separate, static element -- it never gets
+   a transform, so it can't drift even if the rotation math or a
+   font substitution is slightly off. "sp" and "in" live in their
+   own layer (`.orbit`) that spins around a pivot sitting exactly
+   on the static o's measured center (computed at runtime, not
+   guessed from font metrics -- see the script below).
+
+   Speed + motion blur: real optical motion blur doesn't exist in
+   a compositor -- every frame is an instantaneous snapshot. The
+   illusion here is the classic trick of stacking several copies
+   of the same spinning layer, each phase-shifted slightly behind
+   the current one via a small positive `animation-delay` (a
+   positive delay on an infinitely-repeating animation shifts its
+   whole timeline later, so at any instant it's showing where the
+   main copy WAS a few dozen ms ago). Fading opacity + a touch more
+   blur on each older copy turns that into a directional trailing
+   smear instead of a stutter. All copies share one @keyframes, so
+   the trail always matches the live motion exactly, at any speed.
+
+   The pattern itself (2 spins right, 3 left, 3 right, 2 left) is
+   unchanged in shape from the first pass, just compressed to a 2s
+   loop instead of 9s -- fast enough that the blur trail is doing
+   real work. `rotate()` interpolates as a signed number between
+   keyframes, so 720deg -> -360deg genuinely spins backward through
+   1080deg rather than snapping, and the cycle ends at 0deg exactly
+   where it began, so the infinite loop has no seam.
+   ============================================================ */
+
+.loader { display: inline-block; overflow: visible; }
+
+.orbit {
+  transform-box: view-box;
+  animation: spoin-spin-fast 2s infinite;
+  animation-delay: var(--trail-delay, 0ms);
+}
+.orbit-echo { filter: blur(var(--trail-blur, 0.5px)); }
+
+@keyframes spoin-spin-fast {
+  0%   { transform: rotate(0deg);    animation-timing-function: cubic-bezier(.3,.15,.7,.85); }
+  20%  { transform: rotate(720deg);  animation-timing-function: cubic-bezier(.3,.15,.7,.85); }
+  50%  { transform: rotate(1800deg); animation-timing-function: cubic-bezier(.3,.15,.7,.85); }
+  80%  { transform: rotate(2880deg); animation-timing-function: cubic-bezier(.3,.15,.7,.85); }
+  100% { transform: rotate(3600deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Freeze on a held tilt with the trail hidden, rather than no motion at all
+     -- still reads as "loading," just without the spin some users have asked
+     platforms to suppress. */
+  .orbit { animation: none; transform: rotate(8deg); }
+  .orbit-echo { opacity: 0 !important; }
+}
+
+/* ---------------- staging ---------------- */
+.stage { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 36px 28px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; }
+.stage-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-3); }
+
+.inline-demo { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; }
+.fake-button {
+  font-family: var(--font-mono); font-size: 13px; padding: 9px 18px; border-radius: 8px;
+  background: var(--accent); color: var(--bg); border: none; display: inline-flex; align-items: center; gap: 8px;
+}
+
+.pattern-note { display: flex; gap: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); flex-wrap: wrap; justify-content: center; max-width: 420px; }
+.pattern-note b { color: var(--fg-2); }
+.seg { padding: 2px 7px; border-radius: 999px; background: var(--bg-3); }
+.seg[data-dir="r"] { color: var(--accent); }
+.seg[data-dir="l"] { color: var(--fg-2); }
+</style>
+
+<div class="intro">
+  <div class="eyebrow">Spoin — wordmark loader</div>
+  <h1>o holds still. Everything else is a blur.</h1>
+  <p>The <b>o</b> never moves — it's a separate static glyph. "sp" and "in" spin
+  around it on their own fast layer, with four fading, phase-shifted trailing
+  copies behind it to fake a real motion-blur smear. One 2s loop: 2 spins right,
+  3 left, 3 right, 2 left, then it repeats with no seam.</p>
+</div>
+
+<div class="tabs" role="tablist" aria-label="Palette" id="tabs"></div>
+
+<div class="pattern-note">
+  <span class="seg" data-dir="r">2 spins →</span>
+  <span class="seg" data-dir="r">3 spins →</span>
+  <span class="seg" data-dir="r">3 spins →</span>
+  <span class="seg" data-dir="r">2 spins →</span>
+  <span class="seg">↻ repeat, 2s/cycle</span>
+</div>
+
+<div class="stage">
+  <span class="stage-label">Full-page / blocking state</span>
+  <svg class="loader" width="216" height="56" viewBox="0 0 216 56" role="img" aria-label="Loading">
+    <defs>
+      <g id="orbit-letters-big">
+        <text x="0" y="41" font-family="ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace" font-size="40" font-weight="700" letter-spacing="-0.01em"><tspan fill="var(--fg)">sp</tspan><tspan fill="transparent" font-family="Verdana, 'DejaVu Sans', sans-serif">o</tspan><tspan fill="var(--fg)">in</tspan></text>
+      </g>
+    </defs>
+    <use href="#orbit-letters-big" class="orbit orbit-echo" style="opacity:.10; --trail-delay:120ms; --trail-blur:1.4px" />
+    <use href="#orbit-letters-big" class="orbit orbit-echo" style="opacity:.16; --trail-delay:90ms;  --trail-blur:1.1px" />
+    <use href="#orbit-letters-big" class="orbit orbit-echo" style="opacity:.26; --trail-delay:60ms;  --trail-blur:0.8px" />
+    <use href="#orbit-letters-big" class="orbit orbit-echo" style="opacity:.42; --trail-delay:30ms;  --trail-blur:0.5px" />
+    <use href="#orbit-letters-big" class="orbit orbit-main" />
+    <text x="0" y="41" font-family="ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace" font-size="40" font-weight="700" letter-spacing="-0.01em"><tspan fill="transparent">sp</tspan><tspan id="o-hub-big" fill="var(--accent)" font-family="Verdana, 'DejaVu Sans', sans-serif">o</tspan><tspan fill="transparent">in</tspan></text>
+  </svg>
+</div>
+
+<div class="inline-demo">
+  <span class="fake-button">
+    Generating
+    <svg class="loader" width="54" height="14" viewBox="0 0 216 56" role="img" aria-label="Loading">
+      <defs>
+        <g id="orbit-letters-small">
+          <text x="0" y="41" font-family="ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace" font-size="40" font-weight="700" letter-spacing="-0.01em"><tspan fill="currentColor">sp</tspan><tspan fill="transparent" font-family="Verdana, 'DejaVu Sans', sans-serif">o</tspan><tspan fill="currentColor">in</tspan></text>
+        </g>
+      </defs>
+      <use href="#orbit-letters-small" class="orbit orbit-echo" style="opacity:.10; --trail-delay:120ms; --trail-blur:1.4px" />
+      <use href="#orbit-letters-small" class="orbit orbit-echo" style="opacity:.16; --trail-delay:90ms;  --trail-blur:1.1px" />
+      <use href="#orbit-letters-small" class="orbit orbit-echo" style="opacity:.26; --trail-delay:60ms;  --trail-blur:0.8px" />
+      <use href="#orbit-letters-small" class="orbit orbit-echo" style="opacity:.42; --trail-delay:30ms;  --trail-blur:0.5px" />
+      <use href="#orbit-letters-small" class="orbit orbit-main" />
+      <text x="0" y="41" font-family="ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace" font-size="40" font-weight="700" letter-spacing="-0.01em"><tspan fill="transparent">sp</tspan><tspan id="o-hub-small" fill="var(--bg)" fill-opacity="0.55" font-family="Verdana, 'DejaVu Sans', sans-serif">o</tspan><tspan fill="transparent">in</tspan></text>
+    </svg>
+  </span>
+  <span class="stage-label">inline, next to a button label</span>
+</div>
+
+<script>
+const PALETTES = [
+  { key: "notebook", name: "Notebook", dot: "#C1442B" },
+  { key: "copper", name: "Copper Board", dot: "#E2985F" },
+  { key: "cyanotype", name: "Skylight", dot: "#3F7EA3" },
+  { key: "phosphor", name: "Obsidian", dot: "#F4F4F5" },
+  { key: "scope", name: "Oscilloscope", dot: "#38C6D9" },
+];
+
+const tabsEl = document.getElementById("tabs");
+PALETTES.forEach((p, i) => {
+  const btn = document.createElement("button");
+  btn.className = "tab";
+  btn.setAttribute("role", "tab");
+  btn.setAttribute("aria-selected", i === 0 ? "true" : "false");
+  btn.innerHTML = `<span class="dot" style="background:${p.dot}"></span>${p.name}`;
+  btn.addEventListener("click", () => selectPalette(p.key));
+  tabsEl.appendChild(btn);
+});
+
+function selectPalette(key) {
+  document.body.setAttribute("data-palette", key === "notebook" ? "" : key);
+  [...tabsEl.children].forEach((btn, i) => btn.setAttribute("aria-selected", PALETTES[i].key === key ? "true" : "false"));
+}
+selectPalette("notebook");
+
+// Pivot every rotating layer on the true center of the STATIC 'o' -- measured
+// at runtime rather than assumed from font-metrics math, since monospace
+// glyph advance varies slightly across the ui-monospace fallback stack. Both
+// svg instances share the same viewBox (0 0 216 56), so the center is
+// identical in viewBox units regardless of the instance's rendered px size --
+// one measurement, applied to every `.orbit` layer on the page.
+function pivotAllOrbits(hubId) {
+  const hub = document.getElementById(hubId);
+  const box = hub.getBBox();
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+  document.querySelectorAll(".orbit").forEach((el) => {
+    el.style.transformOrigin = `${cx}px ${cy}px`;
+  });
+}
+window.addEventListener("load", () => pivotAllOrbits("o-hub-big"));
+</script>

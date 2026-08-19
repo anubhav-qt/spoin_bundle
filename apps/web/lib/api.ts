@@ -37,6 +37,15 @@ export interface Card {
   /** At most one true per subtopic (ADR-0017) — the client renders this card
    *  never-collapsed with anchor styling; it does not decide for itself. */
   is_hero: boolean;
+  /** ASCII scene reference (ADR-0021), or a model-given label for freehand
+   *  art on the free-form generation testing branch. Null for most cards.
+   *  Renders at the TOP of the card, above the title, and as the entire
+   *  collapsed/preview face when present — see `visual_slots`. */
+  visual_id: string | null;
+  /** {"art": <raw ascii, newline-separated>, "alt": <one sentence>}, or null
+   *  together with `visual_id`. Never markdown — rendered in a dedicated
+   *  monospace box, not through the body's Markdown parser. */
+  visual_slots: Record<string, string> | null;
   created_at: string;
   /** This user's private note on this card, or null if they never wrote one. */
   note: string | null;

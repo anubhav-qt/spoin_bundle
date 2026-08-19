@@ -49,6 +49,8 @@ async def list_notes(session: SessionDep, user_id: UserDep) -> list[NoteWithCard
                 body=row.card.body,
                 archetype=row.card.archetype,
                 is_hero=row.card.is_hero,
+                visual_id=row.card.visual_id,
+                visual_slots=row.card.visual_slots,
                 created_at=row.card.created_at,
                 note=row.body,
             ),

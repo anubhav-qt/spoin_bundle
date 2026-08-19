@@ -146,11 +146,15 @@ class FakeContentGenerator(ContentGenerator):
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
+        want_hero: bool = False,
     ) -> BatchResult[CardDraft]:
         builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
         items = [
             CardDraft(
-                title=f"{subtopic_title} — note {n + 1}"[:120],
+                title=(
+                    f"{subtopic_title} — the big idea" if want_hero
+                    else f"{subtopic_title} — note {n + 1}"
+                )[:120],
                 canonical_title=f"{subtopic_title}: note {n + 1}"[:160],
                 summary=f"A placeholder hook for {subtopic_title} at {difficulty.value} level.",
                 body=(
@@ -159,6 +163,7 @@ class FakeContentGenerator(ContentGenerator):
                     f"{_FAKE_ANGLES[n % len(_FAKE_ANGLES)]}.{builds_on_note}\n"
                 ),
                 difficulty=difficulty,
+                is_hero=want_hero,
             )
             for n in range(count)
         ]

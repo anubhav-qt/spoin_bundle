@@ -62,9 +62,9 @@ useful than the decision itself.
 | [0023](0023-reader-font-selection.md) | Five selectable reader fonts, with the monospace face locked | Accepted |
 | [0024](0024-langgraph-for-card-generation-pipeline.md) | LangGraph for the card-generation pipeline, worker stays the scheduler | Accepted (amends 0002) |
 | [0025](0025-batched-llm-topic-matching.md) | Batched LLM topic matching, no thresholds | Accepted |
-| [0026](0026-one-shot-generation-to-completion.md) | One-shot generation to completion, amends 0006 | Accepted (amends 0006) |
+| [0026](0026-one-shot-generation-to-completion.md) | One-shot generation to completion, amends 0006 | Accepted (amends 0006; fixed by 0041) |
 | [0027](0027-self-selected-entry-tier.md) | Self-selected entry tier; the placement quiz gate is dropped | Accepted (amends 0009; amended by 0032) |
-| [0028](0028-key-model-quota-ladder.md) | Per-key-per-model quota grid, with a two-pool model fallback ladder | Accepted (resolves part of 0008; amended by 0029) |
+| [0028](0028-key-model-quota-ladder.md) | Per-key-per-model quota grid, with a two-pool model fallback ladder | Accepted (resolves part of 0008; amended by 0029, 0030, 0040) |
 | [0029](0029-questions-join-generator-pool.md) | Question generation moves to the generator (formerly "cards") pool | Accepted (amends 0009, 0028) |
 | [0030](0030-two-pass-quality-gate.md) | Two-pass, self-correcting quality gate | Accepted (amends 0008, 0028) |
 | [0031](0031-verification-feedback-and-per-tier-gate-durability.md) | Verification rejection feedback, and a per-tier durable gate | Accepted (amends 0030) |
@@ -76,3 +76,5 @@ useful than the decision itself.
 | [0037](0037-site-wide-font-picker.md) | Implement ADR-0023's font picker, site-wide, with live-preview/revert | Accepted |
 | [0038](0038-restore-inline-discover-box.md) | Restore the inline Discover box below "Your topics" | Accepted (partially supersedes 0036) |
 | [0039](0039-remove-swipe-to-dismiss.md) | Remove swipe-to-dismiss; cards are not draggable | Accepted (partially supersedes 0017) |
+| [0040](0040-per-cell-call-serialization.md) | Serialize actual network calls per (key, model) cell | Accepted (amends 0028) |
+| [0041](0041-per-group-gate-and-persist.md) | Gate+persist per subtopic group, not after a global fan-in | Accepted (fixes 0026) |

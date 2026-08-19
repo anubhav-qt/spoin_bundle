@@ -1,6 +1,11 @@
 # ADR-0018: Real hero mechanism, teaser refinements, block-expand modal
 
 - **Status:** Accepted
+- **Amended by:** [ADR-0042](0042-freeform-ascii-and-real-hero-mechanism.md) -- the real
+  `is_hero`-setting mechanism this ADR deferred to task 0006 (see "`card.is_hero` replaces
+  the 'first card in station' heuristic" below) is now built: a dedicated generation-time
+  call, not a curation step. The fixture seeder's placeholder, described below, is
+  unaffected for fixture-seeded data.
 - **Date:** 2026-08-16
 - **Deciders:** Anubhav
 

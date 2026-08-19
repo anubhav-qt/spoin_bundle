@@ -57,7 +57,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import UTC, datetime
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from google.genai.errors import ClientError, ServerError
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -126,6 +126,14 @@ class _WireCard(_LenientWireModel):
     canonical_title: str = ""
     summary: str = ""
     body: str = ""
+    #: Testing branch (non-ascii-library-generation-testing, see base.py's
+    #: `CardDraft` docstring) — free-form ASCII art instead of a catalog
+    #: `visual_id`. Empty string (not None — `_LenientWireModel` only coerces
+    #: null for plain `str` fields) means the model chose not to draw one for
+    #: this card, which is expected and fine most of the time.
+    ascii_label: str = ""
+    ascii_art: str = ""
+    ascii_alt: str = ""
 
 
 class _WireCardBatch(BaseModel):
@@ -249,10 +257,42 @@ Description: {description}
 Design the full curriculum for this topic now.
 """
 
-_CARDS_SYSTEM = """\
-You write flashcard-style learning content for a learning app, at a single \
-requested difficulty, for one subtopic at a time.
+#: Shared verbatim between the normal and hero card prompts (below) — the
+#: guidance itself doesn't change based on which card is being written, only
+#: how often a card of that kind should reach for it.
+_ASCII_INSTRUCTIONS = """\
+Sometimes — not every card, only when a concept genuinely lends itself to it —
+you may ALSO draw a small ASCII scene that shows the idea rather than just
+describing it: a weird stickman gag, one or two panels, something silly but
+informative — it should actually dramatize the concept, not just decorate the
+card. Canonical example (weight classes in wrestling): panel one shows two
+stick figures facing off, panel two shows the heavy one sitting on the light
+one, who says "shouldn't have done this". That is the bar for charm —
+recognizable, funny, and it actually shows the concept rather than being
+decoration.
 
+A card's ASCII scene, if it has one, renders FIRST — above the title and
+everything else, as the card's visual identity — with the rest of the card's
+content (title, summary, body) following underneath it. When this card
+appears collapsed/previewed in the feed, the scene itself IS the preview
+(instead of the usual text teaser), so the art needs to work as a
+stand-alone thumbnail, not just as an illustration inside a longer read.
+
+If you draw one, set:
+- ascii_label: a short slug for it (e.g. "sit-on-guy"), never empty if art is present.
+- ascii_art: the raw art itself, newline-separated. HARD LIMIT: every line at
+  most 40 characters — a phone renders roughly 38-42 monospace columns, and
+  art that wraps is destroyed, not degraded. Count characters before you
+  commit to a line. If you cannot make the scene work in 40 columns, do not
+  draw it at all rather than drawing it badly.
+- ascii_alt: one plain sentence describing the scene, for a screen reader.
+
+Leave all three empty (ascii_label, ascii_art, ascii_alt) for any card where
+no scene genuinely fits — a joke format on every card is not a joke format,
+it is a layout. Most cards should have none.
+"""
+
+_CARD_FIELDS_BLOCK = """\
 Each card needs:
 - title: the display title. Playful/punchy is welcome here SOMETIMES, not always.
 - canonical_title: the literal, descriptive name of the concept — NEVER playful. \
@@ -268,7 +308,17 @@ Each card needs:
   material, a compact arrow-chain diagram for request-flow/process-order material, \
   a "wrong way / right way" (X/checkmark) pair for misconception-correction \
   material. Plain prose is fine when nothing else fits better — don't force a \
-  shape that doesn't belong.
+  shape that doesn't belong.\
+"""
+
+_CARDS_SYSTEM = (
+    """\
+You write flashcard-style learning content for a learning app, at a single \
+requested difficulty, for one subtopic at a time.
+
+"""
+    + _CARD_FIELDS_BLOCK
+    + """
 
 CRITICAL: never repeat a title (canonical or display) from the "already covered" \
 list below — write about something genuinely different within this subtopic. The \
@@ -286,7 +336,48 @@ a factual error, drifting off-topic. Fix THAT, don't just reword the same card.
 If cards from a LOWER difficulty tier of this same subtopic are shown below \
 ("builds on"), these new cards should genuinely build on them — assume the \
 reader already knows that material, and go deeper rather than re-explaining it.
+
 """
+    + _ASCII_INSTRUCTIONS
+)
+
+#: A dedicated call, always `count=1` (see `ContentGenerator.generate_cards`'s
+#: `want_hero` docstring) — issued once per subtopic-tier, before its normal
+#: rounds. Deliberately a SEPARATE prompt rather than a flag inside the normal
+#: one: the normal prompt (above) must stay exactly as it already reads for
+#: every other card, per the same "derived, never requested" posture as
+#: `CardDraft.is_hero` itself — a card should never be told "you might be the
+#: hero", only ever told definitively that it is or isn't.
+_HERO_CARDS_SYSTEM = (
+    """\
+You write flashcard-style learning content for a learning app. This particular \
+call is for ONE specific card: the HERO card for a subtopic — the single card \
+that anchors it in the feed. A hero card renders larger, with distinct styling, \
+and is never collapsed the way ordinary cards are — it is the first thing a \
+learner sees for this subtopic, and often the only card they remember from it.
+
+Write the ONE thing about this subtopic most worth remembering above \
+everything else in it — not necessarily the first concept chronologically, \
+not a survey of the whole subtopic, but its single most important or most \
+interesting idea, treated with real depth.
+
+"""
+    + _CARD_FIELDS_BLOCK
+    + """
+
+If any cards are shown below as already existing in this subtopic, do not \
+repeat their content or title — this hero card still needs to be genuinely \
+new material, just the most important piece of it.
+
+"""
+    + _ASCII_INSTRUCTIONS
+    + """
+A hero card is exactly the kind of card an ASCII scene suits best — it is \
+the one card in the subtopic guaranteed to be seen, and art here earns its \
+keep more than almost anywhere else. Still entirely optional, still only \
+when a scene genuinely fits — a forced or mediocre scene is worse than none.
+"""
+)
 
 _CARDS_USER = """\
 Topic: {topic_name}
@@ -548,6 +639,31 @@ def _format_builds_on(builds_on: list[str]) -> str:
     return f"\nBuilds on (lower-difficulty cards already written for this subtopic):\n{bodies}\n"
 
 
+#: Testing branch (non-ascii-library-generation-testing) — same width budget
+#: ADR-0021's scene library enforced at catalog-load time (a phone renders
+#: roughly 38-42 monospace columns), now checked against the model's own
+#: freehand output instead of hand-authored scenes.
+_ASCII_MAX_WIDTH = 40
+
+
+def _ascii_visual_fields(wire_card: _WireCard) -> tuple[str | None, dict[str, str] | None]:
+    """Mirrors ADR-0021's deterministic rule 1: the model is trusted for taste
+    (whether to draw, what to draw), never for the width constraint — a line
+    over budget drops the visual and keeps the card, it never rejects the
+    card or truncates/wraps the art."""
+
+    if not wire_card.ascii_art.strip():
+        return None, None
+    if any(len(line) > _ASCII_MAX_WIDTH for line in wire_card.ascii_art.split("\n")):
+        logger.info(
+            "generate_cards: dropping ascii art %r -- a line exceeds the %d-column budget",
+            wire_card.ascii_label or "(unlabeled)", _ASCII_MAX_WIDTH,
+        )
+        return None, None
+    label = wire_card.ascii_label.strip() or "untitled-scene"
+    return label, {"art": wire_card.ascii_art, "alt": wire_card.ascii_alt}
+
+
 def _format_free_text_grade_query(query: FreeTextGradeQuery) -> str:
     # The <student_answer> delimiter is the load-bearing part of the prompt
     # injection defence (see _FREE_TEXT_GRADE_SYSTEM) — everything the user
@@ -635,7 +751,7 @@ class GeminiContentGenerator(ContentGenerator):
         *,
         key_index: int,
         model: str,
-    ):
+    ) -> Any:
         """A 503 (`ServerError`, status `UNAVAILABLE`) means the model itself is
         overloaded -- Google's own docs describe this as "usually temporary."
         It has nothing to do with OUR quota, so unlike a real 429 it does not
@@ -691,9 +807,10 @@ class GeminiContentGenerator(ContentGenerator):
             client = self._client(key_index, model)
             structured = client.with_structured_output(schema)
             try:
-                result = await self._invoke_with_backoff(
-                    structured, prompt, key_index=key_index, model=model
-                )
+                async with pool.cell_lock(key_index, model):
+                    result = await self._invoke_with_backoff(
+                        structured, prompt, key_index=key_index, model=model
+                    )
             except (ClientError, ChatGoogleGenerativeAIError) as exc:
                 # The new `google-genai` SDK (langchain-google-genai>=4.0) has no
                 # dedicated ResourceExhausted class -- every 4xx is a ClientError,
@@ -860,9 +977,10 @@ class GeminiContentGenerator(ContentGenerator):
         difficulty_examples: dict[Difficulty, list[str]],
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
+        want_hero: bool = False,
     ) -> BatchResult[CardDraft]:
         prompt = [
-            ("system", _CARDS_SYSTEM),
+            ("system", _HERO_CARDS_SYSTEM if want_hero else _CARDS_SYSTEM),
             (
                 "human",
                 _CARDS_USER.format(
@@ -888,6 +1006,7 @@ class GeminiContentGenerator(ContentGenerator):
         failures: list[str] = []
         for wire_card in wire_result.cards:
             try:
+                visual_id, visual_slots = _ascii_visual_fields(wire_card)
                 items.append(
                     CardDraft(
                         title=wire_card.title,
@@ -898,6 +1017,13 @@ class GeminiContentGenerator(ContentGenerator):
                         summary=wire_card.summary,
                         body=wire_card.body,
                         difficulty=difficulty,
+                        visual_id=visual_id,
+                        visual_slots=visual_slots,
+                        # NEVER read from the wire model, same reasoning as
+                        # `difficulty` above -- is_hero is entirely a fact
+                        # about which call this is, not something the model
+                        # gets a vote on.
+                        is_hero=want_hero,
                     )
                 )
             except ValidationError as exc:

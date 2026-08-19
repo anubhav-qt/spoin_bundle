@@ -71,27 +71,33 @@ resolve_and_plan_topic
   | Send fan-out, one branch per subtopic GROUP (not per tier -- see below)
   v
 generate_subtopic_cards
-  - no DB access (concurrent across groups AND topics)
+  - concurrent across groups AND topics
   - tiers WITHIN one group run sequentially, lowest difficulty first: a
     linked higher tier's generate_cards() call receives the lower tier's
     actual card BODIES as `builds_on` context, so it can genuinely build on
     them rather than just avoid repeating titles. Groups with one tier (the
     common case) are unaffected -- nothing to sequence.
-  |
-  | fan-in (every branch's results merge, across every topic in the run)
-  v
-gate_and_persist
-  - the ONLY writer node. Runs the two-pass quality gate (ADR-0030): a
-    structural check (generation/gate.py), pass 1 correction and pass 2
-    verification (both thinking-pool LLM calls, concurrent across
-    subtopic-tiers), and near-duplicate detection (local embeddings,
+  - gates+persists its OWN group's cards and questions itself, right here,
+    before returning (ADR-0041) -- runs the two-pass quality gate (ADR-0030):
+    a structural check (generation/gate.py), pass 1 correction and pass 2
+    verification (both thinking-pool LLM calls, concurrent across this
+    group's subtopic-tiers), and near-duplicate detection (local embeddings,
     sequential, between the two passes) -- every draft becomes exactly one of
     an active `Card` or a `rejected_card` row. Accepted cards get embedded,
-    archetype-derived, and bootstrap `CardStats` -- same as before.
-  - THEN: concurrently (asyncio.gather, same semaphore as every other
-    generator call) generates questions FROM the cards just persisted, per
-    subtopic/difficulty, and persists those too (Question rows). A topic's
-    report isn't "done" until both cards and questions exist.
+    archetype-derived, and bootstrap `CardStats`. THEN generates questions
+    FROM the cards just persisted, per subtopic/difficulty, and persists
+    those too (Question rows) -- all before this branch returns, so a card
+    goes live in the feed as soon as ITS OWN group is done, not held back for
+    every other group/topic in the run.
+  |
+  | fan-in (every branch's item_reports merge, across every topic in the run)
+  v
+gate_and_persist
+  - everything is ALREADY persisted by this point. Final, lightweight step:
+    aggregates every group's item_reports into the run's per-topic report,
+    and marks each topic's GenerationJob done. Fan-in is correct HERE (unlike
+    for the actual writes) since the final report and "done" flag genuinely
+    do need every group finished.
 ```
 
 Every real generator call (curriculum, topic matching, card generation, question
@@ -174,9 +180,12 @@ run. `QuotaExhaustedError` is caught specifically at the worker's job boundary a
 the job as `pending` rather than `failed` (safe because the pipeline is idempotent per
 topic, ADR-0026). Wired end to end and unit-tested (`tests/test_quota_governor.py`,
 `tests/test_worker.py`'s requeue test). Each key's connectivity and each ladder model id
-is now live-confirmed (see above) -- what's still unverified is the grid's actual rotation
-behavior under real exhaustion (a genuine `QuotaExhaustedError` from real quota running
-out has never been triggered end to end, only simulated in tests).
+is now live-confirmed (see above), and the grid's rotation under real exhaustion has now
+been triggered end to end for real (not just simulated) -- which is also how
+[ADR-0040](../adr/0040-per-cell-call-serialization.md) got found: `acquire()` granting a
+cell and returning before the actual call fires let concurrent tasks burst a single cell
+past its real RPM, producing 429s the local ledger didn't expect. Fixed by serializing
+same-cell calls; see that ADR for the full story.
 
 ## What's missing
 
@@ -187,11 +196,11 @@ out has never been triggered end to end, only simulated in tests).
   admin-triggered path either.
 - **The quality gate is built** (ADR-0030, content-model.md's "Quality gate" section):
   structural check, pass 1 correction, near-duplicate detection, pass 2 verification, all
-  wired into `gate_and_persist`. `card_duplicate_threshold` (0.9) remains an explicit,
-  uncalibrated placeholder -- see content-model.md's open questions -- and the hand-curated
+  wired into `generate_subtopic_cards`'s per-group gate call (`_gate_and_persist_results`,
+  [ADR-0041](../adr/0041-per-group-gate-and-persist.md) -- persistence moved off the old
+  global `gate_and_persist` fan-in, which now only aggregates the final report and marks
+  topics done). `card_duplicate_threshold` (0.9) remains an explicit, uncalibrated
+  placeholder -- see content-model.md's open questions -- and the hand-curated
   `difficulty_examples` catalog is unauthored (docs/tasks/0011), so standalone
   subtopic-tiers currently get no calibration examples in practice.
-- **The ASCII scene catalog** (ADR-0021). `CardDraft.visual_id`/`visual_slots` exist in
-  the schema and the interface, but there's no catalog for a generator to select from, so
-  nothing populates them in practice yet.
 - **Live Gemini verification, and the model-choice question itself.** See above.

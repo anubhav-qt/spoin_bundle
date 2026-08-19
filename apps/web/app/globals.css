@@ -906,6 +906,32 @@ body {
   color: var(--fg-2);
 }
 
+/* ASCII scene (ADR-0021 / free-form generation testing branch) — always the
+   first thing in the card, ahead of `.card-head`. Bleeds to the card's own
+   edges (negative margin matching `.card`'s own padding) so it reads as the
+   card's visual identity rather than an inset illustration. Deliberately no
+   `max-height`/`overflow-y` here: while collapsed this box stands in for the
+   whole preview (see `AsciiArt` in Card.tsx), so it must render at its real
+   height, not get cropped to fit a "normal" collapsed card's size. */
+.card-ascii {
+  margin: -14px -15px 10px;
+  padding: 16px 15px;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+
+.card-ascii pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.4;
+  white-space: pre;
+  color: var(--fg-2);
+  text-align: center;
+}
+
 .card-head {
   display: flex;
   align-items: center;

@@ -81,6 +81,18 @@ class CardOut(BaseModel):
     #: never-collapsed with anchor styling — it does not decide for itself
     #: which card that is.
     is_hero: bool
+    #: ASCII scene reference (ADR-0021) or, on the free-form generation
+    #: testing branch, a model-given label for art the generator drew itself
+    #: (see `CardDraft.is_hero`'s sibling docstring in generation/base.py).
+    #: Null for the great majority of cards — art is the exception, not the
+    #: rule. The client renders this at the TOP of the card, before title and
+    #: everything else, and as the entire collapsed/preview face when present
+    #: (in place of the usual text teaser).
+    visual_id: str | None = None
+    #: {"art": <raw ascii>, "alt": <one-sentence alt text>}, or null together
+    #: with `visual_id`. Never markdown, never inside `body` — a dedicated
+    #: monospace box the renderer owns (ADR-0021).
+    visual_slots: dict[str, str] | None = None
     created_at: datetime
     #: This user's private `CardNote.body`, or null if they never wrote one.
     #: Populated by a second query keyed on the feed page's card_ids — never

@@ -376,6 +376,12 @@ export function Card({
   };
 
   const archetype = getPrimaryArchetype(card.archetype);
+  // ASCII scene (ADR-0021, or a model-drawn one on the free-form generation
+  // testing branch — see lib/api.ts). Renders above everything else, and
+  // while collapsed it stands in for the usual teaser/summary entirely —
+  // the scene IS the preview, not an addition to it.
+  const asciiArt = card.visual_id !== null ? card.visual_slots?.art : undefined;
+  const hasAsciiArt = asciiArt !== undefined && asciiArt.trim() !== "";
 
   return (
     <motion.div
@@ -396,37 +402,48 @@ export function Card({
           aria-expanded={expanded}
           style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as CSSProperties) : undefined}
         >
-          <div className="card-head">
-            {/* Always this user's own name for the topic (ADR-0004). */}
-            <span className="card-topic">{topicName}</span>
-            <span className="difficulty" aria-label={card.difficulty}>
-              {[1, 2, 3].map((step) => (
-                <i key={step} data-on={step <= DIFFICULTY_RANK[card.difficulty]} />
-              ))}
-            </span>
-            {seen ? <span className="card-read">· Read</span> : null}
-            {isHero ? <span className="hero-badge">Hero</span> : null}
-            {expanded && !isHero ? (
-              <button
-                type="button"
-                className="card-close"
-                aria-label="Collapse card"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  collapse();
-                }}
-              >
-                <CloseIcon />
-              </button>
-            ) : null}
-          </div>
+          {hasAsciiArt ? <AsciiArt art={asciiArt!} alt={card.visual_slots?.alt} /> : null}
 
-          <h2 className="card-title">{card.title}</h2>
+          {/* An ascii-art card's collapsed face is the scene alone (above) —
+              head, title, and the usual teaser/summary wait for expansion,
+              same "the scene IS the preview" reasoning as `hasAsciiArt`'s
+              comment. Every other card shows these unconditionally, as
+              before. */}
+          {!hasAsciiArt || expanded ? (
+            <>
+              <div className="card-head">
+                {/* Always this user's own name for the topic (ADR-0004). */}
+                <span className="card-topic">{topicName}</span>
+                <span className="difficulty" aria-label={card.difficulty}>
+                  {[1, 2, 3].map((step) => (
+                    <i key={step} data-on={step <= DIFFICULTY_RANK[card.difficulty]} />
+                  ))}
+                </span>
+                {seen ? <span className="card-read">· Read</span> : null}
+                {isHero ? <span className="hero-badge">Hero</span> : null}
+                {expanded && !isHero ? (
+                  <button
+                    type="button"
+                    className="card-close"
+                    aria-label="Collapse card"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      collapse();
+                    }}
+                  >
+                    <CloseIcon />
+                  </button>
+                ) : null}
+              </div>
 
-          {archetype === "default" ? (
-            <p className="card-summary">{card.summary}</p>
-          ) : !expanded ? (
-            <ArchetypeTeaser archetype={archetype} body={card.body} />
+              <h2 className="card-title">{card.title}</h2>
+
+              {hasAsciiArt ? null : archetype === "default" ? (
+                <p className="card-summary">{card.summary}</p>
+              ) : !expanded ? (
+                <ArchetypeTeaser archetype={archetype} body={card.body} />
+              ) : null}
+            </>
           ) : null}
 
           {/* `inert` while collapsed. Clipping to zero height hides the body
@@ -636,6 +653,20 @@ function comparisonTags(body: string): { bad: string; good: string } | null {
   const good = extractComparisonTag("✅", body);
   if (bad === null || good === null) return null;
   return { bad, good };
+}
+
+/** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art —
+ *  see `Card.tsx`'s `hasAsciiArt`). Deliberately no `max-height`/`overflow`
+ *  clamp here, unlike `.card-body`'s scroll cap when expanded — while
+ *  collapsed this box IS the entire preview, so it renders at whatever
+ *  height the scene actually needs rather than being cropped to a "normal"
+ *  card's size. */
+function AsciiArt({ art, alt }: { art: string; alt: string | undefined }) {
+  return (
+    <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
+      <pre>{art}</pre>
+    </div>
+  );
 }
 
 function ArchetypeTeaser({ archetype, body }: { archetype: ArchetypeTag | "combo"; body: string }) {

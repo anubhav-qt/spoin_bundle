@@ -15,6 +15,11 @@
   `judge_difficulty` entry is replaced by two calls, `correct_cards` and `verify_cards`.
   Still the same pool, same "always the strongest available model" rule, and this ADR's
   grid/ladder mechanism is otherwise unaffected -- only the shape of that one call changed.
+- **Amended by:** [ADR-0040](0040-per-cell-call-serialization.md) -- closes the gap this
+  ADR's own "Harder" section and "Revisit when" flagged: `acquire()` grants a cell and
+  returns before the actual call fires, so concurrent tasks could burst a single cell past
+  its real RPM and trigger false 429s. `QuotaGovernor` now also serializes same-cell calls;
+  the grid/ladder/RPD-RPM-split mechanics described below are otherwise unchanged.
 
 ## Context
 

@@ -1,7 +1,7 @@
 """add subtopic card_type_quotas
 
 Revision ID: 7c8d9e0f1a2b
-Revises: 15a1fcbd511d
+Revises: 7b3d9c4e1a08
 Create Date: 2026-08-20 00:00:00.000000
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects.postgresql import JSONB
 
 revision: str = '7c8d9e0f1a2b'
-down_revision: str | None = '15a1fcbd511d'
+down_revision: str | None = '7b3d9c4e1a08'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

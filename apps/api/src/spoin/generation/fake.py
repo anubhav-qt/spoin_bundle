@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import hashlib
 
-from spoin.domain.enums import Difficulty
+from spoin.domain.enums import CardType, Difficulty
 from spoin.generation.base import (
     BatchResult,
     CardCorrectionQuery,
@@ -72,6 +72,7 @@ class FakeContentGenerator(ContentGenerator):
         #: -- ADR-0030's pass 2 CAN reject, and the happy path (accept
         #: everything) shouldn't be the only path a test ever exercises.
         self._reject_one = reject_one_per_verify_batch
+        self._card_counter = 0
 
     async def generate_curriculum(
         self,
@@ -87,6 +88,13 @@ class FakeContentGenerator(ContentGenerator):
                         difficulty=difficulty,
                         description=f"Placeholder curriculum slot {n + 1} for {topic_name}.",
                         target_cards=10,
+                        card_type_quotas={
+                            "prose": 2,
+                            "code": 2,
+                            "diagram": 2,
+                            "comparison": 2,
+                            "ascii": 2,
+                        },
                     )
                     for difficulty in Difficulty
                 ],
@@ -147,26 +155,60 @@ class FakeContentGenerator(ContentGenerator):
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
         want_hero: bool = False,
+        card_type: CardType | str | None = None,
     ) -> BatchResult[CardDraft]:
         builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
-        items = [
-            CardDraft(
-                title=(
-                    f"{subtopic_title} — the big idea" if want_hero
-                    else f"{subtopic_title} — note {n + 1}"
-                )[:120],
-                canonical_title=f"{subtopic_title}: note {n + 1}"[:160],
-                summary=f"A placeholder hook for {subtopic_title} at {difficulty.value} level.",
-                body=(
-                    f"# {subtopic_title}\n\n"
-                    f"Card {n + 1} on **{topic_name}** ({difficulty.value}): "
-                    f"{_FAKE_ANGLES[n % len(_FAKE_ANGLES)]}.{builds_on_note}\n"
-                ),
-                difficulty=difficulty,
-                is_hero=want_hero,
+
+        items: list[CardDraft] = []
+        for _ in range(count):
+            self._card_counter += 1
+            idx = self._card_counter
+            extra_body = ""
+            visual_id = None
+            visual_slots = None
+
+            if card_type in (CardType.ASCII, "ascii") or want_hero:
+                visual_id = f"fake-stickman-scene-{idx}"
+                visual_slots = {
+                    "art": f"  o   \"Check this #{idx}!\"\n /|\\\n / \\",
+                    "alt": f"Stick figure explaining scenario {idx}",
+                }
+            elif card_type in (CardType.COMPARISON, "comparison"):
+                extra_body = (
+                    f"\n\n❌ **Common Myth #{idx}**: Misconception {idx} about this topic.\n"
+                    f"✅ **True Fact #{idx}**: Verified behavior for {idx}.\n"
+                )
+            elif card_type in (CardType.CODE, "code"):
+                extra_body = (
+                    f"\n\n```python\ndef handle_operation_{idx}():\n"
+                    f"    return 'result_{idx}'\n```\n"
+                )
+            elif card_type in (CardType.DIAGRAM, "diagram"):
+                extra_body = (
+                    f"\n\n```diagram\n[Source_{idx}] --> [Process_{idx}] --> [Sink_{idx}]\n```\n"
+                )
+
+            angle = _FAKE_ANGLES[(idx - 1) % len(_FAKE_ANGLES)]
+            items.append(
+                CardDraft(
+                    title=(
+                        f"{subtopic_title} — the big idea" if want_hero
+                        else f"{subtopic_title} — note {idx}"
+                    )[:120],
+                    canonical_title=f"{subtopic_title}: note {idx}"[:160],
+                    summary=f"A placeholder hook for {subtopic_title} at {difficulty.value} level.",
+                    body=(
+                        f"# {subtopic_title}\n\n"
+                        f"Card {idx} on **{topic_name}** ({difficulty.value}): "
+                        f"{angle}.{builds_on_note}{extra_body}\n"
+                    ),
+                    difficulty=difficulty,
+                    visual_id=visual_id,
+                    visual_slots=visual_slots,
+                    is_hero=want_hero,
+                )
             )
-            for n in range(count)
-        ]
+
         failures = []
         if self._fail_one and items:
             items.pop()
@@ -262,10 +304,7 @@ class FakeContentGenerator(ContentGenerator):
         results = []
         for item in items:
             answer = item.user_answer.strip()
-            if not answer:
-                level = 0
-            else:
-                level = 1 + _stable_index(item.stem, answer, modulo=3)
+            level = 0 if not answer else 1 + _stable_index(item.stem, answer, modulo=3)
             results.append(
                 FreeTextGradeResult(
                     index=item.index,

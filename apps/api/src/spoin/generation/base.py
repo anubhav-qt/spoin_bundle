@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel, Field, model_validator
 
-from spoin.domain.enums import Difficulty
+from spoin.domain.enums import CardType, Difficulty
 
 
 class CardDraft(BaseModel):
@@ -88,6 +88,8 @@ class SubtopicTierDraft(BaseModel):
     difficulty: Difficulty
     description: str
     target_cards: int = Field(ge=5, le=25)
+    #: Predetermined capacity / quota for each card type (prose, code, diagram, comparison, ascii).
+    card_type_quotas: dict[str, int] = Field(default_factory=dict)
 
 
 class SubtopicGroupDraft(BaseModel):
@@ -245,7 +247,7 @@ class QuestionDraft(BaseModel):
     explanation: str = ""
 
     @model_validator(mode="after")
-    def _check_kind_fields(self) -> "QuestionDraft":
+    def _check_kind_fields(self) -> QuestionDraft:
         """Mirrors `ck_question_kind_fields_present` (the DB check constraint
         on `question`) so a malformed item is caught HERE -- turned into a
         `BatchResult.failures` entry, same as any other per-item validation
@@ -380,6 +382,7 @@ class ContentGenerator(ABC):
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
         want_hero: bool = False,
+        card_type: CardType | str | None = None,
     ) -> BatchResult[CardDraft]:
         """`existing_titles` is every card already in this subtopic **across all
         difficulties, tagged with their level**. Cross-difficulty inclusion is

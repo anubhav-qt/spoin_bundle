@@ -28,6 +28,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -247,6 +248,9 @@ class Subtopic(Base, UUIDPrimaryKey, CreatedAt):
     #: A curriculum-authoring hint. Cards are standalone and unordered by design,
     #: so this may prove dead weight — see content-model.md's open questions.
     position: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    #: Predetermined capacity / quotas for each card type (prose, code, diagram, comparison, ascii)
+    card_type_quotas: Mapped[dict[str, int] | None] = mapped_column(JSONB, nullable=True)
 
     topic: Mapped[Topic] = relationship(back_populates="subtopics")
     cards: Mapped[list[Card]] = relationship(back_populates="subtopic")

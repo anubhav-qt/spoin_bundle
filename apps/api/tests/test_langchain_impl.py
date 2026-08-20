@@ -618,3 +618,59 @@ async def test_match_topics_batches_every_query_in_one_call() -> None:
     assert "Sourdough Baking" in prompt_text
     # One call for the whole batch, not one per query (ADR-0025).
     assert len(captured_prompt) == 1
+
+
+@pytest.mark.parametrize(
+    ("card_type", "expected_phrase"),
+    [
+        ("ascii", "STICKMAN characters (using stickman is a MUST, not optional)"),
+        ("comparison", "MYTH VS FACT / COMPARISON"),
+        ("code", "CODE / COMMAND / CONFIGURATION"),
+        ("diagram", "DIAGRAM / PROCESS FLOW"),
+        ("prose", "CONCEPTUAL PROSE & MENTAL MODELS"),
+    ],
+)
+async def test_generate_cards_prompt_selection_by_card_type(
+    card_type: str, expected_phrase: str
+) -> None:
+    generator = _generator()
+    wire = _WireCardBatch(
+        cards=[
+            _WireCard(
+                title="T",
+                canonical_title="CT",
+                summary="S",
+                body="B",
+                ascii_label="stickman" if card_type == "ascii" else "",
+                ascii_art="  o\n /|\\\n / \\" if card_type == "ascii" else "",
+                ascii_alt="Stickman" if card_type == "ascii" else "",
+            )
+        ]
+    )
+    captured_prompt: list[object] = []
+
+    async def _capture(prompt: object) -> _WireCardBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_cards(
+            topic_name="Databases",
+            subtopic_title="Indexing",
+            subtopic_description="B-trees vs Hash indexes",
+            difficulty=Difficulty.INTERMEDIATE,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
+            rejection_feedback=[],
+            card_type=card_type,
+        )
+
+    assert len(result.items) == 1
+    system_prompt = str(captured_prompt[0])
+    assert expected_phrase in system_prompt
+

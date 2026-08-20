@@ -131,3 +131,14 @@ class GenerationBackend(StrEnum):
     GEMINI = "gemini"
     LOCAL = "local"
     FIXTURE = "fixture"
+
+
+class CardType(StrEnum):
+    """Predetermined archetype / format for card generation."""
+
+    PROSE = "prose"
+    CODE = "code"
+    DIAGRAM = "diagram"
+    COMPARISON = "comparison"
+    ASCII = "ascii"
+

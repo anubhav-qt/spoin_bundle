@@ -326,3 +326,42 @@ async def test_rejected_duplicate_body_feeds_forward_into_next_run(
 
     calls_after = generator.avoid_bodies_seen[calls_before:]
     assert any(rejected_body in seen for seen in calls_after)
+
+
+async def test_subtopic_card_type_quotas_and_diverse_archetypes(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """Predetermined quotas in curriculum ensure cards with ASCII art, comparison,
+    code, diagram, and prose are generated and persisted."""
+    report = await _plan_and_generate(session, settings, "Operating Systems")
+    (topic_report,) = report["topics"]
+    topic_id = uuid.UUID(topic_report["topic_id"])  # type: ignore[arg-type]
+
+    subtopics = (
+        await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id))
+    ).scalars().all()
+    assert len(subtopics) > 0
+    for subtopic in subtopics:
+        assert subtopic.card_type_quotas is not None
+        assert "ascii" in subtopic.card_type_quotas
+        assert "code" in subtopic.card_type_quotas
+        assert "comparison" in subtopic.card_type_quotas
+        assert "diagram" in subtopic.card_type_quotas
+        assert "prose" in subtopic.card_type_quotas
+        assert sum(subtopic.card_type_quotas.values()) == subtopic.target_cards
+
+    cards = (
+        await session.execute(select(Card).where(Card.topic_id == topic_id))
+    ).scalars().all()
+    assert len(cards) > 0
+
+    has_ascii = any(card.visual_id is not None for card in cards)
+    has_code = any("code" in card.archetype for card in cards)
+    has_comparison = any("comparison" in card.archetype for card in cards)
+    has_diagram = any("diagram" in card.archetype for card in cards)
+
+    assert has_ascii, "Expected generated cards to include ASCII art cards"
+    assert has_code, "Expected generated cards to include code cards"
+    assert has_comparison, "Expected generated cards to include comparison cards"
+    assert has_diagram, "Expected generated cards to include diagram cards"
+

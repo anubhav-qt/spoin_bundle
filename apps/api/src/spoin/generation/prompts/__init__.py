@@ -1,0 +1,67 @@
+"""Prompts and system instructions for LLM generation tasks."""
+
+from __future__ import annotations
+
+from spoin.generation.prompts.cards import (
+    ASCII_INSTRUCTIONS,
+    CARD_FIELDS_BLOCK,
+    CARDS_ASCII_SYSTEM,
+    CARDS_CODE_SYSTEM,
+    CARDS_COMMON_HEADER,
+    CARDS_COMPARISON_SYSTEM,
+    CARDS_DIAGRAM_SYSTEM,
+    CARDS_PROSE_SYSTEM,
+    CARDS_SYSTEM,
+    CARDS_USER,
+    HERO_CARDS_SYSTEM,
+)
+from spoin.generation.prompts.curriculum import (
+    CURRICULUM_SYSTEM,
+    CURRICULUM_USER,
+)
+from spoin.generation.prompts.quality import (
+    CORRECTION_SYSTEM,
+    CORRECTION_USER,
+    VERIFICATION_SYSTEM,
+    VERIFICATION_USER,
+)
+from spoin.generation.prompts.quiz import (
+    FREE_TEXT_GRADE_SYSTEM,
+    FREE_TEXT_GRADE_USER,
+    QUESTIONS_SYSTEM,
+    QUESTIONS_USER,
+)
+from spoin.generation.prompts.topics import (
+    TOPIC_BATCH_MATCH_SYSTEM,
+    TOPIC_BATCH_MATCH_USER,
+    TOPIC_NAME_VALIDATE_SYSTEM,
+    TOPIC_NAME_VALIDATE_USER,
+)
+
+__all__ = [
+    "ASCII_INSTRUCTIONS",
+    "CARDS_ASCII_SYSTEM",
+    "CARDS_CODE_SYSTEM",
+    "CARDS_COMMON_HEADER",
+    "CARDS_COMPARISON_SYSTEM",
+    "CARDS_DIAGRAM_SYSTEM",
+    "CARDS_PROSE_SYSTEM",
+    "CARDS_SYSTEM",
+    "CARDS_USER",
+    "CARD_FIELDS_BLOCK",
+    "CORRECTION_SYSTEM",
+    "CORRECTION_USER",
+    "CURRICULUM_SYSTEM",
+    "CURRICULUM_USER",
+    "FREE_TEXT_GRADE_SYSTEM",
+    "FREE_TEXT_GRADE_USER",
+    "HERO_CARDS_SYSTEM",
+    "QUESTIONS_SYSTEM",
+    "QUESTIONS_USER",
+    "TOPIC_BATCH_MATCH_SYSTEM",
+    "TOPIC_BATCH_MATCH_USER",
+    "TOPIC_NAME_VALIDATE_SYSTEM",
+    "TOPIC_NAME_VALIDATE_USER",
+    "VERIFICATION_SYSTEM",
+    "VERIFICATION_USER",
+]

@@ -100,6 +100,7 @@ from spoin.content.difficulty_examples import get_difficulty_examples
 from spoin.core.config import Settings
 from spoin.domain.enums import (
     CardStatus,
+    CardType,
     Difficulty,
     QuestionKind,
     QuestionStatus,
@@ -187,6 +188,7 @@ class SubtopicPlan(TypedDict):
     title: str
     description: str
     target_cards: int
+    card_type_quotas: dict[str, int]
     #: Pre-fetched in resolve_and_plan_topic -- see module docstring for why
     #: this can't be a DB read inside generate_subtopic_cards. Spans every
     #: sibling subtopic in the same subtopic_group_id (ADR-0007's cross-tier ask).
@@ -661,6 +663,7 @@ async def _load_subtopic_plans(
                 title=subtopic.title,
                 description=subtopic.description,
                 target_cards=subtopic.target_cards,
+                card_type_quotas=subtopic.card_type_quotas or {},
                 existing_titles=[_existing_title_tag(c, t, d) for c, t, d in existing],
                 existing_count=this_subtopic_count,
                 avoid_duplicate_bodies=list(avoid_bodies),
@@ -830,6 +833,7 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
                         subtopic.subtopic_group_id = group_id
                     subtopic.description = tier.description
                     subtopic.target_cards = tier.target_cards
+                    subtopic.card_type_quotas = tier.card_type_quotas or None
                     subtopic.min_cards = _min_cards(
                         tier.target_cards, runtime.settings.min_cards_fraction
                     )
@@ -902,6 +906,22 @@ def fan_out_topics(state: PipelineState) -> list[Send]:
 # ---------------------------------------------------------------- card generation --
 
 
+def _card_matches_type(draft: CardDraft, card_type: str) -> bool:
+    """Matches a generated draft to a predetermined card type."""
+    if card_type == CardType.ASCII.value:
+        return draft.visual_id is not None or bool(draft.visual_slots)
+    tags = classify_archetype(draft.body)
+    if card_type == CardType.CODE.value:
+        return "code" in tags
+    if card_type == CardType.DIAGRAM.value:
+        return "diagram" in tags
+    if card_type == CardType.COMPARISON.value:
+        return "comparison" in tags
+    if card_type == CardType.PROSE.value:
+        return not tags and draft.visual_id is None
+    return False
+
+
 async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> dict[str, object]:
@@ -936,6 +956,14 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     results: list[SubtopicCardsResult] = []
     lower_tier_bodies: list[str] = []
 
+    all_card_types = [
+        CardType.PROSE.value,
+        CardType.CODE.value,
+        CardType.DIAGRAM.value,
+        CardType.COMPARISON.value,
+        CardType.ASCII.value,
+    ]
+
     for tier in job["tiers"]:
         difficulty = Difficulty(tier["difficulty"])
         target = tier["target_cards"]
@@ -963,6 +991,16 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         drafts: list[CardDraft] = []
         failures: list[str] = []
         existing_titles = list(tier["existing_titles"])
+
+        # Determine target quotas for each card type in this tier
+        tier_quotas = dict(tier.get("card_type_quotas") or {})
+        if not tier_quotas or sum(tier_quotas.values()) != target:
+            base_qty = target // len(all_card_types)
+            rem = target % len(all_card_types)
+            tier_quotas = {
+                ct: base_qty + (1 if i < rem else 0)
+                for i, ct in enumerate(all_card_types)
+            }
 
         # One-time hero call (task 0006 / ADR-0018), before this tier's
         # normal rounds. Gated on `existing_count == 0` (not just `has_hero`)
@@ -1013,20 +1051,43 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 for d in hero_items
             )
 
-        # +1 round of slack: a batch that comes back short of `count` (partial
-        # failure, ADR-0005) shouldn't need a perfectly-sized final call to
-        # still reach target.
-        max_rounds = math.ceil(target / batch_size) + 1
+        # Allow enough rounds to cycle through all card types plus slack for partial batches
+        max_rounds = max(
+            len(all_card_types) * 2, math.ceil(target / batch_size) + len(all_card_types)
+        )
 
         for round_number in range(1, max_rounds + 1):
             remaining = target - len(drafts)
             if remaining <= 0:
                 break
-            request_count = min(batch_size, remaining)
+
+            # Find card types that still have remaining capacity to fill
+            unfilled_types = [
+                ct
+                for ct in all_card_types
+                if tier_quotas.get(ct, 0) > 0
+                and sum(1 for d in drafts if _card_matches_type(d, ct)) < tier_quotas[ct]
+            ]
+
+            if unfilled_types:
+                # Pick the unfilled card type with the largest remaining deficit
+                chosen_type = max(
+                    unfilled_types,
+                    key=lambda ct: tier_quotas[ct]
+                    - sum(1 for d in drafts if _card_matches_type(d, ct)),
+                )
+                unmet = tier_quotas[chosen_type] - sum(
+                    1 for d in drafts if _card_matches_type(d, chosen_type)
+                )
+                request_count = min(batch_size, remaining, max(1, unmet))
+            else:
+                chosen_type = None
+                request_count = min(batch_size, remaining)
+
             logger.info(
-                "subtopic '%s' [%s]: round %d/%d -- requesting %d card(s) (%d/%d so far)",
-                tier["title"], difficulty.value, round_number, max_rounds, request_count,
-                len(drafts), target,
+                "subtopic '%s' [%s]: round %d/%d (type=%s) -- requesting %d card(s) (%d/%d so far)",
+                tier["title"], difficulty.value, round_number, max_rounds,
+                chosen_type or "general", request_count, len(drafts), target,
             )
             async with runtime.semaphore:
                 result = await runtime.generator.generate_cards(
@@ -1042,6 +1103,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                     rejection_feedback=[
                         (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
                     ],
+                    card_type=chosen_type,
                 )
             logger.info(
                 "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
@@ -1498,6 +1560,7 @@ async def _process_gate_item(
             canonical_title=draft.canonical_title,
             summary=draft.summary,
             body=draft.body,
+            archetype=classify_archetype(draft.body),
             visual_id=draft.visual_id,
             visual_slots=draft.visual_slots,
             is_hero=draft.is_hero,
@@ -1516,7 +1579,6 @@ async def _process_gate_item(
         runtime.session.add_all(new_cards)
         await runtime.session.flush()
         for card in new_cards:
-            card.archetype = classify_archetype(card.body)
             runtime.session.add(CardStats(card_id=card.id))
         await runtime.session.flush()
         # Committed as soon as THIS tier's cards are written -- a crash
@@ -1842,7 +1904,7 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
 
 
 def _build_graph() -> CompiledStateGraph[Any, Any, Any, Any]:
-    graph = StateGraph(PipelineState)
+    graph = StateGraph(cast(type[Any], PipelineState))
     graph.add_node(
         "resolve_and_plan_topic", resolve_and_plan_topic, destinations=("generate_subtopic_cards",)
     )

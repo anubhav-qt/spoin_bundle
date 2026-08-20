@@ -193,7 +193,9 @@ class QuotaGovernor:
         day = _day_start(now)
         for rung in self.ladder:
             if rung.model in exclude_models:
-                logger.debug("quota: model %s excluded (persistently unavailable), skipping", rung.model)
+                logger.debug(
+                    "quota: model %s excluded (persistently unavailable), skipping", rung.model
+                )
                 continue
             for key_index in range(self.key_count):
                 if not self._rpm_has_room(key_index, rung):

@@ -86,11 +86,16 @@ ignore = [
 "langchain".msg = "Only src/spoin/generation/langchain_impl.py may import langchain (ADR-0002)."
 "langchain_core".msg = "Only src/spoin/generation/langchain_impl.py may import langchain (ADR-0002)."
 "langchain_google_genai".msg = "Only src/spoin/generation/langchain_impl.py may import langchain (ADR-0002)."
-"langgraph".msg = "Only src/spoin/generation/pipeline.py may import langgraph (ADR-0024)."
+"langgraph".msg = "Only generation/pipeline/graph.py and nodes.py may import langgraph (ADR-0024)."
 
 [tool.ruff.lint.per-file-ignores]
 "src/spoin/generation/langchain_impl.py" = ["TID251"]
-"src/spoin/generation/pipeline.py" = ["TID251"]
+# pipeline is a package now. Listed file by file rather than globbed: ADR-0024
+# confines langgraph, and only these two actually touch it -- graph.py builds
+# the StateGraph, nodes.py returns Send/Command. A package-wide ignore would
+# quietly let it spread to the other four.
+"src/spoin/generation/pipeline/graph.py" = ["TID251"]
+"src/spoin/generation/pipeline/nodes.py" = ["TID251"]
 # Mocks ChatGoogleGenerativeAI directly — doesn't touch the real API, and
 # tests/test_architecture.py's AST-level check only scans src/spoin, not this
 # file, so the real architectural boundary is unaffected by this exemption.

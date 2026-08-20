@@ -1,7 +1,7 @@
 /**
- * The left rail: wordmark and nav. Only "Home" and "Notes" and "Liked" are
- * real — the rest are stubs (rendered, `aria-disabled`, no click handler)
- * until those surfaces exist. "Explore" moved out in favor of the right
+ * The left rail: wordmark and nav. Everything except "Deep Dive" is real
+ * now; that one stays a stub (rendered, `aria-disabled`, no click handler)
+ * until the surface exists. "Explore" moved out in favor of the right
  * rail's topic discovery (ADR-0015, reworked into a modal by ADR-0036),
  * which replaces it with a real (if simple) feature rather than another stub.
  *
@@ -14,12 +14,9 @@
 import { useAuth } from "./AuthProvider";
 import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon, LogoutIcon } from "./icons";
 
-const STUBS = [
-  { label: "Deep Dive", icon: LayersIcon },
-  { label: "Settings", icon: GearIcon },
-] as const;
+const STUBS = [{ label: "Deep Dive", icon: LayersIcon }] as const;
 
-export type ShellView = "feed" | "notes" | "liked" | "saved" | "profile";
+export type ShellView = "feed" | "notes" | "liked" | "saved" | "profile" | "settings";
 
 interface Props {
   onReset: () => void;
@@ -94,6 +91,18 @@ export function Sidebar({ onReset, view, onNavigate }: Props) {
           <UserIcon filled={view === "profile"} />
         </span>
         <span className="nav-item-label">Profile</span>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "settings" ? "page" : undefined}
+        onClick={() => onNavigate("settings")}
+      >
+        <span className="nav-item-icon">
+          <GearIcon />
+        </span>
+        <span className="nav-item-label">Settings</span>
       </button>
 
       {STUBS.map(({ label, icon: Icon }) => (

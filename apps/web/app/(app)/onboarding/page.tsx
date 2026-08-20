@@ -29,6 +29,7 @@ const CUSTOM_TOPIC_MAX_WORDS = 5;
 export default function OnboardingPage() {
   const [step, setStep] = useState<Step>("topics");
   const [topics, setTopics] = useState<TopicDiscover[] | null>(null);
+  const [topicsError, setTopicsError] = useState("");
   const [selected, setSelected] = useState<Record<string, Difficulty>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -45,12 +46,25 @@ export default function OnboardingPage() {
   // back later) is not a guest -- `is_guest` alone is the right gate here.
   const canRequestCustomTopic = user !== null && !user.is_guest;
 
-  useEffect(() => {
+  // An empty corpus and a failed request are different things and must not
+  // share one message: `spoin_db` ships blank by design (CLAUDE.md), so "no
+  // topics" is a normal state a retry cannot fix, while a 500 or a dropped
+  // connection is exactly what a retry is for. `topics` stays null on failure
+  // so only `topicsError` drives that branch.
+  const loadTopics = () => {
+    setTopics(null);
+    setTopicsError("");
     api
       .discoverTopics("popular")
       .then(setTopics)
-      .catch(() => setTopics([]));
-  }, []);
+      .catch((cause) =>
+        setTopicsError(
+          cause instanceof ApiError ? cause.message : "Couldn't load topics. Check your connection.",
+        ),
+      );
+  };
+
+  useEffect(loadTopics, []);
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -164,7 +178,15 @@ export default function OnboardingPage() {
         </div>
 
         <div className="onboarding-topics">
-          {topics === null && <p className="auth-subtitle">Loading topics...</p>}
+          {topics === null && topicsError === "" && <p className="auth-subtitle">Loading topics...</p>}
+          {topicsError !== "" && (
+            <div className="onboarding-topics-error">
+              <p className="auth-error">{topicsError}</p>
+              <button type="button" className="onboarding-back" onClick={loadTopics}>
+                Try again
+              </button>
+            </div>
+          )}
           {topics?.length === 0 && <p className="auth-subtitle">No topics available yet.</p>}
           {topics?.map((topic) => (
             <button

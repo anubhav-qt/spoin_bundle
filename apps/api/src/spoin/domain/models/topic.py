@@ -60,7 +60,36 @@ class User(Base, UUIDPrimaryKey, Timestamps):
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
     gender: Mapped[str | None] = mapped_column(String(32), nullable=True)
     avatar_icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
-    avatar_image: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    #: Deferred: without this, EVERY `session.get(User, ...)` — including
+    #: `/auth/me`, which the web client calls on every navigation — pulls up to
+    #: 5MB of image bytes off the wire to answer questions that never look at
+    #: them. The one endpoint that serves the bytes loads them explicitly with
+    #: `undefer`; `has_avatar_image` is answered by the column below instead of
+    #: by testing this one for None, so the common path never triggers a lazy
+    #: load either.
+    avatar_image: Mapped[bytes | None] = mapped_column(
+        LargeBinary, nullable=True, deferred=True
+    )
+    #: Denormalized so "does this user have a photo?" is answerable without
+    #: touching the blob. Written only alongside `avatar_image`, by
+    #: ProfileService — the two are never set independently.
+    has_avatar_image: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    #: Sniffed from the uploaded bytes at upload time (profile/images.py), not
+    #: taken from the request. The download endpoint previously answered every
+    #: avatar as `image/jpeg` regardless of what was actually stored.
+    avatar_media_type: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+    #: How many cards a day this user is aiming for. A target the profile's
+    #: activity figures are read against -- deliberately NOT an input to feed
+    #: selection, which stays governed by per-topic progression and the
+    #: server-side DIFFICULTY_MIX (ADR-0010). NOT NULL with a server default so
+    #: every existing row gets the same starting target as a new one, and no
+    #: read path has to handle a null.
+    daily_card_goal: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=10, server_default="10"
+    )
 
     topics: Mapped[list[UserTopic]] = relationship(back_populates="user")
 

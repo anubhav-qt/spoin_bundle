@@ -122,17 +122,17 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   // --------------------------------------------------------------------------
   if (rows === null && !error) {
     return (
-      <div className="liked-view">
-        <div className="liked-view-header">
-          <p className="liked-view-eyebrow">LIKED</p>
-          <p className="liked-view-subtitle">Things worth remembering.</p>
+      <div className="collection-view liked-view">
+        <div className="collection-header">
+          <p className="collection-eyebrow">LIKED</p>
+          <p className="collection-title">Things worth remembering.</p>
         </div>
         <div className="liked-view-list">
           {[1, 2, 3].map((i) => (
             <div key={i} className="liked-skeleton" aria-hidden="true">
-              <div className="liked-skeleton-meta" />
-              <div className="liked-skeleton-title" />
-              <div className="liked-skeleton-body" />
+              <div className="liked-skeleton-meta collection-skeleton-bar" />
+              <div className="liked-skeleton-title collection-skeleton-bar" />
+              <div className="liked-skeleton-body collection-skeleton-bar" />
             </div>
           ))}
         </div>
@@ -145,16 +145,16 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   // --------------------------------------------------------------------------
   if (error) {
     return (
-      <div className="liked-view">
-        <div className="liked-view-header">
-          <p className="liked-view-eyebrow">LIKED</p>
+      <div className="collection-view liked-view">
+        <div className="collection-header">
+          <p className="collection-eyebrow">LIKED</p>
         </div>
-        <div className="liked-view-error">
-          <p className="liked-view-error-head">COULDN&apos;T LOAD YOUR SHELF</p>
-          <p className="liked-view-error-body">Something went sideways.</p>
+        <div className="collection-state">
+          <p className="collection-state-head">COULDN&apos;T LOAD YOUR SHELF</p>
+          <p className="collection-state-body">Something went sideways.</p>
           <button
             type="button"
-            className="liked-view-cta"
+            className="collection-action collection-cta"
             onClick={() => void load(activeTopicId, sort)}
           >
             TRY AGAIN
@@ -169,28 +169,28 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   // --------------------------------------------------------------------------
   if (totalCards === 0 && !activeTopicId && !search) {
     return (
-      <div className="liked-view">
-        <div className="liked-view-header">
-          <p className="liked-view-eyebrow">LIKED</p>
-          <p className="liked-view-subtitle">Things worth remembering.</p>
+      <div className="collection-view liked-view">
+        <div className="collection-header">
+          <p className="collection-eyebrow">LIKED</p>
+          <p className="collection-title">Things worth remembering.</p>
         </div>
-        <div className="liked-view-empty">
-          <pre className="liked-view-empty-ascii" aria-hidden="true">{`
+        <div className="collection-state">
+          <pre className="collection-state-ascii" aria-hidden="true">{`
   ♡  ·  ·  ·  ·  ·
   ·  ·  ·  ·  ·  ·
   ·  ·  ·  ·  ·  ·`}</pre>
-          <p className="liked-view-empty-copy">Nothing here yet.</p>
-          <p className="liked-view-empty-sub">
+          <p className="collection-state-head">NOTHING LIKED YET</p>
+          <p className="collection-state-body">
             When something makes you stop scrolling<br />
             and think <em>&ldquo;I want to remember this&rdquo;</em>,<br />
             it&apos;ll live here.
           </p>
           <button
             type="button"
-            className="liked-view-cta"
+            className="collection-action collection-cta"
             onClick={onNavigateHome}
           >
-            <span className="liked-view-cta-icon"><HomeIcon /></span>
+            <span className="collection-action-icon"><HomeIcon /></span>
             EXPLORE CARDS
           </button>
         </div>
@@ -202,40 +202,38 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   // Main view
   // --------------------------------------------------------------------------
   return (
-    <div className="liked-view">
+    <div className="collection-view liked-view">
       {/* Header */}
-      <div className="liked-view-header">
-        <p className="liked-view-eyebrow">LIKED</p>
-        <p className="liked-view-subtitle">Things worth remembering.</p>
+      <div className="collection-header">
+        <p className="collection-eyebrow">LIKED</p>
+        <p className="collection-title">Things worth remembering.</p>
       </div>
 
       {/* Collection metadata */}
-      <p className="liked-view-meta">
-        {totalCards === 1 ? "1 SAVED CARD" : `${totalCards} SAVED CARDS`}
+      <p className="collection-meta">
+        {totalCards === 1 ? "1 LIKED CARD" : `${totalCards} LIKED CARDS`}
         {topicCount > 0 ? ` · ${topicCount} ${topicCount === 1 ? "TOPIC" : "TOPICS"}` : ""}
       </p>
 
-      <hr className="liked-view-divider" />
+      <hr className="collection-rule" />
 
       {/* Search + Sort controls */}
-      <div className="liked-view-controls">
-        <div className="liked-view-search-wrap">
-          <input
+      <div className="collection-controls">
+        <input
             id="liked-search"
             type="search"
-            className="liked-view-search"
+            className="collection-search"
             placeholder="Search liked cards…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search liked cards"
-          />
-        </div>
-        <div className="liked-view-sort" role="group" aria-label="Sort order">
+          aria-label="Search liked cards"
+        />
+        <div className="collection-pill-row" role="group" aria-label="Sort order">
           {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
             <button
               key={key}
               type="button"
-              className="liked-sort-pill"
+              className="collection-pill"
               data-active={sort === key}
               onClick={() => handleSort(key)}
               aria-pressed={sort === key}
@@ -248,10 +246,10 @@ export function LikedView({ topics, onNavigateHome }: Props) {
 
       {/* Topic filter pills */}
       {likedTopics.length > 1 ? (
-        <div className="liked-view-filters" role="group" aria-label="Filter by topic">
+        <div className="collection-filters" role="group" aria-label="Filter by topic">
           <button
             type="button"
-            className="liked-filter-chip"
+            className="collection-chip"
             data-selected={!activeTopicId}
             onClick={() => handleTopicFilter(undefined)}
           >
@@ -263,7 +261,7 @@ export function LikedView({ topics, onNavigateHome }: Props) {
               <button
                 key={t.id}
                 type="button"
-                className="liked-filter-chip"
+                className="collection-chip"
                 data-selected={activeTopicId === t.id}
                 onClick={() => handleTopicFilter(t.id)}
                 style={
@@ -281,7 +279,7 @@ export function LikedView({ topics, onNavigateHome }: Props) {
 
       {/* Empty state for filtered/searched result */}
       {visible.length === 0 ? (
-        <p className="liked-view-empty-filter">
+        <p className="collection-note">
           {search
             ? `No liked cards match "${search}".`
             : "No liked cards in this topic."}
@@ -318,9 +316,9 @@ export function LikedView({ topics, onNavigateHome }: Props) {
 
       {/* Heart watermark at bottom — quiet editorial touch */}
       {visible.length > 0 ? (
-        <div className="liked-view-footer" aria-hidden="true">
-          <span className="liked-view-footer-icon"><HeartIcon filled /></span>
-          <span className="liked-view-footer-label">
+        <div className="collection-footer" aria-hidden="true">
+          <span className="collection-footer-icon"><HeartIcon filled /></span>
+          <span className="collection-footer-label">
             {visible.length} {visible.length === 1 ? "card" : "cards"} liked
           </span>
         </div>

@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
@@ -16,6 +17,8 @@ from spoin.api.schemas import CardOut, FeedOut, LikedCardOut, SavedCardOut
 from spoin.domain.models import Card, CardBookmark, CardLike, Subtopic, Topic, UserTopic
 from spoin.feed.service import FeedService
 from spoin.notes.service import NotesService
+
+CollectionSort = Literal["recent", "oldest", "topic", "difficulty"]
 
 router = APIRouter(prefix="/feed", tags=["feed"])
 
@@ -91,81 +94,107 @@ async def get_feed(
     )
 
 
-@cards_router.get("/liked", response_model=list[LikedCardOut])
-async def get_liked_cards(
+#: The two collection endpoints below differ only in which join table they read
+#: from. Everything else — the joins, the four sort orders, the note lookup, the
+#: CardOut construction — was duplicated line for line (74% identical by diff,
+#: and `get_saved_cards`'s own docstring said "Mirrors get_liked_cards exactly").
+#: Two copies of a query is two places to fix the next time the card shape
+#: changes, which it has repeatedly (archetype, visual_slots, note).
+_CollectionModel = type[CardLike] | type[CardBookmark]
+
+
+async def _collection(
     session: SessionDep,
-    user_id: UserDep,
-    topic_id: UUID | None = Query(default=None, description="Filter to one topic"),
-    sort: Literal["recent", "oldest", "topic", "difficulty"] = Query(
-        default="recent", description="Sort order"
-    ),
-) -> list[LikedCardOut]:
-    """Every card this user has liked, with enough context to render inline.
+    user_id: UUID,
+    model: _CollectionModel,
+    topic_id: UUID | None,
+    sort: CollectionSort,
+) -> list[tuple[datetime, Card, str, str, str | None]]:
+    """Rows for one card collection: (collected_at, card, subtopic title, topic
+    label, note body).
 
-    Pure data retrieval — no LLM, no generation, no ranking computation.
-    Returns in the requested sort order so the client never has to re-sort a
-    large collection in JS.
+    Pure retrieval — no LLM, no generation, no ranking. Returns in the requested
+    sort order so the client never has to re-sort a large collection in JS.
 
-    Notes are included via a second query (same deliberate separation as the
-    feed endpoint — they're private state, never mixed into the card query).
+    Notes come from a second query (the same deliberate separation the feed
+    endpoint uses — they are private state, never mixed into the card query).
     """
 
     display_name = func.coalesce(UserTopic.display_name, Topic.canonical_name)
 
     stmt = (
-        select(CardLike.created_at, Card, Subtopic.title, display_name)
-        .join(Card, Card.id == CardLike.card_id)
+        select(model.created_at, Card, Subtopic.title, display_name)
+        .join(Card, Card.id == model.card_id)
         .join(Subtopic, Subtopic.id == Card.subtopic_id)
         .join(Topic, Topic.id == Card.topic_id)
         .outerjoin(
             UserTopic,
-            (UserTopic.user_id == CardLike.user_id) & (UserTopic.topic_id == Card.topic_id),
+            (UserTopic.user_id == model.user_id) & (UserTopic.topic_id == Card.topic_id),
         )
-        .where(CardLike.user_id == user_id)
+        .where(model.user_id == user_id)
     )
 
     if topic_id is not None:
         stmt = stmt.where(Card.topic_id == topic_id)
 
     if sort == "recent":
-        stmt = stmt.order_by(CardLike.created_at.desc())
+        stmt = stmt.order_by(model.created_at.desc())
     elif sort == "oldest":
-        stmt = stmt.order_by(CardLike.created_at.asc())
+        stmt = stmt.order_by(model.created_at.asc())
     elif sort == "topic":
-        stmt = stmt.order_by(display_name.asc(), CardLike.created_at.desc())
+        stmt = stmt.order_by(display_name.asc(), model.created_at.desc())
     elif sort == "difficulty":
-        stmt = stmt.order_by(Card.difficulty.asc(), CardLike.created_at.desc())
+        stmt = stmt.order_by(Card.difficulty.asc(), model.created_at.desc())
 
     rows = (await session.execute(stmt)).all()
-
     if not rows:
         return []
 
-    card_ids = [card.id for _, card, _, _ in rows]
-    notes_by_card = await NotesService(session).get_for_cards(user_id, card_ids)
+    notes_by_card = await NotesService(session).get_for_cards(
+        user_id, [card.id for _, card, _, _ in rows]
+    )
+    return [
+        (collected_at, card, subtopic_title, topic_display_name, notes_by_card.get(card.id))
+        for collected_at, card, subtopic_title, topic_display_name in rows
+    ]
 
+
+def _card_out(card: Card, subtopic_title: str, note: str | None) -> CardOut:
+    return CardOut(
+        id=card.id,
+        topic_id=card.topic_id,
+        subtopic_id=card.subtopic_id,
+        subtopic_title=subtopic_title,
+        difficulty=card.difficulty,
+        title=card.title,
+        summary=card.summary,
+        body=card.body,
+        archetype=card.archetype,
+        is_hero=card.is_hero,
+        visual_id=card.visual_id,
+        visual_slots=card.visual_slots,
+        created_at=card.created_at,
+        note=note,
+    )
+
+
+@cards_router.get("/liked", response_model=list[LikedCardOut])
+async def get_liked_cards(
+    session: SessionDep,
+    user_id: UserDep,
+    topic_id: UUID | None = Query(default=None, description="Filter to one topic"),
+    sort: CollectionSort = Query(default="recent", description="Sort order"),
+) -> list[LikedCardOut]:
+    """Every card this user has liked, with enough context to render inline."""
+
+    rows = await _collection(session, user_id, CardLike, topic_id, sort)
     return [
         LikedCardOut(
-            card=CardOut(
-                id=card.id,
-                topic_id=card.topic_id,
-                subtopic_id=card.subtopic_id,
-                subtopic_title=subtopic_title,
-                difficulty=card.difficulty,
-                title=card.title,
-                summary=card.summary,
-                body=card.body,
-                archetype=card.archetype,
-                is_hero=card.is_hero,
-                visual_id=card.visual_id,
-                visual_slots=card.visual_slots,
-                created_at=card.created_at,
-                note=notes_by_card.get(card.id),
-            ),
+            card=_card_out(card, subtopic_title, note),
             topic_name=topic_display_name,
-            liked_at=liked_at,
+            liked_at=collected_at,
         )
-        for liked_at, card, subtopic_title, topic_display_name in rows
+        for collected_at, card, subtopic_title, topic_display_name, note in rows
     ]
 
 
@@ -174,73 +203,17 @@ async def get_saved_cards(
     session: SessionDep,
     user_id: UserDep,
     topic_id: UUID | None = Query(default=None, description="Filter to one topic"),
-    sort: Literal["recent", "oldest", "topic", "difficulty"] = Query(
-        default="recent", description="Sort order"
-    ),
+    sort: CollectionSort = Query(default="recent", description="Sort order"),
 ) -> list[SavedCardOut]:
-    """Every card this user has bookmarked, with enough context to render inline.
+    """Every card this user has bookmarked. Same shape as `/cards/liked`,
+    sourced from `card_bookmark` instead of `card_like`."""
 
-    Pure data retrieval — no LLM, no generation, no ranking computation.
-    Mirrors `get_liked_cards` exactly, sourcing from `card_bookmark` instead of
-    `card_like`. Returns in the requested sort order so the client grid never
-    has to re-sort a large collection in JS.
-    """
-
-    display_name = func.coalesce(UserTopic.display_name, Topic.canonical_name)
-
-    stmt = (
-        select(CardBookmark.created_at, Card, Subtopic.title, display_name)
-        .join(Card, Card.id == CardBookmark.card_id)
-        .join(Subtopic, Subtopic.id == Card.subtopic_id)
-        .join(Topic, Topic.id == Card.topic_id)
-        .outerjoin(
-            UserTopic,
-            (UserTopic.user_id == CardBookmark.user_id)
-            & (UserTopic.topic_id == Card.topic_id),
-        )
-        .where(CardBookmark.user_id == user_id)
-    )
-
-    if topic_id is not None:
-        stmt = stmt.where(Card.topic_id == topic_id)
-
-    if sort == "recent":
-        stmt = stmt.order_by(CardBookmark.created_at.desc())
-    elif sort == "oldest":
-        stmt = stmt.order_by(CardBookmark.created_at.asc())
-    elif sort == "topic":
-        stmt = stmt.order_by(display_name.asc(), CardBookmark.created_at.desc())
-    elif sort == "difficulty":
-        stmt = stmt.order_by(Card.difficulty.asc(), CardBookmark.created_at.desc())
-
-    rows = (await session.execute(stmt)).all()
-
-    if not rows:
-        return []
-
-    card_ids = [card.id for _, card, _, _ in rows]
-    notes_by_card = await NotesService(session).get_for_cards(user_id, card_ids)
-
+    rows = await _collection(session, user_id, CardBookmark, topic_id, sort)
     return [
         SavedCardOut(
-            card=CardOut(
-                id=card.id,
-                topic_id=card.topic_id,
-                subtopic_id=card.subtopic_id,
-                subtopic_title=subtopic_title,
-                difficulty=card.difficulty,
-                title=card.title,
-                summary=card.summary,
-                body=card.body,
-                archetype=card.archetype,
-                is_hero=card.is_hero,
-                visual_id=card.visual_id,
-                visual_slots=card.visual_slots,
-                created_at=card.created_at,
-                note=notes_by_card.get(card.id),
-            ),
+            card=_card_out(card, subtopic_title, note),
             topic_name=topic_display_name,
-            saved_at=saved_at,
+            saved_at=collected_at,
         )
-        for saved_at, card, subtopic_title, topic_display_name in rows
+        for collected_at, card, subtopic_title, topic_display_name, note in rows
     ]

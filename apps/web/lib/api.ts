@@ -189,6 +189,9 @@ export interface User {
   gender?: string | null;
   avatar_icon?: string | null;
   has_avatar_image?: boolean;
+  /** Cards-per-day target. Rides on this payload rather than a separate
+   *  preferences fetch — see UserOut in api/schemas.py. */
+  daily_card_goal?: number;
 }
 
 export interface Progress {
@@ -554,6 +557,33 @@ export const api = {
     request<User>("/profile/me/avatar", {
       method: "DELETE",
     }),
+
+  /** The user's own data as JSON (Settings -> Data & Privacy). Serving-layer
+   *  read only — no generation. */
+  exportData: () => request<ProfileExport>("/profile/me/export"),
+
+  /** The avatar bytes as an object URL.
+   *
+   * `/profile/me/avatar/image` sits behind `UserDep` -> `HTTPBearer`
+   * (api/deps.py), and the access token lives in localStorage, not a cookie.
+   * A bare `<img src={...}>` therefore sends no Authorization header and the
+   * endpoint 401s -- every uploaded avatar silently failed to render. Fetching
+   * it here lets the token ride along on a real request; the caller gets a
+   * blob: URL an <img> can use, and MUST revokeObjectURL it when done.
+   *
+   * Callers are responsible for cache-busting by re-calling after an upload
+   * or delete -- deliberately not a `?t=` on the URL, which (evaluated in a
+   * render) re-fetched the image on every single re-render. */
+  avatarObjectUrl: async () => {
+    const token = localStorage.getItem("spoin_access_token");
+    const response = await fetch(`${BASE_URL}/profile/me/avatar/image`, {
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    });
+    if (!response.ok) {
+      throw new ApiError(response.status, "Could not load avatar image");
+    }
+    return URL.createObjectURL(await response.blob());
+  },
 };
 
 export interface UserProfileUpdateIn {
@@ -561,6 +591,18 @@ export interface UserProfileUpdateIn {
   age?: number | null;
   gender?: string | null;
   avatar_icon?: string | null;
+  daily_card_goal?: number | null;
+}
+
+export interface ProfileExport {
+  exported_at: string;
+  schema_version: number;
+  profile: User;
+  topics: unknown[];
+  notes: unknown[];
+  liked_cards: unknown[];
+  saved_cards: unknown[];
+  daily_activity: DailyActivityOut[];
 }
 
 export interface DailyActivityOut {

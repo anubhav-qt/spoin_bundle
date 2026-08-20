@@ -12,9 +12,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
+import { MotionConfig } from "framer-motion";
 
 import { api, type Difficulty, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { getReducedMotion, subscribeReducedMotion } from "@/lib/motionPreference";
 import type { TopicProgress } from "@/lib/types";
 import { CustomCursor } from "./CustomCursor";
 import { Feed } from "./Feed";
@@ -25,6 +27,7 @@ import { NotesView } from "./NotesView";
 import { ProfileView } from "./ProfileView";
 import { RightRail } from "./RightRail";
 import { SavedView } from "./SavedView";
+import { SettingsView } from "./SettingsView";
 import { Sidebar, type ShellView } from "./Sidebar";
 
 function toTopicProgress(p: {
@@ -45,6 +48,12 @@ function toTopicProgress(p: {
 
 export function AppShell() {
   const [topics, setTopics] = useState<Topic[]>([]);
+  // Settings' reduced-motion switch. CSS covers transitions and keyframes, but
+  // Framer Motion drives its animations through per-frame inline styles that
+  // no stylesheet rule can reach — MotionConfig is the only way in. Read after
+  // mount: the attribute is applied by a pre-hydration script, so reading it
+  // during render would disagree with the server's markup.
+  const [reducedMotion, setReducedMotionState] = useState(false);
   const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
   const [selected, setSelected] = useState<string[]>([]);
   // Session-local, not server state: which cards have been marked seen so
@@ -174,8 +183,15 @@ export function AppShell() {
     setResetCount((count) => count + 1);
   }, []);
 
+  useEffect(() => {
+    setReducedMotionState(getReducedMotion());
+    return subscribeReducedMotion(() => setReducedMotionState(getReducedMotion()));
+  }, []);
+
   return (
-    <>
+    /* "user" also honours prefers-reduced-motion on its own, so the OS setting
+       keeps working when this switch is off. */
+    <MotionConfig reducedMotion={reducedMotion ? "always" : "user"}>
       <CustomCursor />
       <GuestNotice />
       <div className="app-grid" data-focused={focusMode}>
@@ -196,6 +212,12 @@ export function AppShell() {
             <SavedView topics={topics} onNavigateHome={() => setView("feed")} />
           ) : view === "profile" ? (
             <ProfileView />
+          ) : view === "settings" ? (
+            <SettingsView
+              topics={topics}
+              onNavigateProfile={() => setView("profile")}
+              onTopicFollowed={onFollowed}
+            />
           ) : (
             <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
           )}
@@ -219,6 +241,6 @@ export function AppShell() {
           />
         )}
       </div>
-    </>
+    </MotionConfig>
   );
 }

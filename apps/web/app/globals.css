@@ -68,6 +68,11 @@
 
   --r-card: 14px;
   --r-pill: 999px;
+  /* Small squared radius for grid cells and bars -- a contribution cell or a
+     skeleton bar at --r-card reads as a pill, and both were reaching for a
+     hardcoded 4px instead. Radius is palette-independent, so unlike the
+     colours it lives only here. */
+  --r-cell: 4px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-1: 0.15s;
   --dur-2: 0.22s;
@@ -2980,6 +2985,13 @@ body.custom-cursor-active textarea {
 
 .modal-close {
   flex: 0 0 auto;
+  /* Centring was implicit before — a text "x" in a 26px box sat a shade high
+     off the default baseline. Explicit now, and it also lets the button take
+     an icon: CloseIcon is already the app's close mark in Card.tsx, while
+     these modals still pass the literal character. Both centre correctly. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -2989,6 +3001,24 @@ body.custom-cursor-active textarea {
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+
+.modal-close svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.modal-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .modal-close:hover {
@@ -3564,6 +3594,15 @@ body.custom-cursor-active textarea {
     flex-direction: column;
     max-width: none;
     padding: 0;
+    /* `align-items: start` carries over from the grid rule above, and on the
+       cross axis of a column flexbox that means shrink-to-fit rather than
+       stretch — the same class of bug the note on `.shell` describes, just in
+       the single-column fallback instead of the grid. Every view was sized to
+       its own widest child, so the shell measured 324px on Saved/Liked and
+       209px on Profile at the same viewport: three pages, three different
+       page widths, which is exactly what they must not be. `.shell`'s
+       max-width still caps the result. */
+    align-items: stretch;
   }
   .rail-left {
     display: none;
@@ -3837,6 +3876,21 @@ body.custom-cursor-active textarea {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 28px;
+}
+
+.onboarding-topics-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.onboarding-topics-error .auth-error {
+  margin-top: 0;
+}
+
+.onboarding-topics-error .onboarding-back {
+  padding: 8px 14px;
+  font-size: 13px;
 }
 
 .onboarding-difficulty-row {
@@ -4176,27 +4230,51 @@ body.custom-cursor-active textarea {
 }
 
 /* ============================================================================
-   Liked view — "my personal shelf" (per the product spec) */
+   Collection surface — the shared layer behind Liked, Saved and Profile.
 
-.liked-view {
+   These three pages are three views of one personal archive, so they share a
+   masthead, a control bar, a chip, a rule, a section title, a state block and
+   a footer. They used to share none of it: `.liked-*` and `.saved-*` were two
+   byte-equivalent copies of the same 27 rules, and Profile had a third dialect
+   of its own (rem instead of px, a different measure, `transition: all`). Two
+   copies of a rule are two rules that drift, and they had already drifted.
+
+   Page-specific vocabulary stays page-specific below this block — Liked's
+   vertical card list, Saved's tile grid and overlay, Profile's figures and
+   graphs. Anything that is genuinely "how this product presents a collection"
+   lives here and only here.
+   ========================================================================= */
+
+.collection-view {
+  /* One measure across all three pages. Liked and Saved were 640px and
+     Profile 48rem/768px, which is enough of a difference to read as two
+     different templates when you switch between them in the sidebar. */
+  --collection-max: 640px;
+
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 640px;
+  max-width: var(--collection-max);
   margin: 0 auto;
-  padding: 32px 16px 80px;
+  /* No horizontal padding of its own. `.shell` already owns the gutter
+     (`padding: 0 18px`), and adding a second one here stacked two gutters:
+     these pages rendered ~32px narrower than the feed at every width, and at
+     320px the doubled 32px-per-side inset squeezed the contribution cells
+     down to 26px. Vertical padding only; the shell sets the horizontal rag,
+     so a Saved tile now lines up with a feed card exactly. */
+  padding: 32px 0 80px;
 }
 
-/* ---- Header ---- */
+/* ---- Masthead ---- */
 
-.liked-view-header {
+.collection-header {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-/* "LIKED" — uppercase monospace label, same treatment as card-topic metadata */
-.liked-view-eyebrow {
+/* Section identifier — same treatment as card-topic metadata in the feed. */
+.collection-eyebrow {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
@@ -4206,8 +4284,8 @@ body.custom-cursor-active textarea {
   margin: 0;
 }
 
-/* Editorial subtitle — serif, quiet, personality without shouting */
-.liked-view-subtitle {
+/* The editorial line. Serif italic, quiet, carries the personality. */
+.collection-title {
   font-family: var(--font-sans);
   font-size: 22px;
   font-weight: 700;
@@ -4218,38 +4296,43 @@ body.custom-cursor-active textarea {
   line-height: 1.2;
 }
 
-/* ---- Collection metadata ---- */
-
-.liked-view-meta {
+.collection-meta {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-3);
   margin: 0;
+  min-height: 1em; /* Holds its line when a user has set no age/gender. */
 }
 
-/* ---- Divider ---- */
-
-.liked-view-divider {
+.collection-rule {
   border: none;
   border-top: 1px solid var(--line);
   margin: 0;
+  width: 100%;
 }
 
-/* ---- Search + Sort controls ---- */
+/* Section identifier inside a page (MOMENTUM, ALL TIME, the month label). */
+.collection-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  margin: 0;
+}
 
-.liked-view-controls {
+/* ---- Controls ---- */
+
+.collection-controls {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.liked-view-search-wrap {
-  position: relative;
-}
-
-.liked-view-search {
+.collection-search {
   width: 100%;
   box-sizing: border-box;
   padding: 9px 13px;
@@ -4262,34 +4345,39 @@ body.custom-cursor-active textarea {
   letter-spacing: 0.02em;
   outline: none;
   transition: border-color var(--dur-1) var(--ease);
-  /* Remove browser-default search field chrome */
   appearance: none;
   -webkit-appearance: none;
 }
 
-.liked-view-search::placeholder {
+.collection-search::placeholder {
   color: var(--fg-3);
 }
 
-.liked-view-search:focus {
+.collection-search:focus {
   border-color: var(--line-strong);
 }
 
-/* "X" button inside <input type="search"> — match the mono style */
-.liked-view-search::-webkit-search-cancel-button {
+.collection-search:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.collection-search::-webkit-search-cancel-button {
   opacity: 0.4;
   cursor: pointer;
 }
 
-/* ---- Sort pills ---- */
+/* ---- Pills (sort) and chips (topic filter) ----
+   Same family, two weights: a pill selects one of a fixed set of orderings,
+   a chip filters to a topic and carries that topic's accent when selected. */
 
-.liked-view-sort {
+.collection-pill-row {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-.liked-sort-pill {
+.collection-pill {
   flex: 0 0 auto;
   padding: 5px 11px;
   border: 1px solid var(--line);
@@ -4308,36 +4396,36 @@ body.custom-cursor-active textarea {
     color var(--dur-1) var(--ease);
 }
 
-.liked-sort-pill:hover {
+.collection-pill:hover {
   border-color: var(--line-strong);
   color: var(--fg);
 }
 
-.liked-sort-pill[data-active="true"] {
+.collection-pill:active {
+  background: var(--bg-3);
+}
+
+.collection-pill[data-active="true"] {
   background: var(--bg-3);
   border-color: var(--accent);
   color: var(--fg);
 }
 
-/* ---- Topic filter chips ---- */
-
 /* Horizontal scroll strip — same pattern as .topic-rail in the feed masthead */
-.liked-view-filters {
+.collection-filters {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 2px;
   scrollbar-width: none;
   margin: 0 -2px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding: 0 2px 2px;
 }
 
-.liked-view-filters::-webkit-scrollbar {
+.collection-filters::-webkit-scrollbar {
   display: none;
 }
 
-.liked-filter-chip {
+.collection-chip {
   flex: 0 0 auto;
   padding: 6px 13px;
   border: 1px solid var(--line);
@@ -4357,202 +4445,193 @@ body.custom-cursor-active textarea {
     color var(--dur-1) var(--ease);
 }
 
-.liked-filter-chip:hover {
+.collection-chip:hover {
   border-color: var(--line-strong);
   color: var(--fg);
 }
 
-.liked-filter-chip[data-selected="true"] {
+.collection-chip:active {
+  background: var(--bg-3);
+}
+
+.collection-chip[data-selected="true"] {
   background: var(--bg-3);
   border-color: var(--topic-accent, var(--accent));
   color: var(--fg);
 }
 
-/* ---- Card list ---- */
+/* ---- Actions ----
+   A squarer, more deliberate control than a filter pill: edit, upload, save,
+   retry. Three weights — default, quiet (secondary), primary (commits). */
 
-.liked-view-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* ---- Empty / filtered-empty states ---- */
-
-.liked-view-empty {
-  padding: 32px 0 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.liked-view-empty-ascii {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--fg-3);
-  opacity: 0.5;
-  line-height: 1.7;
-  margin: 0;
-  white-space: pre;
-}
-
-.liked-view-empty-copy {
-  font-family: var(--font-sans);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--fg);
-  margin: 0;
-}
-
-.liked-view-empty-sub {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--fg-3);
-  margin: 0;
-}
-
-.liked-view-empty-sub em {
-  font-style: italic;
-  color: var(--fg-2);
-}
-
-.liked-view-empty-filter {
-  padding: 16px 0;
-  color: var(--fg-3);
-  font-size: 14px;
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
-  margin: 0;
-}
-
-/* ---- CTA button — shared by empty + error states ---- */
-
-.liked-view-cta {
+.collection-action {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-  padding: 9px 18px;
+  justify-content: center;
+  gap: 7px;
+  /* Fixed height rather than padding alone, so a text button and an
+     icon+text button always agree on their baseline box. */
+  min-height: 34px;
+  padding: 0 15px;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-pill);
-  background: transparent;
+  background: var(--bg-2);
   color: var(--fg);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   transition:
     background var(--dur-1) var(--ease),
-    border-color var(--dur-1) var(--ease);
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
 }
 
-.liked-view-cta:hover {
+.collection-action:hover:not(:disabled) {
   background: var(--bg-3);
   border-color: var(--accent);
 }
 
-.liked-view-cta-icon {
-  width: 14px;
-  height: 14px;
-  display: inline-flex;
-  flex-shrink: 0;
+.collection-action:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
-.liked-view-cta-icon svg {
+.collection-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.collection-action-quiet {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--fg-2);
+}
+
+.collection-action-quiet:hover:not(:disabled) {
+  background: var(--bg-2);
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.collection-action-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.collection-action-primary:hover:not(:disabled) {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: var(--bg);
+}
+
+.collection-action-icon {
+  display: inline-flex;
+  width: 13px;
+  height: 13px;
+}
+
+.collection-action-icon svg {
   width: 100%;
   height: 100%;
-  stroke: currentColor;
   fill: none;
-  stroke-width: 1.6;
+  stroke: currentColor;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* ---- Error state ---- */
+/* Legacy alias — the empty-state CTA reads as an action, same box. */
+.collection-cta {
+  align-self: flex-start;
+}
 
-.liked-view-error {
+/* ---- States: empty, error, filtered-empty ----
+   One vocabulary for all three pages: a tracked mono head, a serif body, and
+   at most one action. No illustrations beyond the ASCII mark. */
+
+.collection-state {
   padding: 32px 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
 }
 
-.liked-view-error-head {
+.collection-state-ascii {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--fg-3);
+  opacity: 0.55;
+  margin: 0;
+  white-space: pre;
+}
+
+.collection-state-head {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--fg);
+  color: var(--fg-2);
   margin: 0;
 }
 
-.liked-view-error-body {
+.collection-state-body {
+  font-family: var(--font-sans);
   font-size: 14px;
+  line-height: 1.6;
   color: var(--fg-3);
-  margin: 0 0 4px;
+  margin: 0;
+  max-width: 34ch;
 }
 
-/* ---- Loading skeletons — restrained placeholder blocks ---- */
-
-.liked-skeleton {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px 20px 20px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: var(--bg-2);
-  animation: liked-skeleton-pulse 1.6s ease-in-out infinite;
+.collection-state-body em {
+  font-style: italic;
+  color: var(--fg-2);
 }
 
-@keyframes liked-skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+.collection-state .collection-cta {
+  align-self: center;
+  margin-top: 4px;
 }
 
-.liked-skeleton-meta {
-  height: 10px;
-  width: 40%;
-  border-radius: var(--r-pill);
-  background: var(--line-strong);
-}
-
-.liked-skeleton-title {
-  height: 18px;
-  width: 75%;
-  border-radius: 4px;
-  background: var(--line-strong);
-}
-
-.liked-skeleton-body {
-  height: 12px;
-  width: 90%;
-  border-radius: 4px;
-  background: var(--line);
+/* Filter/search returned nothing — inline, not a full state block. */
+.collection-note {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--fg-3);
+  margin: 0;
+  padding: 20px 0;
+  text-align: center;
 }
 
 /* ---- Footer watermark ---- */
 
-.liked-view-footer {
+.collection-footer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   padding-top: 8px;
   color: var(--fg-3);
 }
 
-.liked-view-footer-icon {
+.collection-footer-icon {
+  display: inline-flex;
   width: 14px;
   height: 14px;
-  display: inline-flex;
   color: var(--accent);
   opacity: 0.6;
 }
 
-.liked-view-footer-icon svg {
+.collection-footer-icon svg {
   width: 100%;
   height: 100%;
   stroke: currentColor;
@@ -4562,315 +4641,75 @@ body.custom-cursor-active textarea {
   stroke-linejoin: round;
 }
 
-.liked-view-footer-label {
+.collection-footer-label {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-/* ---- Reduced motion ---- */
+/* ---- Skeleton primitives ----
+   One pulse, one bar shape, shared by all three pages' loading states so a
+   Liked skeleton and a Saved skeleton are visibly the same product waiting. */
 
-@media (prefers-reduced-motion: reduce) {
-  .liked-skeleton {
-    animation: none;
-  }
+@keyframes collection-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
 
-  .liked-sort-pill,
-  .liked-filter-chip,
-  .liked-view-search,
-  .liked-view-cta {
-    transition: none;
-  }
+.collection-skeleton-bar {
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+}
+
+/* ---- Shared focus ring ----
+   Everything interactive on these pages gets the same visible ring. Several
+   of these controls previously had no focus-visible style at all. */
+
+.collection-pill:focus-visible,
+.collection-chip:focus-visible,
+.collection-action:focus-visible,
+.saved-tile:focus-visible,
+.contrib-cell:focus-visible,
+.profile-step:focus-visible,
+.profile-mark:focus-visible,
+.profile-edit-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ============================================================================
-   Saved view — "my personal bookshelf" (grid layout) */
+   Liked view — the vertical reading list */
 
-.saved-view {
+.liked-view-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 32px 16px 80px;
+  gap: 16px;
 }
 
-/* ---- Header (same as Liked) ---- */
-
-.saved-view-header {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.saved-view-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin: 0;
-}
-
-.saved-view-subtitle {
-  font-family: var(--font-sans);
-  font-size: 22px;
-  font-weight: 700;
-  font-style: italic;
-  color: var(--fg);
-  margin: 0;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.saved-view-meta {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-3);
-  margin: 0;
-}
-
-.saved-view-divider {
-  border: none;
-  border-top: 1px solid var(--line);
-  margin: 0;
-}
-
-/* ---- Search + Sort controls (shared structurally with Liked) ---- */
-
-.saved-view-controls {
+.liked-skeleton {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.saved-view-search-wrap {
-  position: relative;
-}
-
-.saved-view-search {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 9px 13px;
+  padding: 18px;
   border: 1px solid var(--line);
-  border-radius: var(--r-pill);
+  border-radius: var(--r-card);
   background: var(--bg-2);
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  outline: none;
-  transition: border-color var(--dur-1) var(--ease);
-  appearance: none;
-  -webkit-appearance: none;
+  animation: collection-pulse 1.6s ease-in-out infinite;
 }
 
-.saved-view-search::placeholder {
-  color: var(--fg-3);
-}
+.liked-skeleton-meta { height: 10px; width: 38%; }
+.liked-skeleton-title { height: 18px; width: 72%; }
+.liked-skeleton-body { height: 40px; width: 100%; border-radius: var(--r-cell); }
 
-.saved-view-search:focus {
-  border-color: var(--line-strong);
-}
-
-.saved-view-search::-webkit-search-cancel-button {
-  opacity: 0.4;
-  cursor: pointer;
-}
-
-.saved-view-sort {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.saved-sort-pill {
-  flex: 0 0 auto;
-  padding: 5px 11px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--bg-2);
-  color: var(--fg-3);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background var(--dur-1) var(--ease),
-    border-color var(--dur-1) var(--ease),
-    color var(--dur-1) var(--ease);
-}
-
-.saved-sort-pill:hover {
-  border-color: var(--line-strong);
-  color: var(--fg);
-}
-
-.saved-sort-pill[data-active="true"] {
-  background: var(--bg-3);
-  border-color: var(--accent);
-  color: var(--fg);
-}
-
-.saved-view-filters {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: none;
-  margin: 0 -2px;
-  padding-left: 2px;
-  padding-right: 2px;
-}
-
-.saved-view-filters::-webkit-scrollbar {
-  display: none;
-}
-
-.saved-filter-chip {
-  flex: 0 0 auto;
-  padding: 6px 13px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--bg-2);
-  color: var(--fg-2);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background var(--dur-1) var(--ease),
-    border-color var(--dur-1) var(--ease),
-    color var(--dur-1) var(--ease);
-}
-
-.saved-filter-chip:hover {
-  border-color: var(--line-strong);
-  color: var(--fg);
-}
-
-.saved-filter-chip[data-selected="true"] {
-  background: var(--bg-3);
-  border-color: var(--topic-accent, var(--accent));
-  color: var(--fg);
-}
-
-/* ---- Empty / Error states ---- */
-
-.saved-view-empty,
-.saved-view-error {
-  padding: 32px 0 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.saved-view-empty-ascii {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--fg-3);
-  opacity: 0.5;
-  line-height: 1.7;
-  margin: 0;
-  white-space: pre;
-}
-
-.saved-view-empty-head,
-.saved-view-error-head {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--fg);
-  margin: 0;
-}
-
-.saved-view-empty-sub,
-.saved-view-error-body {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--fg-3);
-  margin: 0;
-}
-
-.saved-view-empty-filter {
-  padding: 16px 0;
-  color: var(--fg-3);
-  font-size: 14px;
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
-  margin: 0;
-}
-
-.saved-view-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-  padding: 9px 18px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-pill);
-  background: transparent;
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background var(--dur-1) var(--ease),
-    border-color var(--dur-1) var(--ease);
-}
-
-.saved-view-cta:hover {
-  background: var(--bg-3);
-  border-color: var(--accent);
-}
-
-.saved-view-cta-icon {
-  width: 14px;
-  height: 14px;
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-.saved-view-cta-icon svg {
-  width: 100%;
-  height: 100%;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* ---- Grid Layout & Tiles ---- */
+/* ============================================================================
+   Saved view — the browsable tile grid */
 
 .saved-grid,
 .saved-skeleton-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-}
-
-/* Keep 2 columns on mobile — they just get more compact. No horizontal carousel. */
-@media (max-width: 480px) {
-  .saved-grid,
-  .saved-skeleton-grid {
-    gap: 12px;
-  }
 }
 
 .saved-tile {
@@ -4888,11 +4727,14 @@ body.custom-cursor-active textarea {
     border-color var(--dur-1) var(--ease),
     box-shadow var(--dur-1) var(--ease),
     transform var(--dur-1) var(--ease);
-  /* Reset button styles */
   appearance: none;
   -webkit-appearance: none;
   outline: none;
   width: 100%;
+  /* Floor rather than fixed height: short-title tiles used to sit noticeably
+     shorter than their neighbours and break the grid's rhythm, but a hard
+     height would clip a genuinely long title. */
+  min-height: 152px;
 }
 
 .saved-tile:hover {
@@ -4902,14 +4744,16 @@ body.custom-cursor-active textarea {
   transform: translateY(-2px);
 }
 
-.saved-tile:focus-visible {
-  border-color: var(--topic-accent, var(--accent));
+.saved-tile:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px var(--shadow);
 }
 
 .saved-tile-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -4920,11 +4764,16 @@ body.custom-cursor-active textarea {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--topic-accent, var(--accent));
+  /* A long topic name used to push the difficulty dots off the tile edge. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .saved-tile-difficulty {
   display: flex;
   gap: 3px;
+  flex: 0 0 auto;
   opacity: 0.6;
 }
 
@@ -4950,6 +4799,9 @@ body.custom-cursor-active textarea {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* Long unbroken identifiers (URLs, snake_case symbols) are common in this
+     corpus and overflowed the tile instead of wrapping. */
+  overflow-wrap: anywhere;
 }
 
 .saved-tile-preview {
@@ -4958,11 +4810,11 @@ body.custom-cursor-active textarea {
   line-height: 1.5;
   color: var(--fg-2);
   margin: 0 0 12px 0;
-  /* 2-line clamp */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .saved-tile-footer {
@@ -4976,6 +4828,11 @@ body.custom-cursor-active textarea {
   width: 16px;
   height: 16px;
   color: var(--accent);
+  transition: transform var(--dur-1) var(--ease);
+}
+
+.saved-tile:hover .saved-tile-bm {
+  transform: translateY(-1px);
 }
 
 .saved-tile-bm svg {
@@ -4988,12 +4845,15 @@ body.custom-cursor-active textarea {
   stroke-linejoin: round;
 }
 
-/* ---- Card Overlay Portal ---- */
+/* ---- Card overlay portal ---- */
 
 .saved-overlay-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  /* Was a literal rgba(0,0,0,0.4), which is the one hardcoded colour on these
+     pages: it reads as a grey wash on the light palettes and as nothing at
+     all on Twilight. Matches .modal-overlay now. */
+  background: color-mix(in srgb, var(--fg) 22%, transparent);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 100;
@@ -5001,8 +4861,8 @@ body.custom-cursor-active textarea {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  /* Simple fade in */
-  animation: saved-fade-in 0.2s var(--ease);
+  overflow-y: auto;
+  animation: saved-fade-in var(--dur-2) var(--ease);
 }
 
 @keyframes saved-fade-in {
@@ -5013,11 +4873,9 @@ body.custom-cursor-active textarea {
 .saved-overlay-shell {
   width: 100%;
   max-width: 640px;
-  /* Slide up and scale in */
-  animation: saved-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  /* The Card component handles its own internal layout, we just contain it */
+  margin: auto;
   position: relative;
-  /* Override Card's tendency to rely on feed margins if needed, though Card is mostly self-contained */
+  animation: saved-slide-up 0.3s var(--ease);
 }
 
 @keyframes saved-slide-up {
@@ -5031,7 +4889,7 @@ body.custom-cursor-active textarea {
   }
 }
 
-/* ---- Skeleton Tiles ---- */
+/* ---- Skeleton tiles ---- */
 
 .saved-skeleton-tile {
   display: flex;
@@ -5041,123 +4899,84 @@ body.custom-cursor-active textarea {
   border: 1px solid var(--line);
   border-radius: var(--r-card);
   background: var(--bg-2);
-  animation: saved-skeleton-pulse 1.6s ease-in-out infinite;
-  min-height: 140px;
+  animation: collection-pulse 1.6s ease-in-out infinite;
+  min-height: 152px;
 }
 
-@keyframes saved-skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
-
-.saved-skeleton-meta {
-  height: 10px;
-  width: 40%;
-  border-radius: var(--r-pill);
-  background: var(--line-strong);
-}
-
-.saved-skeleton-title {
-  height: 18px;
-  width: 85%;
-  border-radius: 4px;
-  background: var(--line-strong);
-  margin-top: 4px;
-}
-
+.saved-skeleton-meta { height: 10px; width: 40%; }
+.saved-skeleton-title { height: 18px; width: 85%; margin-top: 4px; }
 .saved-skeleton-preview {
   height: 32px;
   width: 100%;
-  border-radius: 4px;
+  border-radius: var(--r-cell);
   background: var(--line);
 }
 
-/* ---- Footer watermark (same as Liked) ---- */
-
-.saved-view-footer {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding-top: 8px;
-  color: var(--fg-3);
-  justify-content: center;
-}
-
-.saved-view-footer-icon {
-  width: 14px;
-  height: 14px;
-  display: inline-flex;
-  color: var(--accent);
-  opacity: 0.6;
-}
-
-.saved-view-footer-icon svg {
-  width: 100%;
-  height: 100%;
-  stroke: currentColor;
-  fill: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.saved-view-footer-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .saved-skeleton-tile {
-    animation: none;
-  }
-
-  .saved-sort-pill,
-  .saved-filter-chip,
-  .saved-view-search,
-  .saved-view-cta,
-  .saved-tile {
-    transition: none;
-  }
-  
-  .saved-overlay-backdrop,
-  .saved-overlay-shell {
-    animation: none;
-  }
-}
-
 /* ============================================================================
-   Profile
+   Profile — the learning journal.
+
+   Reads IDENTITY -> MOMENTUM -> HISTORY -> ALL TIME. The figures are
+   typographic rather than boxed: a large numeral over a tracked mono label,
+   with borders used only where they group (the graph, the modal), never as
+   decoration around a number.
    ========================================================================= */
 
 .profile-view {
-  padding: 3rem 1.5rem;
-  max-width: 48rem;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+  gap: 24px;
+  /* The calendar and the trend are two readings of the same month, stacked.
+     They have to share an edge — at different widths the eye reads them as
+     unrelated charts rather than one figure seen twice. */
+  --graph-max: 352px;
 }
 
-.profile-header {
+.profile-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
+  gap: 14px;
+}
+
+/* ---- Identity ---- */
+
+.profile-identity {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.profile-identity-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0; /* Lets a long display name wrap instead of pushing the avatar. */
+}
+
+.profile-identity-text .collection-title {
+  font-style: normal; /* A person's name is not an editorial aside. */
+  overflow-wrap: anywhere;
+}
+
+.profile-identity-actions {
+  flex-direction: row;
+  margin-top: -6px;
 }
 
 .profile-avatar {
-  width: 120px;
-  height: 120px;
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   border: 1px solid var(--line-strong);
   overflow: hidden;
-  background: var(--bg-3);
+  background: var(--bg-2);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--fg-2);
+}
+
+.profile-avatar[data-empty="true"] {
+  border-style: dashed;
 }
 
 .profile-avatar img {
@@ -5166,243 +4985,1163 @@ body.custom-cursor-active textarea {
   object-fit: cover;
 }
 
-.profile-avatar-icon {
-  font-size: 3rem;
-  color: var(--fg);
+.profile-avatar-mark {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  color: var(--accent);
 }
 
-.profile-avatar-initials {
+.profile-avatar-mark svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.profile-avatar-initials,
+.avatar-mark-legacy {
   font-family: var(--font-mono);
-  font-size: 2.5rem;
-  color: var(--fg);
-  letter-spacing: -0.05em;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fg-2);
 }
 
-.profile-name {
-  font-family: var(--font-sans);
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--fg);
+/* ---- Figures ----
+   Large numeral, tracked mono label underneath. This replaced a
+   repeat(auto-fit, minmax(140px, 1fr)) grid of four bordered boxes — the
+   analytics-dashboard shape the brief rules out. */
+
+.profile-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   margin: 0;
 }
 
-.profile-meta {
-  color: var(--fg-2);
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-}
-
-.profile-edit-btn {
-  margin-top: 1rem;
-}
-
-.profile-section-divider {
-  height: 1px;
-  background: var(--line);
-  width: 100%;
-}
-
-.profile-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.profile-section-title {
-  font-size: 0.85rem;
-  color: var(--fg-2);
-  letter-spacing: 0.05em;
-  margin: 0;
-}
-
-.profile-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 2rem;
-}
-
-.profile-stat-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  position: relative;
-}
-
-.profile-stat-value {
+.profile-figure-value {
   font-family: var(--font-sans);
-  font-size: 2.5rem;
-  font-weight: 400;
-  color: var(--fg);
+  font-size: 34px;
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  /* Keeps the streak numeral from jittering as it crosses 9 -> 10. */
+  font-variant-numeric: tabular-nums;
 }
 
-.profile-stat-label {
-  font-size: 0.75rem;
+.profile-figure-value[data-quiet="true"] {
+  color: var(--fg-3);
+}
+
+.profile-figure-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.profile-figure-lead .profile-figure-value {
+  font-size: 56px;
+  color: var(--accent);
+}
+
+.profile-momentum {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The sentence that makes a number mean something. Serif, quiet, never a
+   claim the data does not support — see ProfileView's header comment. */
+.profile-narrative {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
   color: var(--fg-2);
-  letter-spacing: 0.05em;
+  margin: 0;
+  max-width: 46ch;
 }
 
-.profile-streak-line {
-  margin-top: 0.5rem;
-  height: 2px;
-  background: var(--accent);
-  width: 100%;
-  border-radius: var(--r-pill);
+.profile-narrative-quiet {
+  color: var(--fg-3);
 }
+
+.profile-aside {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin: 0;
+}
+
+.profile-totals {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+/* ---- Month navigation ---- */
 
 .profile-month-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
-.profile-nav-btn {
-  background: none;
-  border: 1px solid var(--line);
-  color: var(--fg);
-  border-radius: var(--r-pill);
-  width: 2rem;
-  height: 2rem;
+.profile-month-steppers {
   display: flex;
+  gap: 6px;
+}
+
+.profile-step {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg-2);
   cursor: pointer;
-  transition: all var(--dur-1) var(--ease);
+  transition:
+    background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
 }
 
-.profile-nav-btn:hover:not(:disabled) {
-  border-color: var(--line-strong);
+.profile-step svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.profile-step:hover:not(:disabled) {
   background: var(--bg-2);
+  border-color: var(--line-strong);
+  color: var(--fg);
 }
 
-.profile-nav-btn:disabled {
+.profile-step:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.profile-heatmap {
+/* ---- Contribution grid ---- */
+
+.contrib {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.profile-heatmap-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  font-size: 0.7rem;
-  color: var(--fg-3);
-  margin-bottom: 0.5rem;
-}
-
-.profile-heatmap-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
   gap: 6px;
+  /* Capped and left-aligned rather than stretched across the measure. Seven
+     square cells across a 640px column come out ~58px each, which reads as a
+     wall calendar, not an activity graph — the cell stops being a mark and
+     starts being a box with a lot of empty middle. 7x46 + 6x5 gaps. */
   width: 100%;
-  max-width: 400px;
+  max-width: var(--graph-max);
 }
 
-.profile-heatmap-cell {
-  aspect-ratio: 1;
-  border-radius: 4px;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
+.contrib-weekdays,
+.contrib-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.contrib-weekdays {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--fg-3);
+  text-align: center;
+}
+
+.contrib-cell {
   position: relative;
-  transition: border-color var(--dur-1) var(--ease);
-  cursor: crosshair;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-cell);
+  background: var(--bg-2);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
 }
 
-.profile-heatmap-cell.empty {
-  background: transparent;
+.contrib-cell.is-pad {
   border-color: transparent;
+  background: transparent;
   cursor: default;
 }
 
-.profile-heatmap-cell.level-1 { background: color-mix(in srgb, var(--accent) 25%, var(--bg-2)); border-color: var(--line); }
-.profile-heatmap-cell.level-2 { background: color-mix(in srgb, var(--accent) 50%, var(--bg-2)); border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
-.profile-heatmap-cell.level-3 { background: color-mix(in srgb, var(--accent) 75%, var(--bg-2)); border-color: var(--accent); }
-.profile-heatmap-cell.level-4 { background: var(--accent); border-color: var(--accent); }
-
-.profile-heatmap-tooltip {
+/* The day number is the non-colour channel: intensity is legible as a ramp,
+   but the exact figure is always available without hovering, and the
+   aria-label carries the count for anything that cannot see either. */
+.contrib-cell-day {
   position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: var(--fg);
-  color: var(--bg);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: all var(--dur-1) var(--ease);
-  z-index: 10;
-}
-
-.profile-heatmap-cell:hover:not(.empty) {
-  border-color: var(--fg);
-}
-
-.profile-heatmap-cell:hover:not(.empty) .profile-heatmap-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* Edit Modal Additions */
-.profile-edit-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.profile-edit-field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.profile-icon-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-}
-
-.profile-icon-preset {
-  aspect-ratio: 1;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  font-size: 1.5rem;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--fg-3);
+  transition: color var(--dur-1) var(--ease);
+}
+
+/* Intensity ramp — the palette's own accent mixed toward the page ground, so
+   it stays inside whichever of the five palettes is active. Lightness, not
+   hue, carries the magnitude. */
+.contrib-cell[data-level="1"] { background: color-mix(in srgb, var(--accent) 22%, var(--bg-2)); }
+.contrib-cell[data-level="2"] { background: color-mix(in srgb, var(--accent) 45%, var(--bg-2)); }
+.contrib-cell[data-level="3"] { background: color-mix(in srgb, var(--accent) 70%, var(--bg-2)); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.contrib-cell[data-level="4"] { background: var(--accent); border-color: var(--accent); }
+
+.contrib-cell[data-level="3"] .contrib-cell-day,
+.contrib-cell[data-level="4"] .contrib-cell-day { color: var(--bg); }
+
+.contrib-cell:hover:not(.is-pad):not(.is-legend) {
+  border-color: var(--fg-2);
+}
+
+.contrib-cell[data-selected="true"] {
+  border-color: var(--fg);
+  transform: scale(1.06);
+  z-index: 1;
+}
+
+.contrib-cell.is-legend {
+  width: 12px;
+  height: 12px;
+  aspect-ratio: auto;
+  cursor: default;
+  flex: 0 0 auto;
+}
+
+.contrib-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.contrib-legend-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--fg-3);
+}
+
+.contrib-legend-label:first-child {
+  margin-right: 2px;
+}
+
+.contrib-legend-label:last-child {
+  margin-left: 2px;
+}
+
+/* Replaces the hover-only tooltip entirely: a persistent readout that works
+   on touch, reads out to a screen reader (role="status"), and never covers
+   the cell it describes. */
+.contrib-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-height: 16px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.contrib-readout-hint { color: var(--fg-3); opacity: 0.75; }
+.contrib-readout-date { color: var(--accent); font-weight: 700; }
+.contrib-readout-sep { color: var(--fg-3); }
+.contrib-readout-count { color: var(--fg-2); font-weight: 600; }
+
+/* ---- Daily trend ---- */
+
+.trend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  width: 100%;
+  max-width: var(--graph-max);
+}
+
+.trend-plot {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 44px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1px;
+}
+
+.trend-bar {
+  flex: 1 1 0;
+  min-width: 0;
+  height: var(--h);
+  min-height: 1px;
+  padding: 0;
+  border: none;
+  border-radius: 1px 1px 0 0;
+  background: color-mix(in srgb, var(--accent) 55%, var(--bg-2));
   cursor: pointer;
-  transition: all var(--dur-1) var(--ease);
+  transition: background var(--dur-1) var(--ease);
+}
+
+.trend-bar[data-empty="true"] {
+  background: var(--line);
+  height: 1px;
+}
+
+.trend-bar:hover { background: var(--accent); }
+.trend-bar[data-selected="true"] { background: var(--fg); }
+
+.trend-axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--fg-3);
+}
+
+.trend-peak { color: var(--fg-2); }
+
+/* ---- Profile loading ---- */
+
+.profile-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: collection-pulse 1.6s ease-in-out infinite;
+}
+
+.profile-skeleton-figure {
+  height: 56px;
+  width: 40%;
+  border-radius: var(--r-cell);
+  background: var(--line-strong);
+}
+
+.profile-skeleton-grid {
+  height: 190px;
+  width: 100%;
+  border-radius: var(--r-card);
+  background: var(--line);
+}
+
+/* ============================================================================
+   Edit profile modal.
+
+   Built on .modal-overlay / .modal-panel like every other modal. The previous
+   version referenced `topic-modal-*` and `card-input` class names that are
+   defined nowhere in this file, so it rendered as unstyled browser chrome.
+   ========================================================================= */
+
+.profile-edit-panel {
+  max-width: 440px;
+}
+
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+.profile-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.profile-edit-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 12px;
+}
+
+.profile-edit-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  padding: 0;
+}
+
+.profile-edit-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  outline: none;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.profile-edit-input:hover:not(:disabled) {
+  border-color: var(--line-strong);
+}
+
+.profile-edit-input:focus {
+  border-color: var(--accent);
+  background: var(--bg-2);
+}
+
+.profile-edit-input[aria-invalid="true"] {
+  border-color: var(--accent);
+}
+
+.profile-edit-input::placeholder {
+  color: var(--fg-3);
+}
+
+/* The one control that must not lose its affordance to `appearance: none`. */
+.profile-edit-select {
+  padding-right: 30px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.profile-edit-hint {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--fg-3);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.profile-edit-error {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 0;
+}
+
+.profile-edit-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- Avatar mark picker ---- */
+
+.profile-mark-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.profile-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  color: var(--fg-2);
+  cursor: pointer;
+  transition:
+    background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+
+.profile-mark svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.profile-mark:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-2);
   color: var(--fg);
 }
 
-.profile-icon-preset:hover {
-  border-color: var(--line-strong);
-  background: var(--bg-3);
-}
-
-.profile-icon-preset.active {
+.profile-mark[data-selected="true"] {
   border-color: var(--accent);
-  background: var(--bg-3);
+  background: var(--bg-2);
+  color: var(--accent);
 }
 
-.profile-icon-preset.clear {
-  font-size: 0.8rem;
-  color: var(--fg-2);
+/* ---- Photo ---- */
+
+.profile-photo-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.profile-photo-preview {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px dashed var(--line-strong);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity var(--dur-1) var(--ease);
+}
+
+.profile-photo-preview[data-busy="true"] {
+  opacity: 0.5;
+}
+
+.profile-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-photo-set,
+.profile-photo-none {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--fg-3);
 }
 
 .profile-photo-actions {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.profile-photo-actions .profile-edit-hint {
+  flex-basis: 100%;
+}
+
+/* Visually hidden, but still reachable and still labelled — `display: none`
+   removes a file input from the accessibility tree entirely. */
+.profile-photo-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================================
+   Settings — a typeset control panel.
+
+   Built on the same `.collection-*` layer as Liked / Saved / Profile, so the
+   masthead, section titles and rules are literally the same rules, not a
+   lookalike. The only thing this section owns is the row: a label and its
+   explanation on the left, one control on the right, separated by the same
+   hairline the rest of the app divides with.
+
+   Deliberately no card per setting. Cards here would mean ~11 nested boxes
+   down the page; the hierarchy comes from type and the rules instead.
+   ========================================================================= */
+
+.settings-view {
+  gap: 28px;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- The row ----
+   Two columns, control right-aligned and vertically centred against the text
+   block. `align-items: center` rather than baseline: the controls are boxes of
+   differing heights (pill row, switch, swatch strip) and baseline-aligning a
+   swatch strip to a sentence puts it visibly off-centre. */
+
+.settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 24px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.settings-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-row-title {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* The title is a <label> whenever it drives a single control, so the whole
+   phrase is the hit target for that control, not just the switch. */
+label.settings-row-title {
+  cursor: pointer;
+  width: fit-content;
+}
+
+.settings-row-desc {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-3);
+  margin: 0;
+  max-width: 52ch;
+}
+
+.settings-row-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* ---- Read-only value ----
+   A value, not a disabled input. There is no endpoint behind these, and a
+   greyed-out field implies there is one and it is temporarily unavailable. */
+
+.settings-value {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--fg-2);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.settings-value[data-muted="true"] {
+  color: var(--fg-3);
+}
+
+/* ---- Link-style action ---- */
+
+.settings-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+
+.settings-link:hover:not(:disabled) {
+  background: var(--bg-2);
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.settings-link:active:not(:disabled) {
+  background: var(--bg-3);
+}
+
+.settings-link:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.settings-link-icon {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  transition: transform var(--dur-1) var(--ease);
+}
+
+.settings-link:hover:not(:disabled) .settings-link-icon {
+  transform: translateX(2px);
+}
+
+.settings-link-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- Choice row (daily goal) ----
+   Reuses `.collection-pill` for the pill itself; only the numeric sizing and
+   the row are new. */
+
+.settings-choice {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.settings-choice-pill {
+  min-width: 38px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  /* Steps are 5/10/20/30/50 — tabular figures keep the pills from resizing
+     between one- and two-digit values. */
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.settings-choice-pill:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+/* ---- Save feedback ----
+   Reserves its own width so a row does not shift sideways when SAVING/SAVED
+   appears and disappears under it. */
+
+.settings-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 58px;
+  height: 14px;
+  color: var(--good);
+}
+
+.settings-feedback-text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.settings-feedback-icon {
+  display: inline-flex;
+  width: 11px;
+  height: 11px;
+}
+
+.settings-feedback-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  text-align: right;
+}
+
+/* ---- Switch ----
+   A real <input type="checkbox"> under the paint. The input keeps the label
+   association, Space to toggle, and the focus ring; the track and thumb are
+   decoration drawn from its :checked state. State is also spelled ON/OFF in
+   text beside it, so it never depends on position or colour alone. */
+
+.settings-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.settings-switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.settings-switch-track {
+  display: inline-flex;
+  align-items: center;
+  width: 40px;
+  height: 22px;
+  padding: 2px;
+  box-sizing: border-box;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--bg-2);
+  cursor: pointer;
+  transition:
+    background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+
+.settings-switch-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--fg-3);
+  transition:
+    transform var(--dur-2) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+
+.settings-switch-input:checked ~ .settings-switch-track {
+  background: var(--bg-3);
+  border-color: var(--accent);
+}
+
+.settings-switch-input:checked ~ .settings-switch-track .settings-switch-thumb {
+  transform: translateX(18px);
+  background: var(--accent);
+}
+
+.settings-switch-input:focus-visible ~ .settings-switch-track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.settings-switch-input:hover ~ .settings-switch-track,
+.settings-switch-track:hover {
+  border-color: var(--accent);
+}
+
+.settings-switch-input:disabled ~ .settings-switch-track {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-switch-state {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--fg-3);
+  /* Wide enough for "OFF" so the row does not jog when it becomes "ON". */
+  min-width: 22px;
+}
+
+.settings-switch-input:checked ~ .settings-switch-state {
+  color: var(--accent);
+}
+
+/* The two pickers were built for the right rail, where they get a full column
+   and stretch into it. In a right-aligned control cell they need to wrap
+   instead of forcing the row past the measure, and `.font-pill`'s `flex: 1 1 0`
+   has to stop stretching or five faces would each claim an equal share of
+   whatever width is left. */
+.settings-row-control .theme-picker,
+.settings-row-control .font-picker-row {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.settings-row-control .font-picker {
+  padding: 0;
+}
+
+.settings-row-control .font-pill {
+  flex: 0 0 auto;
+  min-width: 44px;
+}
+
+/* ============================================================================
+   Collection surfaces — responsive.
+
+   None of these three pages had a single media query. The shell already
+   collapses its rails at 680px, so the work here is the content itself:
+   the identity row, the saved grid, the contribution cells and the modal.
+   ========================================================================= */
+
+@media (max-width: 680px) {
+  .collection-view {
+    padding: 24px 0 64px;
+  }
+
+  .profile-totals {
+    gap: 32px;
+  }
+
+  /* Below this the control column and a full-length description fight for the
+     same line. Stack: description above, control below and left-aligned —
+     "controls can move below descriptions when necessary". */
+  .settings-row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: 14px 0;
+  }
+
+  .settings-row-control {
+    justify-content: flex-start;
+  }
+
+  .settings-choice,
+  .settings-value,
+  .settings-error {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .settings-row-control .theme-picker,
+  .settings-row-control .font-picker-row {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-view {
+    padding: 20px 0 56px;
+    gap: 18px;
+  }
+
+  .collection-title {
+    font-size: 20px;
+  }
+
+  /* Two columns is the product constraint — never a carousel — so the tiles
+     get tighter rather than fewer. */
+  .saved-grid,
+  .saved-skeleton-grid {
+    gap: 10px;
+  }
+
+  .saved-tile {
+    padding: 13px;
+    min-height: 132px;
+  }
+
+  .saved-tile-title {
+    font-size: 15px;
+    -webkit-line-clamp: 3;
+  }
+
+  .saved-tile-preview {
+    font-size: 12.5px;
+    -webkit-line-clamp: 2;
+  }
+
+  .profile-figure-lead .profile-figure-value {
+    font-size: 46px;
+  }
+
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .profile-avatar-mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .contrib-weekdays,
+  .contrib-grid {
+    gap: 4px;
+  }
+
+  .contrib-cell-day {
+    font-size: 8px;
+  }
+
+  /* 8 across leaves ~28px marks at 360px wide; two rows of 4 keeps them
+     comfortably tappable. */
+  .profile-mark-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .profile-edit-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profile-totals {
+    gap: 28px;
+  }
+
+  .settings-view {
+    gap: 22px;
+  }
+
+  /* Tap targets stay full size on touch even as the type steps down. */
+  .settings-row-title {
+    font-size: 14px;
+  }
+
+  .settings-choice-pill {
+    min-width: 42px;
+    padding: 8px 12px;
+  }
+
+  .settings-link {
+    min-height: 34px;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Below this the identity row's two columns fight each other: the name
+     wraps to three lines beside the avatar. Stack them — but in source order,
+     NOT column-reverse: reversing floats the avatar to the very top of the
+     page, where the fixed guest notice sits on top of it. */
+  .profile-identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .trend-plot {
+    height: 36px;
+  }
+}
+
+/* ---- Reduced motion, chosen in Settings ----
+   The OS-level `prefers-reduced-motion` is honoured by its own blocks
+   throughout this file and keeps working regardless of this attribute; this is
+   the opt-IN for someone whose OS says otherwise. It is deliberately a blanket
+   rule rather than another hand-maintained list of selectors: a list would
+   silently miss every transition added after it was written, which is the
+   failure mode that makes a setting like this untrustworthy.
+
+   Near-zero rather than `none` so transitionend/animationend still fire —
+   anything waiting on one of those keeps working instead of hanging.
+
+   Framer Motion is NOT covered here. It animates by writing inline styles
+   every frame, which outranks any stylesheet rule; AppShell passes the same
+   preference to <MotionConfig reducedMotion> for that half. */
+body[data-reduced-motion="1"] *,
+body[data-reduced-motion="1"] *::before,
+body[data-reduced-motion="1"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liked-skeleton,
+  .saved-skeleton-tile,
+  .profile-skeleton {
+    animation: none;
+  }
+
+  .collection-pill,
+  .collection-chip,
+  .collection-search,
+  .collection-action,
+  .saved-tile,
+  .saved-tile-bm,
+  .contrib-cell,
+  .contrib-cell-day,
+  .trend-bar,
+  .profile-step,
+  .profile-mark,
+  .profile-edit-input,
+  .profile-photo-preview {
+    transition: none;
+  }
+
+  .saved-overlay-backdrop,
+  .saved-overlay-shell {
+    animation: none;
+  }
+
+  /* Position/scale changes are the ones that actually provoke symptoms —
+     drop the movement, keep the colour feedback. */
+  .saved-tile:hover,
+  .collection-action:active:not(:disabled),
+  .contrib-cell[data-selected="true"] {
+    transform: none;
+  }
 }

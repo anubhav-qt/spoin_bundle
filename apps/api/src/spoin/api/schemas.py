@@ -380,6 +380,11 @@ class UserOut(BaseModel):
     gender: str | None = None
     avatar_icon: str | None = None
     has_avatar_image: bool = False
+    #: Rides along on the existing user payload rather than behind a separate
+    #: /preferences route: AuthProvider already fetches this object on every
+    #: navigation, so Settings can render its current value with no request of
+    #: its own, and PATCH /profile/me stays the single write path.
+    daily_card_goal: int = 10
 
 
 class OnboardingTopicChoice(BaseModel):
@@ -460,6 +465,10 @@ class UserProfileUpdateIn(BaseModel):
     age: int | None = Field(default=None, ge=1, le=120)
     gender: str | None = Field(default=None, max_length=32)
     avatar_icon: str | None = Field(default=None, max_length=32)
+    #: Bounded server-side, not just in the picker: the UI offers a fixed set
+    #: of steps but the endpoint is the actual authority on what is storable.
+    daily_card_goal: int | None = Field(default=None, ge=1, le=200)
+
 
 
 class DailyActivityOut(BaseModel):
@@ -473,3 +482,45 @@ class ProfileStatsOut(BaseModel):
     total_cards_read: int
     total_topics: int
     monthly_activity: list[DailyActivityOut]
+# -- Data export (Settings -> Data & Privacy) ---------------------------------
+#
+# Everything below is the user's OWN content, read straight from their rows.
+# Nothing derived, nothing about other users, and no card bodies from the
+# shared corpus -- a card belongs to the corpus, the user's relationship to it
+# (that they liked it, saved it, wrote on it) is what is theirs to take.
+
+
+class ExportedCardRefOut(BaseModel):
+    card_id: UUID
+    title: str
+    topic: str
+    difficulty: Difficulty
+    at: datetime
+
+
+class ExportedNoteOut(BaseModel):
+    card_id: UUID
+    card_title: str
+    topic: str
+    body: str
+    updated_at: datetime
+
+
+class ExportedTopicOut(BaseModel):
+    topic_id: UUID
+    name: str
+    is_custom: bool
+    current_difficulty: Difficulty | None
+    followed_at: datetime
+
+
+class ProfileExportOut(BaseModel):
+    #: ISO-8601, set by the server at export time.
+    exported_at: datetime
+    schema_version: int
+    profile: UserOut
+    topics: list[ExportedTopicOut]
+    notes: list[ExportedNoteOut]
+    liked_cards: list[ExportedCardRefOut]
+    saved_cards: list[ExportedCardRefOut]
+    daily_activity: list[DailyActivityOut]

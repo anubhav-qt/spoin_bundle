@@ -90,6 +90,12 @@ services:
       # Mounted so `make lint` / `make types` see the working tree rather than
       # whatever was baked into the image at build time.
       - ./apps/api/tests:/app/tests
+      # And so do their *settings*. src/ and tests/ were mounted but
+      # pyproject.toml was not, so ruff and mypy read the config baked in at
+      # the last `docker compose build` -- editing a per-file-ignore or a
+      # banned-api rule appeared to do nothing, and the stale rule kept firing
+      # with its old message. Read-only: nothing in the container writes it.
+      - ./apps/api/pyproject.toml:/app/pyproject.toml:ro
     command:
       ["uvicorn", "spoin.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
@@ -129,6 +135,9 @@ services:
     volumes:
       - ./apps/api/src:/app/src
       - ./apps/api/tests:/app/tests
+      # pytest reads [tool.pytest.ini_options] from here -- same staleness
+      # trap as the api service above.
+      - ./apps/api/pyproject.toml:/app/pyproject.toml:ro
     entrypoint: ["sh", "-c"]
     command:
       - |

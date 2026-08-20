@@ -1,0 +1,320 @@
+"""Shared types, runtime handle and small pure helpers for the pipeline.
+
+The bottom layer: everything here is either a `TypedDict` describing graph
+state, the `_Runtime` bundle each node unpacks from LangGraph's config, or a
+pure function with no session and no generator. Nothing in this module talks to
+the database or to a model, which is what lets every other pipeline module
+import it without creating a cycle.
+
+`logger` lives here rather than in each module so every pipeline line keeps
+emitting under the name it always has (`spoin.generation.pipeline`) — splitting
+the module should not silently rename the logger anything watching production
+logs is keyed to.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+import operator
+import uuid
+from dataclasses import dataclass, field
+from typing import Annotated, TypedDict
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from spoin.content.archetype import classify_archetype
+from spoin.core.config import Settings
+from spoin.domain.enums import CardType, Difficulty, RejectionStage
+from spoin.domain.models import RejectedCard
+from spoin.embeddings import Embedder
+from spoin.generation.base import CardDraft, ContentGenerator
+
+logger = logging.getLogger("spoin.generation.pipeline")
+
+
+#: ADR-0030: no calibration examples for a linked subtopic-tier -- it gets
+#: real, concept-specific calibration from `builds_on` instead.
+_NO_DIFFICULTY_EXAMPLES: dict[Difficulty, list[str]] = {difficulty: [] for difficulty in Difficulty}
+
+
+_SLUG_KEEP = "abcdefghijklmnopqrstuvwxyz0123456789-"
+
+
+def _slugify(name: str) -> str:
+    lowered = "-".join(name.strip().lower().split())
+    return "".join(char for char in lowered if char in _SLUG_KEEP) or "topic"
+
+
+def _existing_title_tag(canonical_title: str, title: str, difficulty: Difficulty) -> str:
+    """ADR-0022 + ADR-0007: the already-covered list a generator sees must carry
+    the canonical title (so the model can tell a subject is taken), the display
+    title (so it doesn't invent the same joke twice under new wording), AND the
+    difficulty it was written at (so a beginner and advanced card on the same
+    concept differ in depth, not just wording)."""
+
+    label = f"{canonical_title} ({title})" if canonical_title != title else canonical_title
+    return f"{label} [{difficulty.value}]"
+
+
+def _min_cards(target_cards: int, fraction: float) -> int:
+    return max(1, round(target_cards * fraction))
+
+
+def _card_matches_type(draft: CardDraft, card_type: str) -> bool:
+    """Matches a generated draft to a predetermined card type."""
+    if card_type == CardType.ASCII.value:
+        return draft.visual_id is not None or bool(draft.visual_slots)
+    tags = classify_archetype(draft.body)
+    if card_type == CardType.CODE.value:
+        return "code" in tags
+    if card_type == CardType.DIAGRAM.value:
+        return "diagram" in tags
+    if card_type == CardType.COMPARISON.value:
+        return "comparison" in tags
+    if card_type == CardType.PROSE.value:
+        return not tags and draft.visual_id is None
+    return False
+
+
+class TopicRequest(TypedDict):
+    name: str
+    description: str
+
+
+class TopicMatchOutcome(TypedDict):
+    """One `match_and_create_topics` result: either an alias onto an existing
+    topic (nothing else happened) or a freshly-minted, not-yet-generated one."""
+
+    topic_id: str
+    topic_name: str
+    matched_existing: bool
+
+
+class SubtopicPlan(TypedDict):
+    topic_id: str
+    topic_name: str
+    subtopic_id: str
+    #: Groups this subtopic with its sibling difficulty tiers of the same
+    #: curriculum-authored concept -- what generate_subtopic_cards fans out on.
+    subtopic_group_id: str
+    difficulty: str
+    title: str
+    description: str
+    target_cards: int
+    card_type_quotas: dict[str, int]
+    #: Pre-fetched in resolve_and_plan_topic -- see module docstring for why
+    #: this can't be a DB read inside generate_subtopic_cards. Spans every
+    #: sibling subtopic in the same subtopic_group_id (ADR-0007's cross-tier ask).
+    existing_titles: list[str]
+    existing_count: int
+    #: Bodies of this EXACT subtopic-tier's (not group-wide -- near-dup
+    #: detection is subtopic-scoped, see generation/dedup.py) most recent
+    #: `rejected_card` rows with stage=near_duplicate, from a prior run.
+    #: Prevention feedback (ADR-0030 addendum): the writer sees actual
+    #: rejected content and is told not to reproduce it, rather than
+    #: rediscovering the same duplicate only to have it rejected again.
+    avoid_duplicate_bodies: list[str]
+    #: (body, reason) pairs -- as `{"body", "reason"}` dicts, JSON-safe like
+    #: everything else here -- for this EXACT subtopic-tier's most recent
+    #: pass-2 verification rejections. Unlike `avoid_duplicate_bodies`
+    #: (algorithmic similarity, no reasoning), `reason` here is text the
+    #: judge model itself gave, fed to the writer so it fixes the actual
+    #: problem next time instead of just rewording the same card.
+    rejection_feedback: list[dict[str, str]]
+    #: Active cards under THIS subtopic-tier with no `Question` row yet --
+    #: `gate_and_persist` commits a tier's cards and its questions as two
+    #: separate steps, so an interrupted run (crash, quota exhaustion) can
+    #: leave cards persisted with no questions at all. `existing_count`
+    #: already meeting `target_cards` makes `generate_subtopic_cards` skip
+    #: drafting new cards for this tier forever after -- without this,
+    #: nothing would ever revisit it to fill the gap. Each entry is
+    #: `{"card_id", "title", "body"}` (JSON-safe strings, matching every
+    #: other field on this TypedDict).
+    cards_missing_questions: list[dict[str, str]]
+    #: This EXACT subtopic-tier's already-active `Question.stem`s (capped at
+    #: `settings.max_existing_question_stems`), shown to `generate_questions`
+    #: so it doesn't repeat a question angle already asked -- and, combined
+    #: with the BACKFILL framing `cards_missing_questions` triggers, gives the
+    #: writer a sense of what this subtopic-tier's quiz already looks like
+    #: rather than writing each batch as if it were the first.
+    existing_question_stems: list[str]
+    #: Pre-fetched, same reasoning as `existing_titles` -- whether THIS
+    #: subtopic-tier already has an active `is_hero` card (task 0006 / ADR-
+    #: 0018's real hero mechanism). `generate_subtopic_cards` uses this,
+    #: together with `existing_count == 0`, to decide whether to issue the
+    #: one-time hero call before its normal rounds.
+    has_hero: bool
+
+
+class SubtopicGroupPlan(TypedDict):
+    """One curriculum concept's 1-3 difficulty tiers, ordered lowest first --
+    the Send fan-out unit for card generation (ADR-0026)."""
+
+    topic_id: str
+    topic_name: str
+    #: Threaded through so `generate_subtopic_cards` can gate+persist its own
+    #: group immediately without needing the full `topic_plans` state (a
+    #: `Send`-invoked branch only sees its own payload, not the graph's
+    #: accumulated state -- see `PipelineState.topic_plans`'s docstring).
+    topic_description: str
+    tiers: list[SubtopicPlan]
+
+
+class TopicPlanResult(TypedDict):
+    topic_id: str
+    topic_name: str
+    #: Fed to the quality gate's correction pass as the canonical topic
+    #: description (ADR-0030) -- pulled from `Topic.description`, not stored
+    #: anywhere else in the plan.
+    topic_description: str
+    is_survey: bool
+    deep_dive_topic_names: list[str]
+    subtopics: list[SubtopicPlan]
+
+
+class SubtopicCardsResult(TypedDict):
+    topic_id: str
+    subtopic_id: str
+    difficulty: str
+    drafts: list[CardDraft]
+    generator_failures: list[str]
+    #: True iff this subtopic-tier has no sibling tiers in its
+    #: `subtopic_group_id` -- decides whether the quality gate's two passes
+    #: get the hand-curated difficulty example catalog (ADR-0030) instead of
+    #: relying on `builds_on`'s real sibling-tier context.
+    is_standalone: bool
+    #: Passed straight through from `SubtopicPlan` regardless of whether this
+    #: tier drafted any new cards this run -- see that field's docstring.
+    cards_missing_questions: list[dict[str, str]]
+    #: Passed straight through from `SubtopicPlan`, same reasoning as
+    #: `cards_missing_questions` above.
+    existing_question_stems: list[str]
+
+
+class PipelineState(TypedDict, total=False):
+    #: Already-existing Topic ids (ADR-0025 decided that upstream).
+    topic_ids: list[str]
+    #: Only set on a per-branch Send invocation (outer fan-out).
+    topic_job: dict[str, str]
+    #: Globally accumulated across every topic branch -- used by gate_and_persist
+    #: to build the final per-topic report. NOTE: this is also the only way
+    #: `resolve_and_plan_topic` gets its own subtopics to a downstream fan-out --
+    #: see that function's docstring for why a plain (non-reducer) key doesn't
+    #: work here: concurrent topic branches in the same superstep all write into
+    #: the SAME shared channels, and a plain "last value" channel raises
+    #: `InvalidUpdateError` the moment two branches write to it in one step.
+    #: `Send`-created branches are NOT isolated forks with their own local state.
+    topic_plans: Annotated[list[TopicPlanResult], operator.add]
+    #: Only set on a per-branch Send invocation (inner fan-out).
+    subtopic_group_job: SubtopicGroupPlan
+    #: One dict per subtopic-tier gated THIS run (topic_id, subtopic_id,
+    #: difficulty, accepted/rejected/failed, questions_accepted/rejected) --
+    #: written by `generate_subtopic_cards` itself now (it gates+persists its
+    #: own group immediately, ADR-0026), not by a separate global writer node.
+    #: `gate_and_persist` only reads this to build the final per-topic report
+    #: and mark topics done; every card/question this run wrote is already
+    #: committed by the time it runs.
+    item_reports: Annotated[list[dict[str, object]], operator.add]
+    report: dict[str, object]
+
+
+@dataclass
+class _Runtime:
+    """Dependencies threaded through `config["configurable"]` rather than graph
+    state -- none of these are pipeline *data*."""
+
+    session: AsyncSession
+    generator: ContentGenerator
+    embedder: Embedder
+    settings: Settings
+    batch_id: uuid.UUID
+    semaphore: asyncio.Semaphore
+    topic_plan_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    #: `AsyncSession` is not safe for concurrent use across coroutines -- every
+    #: DB-touching section of `_process_gate_item` (dedup reads, card/question
+    #: persist+commit) is serialized through this lock so subtopic-tiers can
+    #: still run their LLM phases (correction, verification, question
+    #: generation) fully concurrently. See `gate_and_persist`'s docstring.
+    session_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+
+
+#: `config` is deliberately left untyped on every node function below (here and
+#: in resolve_and_plan_topic / generate_subtopic_cards / gate_and_persist).
+#: LangGraph's own node config type is `RunnableConfig` (from langchain_core), and
+#: at runtime it inspects each node's `config` parameter annotation -- if present
+#: and not exactly `RunnableConfig`, it emits a `UserWarning` ("should be typed as
+#: RunnableConfig"), which this repo's `filterwarnings = ["error"]` pytest config
+#: turns into a hard test failure. Importing `RunnableConfig` here to satisfy it
+#: would violate ADR-0002/0024's "pipeline.py never imports langchain*" boundary
+#: (enforced by tests/test_architecture.py) for a type that carries no
+#: model/prompt surface at all. Leaving the parameter unannotated is the one
+#: option LangGraph's own inspection treats as a non-issue.
+def _runtime(config) -> _Runtime:  # type: ignore[no-untyped-def]
+    configurable = config["configurable"]
+    runtime = configurable["runtime"]
+    assert isinstance(runtime, _Runtime)
+    return runtime
+
+
+@dataclass
+class _GateItem:
+    """One subtopic-tier's worth of drafts, tracked through the whole gate
+    (ADR-0030) so the two concurrent LLM phases and the sequential DB phase
+    can all find their way back to the right subtopic/topic report."""
+
+    topic_id: str
+    subtopic_id: str
+    difficulty: str
+    topic_name: str
+    topic_description: str
+    difficulty_examples: dict[Difficulty, list[str]]
+    survivors: list[CardDraft]
+    #: (draft, reason) for cards that never made it past structural
+    #: validation -- kept as the ORIGINAL draft, since correction never ran.
+    structural_rejects: list[tuple[CardDraft, str]]
+    generator_failure_count: int
+    #: Existing active cards under this tier with no Question row yet (see
+    #: `SubtopicPlan.cards_missing_questions`) -- question generation runs on
+    #: these IN ADDITION TO any cards accepted by the gate this run, so a
+    #: tier that already has all its cards still gets its questions backfilled.
+    existing_cards_missing_questions: list[dict[str, str]] = field(default_factory=list)
+    #: This tier's already-active question stems (see
+    #: `SubtopicPlan.existing_question_stems`) -- shown to `generate_questions`
+    #: so it doesn't repeat a question angle already asked.
+    existing_question_stems: list[str] = field(default_factory=list)
+    #: Filled in by later phases.
+    corrected: list[CardDraft] = field(default_factory=list)
+    correction_failure_count: int = 0
+    dedup_survivors: list[tuple[CardDraft, list[float]]] = field(default_factory=list)
+    #: (draft, reason) for near-duplicate rejects, post-correction.
+    dedup_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
+    verified: list[tuple[CardDraft, list[float], Difficulty]] = field(default_factory=list)
+    #: (draft, reason) for pass-2 rejects, post-correction.
+    verification_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
+    verification_failure_count: int = 0
+
+
+def _rejected_card(
+    *,
+    topic_id: str,
+    subtopic_id: str,
+    draft: CardDraft,
+    stage: RejectionStage,
+    reason: str,
+    generated_at: str,
+    backend: str,
+    batch_id: uuid.UUID,
+) -> RejectedCard:
+    return RejectedCard(
+        topic_id=uuid.UUID(topic_id),
+        subtopic_id=uuid.UUID(subtopic_id),
+        requested_difficulty=draft.difficulty,
+        title=draft.title,
+        canonical_title=draft.canonical_title,
+        summary=draft.summary,
+        body=draft.body,
+        stage=stage,
+        reason=reason,
+        gen_meta={"backend": backend, "generated_at": generated_at, "batch_id": str(batch_id)},
+    )

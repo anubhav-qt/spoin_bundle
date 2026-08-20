@@ -15,10 +15,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from spoin.api.middleware import RequestContextMiddleware
 from spoin.api.routers import auth, dev, engagement, feed, notes, profile, quiz, topics
 from spoin.api.routers.feed import cards_router
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine
+from spoin.core.logging import configure_logging
 
 
 @asynccontextmanager
@@ -29,6 +31,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    configure_logging(settings.log_level)
 
     app = FastAPI(
         title="Spoin API",
@@ -41,6 +44,13 @@ def create_app() -> FastAPI:
         ),
         lifespan=lifespan,
     )
+
+    # Order matters and is the reverse of registration: the LAST middleware
+    # added is the outermost. CORS has to end up outside the request-context
+    # one, or the 500 response that middleware synthesises would go back to a
+    # browser without CORS headers and surface as an opaque network error
+    # instead of the 500 it actually is.
+    app.add_middleware(RequestContextMiddleware)
 
     app.add_middleware(
         CORSMiddleware,
@@ -58,7 +68,14 @@ def create_app() -> FastAPI:
     app.include_router(engagement.router)
     app.include_router(notes.router)
     app.include_router(profile.router)
-    app.include_router(dev.router)
+
+    # `/dev/reset` wipes a user's entire progress, slates and subscriptions on
+    # one authenticated call. routers/dev.py's own docstring has always said to
+    # gate it before exposing the API publicly; it was mounted unconditionally.
+    # `env` already exists and already gates the JWT-secret validator below it,
+    # so this reuses the switch rather than inventing a second one.
+    if settings.env != "production":
+        app.include_router(dev.router)
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, Any]:

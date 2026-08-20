@@ -247,16 +247,16 @@ export function SavedView({ topics, onNavigateHome }: Props) {
   // ── Loading ──────────────────────────────────────────────────────────────
   if (rows === null && !error) {
     return (
-      <div className="saved-view">
-        <div className="saved-view-header">
-          <p className="saved-view-eyebrow">SAVED</p>
-          <p className="saved-view-subtitle">Keep it here. Come back later.</p>
+      <div className="collection-view saved-view">
+        <div className="collection-header">
+          <p className="collection-eyebrow">SAVED</p>
+          <p className="collection-title">Keep it here. Come back later.</p>
         </div>
         <div className="saved-skeleton-grid" aria-hidden="true">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="saved-skeleton-tile">
-              <div className="saved-skeleton-meta" />
-              <div className="saved-skeleton-title" />
+              <div className="saved-skeleton-meta collection-skeleton-bar" />
+              <div className="saved-skeleton-title collection-skeleton-bar" />
               <div className="saved-skeleton-preview" />
             </div>
           ))}
@@ -268,16 +268,16 @@ export function SavedView({ topics, onNavigateHome }: Props) {
   // ── Error ─────────────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="saved-view">
-        <div className="saved-view-header">
-          <p className="saved-view-eyebrow">SAVED</p>
+      <div className="collection-view saved-view">
+        <div className="collection-header">
+          <p className="collection-eyebrow">SAVED</p>
         </div>
-        <div className="saved-view-error">
-          <p className="saved-view-error-head">COULDN&apos;T LOAD YOUR SHELF</p>
-          <p className="saved-view-error-body">Something went sideways.</p>
+        <div className="collection-state">
+          <p className="collection-state-head">COULDN&apos;T LOAD YOUR SHELF</p>
+          <p className="collection-state-body">Something went sideways.</p>
           <button
             type="button"
-            className="saved-view-cta"
+            className="collection-action collection-cta"
             onClick={() => void load(activeTopicId, sort)}
           >
             TRY AGAIN
@@ -290,28 +290,28 @@ export function SavedView({ topics, onNavigateHome }: Props) {
   // ── Empty state (no bookmarks at all) ─────────────────────────────────────
   if (totalCards === 0 && !activeTopicId && !search) {
     return (
-      <div className="saved-view">
-        <div className="saved-view-header">
-          <p className="saved-view-eyebrow">SAVED</p>
-          <p className="saved-view-subtitle">Keep it here. Come back later.</p>
+      <div className="collection-view saved-view">
+        <div className="collection-header">
+          <p className="collection-eyebrow">SAVED</p>
+          <p className="collection-title">Keep it here. Come back later.</p>
         </div>
-        <div className="saved-view-empty">
-          <pre className="saved-view-empty-ascii" aria-hidden="true">{`
+        <div className="collection-state">
+          <pre className="collection-state-ascii" aria-hidden="true">{`
   \u{1F516}  \u00B7  \u00B7  \u00B7  \u00B7  \u00B7
   \u00B7  \u00B7  \u00B7  \u00B7  \u00B7  \u00B7
   \u00B7  \u00B7  \u00B7  \u00B7  \u00B7  \u00B7`}</pre>
-          <p className="saved-view-empty-head">YOUR SHELF IS EMPTY</p>
-          <p className="saved-view-empty-sub">
+          <p className="collection-state-head">YOUR SHELF IS EMPTY</p>
+          <p className="collection-state-body">
             Save cards you want to revisit.
             <br />
             They&apos;ll live here.
           </p>
           <button
             type="button"
-            className="saved-view-cta"
+            className="collection-action collection-cta"
             onClick={onNavigateHome}
           >
-            <span className="saved-view-cta-icon"><HomeIcon /></span>
+            <span className="collection-action-icon"><HomeIcon /></span>
             EXPLORE FEED
           </button>
         </div>
@@ -321,7 +321,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
 
   // ── Main view ─────────────────────────────────────────────────────────────
   return (
-    <div className="saved-view">
+    <div className="collection-view saved-view">
       {/* Card overlay portal */}
       <AnimatePresence>
         {openRow !== null && (
@@ -345,38 +345,36 @@ export function SavedView({ topics, onNavigateHome }: Props) {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="saved-view-header">
-        <p className="saved-view-eyebrow">SAVED</p>
-        <p className="saved-view-subtitle">Keep it here. Come back later.</p>
+      <div className="collection-header">
+        <p className="collection-eyebrow">SAVED</p>
+        <p className="collection-title">Keep it here. Come back later.</p>
       </div>
 
       {/* Collection metadata */}
-      <p className="saved-view-meta">
+      <p className="collection-meta">
         {totalCards === 1 ? "1 SAVED CARD" : `${totalCards} SAVED CARDS`}
         {topicCount > 0 ? ` \u00B7 ${topicCount} ${topicCount === 1 ? "TOPIC" : "TOPICS"}` : ""}
       </p>
 
-      <hr className="saved-view-divider" />
+      <hr className="collection-rule" />
 
       {/* Search + sort controls */}
-      <div className="saved-view-controls">
-        <div className="saved-view-search-wrap">
-          <input
+      <div className="collection-controls">
+        <input
             id="saved-search"
             type="search"
-            className="saved-view-search"
-            placeholder="Search saved cards\u2026"
+            className="collection-search"
+            placeholder="Search saved cards…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search saved cards"
-          />
-        </div>
-        <div className="saved-view-sort" role="group" aria-label="Sort order">
+          aria-label="Search saved cards"
+        />
+        <div className="collection-pill-row" role="group" aria-label="Sort order">
           {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
             <button
               key={key}
               type="button"
-              className="saved-sort-pill"
+              className="collection-pill"
               data-active={sort === key}
               onClick={() => setSort(key)}
               aria-pressed={sort === key}
@@ -389,10 +387,10 @@ export function SavedView({ topics, onNavigateHome }: Props) {
 
       {/* Topic filter chips */}
       {savedTopics.length > 1 ? (
-        <div className="saved-view-filters" role="group" aria-label="Filter by topic">
+        <div className="collection-filters" role="group" aria-label="Filter by topic">
           <button
             type="button"
-            className="saved-filter-chip"
+            className="collection-chip"
             data-selected={!activeTopicId}
             onClick={() => handleTopicFilter(undefined)}
           >
@@ -404,7 +402,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
               <button
                 key={t.id}
                 type="button"
-                className="saved-filter-chip"
+                className="collection-chip"
                 data-selected={activeTopicId === t.id}
                 onClick={() => handleTopicFilter(t.id)}
                 style={
@@ -422,7 +420,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
 
       {/* Filter/search empty sub-state */}
       {visible.length === 0 ? (
-        <p className="saved-view-empty-filter">
+        <p className="collection-note">
           {search
             ? `No saved cards match "${search}".`
             : "No saved cards in this topic."}
@@ -449,9 +447,9 @@ export function SavedView({ topics, onNavigateHome }: Props) {
 
       {/* Footer watermark */}
       {visible.length > 0 ? (
-        <div className="saved-view-footer" aria-hidden="true">
-          <span className="saved-view-footer-icon"><BookmarkIcon filled /></span>
-          <span className="saved-view-footer-label">
+        <div className="collection-footer" aria-hidden="true">
+          <span className="collection-footer-icon"><BookmarkIcon filled /></span>
+          <span className="collection-footer-label">
             {visible.length} {visible.length === 1 ? "card" : "cards"} saved
           </span>
         </div>

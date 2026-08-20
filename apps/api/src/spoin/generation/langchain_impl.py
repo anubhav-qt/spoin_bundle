@@ -271,12 +271,12 @@ one, who says "shouldn't have done this". That is the bar for charm —
 recognizable, funny, and it actually shows the concept rather than being
 decoration.
 
-A card's ASCII scene, if it has one, renders FIRST — above the title and
-everything else, as the card's visual identity — with the rest of the card's
-content (title, summary, body) following underneath it. When this card
-appears collapsed/previewed in the feed, the scene itself IS the preview
-(instead of the usual text teaser), so the art needs to work as a
-stand-alone thumbnail, not just as an illustration inside a longer read.
+A card's ASCII scene, if it has one, renders right below the title, in place
+of the usual one-line summary/hook — the FIRST thing about the card's actual
+content, before body. When this card appears collapsed/previewed in the
+feed, the scene itself IS the preview (instead of the usual text teaser), so
+the art needs to work as a stand-alone thumbnail, not just as an
+illustration inside a longer read.
 
 If you draw one, set:
 - ascii_label: a short slug for it (e.g. "sit-on-guy"), never empty if art is present.

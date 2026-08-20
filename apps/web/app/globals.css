@@ -906,19 +906,18 @@ body {
   color: var(--fg-2);
 }
 
-/* ASCII scene (ADR-0021 / free-form generation testing branch) — always the
-   first thing in the card, ahead of `.card-head`. Bleeds to the card's own
-   edges (negative margin matching `.card`'s own padding) so it reads as the
-   card's visual identity rather than an inset illustration. Deliberately no
-   `max-height`/`overflow-y` here: while collapsed this box stands in for the
-   whole preview (see `AsciiArt` in Card.tsx), so it must render at its real
+/* ASCII scene (ADR-0021 / free-form generation testing branch) — sits right
+   after `.card-title`, where `.card-summary`/`.card-teaser` normally go,
+   standing in for that collapsed hook entirely rather than alongside it.
+   Deliberately no `max-height`/`overflow-y` here: while collapsed this box
+   IS the preview (see `AsciiArt` in Card.tsx), so it must render at its real
    height, not get cropped to fit a "normal" collapsed card's size. */
 .card-ascii {
-  margin: -14px -15px 10px;
-  padding: 16px 15px;
-  border-radius: var(--r-card) var(--r-card) 0 0;
+  margin: 0 0 10px;
+  padding: 14px 15px;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
-  border-bottom: 1px solid var(--line);
+  border: 1px solid var(--line);
   overflow-x: auto;
 }
 
@@ -1077,16 +1076,23 @@ body {
 
 .card-body h1,
 .card-body h2,
-.card-body h3 {
+.card-body h3,
+.card-body h4,
+.card-body h5,
+.card-body h6 {
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.005em;
+  color: var(--fg);
   margin: 18px 0 7px;
 }
 
 .card-body h1:first-child,
 .card-body h2:first-child,
-.card-body h3:first-child {
+.card-body h3:first-child,
+.card-body h4:first-child,
+.card-body h5:first-child,
+.card-body h6:first-child {
   margin-top: 0;
 }
 
@@ -1094,9 +1100,10 @@ body {
   margin: 0 0 12px;
 }
 
-.card-body ul {
+.card-body ul,
+.card-body ol {
   margin: 0 0 12px;
-  padding-left: 18px;
+  padding-left: 20px;
 }
 
 .card-body li {
@@ -1105,6 +1112,82 @@ body {
 
 .card-body li::marker {
   color: var(--fg-3);
+}
+
+.card-body blockquote {
+  margin: 0 0 12px;
+  padding: 6px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-3);
+  border-radius: 0 6px 6px 0;
+  color: var(--fg-2);
+  font-style: italic;
+}
+
+.card-body blockquote p {
+  margin: 0;
+}
+
+.card-table-wrapper {
+  margin: 0 0 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-3);
+}
+
+.card-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.card-body th {
+  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--fg);
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.card-body td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  font-size: 13px;
+}
+
+.card-body tr:last-child td {
+  border-bottom: none;
+}
+
+/* Math typography */
+.inline-math {
+  display: inline-block;
+  vertical-align: -0.1em;
+  line-height: 0;
+  color: var(--fg);
+}
+
+.inline-math .katex {
+  font-size: 1.05em;
+}
+
+.math-block {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-3);
+  overflow-x: auto;
+  text-align: center;
+}
+
+.math-block .katex-display {
+  margin: 0;
 }
 
 /* Color-only, no background pill — inline code is the "technical syntax /

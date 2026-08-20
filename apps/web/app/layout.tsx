@@ -13,6 +13,7 @@ import {
   Zilla_Slab,
 } from "next/font/google";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import { AuthProvider } from "@/components/AuthProvider";
 
 /**

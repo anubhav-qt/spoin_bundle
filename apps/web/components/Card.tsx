@@ -37,6 +37,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
+import katex from "katex";
 
 import { api, type ArchetypeTag, type Card as CardModel, type Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
@@ -377,9 +378,9 @@ export function Card({
 
   const archetype = getPrimaryArchetype(card.archetype);
   // ASCII scene (ADR-0021, or a model-drawn one on the free-form generation
-  // testing branch — see lib/api.ts). Renders above everything else, and
-  // while collapsed it stands in for the usual teaser/summary entirely —
-  // the scene IS the preview, not an addition to it.
+  // testing branch — see lib/api.ts). Renders right after the title, in the
+  // usual teaser/summary's slot, standing in for it entirely — the scene IS
+  // the preview while collapsed, not an addition to it.
   const asciiArt = card.visual_id !== null ? card.visual_slots?.art : undefined;
   const hasAsciiArt = asciiArt !== undefined && asciiArt.trim() !== "";
 
@@ -402,48 +403,46 @@ export function Card({
           aria-expanded={expanded}
           style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as CSSProperties) : undefined}
         >
-          {hasAsciiArt ? <AsciiArt art={asciiArt!} alt={card.visual_slots?.alt} /> : null}
+          <div className="card-head">
+            {/* Always this user's own name for the topic (ADR-0004). */}
+            <span className="card-topic">{topicName}</span>
+            <span className="difficulty" aria-label={card.difficulty}>
+              {[1, 2, 3].map((step) => (
+                <i key={step} data-on={step <= DIFFICULTY_RANK[card.difficulty]} />
+              ))}
+            </span>
+            {seen ? <span className="card-read">· Read</span> : null}
+            {isHero ? <span className="hero-badge">Hero</span> : null}
+            {expanded && !isHero ? (
+              <button
+                type="button"
+                className="card-close"
+                aria-label="Collapse card"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  collapse();
+                }}
+              >
+                <CloseIcon />
+              </button>
+            ) : null}
+          </div>
 
-          {/* An ascii-art card's collapsed face is the scene alone (above) —
-              head, title, and the usual teaser/summary wait for expansion,
-              same "the scene IS the preview" reasoning as `hasAsciiArt`'s
-              comment. Every other card shows these unconditionally, as
-              before. */}
-          {!hasAsciiArt || expanded ? (
-            <>
-              <div className="card-head">
-                {/* Always this user's own name for the topic (ADR-0004). */}
-                <span className="card-topic">{topicName}</span>
-                <span className="difficulty" aria-label={card.difficulty}>
-                  {[1, 2, 3].map((step) => (
-                    <i key={step} data-on={step <= DIFFICULTY_RANK[card.difficulty]} />
-                  ))}
-                </span>
-                {seen ? <span className="card-read">· Read</span> : null}
-                {isHero ? <span className="hero-badge">Hero</span> : null}
-                {expanded && !isHero ? (
-                  <button
-                    type="button"
-                    className="card-close"
-                    aria-label="Collapse card"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      collapse();
-                    }}
-                  >
-                    <CloseIcon />
-                  </button>
-                ) : null}
-              </div>
+          <h2 className="card-title">{card.title}</h2>
 
-              <h2 className="card-title">{card.title}</h2>
-
-              {hasAsciiArt ? null : archetype === "default" ? (
-                <p className="card-summary">{card.summary}</p>
-              ) : !expanded ? (
-                <ArchetypeTeaser archetype={archetype} body={card.body} />
-              ) : null}
-            </>
+          {/* An ascii-art card shows its scene right where the summary/teaser
+              normally goes — the FIRST thing after the title, ahead of
+              everything else, standing in for the usual collapsed hook
+              entirely (never both). Kept visible through expansion too,
+              unlike the code/diagram teaser above, since the art is a
+              standalone illustration, not a preview of something body
+              repeats. */}
+          {hasAsciiArt ? (
+            <AsciiArt art={asciiArt!} alt={card.visual_slots?.alt} />
+          ) : archetype === "default" ? (
+            <p className="card-summary">{card.summary}</p>
+          ) : !expanded ? (
+            <ArchetypeTeaser archetype={archetype} body={card.body} />
           ) : null}
 
           {/* `inert` while collapsed. Clipping to zero height hides the body

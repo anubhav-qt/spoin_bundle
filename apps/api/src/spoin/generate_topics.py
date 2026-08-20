@@ -18,6 +18,7 @@ import json
 import logging
 import sys
 import uuid
+from typing import Any, cast
 
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine, session_scope
@@ -73,7 +74,8 @@ async def main(argv: list[str]) -> None:
             generation_report = await run_generation_pipeline(
                 session, generator, embedder, settings, topic_ids=all_topic_ids
             )
-        generated_by_id = {t["topic_id"]: t for t in generation_report["topics"]}  # type: ignore[index]
+        generated_topics = cast(list[dict[str, Any]], generation_report["topics"])
+        generated_by_id = {t["topic_id"]: t for t in generated_topics}
 
         report = {
             "topics": [generated_by_id[outcome["topic_id"]] for outcome in outcomes]

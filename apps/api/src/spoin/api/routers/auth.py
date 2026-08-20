@@ -157,7 +157,7 @@ async def google_auth(
     try:
         user_info = verify_google_id_token(payload.id_token, settings.google_client_id)
     except ValueError as e:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail=str(e))
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail=str(e)) from e
 
     user = await session.scalar(select(User).where(User.google_id == user_info.google_id))
 
@@ -198,10 +198,10 @@ async def google_auth(
 async def refresh(payload: RefreshIn, session: SessionDep, settings: SettingsDep) -> TokenOut:
     try:
         decoded = decode_token(payload.refresh_token, settings)
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired")
-    except jwt.PyJWTError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+    except jwt.ExpiredSignatureError as e:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired") from e
+    except jwt.PyJWTError as e:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token") from e
 
     if decoded.get("type") != "refresh":
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")

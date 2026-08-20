@@ -73,13 +73,17 @@ async def test_entry_tier_is_trusted_and_unlocks_below_tiers(
         )
     )
     assert progress is not None
-    assert progress.tier_unlocked == [True, True, False]
+    # ADR-0032 amends ADR-0027: only tiers STRICTLY BELOW the entry tier
+    # pre-unlock. The entry tier itself (index 1, Intermediate) still earns
+    # its own quiz through the normal coverage gate.
+    assert progress.tier_unlocked == [True, False, False]
 
-    # No content read yet, but the entry tier itself needs no quiz gate
-    # (ADR-0027) — a promotion attempt at the entry tier should still be
-    # blocked by the ordinary coverage gate...
+    # No content read yet, so the entry tier's own quiz is still gated by
+    # the ordinary coverage requirement...
     with pytest.raises(HTTPException) as exc_info:
-        await start_quiz(topic_id, QuizStartIn(difficulty=Difficulty.ADVANCED), session, user_id)
+        await start_quiz(
+            topic_id, QuizStartIn(difficulty=Difficulty.INTERMEDIATE), session, user_id
+        )
     assert exc_info.value.status_code == 403
 
     # ...but a practice attempt at a tier BELOW the entry tier is open
@@ -191,6 +195,17 @@ async def test_thin_bank_returns_conflict(session: AsyncSession, settings: Setti
     session.add(topic)
     await session.flush()
     await subscribe_topic(topic.id, session, user_id, entry_difficulty=Difficulty.BEGINNER)
+
+    # ADR-0032: Beginner entry starts fully locked -- force the tier open so
+    # this test exercises the thin-bank check, not the unlock gate.
+    progress = await session.scalar(
+        select(UserTopicProgress).where(
+            UserTopicProgress.user_id == user_id, UserTopicProgress.topic_id == topic.id
+        )
+    )
+    assert progress is not None
+    progress.tier_unlocked = [True, False, False]
+    await session.commit()
 
     with pytest.raises(HTTPException) as exc_info:
         await start_quiz(topic.id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id)

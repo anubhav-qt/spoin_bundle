@@ -162,16 +162,30 @@ class QuotaGovernor:
         runtime condition to degrade from -- raises rather than silently
         no-op-ing, same posture as `parse_ladder` on a malformed ladder string."""
 
+        async with self._lock, session_scope() as session:
+            await self._mark_exhausted_locked(session, key_index, model, now=now)
+
+    async def mark_exhausted_with_session(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime
+    ) -> None:
+        """Same as `mark_exhausted`, but reuses a caller-supplied session instead
+        of opening its own — for tests, same reasoning as `acquire_with_session`."""
+
+        async with self._lock:
+            await self._mark_exhausted_locked(session, key_index, model, now=now)
+
+    async def _mark_exhausted_locked(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime
+    ) -> None:
         rung = next((r for r in self.ladder if r.model == model), None)
         if rung is None:
             raise ValueError(f"mark_exhausted: {model!r} is not in this pool's ladder")
 
         day = _day_start(now)
-        async with self._lock, session_scope() as session:
-            ledger = await self._ledger_row(session, day, key_index, model)
-            ledger.requests_spent = max(ledger.requests_spent, rung.rpd)
-            ledger.exhausted_at = now
-            await session.flush()
+        ledger = await self._ledger_row(session, day, key_index, model)
+        ledger.requests_spent = max(ledger.requests_spent, rung.rpd)
+        ledger.exhausted_at = now
+        await session.flush()
         logger.warning(
             "quota: key %d model %s marked exhausted after a REAL 429 from the provider "
             "(local ledger believed it had room)",

@@ -51,7 +51,7 @@ def create_refresh_token(user_id: UUID, settings: Settings) -> str:
 
 def decode_token(token: str, settings: Settings) -> dict[str, Any]:
     """Decode and verify a JWT. Raises ``jwt.PyJWTError`` on any failure."""
-    return jwt.decode(  # type: ignore[no-any-return]
+    return jwt.decode(
         token,
         settings.jwt_secret_key,
         algorithms=[settings.jwt_algorithm],

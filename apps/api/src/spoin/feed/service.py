@@ -448,7 +448,7 @@ class FeedService:
         found = row.first()
         if found is None or not found[1]:
             return 0.0
-        return found[0] / found[1]
+        return float(found[0]) / float(found[1])
 
     async def _starved_slots(
         self, user_id: UUID, topic_ids: list[UUID]

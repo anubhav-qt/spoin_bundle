@@ -28,7 +28,9 @@ def verify_google_id_token(token: str, client_id: str) -> GoogleUserInfo:
     Raises ``ValueError`` if the token is invalid, expired, or was not
     issued for ``client_id``.
     """
-    idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
+    idinfo = id_token.verify_oauth2_token(  # type: ignore[no-untyped-call]
+        token, google_requests.Request(), client_id
+    )
 
     email = idinfo.get("email")
     if not email:

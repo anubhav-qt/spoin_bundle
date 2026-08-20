@@ -28,18 +28,18 @@ async def _resolve_access_token_user_id(
 ) -> UUID:
     try:
         payload = decode_token(token, settings)
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-    except jwt.PyJWTError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    except jwt.ExpiredSignatureError as e:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token expired") from e
+    except jwt.PyJWTError as e:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token") from e
 
     if payload.get("type") != "access":
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
 
     try:
         user_id = UUID(payload["sub"])
-    except (KeyError, ValueError):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject")
+    except (KeyError, ValueError) as e:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject") from e
 
     exists = await session.scalar(select(User.id).where(User.id == user_id))
     if exists is None:

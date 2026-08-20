@@ -42,7 +42,8 @@ from spoin.embeddings import get_embedder, normalize_topic_text
 
 def load_generated_fixture() -> dict[str, Any]:
     source = resources.files("spoin.fixtures").joinpath("generated_corpus.json")
-    return json.loads(source.read_text(encoding="utf-8"))
+    data: dict[str, Any] = json.loads(source.read_text(encoding="utf-8"))
+    return data
 
 
 async def seed_generated() -> None:
@@ -69,7 +70,9 @@ async def seed_generated() -> None:
             await session.flush()
 
             subscription = await session.scalar(
-                select(UserTopic).where(UserTopic.user_id == user.id, UserTopic.topic_id == topic.id)
+                select(UserTopic).where(
+                    UserTopic.user_id == user.id, UserTopic.topic_id == topic.id
+                )
             )
             if subscription is None:
                 session.add(

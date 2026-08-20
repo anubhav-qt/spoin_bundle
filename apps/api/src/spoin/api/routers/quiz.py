@@ -193,7 +193,7 @@ async def start_quiz(
         attempt_id=attempt.id,
         topic_id=topic_id,
         difficulty=difficulty,
-        kind=kind.value,  # type: ignore[arg-type]
+        kind=kind.value,
         mcq=[
             QuizMcqQuestionOut(question_id=q.id, stem=q.stem, options=q.options or [])
             for q in mcq_questions

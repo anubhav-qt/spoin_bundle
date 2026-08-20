@@ -82,7 +82,7 @@ async def test_mark_exhausted_forces_a_cell_off_the_ladder(session: AsyncSession
     governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 20, 100)))
     now = datetime.now(UTC)
 
-    await governor.mark_exhausted(0, "model-a", now=now)
+    await governor.mark_exhausted_with_session(session, 0, "model-a", now=now)
     ledger = await session.scalar(
         select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
     )

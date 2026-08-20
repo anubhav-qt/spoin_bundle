@@ -25,6 +25,7 @@ import logging
 import sys
 import uuid
 from datetime import UTC, datetime
+from typing import Any, cast
 
 from sqlalchemy import select
 
@@ -63,7 +64,7 @@ async def _run_job(
             job.completed_at = datetime.now(UTC)
             job.attempts += 1
             job.last_error = None
-        topics = report.get("topics", [])
+        topics = cast(list[dict[str, Any]], report.get("topics", []))
         accepted = topics[0].get("accepted", 0) if topics else 0
         logger.info("job %s completed (topic=%s, cards_accepted=%s)", job_id, topic_id, accepted)
     except QuotaExhaustedError as exc:

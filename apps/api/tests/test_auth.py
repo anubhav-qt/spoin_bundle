@@ -6,10 +6,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.api.main import app
+from spoin.auth.passwords import verify_password
 from spoin.core.config import Settings, get_settings
 from spoin.core.db import get_session
 from spoin.domain.models import User
-from spoin.auth.passwords import verify_password
 
 
 @pytest.fixture(autouse=True)

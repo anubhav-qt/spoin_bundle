@@ -64,7 +64,8 @@ async def seed_quiz() -> None:
                 for question_entry in subtopic_entry["questions"]:
                     card = await session.scalar(
                         select(Card).where(
-                            Card.subtopic_id == subtopic.id, Card.title == question_entry["card_title"]
+                            Card.subtopic_id == subtopic.id,
+                            Card.title == question_entry["card_title"],
                         )
                     )
                     if card is None:
@@ -75,7 +76,8 @@ async def seed_quiz() -> None:
 
                     existing = await session.scalar(
                         select(Question).where(
-                            Question.subtopic_id == subtopic.id, Question.stem == question_entry["stem"]
+                            Question.subtopic_id == subtopic.id,
+                            Question.stem == question_entry["stem"],
                         )
                     )
                     if existing is not None:

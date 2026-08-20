@@ -540,7 +540,7 @@ async def get_topic_stats(topic_id: UUID, session: SessionDep, user_id: UserDep)
             .group_by(EngagementEvent.kind)
         )
     ).all()
-    event_counts = {kind: count for kind, count in event_rows}
+    event_counts: dict[EngagementKind, int] = dict(tuple(row) for row in event_rows)
 
     return TopicStatsOut(
         topic_id=topic_id,

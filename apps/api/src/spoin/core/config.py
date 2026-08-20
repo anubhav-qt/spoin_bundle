@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     google_client_id: str = ""
 
     @model_validator(mode="after")
-    def _require_real_jwt_secret_in_production(self) -> "Settings":
+    def _require_real_jwt_secret_in_production(self) -> Settings:
         """The default signing key is checked into git and public. A `production`
         process still carrying it would sign every token with a guessable secret,
         so this fails startup loudly instead of falling back silently."""

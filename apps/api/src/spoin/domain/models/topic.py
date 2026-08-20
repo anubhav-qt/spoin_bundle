@@ -24,6 +24,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -55,6 +56,11 @@ class User(Base, UUIDPrimaryKey, Timestamps):
     google_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     #: Gates onboarding, not signup — set once the onboarding flow finishes.
     onboarding_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    
+    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    avatar_icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    avatar_image: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
 
     topics: Mapped[list[UserTopic]] = relationship(back_populates="user")
 

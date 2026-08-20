@@ -20,8 +20,11 @@ import { CustomCursor } from "./CustomCursor";
 import { Feed } from "./Feed";
 import { FocusToggle } from "./FocusToggle";
 import { GuestNotice } from "./GuestNotice";
+import { LikedView } from "./LikedView";
 import { NotesView } from "./NotesView";
+import { ProfileView } from "./ProfileView";
 import { RightRail } from "./RightRail";
+import { SavedView } from "./SavedView";
 import { Sidebar, type ShellView } from "./Sidebar";
 
 function toTopicProgress(p: {
@@ -187,6 +190,12 @@ export function AppShell() {
         <div className="shell">
           {view === "notes" ? (
             <NotesView />
+          ) : view === "liked" ? (
+            <LikedView topics={topics} onNavigateHome={() => setView("feed")} />
+          ) : view === "saved" ? (
+            <SavedView topics={topics} onNavigateHome={() => setView("feed")} />
+          ) : view === "profile" ? (
+            <ProfileView />
           ) : (
             <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
           )}

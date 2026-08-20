@@ -22,6 +22,10 @@ const URGENT: ReadonlySet<EngagementKind> = new Set([
   "expand",
   "explicit_complete",
   "dwell_complete",
+  "like",
+  "unlike",
+  "bookmark",
+  "unbookmark",
 ]);
 
 class EngagementBuffer {

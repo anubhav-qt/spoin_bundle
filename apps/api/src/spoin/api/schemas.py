@@ -376,6 +376,10 @@ class UserOut(BaseModel):
     display_name: str
     is_guest: bool
     onboarding_complete: bool
+    age: int | None = None
+    gender: str | None = None
+    avatar_icon: str | None = None
+    has_avatar_image: bool = False
 
 
 class OnboardingTopicChoice(BaseModel):
@@ -418,3 +422,54 @@ class NoteWithCardOut(BaseModel):
     #: `TopicOut.display_name`, sourced from `UserTopic` rather than `Topic`.
     topic_name: str
 
+
+class LikedCardOut(BaseModel):
+    """One row of the "liked" collection -- the card the user hearted, enough
+    context to render it inline (same join strategy as `NoteWithCardOut`), and
+    when they liked it so the client can sort by recency without a round-trip."""
+
+    card: CardOut
+    #: This user's own name for the card's topic (ADR-0004).
+    topic_name: str
+    #: Server timestamp from `card_like.created_at` -- the authoritative sort key
+    #: for "recently liked" ordering. Client clocks are wrong; we never trust them.
+    liked_at: datetime
+
+
+class SavedCardOut(BaseModel):
+    """One row of the "saved" collection -- the card the user bookmarked, enough
+    context to render as a compact library tile without a follow-up request.
+
+    Mirrors `LikedCardOut` exactly, sourced from `card_bookmark` rather than
+    `card_like`. Kept as a separate schema so the two surfaces can diverge
+    independently if needed (e.g. bookmark-specific metadata in the future)."""
+
+    card: CardOut
+    #: This user's own name for the card's topic (ADR-0004).
+    topic_name: str
+    #: Server timestamp from `card_bookmark.created_at`. Sort key for "recently
+    #: saved" ordering -- client clocks are never trusted (ADR-0011).
+    saved_at: datetime
+
+
+# ----------------------------------------------------------------------- profile --
+
+
+class UserProfileUpdateIn(BaseModel):
+    display_name: str | None = Field(default=None, min_length=1, max_length=80)
+    age: int | None = Field(default=None, ge=1, le=120)
+    gender: str | None = Field(default=None, max_length=32)
+    avatar_icon: str | None = Field(default=None, max_length=32)
+
+
+class DailyActivityOut(BaseModel):
+    date: str  # YYYY-MM-DD
+    cards_read: int
+
+
+class ProfileStatsOut(BaseModel):
+    current_streak: int
+    longest_streak: int
+    total_cards_read: int
+    total_topics: int
+    monthly_activity: list[DailyActivityOut]

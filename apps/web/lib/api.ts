@@ -185,6 +185,10 @@ export interface User {
   display_name: string;
   is_guest: boolean;
   onboarding_complete: boolean;
+  age?: number | null;
+  gender?: string | null;
+  avatar_icon?: string | null;
+  has_avatar_image?: boolean;
 }
 
 export interface Progress {
@@ -342,6 +346,24 @@ export interface NoteWithCard {
   topic_name: string;
 }
 
+/** One row of the liked collection -- the card the user hearted, the user's
+ *  own name for its topic (ADR-0004), and when they liked it for sorting. */
+export interface LikedCard {
+  card: Card;
+  topic_name: string;
+  /** ISO 8601 server timestamp from `card_like.created_at`. */
+  liked_at: string;
+}
+
+/** One row of the saved (bookmarked) collection -- the card the user bookmarked,
+ *  the user's own topic name, and when they saved it for sorting. */
+export interface SavedCard {
+  card: Card;
+  topic_name: string;
+  /** ISO 8601 server timestamp from `card_bookmark.created_at`. */
+  saved_at: string;
+}
+
 export interface QuizFreeTextSubmitResult {
   attempt_id: string;
   free_text: QuizFreeTextResult;
@@ -477,4 +499,79 @@ export const api = {
   deleteNote: (cardId: string) => request<void>(`/cards/${cardId}/note`, { method: "DELETE" }),
 
   listNotes: () => request<NoteWithCard[]>("/notes"),
+
+  likedCards: (topicId?: string, sort?: string) => {
+    const query = new URLSearchParams();
+    if (topicId) query.set("topic_id", topicId);
+    if (sort) query.set("sort", sort);
+    const suffix = query.toString();
+    return request<LikedCard[]>(`/cards/liked${suffix === "" ? "" : `?${suffix}`}`);
+  },
+
+  savedCards: (topicId?: string, sort?: string) => {
+    const query = new URLSearchParams();
+    if (topicId) query.set("topic_id", topicId);
+    if (sort) query.set("sort", sort);
+    const suffix = query.toString();
+    return request<SavedCard[]>(`/cards/saved${suffix === "" ? "" : `?${suffix}`}`);
+  },
+
+  // --- Profile ---
+  getProfileStats: (year: number, month: number) => 
+    request<ProfileStatsOut>(`/profile/me/stats?year=${year}&month=${month}`),
+    
+  updateProfile: (updates: UserProfileUpdateIn) => 
+    request<User>("/profile/me", {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    }),
+    
+  uploadAvatar: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    const token = localStorage.getItem("spoin_access_token");
+    const response = await fetch(`${BASE_URL}/profile/me/avatar`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      const detail = await response
+        .json()
+        .then((body: any) => body.detail)
+        .catch(() => undefined);
+      throw new ApiError(response.status, detail ?? `POST /profile/me/avatar failed`);
+    }
+  
+    return response.json() as Promise<User>;
+  },
+  
+  deleteAvatar: () => 
+    request<User>("/profile/me/avatar", {
+      method: "DELETE",
+    }),
 };
+
+export interface UserProfileUpdateIn {
+  display_name?: string | null;
+  age?: number | null;
+  gender?: string | null;
+  avatar_icon?: string | null;
+}
+
+export interface DailyActivityOut {
+  date: string;
+  cards_read: number;
+}
+
+export interface ProfileStatsOut {
+  current_streak: number;
+  longest_streak: number;
+  total_cards_read: number;
+  total_topics: number;
+  monthly_activity: DailyActivityOut[];
+}

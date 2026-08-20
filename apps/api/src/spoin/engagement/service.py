@@ -110,6 +110,12 @@ class EngagementService:
         )
         inserted = len((await self._session.execute(statement)).scalars().all())
 
+        # Sort rows to ensure a consistent lock acquisition order across concurrent
+        # requests, preventing deadlocks on user_card_state and user_subtopic_progress.
+        # Python's sort is stable, so multiple events for the SAME card retain
+        # their chronological order from the client batch.
+        rows.sort(key=lambda r: (r["subtopic_id"], r["card_id"]))
+
         for row in rows:
             await self._apply_state(user_id, row)
 

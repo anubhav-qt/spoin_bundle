@@ -17,6 +17,7 @@ dependencies = [
     "bcrypt>=4.0",
     "PyJWT[crypto]>=2.8",
     "google-auth>=2.0",
+    "python-multipart>=0.0.18",
 ]
 
 [project.optional-dependencies]

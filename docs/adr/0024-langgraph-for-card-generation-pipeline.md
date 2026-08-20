@@ -12,6 +12,11 @@
   for cross-job concurrency. This doesn't change the boundary below ("LangGraph owns
   control flow inside one job's execution") -- it clarifies that one job now means one
   topic. The body below is left as originally written; read ADR-0026 alongside it.
+- **Amended by:** [ADR-0044](0044-generation-pipeline-as-a-package.md) -- `pipeline.py` is a
+  package now, so every reference below to that path reads as `generation/pipeline/`. The
+  import boundary is unchanged in intent and narrower in practice: "Committed to:
+  `pipeline.py` is the only place `langgraph` is imported" is now two named files inside
+  the package (`graph.py`, `nodes.py`), not the whole package. Nothing else here changes.
 
 ## Context
 

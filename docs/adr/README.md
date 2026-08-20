@@ -57,10 +57,10 @@ useful than the decision itself.
 | [0018](0018-hero-mechanism-and-teaser-refinements.md) | Real hero mechanism, teaser refinements, block-expand modal | Accepted |
 | [0019](0019-experimental-generated-fixture-content.md) | A second, honestly-tagged fixture for AI-generated content | Accepted |
 | [0020](0020-rename-to-spoin.md) | Rename the product from Slocho to Spoin | Accepted |
-| [0021](0021-ascii-scene-library.md) | ASCII art from a curated scene library, not from the generator | Accepted |
+| [0021](0021-ascii-scene-library.md) | ASCII art from a curated scene library, not from the generator | Superseded by 0042 |
 | [0022](0022-dual-titles.md) | Every card carries a display title and a canonical title | Accepted |
 | [0023](0023-reader-font-selection.md) | Five selectable reader fonts, with the monospace face locked | Accepted |
-| [0024](0024-langgraph-for-card-generation-pipeline.md) | LangGraph for the card-generation pipeline, worker stays the scheduler | Accepted (amends 0002) |
+| [0024](0024-langgraph-for-card-generation-pipeline.md) | LangGraph for the card-generation pipeline, worker stays the scheduler | Accepted (amends 0002; amended by 0026, 0044) |
 | [0025](0025-batched-llm-topic-matching.md) | Batched LLM topic matching, no thresholds | Accepted |
 | [0026](0026-one-shot-generation-to-completion.md) | One-shot generation to completion, amends 0006 | Accepted (amends 0006; fixed by 0041) |
 | [0027](0027-self-selected-entry-tier.md) | Self-selected entry tier; the placement quiz gate is dropped | Accepted (amends 0009; amended by 0032) |
@@ -78,3 +78,8 @@ useful than the decision itself.
 | [0039](0039-remove-swipe-to-dismiss.md) | Remove swipe-to-dismiss; cards are not draggable | Accepted (partially supersedes 0017) |
 | [0040](0040-per-cell-call-serialization.md) | Serialize actual network calls per (key, model) cell | Accepted (amends 0028) |
 | [0041](0041-per-group-gate-and-persist.md) | Gate+persist per subtopic group, not after a global fan-in | Accepted (fixes 0026) |
+| [0042](0042-freeform-ascii-and-real-hero-mechanism.md) | Free-form generator-drawn ASCII art, and a real hero-card mechanism | Accepted (supersedes 0021) |
+| [0043](0043-routers-are-transport-only.md) | Routers are transport; every domain gets a service module | Accepted |
+| [0044](0044-generation-pipeline-as-a-package.md) | The generation pipeline becomes a package; `langgraph` confined to two files | Accepted (amends 0024) |
+| [0045](0045-settings-surface-and-user-preferences.md) | A Settings surface, with preferences on the user row and no parallel system | Accepted |
+| [0046](0046-one-collection-surface.md) | One collection surface shared by Saved, Liked, Profile and Settings | Accepted |

@@ -428,7 +428,7 @@ export function Card({
             ) : null}
           </div>
 
-          <h2 className="card-title">{card.title}</h2>
+          <h2 className="card-title">{inline(normalizeText(card.title))}</h2>
 
           {/* An ascii-art card shows its scene right where the summary/teaser
               normally goes — the FIRST thing after the title, ahead of
@@ -440,7 +440,7 @@ export function Card({
           {hasAsciiArt ? (
             <AsciiArt art={asciiArt!} alt={card.visual_slots?.alt} />
           ) : archetype === "default" ? (
-            <p className="card-summary">{card.summary}</p>
+            <p className="card-summary">{inline(normalizeText(card.summary))}</p>
           ) : !expanded ? (
             <ArchetypeTeaser archetype={archetype} body={card.body} />
           ) : null}
@@ -602,12 +602,45 @@ function getPrimaryArchetype(tags: ArchetypeTag[]): ArchetypeTag | "combo" | "de
   return "default";
 }
 
+/** Normalizes escaped characters (e.g. \n, \", \') while preserving LaTeX syntax. */
+function normalizeText(source: string): string {
+  if (!source) return "";
+
+  // Protect escaped dollar signs \$ before splitting on math boundaries
+  const escapedDollarPlaceHolder = "\uE000";
+  const text = source.replace(/\\\$/g, escapedDollarPlaceHolder);
+
+  // Match $$...$$, $...$, \[...\], \(...\)
+  const mathRegex = /(\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\\\[[\s\S]*?\\\]|\\\([^)\n]+\\\))/g;
+  const segments = text.split(mathRegex);
+
+  for (let i = 0; i < segments.length; i++) {
+    if (i % 2 === 0) {
+      // Outside math: normalize escaped newlines, tabs, quotes
+      segments[i] = segments[i]
+        .replace(/\\r\\n|\\r/g, "\n")
+        .replace(/\\n/g, "\n")
+        .replace(/\\t/g, "  ")
+        .replace(/\\"/g, '"')
+        .replace(/\\'/g, "'");
+    } else {
+      // Inside math: normalize linebreaks and quotes
+      segments[i] = segments[i]
+        .replace(/\\r\\n|\\r/g, "\n")
+        .replace(/\\"/g, '"')
+        .replace(/\\'/g, "'");
+    }
+  }
+
+  return segments.join("").replace(new RegExp(escapedDollarPlaceHolder, "g"), "\\$");
+}
+
 /** Presentation-only mirror of content/archetype.py's diagram heuristic — it
  *  exists here purely to pick which fenced block to preview in the collapsed
  *  teaser. `card.archetype` (server-derived) remains the single source of
  *  truth for WHICH archetype a card is; this never overrides it. */
-const DIAGRAM_LANG_TAGS = new Set(["diagram", "text", "ascii", ""]);
-const DIAGRAM_CHARS_RE = /[─│┌└┐┘├┤┬┴┼→▶►]|-->|==>|──>/;
+const DIAGRAM_LANG_TAGS = new Set(["diagram", "text", "ascii", "table", ""]);
+const DIAGRAM_CHARS_RE = /[─│┌└┐┘├┤┬┴┼→▶►]|-->|==>|──>|\+[-+]+\+|\|.*\|/;
 
 function isDiagramFence(lang: string, content: string): boolean {
   const normalized = lang.toLowerCase();
@@ -619,7 +652,8 @@ function isDiagramFence(lang: string, content: string): boolean {
 const FENCE_RE = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g;
 
 function firstFenceOfKind(body: string, kind: "code" | "diagram"): { lang: string; content: string } | null {
-  for (const match of body.matchAll(FENCE_RE)) {
+  const normalized = normalizeText(body);
+  for (const match of normalized.matchAll(FENCE_RE)) {
     const [, lang, content] = match;
     if ((isDiagramFence(lang, content) ? "diagram" : "code") === kind) {
       return { lang, content: content.replace(/\n$/, "") };
@@ -638,10 +672,11 @@ function firstNonEmptyLine(text: string): string {
  *  otherwise) and strips markdown syntax, rather than showing raw `**`/full
  *  paragraphs verbatim. */
 function extractComparisonTag(marker: string, body: string): string | null {
-  const boldClaim = new RegExp(`${marker}\\s*\\*\\*([^*]+)\\*\\*`).exec(body);
+  const normalized = normalizeText(body);
+  const boldClaim = new RegExp(`${marker}\\s*\\*\\*([^*]+)\\*\\*`).exec(normalized);
   if (boldClaim !== null) return boldClaim[1].trim();
 
-  const line = new RegExp(`${marker}\\s*([^\\n]+)`).exec(body);
+  const line = new RegExp(`${marker}\\s*([^\\n]+)`).exec(normalized);
   if (line === null) return null;
   const plain = line[1].replace(/\*\*/g, "").trim();
   return plain.length > 60 ? `${plain.slice(0, 57).trimEnd()}…` : plain;
@@ -655,15 +690,11 @@ function comparisonTags(body: string): { bad: string; good: string } | null {
 }
 
 /** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art —
- *  see `Card.tsx`'s `hasAsciiArt`). Deliberately no `max-height`/`overflow`
- *  clamp here, unlike `.card-body`'s scroll cap when expanded — while
- *  collapsed this box IS the entire preview, so it renders at whatever
- *  height the scene actually needs rather than being cropped to a "normal"
- *  card's size. */
+ *  see `Card.tsx`'s `hasAsciiArt`). */
 function AsciiArt({ art, alt }: { art: string; alt: string | undefined }) {
   return (
     <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
-      <pre>{art}</pre>
+      <pre>{normalizeText(art)}</pre>
     </div>
   );
 }
@@ -726,16 +757,53 @@ function ArchetypeTeaser({ archetype, body }: { archetype: ArchetypeTag | "combo
   );
 }
 
+function MathBlock({ math }: { math: string }) {
+  let clean = math.trim();
+  if (clean.startsWith("$$") && clean.endsWith("$$") && clean.length >= 4) {
+    clean = clean.slice(2, -2).trim();
+  } else if (clean.startsWith("\\[") && clean.endsWith("\\]") && clean.length >= 4) {
+    clean = clean.slice(2, -2).trim();
+  }
+
+  try {
+    const html = katex.renderToString(clean, {
+      displayMode: true,
+      throwOnError: false,
+      output: "htmlAndMathml",
+    });
+    return <div className="math-block" dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch {
+    return <pre className="math-block mono">{clean}</pre>;
+  }
+}
+
+function InlineMath({ math }: { math: string }) {
+  let clean = math.trim();
+  if (clean.startsWith("$") && clean.endsWith("$") && clean.length >= 2) {
+    clean = clean.slice(1, -1).trim();
+  } else if (clean.startsWith("\\(") && clean.endsWith("\\)") && clean.length >= 4) {
+    clean = clean.slice(2, -2).trim();
+  }
+
+  try {
+    const html = katex.renderToString(clean, {
+      displayMode: false,
+      throwOnError: false,
+      output: "htmlAndMathml",
+    });
+    return <span className="inline-math" dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch {
+    return <span className="inline-math">{clean}</span>;
+  }
+}
+
 /**
- * The smallest markdown renderer covering what the generator emits: headings,
- * paragraphs, bullets, bold, inline code, fenced code/diagram blocks, and
- * ❌/✅ comparison pairs (ADR-0017).
- *
- * A full library is ~40kB for features we do not use, and this never touches
- * `innerHTML` — worth caring about when card bodies come from a model.
+ * Markdown renderer covering headings, paragraphs, ordered/unordered lists,
+ * tables, blockquotes, bold, italic, inline code, links, LaTeX math formulas,
+ * fenced code/diagram blocks, and ❌/✅ comparison pairs (ADR-0017).
  */
 function Markdown({ source }: { source: string }) {
-  const tokens = tokenize(source.trim());
+  const tokens = tokenize(source);
 
   return (
     <>
@@ -758,50 +826,43 @@ type Token =
   | { type: "fence"; lang: string; content: string; kind: "code" | "diagram" }
   | { type: "prose"; text: string };
 
-/** Fences are extracted BEFORE paragraph splitting — a fenced block's own
- *  blank lines would otherwise get corrupted by the `\n{2,}` prose splitter.
- *
- *  Only the FIRST fence of each kind (code/diagram) becomes a token — content
- *  generation should never stuff more than one of either into a single card,
- *  but if it does, silently rendering nothing for the extras keeps the card
- *  predictable instead of guessing which one "deserves" the space or falling
- *  back to raw fenced text as prose. */
+/** Fences are extracted BEFORE block splitting — a fenced block's own
+ *  blank lines would otherwise get corrupted by line/paragraph splitters. */
 function tokenize(source: string): Token[] {
+  const normalized = normalizeText(source);
   const tokens: Token[] = [];
   let lastIndex = 0;
-  const seen: Record<"code" | "diagram", boolean> = { code: false, diagram: false };
 
-  for (const match of source.matchAll(FENCE_RE)) {
+  for (const match of normalized.matchAll(FENCE_RE)) {
     const [full, lang, content] = match;
     const index = match.index ?? 0;
-    if (index > lastIndex) tokens.push({ type: "prose", text: source.slice(lastIndex, index) });
+    if (index > lastIndex) tokens.push({ type: "prose", text: normalized.slice(lastIndex, index) });
 
     const kind = isDiagramFence(lang, content) ? "diagram" : "code";
-    if (!seen[kind]) {
-      seen[kind] = true;
-      tokens.push({ type: "fence", lang, content: content.replace(/\n$/, ""), kind });
-    }
+    tokens.push({ type: "fence", lang, content: content.replace(/\n$/, ""), kind });
 
     lastIndex = index + full.length;
   }
 
-  if (lastIndex < source.length) tokens.push({ type: "prose", text: source.slice(lastIndex) });
+  if (lastIndex < normalized.length) tokens.push({ type: "prose", text: normalized.slice(lastIndex) });
   return tokens;
 }
 
 function ProseBlocks({ text }: { text: string }) {
-  const blocks = text.trim().split(/\n{2,}/).filter((block) => block.trim().length > 0);
+  const lines = text.split("\n");
   const nodes: React.ReactNode[] = [];
-  let pairBuffer: { tone: "bad" | "good"; text: string }[] = [];
+  let i = 0;
+  let keyIndex = 0;
 
-  const flushPair = (key: string) => {
+  let pairBuffer: { tone: "bad" | "good"; text: string }[] = [];
+  const flushPairs = () => {
     if (pairBuffer.length === 0) return;
     const rows = pairBuffer;
     pairBuffer = [];
     nodes.push(
-      <div className="comparison-pair" key={key}>
-        {rows.map((row, i) => (
-          <div className="comparison-row" data-tone={row.tone} key={i}>
+      <div className="comparison-pair" key={`pair-${keyIndex++}`}>
+        {rows.map((row, idx) => (
+          <div className="comparison-row" data-tone={row.tone} key={idx}>
             {inline(row.text)}
           </div>
         ))}
@@ -809,56 +870,256 @@ function ProseBlocks({ text }: { text: string }) {
     );
   };
 
-  blocks.forEach((block, index) => {
-    const bad = /^❌\s*([\s\S]*)$/.exec(block);
-    const good = /^✅\s*([\s\S]*)$/.exec(block);
-    if (bad !== null || good !== null) {
-      pairBuffer.push({ tone: bad !== null ? "bad" : "good", text: (bad ?? good)![1] });
-      return;
-    }
-    flushPair(`pair-${index}`);
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
 
-    const heading = /^(#{1,3})\s+(.*)$/.exec(block);
-    if (heading !== null) {
-      const Tag = `h${heading[1].length}` as "h1" | "h2" | "h3";
-      nodes.push(<Tag key={index}>{inline(heading[2])}</Tag>);
-      return;
+    if (trimmed.length === 0) {
+      flushPairs();
+      i++;
+      continue;
     }
 
-    if (/^[-*]\s+/m.test(block)) {
-      const items = block.split("\n").filter((line) => /^[-*]\s+/.test(line));
+    // Comparison row (❌ / ✅)
+    const badMatch = /^❌\s*([\s\S]*)$/.exec(trimmed);
+    const goodMatch = /^✅\s*([\s\S]*)$/.exec(trimmed);
+    if (badMatch !== null || goodMatch !== null) {
+      pairBuffer.push({
+        tone: badMatch !== null ? "bad" : "good",
+        text: (badMatch ?? goodMatch)![1],
+      });
+      i++;
+      continue;
+    }
+    flushPairs();
+
+    // Display Math Block: $$ ... $$ or \[ ... \]
+    if (trimmed.startsWith("$$") || trimmed.startsWith("\\[")) {
+      const isBracket = trimmed.startsWith("\\[");
+      const endMarker = isBracket ? "\\]" : "$$";
+
+      if (
+        trimmed.length > 2 &&
+        (isBracket ? trimmed.endsWith("\\]") : trimmed.slice(2).includes("$$"))
+      ) {
+        nodes.push(<MathBlock key={`math-${keyIndex++}`} math={trimmed} />);
+        i++;
+        continue;
+      }
+
+      const mathLines = [line];
+      i++;
+      while (i < lines.length) {
+        mathLines.push(lines[i]);
+        if (lines[i].includes(endMarker)) {
+          i++;
+          break;
+        }
+        i++;
+      }
+      nodes.push(<MathBlock key={`math-${keyIndex++}`} math={mathLines.join("\n")} />);
+      continue;
+    }
+
+    // Heading: #, ##, ###, ####, #####, ######
+    const headingMatch = /^(#{1,6})\s+(.*)$/.exec(trimmed);
+    if (headingMatch !== null) {
+      const level = headingMatch[1].length;
+      const Tag = (`h${Math.min(level, 6)}`) as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+      nodes.push(<Tag key={`h-${keyIndex++}`}>{inline(headingMatch[2])}</Tag>);
+      i++;
+      continue;
+    }
+
+    // Blockquote: > line
+    if (trimmed.startsWith(">")) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith(">")) {
+        quoteLines.push(lines[i].trim().replace(/^>\s?/, ""));
+        i++;
+      }
       nodes.push(
-        <ul key={index}>
-          {items.map((item, i) => (
-            <li key={i}>{inline(item.replace(/^[-*]\s+/, ""))}</li>
+        <blockquote key={`quote-${keyIndex++}`}>
+          <p>{inline(quoteLines.join(" "))}</p>
+        </blockquote>,
+      );
+      continue;
+    }
+
+    // Unordered List: - item, * item, • item
+    if (/^[-*•]\s+/.test(trimmed)) {
+      const items: string[] = [];
+      while (i < lines.length && /^[-*•]\s+/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^[-*•]\s+/, ""));
+        i++;
+      }
+      nodes.push(
+        <ul key={`ul-${keyIndex++}`}>
+          {items.map((item, idx) => (
+            <li key={idx}>{inline(item)}</li>
           ))}
         </ul>,
       );
-      return;
+      continue;
     }
 
-    nodes.push(<p key={index}>{inline(block)}</p>);
-  });
-  flushPair("pair-final");
+    // Ordered List: 1. item, 2. item, 1) item
+    if (/^\d+[.)]\s+/.test(trimmed)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\d+[.)]\s+/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^\d+[.)]\s+/, ""));
+        i++;
+      }
+      nodes.push(
+        <ol key={`ol-${keyIndex++}`}>
+          {items.map((item, idx) => (
+            <li key={idx}>{inline(item)}</li>
+          ))}
+        </ol>,
+      );
+      continue;
+    }
 
+    // Markdown Table: | a | b |
+    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+      const tableLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
+        tableLines.push(lines[i].trim());
+        i++;
+      }
+      if (tableLines.length >= 2) {
+        const parseRow = (r: string) =>
+          r
+            .slice(1, -1)
+            .split("|")
+            .map((c) => c.trim());
+        const headerCols = parseRow(tableLines[0]);
+        const isSeparator = /^[\s|:-]+$/.test(tableLines[1]);
+        const bodyStart = isSeparator ? 2 : 1;
+        const rows = tableLines.slice(bodyStart).map(parseRow);
+
+        nodes.push(
+          <div className="card-table-wrapper" key={`tbl-${keyIndex++}`}>
+            <table>
+              {isSeparator ? (
+                <thead>
+                  <tr>
+                    {headerCols.map((col, idx) => (
+                      <th key={idx}>{inline(col)}</th>
+                    ))}
+                  </tr>
+                </thead>
+              ) : null}
+              <tbody>
+                {rows.map((row, rIdx) => (
+                  <tr key={rIdx}>
+                    {row.map((cell, cIdx) => (
+                      <td key={cIdx}>{inline(cell)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>,
+        );
+        continue;
+      }
+    }
+
+    // Paragraph: collect lines until blank line or next structural block
+    const pLines: string[] = [];
+    while (i < lines.length) {
+      const cur = lines[i].trim();
+      if (cur.length === 0) break;
+      if (
+        /^#{1,6}\s+/.test(cur) ||
+        /^[-*•]\s+/.test(cur) ||
+        /^\d+[.)]\s+/.test(cur) ||
+        cur.startsWith(">") ||
+        cur.startsWith("$$") ||
+        cur.startsWith("\\[") ||
+        cur.startsWith("❌") ||
+        cur.startsWith("✅") ||
+        (cur.startsWith("|") && cur.endsWith("|"))
+      ) {
+        break;
+      }
+      pLines.push(cur);
+      i++;
+    }
+
+    if (pLines.length > 0) {
+      nodes.push(<p key={`p-${keyIndex++}`}>{inline(pLines.join(" "))}</p>);
+    }
+  }
+
+  flushPairs();
   return <>{nodes}</>;
 }
 
+const INLINE_RE =
+  /(\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\\\[[\s\S]*?\\\]|\\\([^)\n]+\\\)|`[^`]+`|\*\*\*[^*]+\*\*\*|___[^_]+___|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_|~~[^~]+~~|\[[^\]]+\]\([^)]+\))/g;
+
 function inline(text: string): React.ReactNode[] {
-  // Bold matches before single-asterisk emphasis in the alternation — for a
-  // `**bold**` run, the engine tries `\*\*...\*\*` at that position first and
-  // it succeeds, so the single-star pattern never gets a chance to split it
-  // into two bogus emphasis runs.
-  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((part, index) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>;
+  return text.split(INLINE_RE).map((part, index) => {
+    if (!part) return null;
+
+    if (
+      (part.startsWith("$$") && part.endsWith("$$") && part.length >= 4) ||
+      (part.startsWith("\\[") && part.endsWith("\\]") && part.length >= 4)
+    ) {
+      return <MathBlock key={index} math={part} />;
     }
-    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
-      return <em key={index}>{part.slice(1, -1)}</em>;
+
+    if (
+      (part.startsWith("$") && part.endsWith("$") && part.length >= 2) ||
+      (part.startsWith("\\(") && part.endsWith("\\)") && part.length >= 4)
+    ) {
+      return <InlineMath key={index} math={part} />;
     }
-    if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
+
+    if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
       return <code key={index}>{part.slice(1, -1)}</code>;
     }
+
+    if (
+      (part.startsWith("***") && part.endsWith("***") && part.length > 6) ||
+      (part.startsWith("___") && part.endsWith("___") && part.length > 6)
+    ) {
+      return (
+        <strong key={index}>
+          <em>{part.slice(3, -3)}</em>
+        </strong>
+      );
+    }
+
+    if (
+      (part.startsWith("**") && part.endsWith("**") && part.length > 4) ||
+      (part.startsWith("__") && part.endsWith("__") && part.length > 4)
+    ) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+
+    if (
+      (part.startsWith("*") && part.endsWith("*") && part.length > 2) ||
+      (part.startsWith("_") && part.endsWith("_") && part.length > 2)
+    ) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+
+    if (part.startsWith("~~") && part.endsWith("~~") && part.length > 4) {
+      return <del key={index}>{part.slice(2, -2)}</del>;
+    }
+
+    const linkMatch = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(part);
+    if (linkMatch !== null) {
+      return (
+        <a key={index} href={linkMatch[2]} target="_blank" rel="noreferrer" className="card-link">
+          {linkMatch[1]}
+        </a>
+      );
+    }
+
     return <span key={index}>{part}</span>;
   });
 }

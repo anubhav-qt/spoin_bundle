@@ -6,14 +6,12 @@ if we ever switch to argon2 or scrypt, only this file changes.
 
 from __future__ import annotations
 
-from typing import cast
-
 import bcrypt
 
 
 def hash_password(plain: str) -> str:
     """Hash a plaintext password. Returns the bcrypt hash as a string."""
-    return cast(str, bcrypt.hashpw(plain.encode(), bcrypt.gensalt()).decode())
+    return bcrypt.hashpw(plain.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:

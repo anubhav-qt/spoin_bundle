@@ -138,9 +138,7 @@ async def test_coverage_is_governed_by_the_weakest_subtopic(
     assert unlocked is False
 
 
-async def test_reaching_the_gate_unlocks(
-    session: AsyncSession, service_settings: Settings
-) -> None:
+async def test_reaching_the_gate_unlocks(session: AsyncSession, service_settings: Settings) -> None:
     user_id, topic_id, cards = await _topic_with_cards(session, subtopics=[10])
     await _mark_seen(session, user_id, cards[:8])  # exactly 80%
 
@@ -202,8 +200,6 @@ async def test_unlock_latches_and_survives_new_cards_landing(
         )
     await session.flush()
 
-    _p, _t, coverage, still_unlocked, _m = await service.ensure_unlock_latched(
-        user_id, topic_id
-    )
+    _p, _t, coverage, still_unlocked, _m = await service.ensure_unlock_latched(user_id, topic_id)
     assert coverage == pytest.approx(0.4)
     assert still_unlocked is True, "the latch must not be recomputed away"

@@ -9,6 +9,7 @@ from spoin.profile.service import ProfileService
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 
+
 @router.get("/me", response_model=UserOut)
 async def get_profile(user_id: UserDep, session: SessionDep) -> User:
     """Returns the authenticated user's profile information."""
@@ -17,22 +18,18 @@ async def get_profile(user_id: UserDep, session: SessionDep) -> User:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 @router.patch("/me", response_model=UserOut)
 async def update_profile(
-    updates: UserProfileUpdateIn,
-    user_id: UserDep,
-    session: SessionDep
+    updates: UserProfileUpdateIn, user_id: UserDep, session: SessionDep
 ) -> User:
     """Updates the user's profile."""
     service = ProfileService(session)
     return await service.update_profile(user_id, updates)
 
+
 @router.post("/me/avatar", response_model=UserOut)
-async def upload_avatar(
-    file: UploadFile,
-    user_id: UserDep,
-    session: SessionDep
-) -> User:
+async def upload_avatar(file: UploadFile, user_id: UserDep, session: SessionDep) -> User:
     """Uploads and saves a custom avatar image.
 
     Validation is by magic bytes and a streaming byte cap — see
@@ -45,19 +42,14 @@ async def upload_avatar(
 
 
 @router.delete("/me/avatar", response_model=UserOut)
-async def delete_avatar(
-    user_id: UserDep,
-    session: SessionDep
-) -> User:
+async def delete_avatar(user_id: UserDep, session: SessionDep) -> User:
     """Removes the user's custom avatar."""
     service = ProfileService(session)
     return await service.delete_avatar_image(user_id)
 
+
 @router.get("/me/avatar/image")
-async def get_avatar_image(
-    user_id: UserDep,
-    session: SessionDep
-) -> Response:
+async def get_avatar_image(user_id: UserDep, session: SessionDep) -> Response:
     """The raw avatar bytes, served as whatever they actually are.
 
     This used to answer `image/jpeg` unconditionally with a comment admitting
@@ -90,10 +82,7 @@ async def export_profile_data(
 
 @router.get("/me/stats", response_model=ProfileStatsOut)
 async def get_profile_stats(
-    year: int,
-    month: int,
-    user_id: UserDep,
-    session: SessionDep
+    year: int, month: int, user_id: UserDep, session: SessionDep
 ) -> ProfileStatsOut:
     """Returns the user's aggregated statistics, streaks, and heatmap."""
     service = ProfileService(session)

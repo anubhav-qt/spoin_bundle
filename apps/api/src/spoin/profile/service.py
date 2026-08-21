@@ -87,9 +87,7 @@ class ProfileService:
 
         row = (
             await self._session.execute(
-                select(User)
-                .where(User.id == user_id)
-                .options(undefer(User.avatar_image))
+                select(User).where(User.id == user_id).options(undefer(User.avatar_image))
             )
         ).scalar_one_or_none()
         if row is None or row.avatar_image is None:
@@ -166,7 +164,7 @@ class ProfileService:
 
         longest_streak = max([s.streak_length for s in streaks]) if streaks else 0
         current_streak = 0
-        
+
         if streaks:
             last_streak = streaks[0]
             today = datetime.datetime.now(datetime.UTC).replace(

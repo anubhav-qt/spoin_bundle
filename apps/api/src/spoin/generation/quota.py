@@ -189,7 +189,8 @@ class QuotaGovernor:
         logger.warning(
             "quota: key %d model %s marked exhausted after a REAL 429 from the provider "
             "(local ledger believed it had room)",
-            key_index, model,
+            key_index,
+            model,
         )
 
     async def _acquire_locked(
@@ -215,7 +216,9 @@ class QuotaGovernor:
                 if not self._rpm_has_room(key_index, rung):
                     logger.debug(
                         "quota: key %d model %s at RPM ceiling (%d/min), trying next",
-                        key_index, rung.model, rung.rpm,
+                        key_index,
+                        rung.model,
+                        rung.rpm,
                     )
                     continue
                 ledger = await self._ledger_row(session, day, key_index, rung.model)
@@ -225,22 +228,34 @@ class QuotaGovernor:
                         ledger.exhausted_at = now
                         logger.info(
                             "quota: key %d model %s just hit its RPD ceiling (%d/day) for %s",
-                            key_index, rung.model, rung.rpd, day.date(),
+                            key_index,
+                            rung.model,
+                            rung.rpd,
+                            day.date(),
                         )
                     await session.flush()
                     self._record_rpm(key_index, rung)
                     logger.info(
                         "quota: acquired key=%d model=%s (%d/%d spent today)",
-                        key_index, rung.model, ledger.requests_spent, rung.rpd,
+                        key_index,
+                        rung.model,
+                        ledger.requests_spent,
+                        rung.rpd,
                     )
                     return key_index, rung.model
                 logger.debug(
                     "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
-                    key_index, rung.model, day.date(), ledger.requests_spent, rung.rpd,
+                    key_index,
+                    rung.model,
+                    day.date(),
+                    ledger.requests_spent,
+                    rung.rpd,
                 )
         logger.warning(
             "quota: ALL %d key(s) x %d model(s) exhausted for %s",
-            self.key_count, len(self.ladder), day.date(),
+            self.key_count,
+            len(self.ladder),
+            day.date(),
         )
         raise QuotaExhaustedError(
             f"All {self.key_count} key(s) x {len(self.ladder)} model(s) exhausted for {day.date()}"

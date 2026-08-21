@@ -81,8 +81,10 @@ async def test_fresh_topic_generates_cards_dual_titles_and_questions(
     assert topic_report["questions_accepted"] > 0
 
     cards = (
-        await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"]))
-    ).scalars().all()
+        (await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"])))
+        .scalars()
+        .all()
+    )
     assert len(cards) == topic_report["accepted"]
     for card in cards:
         assert card.canonical_title  # ADR-0022: always present
@@ -90,12 +92,16 @@ async def test_fresh_topic_generates_cards_dual_titles_and_questions(
         assert card.content_embedding is not None
 
     questions = (
-        await session.execute(
-            select(Question).join(Card, Card.id == Question.card_id).where(
-                Card.topic_id == topic_report["topic_id"]
+        (
+            await session.execute(
+                select(Question)
+                .join(Card, Card.id == Question.card_id)
+                .where(Card.topic_id == topic_report["topic_id"])
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(questions) == topic_report["questions_accepted"]
     for question in questions:
         assert question.card_id in {card.id for card in cards}
@@ -117,8 +123,14 @@ async def test_rerun_skips_curriculum_and_does_not_duplicate(
     assert second_topic["accepted"] == 0
 
     subtopics = (
-        await session.execute(select(Subtopic).where(Subtopic.topic_id == first_topic["topic_id"]))
-    ).scalars().all()
+        (
+            await session.execute(
+                select(Subtopic).where(Subtopic.topic_id == first_topic["topic_id"])
+            )
+        )
+        .scalars()
+        .all()
+    )
     assert len(subtopics) > 0
 
 
@@ -143,8 +155,10 @@ async def test_min_cards_derived_from_fraction_setting(
     topic_id = report["topics"][0]["topic_id"]
 
     subtopics = (
-        await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id))
-    ).scalars().all()
+        (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id)))
+        .scalars()
+        .all()
+    )
     for subtopic in subtopics:
         expected = max(1, round(subtopic.target_cards * settings.min_cards_fraction))
         assert subtopic.min_cards == expected
@@ -165,7 +179,9 @@ async def test_exact_repeat_name_auto_merges_via_batched_match(
     assert alias.decided_by == "llm_batch_match"
 
 
-async def test_unrelated_topics_do_not_auto_merge(session: AsyncSession, settings: Settings) -> None:
+async def test_unrelated_topics_do_not_auto_merge(
+    session: AsyncSession, settings: Settings
+) -> None:
     report = await _plan_and_generate(session, settings, "Photosynthesis", "Rust Ownership")
     for topic_report in report["topics"]:
         assert topic_report["merged_into_existing"] is False
@@ -216,10 +232,14 @@ async def test_verification_rejection_is_persisted_to_rejected_card(
     assert topic_report["rejected"] > 0
 
     rejected_rows = (
-        await session.execute(
-            select(RejectedCard).where(RejectedCard.topic_id == topic_report["topic_id"])
+        (
+            await session.execute(
+                select(RejectedCard).where(RejectedCard.topic_id == topic_report["topic_id"])
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(rejected_rows) > 0
     assert all(row.stage == RejectionStage.VERIFICATION for row in rejected_rows)
     assert all(row.reason for row in rejected_rows)
@@ -228,7 +248,9 @@ async def test_verification_rejection_is_persisted_to_rejected_card(
         card.body
         for card in (
             await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"]))
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     }
     assert not active_bodies & {row.body for row in rejected_rows}
 
@@ -258,13 +280,17 @@ async def test_near_duplicate_cards_are_rejected_and_persisted(
     assert topic_report["rejected"] > 0
 
     rejected_rows = (
-        await session.execute(
-            select(RejectedCard).where(
-                RejectedCard.topic_id == topic_report["topic_id"],
-                RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+        (
+            await session.execute(
+                select(RejectedCard).where(
+                    RejectedCard.topic_id == topic_report["topic_id"],
+                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(rejected_rows) > 0
 
 
@@ -300,7 +326,10 @@ async def test_rejected_duplicate_body_feeds_forward_into_next_run(
     generator = _RecordingDuplicateGenerator()
     embedder = HashEmbedder(settings.embedding_dim)
     outcomes = await match_and_create_topics(
-        session, generator, embedder, settings,
+        session,
+        generator,
+        embedder,
+        settings,
         topic_requests=[TopicRequest(name="Ornithology", description="")],
     )
     topic_id = uuid.UUID(outcomes[0]["topic_id"])
@@ -308,12 +337,17 @@ async def test_rejected_duplicate_body_feeds_forward_into_next_run(
     await run_generation_pipeline(session, generator, embedder, settings, topic_ids=[topic_id])
 
     rejected_rows = (
-        await session.execute(
-            select(RejectedCard).where(
-                RejectedCard.topic_id == topic_id, RejectedCard.stage == RejectionStage.NEAR_DUPLICATE
+        (
+            await session.execute(
+                select(RejectedCard).where(
+                    RejectedCard.topic_id == topic_id,
+                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert len(rejected_rows) > 0
     rejected_body = rejected_rows[0].body
 
@@ -338,8 +372,10 @@ async def test_subtopic_card_type_quotas_and_diverse_archetypes(
     topic_id = uuid.UUID(topic_report["topic_id"])  # type: ignore[arg-type]
 
     subtopics = (
-        await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id))
-    ).scalars().all()
+        (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id)))
+        .scalars()
+        .all()
+    )
     assert len(subtopics) > 0
     for subtopic in subtopics:
         assert subtopic.card_type_quotas is not None
@@ -350,9 +386,7 @@ async def test_subtopic_card_type_quotas_and_diverse_archetypes(
         assert "prose" in subtopic.card_type_quotas
         assert sum(subtopic.card_type_quotas.values()) == subtopic.target_cards
 
-    cards = (
-        await session.execute(select(Card).where(Card.topic_id == topic_id))
-    ).scalars().all()
+    cards = (await session.execute(select(Card).where(Card.topic_id == topic_id))).scalars().all()
     assert len(cards) > 0
 
     has_ascii = any(card.visual_id is not None for card in cards)
@@ -364,4 +398,3 @@ async def test_subtopic_card_type_quotas_and_diverse_archetypes(
     assert has_code, "Expected generated cards to include code cards"
     assert has_comparison, "Expected generated cards to include comparison cards"
     assert has_diagram, "Expected generated cards to include diagram cards"
-

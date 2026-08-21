@@ -99,7 +99,10 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         logger.info(
             "topic '%s': curriculum generated -- %d subtopic group(s), %d tier(s) total, "
             "survey=%s, %d deep-dive topic(s) proposed",
-            topic.canonical_name, len(draft.subtopics), total_tiers, draft.is_survey,
+            topic.canonical_name,
+            len(draft.subtopics),
+            total_tiers,
+            draft.is_survey,
             len(draft.deep_dive_topics),
         )
         async with runtime.topic_plan_lock:
@@ -281,8 +284,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
             base_qty = target // len(all_card_types)
             rem = target % len(all_card_types)
             tier_quotas = {
-                ct: base_qty + (1 if i < rem else 0)
-                for i, ct in enumerate(all_card_types)
+                ct: base_qty + (1 if i < rem else 0) for i, ct in enumerate(all_card_types)
             }
 
         # One-time hero call (task 0006 / ADR-0018), before this tier's
@@ -320,18 +322,22 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 logger.warning(
                     "subtopic '%s' [%s]: hero call returned %d cards for a count=1 "
                     "request -- keeping only the first, dropping %d extra(s)",
-                    tier["title"], difficulty.value, len(hero_result.items),
+                    tier["title"],
+                    difficulty.value,
+                    len(hero_result.items),
                     len(hero_result.items) - 1,
                 )
             logger.info(
                 "subtopic '%s' [%s]: hero card -- %d card(s), %d generator failure(s)",
-                tier["title"], difficulty.value, len(hero_items), len(hero_result.failures),
+                tier["title"],
+                difficulty.value,
+                len(hero_items),
+                len(hero_result.failures),
             )
             failures.extend(hero_result.failures)
             drafts.extend(hero_items)
             existing_titles.extend(
-                _existing_title_tag(d.canonical_title, d.title, d.difficulty)
-                for d in hero_items
+                _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in hero_items
             )
 
         # Allow enough rounds to cycle through all card types plus slack for partial batches
@@ -356,8 +362,9 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 # Pick the unfilled card type with the largest remaining deficit
                 chosen_type = max(
                     unfilled_types,
-                    key=lambda ct: tier_quotas[ct]
-                    - sum(1 for d in drafts if _card_matches_type(d, ct)),
+                    key=lambda ct: (
+                        tier_quotas[ct] - sum(1 for d in drafts if _card_matches_type(d, ct))
+                    ),
                 )
                 unmet = tier_quotas[chosen_type] - sum(
                     1 for d in drafts if _card_matches_type(d, chosen_type)
@@ -369,8 +376,14 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 
             logger.info(
                 "subtopic '%s' [%s]: round %d/%d (type=%s) -- requesting %d card(s) (%d/%d so far)",
-                tier["title"], difficulty.value, round_number, max_rounds,
-                chosen_type or "general", request_count, len(drafts), target,
+                tier["title"],
+                difficulty.value,
+                round_number,
+                max_rounds,
+                chosen_type or "general",
+                request_count,
+                len(drafts),
+                target,
             )
             async with runtime.semaphore:
                 result = await runtime.generator.generate_cards(
@@ -390,7 +403,10 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 )
             logger.info(
                 "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
-                tier["title"], difficulty.value, round_number, len(result.items),
+                tier["title"],
+                difficulty.value,
+                round_number,
+                len(result.items),
                 len(result.failures),
             )
             failures.extend(result.failures)
@@ -482,7 +498,9 @@ async def _correct_subtopic_drafts(
                 edited_count += 1
                 logger.info(
                     "gate: pass 1 edited '%s' (subtopic %s) -- %s",
-                    correction.canonical_title, subtopic_id, correction.note or "no note given",
+                    correction.canonical_title,
+                    subtopic_id,
+                    correction.note or "no note given",
                 )
             corrected.append(
                 draft.model_copy(
@@ -497,7 +515,10 @@ async def _correct_subtopic_drafts(
         logger.info(
             "gate: pass 1 correction for subtopic %s -- %d/%d card(s) edited this chunk, "
             "%d failure(s)",
-            subtopic_id, edited_count, len(chunk), len(result.failures),
+            subtopic_id,
+            edited_count,
+            len(chunk),
+            len(result.failures),
         )
         if chunk_failures:
             # The count above says HOW MANY; this says WHY -- same gap task
@@ -507,7 +528,8 @@ async def _correct_subtopic_drafts(
             # malformed per-card corrections.
             logger.warning(
                 "gate: pass 1 correction for subtopic %s had failure(s): %s",
-                subtopic_id, "; ".join(chunk_failures),
+                subtopic_id,
+                "; ".join(chunk_failures),
             )
 
     return subtopic_id, corrected, failures
@@ -563,23 +585,28 @@ async def _verify_subtopic_drafts(
                 reason = verdict.reason or "failed verification"
                 logger.info(
                     "gate: pass 2 REJECTED '%s' (subtopic %s) -- %s",
-                    draft.canonical_title, subtopic_id, reason,
+                    draft.canonical_title,
+                    subtopic_id,
+                    reason,
                 )
                 rejected.append((draft, reason))
                 continue
             if verdict.confirmed_difficulty != draft.difficulty:
                 logger.info(
-                    "gate: pass 2 accepted '%s' (subtopic %s) but re-rated difficulty "
-                    "%s -> %s",
-                    draft.canonical_title, subtopic_id, draft.difficulty.value,
+                    "gate: pass 2 accepted '%s' (subtopic %s) but re-rated difficulty %s -> %s",
+                    draft.canonical_title,
+                    subtopic_id,
+                    draft.difficulty.value,
                     verdict.confirmed_difficulty.value,
                 )
             chunk_accepted += 1
             accepted.append((draft, embedding, verdict.confirmed_difficulty))
         logger.info(
-            "gate: pass 2 verification for subtopic %s -- %d/%d accepted this chunk, "
-            "%d failure(s)",
-            subtopic_id, chunk_accepted, len(chunk), len(result.failures),
+            "gate: pass 2 verification for subtopic %s -- %d/%d accepted this chunk, %d failure(s)",
+            subtopic_id,
+            chunk_accepted,
+            len(chunk),
+            len(result.failures),
         )
         if chunk_failures:
             # Same reasoning as pass 1's warning above: a whole-call failure
@@ -589,7 +616,8 @@ async def _verify_subtopic_drafts(
             # reason has to survive here in the log or it's lost entirely.
             logger.warning(
                 "gate: pass 2 verification for subtopic %s had failure(s): %s",
-                subtopic_id, "; ".join(chunk_failures),
+                subtopic_id,
+                "; ".join(chunk_failures),
             )
 
     return subtopic_id, accepted, rejected, failures
@@ -696,7 +724,9 @@ async def _process_gate_item(
                     reason = f"near-duplicate of an existing card (similarity {corpus_hit:.3f})"
                     logger.info(
                         "gate: near-dup REJECTED '%s' (subtopic %s) -- %s",
-                        draft.canonical_title, item.subtopic_id, reason,
+                        draft.canonical_title,
+                        item.subtopic_id,
+                        reason,
                     )
                     item.dedup_rejects.append((draft, reason))
                     continue
@@ -707,7 +737,9 @@ async def _process_gate_item(
                     reason = f"near-duplicate within this batch (similarity {batch_hit:.3f})"
                     logger.info(
                         "gate: near-dup REJECTED '%s' (subtopic %s) -- %s",
-                        draft.canonical_title, item.subtopic_id, reason,
+                        draft.canonical_title,
+                        item.subtopic_id,
+                        reason,
                     )
                     item.dedup_rejects.append((draft, reason))
                     continue
@@ -844,9 +876,16 @@ async def _process_gate_item(
         "subtopic %s [%s]: persisted %d card(s), rejected %d "
         "(structural=%d near_dup=%d verification=%d), failed %d "
         "(correction=%d verification=%d generator=%d)",
-        item.subtopic_id, item.difficulty, len(new_cards), total_rejected,
-        len(item.structural_rejects), len(item.dedup_rejects), len(item.verification_rejects),
-        total_failed, item.correction_failure_count, item.verification_failure_count,
+        item.subtopic_id,
+        item.difficulty,
+        len(new_cards),
+        total_rejected,
+        len(item.structural_rejects),
+        len(item.dedup_rejects),
+        len(item.verification_rejects),
+        total_failed,
+        item.correction_failure_count,
+        item.verification_failure_count,
         item.generator_failure_count,
     )
 
@@ -941,7 +980,9 @@ async def _process_gate_item(
         if all_question_failures:
             logger.info(
                 "subtopic %s [%s]: %d question failure(s): %s",
-                item.subtopic_id, item.difficulty, len(all_question_failures),
+                item.subtopic_id,
+                item.difficulty,
+                len(all_question_failures),
                 "; ".join(all_question_failures),
             )
 
@@ -999,9 +1040,7 @@ async def _gate_and_persist_results(
             else:
                 structural_rejects.append((draft, reason or "failed structural gate"))
 
-        examples = (
-            get_difficulty_examples() if result["is_standalone"] else _NO_DIFFICULTY_EXAMPLES
-        )
+        examples = get_difficulty_examples() if result["is_standalone"] else _NO_DIFFICULTY_EXAMPLES
         items.append(
             _GateItem(
                 topic_id=result["topic_id"],
@@ -1023,7 +1062,10 @@ async def _gate_and_persist_results(
     logger.info(
         "gate: topic '%s' -- %d draft(s) across %d subtopic-tier(s) -- %d failed the "
         "structural check",
-        topic_name, total_drafts, len(items), total_structural_rejects,
+        topic_name,
+        total_drafts,
+        len(items),
+        total_structural_rejects,
     )
 
     if not items:
@@ -1084,8 +1126,8 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
     topic_reports: list[dict[str, object]] = []
     for plan in state.get("topic_plans", []):
         topic_id = plan["topic_id"]
-        total_accepted, total_rejected, total_failed, q_accepted, q_rejected = (
-            totals_by_topic.get(topic_id, (0, 0, 0, 0, 0))
+        total_accepted, total_rejected, total_failed, q_accepted, q_rejected = totals_by_topic.get(
+            topic_id, (0, 0, 0, 0, 0)
         )
         topic_reports.append(
             {
@@ -1104,7 +1146,11 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
         logger.info(
             "topic '%s' done -- %d card(s) accepted, %d rejected, %d failed (not judged -- "
             "e.g. quota exhaustion), %d question(s) accepted, %d rejected",
-            plan["topic_name"], total_accepted, total_rejected, total_failed, q_accepted,
+            plan["topic_name"],
+            total_accepted,
+            total_rejected,
+            total_failed,
+            q_accepted,
             q_rejected,
         )
 

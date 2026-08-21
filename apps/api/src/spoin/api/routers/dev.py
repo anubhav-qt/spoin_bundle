@@ -51,8 +51,14 @@ async def reset_demo(session: SessionDep, user_id: UserDep) -> list[TopicOut]:
     await session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
 
     progress_rows = (
-        await session.execute(select(UserTopicProgress).where(UserTopicProgress.user_id == user_id))
-    ).scalars().all()
+        (
+            await session.execute(
+                select(UserTopicProgress).where(UserTopicProgress.user_id == user_id)
+            )
+        )
+        .scalars()
+        .all()
+    )
     for progress in progress_rows:
         progress.current_difficulty = Difficulty.BEGINNER
         progress.tier_unlocked = [False, False, False]
@@ -62,8 +68,10 @@ async def reset_demo(session: SessionDep, user_id: UserDep) -> list[TopicOut]:
         progress.revisit_mode = False
 
     followed_topic_ids = (
-        await session.execute(select(UserTopic.topic_id).where(UserTopic.user_id == user_id))
-    ).scalars().all()
+        (await session.execute(select(UserTopic.topic_id).where(UserTopic.user_id == user_id)))
+        .scalars()
+        .all()
+    )
     to_unfollow = random.sample(followed_topic_ids, k=min(_UNFOLLOW_COUNT, len(followed_topic_ids)))
     for topic_id in to_unfollow:
         await session.execute(

@@ -105,7 +105,10 @@ async def match_and_create_topics(
             )
             logger.info(
                 "topic '%s': matched existing topic '%s' (id=%s, similarity=%s)",
-                request["name"], topic.canonical_name, topic.id, similarity,
+                request["name"],
+                topic.canonical_name,
+                topic.id,
+                similarity,
             )
             outcomes.append(
                 TopicMatchOutcome(

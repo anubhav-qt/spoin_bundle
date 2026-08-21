@@ -27,7 +27,13 @@ RNG = random.Random(1234)
 
 
 async def _seed_read_fraction(
-    session: AsyncSession, user_id: Any, topic_id: Any, difficulty: Difficulty, *, seen: int, total: int
+    session: AsyncSession,
+    user_id: Any,
+    topic_id: Any,
+    difficulty: Difficulty,
+    *,
+    seen: int,
+    total: int,
 ) -> None:
     """Directly seeds the dynamic-mix ramp's input aggregate, bypassing the
     engagement ingest pipeline — these tests care about what `build_slate`
@@ -35,7 +41,11 @@ async def _seed_read_fraction(
 
     session.add(
         UserTopicDifficultyProgress(
-            user_id=user_id, topic_id=topic_id, difficulty=difficulty, seen_count=seen, total_count=total
+            user_id=user_id,
+            topic_id=topic_id,
+            difficulty=difficulty,
+            seen_count=seen,
+            total_count=total,
         )
     )
     await session.flush()

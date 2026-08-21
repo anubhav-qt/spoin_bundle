@@ -170,7 +170,7 @@ class FakeContentGenerator(ContentGenerator):
             if card_type in (CardType.ASCII, "ascii") or want_hero:
                 visual_id = f"fake-stickman-scene-{idx}"
                 visual_slots = {
-                    "art": f"  o   \"Check this #{idx}!\"\n /|\\\n / \\",
+                    "art": f'  o   "Check this #{idx}!"\n /|\\\n / \\',
                     "alt": f"Stick figure explaining scenario {idx}",
                 }
             elif card_type in (CardType.COMPARISON, "comparison"):
@@ -192,7 +192,8 @@ class FakeContentGenerator(ContentGenerator):
             items.append(
                 CardDraft(
                     title=(
-                        f"{subtopic_title} — the big idea" if want_hero
+                        f"{subtopic_title} — the big idea"
+                        if want_hero
                         else f"{subtopic_title} — note {idx}"
                     )[:120],
                     canonical_title=f"{subtopic_title}: note {idx}"[:160],

@@ -66,7 +66,11 @@ async def test_matching_existing_topic_subscribes_without_a_job(session: AsyncSe
     assert second.status == "subscribed"
 
     jobs = (
-        (await session.execute(select(GenerationJob).where(GenerationJob.topic_id == first.topic.id)))
+        (
+            await session.execute(
+                select(GenerationJob).where(GenerationJob.topic_id == first.topic.id)
+            )
+        )
         .scalars()
         .all()
     )

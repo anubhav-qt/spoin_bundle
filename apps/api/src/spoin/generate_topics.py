@@ -77,9 +77,7 @@ async def main(argv: list[str]) -> None:
         generated_topics = cast(list[dict[str, Any]], generation_report["topics"])
         generated_by_id = {t["topic_id"]: t for t in generated_topics}
 
-        report = {
-            "topics": [generated_by_id[outcome["topic_id"]] for outcome in outcomes]
-        }
+        report = {"topics": [generated_by_id[outcome["topic_id"]] for outcome in outcomes]}
         for topic_report, outcome in zip(report["topics"], outcomes, strict=True):
             topic_report["merged_into_existing"] = outcome["matched_existing"]
     finally:

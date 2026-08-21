@@ -470,7 +470,6 @@ class UserProfileUpdateIn(BaseModel):
     daily_card_goal: int | None = Field(default=None, ge=1, le=200)
 
 
-
 class DailyActivityOut(BaseModel):
     date: str  # YYYY-MM-DD
     cards_read: int
@@ -482,6 +481,8 @@ class ProfileStatsOut(BaseModel):
     total_cards_read: int
     total_topics: int
     monthly_activity: list[DailyActivityOut]
+
+
 # -- Data export (Settings -> Data & Privacy) ---------------------------------
 #
 # Everything below is the user's OWN content, read straight from their rows.

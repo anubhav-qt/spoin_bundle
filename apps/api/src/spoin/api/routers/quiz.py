@@ -132,9 +132,7 @@ async def submit_free_text(
         score=graded.score,
         passed=graded.passed,
         remediation=[
-            RemediationCardOut(
-                card_id=r.card_id, title=r.title, subtopic_title=r.subtopic_title
-            )
+            RemediationCardOut(card_id=r.card_id, title=r.title, subtopic_title=r.subtopic_title)
             for r in graded.remediation
         ],
         progressed=graded.progressed,

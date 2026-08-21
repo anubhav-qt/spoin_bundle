@@ -321,7 +321,8 @@ def _ascii_visual_fields(wire_card: _WireCard) -> tuple[str | None, dict[str, st
     if any(len(line) > _ASCII_MAX_WIDTH for line in wire_card.ascii_art.split("\n")):
         logger.info(
             "generate_cards: dropping ascii art %r -- a line exceeds the %d-column budget",
-            wire_card.ascii_label or "(unlabeled)", _ASCII_MAX_WIDTH,
+            wire_card.ascii_label or "(unlabeled)",
+            _ASCII_MAX_WIDTH,
         )
         return None, None
     label = wire_card.ascii_label.strip() or "untitled-scene"
@@ -433,7 +434,11 @@ class GeminiContentGenerator(ContentGenerator):
                 logger.warning(
                     "quota: key=%d model=%s got a transient 503 (high demand, attempt "
                     "%d/%d) -- retrying in %.0fs",
-                    key_index, model, attempt, _SERVER_ERROR_RETRIES, delay,
+                    key_index,
+                    model,
+                    attempt,
+                    _SERVER_ERROR_RETRIES,
+                    delay,
                 )
                 await asyncio.sleep(delay)
                 delay *= 2
@@ -497,7 +502,11 @@ class GeminiContentGenerator(ContentGenerator):
                     "quota: key=%d model=%s got a REAL 429 from the provider despite our "
                     "ledger showing room -- marking exhausted, trying next cell "
                     "(attempt %d/%d): %s",
-                    key_index, model, attempt, max_attempts, exc,
+                    key_index,
+                    model,
+                    attempt,
+                    max_attempts,
+                    exc,
                 )
                 await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
                 continue
@@ -509,7 +518,11 @@ class GeminiContentGenerator(ContentGenerator):
                 logger.warning(
                     "quota: model=%s still UNAVAILABLE after backoff on key=%d -- "
                     "excluding this model, trying next one (attempt %d/%d): %s",
-                    model, key_index, attempt, max_attempts, exc,
+                    model,
+                    key_index,
+                    attempt,
+                    max_attempts,
+                    exc,
                 )
                 unavailable_models.add(model)
                 last_server_error = exc
@@ -591,9 +604,7 @@ class GeminiContentGenerator(ContentGenerator):
         if not queries:
             return BatchResult(items=[])
 
-        queries_block = "\n".join(
-            f'- request_index {q.request_index}: "{q.name}"' for q in queries
-        )
+        queries_block = "\n".join(f'- request_index {q.request_index}: "{q.name}"' for q in queries)
         prompt = [
             ("system", prompts.TOPIC_NAME_VALIDATE_SYSTEM),
             ("human", prompts.TOPIC_NAME_VALIDATE_USER.format(queries_block=queries_block)),

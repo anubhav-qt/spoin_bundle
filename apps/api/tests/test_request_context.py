@@ -37,9 +37,7 @@ def app() -> FastAPI:
 
 
 async def _client(app: FastAPI) -> httpx.AsyncClient:
-    return httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app), base_url="http://test"
-    )
+    return httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test")
 
 
 async def test_assigns_and_echoes_a_request_id(app: FastAPI) -> None:

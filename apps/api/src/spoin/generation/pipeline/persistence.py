@@ -173,16 +173,20 @@ async def _load_subtopic_plans(
         # Subtopic-scoped, not group-scoped -- matches where the near-dup
         # check itself is scoped (generation/dedup.py's find_corpus_duplicate).
         avoid_bodies = (
-            await session.execute(
-                select(RejectedCard.body)
-                .where(
-                    RejectedCard.subtopic_id == subtopic.id,
-                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+            (
+                await session.execute(
+                    select(RejectedCard.body)
+                    .where(
+                        RejectedCard.subtopic_id == subtopic.id,
+                        RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+                    )
+                    .order_by(RejectedCard.created_at.desc())
+                    .limit(max_duplicate_feedback_bodies)
                 )
-                .order_by(RejectedCard.created_at.desc())
-                .limit(max_duplicate_feedback_bodies)
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         rejection_feedback_rows = (
             await session.execute(
                 select(RejectedCard.body, RejectedCard.reason)
@@ -206,16 +210,20 @@ async def _load_subtopic_plans(
             )
         ).all()
         existing_question_stems = (
-            await session.execute(
-                select(Question.stem)
-                .where(
-                    Question.subtopic_id == subtopic.id,
-                    Question.status == QuestionStatus.ACTIVE,
+            (
+                await session.execute(
+                    select(Question.stem)
+                    .where(
+                        Question.subtopic_id == subtopic.id,
+                        Question.status == QuestionStatus.ACTIVE,
+                    )
+                    .order_by(Question.created_at.desc())
+                    .limit(max_existing_question_stems)
                 )
-                .order_by(Question.created_at.desc())
-                .limit(max_existing_question_stems)
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         # Subtopic-scoped (not group-wide, unlike `existing` above) -- a hero
         # is one-per-subtopic-tier, matching `CardDraft.is_hero`'s scope.
         has_hero = (

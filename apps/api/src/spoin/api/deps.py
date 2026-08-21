@@ -81,4 +81,3 @@ async def current_user_id_optional(
 
 UserDep = Annotated[UUID, Depends(current_user_id)]
 OptionalUserDep = Annotated[UUID | None, Depends(current_user_id_optional)]
-

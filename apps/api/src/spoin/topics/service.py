@@ -165,9 +165,7 @@ class TopicsService:
             for user_topic, topic in rows
         ]
 
-    async def _latest_jobs_by_topic(
-        self, topic_ids: list[UUID]
-    ) -> dict[UUID, GenerationJob]:
+    async def _latest_jobs_by_topic(self, topic_ids: list[UUID]) -> dict[UUID, GenerationJob]:
         """Most recent job per topic, in one round trip.
 
         `DISTINCT ON` rather than a window function: Postgres-only, but this
@@ -178,13 +176,17 @@ class TopicsService:
         if not topic_ids:
             return {}
         rows = (
-            await self._session.execute(
-                select(GenerationJob)
-                .where(GenerationJob.topic_id.in_(topic_ids))
-                .distinct(GenerationJob.topic_id)
-                .order_by(GenerationJob.topic_id, GenerationJob.created_at.desc())
+            (
+                await self._session.execute(
+                    select(GenerationJob)
+                    .where(GenerationJob.topic_id.in_(topic_ids))
+                    .distinct(GenerationJob.topic_id)
+                    .order_by(GenerationJob.topic_id, GenerationJob.created_at.desc())
+                )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         return {job.topic_id: job for job in rows}
 
     async def generation_progress(self, topic_id: UUID) -> GenerationProgressOut:
@@ -241,8 +243,10 @@ class TopicsService:
         )
 
         rows = (
-            await self._session.execute(select(Topic).order_by(Topic.subscriber_count.desc()))
-        ).scalars().all()
+            (await self._session.execute(select(Topic).order_by(Topic.subscriber_count.desc())))
+            .scalars()
+            .all()
+        )
 
         return [
             TopicDiscoverOut(
@@ -267,13 +271,17 @@ class TopicsService:
 
         followed = select(UserTopic.topic_id).where(UserTopic.user_id == user_id)
         rows = (
-            await self._session.execute(
-                select(Topic)
-                .where(Topic.id.not_in(followed))
-                .order_by(Topic.subscriber_count.desc())
-                .limit(_DISCOVER_LIMIT)
+            (
+                await self._session.execute(
+                    select(Topic)
+                    .where(Topic.id.not_in(followed))
+                    .order_by(Topic.subscriber_count.desc())
+                    .limit(_DISCOVER_LIMIT)
+                )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
 
         return [
             TopicDiscoverOut(
@@ -346,9 +354,7 @@ class TopicsService:
                     Subtopic.title,
                     Subtopic.difficulty,
                     func.count(Card.id).filter(Card.status == CardStatus.ACTIVE),
-                    func.count(UserCardState.card_id).filter(
-                        UserCardState.state == SeenState.SEEN
-                    ),
+                    func.count(UserCardState.card_id).filter(UserCardState.state == SeenState.SEEN),
                 )
                 .select_from(Subtopic)
                 .outerjoin(Card, Card.subtopic_id == Subtopic.id)
@@ -455,9 +461,7 @@ class TopicsService:
                 select(
                     Subtopic.id,
                     func.count(Card.id),
-                    func.count(UserCardState.card_id).filter(
-                        UserCardState.state == SeenState.SEEN
-                    ),
+                    func.count(UserCardState.card_id).filter(UserCardState.state == SeenState.SEEN),
                 )
                 .select_from(Subtopic)
                 .outerjoin(Card, (Card.subtopic_id == Subtopic.id))
@@ -485,14 +489,10 @@ class TopicsService:
         the deterministic default the client computes itself."""
 
         user_topic = await self._session.scalar(
-            select(UserTopic).where(
-                UserTopic.user_id == user_id, UserTopic.topic_id == topic_id
-            )
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
         )
         if user_topic is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, detail="Not subscribed to this topic"
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not subscribed to this topic")
 
         user_topic.accent_hue = hue
         progress = await self._session.scalar(
@@ -522,9 +522,7 @@ class TopicsService:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unknown topic")
 
         existing = await self._session.scalar(
-            select(UserTopic).where(
-                UserTopic.user_id == user_id, UserTopic.topic_id == topic_id
-            )
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
         )
         if existing is not None:
             raise HTTPException(status.HTTP_409_CONFLICT, detail="Already subscribed")
@@ -693,9 +691,7 @@ class TopicsService:
         topic_id = UUID(outcome["topic_id"])
 
         existing = await session.scalar(
-            select(UserTopic).where(
-                UserTopic.user_id == user_id, UserTopic.topic_id == topic_id
-            )
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
         )
         if existing is not None:
             # Already following the topic this name resolved to -- no slot

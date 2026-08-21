@@ -53,11 +53,14 @@ Each card needs:
   shape that doesn't belong.\
 """
 
-CARDS_COMMON_HEADER = """\
+CARDS_COMMON_HEADER = (
+    """\
 You write flashcard-style learning content for a learning app, at a single \
 requested difficulty, for one subtopic at a time.
 
-""" + CARD_FIELDS_BLOCK + """
+"""
+    + CARD_FIELDS_BLOCK
+    + """
 
 CRITICAL: never repeat a title (canonical or display) from the "already covered" \
 list below — write about something genuinely different within this subtopic. The \
@@ -76,10 +79,13 @@ If cards from a LOWER difficulty tier of this same subtopic are shown below \
 ("builds on"), these new cards should genuinely build on them — assume the \
 reader already knows that material, and go deeper rather than re-explaining it.
 """
+)
 
 CARDS_SYSTEM = CARDS_COMMON_HEADER + "\n" + ASCII_INSTRUCTIONS
 
-CARDS_ASCII_SYSTEM = CARDS_COMMON_HEADER + """
+CARDS_ASCII_SYSTEM = (
+    CARDS_COMMON_HEADER
+    + """
 
 CARD TYPE REQUIREMENT — ASCII ART SCENE WITH STICKMAN (MANDATORY):
 Every single card in this batch MUST include a charming, funny ASCII scene featuring \
@@ -93,8 +99,11 @@ trying the wrong thing, captioning the core idea).
   * ascii_alt: one plain sentence describing the stick figure scene for screen readers.
 - Do NOT omit the ASCII art on any card in this batch.
 """
+)
 
-CARDS_COMPARISON_SYSTEM = CARDS_COMMON_HEADER + """
+CARDS_COMPARISON_SYSTEM = (
+    CARDS_COMMON_HEADER
+    + """
 
 CARD TYPE REQUIREMENT — MYTH VS FACT / COMPARISON (MANDATORY):
 Every single card in this batch MUST be a misconception-busting or "wrong way vs right way" \
@@ -105,8 +114,11 @@ comparison card.
 - Followed by a concise, clear explanation explaining WHY people make this mistake \
 and how the underlying mechanism actually works.
 """
+)
 
-CARDS_CODE_SYSTEM = CARDS_COMMON_HEADER + """
+CARDS_CODE_SYSTEM = (
+    CARDS_COMMON_HEADER
+    + """
 
 CARD TYPE REQUIREMENT — CODE / COMMAND / CONFIGURATION (MANDATORY):
 Every single card in this batch MUST teach a practical, concrete code, command, \
@@ -115,8 +127,11 @@ query, or configuration example.
 with a language tag (e.g. ```python, ```bash, ```sql, ```typescript, ```yaml, ```dockerfile).
 - The code block must be clean, realistic, and directly illustrate the concept being explained.
 """
+)
 
-CARDS_DIAGRAM_SYSTEM = CARDS_COMMON_HEADER + """
+CARDS_DIAGRAM_SYSTEM = (
+    CARDS_COMMON_HEADER
+    + """
 
 CARD TYPE REQUIREMENT — DIAGRAM / PROCESS FLOW (MANDATORY):
 Every single card in this batch MUST illustrate an architecture, request lifecycle, \
@@ -126,8 +141,11 @@ or ```text) or an ASCII arrow chain using box-drawing characters (`+---+`, `| |`
 or arrows (`-->`, `──>`).
 - The diagram must clearly show steps, components, or state changes.
 """
+)
 
-CARDS_PROSE_SYSTEM = CARDS_COMMON_HEADER + """
+CARDS_PROSE_SYSTEM = (
+    CARDS_COMMON_HEADER
+    + """
 
 CARD TYPE REQUIREMENT — CONCEPTUAL PROSE & MENTAL MODELS:
 Every single card in this batch MUST focus on deep conceptual understanding, \
@@ -135,6 +153,7 @@ intuition, physical analogies, and fundamental principles.
 - Focus on crystal-clear prose and strong mental models without forcing \
 artificial code blocks or diagrams.
 """
+)
 
 HERO_CARDS_SYSTEM = (
     """\

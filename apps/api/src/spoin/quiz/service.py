@@ -120,20 +120,24 @@ class QuizService:
 
         seen = select(UserQuestionSeen.question_id).where(UserQuestionSeen.user_id == user_id)
         rows = (
-            await self._session.execute(
-                select(Question)
-                .join(Subtopic, Subtopic.id == Question.subtopic_id)
-                .where(
-                    Subtopic.topic_id == topic_id,
-                    Question.difficulty == difficulty,
-                    Question.kind == kind,
-                    Question.status == QuestionStatus.ACTIVE,
+            (
+                await self._session.execute(
+                    select(Question)
+                    .join(Subtopic, Subtopic.id == Question.subtopic_id)
+                    .where(
+                        Subtopic.topic_id == topic_id,
+                        Question.difficulty == difficulty,
+                        Question.kind == kind,
+                        Question.status == QuestionStatus.ACTIVE,
+                    )
+                    # Unseen first (False sorts before True), random within each group.
+                    .order_by(Question.id.in_(seen).asc(), func.random())
+                    .limit(count)
                 )
-                # Unseen first (False sorts before True), random within each group.
-                .order_by(Question.id.in_(seen).asc(), func.random())
-                .limit(count)
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         return list(rows)
 
     async def _mark_seen(self, user_id: UUID, question_ids: list[UUID]) -> None:
@@ -366,18 +370,20 @@ class QuizService:
         attempt_question.justification = justification
 
         mcq_correct = (
-            await self._session.execute(
-                select(QuizAttemptQuestion.correct)
-                .join(Question, Question.id == QuizAttemptQuestion.question_id)
-                .where(
-                    QuizAttemptQuestion.attempt_id == attempt_id,
-                    Question.kind == QuestionKind.MCQ,
+            (
+                await self._session.execute(
+                    select(QuizAttemptQuestion.correct)
+                    .join(Question, Question.id == QuizAttemptQuestion.question_id)
+                    .where(
+                        QuizAttemptQuestion.attempt_id == attempt_id,
+                        Question.kind == QuestionKind.MCQ,
+                    )
                 )
             )
-        ).scalars().all()
-        mcq_fraction = (
-            (sum(1 for c in mcq_correct if c) / len(mcq_correct)) if mcq_correct else 0.0
+            .scalars()
+            .all()
         )
+        mcq_fraction = (sum(1 for c in mcq_correct if c) / len(mcq_correct)) if mcq_correct else 0.0
 
         score = combined_score(
             mcq_fraction=mcq_fraction,
@@ -467,13 +473,17 @@ class QuizService:
 
     async def _remediation_for(self, attempt_id: UUID) -> list[RemediationCard]:
         wrong_question_ids = (
-            await self._session.execute(
-                select(QuizAttemptQuestion.question_id).where(
-                    QuizAttemptQuestion.attempt_id == attempt_id,
-                    QuizAttemptQuestion.correct.is_(False),
+            (
+                await self._session.execute(
+                    select(QuizAttemptQuestion.question_id).where(
+                        QuizAttemptQuestion.attempt_id == attempt_id,
+                        QuizAttemptQuestion.correct.is_(False),
+                    )
                 )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         if not wrong_question_ids:
             return []
 
@@ -492,7 +502,5 @@ class QuizService:
             if card_id in seen_card_ids:
                 continue
             seen_card_ids.add(card_id)
-            out.append(
-                RemediationCard(card_id=card_id, title=title, subtopic_title=subtopic_title)
-            )
+            out.append(RemediationCard(card_id=card_id, title=title, subtopic_title=subtopic_title))
         return out

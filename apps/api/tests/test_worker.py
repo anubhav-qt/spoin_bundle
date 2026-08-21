@@ -124,7 +124,9 @@ async def test_run_once_isolates_one_jobs_failure_from_others(
     session.add_all([good_job, bad_job])
     await session.commit()
 
-    monkeypatch.setattr(worker_module, "get_content_generator", lambda: _FlakyGenerator("Bad Topic"))
+    monkeypatch.setattr(
+        worker_module, "get_content_generator", lambda: _FlakyGenerator("Bad Topic")
+    )
 
     processed = await worker_module.run_once()
     assert processed == 2
@@ -140,11 +142,11 @@ async def test_run_once_isolates_one_jobs_failure_from_others(
     from sqlalchemy import select
 
     good_cards = (
-        await session.execute(select(Card).where(Card.topic_id == good_topic.id))
-    ).scalars().all()
+        (await session.execute(select(Card).where(Card.topic_id == good_topic.id))).scalars().all()
+    )
     bad_cards = (
-        await session.execute(select(Card).where(Card.topic_id == bad_topic.id))
-    ).scalars().all()
+        (await session.execute(select(Card).where(Card.topic_id == bad_topic.id))).scalars().all()
+    )
     assert len(good_cards) > 0
     assert len(bad_cards) == 0
 

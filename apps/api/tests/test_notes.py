@@ -16,7 +16,9 @@ from spoin.notes.service import NotesService
 pytestmark = pytest.mark.asyncio
 
 
-async def test_upsert_creates_then_updates_in_place(session: AsyncSession, corpus: dict[str, Any]) -> None:
+async def test_upsert_creates_then_updates_in_place(
+    session: AsyncSession, corpus: dict[str, Any]
+) -> None:
     """A user should be able to edit a note they already wrote, not append."""
 
     service = NotesService(session)
@@ -79,7 +81,9 @@ async def test_notes_are_private_per_user(session: AsyncSession, corpus: dict[st
     assert notes_for_owner == {card.id: "mine"}
 
 
-async def test_list_for_user_orders_newest_edit_first(session: AsyncSession, corpus: dict[str, Any]) -> None:
+async def test_list_for_user_orders_newest_edit_first(
+    session: AsyncSession, corpus: dict[str, Any]
+) -> None:
     service = NotesService(session)
     user = corpus["user"]
     first_card, second_card = corpus["cards"][0], corpus["cards"][1]
@@ -96,7 +100,9 @@ async def test_list_for_user_orders_newest_edit_first(session: AsyncSession, cor
     assert rows[0].topic_name == "Testing"
 
 
-async def test_list_for_user_excludes_other_users_notes(session: AsyncSession, corpus: dict[str, Any]) -> None:
+async def test_list_for_user_excludes_other_users_notes(
+    session: AsyncSession, corpus: dict[str, Any]
+) -> None:
     from spoin.domain.models import User
 
     service = NotesService(session)

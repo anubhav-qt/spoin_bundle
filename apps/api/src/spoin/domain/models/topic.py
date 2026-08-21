@@ -56,7 +56,7 @@ class User(Base, UUIDPrimaryKey, Timestamps):
     google_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     #: Gates onboarding, not signup — set once the onboarding flow finishes.
     onboarding_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    
+
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
     gender: Mapped[str | None] = mapped_column(String(32), nullable=True)
     avatar_icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
@@ -67,9 +67,7 @@ class User(Base, UUIDPrimaryKey, Timestamps):
     #: `undefer`; `has_avatar_image` is answered by the column below instead of
     #: by testing this one for None, so the common path never triggers a lazy
     #: load either.
-    avatar_image: Mapped[bytes | None] = mapped_column(
-        LargeBinary, nullable=True, deferred=True
-    )
+    avatar_image: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
     #: Denormalized so "does this user have a photo?" is answerable without
     #: touching the blob. Written only alongside `avatar_image`, by
     #: ProfileService — the two are never set independently.

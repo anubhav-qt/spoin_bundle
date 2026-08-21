@@ -39,9 +39,7 @@ async def test_stays_on_first_key_and_model_while_under_target(session: AsyncSes
 
 
 async def test_drains_every_key_before_falling_to_the_next_model(session: AsyncSession) -> None:
-    governor = QuotaGovernor(
-        key_count=2, ladder=_ladder(("model-a", 2, 100), ("model-b", 2, 100))
-    )
+    governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 2, 100), ("model-b", 2, 100)))
     now = datetime.now(UTC)
 
     results = [await governor.acquire_with_session(session, now=now) for _ in range(5)]

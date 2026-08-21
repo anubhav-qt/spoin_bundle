@@ -43,7 +43,9 @@ def _real_429(message: str = "quota exceeded") -> ClientError:
     the API's `{"error": {...}}` envelope. Mirrors what
     `GeminiContentGenerator._invoke_with_retry` matches on (`exc.code == 429`)."""
 
-    return ClientError(429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "message": message}})
+    return ClientError(
+        429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "message": message}}
+    )
 
 
 def _settings(**overrides: object) -> Settings:
@@ -234,7 +236,9 @@ async def test_generate_cards_whole_call_failure_degrades_to_empty_batch() -> No
 async def test_generate_cards_threads_builds_on_into_prompt() -> None:
     generator = _generator()
     wire = _WireCardBatch(
-        cards=[_WireCard(title="Advanced take", canonical_title="Advanced Take", summary="s", body="b")]
+        cards=[
+            _WireCard(title="Advanced take", canonical_title="Advanced Take", summary="s", body="b")
+        ]
     )
     captured_prompt: list[object] = []
 
@@ -357,8 +361,13 @@ async def test_correct_cards_passes_through_edits_and_rejects_bad_item() -> None
     wire = _WireCorrectionBatch(
         corrections=[
             _WireCorrection(
-                index=0, title="Fixed", canonical_title="Fixed Title", summary="s", body="b",
-                was_edited=True, note="fixed topic drift",
+                index=0,
+                title="Fixed",
+                canonical_title="Fixed Title",
+                summary="s",
+                body="b",
+                was_edited=True,
+                note="fixed topic drift",
             ),
         ]
     )
@@ -370,8 +379,13 @@ async def test_correct_cards_passes_through_edits_and_rejects_bad_item() -> None
         result = await generator.correct_cards(
             [
                 CardCorrectionQuery(
-                    index=0, topic_name="T", topic_description="d", title="Orig",
-                    canonical_title="Orig Title", summary="s", body="off-topic body",
+                    index=0,
+                    topic_name="T",
+                    topic_description="d",
+                    title="Orig",
+                    canonical_title="Orig Title",
+                    summary="s",
+                    body="off-topic body",
                 )
             ],
             difficulty_examples={},
@@ -400,11 +414,15 @@ async def test_verify_cards_parses_verdicts_and_rejects_bad_enum() -> None:
         result = await generator.verify_cards(
             [
                 CardVerificationQuery(
-                    index=0, canonical_title="A", body="body one",
+                    index=0,
+                    canonical_title="A",
+                    body="body one",
                     requested_difficulty=Difficulty.ADVANCED,
                 ),
                 CardVerificationQuery(
-                    index=1, canonical_title="B", body="body two",
+                    index=1,
+                    canonical_title="B",
+                    body="body two",
                     requested_difficulty=Difficulty.BEGINNER,
                 ),
             ],
@@ -578,7 +596,9 @@ async def test_match_topics_batches_every_query_in_one_call() -> None:
     generator = _generator()
     wire = _WireTopicMatchBatch(
         results=[
-            _WireTopicMatchResult(request_index=0, matched_topic_id="11111111-1111-1111-1111-111111111111"),
+            _WireTopicMatchResult(
+                request_index=0, matched_topic_id="11111111-1111-1111-1111-111111111111"
+            ),
             _WireTopicMatchResult(request_index=1, matched_topic_id=None),
         ]
     )
@@ -606,7 +626,9 @@ async def test_match_topics_batches_every_query_in_one_call() -> None:
                     )
                 ],
             ),
-            TopicMatchQuery(request_index=1, name="Sourdough Baking", description="", candidates=[]),
+            TopicMatchQuery(
+                request_index=1, name="Sourdough Baking", description="", candidates=[]
+            ),
         ]
         result = await generator.match_topics(queries)
 
@@ -673,4 +695,3 @@ async def test_generate_cards_prompt_selection_by_card_type(
     assert len(result.items) == 1
     system_prompt = str(captured_prompt[0])
     assert expected_phrase in system_prompt
-

@@ -141,4 +141,3 @@ class CardType(StrEnum):
     DIAGRAM = "diagram"
     COMPARISON = "comparison"
     ASCII = "ascii"
-

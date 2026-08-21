@@ -23,7 +23,6 @@ def override_dependencies(session: AsyncSession, settings: Settings):
     app.dependency_overrides.clear()
 
 
-
 @pytest.mark.asyncio
 async def test_register_and_login(session: AsyncSession, settings: Settings):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
@@ -126,12 +125,14 @@ async def test_refresh_token(session: AsyncSession, settings: Settings):
 async def test_google_auth(session: AsyncSession, settings: Settings, monkeypatch):
     # Mock verify_google_id_token
     from spoin.auth import google
+
     def mock_verify(*args, **kwargs):
         return google.GoogleUserInfo(
             email="google@example.com",
             google_id="1234567890",
             name="Google User",
         )
+
     monkeypatch.setattr("spoin.api.routers.auth.verify_google_id_token", mock_verify)
 
     # Enable google client id in settings

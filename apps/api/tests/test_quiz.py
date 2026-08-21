@@ -88,7 +88,9 @@ async def test_entry_tier_is_trusted_and_unlocks_below_tiers(
 
     # ...but a practice attempt at a tier BELOW the entry tier is open
     # immediately, no coverage required.
-    start = await start_quiz(topic_id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id)
+    start = await start_quiz(
+        topic_id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id
+    )
     assert start.kind == "placement"
     assert len(start.mcq) == settings.quiz_mcq_count
 
@@ -113,7 +115,9 @@ async def test_full_promotion_flow_advances_current_difficulty(
     progress.tier_unlocked = [True, False, False]
     await session.commit()
 
-    start = await start_quiz(topic_id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id)
+    start = await start_quiz(
+        topic_id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id
+    )
     assert start.kind == "promotion"
     assert len(start.mcq) == settings.quiz_mcq_count
 
@@ -121,7 +125,9 @@ async def test_full_promotion_flow_advances_current_difficulty(
     correct_by_id = {
         q.id: q.correct_index
         for q in (
-            await session.execute(select(Question).where(Question.id.in_([m.question_id for m in start.mcq])))
+            await session.execute(
+                select(Question).where(Question.id.in_([m.question_id for m in start.mcq]))
+            )
         )
         .scalars()
         .all()
@@ -172,7 +178,9 @@ async def test_placement_attempt_never_changes_progression(
     assert progress is not None
     before = progress.current_difficulty
 
-    start = await start_quiz(topic_id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id)
+    start = await start_quiz(
+        topic_id, QuizStartIn(difficulty=Difficulty.BEGINNER), session, user_id
+    )
     assert start.kind == "placement"
 
     # Correct or not doesn't matter for this test — only that it never

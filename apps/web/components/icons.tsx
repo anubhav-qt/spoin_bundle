@@ -138,9 +138,9 @@ export function CompassIcon(_: IconProps) {
   );
 }
 
-export function UserIcon(_: IconProps) {
+export function UserIcon({ filled = false }: { filled?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style={{ fill: filled ? "currentColor" : "none" }}>
       <circle cx="12" cy="8.5" r="3.5" />
       <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
     </svg>

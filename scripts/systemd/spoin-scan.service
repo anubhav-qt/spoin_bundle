@@ -1,0 +1,17 @@
+[Unit]
+Description=Spoin Incomplete Topics Scanner & Card Generation Pass
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=spoin
+WorkingDirectory=/opt/spoin/apps/api
+EnvironmentFile=/opt/spoin/.env
+Environment=PYTHONPATH=/opt/spoin/apps/api/src
+Environment=SPOIN_DATABASE_URL=postgresql+asyncpg://spoin:spoin@localhost:5432/spoin_db
+ExecStart=/usr/bin/python3 -m spoin.scan_and_generate --limit 1
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

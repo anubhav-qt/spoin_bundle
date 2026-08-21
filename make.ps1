@@ -54,6 +54,7 @@ switch ($Target) {
         Invoke-Compose @('run', '--rm', 'seed', 'alembic', 'revision', '--autogenerate', '-m', $m)
     }
     'worker'    { Invoke-Compose @('--profile', 'worker', 'run', '--rm', 'worker') }
+    'scan'      { Invoke-Compose ($api + @('python', '-m', 'spoin.scan_and_generate', '--limit', '1')) }
     'api-types' {
         & npx --yes openapi-typescript http://localhost:8000/openapi.json -o packages/api-types/schema.d.ts
     }

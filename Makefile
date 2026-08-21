@@ -52,6 +52,9 @@ migration: ## Autogenerate a migration: make migration m="add foo"
 worker: ## Run one batch pass of the worker, then exit
 	$(COMPOSE) --profile worker run --rm worker
 
+scan: ## Scan incomplete topics and run one generation pass
+	$(API) python -m spoin.scan_and_generate --limit 1
+
 api-types: ## Regenerate packages/api-types from the live OpenAPI schema
 	npx --yes openapi-typescript http://localhost:8000/openapi.json \
 		-o packages/api-types/schema.d.ts

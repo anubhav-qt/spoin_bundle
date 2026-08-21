@@ -325,7 +325,7 @@ def _ascii_visual_fields(wire_card: _WireCard) -> tuple[str | None, dict[str, st
             _ASCII_MAX_WIDTH,
         )
         return None, None
-    label = wire_card.ascii_label.strip() or "untitled-scene"
+    label = (wire_card.ascii_label.strip() or "untitled-scene")[:64]
     return label, {"art": wire_card.ascii_art, "alt": wire_card.ascii_alt}
 
 
@@ -493,21 +493,34 @@ class GeminiContentGenerator(ContentGenerator):
                 # happens in practice. The real error survives as `__cause__`, so
                 # unwrap that to find the actual `.code` this branch needs.
                 real_error = exc if isinstance(exc, ClientError) else exc.__cause__
-                # Anything that isn't actually a 429 re-raises immediately rather
-                # than burning a retry attempt on an error no amount of key
-                # rotation fixes (a malformed request, an auth failure, ...).
-                if not isinstance(real_error, ClientError) or real_error.code != 429:
+                # 429: quota exhausted for this key/project.
+                # 401/403: key disabled, service account invalid, or unauthenticated.
+                # In either case, mark this cell exhausted for today and rotate to the next key.
+                # Anything else (e.g. malformed request, bad schema) re-raises immediately.
+                if not isinstance(real_error, ClientError) or real_error.code not in (401, 403, 429):
                     raise
-                logger.warning(
-                    "quota: key=%d model=%s got a REAL 429 from the provider despite our "
-                    "ledger showing room -- marking exhausted, trying next cell "
-                    "(attempt %d/%d): %s",
-                    key_index,
-                    model,
-                    attempt,
-                    max_attempts,
-                    exc,
-                )
+                if real_error.code in (401, 403):
+                    logger.warning(
+                        "quota: key=%d model=%s got auth error %d (%s) -- marking exhausted, "
+                        "trying next cell (attempt %d/%d)",
+                        key_index,
+                        model,
+                        real_error.code,
+                        getattr(real_error, "message", str(exc)),
+                        attempt,
+                        max_attempts,
+                    )
+                else:
+                    logger.warning(
+                        "quota: key=%d model=%s got a REAL 429 from the provider despite our "
+                        "ledger showing room -- marking exhausted, trying next cell "
+                        "(attempt %d/%d): %s",
+                        key_index,
+                        model,
+                        attempt,
+                        max_attempts,
+                        exc,
+                    )
                 await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
                 continue
             except ServerError as exc:

@@ -143,6 +143,46 @@ To hold that line, built in from the start rather than retrofitted:
 The enforcement half matters more than the documentation half: docs rot silently,
 a failing CI check does not.
 
+## Automated Background Topic Generation & Idle Scanner
+
+Spoin includes an automated scanning and generation runner (`spoin.scan_and_generate`) that finds incomplete topics in `spoin_db` (topics without curricula or subtopics with active cards below target) and runs the generation pipeline automatically when the machine or server is idle.
+
+### Linux Production Deployment (Crontab / Systemd)
+
+#### Option 1: Standard Linux Crontab (Every 15 Minutes)
+```bash
+# Edit crontab
+crontab -e
+
+# Run one generation pass every 15 minutes:
+*/15 * * * * cd /opt/spoin/apps/api && PYTHONPATH=src SPOIN_DATABASE_URL="postgresql+asyncpg://spoin:spoin@localhost:5432/spoin_db" python3 -m spoin.scan_and_generate --limit 1 >> /var/log/spoin-scan.log 2>&1
+```
+
+#### Option 2: Linux `systemd` Service & Timer
+```bash
+sudo cp scripts/systemd/spoin-scan.service /etc/systemd/system/
+sudo cp scripts/systemd/spoin-scan.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now spoin-scan.timer
+```
+
+#### Option 3: Continuous CPU Idle Daemon (Linux / Windows)
+Monitors system CPU utilization via `psutil`. When the system CPU has been continuously idle (<15% utilization) for 15 minutes, it triggers a generation pass:
+```bash
+# Linux
+nohup ./scripts/start_idle_runner.sh 15 15.0 1 > /var/log/spoin-idle.log 2>&1 &
+
+# Windows PowerShell
+.\scripts\start_idle_runner.ps1 -Background
+```
+
+#### Option 4: Docker / Makefile One-Off Scan
+```bash
+make scan
+# Or on Windows without make:
+.\make.ps1 scan
+```
+
 ## Team
 
 Spoin is open source, and we'd genuinely welcome contributors. Right now it's a

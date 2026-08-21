@@ -26,7 +26,7 @@ in the UI" path now goes through `GenerationJob` end to end.
 
 ## How it runs
 
-v1 runs as a **scheduled batch job** (GitHub Actions cron, ~15 min), not a persistent
+v1 runs as a **scheduled batch job** (GitHub Actions cron or Linux crontab/systemd, ~15 min), not a persistent
 worker pool. At free-tier quota there is nothing for a persistent pool to do 99% of the
 time, and free hosting tiers sleep idle services anyway.
 
@@ -39,6 +39,14 @@ pending jobs every few seconds so a topic typed into the app locally actually ge
 generated without manually rerunning the worker. `--watch` is dev ergonomics on top of
 the exact same `run_once()`/`_run_job` code the cron entrypoint calls, not a change to
 the production shape above.
+
+## Incomplete Topic Scanning & CPU Idle Runner
+
+In addition to demand-driven `GenerationJob` claims, `spoin.scan_and_generate` scans the database for any topic missing curriculum or with active cards below `target_cards`:
+
+- **CLI invocation:** `python -m spoin.scan_and_generate --limit 1` (or `make scan`)
+- **CPU Idle Daemon (`scripts/idle_generation_runner.py`):** Uses `psutil` to sample system CPU load. When CPU utilization stays $<15\%$ continuously for 15 minutes, it automatically executes a single scan-and-generate pass.
+- **Linux Crontab / Systemd Timer:** Fully supported via `scripts/systemd/spoin-scan.service` + `spoin-scan.timer` or a standard crontab entry.
 
 ## Local GPU
 

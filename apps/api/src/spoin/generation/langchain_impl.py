@@ -582,6 +582,8 @@ class GeminiContentGenerator(ContentGenerator):
             wire_result = await self._invoke_with_retry(
                 self._thinking, _WireTopicMatchBatch, prompt
             )
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             return BatchResult(items=[], failures=[f"match_topics call failed: {exc}"])
 
@@ -613,6 +615,8 @@ class GeminiContentGenerator(ContentGenerator):
             wire_result = await self._invoke_with_retry(
                 self._thinking, _WireTopicNameVerdictBatch, prompt
             )
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             # Fails OPEN, not closed (see TopicNameVerdict's default) — a
             # sanity check that can't run should never be the reason a real
@@ -690,6 +694,8 @@ class GeminiContentGenerator(ContentGenerator):
         ]
         try:
             wire_result = await self._invoke_with_retry(self._generator, _WireCardBatch, prompt)
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             return BatchResult(items=[], failures=[f"generate_cards call failed: {exc}"])
 
@@ -756,6 +762,8 @@ class GeminiContentGenerator(ContentGenerator):
             wire_result = await self._invoke_with_retry(
                 self._thinking, _WireCorrectionBatch, prompt
             )
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             return BatchResult(items=[], failures=[f"correct_cards call failed: {exc}"])
 
@@ -808,6 +816,8 @@ class GeminiContentGenerator(ContentGenerator):
             wire_result = await self._invoke_with_retry(
                 self._thinking, _WireVerificationBatch, prompt
             )
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             return BatchResult(items=[], failures=[f"verify_cards call failed: {exc}"])
 
@@ -857,6 +867,8 @@ class GeminiContentGenerator(ContentGenerator):
         ]
         try:
             wire_result = await self._invoke_with_retry(self._generator, _WireQuestionBatch, prompt)
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             return BatchResult(
                 items=[],
@@ -917,6 +929,8 @@ class GeminiContentGenerator(ContentGenerator):
             wire_result = await self._invoke_with_retry(
                 self._thinking, _WireFreeTextGradeBatch, prompt
             )
+        except QuotaExhaustedError:
+            raise
         except Exception as exc:
             return BatchResult(items=[], failures=[f"grade_free_text call failed: {exc}"])
 

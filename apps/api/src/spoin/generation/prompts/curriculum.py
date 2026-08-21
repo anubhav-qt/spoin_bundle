@@ -5,7 +5,9 @@ from __future__ import annotations
 CURRICULUM_SYSTEM = """\
 You are designing the curriculum for a learning app. You lay out the full \
 "road to mastery" for one topic, across all three difficulty tiers \
-(beginner, intermediate, advanced), in a single coherent pass.
+(beginner, intermediate, advanced), in a single coherent pass. Topics can span \
+any domain imaginable (e.g. Computer Science, History, Biology, Philosophy, \
+Economics, Engineering, Music, Linguistics).
 
 Rules:
 - Break the topic into subtopics. Each subtopic is a CONCEPT, and you decide \
@@ -18,14 +20,23 @@ Rules:
   If a subtopic would want more than 25 cards, it is too broad — split it into \
   more than one subtopic instead.
 - For each tier in a subtopic, predetermine the distribution of card types \
-  (card_type_quotas) across the 5 supported types: "prose", "code", "diagram", \
-  "comparison", "ascii". The numbers must be non-negative integers that sum \
-  EXACTLY to target_cards. Pick the distribution matching the nature of the concept:
-  * "code": for hands-on syntax, commands, configuration, queries, API usage.
-  * "diagram": for process flows, architecture, state transitions, pipelines, lifecycles.
-  * "comparison": for common misconceptions, pitfalls, "wrong way vs right way" contrasts.
-  * "ascii": for visual gags, stick figure analogies, intuitive physical metaphors.
-  * "prose": for foundational mental models, conceptual principles, deep intuition.
+  (card_type_quotas) across the 5 supported types: "ascii", "diagram", "comparison", \
+  "code", "prose". The numbers must be non-negative integers that sum EXACTLY to \
+  target_cards. Apply these domain-aware diversity rules:
+  * "code": STRICTLY for Computer Science, programming, queries, CLI commands, or \
+    technical syntax/config. For ALL non-CS/non-technical topics, code quota MUST BE 0.
+  * "diagram": HIGH PRIORITY across all topics. Used for domain-specialized diagrams: \
+    system design architecture, request flows, state machines, timelines, biological \
+    cycles/cascades, economic feedback loops, chemical processes, organizational trees. \
+    Aim for at least 1-2 diagram cards in almost every subtopic tier.
+  * "ascii": HIGH PRIORITY across all topics. 1-2 panel silly, funny stickman visual \
+    gags and humorous physical analogies that make concepts stick. Aim for at least \
+    1-2 ascii stickman cards in every subtopic tier.
+  * "comparison": HIGH PRIORITY for common misconceptions, myths vs facts, pitfalls, \
+    and "wrong way vs right way" contrasts.
+  * "prose": For foundational mental models, conceptual principles, and deep intuition. \
+    Keep prose capped (roughly 20-35% of a tier's cards) so visual and interactive cards \
+    form the majority.
 - Aim for roughly 15-20 subtopics per tier. If the topic is broad enough that you \
   want more than ~20 subtopics in a tier, this is a SURVEY topic: set is_survey \
   true, keep the curriculum you already planned, and additionally list the \

@@ -11,6 +11,7 @@ explicitly NOT covered here — there is no real key to verify that against.
 
 from __future__ import annotations
 
+from typing import cast
 from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
@@ -19,7 +20,13 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
-from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
+from spoin.generation.base import (
+    CardCorrectionQuery,
+    CardVerificationQuery,
+    CurriculumDraft,
+    SubtopicGroupDraft,
+    SubtopicTierDraft,
+)
 from spoin.generation.langchain_impl import (
     GeminiContentGenerator,
     _WireCard,
@@ -172,7 +179,7 @@ async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() ->
         await generator.generate_curriculum("Topic", "desc")
 
     generator._thinking.mark_exhausted.assert_not_awaited()
-    assert generator._thinking.acquire.await_count == 1
+    assert cast(AsyncMock, generator._thinking.acquire).await_count == 1
 
 
 async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:
@@ -645,10 +652,10 @@ async def test_match_topics_batches_every_query_in_one_call() -> None:
 @pytest.mark.parametrize(
     ("card_type", "expected_phrase"),
     [
-        ("ascii", "STICKMAN characters (using stickman is a MUST, not optional)"),
+        ("ascii", "STICKMAN ASCII COMIC SCENE"),
         ("comparison", "MYTH VS FACT / COMPARISON"),
-        ("code", "CODE / COMMAND / CONFIGURATION"),
-        ("diagram", "DIAGRAM / PROCESS FLOW"),
+        ("code", "CODE / SYNTAX / CONFIGURATION"),
+        ("diagram", "DOMAIN-SPECIALIZED DIAGRAM"),
         ("prose", "CONCEPTUAL PROSE & MENTAL MODELS"),
     ],
 )
@@ -695,3 +702,67 @@ async def test_generate_cards_prompt_selection_by_card_type(
     assert len(result.items) == 1
     system_prompt = str(captured_prompt[0])
     assert expected_phrase in system_prompt
+
+
+async def test_quota_exhausted_error_is_reraised_across_methods() -> None:
+    """When QuotaExhaustedError is raised, it must NOT be swallowed into BatchResult.failures;
+    it must propagate so worker can pause and requeue cleanly."""
+    generator = _generator()
+    generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=QuotaExhaustedError("All exhausted")
+    )
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=QuotaExhaustedError("All exhausted")
+    )
+
+    with pytest.raises(QuotaExhaustedError):
+        await generator.generate_cards(
+            topic_name="T",
+            subtopic_title="S",
+            subtopic_description="D",
+            difficulty=Difficulty.BEGINNER,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
+            rejection_feedback=[],
+        )
+
+    with pytest.raises(QuotaExhaustedError):
+        await generator.correct_cards(
+            [
+                CardCorrectionQuery(
+                    index=0,
+                    topic_name="T",
+                    topic_description="D",
+                    title="title",
+                    canonical_title="ctitle",
+                    summary="summary",
+                    body="body",
+                )
+            ],
+            difficulty_examples={},
+        )
+
+    with pytest.raises(QuotaExhaustedError):
+        await generator.verify_cards(
+            [
+                CardVerificationQuery(
+                    index=0,
+                    canonical_title="ctitle",
+                    body="body",
+                    requested_difficulty=Difficulty.BEGINNER,
+                )
+            ],
+            difficulty_examples={},
+        )
+
+    with pytest.raises(QuotaExhaustedError):
+        await generator.generate_questions(
+            [("title", "body")],
+            difficulty=Difficulty.BEGINNER,
+            existing_stems=[],
+            is_backfill=False,
+        )
+

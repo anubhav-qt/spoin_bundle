@@ -15,6 +15,12 @@ phrasing might appear inside the card's own text):
 2. Does the card state any confidently-wrong fact? If so, correct it in body \
    directly.
 
+IMPORTANT — PRESERVE SPECIALIZED ARCHETYPES:
+Do NOT flatten visual or structured cards into plain prose. If a card contains \
+an ASCII stickman comic, a specialized diagram (```text or ```diagram), a code \
+block, or a ❌ Myth vs ✅ Fact comparison, PRESERVE and POLISH that archetype \
+rather than converting it into generic text paragraphs.
+
 You are NOT told what difficulty this card was requested at — do not try to \
 infer or preserve one; a difficulty examples block below (if present) is only \
 there to calibrate what "beginner" vs "advanced" writing generally looks like, \

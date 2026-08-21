@@ -35,6 +35,11 @@ class Candidate:
     #: toward the 80% coverage gate rather than letting a user pile up in one
     #: corner of a topic.
     coverage_need: float
+    #: `Card.archetype` tags (content/archetype.py), used only by `diversify` to
+    #: avoid serving the same content shape (code/diagram/comparison) back to
+    #: back. Never a scoring input — this is a slate-ordering concern, not a
+    #: ranking one.
+    archetype: tuple[str, ...] = ()
 
 
 def freshness(created_at: datetime, *, now: datetime) -> float:
@@ -94,26 +99,60 @@ def rank(
     return chosen[:limit]
 
 
+#: Frontend mirror: Card.tsx's `getPrimaryArchetype`. Collapses the tag set to
+#: one bucket purely for back-to-back comparison — never persisted, never a
+#: score input.
+def _primary_archetype(tags: tuple[str, ...]) -> str:
+    has_code = "code" in tags
+    has_diagram = "diagram" in tags
+    if has_code and has_diagram:
+        return "combo"
+    if has_code:
+        return "code"
+    if has_diagram:
+        return "diagram"
+    if "comparison" in tags:
+        return "comparison"
+    return "default"
+
+
 def diversify(candidates: list[Candidate]) -> list[Candidate]:
-    """Spread consecutive cards across subtopics.
+    """Spread consecutive cards across subtopics, and secondarily archetype.
 
     Five excellent cards from one subtopic is a worse page than five good cards
     from five subtopics, and that cannot be expressed as a per-card score because
     it depends entirely on what preceded it. So it happens here, after ranking,
     rather than as another weight.
+
+    Archetype (code/diagram/comparison/default) rides along as a second, weaker
+    preference: two diagram cards back to back reads as repetitive even from
+    different subtopics. It never overrides the subtopic constraint and never
+    drops a card — a topic down to one archetype (e.g. everything left is
+    "code") just stops being able to satisfy it, and falls back to subtopic-only
+    spread. Quantity always wins over variety when they conflict.
     """
 
     remaining = list(candidates)
     out: list[Candidate] = []
     last_subtopic: UUID | None = None
+    last_archetype: str | None = None
 
     while remaining:
         pick = next(
-            (c for c in remaining if c.subtopic_id != last_subtopic),
-            remaining[0],  # only one subtopic left; repeating beats dropping cards
+            (
+                c
+                for c in remaining
+                if c.subtopic_id != last_subtopic
+                and _primary_archetype(c.archetype) != last_archetype
+            ),
+            next(
+                (c for c in remaining if c.subtopic_id != last_subtopic),
+                remaining[0],  # only one subtopic left; repeating beats dropping cards
+            ),
         )
         remaining.remove(pick)
         out.append(pick)
         last_subtopic = pick.subtopic_id
+        last_archetype = _primary_archetype(pick.archetype)
 
     return out

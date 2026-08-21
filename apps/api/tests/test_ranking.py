@@ -20,6 +20,7 @@ def make_candidate(
     coverage: float = 0.0,
     age_days: int = 0,
     subtopic_id: object | None = None,
+    archetype: tuple[str, ...] = (),
 ) -> Candidate:
     return Candidate(
         card_id=uuid4(),
@@ -28,6 +29,7 @@ def make_candidate(
         card_quality=quality,
         topic_affinity=affinity,
         coverage_need=coverage,
+        archetype=archetype,
     )
 
 
@@ -103,4 +105,31 @@ def test_diversify_tolerates_a_single_subtopic() -> None:
 
     only = uuid4()
     candidates = [make_candidate(subtopic_id=only) for _ in range(4)]
+    assert len(diversify(candidates)) == 4
+
+
+def test_diversify_avoids_consecutive_archetypes() -> None:
+    """Two diagram cards back to back reads as repetitive even from different
+    subtopics — archetype rides along as a secondary spread, distinct
+    subtopics per candidate so it isn't the subtopic constraint doing the
+    work."""
+
+    candidates = [make_candidate(archetype=("diagram",)) for _ in range(3)] + [
+        make_candidate(archetype=("code",)) for _ in range(3)
+    ]
+
+    ordered = diversify(candidates)
+    archetypes = [c.archetype for c in ordered]
+
+    assert len(ordered) == 6, "diversification must not drop cards"
+    assert all(a != b for a, b in pairwise(archetypes))
+
+
+def test_diversify_falls_back_when_only_one_archetype_remains() -> None:
+    """A topic that's run dry on variety (say only 'code' cards left) must
+    still serve every card — quantity always wins over variety when they
+    conflict, never a starved page."""
+
+    only = uuid4()
+    candidates = [make_candidate(subtopic_id=only, archetype=("code",)) for _ in range(4)]
     assert len(diversify(candidates)) == 4

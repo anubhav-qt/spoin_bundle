@@ -22,6 +22,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0011](0011-difficulty-example-catalog.md) | Author the difficulty example catalog (ADR-0030) | unassigned |
 | [0012](0012-question-generation-failure-visibility.md) | Diagnose silent question-generation failures for specific subtopics | mostly resolved, see doc |
 | [0013](0013-card-preview-swap-not-animated.md) | Collapsed-state preview swaps instantly while the body around it animates | unassigned |
+| [0015](0015-topic-mastery-and-retention-mode.md) | Topic mastery message + retention/spaced-repetition mode once a topic is fully read | unassigned |
 
 ## Closed
 

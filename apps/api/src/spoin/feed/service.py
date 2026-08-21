@@ -331,7 +331,7 @@ class FeedService:
     # driver actually hands back.
     def _eligible_cards(
         self, user_id: UUID, topic_id: UUID, difficulty: Difficulty
-    ) -> Select[tuple[UUID, UUID, datetime, float, float | Decimal]]:
+    ) -> Select[tuple[UUID, UUID, datetime, float, float | Decimal, list[str]]]:
         """Eligible = UNSEEN, or DEFERRED in an earlier cycle.
 
         SEEN never returns — it counts toward the 80% gate. DEFERRED comes back
@@ -365,6 +365,7 @@ class FeedService:
                     / func.nullif(UserSubtopicProgress.total_count, 0),
                     1.0,
                 ),
+                Card.archetype,
             )
             .select_from(Card)
             .join(Subtopic, Subtopic.id == Card.subtopic_id)
@@ -419,6 +420,7 @@ class FeedService:
                 card_quality=float(row[3]),
                 topic_affinity=float(affinity if affinity is not None else 1.0),
                 coverage_need=float(row[4]),
+                archetype=tuple(row[5]),
             )
             for row in rows
         ]

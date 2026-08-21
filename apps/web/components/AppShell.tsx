@@ -232,7 +232,7 @@ export function AppShell() {
           </div>
           {visited.has("notes") ? (
             <div hidden={view !== "notes"}>
-              <NotesView />
+              <NotesView topics={topics} onNavigateHome={() => setView("feed")} />
             </div>
           ) : null}
           {visited.has("liked") ? (

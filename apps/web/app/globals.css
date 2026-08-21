@@ -4373,43 +4373,26 @@ body.custom-cursor-active textarea {
 /* ============================================================================
    Notes view — "all my notes" (docs/tasks/0004) */
 
-.notes-view {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 32px 16px 80px;
-}
-
-.notes-view-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.notes-view-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--fg);
-}
-
-.notes-view-subtitle {
-  font-size: 13px;
-  color: var(--fg-3);
-}
-
-.notes-view-empty {
-  padding: 24px 0;
-  color: var(--fg-3);
-  font-size: 14px;
-}
-
 .notes-view-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
+
+.notes-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  animation: collection-pulse 1.6s ease-in-out infinite;
+}
+
+.notes-skeleton-meta { height: 10px; width: 38%; }
+.notes-skeleton-title { height: 18px; width: 72%; }
+.notes-skeleton-body { height: 40px; width: 100%; border-radius: var(--r-cell); }
 
 /* ============================================================================
    Collection surface — the shared layer behind Liked, Saved and Profile.

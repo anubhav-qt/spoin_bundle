@@ -60,3 +60,28 @@ During this run, the Two-Pass Quality Gate ([ADR-0030](../adr/0030-two-pass-qual
 
 ### Atomic Per-Group Persistence ([ADR-0041](../adr/0041-per-group-gate-and-persist.md))
 - Each subtopic group wrote its cards, 384-dimensional FastEmbed vector embeddings, and 4-choice quiz questions atomically to PostgreSQL upon clearing verification, making completed content immediately playable in the user feed.
+
+---
+
+## Next Benchmark: Parallel Execution & Unbounded Drafting
+
+With [Task 0014](../tasks/0014-unbounded-drafting-rounds.md) (unbounded drafting loop) and multi-key rotation now active, the **next test run** will benchmark concurrent multi-topic generation with all subtopics fanned out in parallel.
+
+### Comparative Metrics to Measure in Next Run
+
+| Metric Dimension | Baseline Run (Run 1: 2026-08-21) | Next Run (Run 2: Unbounded Parallel) | Delta / Analysis |
+| :--- | :---: | :---: | :---: |
+| **Drafting Loop Model** | Capped (`max_rounds = 10`) | Unbounded (`while drafts < target`) | Target deficit elimination |
+| **Total Execution Time** | ~75 minutes (mixed 503 backoff) | *To be recorded* | Net throughput acceleration |
+| **Throughput (Cards/Min)** | ~14.2 cards/min | *To be recorded* | Concurrency impact |
+| **Draft Yield Efficiency** | ~4.2 cards/batch | *To be recorded* | Unbounded fill rate |
+| **Key Quota Utilization** | Keys 0–8 active | *To be recorded* | Load distribution across pool |
+| **Pass 1/2 Rejection Rate** | 1.1% (12 rejected / 1,077 drafted) | *To be recorded* | Quality consistency |
+| **Question Generation Rate** | 99.1% (1,056 questions / 1,065 cards) | *To be recorded* | Quiz completion rate |
+
+### Documentation Protocol for Run 2
+When triggering the next run:
+1. Record timestamp and start/finish wall-clock duration.
+2. Log key distribution from the Quota Governor ledger (`key_index`, `model`, request count).
+3. Populate the comparative matrix above to evaluate latency, throughput, and key-rotation efficiency under full parallel fan-out.
+

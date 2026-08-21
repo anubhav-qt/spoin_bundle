@@ -1763,6 +1763,10 @@ body.custom-cursor-active textarea {
   padding: 8px;
   border-radius: var(--r-pill);
   overflow: hidden;
+  /* A <button> doesn't inherit the page's chosen font by default -- without
+     this it renders in the browser's UA button font regardless of which of
+     the five site fonts (FontPicker) or custom font is active. */
+  font: inherit;
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 

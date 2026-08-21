@@ -65,12 +65,43 @@ export function CustomCursor() {
       if (dot.dataset.state !== "active") dot.dataset.state = hoverStateFor(event.target);
     };
 
+    // A native scrollbar isn't part of the DOM, so `cursor: none` never
+    // reaches it -- the browser always draws its own cursor there, drag or
+    // no drag, and there's no fixing that. Dragging the thumb is the part
+    // that actually breaks: the browser captures the pointer at the OS/
+    // chrome level for the rest of the drag, so `document` stops receiving
+    // `pointermove` entirely until release -- our JS-driven dot freezes at
+    // the mousedown position while the real cursor keeps moving. The only
+    // element a scrollbar click can hit-test to is `<html>` (nothing else
+    // occupies that pixel column/row), so combined with the click landing
+    // within the OS-reported scrollbar's own thickness of the viewport edge,
+    // that's the best signal a plain PointerEvent gives us.
+    const isScrollbarTarget = (event: PointerEvent): boolean => {
+      if (event.target !== document.documentElement) return false;
+      const vScrollbar = window.innerWidth - document.documentElement.clientWidth;
+      const hScrollbar = window.innerHeight - document.documentElement.clientHeight;
+      return (
+        (vScrollbar > 0 && event.clientX >= window.innerWidth - vScrollbar) ||
+        (hScrollbar > 0 && event.clientY >= window.innerHeight - hScrollbar)
+      );
+    };
+
     const onDown = (event: PointerEvent) => {
       if (event.button !== 0) return;
+      if (isScrollbarTarget(event)) {
+        // Bow out for the duration of the drag: hide the dot and hand the
+        // whole page back to the native cursor, same as the scrollbar
+        // itself already forces regardless. The next real `pointermove`
+        // after release re-shows it at the (by-then-correct) position.
+        pos.dataset.visible = "false";
+        document.body.classList.remove("custom-cursor-active");
+        return;
+      }
       dot.dataset.state = "active";
     };
 
     const onUp = (event: PointerEvent) => {
+      document.body.classList.add("custom-cursor-active");
       dot.dataset.state = hoverStateFor(event.target);
     };
 

@@ -15,12 +15,12 @@ Web first; a React Native app comes later and shares this backend.
 > **Status: early build.** Feed serving, engagement, the quiz-taking UI, and real JWT
 > auth (email/password + Google OAuth + guest sessions; see
 > [ADR-0033](docs/adr/0033-jwt-auth-and-guest-identity.md)) are live against `spoin_db`,
-> the one dev database this project keeps -- blank by default, not seeded (see
-> "Developer experience" below and `CLAUDE.md`).
+> which holds real verified production data from the generation pipeline (seeded mock
+> data has been purged; see [generation-pipeline-test-run.md](docs/architecture/generation-pipeline-test-run.md) and `CLAUDE.md`).
 > The web app's feed visual design is in [ADR-0012](docs/adr/0012-feed-visual-design.md).
 > The generation pipeline (curriculum, topic merging, card generation, the two-pass
 > quality gate; see [generation-pipeline.md](docs/architecture/generation-pipeline.md) and
-> [ADR-0030](docs/adr/0030-two-pass-quality-gate.md)) is built and wired to
+> [ADR-0030](docs/adr/0030-two-pass-quality-gate.md)) is built, tested, and wired to
 > `apps/worker` (task [0008](docs/tasks/0008-wire-generation-job-worker.md), done). The
 > palette picker (task [0002](docs/tasks/0002-palette-selection-ui.md)) is not built yet.
 > Read [`docs/architecture/overview.md`](docs/architecture/overview.md) first; it is the

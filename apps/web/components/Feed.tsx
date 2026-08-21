@@ -23,6 +23,7 @@ import { AnimatePresence } from "framer-motion";
 
 import { api, type Card as CardModel, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { useRefreshEffect } from "@/lib/refresh";
 import { groupIntoStations, stationKey, stationKind } from "@/lib/stations";
 import { topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
@@ -136,6 +137,10 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
   useEffect(() => {
     void loadPage(true);
   }, [loadPage]);
+
+  // Manual refresh (the header control) or an invalidation elsewhere (dev
+  // reset) — re-runs a fresh page-1 load without waiting for a remount.
+  useRefreshEffect("feed", () => void loadPage(true));
 
   // -- infinite scroll -------------------------------------------------------
   // `loadingMore` is read via a ref, not a dependency: keeping it out of the

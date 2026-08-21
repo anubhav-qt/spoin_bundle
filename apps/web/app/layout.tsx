@@ -53,6 +53,24 @@ const APPLY_FONT_SCRIPT = `
 })();
 `;
 
+/** Same shape again, for Settings' reduced-motion switch.
+ *
+ *  Only ever sets the attribute, never clears it: `prefers-reduced-motion` is
+ *  still honoured on its own in globals.css, so this is a way to opt IN on a
+ *  device whose OS setting says otherwise — not a way to opt out of the OS
+ *  setting. Pre-hydration for the same reason as the two above: an animation
+ *  that plays for one frame before React clears it is exactly the thing
+ *  someone turning this on is trying to avoid. */
+const APPLY_MOTION_SCRIPT = `
+(function () {
+  try {
+    if (localStorage.getItem("spoin-reduced-motion") === "1") {
+      document.body.setAttribute("data-reduced-motion", "1");
+    }
+  } catch (e) {}
+})();
+`;
+
 /**
  * The five PRESET faces, self-hosted via next/font/google (ADR-0037) — no
  * runtime CDN request, and a browser only fetches the @font-face a reader's
@@ -219,6 +237,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href={EXTRA_GOOGLE_FONTS_HREF} />
         <Script id="apply-palette" strategy="beforeInteractive">
           {APPLY_PALETTE_SCRIPT}
+        </Script>
+        <Script id="apply-motion" strategy="beforeInteractive">
+          {APPLY_MOTION_SCRIPT}
         </Script>
         <Script id="apply-font" strategy="beforeInteractive">
           {APPLY_FONT_SCRIPT}

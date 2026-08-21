@@ -113,6 +113,16 @@ async def run_once() -> int:
                     # tomorrow rather than everyone starving equally.
                     .order_by(GenerationJob.priority.desc(), GenerationJob.created_at)
                     .limit(settings.generation_batch_size)
+                    # Two passes that overlap -- `--watch` running long enough
+                    # to lap itself, a cron pass landing on top of a slow one,
+                    # or a second replica -- both read the same `pending` rows
+                    # under READ COMMITTED and both dispatch them. That is
+                    # duplicate generation billed twice against the quota
+                    # ADR-0028 exists to protect. SKIP LOCKED makes a concurrent
+                    # pass step over rows this one has already taken rather than
+                    # block on them, so the second pass picks up the next batch
+                    # instead of waiting or double-claiming.
+                    .with_for_update(skip_locked=True)
                 )
             )
             .scalars()

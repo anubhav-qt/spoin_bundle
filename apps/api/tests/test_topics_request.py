@@ -15,8 +15,9 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from spoin.api.routers.topics import CUSTOM_TOPIC_LIMIT, request_topic
+from spoin.api.routers.topics import request_topic
 from spoin.api.schemas import TopicRequestIn
+from spoin.core.config import get_settings
 from spoin.domain.models import GenerationJob, User, UserTopic
 
 
@@ -86,7 +87,7 @@ async def test_already_subscribed_is_a_conflict(session: AsyncSession) -> None:
 async def test_custom_topic_limit_enforced_server_side(session: AsyncSession) -> None:
     user_id = await _make_user(session)
 
-    for index in range(CUSTOM_TOPIC_LIMIT):
+    for index in range(get_settings().custom_topic_limit):
         result = await request_topic(TopicRequestIn(name=f"Topic {index}"), session, user_id)
         assert result.topic.is_custom is True
 
@@ -95,7 +96,7 @@ async def test_custom_topic_limit_enforced_server_side(session: AsyncSession) ->
         .select_from(UserTopic)
         .where(UserTopic.user_id == user_id, UserTopic.is_custom.is_(True))
     )
-    assert custom_count == CUSTOM_TOPIC_LIMIT
+    assert custom_count == get_settings().custom_topic_limit
 
     with pytest.raises(HTTPException) as exc_info:
         await request_topic(TopicRequestIn(name="One too many"), session, user_id)

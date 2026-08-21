@@ -1,103 +1,26 @@
-"""Two topics-in, corpus-out phases — one-shot generation, as a LangGraph graph.
+"""The graph's nodes, plus the correction / verification / gate passes they run.
 
-See ADR-0024 for why this is a graph at all, ADR-0025 for the batched topic
-matching phase, and ADR-0026 for the one-shot-completion redesign this module
-now implements. This module owns only what happens *inside* generation itself —
-scheduling, retry-across-restart, and priority remain the worker/`GenerationJob`'s
-job, unchanged.
-
-**Two entrypoints, two transactions, on purpose:**
-
-```
-match_and_create_topics()    ADR-0025. Cheap, no card generation. For each
-                              incoming (name, description): either alias onto
-                              an existing topic (nothing else happens), or mint
-                              a brand-new Topic row -- curriculum NOT generated
-                              yet. Callers commit this BEFORE calling
-                              run_generation_pipeline, so a topic's identity
-                              (and any GenerationJob row referencing its id)
-                              survives even if generation itself later fails
-                              and retries.
-
-run_generation_pipeline()    ADR-0026. Takes topic_ids that ALREADY exist
-                              (minted by match_and_create_topics, possibly in an
-                              earlier, separately-committed call). Curriculum
-                              (if not already generated) -> cards, per subtopic
-                              per difficulty tier, with a linked tier's higher-
-                              difficulty cards built on its lower tier's actual
-                              content -> questions, generated from the cards
-                              just written. One topic, run once, done --
-                              idempotent if called again for a topic that
-                              already finished (nothing left to generate).
-```
-
-**`langgraph` is confined to this module**, the same way ADR-0002 confines
-`langchain*` to `langchain_impl.py` -- this module never imports `langchain*`
-either, it only calls the `ContentGenerator` interface, so it has no idea
-whether Gemini, local, or `FakeContentGenerator` is behind it.
-
-```
-START
-  |  Send fan-out, one branch per topic_id (independent -- a topic already
-  |  curriculum'd and just topping up cards never waits on a sibling topic
-  |  still doing its first curriculum pass)
-  v
-resolve_and_plan_topic     Per topic (already exists; ADR-0025 decided that
-                           upstream). Curriculum call only if
-                           curriculum_generated_at is unset. Groups its
-                           subtopics by subtopic_group_id (a curriculum
-                           "concept"'s 1-3 difficulty tiers).
-  |
-  | Send fan-out, one branch per subtopic GROUP (not per subtopic-tier --
-  | see generate_subtopic_cards for why)
-  v
-generate_subtopic_cards   Concurrent across groups AND topics. Within one
-                          group, tiers run SEQUENTIALLY, lowest difficulty
-                          first, because a linked higher tier's card
-                          generation receives the lower tier's actual card
-                          BODIES as context (ADR-0026) -- it has to exist
-                          first. Groups with only one tier (the common case)
-                          are unaffected: nothing to sequence. Gates+persists
-                          its OWN group's cards (minimal gate, then the
-                          correction/verification passes -- see
-                          generation/gate.py and ADR-0030) and questions
-                          itself, right here, before returning -- cards go
-                          live in the feed as soon as THIS group is done
-                          (ADR-0026), not held back for every other group or
-                          topic in the run to also finish.
-  |
-  | fan-in (every branch's item_reports merge, across every topic in the run)
-  v
-gate_and_persist          Everything is ALREADY persisted by this point --
-                           this is just final aggregation: builds the run's
-                           per-topic report from every group's item_reports,
-                           and marks each topic's GenerationJob done. Fan-in
-                           is correct HERE (unlike for the writes themselves)
-                           because the final report and "done" marking
-                           genuinely do need everything finished.
-```
+One module per stage was considered and rejected: `generate_subtopic_cards`,
+the two correction passes and `_process_gate_item` form a single sequence over
+one subtopic group's drafts, and splitting them further would spread that
+sequence across files without giving any of the pieces an independent reason to
+exist. What they no longer contain is the persistence — that is
+`persistence.py` — or the graph wiring, which is `graph.py`.
 """
 
 from __future__ import annotations
 
 import asyncio
-import logging
 import math
-import operator
 import uuid
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Annotated, Any, TypedDict, cast
+from typing import Any, cast
 
-from langgraph.graph import END, START, StateGraph
-from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command, Send
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.content.archetype import classify_archetype
 from spoin.content.difficulty_examples import get_difficulty_examples
-from spoin.core.config import Settings
 from spoin.domain.enums import (
     CardStatus,
     CardType,
@@ -105,657 +28,36 @@ from spoin.domain.enums import (
     QuestionKind,
     QuestionStatus,
     RejectionStage,
-    TopicEdgeKind,
 )
-from spoin.domain.models import (
-    Card,
-    CardStats,
-    GenerationJob,
-    Question,
-    RejectedCard,
-    Subtopic,
-    Topic,
-    TopicAlias,
-    TopicEdge,
-)
-from spoin.embeddings import Embedder, normalize_topic_text
-from spoin.generation.base import (
-    CardCorrectionQuery,
-    CardDraft,
-    CardVerificationQuery,
-    ContentGenerator,
-    TopicMatchCandidate,
-    TopicMatchQuery,
-    TopicMatchResult,
-)
+from spoin.domain.models import Card, CardStats, Question, Topic
+from spoin.generation.base import CardCorrectionQuery, CardDraft, CardVerificationQuery
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
-
-logger = logging.getLogger("spoin.generation.pipeline")
-
-#: ADR-0030: no calibration examples for a linked subtopic-tier -- it gets
-#: real, concept-specific calibration from `builds_on` instead.
-_NO_DIFFICULTY_EXAMPLES: dict[Difficulty, list[str]] = {difficulty: [] for difficulty in Difficulty}
-
-_SLUG_KEEP = "abcdefghijklmnopqrstuvwxyz0123456789-"
-
-
-def _slugify(name: str) -> str:
-    lowered = "-".join(name.strip().lower().split())
-    return "".join(char for char in lowered if char in _SLUG_KEEP) or "topic"
-
-
-def _existing_title_tag(canonical_title: str, title: str, difficulty: Difficulty) -> str:
-    """ADR-0022 + ADR-0007: the already-covered list a generator sees must carry
-    the canonical title (so the model can tell a subject is taken), the display
-    title (so it doesn't invent the same joke twice under new wording), AND the
-    difficulty it was written at (so a beginner and advanced card on the same
-    concept differ in depth, not just wording)."""
-
-    label = f"{canonical_title} ({title})" if canonical_title != title else canonical_title
-    return f"{label} [{difficulty.value}]"
-
-
-def _min_cards(target_cards: int, fraction: float) -> int:
-    return max(1, round(target_cards * fraction))
-
-
-# --------------------------------------------------------------------- state --
-
-
-class TopicRequest(TypedDict):
-    name: str
-    description: str
-
-
-class TopicMatchOutcome(TypedDict):
-    """One `match_and_create_topics` result: either an alias onto an existing
-    topic (nothing else happened) or a freshly-minted, not-yet-generated one."""
-
-    topic_id: str
-    topic_name: str
-    matched_existing: bool
-
-
-class SubtopicPlan(TypedDict):
-    topic_id: str
-    topic_name: str
-    subtopic_id: str
-    #: Groups this subtopic with its sibling difficulty tiers of the same
-    #: curriculum-authored concept -- what generate_subtopic_cards fans out on.
-    subtopic_group_id: str
-    difficulty: str
-    title: str
-    description: str
-    target_cards: int
-    card_type_quotas: dict[str, int]
-    #: Pre-fetched in resolve_and_plan_topic -- see module docstring for why
-    #: this can't be a DB read inside generate_subtopic_cards. Spans every
-    #: sibling subtopic in the same subtopic_group_id (ADR-0007's cross-tier ask).
-    existing_titles: list[str]
-    existing_count: int
-    #: Bodies of this EXACT subtopic-tier's (not group-wide -- near-dup
-    #: detection is subtopic-scoped, see generation/dedup.py) most recent
-    #: `rejected_card` rows with stage=near_duplicate, from a prior run.
-    #: Prevention feedback (ADR-0030 addendum): the writer sees actual
-    #: rejected content and is told not to reproduce it, rather than
-    #: rediscovering the same duplicate only to have it rejected again.
-    avoid_duplicate_bodies: list[str]
-    #: (body, reason) pairs -- as `{"body", "reason"}` dicts, JSON-safe like
-    #: everything else here -- for this EXACT subtopic-tier's most recent
-    #: pass-2 verification rejections. Unlike `avoid_duplicate_bodies`
-    #: (algorithmic similarity, no reasoning), `reason` here is text the
-    #: judge model itself gave, fed to the writer so it fixes the actual
-    #: problem next time instead of just rewording the same card.
-    rejection_feedback: list[dict[str, str]]
-    #: Active cards under THIS subtopic-tier with no `Question` row yet --
-    #: `gate_and_persist` commits a tier's cards and its questions as two
-    #: separate steps, so an interrupted run (crash, quota exhaustion) can
-    #: leave cards persisted with no questions at all. `existing_count`
-    #: already meeting `target_cards` makes `generate_subtopic_cards` skip
-    #: drafting new cards for this tier forever after -- without this,
-    #: nothing would ever revisit it to fill the gap. Each entry is
-    #: `{"card_id", "title", "body"}` (JSON-safe strings, matching every
-    #: other field on this TypedDict).
-    cards_missing_questions: list[dict[str, str]]
-    #: This EXACT subtopic-tier's already-active `Question.stem`s (capped at
-    #: `settings.max_existing_question_stems`), shown to `generate_questions`
-    #: so it doesn't repeat a question angle already asked -- and, combined
-    #: with the BACKFILL framing `cards_missing_questions` triggers, gives the
-    #: writer a sense of what this subtopic-tier's quiz already looks like
-    #: rather than writing each batch as if it were the first.
-    existing_question_stems: list[str]
-    #: Pre-fetched, same reasoning as `existing_titles` -- whether THIS
-    #: subtopic-tier already has an active `is_hero` card (task 0006 / ADR-
-    #: 0018's real hero mechanism). `generate_subtopic_cards` uses this,
-    #: together with `existing_count == 0`, to decide whether to issue the
-    #: one-time hero call before its normal rounds.
-    has_hero: bool
-
-
-class SubtopicGroupPlan(TypedDict):
-    """One curriculum concept's 1-3 difficulty tiers, ordered lowest first --
-    the Send fan-out unit for card generation (ADR-0026)."""
-
-    topic_id: str
-    topic_name: str
-    #: Threaded through so `generate_subtopic_cards` can gate+persist its own
-    #: group immediately without needing the full `topic_plans` state (a
-    #: `Send`-invoked branch only sees its own payload, not the graph's
-    #: accumulated state -- see `PipelineState.topic_plans`'s docstring).
-    topic_description: str
-    tiers: list[SubtopicPlan]
-
-
-class TopicPlanResult(TypedDict):
-    topic_id: str
-    topic_name: str
-    #: Fed to the quality gate's correction pass as the canonical topic
-    #: description (ADR-0030) -- pulled from `Topic.description`, not stored
-    #: anywhere else in the plan.
-    topic_description: str
-    is_survey: bool
-    deep_dive_topic_names: list[str]
-    subtopics: list[SubtopicPlan]
-
-
-class SubtopicCardsResult(TypedDict):
-    topic_id: str
-    subtopic_id: str
-    difficulty: str
-    drafts: list[CardDraft]
-    generator_failures: list[str]
-    #: True iff this subtopic-tier has no sibling tiers in its
-    #: `subtopic_group_id` -- decides whether the quality gate's two passes
-    #: get the hand-curated difficulty example catalog (ADR-0030) instead of
-    #: relying on `builds_on`'s real sibling-tier context.
-    is_standalone: bool
-    #: Passed straight through from `SubtopicPlan` regardless of whether this
-    #: tier drafted any new cards this run -- see that field's docstring.
-    cards_missing_questions: list[dict[str, str]]
-    #: Passed straight through from `SubtopicPlan`, same reasoning as
-    #: `cards_missing_questions` above.
-    existing_question_stems: list[str]
-
-
-class PipelineState(TypedDict, total=False):
-    #: Already-existing Topic ids (ADR-0025 decided that upstream).
-    topic_ids: list[str]
-    #: Only set on a per-branch Send invocation (outer fan-out).
-    topic_job: dict[str, str]
-    #: Globally accumulated across every topic branch -- used by gate_and_persist
-    #: to build the final per-topic report. NOTE: this is also the only way
-    #: `resolve_and_plan_topic` gets its own subtopics to a downstream fan-out --
-    #: see that function's docstring for why a plain (non-reducer) key doesn't
-    #: work here: concurrent topic branches in the same superstep all write into
-    #: the SAME shared channels, and a plain "last value" channel raises
-    #: `InvalidUpdateError` the moment two branches write to it in one step.
-    #: `Send`-created branches are NOT isolated forks with their own local state.
-    topic_plans: Annotated[list[TopicPlanResult], operator.add]
-    #: Only set on a per-branch Send invocation (inner fan-out).
-    subtopic_group_job: SubtopicGroupPlan
-    #: One dict per subtopic-tier gated THIS run (topic_id, subtopic_id,
-    #: difficulty, accepted/rejected/failed, questions_accepted/rejected) --
-    #: written by `generate_subtopic_cards` itself now (it gates+persists its
-    #: own group immediately, ADR-0026), not by a separate global writer node.
-    #: `gate_and_persist` only reads this to build the final per-topic report
-    #: and mark topics done; every card/question this run wrote is already
-    #: committed by the time it runs.
-    item_reports: Annotated[list[dict[str, object]], operator.add]
-    report: dict[str, object]
-
-
-@dataclass
-class _Runtime:
-    """Dependencies threaded through `config["configurable"]` rather than graph
-    state -- none of these are pipeline *data*."""
-
-    session: AsyncSession
-    generator: ContentGenerator
-    embedder: Embedder
-    settings: Settings
-    batch_id: uuid.UUID
-    semaphore: asyncio.Semaphore
-    topic_plan_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
-    #: `AsyncSession` is not safe for concurrent use across coroutines -- every
-    #: DB-touching section of `_process_gate_item` (dedup reads, card/question
-    #: persist+commit) is serialized through this lock so subtopic-tiers can
-    #: still run their LLM phases (correction, verification, question
-    #: generation) fully concurrently. See `gate_and_persist`'s docstring.
-    session_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
-
-
-#: `config` is deliberately left untyped on every node function below (here and
-#: in resolve_and_plan_topic / generate_subtopic_cards / gate_and_persist).
-#: LangGraph's own node config type is `RunnableConfig` (from langchain_core), and
-#: at runtime it inspects each node's `config` parameter annotation -- if present
-#: and not exactly `RunnableConfig`, it emits a `UserWarning` ("should be typed as
-#: RunnableConfig"), which this repo's `filterwarnings = ["error"]` pytest config
-#: turns into a hard test failure. Importing `RunnableConfig` here to satisfy it
-#: would violate ADR-0002/0024's "pipeline.py never imports langchain*" boundary
-#: (enforced by tests/test_architecture.py) for a type that carries no
-#: model/prompt surface at all. Leaving the parameter unannotated is the one
-#: option LangGraph's own inspection treats as a non-issue.
-def _runtime(config) -> _Runtime:  # type: ignore[no-untyped-def]
-    configurable = config["configurable"]
-    runtime = configurable["runtime"]
-    assert isinstance(runtime, _Runtime)
-    return runtime
-
-
-# ---------------------------------------------------------- topic matching (ADR-0025) --
-
-
-async def _find_top_topic_candidates(
-    session: AsyncSession, embedding: list[float], *, limit: int
-) -> list[tuple[Topic, float]]:
-    rows = (
-        await session.execute(
-            select(Topic, Topic.embedding.cosine_distance(embedding).label("distance"))
-            .where(Topic.embedding.is_not(None))
-            .order_by("distance")
-            .limit(limit)
-        )
-    ).all()
-    return [(topic, 1.0 - distance) for topic, distance in rows]
-
-
-async def _ensure_alias(
-    session: AsyncSession, topic: Topic, raw_name: str, *, decided_by: str, similarity: float | None
-) -> None:
-    normalized = normalize_topic_text(raw_name)
-    existing = await session.scalar(
-        select(TopicAlias).where(TopicAlias.normalized_text == normalized)
-    )
-    if existing is None:
-        session.add(
-            TopicAlias(
-                normalized_text=normalized,
-                raw_text=raw_name,
-                topic_id=topic.id,
-                decided_by=decided_by,
-                similarity=similarity,
-            )
-        )
-
-
-async def match_and_create_topics(
-    session: AsyncSession,
-    generator: ContentGenerator,
-    embedder: Embedder,
-    settings: Settings,
-    *,
-    topic_requests: list[TopicRequest],
-) -> list[TopicMatchOutcome]:
-    """ADR-0025. Embeds every incoming topic, finds each one's top-N nearest
-    existing topics locally (pgvector, free), then makes ONE batched LLM call
-    covering every incoming topic at once for the actual yes/no decision. No
-    thresholds -- similarity scores are context for the call, never a gate
-    applied by this function.
-
-    Matched topics get aliased and nothing else happens. Unmatched topics get a
-    brand-new `Topic` row -- **no curriculum, no cards yet**. Callers should
-    commit this before calling `run_generation_pipeline` in a separate
-    transaction, so a topic's identity outlives a failed/retried generation
-    attempt (see module docstring).
-    """
-
-    if not topic_requests:
-        return []
-
-    normalized_names = [normalize_topic_text(request["name"]) for request in topic_requests]
-    embeddings = embedder.embed(normalized_names)
-
-    candidate_lists: list[list[tuple[Topic, float]]] = []
-    queries: list[TopicMatchQuery] = []
-    for index, (request, embedding) in enumerate(zip(topic_requests, embeddings, strict=True)):
-        candidates = await _find_top_topic_candidates(
-            session, embedding, limit=settings.topic_match_candidates
-        )
-        candidate_lists.append(candidates)
-        queries.append(
-            TopicMatchQuery(
-                request_index=index,
-                name=request["name"],
-                description=request["description"],
-                candidates=[
-                    TopicMatchCandidate(
-                        topic_id=str(topic.id), name=topic.canonical_name, similarity=round(sim, 4)
-                    )
-                    for topic, sim in candidates
-                ],
-            )
-        )
-
-    # Only ask the LLM about topics that have at least one candidate -- nothing
-    # to possibly match against otherwise is not a judgment call, it's a fact.
-    askable = [query for query in queries if query.candidates]
-    verdicts_by_index: dict[int, TopicMatchResult] = {}
-    if askable:
-        verdict_result = await generator.match_topics(askable)
-        verdicts_by_index = {verdict.request_index: verdict for verdict in verdict_result.items}
-
-    outcomes: list[TopicMatchOutcome] = []
-    for index, (request, embedding) in enumerate(zip(topic_requests, embeddings, strict=True)):
-        verdict = verdicts_by_index.get(index)
-        matched_topic_id = (
-            uuid.UUID(verdict.matched_topic_id)
-            if verdict is not None and verdict.matched_topic_id
-            else None
-        )
-        if matched_topic_id is not None:
-            topic = await session.get(Topic, matched_topic_id)
-            assert topic is not None, f"match_topics returned unknown topic_id {matched_topic_id}"
-            similarity = next(
-                (
-                    sim
-                    for candidate, sim in candidate_lists[index]
-                    if candidate.id == matched_topic_id
-                ),
-                None,
-            )
-            await _ensure_alias(
-                session, topic, request["name"], decided_by="llm_batch_match", similarity=similarity
-            )
-            logger.info(
-                "topic '%s': matched existing topic '%s' (id=%s, similarity=%s)",
-                request["name"], topic.canonical_name, topic.id, similarity,
-            )
-            outcomes.append(
-                TopicMatchOutcome(
-                    topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=True
-                )
-            )
-        else:
-            topic = Topic(
-                slug=_slugify(request["name"]),
-                canonical_name=request["name"],
-                description=request["description"],
-            )
-            session.add(topic)
-            await session.flush()
-            topic.embedding = embedding
-            logger.info("topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id)
-            outcomes.append(
-                TopicMatchOutcome(
-                    topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=False
-                )
-            )
-
-    await session.flush()
-    return outcomes
-
-
-# ------------------------------------------------------------- topic resolution --
-
-
-async def _create_deep_dive_stubs(
-    session: AsyncSession, *, parent: Topic, names: list[str]
-) -> None:
-    """ADR-0007: deep-dive topics are created as canonical topics immediately,
-    without curricula -- those are generated lazily on first subscription."""
-
-    for name in names:
-        slug = _slugify(name)
-        child = await session.scalar(select(Topic).where(Topic.slug == slug))
-        if child is None:
-            child = Topic(slug=slug, canonical_name=name, is_seeded=parent.is_seeded)
-            session.add(child)
-            await session.flush()
-        edge = await session.scalar(
-            select(TopicEdge).where(
-                TopicEdge.from_topic_id == parent.id,
-                TopicEdge.to_topic_id == child.id,
-                TopicEdge.kind == TopicEdgeKind.DEEP_DIVE,
-            )
-        )
-        if edge is None:
-            session.add(
-                TopicEdge(
-                    from_topic_id=parent.id, to_topic_id=child.id, kind=TopicEdgeKind.DEEP_DIVE
-                )
-            )
-
-
-async def _existing_subtopic_hints(session: AsyncSession, topic_id: uuid.UUID) -> list[str]:
-    """Titles (with description) of subtopics already under THIS topic -- fed to
-    `generate_curriculum` as `existing_subtopics` so the model can reuse an exact
-    title verbatim when a subtopic it wants is already covered (prevention, same
-    pattern already used for card titles -- see `generate_cards`'s
-    `existing_titles`). Empty for a topic reaching this for the first time
-    (the normal case post-ADR-0025); non-empty when `run_generation_pipeline` is
-    called again for a topic that already has some subtopics from an earlier
-    call -- see `generate_curriculum`'s docstring."""
-
-    rows = (
-        await session.execute(
-            select(Subtopic.title, Subtopic.description)
-            .where(Subtopic.topic_id == topic_id)
-            .distinct()
-        )
-    ).all()
-    return [f"{title} :: {description}" if description else title for title, description in rows]
-
-
-async def _reuse_or_create_subtopic(
-    session: AsyncSession, *, topic_id: uuid.UUID, title: str, difficulty: Difficulty
-) -> tuple[Subtopic, bool]:
-    """Exact title+difficulty match only -- the curriculum call is trusted to have
-    already reused an existing title verbatim where it judged that appropriate
-    (see `_existing_subtopic_hints`); this is just the mechanical lookup that
-    honors that decision. Returns (row, was_reused)."""
-
-    existing = await session.scalar(
-        select(Subtopic).where(
-            Subtopic.topic_id == topic_id,
-            Subtopic.title == title,
-            Subtopic.difficulty == difficulty,
-        )
-    )
-    if existing is not None:
-        return existing, True
-    subtopic = Subtopic(
-        topic_id=topic_id,
-        title=title,
-        difficulty=difficulty,
-        description="",
-        target_cards=5,
-        min_cards=1,
-    )
-    session.add(subtopic)
-    await session.flush()
-    return subtopic, False
-
-
-async def _load_subtopic_plans(
-    session: AsyncSession,
-    topic: Topic,
-    *,
-    max_duplicate_feedback_bodies: int,
-    max_verification_feedback_bodies: int,
-    max_existing_question_stems: int,
-) -> list[SubtopicPlan]:
-    subtopics = (
-        (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic.id)))
-        .scalars()
-        .all()
-    )
-
-    plans: list[SubtopicPlan] = []
-    for subtopic in subtopics:
-        existing = (
-            await session.execute(
-                select(Card.canonical_title, Card.title, Card.difficulty)
-                .join(Subtopic, Subtopic.id == Card.subtopic_id)
-                .where(
-                    Subtopic.subtopic_group_id == subtopic.subtopic_group_id,
-                    Card.status == CardStatus.ACTIVE,
-                )
-            )
-        ).all()
-        this_subtopic_count = sum(1 for _, _, d in existing if d == subtopic.difficulty)
-        # Subtopic-scoped, not group-scoped -- matches where the near-dup
-        # check itself is scoped (generation/dedup.py's find_corpus_duplicate).
-        avoid_bodies = (
-            await session.execute(
-                select(RejectedCard.body)
-                .where(
-                    RejectedCard.subtopic_id == subtopic.id,
-                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
-                )
-                .order_by(RejectedCard.created_at.desc())
-                .limit(max_duplicate_feedback_bodies)
-            )
-        ).scalars().all()
-        rejection_feedback_rows = (
-            await session.execute(
-                select(RejectedCard.body, RejectedCard.reason)
-                .where(
-                    RejectedCard.subtopic_id == subtopic.id,
-                    RejectedCard.stage == RejectionStage.VERIFICATION,
-                )
-                .order_by(RejectedCard.created_at.desc())
-                .limit(max_verification_feedback_bodies)
-            )
-        ).all()
-        missing_question_cards = (
-            await session.execute(
-                select(Card.id, Card.title, Card.body)
-                .outerjoin(Question, Question.card_id == Card.id)
-                .where(
-                    Card.subtopic_id == subtopic.id,
-                    Card.status == CardStatus.ACTIVE,
-                    Question.id.is_(None),
-                )
-            )
-        ).all()
-        existing_question_stems = (
-            await session.execute(
-                select(Question.stem)
-                .where(
-                    Question.subtopic_id == subtopic.id,
-                    Question.status == QuestionStatus.ACTIVE,
-                )
-                .order_by(Question.created_at.desc())
-                .limit(max_existing_question_stems)
-            )
-        ).scalars().all()
-        # Subtopic-scoped (not group-wide, unlike `existing` above) -- a hero
-        # is one-per-subtopic-tier, matching `CardDraft.is_hero`'s scope.
-        has_hero = (
-            await session.execute(
-                select(Card.id)
-                .where(
-                    Card.subtopic_id == subtopic.id,
-                    Card.status == CardStatus.ACTIVE,
-                    Card.is_hero.is_(True),
-                )
-                .limit(1)
-            )
-        ).first() is not None
-        plans.append(
-            SubtopicPlan(
-                topic_id=str(topic.id),
-                topic_name=topic.canonical_name,
-                subtopic_id=str(subtopic.id),
-                subtopic_group_id=str(subtopic.subtopic_group_id),
-                difficulty=subtopic.difficulty.value,
-                title=subtopic.title,
-                description=subtopic.description,
-                target_cards=subtopic.target_cards,
-                card_type_quotas=subtopic.card_type_quotas or {},
-                existing_titles=[_existing_title_tag(c, t, d) for c, t, d in existing],
-                existing_count=this_subtopic_count,
-                avoid_duplicate_bodies=list(avoid_bodies),
-                rejection_feedback=[
-                    {"body": body, "reason": reason} for body, reason in rejection_feedback_rows
-                ],
-                cards_missing_questions=[
-                    {"card_id": str(card_id), "title": title, "body": body}
-                    for card_id, title, body in missing_question_cards
-                ],
-                existing_question_stems=list(existing_question_stems),
-                has_hero=has_hero,
-            )
-        )
-    return plans
-
-
-# ------------------------------------------------------------- live progress --
-# Best-effort progress for the request-a-topic streaming UI. "Best-effort"
-# because a job's DB row is looked up fresh each call rather than threaded
-# through graph state (LangGraph's Send-based fan-out has no per-topic slot
-# for it that survives a Command.goto) -- a job that's already moved past
-# "running" (raced by the time this runs, or this is a topic backfill with no
-# job at all) just means the write silently no-ops. Never a reason to fail
-# the actual generation. Callers are already inside `topic_plan_lock` or
-# `session_lock` at every call site below, so `runtime.session` is safe to
-# use here without a lock of its own.
-
-
-async def _running_job(runtime: _Runtime, topic_id: uuid.UUID) -> GenerationJob | None:
-    job: GenerationJob | None = await runtime.session.scalar(
-        select(GenerationJob).where(
-            GenerationJob.topic_id == topic_id, GenerationJob.status == "running"
-        )
-    )
-    return job
-
-
-async def _seed_progress(
-    runtime: _Runtime, topic_id: uuid.UUID, topic_name: str, subtopic_plans: list[SubtopicPlan]
-) -> None:
-    """Called once per topic, right after this run's subtopic-tier plans are
-    loaded (whether or not curriculum generation ran THIS call -- a resumed
-    topic already has one). `cards_done`/`questions_done` start from what's
-    already active from a prior run, not zero, so a resumed job's bars don't
-    visibly regress."""
-
-    job = await _running_job(runtime, topic_id)
-    if job is None:
-        return
-    job.progress = {
-        "stage": "cards",
-        "topic_name": topic_name,
-        "subtopics": [
-            {
-                "subtopic_id": sp["subtopic_id"],
-                "group_title": sp["title"],
-                "difficulty": sp["difficulty"],
-                "cards_target": sp["target_cards"],
-                "cards_done": sp["existing_count"],
-                "questions_target": None,
-                "questions_done": sp["existing_count"] - len(sp["cards_missing_questions"]),
-            }
-            for sp in subtopic_plans
-        ],
-    }
-
-
-async def _update_subtopic_progress(
-    runtime: _Runtime, topic_id: uuid.UUID, subtopic_id: str, **fields: object
-) -> None:
-    job = await _running_job(runtime, topic_id)
-    if job is None or not job.progress:
-        return
-    progress = dict(job.progress)
-    raw_subtopics = cast("list[dict[str, object]]", progress.get("subtopics", []))
-    subtopics = [dict(entry) for entry in raw_subtopics]
-    for entry in subtopics:
-        if entry.get("subtopic_id") == subtopic_id:
-            entry.update(fields)
-            break
-    progress["subtopics"] = subtopics
-    job.progress = progress
-
-
-async def _mark_progress_done(runtime: _Runtime, topic_id: uuid.UUID) -> None:
-    job = await _running_job(runtime, topic_id)
-    if job is None:
-        return
-    progress = dict(job.progress or {})
-    progress["stage"] = "done"
-    job.progress = progress
+from spoin.generation.pipeline.persistence import (
+    _create_deep_dive_stubs,
+    _existing_subtopic_hints,
+    _load_subtopic_plans,
+    _mark_progress_done,
+    _reuse_or_create_subtopic,
+    _seed_progress,
+    _update_subtopic_progress,
+)
+from spoin.generation.pipeline.state import (
+    _NO_DIFFICULTY_EXAMPLES,
+    PipelineState,
+    SubtopicCardsResult,
+    SubtopicGroupPlan,
+    SubtopicPlan,
+    TopicPlanResult,
+    _card_matches_type,
+    _existing_title_tag,
+    _GateItem,
+    _min_cards,
+    _rejected_card,
+    _Runtime,
+    _runtime,
+    logger,
+)
 
 
 async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
@@ -901,25 +203,6 @@ def fan_out_topics(state: PipelineState) -> list[Send]:
         Send("resolve_and_plan_topic", {"topic_job": {"topic_id": topic_id}})
         for topic_id in state["topic_ids"]
     ]
-
-
-# ---------------------------------------------------------------- card generation --
-
-
-def _card_matches_type(draft: CardDraft, card_type: str) -> bool:
-    """Matches a generated draft to a predetermined card type."""
-    if card_type == CardType.ASCII.value:
-        return draft.visual_id is not None or bool(draft.visual_slots)
-    tags = classify_archetype(draft.body)
-    if card_type == CardType.CODE.value:
-        return "code" in tags
-    if card_type == CardType.DIAGRAM.value:
-        return "diagram" in tags
-    if card_type == CardType.COMPARISON.value:
-        return "comparison" in tags
-    if card_type == CardType.PROSE.value:
-        return not tags and draft.visual_id is None
-    return False
 
 
 async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
@@ -1147,34 +430,6 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     return {"item_reports": item_reports}
 
 
-# ------------------------------------------------------- persist cards + questions --
-
-
-def _rejected_card(
-    *,
-    topic_id: str,
-    subtopic_id: str,
-    draft: CardDraft,
-    stage: RejectionStage,
-    reason: str,
-    generated_at: str,
-    backend: str,
-    batch_id: uuid.UUID,
-) -> RejectedCard:
-    return RejectedCard(
-        topic_id=uuid.UUID(topic_id),
-        subtopic_id=uuid.UUID(subtopic_id),
-        requested_difficulty=draft.difficulty,
-        title=draft.title,
-        canonical_title=draft.canonical_title,
-        summary=draft.summary,
-        body=draft.body,
-        stage=stage,
-        reason=reason,
-        gen_meta={"backend": backend, "generated_at": generated_at, "batch_id": str(batch_id)},
-    )
-
-
 async def _correct_subtopic_drafts(
     runtime: _Runtime,
     *,
@@ -1387,44 +642,6 @@ async def _generate_questions_for_group(
     return topic_id, subtopic_id, difficulty, drafts, failures
 
 
-@dataclass
-class _GateItem:
-    """One subtopic-tier's worth of drafts, tracked through the whole gate
-    (ADR-0030) so the two concurrent LLM phases and the sequential DB phase
-    can all find their way back to the right subtopic/topic report."""
-
-    topic_id: str
-    subtopic_id: str
-    difficulty: str
-    topic_name: str
-    topic_description: str
-    difficulty_examples: dict[Difficulty, list[str]]
-    survivors: list[CardDraft]
-    #: (draft, reason) for cards that never made it past structural
-    #: validation -- kept as the ORIGINAL draft, since correction never ran.
-    structural_rejects: list[tuple[CardDraft, str]]
-    generator_failure_count: int
-    #: Existing active cards under this tier with no Question row yet (see
-    #: `SubtopicPlan.cards_missing_questions`) -- question generation runs on
-    #: these IN ADDITION TO any cards accepted by the gate this run, so a
-    #: tier that already has all its cards still gets its questions backfilled.
-    existing_cards_missing_questions: list[dict[str, str]] = field(default_factory=list)
-    #: This tier's already-active question stems (see
-    #: `SubtopicPlan.existing_question_stems`) -- shown to `generate_questions`
-    #: so it doesn't repeat a question angle already asked.
-    existing_question_stems: list[str] = field(default_factory=list)
-    #: Filled in by later phases.
-    corrected: list[CardDraft] = field(default_factory=list)
-    correction_failure_count: int = 0
-    dedup_survivors: list[tuple[CardDraft, list[float]]] = field(default_factory=list)
-    #: (draft, reason) for near-duplicate rejects, post-correction.
-    dedup_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
-    verified: list[tuple[CardDraft, list[float], Difficulty]] = field(default_factory=list)
-    #: (draft, reason) for pass-2 rejects, post-correction.
-    verification_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
-    verification_failure_count: int = 0
-
-
 async def _process_gate_item(
     runtime: _Runtime,
     item: _GateItem,
@@ -1464,7 +681,7 @@ async def _process_gate_item(
 
     if item.corrected:
         bodies = [draft.body for draft in item.corrected]
-        embeddings = runtime.embedder.embed(bodies)
+        embeddings = await runtime.embedder.aembed(bodies)
         accepted_embeddings: list[list[float]] = []
         subtopic_uuid = uuid.UUID(item.subtopic_id)
         async with runtime.session_lock:
@@ -1680,7 +897,7 @@ async def _process_gate_item(
     if all_question_drafts or all_question_failures:
         parsed_difficulty = Difficulty(item.difficulty)
         stems = [draft.stem for draft, _card_id in all_question_drafts]
-        embeddings = runtime.embedder.embed(stems) if stems else []
+        embeddings = await runtime.embedder.aembed(stems) if stems else []
         new_questions = [
             Question(
                 subtopic_id=uuid.UUID(item.subtopic_id),
@@ -1898,58 +1115,3 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
             await runtime.session.commit()
 
     return {"report": {"topics": topic_reports}}
-
-
-# ------------------------------------------------------------------- entrypoint --
-
-
-def _build_graph() -> CompiledStateGraph[Any, Any, Any, Any]:
-    graph = StateGraph(cast(type[Any], PipelineState))
-    graph.add_node(
-        "resolve_and_plan_topic", resolve_and_plan_topic, destinations=("generate_subtopic_cards",)
-    )
-    graph.add_node("generate_subtopic_cards", generate_subtopic_cards)
-    graph.add_node("gate_and_persist", gate_and_persist)
-
-    graph.add_conditional_edges(START, fan_out_topics, ["resolve_and_plan_topic"])
-    graph.add_edge("generate_subtopic_cards", "gate_and_persist")
-    graph.add_edge("gate_and_persist", END)
-
-    return graph.compile()
-
-
-async def run_generation_pipeline(
-    session: AsyncSession,
-    generator: ContentGenerator,
-    embedder: Embedder,
-    settings: Settings,
-    *,
-    topic_ids: list[uuid.UUID],
-) -> dict[str, object]:
-    """ADR-0026's one-shot run: curriculum (if needed) -> cards -> questions,
-    for topics that ALREADY EXIST (see `match_and_create_topics`). Callable
-    directly from a CLI script (today) or a worker job handler (task 0008) --
-    this function has no idea which is calling it, or whether a topic_id is
-    brand new or a retry of one whose earlier attempt failed partway.
-    """
-
-    if not topic_ids:
-        return {"topics": []}
-
-    graph = _build_graph()
-    runtime = _Runtime(
-        session=session,
-        generator=generator,
-        embedder=embedder,
-        settings=settings,
-        batch_id=uuid.uuid4(),
-        semaphore=asyncio.Semaphore(settings.max_concurrent_generation_calls),
-    )
-    initial_state: PipelineState = {
-        "topic_ids": [str(topic_id) for topic_id in topic_ids],
-        "topic_plans": [],
-        "item_reports": [],
-    }
-    final_state = await graph.ainvoke(initial_state, config={"configurable": {"runtime": runtime}})
-    report: dict[str, object] = final_state["report"]
-    return report

@@ -201,6 +201,34 @@ class Settings(BaseSettings):
     dwell_complete_ms: int = 8000
     dwell_max_ms: int = 300_000  # a tab open overnight is not a nine-hour read
 
+    # -- topics (moved out of routers/topics.py) --------------------------------
+    #
+    # These are product knobs, not implementation details, and they lived as
+    # module constants inside a router. That put them out of reach of anything
+    # that is not an HTTP handler and made them the one class of tunable a
+    # deploy was required to change — the exact thing
+    # `test_difficulty_mix_is_config_not_code` exists to prevent for the
+    # difficulty mix.
+
+    #: The coverage gate (ADR-0009). Relative rather than absolute so it
+    #: self-adjusts to whatever the corpus actually holds — a thin subtopic
+    #: cannot strand a user at an unreachable bar.
+    coverage_gate: float = 0.80
+
+    #: content-model.md's "Custom topics" section. Enforced server-side on
+    #: `UserTopic.is_custom` rows -- a custom topic that canonicalizes onto an
+    #: existing topic still consumes a slot (ADR-0004): users are buying slots
+    #: in their own topic list, not new entries in the shared corpus.
+    custom_topic_limit: int = 3
+
+    #: A constraint, not taste -- enforced in code rather than asked of the
+    #: model, per the "generator is trusted for taste, never for constraints"
+    #: rule. Keeps the box a topic name, not a sentence describing one.
+    #:
+    #: Mirrored by CUSTOM_TOPIC_MAX_WORDS in apps/web's onboarding form, which
+    #: is a client-side courtesy only — this value is the authority.
+    custom_topic_max_words: int = 5
+
     # -- quiz (ADR-0009, entry tier amended by ADR-0027) -------------------------
     quiz_mcq_count: int = 9
     quiz_free_text_count: int = 1

@@ -23,7 +23,8 @@ python -m spoin.generate_topics "Topic Name" "Another Topic::with a description"
 
 ## Two phases, two transactions
 
-`generation/pipeline.py` exposes two entrypoints, meant to be called in **separate**
+`generation/pipeline/` exposes two entrypoints (re-exported from its `__init__`; see
+[ADR-0044](../adr/0044-generation-pipeline-as-a-package.md)), meant to be called in **separate**
 `session_scope()` blocks (see the CLI, `generate_topics.py`, or the worker,
 `worker/__main__.py`, for the pattern) -- so a topic's identity survives even if its
 generation later fails and gets retried:

@@ -12,16 +12,23 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
+import { MotionConfig } from "framer-motion";
 
 import { api, type Difficulty, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { getReducedMotion, subscribeReducedMotion } from "@/lib/motionPreference";
+import { invalidate } from "@/lib/refresh";
 import type { TopicProgress } from "@/lib/types";
 import { CustomCursor } from "./CustomCursor";
 import { Feed } from "./Feed";
 import { FocusToggle } from "./FocusToggle";
 import { GuestNotice } from "./GuestNotice";
+import { LikedView } from "./LikedView";
 import { NotesView } from "./NotesView";
+import { ProfileView } from "./ProfileView";
 import { RightRail } from "./RightRail";
+import { SavedView } from "./SavedView";
+import { SettingsView } from "./SettingsView";
 import { Sidebar, type ShellView } from "./Sidebar";
 
 function toTopicProgress(p: {
@@ -42,6 +49,12 @@ function toTopicProgress(p: {
 
 export function AppShell() {
   const [topics, setTopics] = useState<Topic[]>([]);
+  // Settings' reduced-motion switch. CSS covers transitions and keyframes, but
+  // Framer Motion drives its animations through per-frame inline styles that
+  // no stylesheet rule can reach — MotionConfig is the only way in. Read after
+  // mount: the attribute is applied by a pre-hydration script, so reading it
+  // during render would disagree with the server's markup.
+  const [reducedMotion, setReducedMotionState] = useState(false);
   const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
   const [selected, setSelected] = useState<string[]>([]);
   // Session-local, not server state: which cards have been marked seen so
@@ -59,6 +72,17 @@ export function AppShell() {
   // rather than trying to individually invalidate each one.
   const [resetCount, setResetCount] = useState(0);
   const [view, setView] = useState<ShellView>("feed");
+  // Every one of Home/Notes/Liked/Saved/Profile/Settings fetches once, the
+  // first time the user actually opens it, and then stays mounted (hidden,
+  // not unmounted) for the rest of the session — see the render below.
+  // Switching between them is a pure visibility toggle, no refetch; the only
+  // things that DO trigger a refetch are the header's refresh control and
+  // lib/refresh's invalidation calls after a mutation (see Feed/NotesView/
+  // LikedView/SavedView/ProfileView's `useRefreshEffect`).
+  const [visited, setVisited] = useState<ReadonlySet<ShellView>>(() => new Set(["feed"]));
+  useEffect(() => {
+    setVisited((current) => (current.has(view) ? current : new Set(current).add(view)));
+  }, [view]);
 
   const loadTopics = useCallback(async () => {
     const list = await api.topics();
@@ -169,10 +193,24 @@ export function AppShell() {
     setSelected([]);
     setReadCardIds(new Set());
     setResetCount((count) => count + 1);
+    // Every view's server-backed data is gone, not just the feed's — Notes/
+    // Liked/Saved/Profile need to refetch next time they're looked at too.
+    invalidate("all");
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    invalidate(view);
+  }, [view]);
+
+  useEffect(() => {
+    setReducedMotionState(getReducedMotion());
+    return subscribeReducedMotion(() => setReducedMotionState(getReducedMotion()));
   }, []);
 
   return (
-    <>
+    /* "user" also honours prefers-reduced-motion on its own, so the OS setting
+       keeps working when this switch is off. */
+    <MotionConfig reducedMotion={reducedMotion ? "always" : "user"}>
       <CustomCursor />
       <GuestNotice />
       <div className="app-grid" data-focused={focusMode}>
@@ -182,14 +220,44 @@ export function AppShell() {
         {focusMode ? (
           <div className="rail-left" aria-hidden="true" />
         ) : (
-          <Sidebar onReset={() => void onReset()} view={view} onNavigate={setView} />
+          <Sidebar onReset={() => void onReset()} onRefresh={onRefresh} view={view} onNavigate={setView} />
         )}
         <div className="shell">
-          {view === "notes" ? (
-            <NotesView />
-          ) : (
+          {/* Each view mounts once, the first time it's visited, and then stays
+              mounted (hidden via the `hidden` attribute, never unmounted) so
+              switching back to it never refetches on its own. */}
+          <div hidden={view !== "feed"}>
             <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
-          )}
+          </div>
+          {visited.has("notes") ? (
+            <div hidden={view !== "notes"}>
+              <NotesView />
+            </div>
+          ) : null}
+          {visited.has("liked") ? (
+            <div hidden={view !== "liked"}>
+              <LikedView topics={topics} onNavigateHome={() => setView("feed")} />
+            </div>
+          ) : null}
+          {visited.has("saved") ? (
+            <div hidden={view !== "saved"}>
+              <SavedView topics={topics} onNavigateHome={() => setView("feed")} />
+            </div>
+          ) : null}
+          {visited.has("profile") ? (
+            <div hidden={view !== "profile"}>
+              <ProfileView />
+            </div>
+          ) : null}
+          {visited.has("settings") ? (
+            <div hidden={view !== "settings"}>
+              <SettingsView
+                topics={topics}
+                onNavigateProfile={() => setView("profile")}
+                onTopicFollowed={onFollowed}
+              />
+            </div>
+          ) : null}
         </div>
         {focusMode ? (
           <>
@@ -210,6 +278,6 @@ export function AppShell() {
           />
         )}
       </div>
-    </>
+    </MotionConfig>
   );
 }

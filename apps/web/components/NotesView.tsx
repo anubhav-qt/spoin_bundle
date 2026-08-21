@@ -11,20 +11,30 @@
  * than round-tripping through engagement/progress like the feed does.
  */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, type NoteWithCard } from "@/lib/api";
+import { useRefreshEffect } from "@/lib/refresh";
 import { Card } from "./Card";
 
 export function NotesView() {
   const [notes, setNotes] = useState<NoteWithCard[] | null>(null);
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setNotes(null);
     api
       .listNotes()
       .then(setNotes)
       .catch(() => setNotes([]));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // Manual refresh, or an invalidation from elsewhere (a note saved/deleted
+  // from a card in the feed, say) — re-fetches without needing a remount.
+  useRefreshEffect("notes", load);
 
   const onNoteChange = (cardId: string, body: string | null) => {
     if (body !== null) return;

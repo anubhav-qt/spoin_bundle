@@ -48,6 +48,17 @@ export function DeckIcon(_: IconProps) {
   );
 }
 
+export function RefreshIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 12a8 8 0 0 1 13.66-5.66L20 8.5" />
+      <path d="M20 4v4.5h-4.5" />
+      <path d="M20 12a8 8 0 0 1-13.66 5.66L4 15.5" />
+      <path d="M4 20v-4.5h4.5" />
+    </svg>
+  );
+}
+
 export function HeartIcon({ filled = false }: { filled?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" style={{ fill: filled ? "currentColor" : "none" }}>
@@ -199,6 +210,105 @@ export function GearIcon(_: IconProps) {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
       <path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M17.7 6.3l-1.6 1.6M7.9 16.1l-1.6 1.6M17.7 17.7l-1.6-1.6M7.9 7.9 6.3 6.3" />
+    </svg>
+  );
+}
+
+/* ── Avatar marks ───────────────────────────────────────────────────────────
+   A closed set of eight, drawn to the same spec as the icons above (24
+   viewBox, 1.5 stroke, rounded caps, no fills) so a chosen avatar sits in the
+   same visual family as the rest of the interface.
+
+   These replaced a row of raw Unicode glyphs (◉ ◇ △ ✦ …). A glyph inherits
+   whichever face is active — five of them ship (ADR-0023/0037) — so the same
+   stored avatar rendered at a different weight, size and baseline per font,
+   and two of them fell back to a system face entirely. A path renders
+   identically everywhere and picks up `currentColor` like every other icon.
+
+   `avatar_icon` stores the KEY ("orbit"), not the glyph. `AvatarMark` falls
+   back to rendering an unrecognized value as text, so accounts that saved a
+   glyph before this change keep showing it rather than going blank. */
+
+export const AVATAR_MARK_KEYS = [
+  "orbit",
+  "prism",
+  "lattice",
+  "aperture",
+  "meridian",
+  "cairn",
+  "beacon",
+  "helix",
+] as const;
+
+export type AvatarMarkKey = (typeof AVATAR_MARK_KEYS)[number];
+
+const AVATAR_MARKS: Record<AvatarMarkKey, React.ReactElement> = {
+  orbit: (
+    <>
+      <circle cx="12" cy="12" r="3.5" />
+      <ellipse cx="12" cy="12" rx="9" ry="4.5" transform="rotate(-24 12 12)" />
+    </>
+  ),
+  prism: (
+    <>
+      <path d="M12 3.5 20.5 19H3.5L12 3.5Z" />
+      <path d="M12 3.5V19" />
+    </>
+  ),
+  lattice: (
+    <>
+      <path d="M4 9h16M4 15h16" />
+      <path d="M9 4v16M15 4v16" />
+    </>
+  ),
+  aperture: (
+    <>
+      <path d="M12 3.5 20 8v8l-8 4.5L4 16V8l8-4.5Z" />
+      <circle cx="12" cy="12" r="2.5" />
+    </>
+  ),
+  meridian: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 3.5c3 2.4 4.5 5.2 4.5 8.5S15 18.1 12 20.5c-3-2.4-4.5-5.2-4.5-8.5S9 5.9 12 3.5Z" />
+    </>
+  ),
+  cairn: (
+    <>
+      <path d="M8 19.5h8" />
+      <rect x="6.5" y="14" width="11" height="4" rx="1.5" />
+      <rect x="8.5" y="9" width="7" height="4" rx="1.5" />
+      <circle cx="12" cy="5.5" r="2" />
+    </>
+  ),
+  beacon: (
+    <>
+      <path d="M12 4v9" />
+      <circle cx="12" cy="16.5" r="2.5" />
+      <path d="M6.5 6.5 8.5 9M17.5 6.5 15.5 9" />
+    </>
+  ),
+  helix: (
+    <>
+      <path d="M8 3.5c0 6 8 8.5 8 14.5" />
+      <path d="M16 3.5c0 6-8 8.5-8 14.5" />
+      <path d="M8.5 8.5h7M8.5 15.5h7" />
+    </>
+  ),
+};
+
+export function isAvatarMarkKey(value: string): value is AvatarMarkKey {
+  return (AVATAR_MARK_KEYS as readonly string[]).includes(value);
+}
+
+/** Renders a stored `avatar_icon`. Unknown values render as text — see above. */
+export function AvatarMark({ mark }: { mark: string }) {
+  if (!isAvatarMarkKey(mark)) {
+    return <span className="avatar-mark-legacy">{mark}</span>;
+  }
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      {AVATAR_MARKS[mark]}
     </svg>
   );
 }

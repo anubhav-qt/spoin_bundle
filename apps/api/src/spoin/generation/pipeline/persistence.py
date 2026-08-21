@@ -1,0 +1,322 @@
+"""Every database read and write the pipeline performs, in one place.
+
+These were interleaved with generation logic across the original 1955-line
+module, which made the graph's actual shape hard to see: a reader tracing
+"what happens to a subtopic" had to step over alias upserts, progress-row
+seeding and job lookups to find it.
+
+Nothing here calls a model. Nodes decide *what* to persist; this module knows
+*how*.
+"""
+
+from __future__ import annotations
+
+import uuid
+from typing import cast
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from spoin.domain.enums import CardStatus, Difficulty, QuestionStatus, RejectionStage, TopicEdgeKind
+from spoin.domain.models import (
+    Card,
+    GenerationJob,
+    Question,
+    RejectedCard,
+    Subtopic,
+    Topic,
+    TopicAlias,
+    TopicEdge,
+)
+from spoin.embeddings import normalize_topic_text
+from spoin.generation.pipeline.state import SubtopicPlan, _existing_title_tag, _Runtime, _slugify
+
+
+async def _find_top_topic_candidates(
+    session: AsyncSession, embedding: list[float], *, limit: int
+) -> list[tuple[Topic, float]]:
+    rows = (
+        await session.execute(
+            select(Topic, Topic.embedding.cosine_distance(embedding).label("distance"))
+            .where(Topic.embedding.is_not(None))
+            .order_by("distance")
+            .limit(limit)
+        )
+    ).all()
+    return [(topic, 1.0 - distance) for topic, distance in rows]
+
+
+async def _ensure_alias(
+    session: AsyncSession, topic: Topic, raw_name: str, *, decided_by: str, similarity: float | None
+) -> None:
+    normalized = normalize_topic_text(raw_name)
+    existing = await session.scalar(
+        select(TopicAlias).where(TopicAlias.normalized_text == normalized)
+    )
+    if existing is None:
+        session.add(
+            TopicAlias(
+                normalized_text=normalized,
+                raw_text=raw_name,
+                topic_id=topic.id,
+                decided_by=decided_by,
+                similarity=similarity,
+            )
+        )
+
+
+async def _create_deep_dive_stubs(
+    session: AsyncSession, *, parent: Topic, names: list[str]
+) -> None:
+    """ADR-0007: deep-dive topics are created as canonical topics immediately,
+    without curricula -- those are generated lazily on first subscription."""
+
+    for name in names:
+        slug = _slugify(name)
+        child = await session.scalar(select(Topic).where(Topic.slug == slug))
+        if child is None:
+            child = Topic(slug=slug, canonical_name=name, is_seeded=parent.is_seeded)
+            session.add(child)
+            await session.flush()
+        edge = await session.scalar(
+            select(TopicEdge).where(
+                TopicEdge.from_topic_id == parent.id,
+                TopicEdge.to_topic_id == child.id,
+                TopicEdge.kind == TopicEdgeKind.DEEP_DIVE,
+            )
+        )
+        if edge is None:
+            session.add(
+                TopicEdge(
+                    from_topic_id=parent.id, to_topic_id=child.id, kind=TopicEdgeKind.DEEP_DIVE
+                )
+            )
+
+
+async def _existing_subtopic_hints(session: AsyncSession, topic_id: uuid.UUID) -> list[str]:
+    """Titles (with description) of subtopics already under THIS topic -- fed to
+    `generate_curriculum` as `existing_subtopics` so the model can reuse an exact
+    title verbatim when a subtopic it wants is already covered (prevention, same
+    pattern already used for card titles -- see `generate_cards`'s
+    `existing_titles`). Empty for a topic reaching this for the first time
+    (the normal case post-ADR-0025); non-empty when `run_generation_pipeline` is
+    called again for a topic that already has some subtopics from an earlier
+    call -- see `generate_curriculum`'s docstring."""
+
+    rows = (
+        await session.execute(
+            select(Subtopic.title, Subtopic.description)
+            .where(Subtopic.topic_id == topic_id)
+            .distinct()
+        )
+    ).all()
+    return [f"{title} :: {description}" if description else title for title, description in rows]
+
+
+async def _reuse_or_create_subtopic(
+    session: AsyncSession, *, topic_id: uuid.UUID, title: str, difficulty: Difficulty
+) -> tuple[Subtopic, bool]:
+    """Exact title+difficulty match only -- the curriculum call is trusted to have
+    already reused an existing title verbatim where it judged that appropriate
+    (see `_existing_subtopic_hints`); this is just the mechanical lookup that
+    honors that decision. Returns (row, was_reused)."""
+
+    existing = await session.scalar(
+        select(Subtopic).where(
+            Subtopic.topic_id == topic_id,
+            Subtopic.title == title,
+            Subtopic.difficulty == difficulty,
+        )
+    )
+    if existing is not None:
+        return existing, True
+    subtopic = Subtopic(
+        topic_id=topic_id,
+        title=title,
+        difficulty=difficulty,
+        description="",
+        target_cards=5,
+        min_cards=1,
+    )
+    session.add(subtopic)
+    await session.flush()
+    return subtopic, False
+
+
+async def _load_subtopic_plans(
+    session: AsyncSession,
+    topic: Topic,
+    *,
+    max_duplicate_feedback_bodies: int,
+    max_verification_feedback_bodies: int,
+    max_existing_question_stems: int,
+) -> list[SubtopicPlan]:
+    subtopics = (
+        (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic.id)))
+        .scalars()
+        .all()
+    )
+
+    plans: list[SubtopicPlan] = []
+    for subtopic in subtopics:
+        existing = (
+            await session.execute(
+                select(Card.canonical_title, Card.title, Card.difficulty)
+                .join(Subtopic, Subtopic.id == Card.subtopic_id)
+                .where(
+                    Subtopic.subtopic_group_id == subtopic.subtopic_group_id,
+                    Card.status == CardStatus.ACTIVE,
+                )
+            )
+        ).all()
+        this_subtopic_count = sum(1 for _, _, d in existing if d == subtopic.difficulty)
+        # Subtopic-scoped, not group-scoped -- matches where the near-dup
+        # check itself is scoped (generation/dedup.py's find_corpus_duplicate).
+        avoid_bodies = (
+            await session.execute(
+                select(RejectedCard.body)
+                .where(
+                    RejectedCard.subtopic_id == subtopic.id,
+                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+                )
+                .order_by(RejectedCard.created_at.desc())
+                .limit(max_duplicate_feedback_bodies)
+            )
+        ).scalars().all()
+        rejection_feedback_rows = (
+            await session.execute(
+                select(RejectedCard.body, RejectedCard.reason)
+                .where(
+                    RejectedCard.subtopic_id == subtopic.id,
+                    RejectedCard.stage == RejectionStage.VERIFICATION,
+                )
+                .order_by(RejectedCard.created_at.desc())
+                .limit(max_verification_feedback_bodies)
+            )
+        ).all()
+        missing_question_cards = (
+            await session.execute(
+                select(Card.id, Card.title, Card.body)
+                .outerjoin(Question, Question.card_id == Card.id)
+                .where(
+                    Card.subtopic_id == subtopic.id,
+                    Card.status == CardStatus.ACTIVE,
+                    Question.id.is_(None),
+                )
+            )
+        ).all()
+        existing_question_stems = (
+            await session.execute(
+                select(Question.stem)
+                .where(
+                    Question.subtopic_id == subtopic.id,
+                    Question.status == QuestionStatus.ACTIVE,
+                )
+                .order_by(Question.created_at.desc())
+                .limit(max_existing_question_stems)
+            )
+        ).scalars().all()
+        # Subtopic-scoped (not group-wide, unlike `existing` above) -- a hero
+        # is one-per-subtopic-tier, matching `CardDraft.is_hero`'s scope.
+        has_hero = (
+            await session.execute(
+                select(Card.id)
+                .where(
+                    Card.subtopic_id == subtopic.id,
+                    Card.status == CardStatus.ACTIVE,
+                    Card.is_hero.is_(True),
+                )
+                .limit(1)
+            )
+        ).first() is not None
+        plans.append(
+            SubtopicPlan(
+                topic_id=str(topic.id),
+                topic_name=topic.canonical_name,
+                subtopic_id=str(subtopic.id),
+                subtopic_group_id=str(subtopic.subtopic_group_id),
+                difficulty=subtopic.difficulty.value,
+                title=subtopic.title,
+                description=subtopic.description,
+                target_cards=subtopic.target_cards,
+                card_type_quotas=subtopic.card_type_quotas or {},
+                existing_titles=[_existing_title_tag(c, t, d) for c, t, d in existing],
+                existing_count=this_subtopic_count,
+                avoid_duplicate_bodies=list(avoid_bodies),
+                rejection_feedback=[
+                    {"body": body, "reason": reason} for body, reason in rejection_feedback_rows
+                ],
+                cards_missing_questions=[
+                    {"card_id": str(card_id), "title": title, "body": body}
+                    for card_id, title, body in missing_question_cards
+                ],
+                existing_question_stems=list(existing_question_stems),
+                has_hero=has_hero,
+            )
+        )
+    return plans
+
+
+async def _running_job(runtime: _Runtime, topic_id: uuid.UUID) -> GenerationJob | None:
+    job: GenerationJob | None = await runtime.session.scalar(
+        select(GenerationJob).where(
+            GenerationJob.topic_id == topic_id, GenerationJob.status == "running"
+        )
+    )
+    return job
+
+
+async def _seed_progress(
+    runtime: _Runtime, topic_id: uuid.UUID, topic_name: str, subtopic_plans: list[SubtopicPlan]
+) -> None:
+    """Called once per topic, right after this run's subtopic-tier plans are
+    loaded (whether or not curriculum generation ran THIS call -- a resumed
+    topic already has one). `cards_done`/`questions_done` start from what's
+    already active from a prior run, not zero, so a resumed job's bars don't
+    visibly regress."""
+
+    job = await _running_job(runtime, topic_id)
+    if job is None:
+        return
+    job.progress = {
+        "stage": "cards",
+        "topic_name": topic_name,
+        "subtopics": [
+            {
+                "subtopic_id": sp["subtopic_id"],
+                "group_title": sp["title"],
+                "difficulty": sp["difficulty"],
+                "cards_target": sp["target_cards"],
+                "cards_done": sp["existing_count"],
+                "questions_target": None,
+                "questions_done": sp["existing_count"] - len(sp["cards_missing_questions"]),
+            }
+            for sp in subtopic_plans
+        ],
+    }
+
+
+async def _update_subtopic_progress(
+    runtime: _Runtime, topic_id: uuid.UUID, subtopic_id: str, **fields: object
+) -> None:
+    job = await _running_job(runtime, topic_id)
+    if job is None or not job.progress:
+        return
+    progress = dict(job.progress)
+    raw_subtopics = cast("list[dict[str, object]]", progress.get("subtopics", []))
+    subtopics = [dict(entry) for entry in raw_subtopics]
+    for entry in subtopics:
+        if entry.get("subtopic_id") == subtopic_id:
+            entry.update(fields)
+            break
+    progress["subtopics"] = subtopics
+    job.progress = progress
+
+
+async def _mark_progress_done(runtime: _Runtime, topic_id: uuid.UUID) -> None:
+    job = await _running_job(runtime, topic_id)
+    if job is None:
+        return
+    progress = dict(job.progress or {})
+    progress["stage"] = "done"
+    job.progress = progress

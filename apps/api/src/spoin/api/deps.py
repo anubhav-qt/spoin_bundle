@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from spoin.auth.tokens import decode_token
 from spoin.core.config import Settings, get_settings
 from spoin.core.db import get_session
+from spoin.core.logging import user_id_var
 from spoin.domain.models import User
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
@@ -53,7 +54,12 @@ async def current_user_id(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(_bearer)],
 ) -> UUID:
     """Resolve the acting user via JWT Bearer token."""
-    return await _resolve_access_token_user_id(session, settings, credentials.credentials)
+    user_id = await _resolve_access_token_user_id(session, settings, credentials.credentials)
+    # Every log line emitted for the rest of this request carries the acting
+    # user (see core/logging.py's ContextFilter). A UUID, never an email —
+    # enough to correlate a report with its request, not a PII leak into logs.
+    user_id_var.set(str(user_id))
+    return user_id
 
 
 async def current_user_id_optional(

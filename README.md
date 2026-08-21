@@ -89,7 +89,7 @@ See [content-model.md](docs/architecture/content-model.md).
 | ORM | SQLAlchemy 2.0 (async) + Alembic | typed, readable SQL |
 | Embeddings | `fastembed` / BGE-small, **local** | free and unlimited; protects LLM quota |
 | Generation | Gemini Flash via LangChain, behind `ContentGenerator` | [ADR-0002](docs/adr/0002-langchain-behind-an-interface.md) |
-| Generation orchestration | LangGraph, confined to `generation/pipeline.py` | [ADR-0024](docs/adr/0024-langgraph-for-card-generation-pipeline.md) |
+| Generation orchestration | LangGraph, confined to `generation/pipeline/`'s `graph.py` + `nodes.py` | [ADR-0024](docs/adr/0024-langgraph-for-card-generation-pipeline.md), [ADR-0044](docs/adr/0044-generation-pipeline-as-a-package.md) |
 | Web | Next.js + TypeScript → Cloudflare Pages | Vercel Hobby forbids commercial use |
 | Typography | Five self-hosted OFL faces, user-selectable; mono locked | [ADR-0023](docs/adr/0023-reader-font-selection.md) |
 | API types | Generated from OpenAPI, checked in CI | [ADR-0001](docs/adr/0001-python-fastapi-over-node.md) |

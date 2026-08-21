@@ -26,8 +26,20 @@ const REDIRECT_EXEMPT_PATHS = new Set(["/claim"]);
 
 interface AuthContextValue {
   user: User | null;
-  /** Re-fetches `/auth/me` — call after login/register/guest/claim/onboarding. */
+  /** Re-fetches `/auth/me` AND re-runs the route gate — call after
+   *  login/register/guest/claim/onboarding, i.e. whenever where the user
+   *  belongs may have changed.
+   *
+   *  Not for in-app profile edits: `refresh` is `load`, which flips `loading`
+   *  back on, and a protected path renders the blocking loader instead of its
+   *  children while that is true. That unmounts the whole AppShell, so every
+   *  bit of its state — which view you were on, the topic filter, the feed —
+   *  is destroyed and rebuilt. Saving your name from the profile page used to
+   *  drop you back on the feed for exactly this reason. Use `applyUser`. */
   refresh: () => Promise<void>;
+  /** Publish an already-fetched user (e.g. the one a PATCH just returned)
+   *  without re-running the gate or a redundant `/auth/me` round trip. */
+  applyUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -117,5 +129,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <AuthContext.Provider value={{ user, refresh: load, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, refresh: load, applyUser: setUser, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

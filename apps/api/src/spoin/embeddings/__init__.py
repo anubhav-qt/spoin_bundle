@@ -8,6 +8,7 @@ worst possible moment for it to stop working.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import math
 from abc import ABC, abstractmethod
@@ -19,10 +20,30 @@ from spoin.core.config import get_settings
 class Embedder(ABC):
     @abstractmethod
     def embed(self, texts: list[str]) -> list[list[float]]:
-        """Takes a collection, like every other batch interface here."""
+        """Takes a collection, like every other batch interface here.
+
+        **Synchronous and CPU-bound.** `FastEmbedEmbedder` runs ONNX inference
+        here. Call `aembed` from anything async — see below.
+        """
 
     def embed_one(self, text: str) -> list[float]:
         return self.embed([text])[0]
+
+    async def aembed(self, texts: list[str]) -> list[list[float]]:
+        """`embed`, off the event loop.
+
+        Calling `embed` directly from a coroutine parks the whole event loop
+        for the duration of the inference, which on the API means every
+        concurrent request — including the ~50ms feed swipe the architecture is
+        built around — waits behind it. That was reachable from a real request
+        path: POST /topics -> match_and_create_topics -> embed.
+
+        A thread is the right tool rather than a process pool: ONNX Runtime
+        releases the GIL inside its native inference call, so the event loop
+        genuinely runs during it.
+        """
+
+        return await asyncio.to_thread(self.embed, texts)
 
 
 class HashEmbedder(Embedder):

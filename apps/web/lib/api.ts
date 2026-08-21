@@ -185,6 +185,13 @@ export interface User {
   display_name: string;
   is_guest: boolean;
   onboarding_complete: boolean;
+  age?: number | null;
+  gender?: string | null;
+  avatar_icon?: string | null;
+  has_avatar_image?: boolean;
+  /** Cards-per-day target. Rides on this payload rather than a separate
+   *  preferences fetch — see UserOut in api/schemas.py. */
+  daily_card_goal?: number;
 }
 
 export interface Progress {
@@ -342,6 +349,24 @@ export interface NoteWithCard {
   topic_name: string;
 }
 
+/** One row of the liked collection -- the card the user hearted, the user's
+ *  own name for its topic (ADR-0004), and when they liked it for sorting. */
+export interface LikedCard {
+  card: Card;
+  topic_name: string;
+  /** ISO 8601 server timestamp from `card_like.created_at`. */
+  liked_at: string;
+}
+
+/** One row of the saved (bookmarked) collection -- the card the user bookmarked,
+ *  the user's own topic name, and when they saved it for sorting. */
+export interface SavedCard {
+  card: Card;
+  topic_name: string;
+  /** ISO 8601 server timestamp from `card_bookmark.created_at`. */
+  saved_at: string;
+}
+
 export interface QuizFreeTextSubmitResult {
   attempt_id: string;
   free_text: QuizFreeTextResult;
@@ -477,4 +502,118 @@ export const api = {
   deleteNote: (cardId: string) => request<void>(`/cards/${cardId}/note`, { method: "DELETE" }),
 
   listNotes: () => request<NoteWithCard[]>("/notes"),
+
+  likedCards: (topicId?: string, sort?: string) => {
+    const query = new URLSearchParams();
+    if (topicId) query.set("topic_id", topicId);
+    if (sort) query.set("sort", sort);
+    const suffix = query.toString();
+    return request<LikedCard[]>(`/cards/liked${suffix === "" ? "" : `?${suffix}`}`);
+  },
+
+  savedCards: (topicId?: string, sort?: string) => {
+    const query = new URLSearchParams();
+    if (topicId) query.set("topic_id", topicId);
+    if (sort) query.set("sort", sort);
+    const suffix = query.toString();
+    return request<SavedCard[]>(`/cards/saved${suffix === "" ? "" : `?${suffix}`}`);
+  },
+
+  // --- Profile ---
+  getProfileStats: (year: number, month: number) => 
+    request<ProfileStatsOut>(`/profile/me/stats?year=${year}&month=${month}`),
+    
+  updateProfile: (updates: UserProfileUpdateIn) => 
+    request<User>("/profile/me", {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    }),
+    
+  uploadAvatar: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    const token = localStorage.getItem("spoin_access_token");
+    const response = await fetch(`${BASE_URL}/profile/me/avatar`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      const detail = await response
+        .json()
+        .then((body: any) => body.detail)
+        .catch(() => undefined);
+      throw new ApiError(response.status, detail ?? `POST /profile/me/avatar failed`);
+    }
+  
+    return response.json() as Promise<User>;
+  },
+  
+  deleteAvatar: () => 
+    request<User>("/profile/me/avatar", {
+      method: "DELETE",
+    }),
+
+  /** The user's own data as JSON (Settings -> Data & Privacy). Serving-layer
+   *  read only — no generation. */
+  exportData: () => request<ProfileExport>("/profile/me/export"),
+
+  /** The avatar bytes as an object URL.
+   *
+   * `/profile/me/avatar/image` sits behind `UserDep` -> `HTTPBearer`
+   * (api/deps.py), and the access token lives in localStorage, not a cookie.
+   * A bare `<img src={...}>` therefore sends no Authorization header and the
+   * endpoint 401s -- every uploaded avatar silently failed to render. Fetching
+   * it here lets the token ride along on a real request; the caller gets a
+   * blob: URL an <img> can use, and MUST revokeObjectURL it when done.
+   *
+   * Callers are responsible for cache-busting by re-calling after an upload
+   * or delete -- deliberately not a `?t=` on the URL, which (evaluated in a
+   * render) re-fetched the image on every single re-render. */
+  avatarObjectUrl: async () => {
+    const token = localStorage.getItem("spoin_access_token");
+    const response = await fetch(`${BASE_URL}/profile/me/avatar/image`, {
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    });
+    if (!response.ok) {
+      throw new ApiError(response.status, "Could not load avatar image");
+    }
+    return URL.createObjectURL(await response.blob());
+  },
 };
+
+export interface UserProfileUpdateIn {
+  display_name?: string | null;
+  age?: number | null;
+  gender?: string | null;
+  avatar_icon?: string | null;
+  daily_card_goal?: number | null;
+}
+
+export interface ProfileExport {
+  exported_at: string;
+  schema_version: number;
+  profile: User;
+  topics: unknown[];
+  notes: unknown[];
+  liked_cards: unknown[];
+  saved_cards: unknown[];
+  daily_activity: DailyActivityOut[];
+}
+
+export interface DailyActivityOut {
+  date: string;
+  cards_read: number;
+}
+
+export interface ProfileStatsOut {
+  current_streak: number;
+  longest_streak: number;
+  total_cards_read: number;
+  total_topics: number;
+  monthly_activity: DailyActivityOut[];
+}

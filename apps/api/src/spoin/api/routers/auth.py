@@ -40,12 +40,29 @@ def _client_ip(request: Request) -> str:
 
 
 def _user_out(user: User) -> UserOut:
+    """`UserOut` has declared age/gender/avatar_icon/has_avatar_image since the
+    profile feature landed, but this builder never populated them, so every
+    field defaulted to None/False. `/auth/me` is the only user payload the web
+    app reads on load (AuthProvider), which meant the profile header rendered
+    with no avatar, no mark, no age and no gender on every page load — the
+    values only appeared after an edit, because PATCH /profile/me returns the
+    full object. Filling them in here is what the schema already promised.
+
+    `has_avatar_image` is a stored column, so this reads the flag without
+    touching `avatar_image` — which is deferred precisely so this path, run on
+    every navigation, never pulls megabytes it does not look at.
+    """
     return UserOut(
         id=user.id,
         email=user.email,
         display_name=user.display_name,
         is_guest=user.is_guest,
         onboarding_complete=user.onboarding_complete,
+        age=user.age,
+        gender=user.gender,
+        avatar_icon=user.avatar_icon,
+        has_avatar_image=user.has_avatar_image,
+        daily_card_goal=user.daily_card_goal,
     )
 
 

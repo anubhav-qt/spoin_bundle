@@ -41,6 +41,7 @@ import katex from "katex";
 
 import { api, type ArchetypeTag, type Card as CardModel, type Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
+import { invalidate } from "@/lib/refresh";
 import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
 import {
   BookmarkIcon,
@@ -100,6 +101,19 @@ interface Props {
   /** Opens the note editor pre-expanded — used by NotesView so a note is
    *  visible/editable immediately instead of requiring an extra click. */
   initialNoteOpen?: boolean;
+  /** Seeds the liked state — used by LikedView where every card in the list
+   *  is already liked. Feed cards omit this and start unliked (unchanged). */
+  initialLiked?: boolean;
+  /** Fired when the user untaps the heart from an already-liked state -- used
+   *  by LikedView to remove the card from the collection after unlike. Omitted
+   *  by the feed, which has nothing to remove. */
+  onUnliked?: (cardId: string) => void;
+  /** Seeds the bookmarked state -- used by SavedView where every card in the
+   *  grid is already bookmarked. Feed cards omit this and start un-bookmarked. */
+  initialBookmarked?: boolean;
+  /** Fired when the user un-bookmarks from an already-saved state -- used by
+   *  SavedView to remove the tile from the grid. Omitted by the feed. */
+  onUnbookmarked?: (cardId: string) => void;
   /** Fired after a note save/delete completes, so a caller holding its own
    *  copy of this card's note (NotesView's list) can update without
    *  refetching the whole list. Omitted by the feed, which has nothing of
@@ -116,14 +130,18 @@ export function Card({
   onUnseen,
   isHero,
   initialNoteOpen,
+  initialLiked,
+  onUnliked,
+  initialBookmarked,
+  onUnbookmarked,
   onNoteChange,
 }: Props) {
   // Hero never collapses: starting `expanded` (and `everExpanded`) true and
   // making `toggle` a no-op for hero reuses every bit of existing dwell/reveal
   // logic below instead of forking a parallel code path for it.
   const [expanded, setExpanded] = useState(isHero);
-  const [liked, setLiked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [liked, setLiked] = useState(initialLiked ?? false);
+  const [bookmarked, setBookmarked] = useState(initialBookmarked ?? false);
   const [noteOpen, setNoteOpen] = useState(initialNoteOpen ?? false);
   const [noteDraft, setNoteDraft] = useState(card.note ?? "");
   const [savedNote, setSavedNote] = useState(card.note ?? null);
@@ -351,12 +369,14 @@ export function Card({
           await api.deleteNote(card.id);
           setSavedNote(null);
           onNoteChange?.(card.id, null);
+          invalidate("notes");
         }
       } else {
         const result = await api.saveNote(card.id, trimmed);
         setSavedNote(result.body);
         onNoteChange?.(card.id, result.body);
         engagement.record(card.id, "note");
+        invalidate("notes");
       }
     } finally {
       setNoteSaving(false);
@@ -371,6 +391,7 @@ export function Card({
       setSavedNote(null);
       setNoteDraft("");
       onNoteChange?.(card.id, null);
+      invalidate("notes");
     } finally {
       setNoteSaving(false);
     }
@@ -464,13 +485,15 @@ export function Card({
               aria-label="Like"
               onClick={(e) =>
                 act(e, () => {
-                  setLiked(!liked);
-                  engagement.record(card.id, liked ? "unlike" : "like");
+                  const wasLiked = liked;
+                  setLiked(!wasLiked);
+                  engagement.record(card.id, wasLiked ? "unlike" : "like");
+                  if (wasLiked) onUnliked?.(card.id);
                 })
               }
               type="button"
             >
-              <HeartIcon />
+              <HeartIcon filled={liked} />
             </button>
 
             <button
@@ -480,8 +503,10 @@ export function Card({
               aria-label="Save"
               onClick={(e) =>
                 act(e, () => {
-                  setBookmarked(!bookmarked);
-                  engagement.record(card.id, bookmarked ? "unbookmark" : "bookmark");
+                  const wasBookmarked = bookmarked;
+                  setBookmarked(!wasBookmarked);
+                  engagement.record(card.id, wasBookmarked ? "unbookmark" : "bookmark");
+                  if (wasBookmarked) onUnbookmarked?.(card.id);
                 })
               }
               type="button"

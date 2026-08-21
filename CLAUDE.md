@@ -37,7 +37,7 @@ apps/api      FastAPI (Python 3.13, async). The single source of truth for every
               mobile client can't, that's a bug, not a shortcut.
 apps/worker   Background jobs. Same codebase as apps/api, a different entrypoint
               (worker/__main__.py) — not a second project. Claims GenerationJob rows and
-              runs generation/pipeline.py. Nothing here is ever in a user-facing request.
+              runs generation/pipeline/. Nothing here is ever in a user-facing request.
 apps/web      Next.js + TypeScript, deployed to Cloudflare Pages. Rendering and client
               state ONLY, zero business logic — see "rules that generalize" below.
 docs/         Everything durable that isn't code: architecture, ADRs, tasks, mockups.

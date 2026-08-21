@@ -90,10 +90,9 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         logger.info("topic '%s': generating curriculum...", topic.canonical_name)
         async with runtime.topic_plan_lock:
             existing_subtopic_hints = await _existing_subtopic_hints(runtime.session, topic.id)
-        async with runtime.semaphore:
-            draft = await runtime.generator.generate_curriculum(
-                topic.canonical_name, topic.description or "", existing_subtopic_hints or None
-            )
+        draft = await runtime.generator.generate_curriculum(
+            topic.canonical_name, topic.description or "", existing_subtopic_hints or None
+        )
         total_tiers = sum(len(group.tiers) for group in draft.subtopics)
         logger.info(
             "topic '%s': curriculum generated -- %d subtopic group(s), %d tier(s) total, "
@@ -293,22 +292,21 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         # a late hero onto a tier that already accumulated ordinary cards
         # under the old (no-op) `is_hero` behavior.
         if tier["existing_count"] == 0 and not tier["has_hero"]:
-            async with runtime.semaphore:
-                hero_result = await runtime.generator.generate_cards(
-                    topic_name=job["topic_name"],
-                    subtopic_title=tier["title"],
-                    subtopic_description=tier["description"],
-                    difficulty=difficulty,
-                    count=1,
-                    existing_titles=existing_titles,
-                    builds_on=lower_tier_bodies,
-                    difficulty_examples=difficulty_examples,
-                    avoid_bodies=tier["avoid_duplicate_bodies"],
-                    rejection_feedback=[
-                        (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
-                    ],
-                    want_hero=True,
-                )
+            hero_result = await runtime.generator.generate_cards(
+                topic_name=job["topic_name"],
+                subtopic_title=tier["title"],
+                subtopic_description=tier["description"],
+                difficulty=difficulty,
+                count=1,
+                existing_titles=existing_titles,
+                builds_on=lower_tier_bodies,
+                difficulty_examples=difficulty_examples,
+                avoid_bodies=tier["avoid_duplicate_bodies"],
+                rejection_feedback=[
+                    (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
+                ],
+                want_hero=True,
+            )
             # The model is asked for exactly 1 card here but is trusted for
             # taste, never for constraints (CLAUDE.md) -- a batch call can
             # still return more than one despite `count=1`. Every item in
@@ -379,22 +377,21 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 len(drafts),
                 target,
             )
-            async with runtime.semaphore:
-                result = await runtime.generator.generate_cards(
-                    topic_name=job["topic_name"],
-                    subtopic_title=tier["title"],
-                    subtopic_description=tier["description"],
-                    difficulty=difficulty,
-                    count=request_count,
-                    existing_titles=existing_titles,
-                    builds_on=lower_tier_bodies,
-                    difficulty_examples=difficulty_examples,
-                    avoid_bodies=tier["avoid_duplicate_bodies"],
-                    rejection_feedback=[
-                        (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
-                    ],
-                    card_type=chosen_type,
-                )
+            result = await runtime.generator.generate_cards(
+                topic_name=job["topic_name"],
+                subtopic_title=tier["title"],
+                subtopic_description=tier["description"],
+                difficulty=difficulty,
+                count=request_count,
+                existing_titles=existing_titles,
+                builds_on=lower_tier_bodies,
+                difficulty_examples=difficulty_examples,
+                avoid_bodies=tier["avoid_duplicate_bodies"],
+                rejection_feedback=[
+                    (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
+                ],
+                card_type=chosen_type,
+            )
             logger.info(
                 "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
                 tier["title"],
@@ -473,10 +470,9 @@ async def _correct_subtopic_drafts(
             )
             for index, draft in enumerate(chunk)
         ]
-        async with runtime.semaphore:
-            result = await runtime.generator.correct_cards(
-                queries, difficulty_examples=difficulty_examples
-            )
+        result = await runtime.generator.correct_cards(
+            queries, difficulty_examples=difficulty_examples
+        )
         chunk_failures = list(result.failures)
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
@@ -560,10 +556,9 @@ async def _verify_subtopic_drafts(
             )
             for index, (draft, _embedding) in enumerate(chunk)
         ]
-        async with runtime.semaphore:
-            result = await runtime.generator.verify_cards(
-                queries, difficulty_examples=difficulty_examples
-            )
+        result = await runtime.generator.verify_cards(
+            queries, difficulty_examples=difficulty_examples
+        )
         chunk_failures = list(result.failures)
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
@@ -649,13 +644,12 @@ async def _generate_questions_for_group(
 
     for start in range(0, len(cards), batch_size):
         chunk = cards[start : start + batch_size]
-        async with runtime.semaphore:
-            result = await runtime.generator.generate_questions(
-                cards=[(title, body) for _card_id, title, body in chunk],
-                difficulty=parsed_difficulty,
-                existing_stems=existing_stems,
-                is_backfill=is_backfill,
-            )
+        result = await runtime.generator.generate_questions(
+            cards=[(title, body) for _card_id, title, body in chunk],
+            difficulty=parsed_difficulty,
+            existing_stems=existing_stems,
+            is_backfill=is_backfill,
+        )
         failures.extend(result.failures)
         for draft in result.items:
             if 0 <= draft.card_index < len(chunk):
@@ -677,8 +671,8 @@ async def _process_gate_item(
     run start to finish independently of every sibling subtopic-tier.
     Concurrent across tiers via `asyncio.gather` in `gate_and_persist`: the
     LLM phases (correction, verification, question generation) touch no DB
-    and run fully concurrently (bounded by `runtime.semaphore`, same as
-    every other generator call); dedup and persist touch `runtime.session`,
+    and run fully concurrently (rate limits governed by QuotaGovernor);
+    dedup and persist touch `runtime.session`,
     which is not safe for concurrent use across coroutines, so those
     sections are serialized through `runtime.session_lock` instead of
     running as one sequential pass over every tier.

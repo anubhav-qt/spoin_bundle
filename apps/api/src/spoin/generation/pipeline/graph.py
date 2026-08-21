@@ -8,7 +8,6 @@ without scrolling past the ~1400 lines of work the nodes actually do.
 
 from __future__ import annotations
 
-import asyncio
 import uuid
 from typing import Any, cast
 
@@ -68,7 +67,6 @@ async def run_generation_pipeline(
         embedder=embedder,
         settings=settings,
         batch_id=uuid.uuid4(),
-        semaphore=asyncio.Semaphore(settings.max_concurrent_generation_calls),
     )
     initial_state: PipelineState = {
         "topic_ids": [str(topic_id) for topic_id in topic_ids],

@@ -229,7 +229,6 @@ class _Runtime:
     embedder: Embedder
     settings: Settings
     batch_id: uuid.UUID
-    semaphore: asyncio.Semaphore
     topic_plan_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     #: `AsyncSession` is not safe for concurrent use across coroutines -- every
     #: DB-touching section of `_process_gate_item` (dedup reads, card/question

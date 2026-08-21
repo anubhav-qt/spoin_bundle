@@ -83,3 +83,5 @@ useful than the decision itself.
 | [0044](0044-generation-pipeline-as-a-package.md) | The generation pipeline becomes a package; `langgraph` confined to two files | Accepted (amends 0024) |
 | [0045](0045-settings-surface-and-user-preferences.md) | A Settings surface, with preferences on the user row and no parallel system | Accepted |
 | [0046](0046-one-collection-surface.md) | One collection surface shared by Saved, Liked, Profile and Settings | Accepted |
+| [0047](0047-removal-of-legacy-concurrency-semaphore.md) | Remove legacy concurrency semaphore; QuotaGovernor manages full cluster concurrency | Accepted (amends 0024, 0026, 0028) |
+

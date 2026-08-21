@@ -830,6 +830,19 @@ function AsciiArt({ art, alt }: { art: string; alt: string | undefined }) {
   );
 }
 
+/** Renders a diagram card's fenced diagram in full, in the same slot and at
+ *  the same visual weight as `AsciiArt` — collapsed, this box IS the
+ *  preview, not a truncated one-line stand-in for it. Only shown while
+ *  collapsed; `card.body`'s own `DiagramBlock` takes over once expanded, so
+ *  the diagram isn't rendered twice. */
+function DiagramArt({ content }: { content: string }) {
+  return (
+    <div className="card-ascii card-diagram-art">
+      <pre>{content}</pre>
+    </div>
+  );
+}
+
 function ArchetypeTeaser({ archetype, body }: { archetype: ArchetypeTag | "combo"; body: string }) {
   if (archetype === "combo") {
     const code = firstFenceOfKind(body, "code");
@@ -864,11 +877,8 @@ function ArchetypeTeaser({ archetype, body }: { archetype: ArchetypeTag | "combo
 
   if (archetype === "diagram") {
     const fence = firstFenceOfKind(body, "diagram");
-    return (
-      <p className="card-teaser card-teaser-diagram mono">
-        {fence !== null ? firstNonEmptyLine(fence.content) : ""}
-      </p>
-    );
+    if (fence === null) return null;
+    return <DiagramArt content={fence.content} />;
   }
 
   // Minimal by design (ADR-0017 follow-up): the actual claim text is raw,

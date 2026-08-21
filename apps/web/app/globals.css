@@ -960,6 +960,13 @@ body {
   text-align: center;
 }
 
+/* Diagram cards reuse .card-ascii's box treatment (ADR-0021's "the preview
+   IS the collapsed hook" idiom) but left-align, since box-drawn diagrams
+   read as structure, not as centered artwork. */
+.card-diagram-art pre {
+  text-align: left;
+}
+
 .card-head {
   display: flex;
   align-items: center;

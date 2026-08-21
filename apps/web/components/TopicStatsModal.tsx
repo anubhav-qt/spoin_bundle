@@ -139,7 +139,7 @@ export function TopicStatsModal({
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-panel"
+        className="modal-panel modal-panel-curriculum"
         role="dialog"
         aria-modal="true"
         aria-label={`${topicName} details`}
@@ -236,37 +236,130 @@ export function TopicStatsModal({
               </div>
             </div>
 
-            <div className="modal-curriculum">
-              <h3 className="modal-curriculum-title mono">Curriculum</h3>
+            <div className="curriculum-tree-section">
+              <div className="curriculum-tree-head">
+                <span className="curriculum-tree-title mono">Curriculum Roadmap</span>
+                {subtopics ? (
+                  <span className="curriculum-tree-count mono">
+                    {subtopics.filter((s) => s.covered).length} / {subtopics.length} completed
+                  </span>
+                ) : null}
+              </div>
+
               {subtopics === null ? (
-                <p className="modal-loading mono">Loading…</p>
+                <p className="modal-loading mono">Loading roadmap…</p>
               ) : (
-                TIER_ORDER.map((tier) => {
-                  const tierSubtopics = subtopics.filter((s) => s.difficulty === tier);
-                  if (tierSubtopics.length === 0) return null;
-                  return (
-                    <div key={tier} className="modal-curriculum-tier">
-                      <h4 className="modal-curriculum-tier-title mono">{DIFFICULTY_LABEL[tier]}</h4>
-                      <div className="modal-curriculum-list">
-                        {tierSubtopics.map((s) => (
-                          <div key={s.subtopic_id} className="modal-curriculum-row">
-                            <span className="modal-curriculum-row-title">{s.title}</span>
-                            <span className="meter">
-                              <span
-                                className="meter-fill"
-                                data-complete={s.covered}
-                                style={{ width: `${Math.min(s.coverage, 1) * 100}%` }}
-                              />
-                            </span>
-                            <span className="modal-curriculum-row-count mono">
-                              {s.total_cards === 0 ? "not generated yet" : `${s.seen_cards}/${s.total_cards}`}
+                <div className="curriculum-tree-root">
+                  {TIER_ORDER.map((tier, tierIdx) => {
+                    const tierSubtopics = subtopics.filter((s) => s.difficulty === tier);
+                    if (tierSubtopics.length === 0) return null;
+                    const tierPassed = stats.tier_quiz_passed[tierIdx] ?? false;
+                    const tierCoveredCount = tierSubtopics.filter((s) => s.covered).length;
+                    const tierTotalSeen = tierSubtopics.reduce((acc, s) => acc + s.seen_cards, 0);
+                    const tierTotalCards = tierSubtopics.reduce((acc, s) => acc + s.total_cards, 0);
+                    const tierProgress = tierTotalCards > 0 ? tierTotalSeen / tierTotalCards : 0;
+                    const isCurrentTier = stats.current_difficulty === tier;
+
+                    return (
+                      <div
+                        key={tier}
+                        className="curriculum-tree-tier"
+                        data-current={isCurrentTier}
+                        data-passed={tierPassed}
+                      >
+                        {/* Tier Root Node */}
+                        <div className="curriculum-tree-tier-node">
+                          <div
+                            className="curriculum-tier-indicator"
+                            data-passed={tierPassed}
+                            data-current={isCurrentTier}
+                          >
+                            {tierPassed ? (
+                              <span className="tier-check-icon">✓</span>
+                            ) : (
+                              <span className="tier-number-badge">{tierIdx + 1}</span>
+                            )}
+                          </div>
+                          <div className="curriculum-tier-info">
+                            <span className="curriculum-tier-name">{DIFFICULTY_LABEL[tier]} Tier</span>
+                            <span className="curriculum-tier-meta mono">
+                              {tierCoveredCount} of {tierSubtopics.length} subtopics • {Math.round(tierProgress * 100)}%
                             </span>
                           </div>
-                        ))}
+                          {tierPassed ? (
+                            <span className="curriculum-tier-status-pill passed mono">Mastered</span>
+                          ) : isCurrentTier ? (
+                            <span className="curriculum-tier-status-pill active mono">Active</span>
+                          ) : null}
+                        </div>
+
+                        {/* Branch Trunk & Subtopic Leaf Nodes */}
+                        <div className="curriculum-tree-branches">
+                          <div className="curriculum-tree-trunk-line" aria-hidden="true" />
+                          <div className="curriculum-tree-leaves">
+                            {tierSubtopics.map((s) => {
+                              const isComplete = s.covered;
+                              const inProgress = !s.covered && s.seen_cards > 0;
+                              const pct = Math.min(s.coverage, 1) * 100;
+
+                              return (
+                                <div
+                                  key={s.subtopic_id}
+                                  className="curriculum-leaf-node"
+                                  data-status={isComplete ? "complete" : inProgress ? "in-progress" : "unstarted"}
+                                >
+                                  {/* Branch Elbow Connector */}
+                                  <div className="curriculum-branch-elbow" aria-hidden="true" />
+
+                                  {/* Subtopic Status Dot */}
+                                  <div
+                                    className="curriculum-leaf-dot"
+                                    data-status={isComplete ? "complete" : inProgress ? "in-progress" : "unstarted"}
+                                  >
+                                    {isComplete ? (
+                                      <svg viewBox="0 0 16 16" className="leaf-check-svg">
+                                        <path
+                                          d="M3.5 8.5l3 3L12.5 4.5"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                      </svg>
+                                    ) : inProgress ? (
+                                      <span className="leaf-pulse-dot" />
+                                    ) : null}
+                                  </div>
+
+                                  {/* Subtopic Card Box */}
+                                  <div className="curriculum-leaf-card">
+                                    <div className="curriculum-leaf-header">
+                                      <span className="curriculum-leaf-title">{s.title}</span>
+                                      <span className="curriculum-leaf-cards mono">
+                                        {s.total_cards === 0 ? "generating" : `${s.seen_cards}/${s.total_cards}`}
+                                      </span>
+                                    </div>
+                                    <div className="curriculum-leaf-meter-wrap">
+                                      <div className="curriculum-leaf-meter">
+                                        <div
+                                          className="curriculum-leaf-fill"
+                                          data-complete={isComplete}
+                                          style={{ width: `${pct}%` }}
+                                        />
+                                      </div>
+                                      <span className="curriculum-leaf-pct mono">{Math.round(pct)}%</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           </>

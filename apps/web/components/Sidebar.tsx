@@ -11,6 +11,7 @@
  * discoverable only by clicking the thing that's always on screen anyway.
  */
 
+import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import {
   BookmarkIcon,
@@ -47,7 +48,7 @@ interface Props {
 }
 
 export function Sidebar({ onReset, onRefresh, view, onNavigate }: Props) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <nav className="rail-left" aria-label="Primary">
@@ -151,12 +152,21 @@ export function Sidebar({ onReset, onRefresh, view, onNavigate }: Props) {
       ))}
 
       <div className="nav-item-logout-wrap">
-        <button type="button" className="nav-item nav-item-logout" onClick={logout}>
-          <span className="nav-item-icon">
-            <LogoutIcon />
-          </span>
-          <span className="nav-item-label">Log out</span>
-        </button>
+        {user?.is_guest ? (
+          <Link href="/claim" className="nav-item nav-item-signup">
+            <span className="nav-item-icon">
+              <UserIcon />
+            </span>
+            <span className="nav-item-label">Sign up</span>
+          </Link>
+        ) : (
+          <button type="button" className="nav-item nav-item-logout" onClick={logout}>
+            <span className="nav-item-icon">
+              <LogoutIcon />
+            </span>
+            <span className="nav-item-label">Log out</span>
+          </button>
+        )}
       </div>
     </nav>
   );

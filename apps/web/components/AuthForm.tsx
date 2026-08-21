@@ -104,7 +104,7 @@ export function AuthForm({ mode }: Props) {
       ? "Welcome back."
       : "Create your account.";
   const subtitle = claiming
-    ? "Add an email and password so your session doesn't disappear."
+    ? "Add an email and password to keep your progress, or sign in to an existing account."
     : mode === "login"
       ? "Enter your details to access your feed."
       : "Join to start exploring knowledge.";
@@ -195,44 +195,38 @@ export function AuthForm({ mode }: Props) {
               </button>
             </form>
 
-            {!claiming && (
-              <>
-                <div className="auth-divider">or</div>
+            <div className="auth-divider">or</div>
 
-                <GoogleSignInButton onToken={handleGoogleToken} />
+            <GoogleSignInButton onToken={handleGoogleToken} />
 
-                {mode === "register" && (
-                  <button
-                    type="button"
-                    className="auth-button auth-button-secondary"
-                    onClick={handleGuest}
-                    disabled={loading}
-                  >
-                    Continue as guest
-                  </button>
-                )}
-              </>
+            {mode === "register" && !claiming && (
+              <button
+                type="button"
+                className="auth-button auth-button-secondary"
+                onClick={handleGuest}
+                disabled={loading}
+              >
+                Continue as guest
+              </button>
             )}
 
-            {!claiming && (
-              <div className="auth-footer">
-                {mode === "login" ? (
-                  <>
-                    Don&apos;t have an account?{" "}
-                    <Link className="auth-link" href="/signup">
-                      Create one &rarr;
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{" "}
-                    <Link className="auth-link" href="/login">
-                      Sign in &rarr;
-                    </Link>
-                  </>
-                )}
-              </div>
-            )}
+            <div className="auth-footer">
+              {mode === "login" ? (
+                <>
+                  Don&apos;t have an account?{" "}
+                  <Link className="auth-link" href="/signup">
+                    Create one &rarr;
+                  </Link>
+                </>
+              ) : (
+                <>
+                  Already have an account?{" "}
+                  <Link className="auth-link" href="/login">
+                    Sign in &rarr;
+                  </Link>
+                </>
+              )}
+            </div>
           </motion.div>
         </AnimatePresence>
       </motion.div>

@@ -30,7 +30,7 @@ from typing import Literal, cast
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.api.schemas import (
@@ -52,6 +52,7 @@ from spoin.domain.models import (
     CardBookmark,
     CardLike,
     EngagementEvent,
+    FeedPlan,
     GenerationJob,
     Subtopic,
     Topic,
@@ -545,6 +546,7 @@ class TopicsService:
                 tier_unlocked=entry_tier_unlock(entry_difficulty),
             )
         )
+        await self._session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
         await self._session.commit()
 
         return TopicOut(
@@ -607,6 +609,7 @@ class TopicsService:
         assert user is not None
         user.onboarding_complete = True
 
+        await self._session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
         await self._session.commit()
         return subscribed
 
@@ -724,6 +727,7 @@ class TopicsService:
         if is_new_topic:
             session.add(GenerationJob(topic_id=topic_id, status="pending"))
 
+        await session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
         await session.commit()
 
         return RequestedTopic(

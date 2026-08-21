@@ -69,8 +69,8 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
   const topicAccentHue = useCallback(
     (topicId: string) => {
       const index = topics.findIndex((t) => t.id === topicId);
-      if (index === -1) return undefined;
-      return topicHue(topicId, topics[index].accent_hue, index);
+      const accent = index !== -1 ? topics[index].accent_hue : null;
+      return topicHue(topicId, accent, index !== -1 ? index : undefined);
     },
     [topics],
   );

@@ -198,7 +198,7 @@ class Settings(BaseSettings):
     mix_ramp_end: float = 0.60
 
     # -- engagement (ADR-0011) --------------------------------------------------
-    dwell_complete_ms: int = 8000
+    dwell_complete_ms: int = 10000
     dwell_max_ms: int = 300_000  # a tab open overnight is not a nine-hour read
 
     # -- topics (moved out of routers/topics.py) --------------------------------

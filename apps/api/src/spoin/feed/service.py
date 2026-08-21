@@ -148,11 +148,18 @@ class FeedService:
     async def _ensure_plan(self, user_id: UUID, topic_filter: list[UUID] | None) -> FeedPlan:
         key = filter_key(topic_filter)
         existing = await self._session.scalar(select(FeedPlan).where(FeedPlan.user_id == user_id))
+        affinities = await self._affinities(user_id, topic_filter)
 
-        if existing is not None and existing.filter_key == key:
+        if (
+            existing is not None
+            and existing.filter_key == key
+            and (
+                set(existing.topic_order) == set(affinities.keys())
+                or (not affinities and not existing.topic_order)
+            )
+        ):
             return existing
 
-        affinities = await self._affinities(user_id, topic_filter)
         order = build_plan(
             affinities,
             self._settings.plan_size,

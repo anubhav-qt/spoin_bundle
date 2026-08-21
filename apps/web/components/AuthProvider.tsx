@@ -93,7 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         router.replace(ONBOARDING_PATH);
         return;
       }
-      if (me.onboarding_complete && !exempt && (PUBLIC_PATHS.has(pathname) || pathname === ONBOARDING_PATH)) {
+      if (
+        me.onboarding_complete &&
+        !me.is_guest &&
+        !exempt &&
+        (PUBLIC_PATHS.has(pathname) || pathname === ONBOARDING_PATH)
+      ) {
         router.replace("/");
         return;
       }

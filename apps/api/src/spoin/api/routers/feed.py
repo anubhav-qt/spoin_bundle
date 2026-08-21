@@ -9,10 +9,10 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import func, select
 
-from spoin.api.deps import SessionDep, SettingsDep, UserDep
+from spoin.api.deps import OptionalUserDep, SessionDep, SettingsDep, UserDep
 from spoin.api.schemas import CardOut, FeedOut, LikedCardOut, SavedCardOut
 from spoin.domain.models import Card, CardBookmark, CardLike, Subtopic, Topic, UserTopic
 from spoin.feed.service import FeedService
@@ -217,3 +217,28 @@ async def get_saved_cards(
         )
         for collected_at, card, subtopic_title, topic_display_name, note in rows
     ]
+
+
+@cards_router.get("/{card_id}", response_model=CardOut)
+async def get_card(
+    card_id: UUID,
+    session: SessionDep,
+    user_id: OptionalUserDep,
+) -> CardOut:
+    """Fetch a single card by its UUID for direct linking and share spaces."""
+    row = (
+        await session.execute(
+            select(Card, Subtopic.title)
+            .join(Subtopic, Subtopic.id == Card.subtopic_id)
+            .where(Card.id == card_id)
+        )
+    ).first()
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Card not found")
+    card, subtopic_title = row
+    note = None
+    if user_id is not None:
+        notes_by_card = await NotesService(session).get_for_cards(user_id, [card_id])
+        note = notes_by_card.get(card_id)
+    return _card_out(card, subtopic_title, note)
+

@@ -50,7 +50,9 @@ import {
   CopyIcon,
   ExpandIcon,
   HeartIcon,
+  LinkIcon,
   NoteIcon,
+  PhotoIcon,
   ShareIcon,
   SparkIcon,
 } from "./icons";
@@ -77,7 +79,7 @@ function claimHeroTutorial(): boolean {
 
 /** Mirrors SPOIN_DWELL_COMPLETE_MS. The server stays the authority; this only
  *  decides when the client stops waiting and reports. */
-const DWELL_COMPLETE_MS = 8000;
+const DWELL_COMPLETE_MS = 10000;
 
 const DIFFICULTY_RANK: Record<Difficulty, number> = {
   beginner: 1,
@@ -148,6 +150,11 @@ export function Card({
   const [noteSaving, setNoteSaving] = useState(false);
   const [everExpanded, setEverExpanded] = useState(isHero);
   const [focused, setFocused] = useState(true);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [copyingImage, setCopyingImage] = useState(false);
+  const [copiedImage, setCopiedImage] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const shareWrapRef = useRef<HTMLDivElement>(null);
   // ADR-0035: only the very first hero card mounted while the flag is unset
   // shows the tutorial — read once at mount, not reactively, so it can't
   // flip back on for a second hero card later in the same session. Claims
@@ -160,6 +167,68 @@ export function Card({
   const node = useRef<HTMLDivElement>(null);
   const gotItButton = useRef<HTMLButtonElement>(null);
   const impressed = useRef(false);
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    const onPointer = (e: PointerEvent) => {
+      if (shareWrapRef.current && !shareWrapRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShareOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [shareOpen]);
+
+  const copyCardImage = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const el = article.current;
+    if (!el || copyingImage) return;
+    setCopyingImage(true);
+    try {
+      const { toBlob } = await import("html-to-image");
+      const blob = await toBlob(el, {
+        pixelRatio: 2,
+        backgroundColor: getComputedStyle(document.body).backgroundColor || "#edf0ea",
+        filter: (n) => {
+          if (
+            n instanceof HTMLElement &&
+            (n.classList.contains("share-popover") || n.classList.contains("hero-tutorial-overlay"))
+          ) {
+            return false;
+          }
+          return true;
+        },
+      });
+      if (blob) {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        setCopiedImage(true);
+        setTimeout(() => setCopiedImage(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to copy card image:", err);
+    } finally {
+      setCopyingImage(false);
+    }
+  };
+
+  const copyShareLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/share/${card.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+    }
+  };
 
   const dismissTutorial = useCallback(() => {
     localStorage.setItem(HERO_TUTORIAL_KEY, "1");
@@ -534,14 +603,51 @@ export function Card({
               <SparkIcon />
             </button>
 
-            <button
-              className="action"
-              aria-label="Share"
-              onClick={(e) => act(e, () => engagement.record(card.id, "share"))}
-              type="button"
-            >
-              <ShareIcon />
-            </button>
+            <div className="share-action-wrap" ref={shareWrapRef}>
+              <button
+                className="action"
+                aria-label="Share"
+                aria-expanded={shareOpen}
+                onClick={(e) =>
+                  act(e, () => {
+                    setShareOpen((open) => !open);
+                    engagement.record(card.id, "share");
+                  })
+                }
+                type="button"
+              >
+                <ShareIcon />
+              </button>
+              {shareOpen ? (
+                <div className="share-popover" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    className="share-popover-item"
+                    onClick={copyCardImage}
+                    disabled={copyingImage}
+                  >
+                    <span className="share-popover-icon">
+                      {copiedImage ? <CheckIcon /> : <PhotoIcon />}
+                    </span>
+                    <span className="share-popover-text">
+                      {copyingImage ? "Rendering image…" : copiedImage ? "Image copied!" : "Copy as image"}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="share-popover-item"
+                    onClick={copyShareLink}
+                  >
+                    <span className="share-popover-icon">
+                      {copiedLink ? <CheckIcon /> : <LinkIcon />}
+                    </span>
+                    <span className="share-popover-text">
+                      {copiedLink ? "Link copied!" : "Copy link"}
+                    </span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
 
             <span className="action-spacer" />
 
@@ -888,7 +994,11 @@ function ProseBlocks({ text }: { text: string }) {
       <div className="comparison-pair" key={`pair-${keyIndex++}`}>
         {rows.map((row, idx) => (
           <div className="comparison-row" data-tone={row.tone} key={idx}>
-            {inline(row.text)}
+            <span className="comparison-tone-badge" data-tone={row.tone}>
+              <span className="comparison-tone-icon">{row.tone === "bad" ? "❌" : "✅"}</span>
+              <span className="comparison-tone-label">{row.tone === "bad" ? "Myth" : "Fact"}</span>
+            </span>
+            <div className="comparison-content">{inline(row.text)}</div>
           </div>
         ))}
       </div>,
@@ -900,6 +1010,20 @@ function ProseBlocks({ text }: { text: string }) {
     const trimmed = line.trim();
 
     if (trimmed.length === 0) {
+      let nextNonEmpty = -1;
+      for (let j = i + 1; j < lines.length; j++) {
+        if (lines[j].trim().length > 0) {
+          nextNonEmpty = j;
+          break;
+        }
+      }
+      if (
+        nextNonEmpty !== -1 &&
+        (/^❌\s*/.test(lines[nextNonEmpty].trim()) || /^✅\s*/.test(lines[nextNonEmpty].trim()))
+      ) {
+        i++;
+        continue;
+      }
       flushPairs();
       i++;
       continue;
@@ -909,11 +1033,32 @@ function ProseBlocks({ text }: { text: string }) {
     const badMatch = /^❌\s*([\s\S]*)$/.exec(trimmed);
     const goodMatch = /^✅\s*([\s\S]*)$/.exec(trimmed);
     if (badMatch !== null || goodMatch !== null) {
+      let rowText = (badMatch ?? goodMatch)![1].trim();
+      let nextI = i + 1;
+      while (nextI < lines.length) {
+        const nextTrimmed = lines[nextI].trim();
+        if (
+          nextTrimmed.length === 0 ||
+          nextTrimmed.startsWith("❌") ||
+          nextTrimmed.startsWith("✅") ||
+          /^#{1,6}\s+/.test(nextTrimmed) ||
+          /^[-*•]\s+/.test(nextTrimmed) ||
+          /^\d+[.)]\s+/.test(nextTrimmed) ||
+          nextTrimmed.startsWith(">") ||
+          nextTrimmed.startsWith("$$") ||
+          nextTrimmed.startsWith("\\[") ||
+          (nextTrimmed.startsWith("|") && nextTrimmed.endsWith("|"))
+        ) {
+          break;
+        }
+        rowText += " " + nextTrimmed;
+        nextI++;
+      }
       pairBuffer.push({
         tone: badMatch !== null ? "bad" : "good",
-        text: (badMatch ?? goodMatch)![1],
+        text: rowText,
       });
-      i++;
+      i = nextI;
       continue;
     }
     flushPairs();

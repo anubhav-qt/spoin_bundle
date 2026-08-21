@@ -214,6 +214,25 @@ export function GearIcon(_: IconProps) {
   );
 }
 
+export function LinkIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  );
+}
+
+export function PhotoIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="m20.5 15-5-5L5.5 19" />
+    </svg>
+  );
+}
+
 /* ── Avatar marks ───────────────────────────────────────────────────────────
    A closed set of eight, drawn to the same spec as the icons above (24
    viewBox, 1.5 stroke, rounded caps, no fills) so a chosen avatar sits in the

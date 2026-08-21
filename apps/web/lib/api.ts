@@ -519,6 +519,8 @@ export const api = {
     return request<SavedCard[]>(`/cards/saved${suffix === "" ? "" : `?${suffix}`}`);
   },
 
+  getCard: (cardId: string) => request<Card>(`/cards/${cardId}`),
+
   // --- Profile ---
   getProfileStats: (year: number, month: number) => 
     request<ProfileStatsOut>(`/profile/me/stats?year=${year}&month=${month}`),

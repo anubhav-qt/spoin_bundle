@@ -171,6 +171,7 @@ export function AppShell() {
     setTopics((current) => (current.some((t) => t.id === topic.id) ? current : [...current, topic]));
     const p = await api.progress(topic.id);
     setProgress((current) => ({ ...current, [topic.id]: toTopicProgress(p) }));
+    invalidate("feed");
   }, []);
 
   // TopicStatsModal's color picker (ADR-0034) calls this after a successful

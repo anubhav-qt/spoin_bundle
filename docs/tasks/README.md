@@ -27,6 +27,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 
 | # | Task | Outcome |
 |---|---|---|
+| [0014](0014-unbounded-drafting-rounds.md) | Remove artificial drafting round constraints and allow unbounded completion | Done -- 2026-08-21 |
 | [0006](0006-curated-hero-cards.md) | A real curated `is_hero` flag, replacing the "first in station" heuristic | Done -- 2026-08-20, see ADR-0042 |
 | [0007](0007-rename-to-spoin.md) | Execute the Slocho → Spoin rename | Done -- 2026-08-17 |
 | [0001](0001-topic-threshold-calibration.md) | Topic similarity threshold calibration | Obsolete -- 2026-08-17, superseded by ADR-0025 |

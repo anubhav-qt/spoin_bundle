@@ -11,7 +11,6 @@ exist. What they no longer contain is the persistence — that is
 from __future__ import annotations
 
 import asyncio
-import math
 import uuid
 from datetime import UTC, datetime
 from typing import Any, cast
@@ -340,15 +339,11 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in hero_items
             )
 
-        # Allow enough rounds to cycle through all card types plus slack for partial batches
-        max_rounds = max(
-            len(all_card_types) * 2, math.ceil(target / batch_size) + len(all_card_types)
-        )
-
-        for round_number in range(1, max_rounds + 1):
+        # Unbounded drafting: cycle through card types until target quota is satisfied
+        round_number = 0
+        while len(drafts) < target:
+            round_number += 1
             remaining = target - len(drafts)
-            if remaining <= 0:
-                break
 
             # Find card types that still have remaining capacity to fill
             unfilled_types = [
@@ -375,11 +370,10 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 request_count = min(batch_size, remaining)
 
             logger.info(
-                "subtopic '%s' [%s]: round %d/%d (type=%s) -- requesting %d card(s) (%d/%d so far)",
+                "subtopic '%s' [%s]: round %d (type=%s) -- requesting %d card(s) (%d/%d so far)",
                 tier["title"],
                 difficulty.value,
                 round_number,
-                max_rounds,
                 chosen_type or "general",
                 request_count,
                 len(drafts),

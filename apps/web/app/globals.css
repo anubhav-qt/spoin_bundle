@@ -1915,6 +1915,12 @@ body.custom-cursor-active textarea {
   justify-content: center;
   gap: 6px;
   flex: 1 1 auto;
+  /* `.theme-picker`'s own 2px top/bottom padding makes IT 42px tall, not 38.
+     `.rail-top-row`'s `align-items: stretch` only stretches auto-height
+     children, so this fixed-height sibling top-aligns by default instead of
+     matching that extra 4px of breathing room -- `center` splits it evenly
+     top and bottom instead. */
+  align-self: center;
   min-width: 44px;
   height: 38px;
   border-radius: 10px;

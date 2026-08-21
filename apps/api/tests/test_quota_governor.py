@@ -141,6 +141,7 @@ async def test_flash_lite_model_cooldown_and_resets(session: AsyncSession) -> No
     """Flash-lite models 429 triggers a 60s cooldown and resets requests_spent to 0
     up to 10 times before becoming permanently exhausted."""
     import time
+
     governor = QuotaGovernor(key_count=2, ladder=_ladder(("gemini-2.0-flash-lite", 20, 100)))
     now = datetime.now(UTC)
 
@@ -183,4 +184,3 @@ async def test_flash_lite_model_cooldown_and_resets(session: AsyncSession) -> No
     assert ledger_final is not None
     assert ledger_final.requests_spent >= 20
     assert ledger_final.exhausted_at is not None
-

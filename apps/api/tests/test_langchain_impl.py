@@ -765,4 +765,3 @@ async def test_quota_exhausted_error_is_reraised_across_methods() -> None:
             existing_stems=[],
             is_backfill=False,
         )
-

@@ -241,4 +241,3 @@ async def get_card(
         notes_by_card = await NotesService(session).get_for_cards(user_id, [card_id])
         note = notes_by_card.get(card_id)
     return _card_out(card, subtopic_title, note)
-

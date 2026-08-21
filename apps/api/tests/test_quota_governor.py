@@ -135,3 +135,52 @@ def test_parse_ladder_rejects_empty_string() -> None:
 def test_governor_rejects_empty_ladder() -> None:
     with pytest.raises(ValueError, match="at least one ladder rung"):
         QuotaGovernor(key_count=1, ladder=[])
+
+
+async def test_flash_lite_model_cooldown_and_resets(session: AsyncSession) -> None:
+    """Flash-lite models 429 triggers a 60s cooldown and resets requests_spent to 0
+    up to 10 times before becoming permanently exhausted."""
+    import time
+    governor = QuotaGovernor(key_count=2, ladder=_ladder(("gemini-2.0-flash-lite", 20, 100)))
+    now = datetime.now(UTC)
+
+    # Acquire once on key 0
+    result = await governor.acquire_with_session(session, now=now)
+    assert result == (0, "gemini-2.0-flash-lite")
+
+    # 429 on key 0 for flash-lite
+    await governor.mark_exhausted_with_session(session, 0, "gemini-2.0-flash-lite", now=now)
+
+    # Ledger requests_spent should be reset to 0, exhausted_at None
+    ledger = await session.scalar(
+        select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:gemini-2.0-flash-lite")
+    )
+    assert ledger is not None
+    assert ledger.requests_spent == 0
+    assert ledger.exhausted_at is None
+
+    # While in cooldown, next acquire skips key 0 and gets key 1
+    next_res = await governor.acquire_with_session(session, now=now)
+    assert next_res == (1, "gemini-2.0-flash-lite")
+
+    # Fast-forward cooldown for key 0
+    governor._flash_lite_cooldowns[(0, "gemini-2.0-flash-lite")] = time.monotonic() - 1.0
+
+    # Key 0 is available again
+    key0_res = await governor.acquire_with_session(session, now=now)
+    assert key0_res == (0, "gemini-2.0-flash-lite")
+
+    # Now trigger remaining 9 resets on key 0 (total 10)
+    for _ in range(9):
+        await governor.mark_exhausted_with_session(session, 0, "gemini-2.0-flash-lite", now=now)
+        governor._flash_lite_cooldowns[(0, "gemini-2.0-flash-lite")] = time.monotonic() - 1.0
+
+    # 11th 429 exceeds 10 resets -> permanently exhausted
+    await governor.mark_exhausted_with_session(session, 0, "gemini-2.0-flash-lite", now=now)
+    ledger_final = await session.scalar(
+        select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:gemini-2.0-flash-lite")
+    )
+    assert ledger_final is not None
+    assert ledger_final.requests_spent >= 20
+    assert ledger_final.exhausted_at is not None
+

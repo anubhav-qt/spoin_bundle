@@ -46,6 +46,8 @@ logger = logging.getLogger("spoin.generation.quota")
 #: The trailing window RPM is measured over. Fixed at 60s (what "requests per
 #: minute" means) — not a setting, since it isn't a tuning knob.
 _RPM_WINDOW_SECONDS = 60.0
+_FLASH_LITE_COOLDOWN_SECONDS = 60.0
+_FLASH_LITE_MAX_RESETS = 10
 
 
 class QuotaExhaustedError(RuntimeError):
@@ -126,6 +128,15 @@ class QuotaGovernor:
     _cell_locks: dict[tuple[int, str], asyncio.Lock] = field(
         default_factory=dict, init=False, repr=False
     )
+    #: (key_index, model) -> timestamp (time.monotonic()) until which flash-lite
+    #: cell is cooling off after a 429 before resetting spend to 0.
+    _flash_lite_cooldowns: dict[tuple[int, str], float] = field(
+        default_factory=dict, init=False, repr=False
+    )
+    #: (key_index, model) -> number of 60s cooldown resets done today for flash-lite
+    _flash_lite_reset_counts: dict[tuple[int, str], int] = field(
+        default_factory=lambda: defaultdict(int), init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         if self.key_count < 1:
@@ -158,6 +169,9 @@ class QuotaGovernor:
         -- ours or a concurrent caller's -- skips it immediately instead of
         rediscovering the same 429 on every subsequent call.
 
+        For flash-lite models, we apply a 60s cooldown and reset spend to 0
+        up to 10 times per key before marking it permanently exhausted for today.
+
         Unknown model (not in this pool's ladder) is a caller bug, not a
         runtime condition to degrade from -- raises rather than silently
         no-op-ing, same posture as `parse_ladder` on a malformed ladder string."""
@@ -183,6 +197,30 @@ class QuotaGovernor:
 
         day = _day_start(now)
         ledger = await self._ledger_row(session, day, key_index, model)
+
+        is_flash_lite = "flash-lite" in model.lower()
+        if (
+            is_flash_lite
+            and self._flash_lite_reset_counts[(key_index, model)] < _FLASH_LITE_MAX_RESETS
+        ):
+            self._flash_lite_reset_counts[(key_index, model)] += 1
+            reset_num = self._flash_lite_reset_counts[(key_index, model)]
+            self._flash_lite_cooldowns[(key_index, model)] = (
+                time.monotonic() + _FLASH_LITE_COOLDOWN_SECONDS
+            )
+            ledger.requests_spent = 0
+            ledger.exhausted_at = None
+            await session.flush()
+            logger.warning(
+                "quota: key %d flash-lite model %s 429'd -- rotated key, reset spend to 0 "
+                "with 60s cooldown (reset %d/%d)",
+                key_index,
+                model,
+                reset_num,
+                _FLASH_LITE_MAX_RESETS,
+            )
+            return
+
         ledger.requests_spent = max(ledger.requests_spent, rung.rpd)
         ledger.exhausted_at = now
         await session.flush()
@@ -213,6 +251,16 @@ class QuotaGovernor:
                 )
                 continue
             for key_index in range(self.key_count):
+                cooldown_until = self._flash_lite_cooldowns.get((key_index, rung.model))
+                if cooldown_until is not None and time.monotonic() < cooldown_until:
+                    logger.debug(
+                        "quota: key %d model %s is in flash-lite cooldown (%.1fs remaining), "
+                        "trying next",
+                        key_index,
+                        rung.model,
+                        cooldown_until - time.monotonic(),
+                    )
+                    continue
                 if not self._rpm_has_room(key_index, rung):
                     logger.debug(
                         "quota: key %d model %s at RPM ceiling (%d/min), trying next",

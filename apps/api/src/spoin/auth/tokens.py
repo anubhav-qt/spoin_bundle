@@ -13,7 +13,7 @@ auth service holds the private key.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 from uuid import UUID
 
 import jwt
@@ -51,10 +51,13 @@ def create_refresh_token(user_id: UUID, settings: Settings) -> str:
 
 def decode_token(token: str, settings: Settings) -> dict[str, Any]:
     """Decode and verify a JWT. Raises ``jwt.PyJWTError`` on any failure."""
-    return jwt.decode(
-        token,
-        settings.jwt_secret_key,
-        algorithms=[settings.jwt_algorithm],
+    return cast(
+        dict[str, Any],
+        jwt.decode(
+            token,
+            settings.jwt_secret_key,
+            algorithms=[settings.jwt_algorithm],
+        ),
     )
 
 

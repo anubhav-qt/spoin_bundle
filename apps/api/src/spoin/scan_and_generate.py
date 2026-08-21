@@ -19,9 +19,7 @@ import asyncio
 import json
 import logging
 import sys
-import uuid
-from datetime import UTC, datetime
-from typing import Any, cast
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,61 +35,73 @@ from spoin.generation.quota import QuotaExhaustedError
 logger = logging.getLogger("spoin.scan_and_generate")
 
 
-async def find_incomplete_topics(
-    session: AsyncSession, *, limit: int = 1
-) -> list[dict[str, Any]]:
+async def find_incomplete_topics(session: AsyncSession, *, limit: int = 1) -> list[dict[str, Any]]:
     """Query and return incomplete topics ordered by priority and completion deficit."""
 
     # 1. Unstarted topics (no curriculum generated)
     unstarted_rows = (
-        await session.execute(
-            select(Topic)
-            .where(Topic.curriculum_generated_at.is_(None))
-            .order_by(Topic.subscriber_count.desc(), Topic.is_seeded.desc(), Topic.created_at)
+        (
+            await session.execute(
+                select(Topic)
+                .where(Topic.curriculum_generated_at.is_(None))
+                .order_by(Topic.subscriber_count.desc(), Topic.is_seeded.desc(), Topic.created_at)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     candidates: list[dict[str, Any]] = []
 
     for t in unstarted_rows:
-        candidates.append({
-            "topic_id": t.id,
-            "name": t.canonical_name,
-            "status": "unstarted",
-            "curriculum_generated": False,
-            "active_cards": 0,
-            "target_cards": 0,
-            "completion_pct": 0.0,
-            "subscriber_count": t.subscriber_count,
-            "is_seeded": t.is_seeded,
-        })
-
-    # 2. Topics with curriculum but under-target cards
-    started_rows = (
-        await session.execute(
-            select(Topic)
-            .where(Topic.curriculum_generated_at.is_not(None))
-            .order_by(Topic.subscriber_count.desc(), Topic.is_seeded.desc(), Topic.created_at)
-        )
-    ).scalars().all()
-
-    for t in started_rows:
-        subtopics = (
-            await session.execute(select(Subtopic).where(Subtopic.topic_id == t.id))
-        ).scalars().all()
-
-        if not subtopics:
-            candidates.append({
+        candidates.append(
+            {
                 "topic_id": t.id,
                 "name": t.canonical_name,
-                "status": "no_subtopics",
-                "curriculum_generated": True,
+                "status": "unstarted",
+                "curriculum_generated": False,
                 "active_cards": 0,
                 "target_cards": 0,
                 "completion_pct": 0.0,
                 "subscriber_count": t.subscriber_count,
                 "is_seeded": t.is_seeded,
-            })
+            }
+        )
+
+    # 2. Topics with curriculum but under-target cards
+    started_rows = (
+        (
+            await session.execute(
+                select(Topic)
+                .where(Topic.curriculum_generated_at.is_not(None))
+                .order_by(Topic.subscriber_count.desc(), Topic.is_seeded.desc(), Topic.created_at)
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    for t in started_rows:
+        subtopics = (
+            (await session.execute(select(Subtopic).where(Subtopic.topic_id == t.id)))
+            .scalars()
+            .all()
+        )
+
+        if not subtopics:
+            candidates.append(
+                {
+                    "topic_id": t.id,
+                    "name": t.canonical_name,
+                    "status": "no_subtopics",
+                    "curriculum_generated": True,
+                    "active_cards": 0,
+                    "target_cards": 0,
+                    "completion_pct": 0.0,
+                    "subscriber_count": t.subscriber_count,
+                    "is_seeded": t.is_seeded,
+                }
+            )
             continue
 
         target_cards = sum(s.target_cards for s in subtopics)
@@ -105,17 +115,19 @@ async def find_incomplete_topics(
 
         if active_cards < target_cards:
             pct = (active_cards / target_cards * 100.0) if target_cards > 0 else 100.0
-            candidates.append({
-                "topic_id": t.id,
-                "name": t.canonical_name,
-                "status": "under_target",
-                "curriculum_generated": True,
-                "active_cards": active_cards,
-                "target_cards": target_cards,
-                "completion_pct": round(pct, 1),
-                "subscriber_count": t.subscriber_count,
-                "is_seeded": t.is_seeded,
-            })
+            candidates.append(
+                {
+                    "topic_id": t.id,
+                    "name": t.canonical_name,
+                    "status": "under_target",
+                    "curriculum_generated": True,
+                    "active_cards": active_cards,
+                    "target_cards": target_cards,
+                    "completion_pct": round(pct, 1),
+                    "subscriber_count": t.subscriber_count,
+                    "is_seeded": t.is_seeded,
+                }
+            )
 
     # Sort candidates by:
     # 1. unstarted first (or 0% complete)
@@ -178,33 +190,39 @@ async def process_incomplete_topics(
                     topic_ids=[topic_id],
                 )
             logger.info("Completed generation pipeline for topic: %s", candidate["name"])
-            reports.append({
-                "topic": candidate["name"],
-                "topic_id": str(topic_id),
-                "status": "success",
-                "report": generation_report,
-            })
+            reports.append(
+                {
+                    "topic": candidate["name"],
+                    "topic_id": str(topic_id),
+                    "status": "success",
+                    "report": generation_report,
+                }
+            )
         except QuotaExhaustedError as exc:
             logger.warning(
                 "Daily quota reached while processing topic %s: %s. Pausing for tomorrow.",
                 candidate["name"],
                 exc,
             )
-            reports.append({
-                "topic": candidate["name"],
-                "topic_id": str(topic_id),
-                "status": "quota_exhausted",
-                "error": str(exc),
-            })
+            reports.append(
+                {
+                    "topic": candidate["name"],
+                    "topic_id": str(topic_id),
+                    "status": "quota_exhausted",
+                    "error": str(exc),
+                }
+            )
             break
         except Exception as exc:
             logger.exception("Error processing topic %s: %s", candidate["name"], exc)
-            reports.append({
-                "topic": candidate["name"],
-                "topic_id": str(topic_id),
-                "status": "error",
-                "error": str(exc),
-            })
+            reports.append(
+                {
+                    "topic": candidate["name"],
+                    "topic_id": str(topic_id),
+                    "status": "error",
+                    "error": str(exc),
+                }
+            )
 
     return reports
 

@@ -110,7 +110,7 @@ warn_unreachable = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["pgvector.*", "fastembed.*", "procrastinate.*"]
+module = ["pgvector.*", "fastembed.*", "procrastinate.*", "bcrypt.*", "psutil.*"]
 ignore_missing_imports = true
 
 # ----------------------------------------------------------------- pytest -----

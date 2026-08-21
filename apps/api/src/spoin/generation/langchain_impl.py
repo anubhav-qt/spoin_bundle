@@ -497,7 +497,9 @@ class GeminiContentGenerator(ContentGenerator):
                 # 401/403: key disabled, service account invalid, or unauthenticated.
                 # In either case, mark this cell exhausted for today and rotate to the next key.
                 # Anything else (e.g. malformed request, bad schema) re-raises immediately.
-                if not isinstance(real_error, ClientError) or real_error.code not in (401, 403, 429):
+                if not isinstance(real_error, ClientError) or (
+                    real_error.code not in (401, 403, 429)
+                ):
                     raise
                 if real_error.code in (401, 403):
                     logger.warning(

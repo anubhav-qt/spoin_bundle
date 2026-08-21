@@ -39,7 +39,7 @@ useful than the decision itself.
 |---|---|---|
 | [0001](0001-python-fastapi-over-node.md) | Python + FastAPI over Node/NestJS | Accepted |
 | [0002](0002-langchain-behind-an-interface.md) | LangChain, confined behind `ContentGenerator` | Accepted |
-| [0003](0003-free-tier-first.md) | Free-tier-first infrastructure with a paid upgrade path | Accepted |
+| [0003](0003-free-tier-first.md) | Free-tier-first infrastructure with a paid upgrade path | Accepted (amended by 0048, extended by 0049) |
 | [0004](0004-topic-canonicalization.md) | Shared canonical topics with per-user display names | Accepted |
 | [0005](0005-batch-llm-calls.md) | Batch every LLM call; never economize on tokens | Accepted |
 | [0006](0006-demand-driven-pool-fill.md) | Demand-driven pool fill with degraded serving and hysteresis | Accepted (amended by 0007) |
@@ -84,4 +84,6 @@ useful than the decision itself.
 | [0045](0045-settings-surface-and-user-preferences.md) | A Settings surface, with preferences on the user row and no parallel system | Accepted |
 | [0046](0046-one-collection-surface.md) | One collection surface shared by Saved, Liked, Profile and Settings | Accepted |
 | [0047](0047-removal-of-legacy-concurrency-semaphore.md) | Remove legacy concurrency semaphore; QuotaGovernor manages full cluster concurrency | Accepted (amends 0024, 0026, 0028) |
+| [0048](0048-cockroachdb-over-neon.md) | CockroachDB Basic over Neon, for corpus storage headroom | Accepted (amends 0003) |
+| [0049](0049-no-message-broker-in-v1.md) | No message broker in v1; Kafka rejected, not deferred-by-accident | Accepted (extends 0003 §4) |
 

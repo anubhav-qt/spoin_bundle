@@ -23,6 +23,16 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0012](0012-question-generation-failure-visibility.md) | Diagnose silent question-generation failures for specific subtopics | mostly resolved, see doc |
 | [0013](0013-card-preview-swap-not-animated.md) | Collapsed-state preview swaps instantly while the body around it animates | unassigned |
 | [0015](0015-topic-mastery-and-retention-mode.md) | Topic mastery message + retention/spaced-repetition mode once a topic is fully read | unassigned |
+| [0016](0016-cockroachdb-spike.md) | CockroachDB viability spike -- **go/no-go gate for ADR-0048** | unassigned |
+| [0017](0017-sql-portability-fixes.md) | Fix the Postgres-only SQL the spike found | blocked on 0016 |
+| [0018](0018-alembic-on-cockroachdb.md) | Make the Alembic chain apply cleanly on CockroachDB | blocked on 0016 |
+| [0019](0019-transaction-retry-boundary.md) | A transaction retry boundary for CockroachDB's `40001` errors | blocked on 0016 |
+| [0020](0020-corpus-migration-and-parity.md) | Move the live corpus to CockroachDB, and prove nothing was lost | blocked on 0017-0019 |
+| [0021](0021-cockroachdb-cutover.md) | Cut over to CockroachDB Basic, and instrument both meters | blocked on 0020 |
+
+Tasks 0016-0021 are one sequence, gated on 0016. Read
+[ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and
+[ADR-0049](../adr/0049-no-message-broker-in-v1.md) before proposing to add Kafka to it.
 
 ## Closed
 

@@ -1,8 +1,22 @@
 # ADR-0003: Free-tier-first infrastructure, with a config-only upgrade path
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by 0048, extended by 0049)
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
+
+> **Amended 2026-08-22 by [ADR-0048](0048-cockroachdb-over-neon.md).** §2's table below
+> still names Neon as the database. It is now CockroachDB Basic — its 10 GiB free tier
+> against Neon's 500 MB, because the corpus target grew to 1,000+ topics (~5 GB) and
+> Neon's free tier runs out around 100. **The reasoning in this ADR is unchanged and
+> still governs**: §2's rule that no accommodation may require a rewrite to undo is why
+> that swap was acceptable, and scaling past 10 GiB remains a billing toggle. The one
+> claim that no longer holds unqualified is in §Context — storage is still not the
+> binding constraint on *generation*, but it became the binding constraint on *corpus
+> size* at the new target.
+>
+> **Extended 2026-08-22 by [ADR-0049](0049-no-message-broker-in-v1.md).** §4's "no Redis
+> in v1" reasoning was applied to Kafka and message brokers generally, and reached the
+> same answer for the same reasons.
 
 ## Context
 

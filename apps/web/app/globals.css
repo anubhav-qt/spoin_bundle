@@ -971,6 +971,12 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  /* Pinned to .card-close's 22px so mounting/unmounting that button on
+     expand doesn't change the row's own height (align-items: center would
+     otherwise stretch the row to fit it) and shift the title/summary below
+     by the difference. Every other child (topic name, dots, "· Read") sits
+     well under 22px on its own. */
+  min-height: 22px;
   margin-bottom: 7px;
   font-family: var(--font-mono);
   font-size: 10.5px;

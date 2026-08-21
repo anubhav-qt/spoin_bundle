@@ -14,6 +14,7 @@
  */
 
 import { api, type EngagementEvent, type EngagementKind } from "./api";
+import { invalidate } from "./refresh";
 
 const FLUSH_INTERVAL_MS = 5000;
 
@@ -65,6 +66,12 @@ class EngagementBuffer {
     });
 
     if (URGENT.has(kind)) this.flushing = this.flush();
+
+    // Stales the collection view a like/bookmark just changed the membership
+    // of, so it re-fetches next time it's looked at instead of showing a
+    // list that's quietly out of date with what the feed just did.
+    if (kind === "like" || kind === "unlike") invalidate("liked");
+    if (kind === "bookmark" || kind === "unbookmark") invalidate("saved");
   }
 
   /** Resolves once the most recent urgent flush (if any) has settled. */

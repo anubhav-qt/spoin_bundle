@@ -24,6 +24,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { api, type SavedCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { useRefreshEffect } from "@/lib/refresh";
 import { topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
 import { BookmarkIcon, HomeIcon } from "./icons";
@@ -202,6 +203,11 @@ export function SavedView({ topics, onNavigateHome }: Props) {
     void load(activeTopicId, sort);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTopicId, sort]);
+
+  // Manual refresh, or an invalidation from elsewhere (bookmarking/unbookmarking
+  // a card anywhere in the app) — re-fetches the current filter/sort without
+  // needing a remount.
+  useRefreshEffect("saved", () => void load(activeTopicId, sort));
 
   // Client-side search across title + summary + topic name
   const visible = useMemo(() => {

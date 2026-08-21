@@ -28,6 +28,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { type ProfileStatsOut, type User, api } from "@/lib/api";
+import { useRefreshEffect } from "@/lib/refresh";
 import { AvatarMark } from "./icons";
 import { useAuth } from "./AuthProvider";
 import { EditProfileModal } from "./EditProfileModal";
@@ -301,6 +302,10 @@ export function ProfileView() {
     if (!user) return;
     load();
   }, [user, load]);
+
+  // Manual refresh, or an invalidation from elsewhere (a quiz pass moving
+  // the streak, say) — re-fetches the currently viewed month.
+  useRefreshEffect("profile", load);
 
   // Selecting a day is scoped to the month it was selected in.
   useEffect(() => setSelectedDay(null), [year, month]);

@@ -25,6 +25,7 @@ import {
   type QuizFreeTextSubmitResult,
   type QuizStart,
 } from "@/lib/api";
+import { invalidate } from "@/lib/refresh";
 import { CheckIcon, CloseIcon } from "./icons";
 
 interface Props {
@@ -112,6 +113,8 @@ export function QuizModal({ topicId, topicName, difficulty, onClose, onGraded }:
       setFinal(result);
       setPhase("done");
       onGraded();
+      // A passed quiz can move the streak/momentum figures on Profile.
+      invalidate("profile");
     } catch (cause) {
       setSubmitError(
         cause instanceof ApiError ? cause.message : "Couldn't grade your written answer",

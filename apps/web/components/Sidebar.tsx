@@ -12,26 +12,62 @@
  */
 
 import { useAuth } from "./AuthProvider";
-import { BookmarkIcon, GearIcon, HeartIcon, HomeIcon, LayersIcon, NoteIcon, UserIcon, LogoutIcon } from "./icons";
+import {
+  BookmarkIcon,
+  GearIcon,
+  HeartIcon,
+  HomeIcon,
+  LayersIcon,
+  NoteIcon,
+  RefreshIcon,
+  UserIcon,
+  LogoutIcon,
+} from "./icons";
 
 const STUBS = [{ label: "Deep Dive", icon: LayersIcon }] as const;
 
 export type ShellView = "feed" | "notes" | "liked" | "saved" | "profile" | "settings";
 
+const VIEW_LABEL: Record<ShellView, string> = {
+  feed: "home",
+  notes: "notes",
+  liked: "liked",
+  saved: "saved",
+  profile: "profile",
+  settings: "settings",
+};
+
 interface Props {
   onReset: () => void;
+  /** Refreshes whichever view is currently open — the header control next to
+   *  the wordmark, not the dev-reset easter egg the wordmark itself is. */
+  onRefresh: () => void;
   view: ShellView;
   onNavigate: (view: ShellView) => void;
 }
 
-export function Sidebar({ onReset, view, onNavigate }: Props) {
+export function Sidebar({ onReset, onRefresh, view, onNavigate }: Props) {
   const { logout } = useAuth();
 
   return (
     <nav className="rail-left" aria-label="Primary">
-      <button type="button" className="sidebar-mark mono" onClick={onReset} aria-label="spoin">
-        sp<span className="sidebar-mark-accent">o</span>in
-      </button>
+      <div className="sidebar-topbar">
+        <button type="button" className="sidebar-mark mono" onClick={onReset} aria-label="spoin">
+          sp<span className="sidebar-mark-accent">o</span>in
+        </button>
+
+        <button
+          type="button"
+          className="sidebar-refresh"
+          onClick={onRefresh}
+          aria-label={`Refresh ${VIEW_LABEL[view]}`}
+        >
+          <span className="sidebar-refresh-icon">
+            <RefreshIcon />
+          </span>
+          <span className="sidebar-refresh-label">Refresh</span>
+        </button>
+      </div>
 
       <button
         type="button"

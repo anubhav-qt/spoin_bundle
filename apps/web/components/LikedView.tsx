@@ -21,6 +21,7 @@ import { AnimatePresence } from "framer-motion";
 
 import { api, type LikedCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { useRefreshEffect } from "@/lib/refresh";
 import { topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
 import { HeartIcon, HomeIcon } from "./icons";
@@ -74,6 +75,11 @@ export function LikedView({ topics, onNavigateHome }: Props) {
     void load(activeTopicId, sort);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTopicId, sort]);
+
+  // Manual refresh, or an invalidation from elsewhere (liking/unliking a
+  // card anywhere in the app) — re-fetches the current filter/sort without
+  // needing a remount.
+  useRefreshEffect("liked", () => void load(activeTopicId, sort));
 
   // Client-side search filter over the already-fetched rows.
   const visible = useMemo(() => {

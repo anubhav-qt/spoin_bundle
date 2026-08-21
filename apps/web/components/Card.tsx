@@ -41,6 +41,7 @@ import katex from "katex";
 
 import { api, type ArchetypeTag, type Card as CardModel, type Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
+import { invalidate } from "@/lib/refresh";
 import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
 import {
   BookmarkIcon,
@@ -368,12 +369,14 @@ export function Card({
           await api.deleteNote(card.id);
           setSavedNote(null);
           onNoteChange?.(card.id, null);
+          invalidate("notes");
         }
       } else {
         const result = await api.saveNote(card.id, trimmed);
         setSavedNote(result.body);
         onNoteChange?.(card.id, result.body);
         engagement.record(card.id, "note");
+        invalidate("notes");
       }
     } finally {
       setNoteSaving(false);
@@ -388,6 +391,7 @@ export function Card({
       setSavedNote(null);
       setNoteDraft("");
       onNoteChange?.(card.id, null);
+      invalidate("notes");
     } finally {
       setNoteSaving(false);
     }

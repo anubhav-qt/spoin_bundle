@@ -1721,8 +1721,18 @@ body.custom-cursor-active textarea {
    `align-items: stretch` regardless of its own specified `display`. Without
    `align-self`, the button was a 275px-wide invisible rectangle instead of
    sized to its own text. */
+/* Wordmark (left) and the refresh control (right), sharing one row. The
+   wordmark keeps `align-self` unset here on purpose — this wrapper is a row,
+   not `.rail-left`'s own column, so the "blockified/stretched" trap the old
+   comment on `.sidebar-mark` described doesn't apply inside it. */
+.sidebar-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 20px;
+}
+
 .sidebar-mark {
-  align-self: start;
   border: none;
   background: transparent;
   text-align: left;
@@ -1731,11 +1741,70 @@ body.custom-cursor-active textarea {
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--fg);
-  padding: 8px 12px 20px;
+  padding: 8px;
 }
 
 .sidebar-mark-accent {
   color: var(--accent);
+}
+
+/* Compact icon button that expands to reveal a text label on hover/focus —
+   collapsed by default so it doesn't compete with the wordmark for space,
+   but discoverable and namable once you're looking right at it. Refreshes
+   whichever view (`view` in AppShell) is currently open. */
+.sidebar-refresh {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: none;
+  background: transparent;
+  color: var(--fg-2);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+
+.sidebar-refresh:hover,
+.sidebar-refresh:focus-visible {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+
+.sidebar-refresh-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+.sidebar-refresh-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sidebar-refresh-label {
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 13px;
+  transition: max-width var(--dur-2) var(--ease), margin var(--dur-2) var(--ease),
+    opacity var(--dur-1) var(--ease);
+}
+
+.sidebar-refresh:hover .sidebar-refresh-label,
+.sidebar-refresh:focus-visible .sidebar-refresh-label {
+  max-width: 60px;
+  margin-left: 6px;
+  opacity: 1;
 }
 
 .nav-item {

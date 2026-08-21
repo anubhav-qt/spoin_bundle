@@ -90,8 +90,11 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
   }, []);
 
   // -- data -----------------------------------------------------------------
+  // Returns whether the caller should try loading yet another page right
+  // away (succeeded and the feed isn't exhausted) — see the infinite-scroll
+  // effect below for why that matters.
   const loadPage = useCallback(
-    async (reset: boolean) => {
+    async (reset: boolean): Promise<boolean> => {
       if (reset) {
         setLoading(true);
         position.current = undefined;
@@ -105,24 +108,42 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
         const page = await api.feed(position.current, selected);
         // A newer loadPage call was issued while this one was in flight —
         // its result (or the one still pending) is authoritative instead.
-        if (requestId !== loadRequestId.current) return;
+        if (requestId !== loadRequestId.current) return false;
 
         position.current = page.next_position;
 
+        // A card the server ranks as UNSEEN can still be one this reader has
+        // already scrolled past without dwelling on it long enough to
+        // register as SEEN server-side (ADR-0010/0011 — a scroll-past alone
+        // is deliberately not enough). Once a slate rebuilds, ranking is
+        // mostly stable short-term (quality/affinity/coverage don't move
+        // without new engagement, only a small exploration slice is
+        // randomized), so a fast scroll with nothing actually read can get
+        // handed back mostly the same page it already has. `addedCount`
+        // catches that: a page that resolved fine but contributed nothing
+        // new is functionally the end of what's servable RIGHT NOW.
+        let addedCount = 0;
         setCards((current) => {
-          if (reset) return page.cards;
+          if (reset) {
+            addedCount = page.cards.length;
+            return page.cards;
+          }
           // Belt and braces against a duplicate slipping through a slate refill.
           // A visibly repeated card is the most damaging feed bug there is.
           const known = new Set(current.map((c) => c.id));
-          return [...current, ...page.cards.filter((c) => !known.has(c.id))];
+          const fresh = page.cards.filter((c) => !known.has(c.id));
+          addedCount = fresh.length;
+          return [...current, ...fresh];
         });
 
         setDegraded(page.degraded);
         setExhausted(page.exhausted);
         setError(null);
+        return !page.exhausted && addedCount > 0;
       } catch (cause) {
-        if (requestId !== loadRequestId.current) return;
+        if (requestId !== loadRequestId.current) return false;
         setError(cause instanceof Error ? cause.message : "Unknown error");
+        return false;
       } finally {
         if (requestId === loadRequestId.current) {
           setLoading(false);
@@ -156,12 +177,31 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
     const node = sentinel.current;
     if (node === null || exhausted || loading) return;
 
+    // IntersectionObserver only calls back on a boundary CROSSING (entering
+    // or leaving the rootMargin-expanded viewport) — it does not fire again
+    // just because more cards got appended while the sentinel stayed
+    // continuously intersecting the whole time. On a short page (or a tall
+    // viewport, or a page-2 that's mostly short cards), that's exactly what
+    // happens: one page-2 loads, the sentinel never leaves the 600px zone
+    // afterward, and the feed sits stuck forever with no further scroll able
+    // to re-trigger a callback that was never going to fire again. Tracking
+    // the latest known state here and re-checking it once each load settles
+    // closes that gap — the loop keeps pulling pages for as long as the
+    // sentinel stays in view, the same as a user who kept scrolling would.
+    let stillIntersecting = false;
+
+    const maybeLoadMore = () => {
+      if (!stillIntersecting || loadingMoreRef.current) return;
+      loadingMoreRef.current = true;
+      void loadPage(false).then((shouldContinue) => {
+        if (shouldContinue) maybeLoadMore();
+      });
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !loadingMoreRef.current) {
-          loadingMoreRef.current = true;
-          void loadPage(false);
-        }
+        stillIntersecting = entry.isIntersecting;
+        maybeLoadMore();
       },
       // Prefetch a screen early, so the next page is usually already there.
       { rootMargin: "600px" },

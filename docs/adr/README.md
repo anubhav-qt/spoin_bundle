@@ -46,7 +46,7 @@ useful than the decision itself.
 | [0007](0007-curriculum-driven-generation.md) | Curriculum-driven generation with a bounded, completable corpus | Accepted |
 | [0008](0008-local-gpu-generation.md) | Local GPU generation for seed content, cloud verification | Accepted |
 | [0009](0009-quiz-gated-progression.md) | Quiz-gated difficulty progression | Accepted (amended by 0027) |
-| [0010](0010-feed-serving.md) | Feed serving: stratified selection, linear ranking, slate pagination | Accepted |
+| [0010](0010-feed-serving.md) | Feed serving: stratified selection, linear ranking, slate pagination | Accepted (amended by 0050) |
 | [0011](0011-engagement.md) | Engagement: append-only events, mutable state, derived aggregates | Accepted |
 | [0012](0012-feed-visual-design.md) | Feed visual design: Thread layout, five committed palettes | Accepted |
 | [0013](0013-topic-relationship-graph.md) | Topic-relationship graph: request-time embedding similarity, topics as nodes | Superseded by 0014 |
@@ -86,4 +86,5 @@ useful than the decision itself.
 | [0047](0047-removal-of-legacy-concurrency-semaphore.md) | Remove legacy concurrency semaphore; QuotaGovernor manages full cluster concurrency | Accepted (amends 0024, 0026, 0028) |
 | [0048](0048-cockroachdb-over-neon.md) | CockroachDB Basic over Neon, for corpus storage headroom | Accepted (amends 0003) |
 | [0049](0049-no-message-broker-in-v1.md) | No message broker in v1; Kafka rejected, not deferred-by-accident | Accepted (extends 0003 §4) |
+| [0050](0050-shown-consumes-a-card.md) | Being shown a card consumes it; a difficulty turns over instead of running dry | Accepted (amends 0010) |
 

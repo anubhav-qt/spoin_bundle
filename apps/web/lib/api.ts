@@ -70,7 +70,11 @@ export interface Topic {
   slug: string;
   is_custom: boolean;
   current_difficulty: Difficulty;
-  /** 0-359, or null to use the deterministic default (ADR-0034). */
+  /** 0-359, -1 to opt out of topic color entirely (ADR-0051, follow the
+   *  theme's own accent), or null to use the deterministic default
+   *  (ADR-0034). Read through `topicHue()`/`explicitTopicHue()`
+   *  (`lib/topicColor.ts`), never directly -- the sentinel renders as a real
+   *  (red) hue if fed straight into `oklch()`. */
   accent_hue: number | null;
 }
 

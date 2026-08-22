@@ -3453,6 +3453,28 @@ body.custom-cursor-active textarea {
   border-color: var(--fg);
 }
 
+/* ADR-0051: "no color" opt-out -- filled with the theme's own plain accent
+   (honest, since that is exactly what the card renders) plus a diagonal
+   slash, the conventional "no fill" affordance, so it reads as distinct
+   from a hue preset rather than as one more color choice. */
+.modal-color-swatch-none {
+  background: var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-color-swatch-none::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    var(--bg) calc(50% - 1px) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+}
+
 /* -- quiz (ADR-0009) -- */
 .quiz-panel {
   max-height: 88vh;

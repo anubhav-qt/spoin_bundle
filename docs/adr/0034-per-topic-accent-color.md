@@ -1,8 +1,13 @@
 # ADR-0034: Per-topic accent color, composed with the active palette
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by [ADR-0051](0051-topic-color-opt-out.md))
 - **Date:** 2026-08-18
 - **Deciders:** Anubhav
+
+> **Amended 2026-08-22 by [ADR-0051](0051-topic-color-opt-out.md).** `accent_hue`
+> gains a third state, `-1` (`NO_TOPIC_COLOR`), meaning "opt out of topic color
+> entirely, render the plain palette accent" -- alongside `null` (default hue) and
+> `0-359` (a chosen hue) below. Same column, no migration.
 
 ## Context
 

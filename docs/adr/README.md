@@ -70,7 +70,7 @@ useful than the decision itself.
 | [0031](0031-verification-feedback-and-per-tier-gate-durability.md) | Verification rejection feedback, and a per-tier durable gate | Accepted (amends 0030) |
 | [0032](0032-entry-tier-quiz-still-earned.md) | The entry tier's own quiz is still earned, not free | Accepted (amends 0027) |
 | [0033](0033-jwt-auth-and-guest-identity.md) | JWT auth, localStorage token storage, and guest identity via a nullable-email User row | Accepted |
-| [0034](0034-per-topic-accent-color.md) | Per-topic accent color, composed with the active palette via relative color hue rotation | Accepted |
+| [0034](0034-per-topic-accent-color.md) | Per-topic accent color, composed with the active palette via relative color hue rotation | Accepted (amended by 0051) |
 | [0035](0035-hero-card-tutorial-overlay.md) | First-time hero-card tutorial overlay; no new SEEN mechanism needed | Accepted |
 | [0036](0036-topic-discovery-modal.md) | Topic discovery modal replaces the inline Discover list | Partially superseded by 0038 |
 | [0037](0037-site-wide-font-picker.md) | Implement ADR-0023's font picker, site-wide, with live-preview/revert | Accepted |
@@ -87,4 +87,5 @@ useful than the decision itself.
 | [0048](0048-cockroachdb-over-neon.md) | CockroachDB Basic over Neon, for corpus storage headroom | Accepted (amends 0003) |
 | [0049](0049-no-message-broker-in-v1.md) | No message broker in v1; Kafka rejected, not deferred-by-accident | Accepted (extends 0003 §4) |
 | [0050](0050-shown-consumes-a-card.md) | Being shown a card consumes it; a difficulty turns over instead of running dry | Accepted (amends 0010) |
+| [0051](0051-topic-color-opt-out.md) | A "no color" opt-out for per-topic accent, via a sentinel hue | Accepted (amends 0034) |
 

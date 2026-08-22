@@ -25,7 +25,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { api, type SavedCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
 import { useRefreshEffect } from "@/lib/refresh";
-import { topicHue } from "@/lib/topicColor";
+import { explicitTopicHue, topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
 import { BookmarkIcon, HomeIcon } from "./icons";
 
@@ -55,7 +55,7 @@ interface Props {
 
 interface TileProps {
   row: SavedCard;
-  accentHue: number | undefined;
+  accentHue: number | null | undefined;
   onOpen: (row: SavedCard) => void;
 }
 
@@ -73,7 +73,11 @@ function SavedTile({ row, accentHue, onOpen }: TileProps) {
       className="saved-tile"
       onClick={() => onOpen(row)}
       aria-label={`Open card: ${card.title}`}
-      style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as React.CSSProperties) : undefined}
+      style={
+        accentHue !== null && accentHue !== undefined
+          ? ({ "--topic-hue": accentHue } as React.CSSProperties)
+          : undefined
+      }
     >
       {/* Topic + difficulty row */}
       <div className="saved-tile-head">
@@ -105,7 +109,7 @@ function SavedTile({ row, accentHue, onOpen }: TileProps) {
 
 interface OverlayProps {
   row: SavedCard;
-  accentHue: number | undefined;
+  accentHue: number | null | undefined;
   onClose: () => void;
   onUnbookmarked: (cardId: string) => void;
   seenIds: Set<string>;
@@ -403,7 +407,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
             ALL
           </button>
           {savedTopics.map((t) => {
-            const hue = hueByTopicId[t.id];
+            const hue = explicitTopicHue(hueByTopicId[t.id]);
             return (
               <button
                 key={t.id}
@@ -411,11 +415,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
                 className="collection-chip"
                 data-selected={activeTopicId === t.id}
                 onClick={() => handleTopicFilter(t.id)}
-                style={
-                  hue !== undefined && hue !== null
-                    ? ({ "--topic-hue": hue } as React.CSSProperties)
-                    : undefined
-                }
+                style={hue !== null ? ({ "--topic-hue": hue } as React.CSSProperties) : undefined}
               >
                 {t.name.toUpperCase()}
               </button>

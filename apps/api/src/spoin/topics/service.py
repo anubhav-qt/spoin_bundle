@@ -487,7 +487,9 @@ class TopicsService:
     async def set_color(self, user_id: UUID, topic_id: UUID, hue: int | None) -> TopicOut:
         """ADR-0034: per-subscription accent hue, not a shared `Topic` property
         -- two users may color the same topic differently. `hue=None` resets to
-        the deterministic default the client computes itself."""
+        the deterministic default the client computes itself; `hue=-1` opts out
+        of topic color entirely (ADR-0051) -- stored as-is, no special-casing
+        needed here since the client owns both the default and the sentinel."""
 
         user_topic = await self._session.scalar(
             select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)

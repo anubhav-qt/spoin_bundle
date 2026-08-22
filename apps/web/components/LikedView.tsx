@@ -22,7 +22,7 @@ import { AnimatePresence } from "framer-motion";
 import { api, type LikedCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
 import { useRefreshEffect } from "@/lib/refresh";
-import { topicHue } from "@/lib/topicColor";
+import { explicitTopicHue, topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
 import { HeartIcon, HomeIcon } from "./icons";
 
@@ -262,7 +262,7 @@ export function LikedView({ topics, onNavigateHome }: Props) {
             ALL
           </button>
           {likedTopics.map((t) => {
-            const hue = hueByTopicId[t.id];
+            const hue = explicitTopicHue(hueByTopicId[t.id]);
             return (
               <button
                 key={t.id}
@@ -270,11 +270,7 @@ export function LikedView({ topics, onNavigateHome }: Props) {
                 className="collection-chip"
                 data-selected={activeTopicId === t.id}
                 onClick={() => handleTopicFilter(t.id)}
-                style={
-                  hue !== undefined && hue !== null
-                    ? ({ "--topic-hue": hue } as React.CSSProperties)
-                    : undefined
-                }
+                style={hue !== null ? ({ "--topic-hue": hue } as React.CSSProperties) : undefined}
               >
                 {t.name.toUpperCase()}
               </button>

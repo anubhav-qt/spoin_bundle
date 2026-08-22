@@ -23,7 +23,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
 import { api, type Difficulty, type SubtopicProgress, type TopicStats } from "@/lib/api";
-import { defaultTopicHue } from "@/lib/topicColor";
+import { defaultTopicHue, NO_TOPIC_COLOR } from "@/lib/topicColor";
 import { CheckIcon, HeartIcon, BookmarkIcon, NoteIcon, ShareIcon } from "./icons";
 import { QuizModal } from "./QuizModal";
 
@@ -167,6 +167,13 @@ export function TopicStatsModal({
           <div className="modal-color-picker">
             <span className="modal-color-picker-label mono">Card color</span>
             <div className="modal-color-swatches" role="group" aria-label="Topic accent color">
+              <button
+                type="button"
+                className="modal-color-swatch modal-color-swatch-none"
+                data-active={accentHue === NO_TOPIC_COLOR}
+                aria-label="No color — follow the theme"
+                onClick={() => selectHue(NO_TOPIC_COLOR)}
+              />
               {HUE_PRESETS.map((hue) => (
                 <button
                   key={hue}

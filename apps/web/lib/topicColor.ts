@@ -10,6 +10,17 @@
  * in the first place). What hue *choice* actually controls is whether two
  * different topics read as visibly different colors rather than converging
  * on similar-looking hues — that's what the curated set below is for.
+ *
+ * ADR-0051: a topic can also opt OUT of coloring entirely and just render
+ * the palette's plain `--accent`, which is a third state distinct from "use
+ * the default hue" (`accent_hue: null`) and "use this hue"
+ * (`accent_hue: 0-359`). `accent_hue` is stored as a nullable int server-side
+ * (no migration for a third column), so opt-out is the sentinel `-1` rather
+ * than a new field — `topicHue()` maps it to `null`, meaning "set no
+ * `--topic-hue` custom property," and every call site that reads a hue must
+ * go through `topicHue()`/`explicitTopicHue()` rather than reading
+ * `accent_hue` off the wire directly, or the sentinel renders as a real
+ * (red) hue instead of no color.
  */
 
 /** 10 hues spread evenly around the wheel (36° apart) so the first 10
@@ -38,10 +49,31 @@ export function defaultTopicHue(topicId: string, topicIndex?: number): number {
   return hashTopicId(topicId);
 }
 
+/** ADR-0051: the sentinel stored in `accent_hue` meaning "don't tint this
+ *  topic — render the palette's plain `--accent`." Not a real hue; must
+ *  never reach `oklch()`. */
+export const NO_TOPIC_COLOR = -1;
+
+/** The hue to render for this topic, or `null` if it's opted out
+ *  (`accent_hue === NO_TOPIC_COLOR`) — `null` means "set no `--topic-hue`
+ *  custom property," letting `--topic-accent` fall back to the plain
+ *  palette `--accent` (globals.css) exactly as it already does for
+ *  mixed/topicless content. */
 export function topicHue(
   topicId: string,
   accentHue: number | null | undefined,
   topicIndex?: number,
-): number {
+): number | null {
+  if (accentHue === NO_TOPIC_COLOR) return null;
   return accentHue ?? defaultTopicHue(topicId, topicIndex);
+}
+
+/** Like `topicHue`, but for call sites (collection-filter chips in Saved/
+ *  Liked/Notes) that only ever want to tint on an *explicitly chosen* hue,
+ *  never the computed default — so a topic nobody has colored renders as a
+ *  plain chip, and one opted out (or never colored) is indistinguishable
+ *  from the other, which is the point. */
+export function explicitTopicHue(accentHue: number | null | undefined): number | null {
+  if (accentHue === null || accentHue === undefined || accentHue === NO_TOPIC_COLOR) return null;
+  return accentHue;
 }

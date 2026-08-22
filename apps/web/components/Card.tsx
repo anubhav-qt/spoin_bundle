@@ -99,10 +99,12 @@ const DIFFICULTY_RANK: Record<Difficulty, number> = {
 interface Props {
   card: CardModel;
   topicName: string;
-  /** 0-359, or undefined for a mixed/unknown topic — omitted entirely rather
-   *  than defaulted here, so --topic-accent falls back to the plain palette
-   *  accent (ADR-0034) instead of every card converging on hue 0 (red). */
-  accentHue: number | undefined;
+  /** 0-359, null when the topic has explicitly opted out of coloring
+   *  (ADR-0051), or undefined for a mixed/unknown topic — all three leave
+   *  no `--topic-hue` set below, so --topic-accent falls back to the plain
+   *  palette accent (ADR-0034) instead of every card converging on hue 0
+   *  (red). */
+  accentHue: number | null | undefined;
   seen: boolean;
   onSeen: (cardId: string) => void;
   onUnseen: (cardId: string) => void;
@@ -524,7 +526,11 @@ export function Card({
           data-hero={isHero}
           onClick={toggle}
           aria-expanded={expanded}
-          style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as CSSProperties) : undefined}
+          style={
+            accentHue !== null && accentHue !== undefined
+              ? ({ "--topic-hue": accentHue } as CSSProperties)
+              : undefined
+          }
         >
           <div className="card-head">
             {/* Always this user's own name for the topic (ADR-0004). */}

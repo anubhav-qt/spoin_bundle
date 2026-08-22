@@ -85,10 +85,21 @@ async def test_completion_paths_are_recorded_separately(
     assert kinds == {EngagementKind.EXPLICIT_COMPLETE, EngagementKind.DWELL_COMPLETE}
 
 
-async def test_impression_alone_never_marks_seen(
+async def test_impression_marks_shown_but_never_seen(
     session: AsyncSession, corpus: dict[str, Any], settings: Settings
 ) -> None:
-    """Scrolling past never counts. Expansion is required."""
+    """An impression means shown, not read.
+
+    DEFERRED, not SEEN: the card drops out of rotation until this difficulty's
+    cycle turns over, but it contributes nothing to the 80% coverage gate. Only
+    expansion (or an explicit "Got it") does that, which is what keeps quiz
+    unlock a measure of reading rather than of scrolling.
+
+    This used to assert UNSEEN, from when an impression changed nothing at all.
+    That is what left a reader who scrolled without opening anything being served
+    the same slate forever — nothing except deliberate reading ever consumed a
+    card.
+    """
 
     service = EngagementService(session, settings)
     card_id = corpus["cards"][0].id
@@ -100,7 +111,8 @@ async def test_impression_alone_never_marks_seen(
 
     state = await session.scalar(select(UserCardState).where(UserCardState.card_id == card_id))
     assert state is not None
-    assert state.state is SeenState.UNSEEN
+    assert state.state is SeenState.DEFERRED
+    assert state.state is not SeenState.SEEN, "an impression must never satisfy the coverage gate"
 
 
 async def test_implausible_dwell_is_rejected_at_ingest(

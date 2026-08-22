@@ -58,8 +58,19 @@ class FeedPage:
     #: seconds, so an indefinite spinner is a lie.
     degraded: bool
     exhausted: bool
-    #: Slots the mix asked for and the corpus could not supply. The caller enqueues
-    #: a coalesced fill job for each.
+    #: True once any topic on this page is serving a repeat pass. The client says
+    #: so ONCE rather than silently looping -- an unannounced repeat reads as a
+    #: bug, and ADR-0006 is explicit that these states are a design surface.
+    recycling: bool
+    #: Slots the mix asked for and the corpus could not supply. Intended for the
+    #: caller to enqueue a coalesced fill job for each.
+    #:
+    #: NOTE: nothing currently reads this. `routers/feed.py` drops it, so no fill
+    #: job is triggered from a starved read — ADR-0006's demand-driven fill loop
+    #: is only half-wired. Left computed on the short-page path (where it always
+    #: was) rather than extended to recycling reads: it costs roughly one query
+    #: per (topic, stratum) and there is no point paying that on the hot path for
+    #: a value that is discarded.
     starved: list[tuple[UUID, Difficulty]]
 
 
@@ -80,7 +91,7 @@ class FeedService:
         settings = self._settings
         plan = await self._ensure_plan(user_id, topic_filter)
         if not plan.topic_order:
-            return FeedPage([], 0, degraded=False, exhausted=True, starved=[])
+            return FeedPage([], 0, degraded=False, exhausted=True, recycling=False, starved=[])
 
         cursor = plan.position if position is None else position
         card_ids: list[UUID] = []
@@ -132,6 +143,7 @@ class FeedService:
         if len(card_ids) < settings.page_size:
             exhausted = True
             starved = await self._starved_slots(user_id, plan.topic_order)
+        recycling = await self._any_recycling(user_id, plan.topic_order)
 
         plan.position = cursor
         await self._session.flush()
@@ -141,6 +153,7 @@ class FeedService:
             next_position=cursor,
             degraded=degraded,
             exhausted=exhausted,
+            recycling=recycling,
             starved=starved,
         )
 
@@ -269,7 +282,16 @@ class FeedService:
         candidates_by_tier: dict[Difficulty, list[Candidate]] = {}
         for difficulty in Difficulty:
             found = await self._candidates(user_id, topic_id, difficulty)
+            # Nothing eligible: either this difficulty is genuinely empty, or
+            # everything in it has been shown and is sitting in the DEFERRED
+            # pile waiting for the cycle to turn over. Only the second case
+            # advances -- see `_maybe_advance_cycle`.
+            if not found and await self._maybe_advance_cycle(user_id, topic_id, difficulty):
+                found = await self._candidates(user_id, topic_id, difficulty)
             candidates_by_tier[difficulty] = [c for c in found if c.card_id not in blocked]
+
+        cycles = await self._cycles(user_id, topic_id)
+        recycled = {d for d, cycle in cycles.items() if cycle > 0}
 
         read_fraction = await self._tier_read_fraction(user_id, topic_id, tier)
         mix_override = dynamic_mix(
@@ -289,15 +311,22 @@ class FeedService:
             mix_override=mix_override,
         )
 
+        picker = rng or random.Random()
         picked: list[Candidate] = []
         for fill in outcome.fills:
-            picked += rank(
-                candidates_by_tier[fill.difficulty],
-                settings,
-                now=now,
-                limit=fill.served,
-                rng=rng,
-            )
+            pool = candidates_by_tier[fill.difficulty]
+            if fill.difficulty in recycled:
+                # Second pass and beyond: rank's inputs have stopped meaning
+                # anything. `coverage_need` is ~0 everywhere (the reader has been
+                # shown all of it) and recency/quality would hand back the same
+                # order every cycle, so a re-read would feel like a replay rather
+                # than a reshuffle. Shuffle instead; `diversify` below still stops
+                # one subtopic clumping.
+                shuffled = list(pool)
+                picker.shuffle(shuffled)
+                picked += shuffled[: fill.served]
+            else:
+                picked += rank(pool, settings, now=now, limit=fill.served, rng=rng)
 
         if not picked:
             return None
@@ -399,6 +428,96 @@ class FeedService:
             .limit(self._settings.slate_size * 4)
         )
 
+    async def _cycles(self, user_id: UUID, topic_id: UUID) -> dict[Difficulty, int]:
+        """This user's cycle number per difficulty for one topic. Absent row = 0,
+        which is the first pass through freshly-generated content."""
+
+        rows = (
+            await self._session.execute(
+                select(UserTopicCycle.difficulty, UserTopicCycle.cycle).where(
+                    UserTopicCycle.user_id == user_id,
+                    UserTopicCycle.topic_id == topic_id,
+                )
+            )
+        ).all()
+        # `dict(...)` over a generator rather than a dict comprehension: the
+        # comprehension is just `dict()` with extra steps (ruff C416), and the
+        # annotated local keeps mypy --strict from seeing a bare Any return.
+        # Same shape as `TopicsService.stats`'s event_counts.
+        cycles: dict[Difficulty, int] = dict(tuple(row) for row in rows)
+        return cycles
+
+    async def _maybe_advance_cycle(
+        self, user_id: UUID, topic_id: UUID, difficulty: Difficulty
+    ) -> bool:
+        """Turn this difficulty over so its DEFERRED pile becomes eligible again.
+
+        `UserTopicCycle`'s docstring has always promised this ("advances when no
+        UNSEEN cards remain at that difficulty") and nothing implemented it: the
+        table was read in two places and written in none, so `cycle` was
+        permanently 0, `deferred_cycle` was permanently 0, and the eligibility
+        predicate `deferred_cycle < current_cycle` was `0 < 0` -- false forever.
+        The second-chance pass ADR-0010 designed could never happen.
+
+        Two conditions, both required:
+
+        - **No UNSEEN left.** A card the reader has never been shown always
+          outranks one they have. Advancing early would start repeating while
+          fresh material was still sitting there.
+        - **Something IS deferred at the current cycle.** Otherwise there is
+          nothing to release and this is a genuinely empty difficulty -- bumping
+          the counter would just paper over a starved pool that ought to be
+          reported and generated into (see `_starved_slots`).
+
+        Called only when a stratum came back empty, so the cost is two EXISTS
+        queries on a path that was about to serve nothing anyway. No aggregation
+        over event history, per this module's second rule.
+        """
+
+        current = (await self._cycles(user_id, topic_id)).get(difficulty, 0)
+
+        base = (
+            select(Card.id)
+            .join(Subtopic, Subtopic.id == Card.subtopic_id)
+            .outerjoin(
+                UserCardState,
+                and_(UserCardState.card_id == Card.id, UserCardState.user_id == user_id),
+            )
+            .where(
+                Card.topic_id == topic_id,
+                Card.difficulty == difficulty,
+                Card.status == CardStatus.ACTIVE,
+            )
+        )
+
+        has_unseen = await self._session.scalar(
+            base.where(
+                or_(UserCardState.state.is_(None), UserCardState.state == SeenState.UNSEEN)
+            ).limit(1)
+        )
+        if has_unseen is not None:
+            return False
+
+        has_deferred = await self._session.scalar(
+            base.where(
+                UserCardState.state == SeenState.DEFERRED,
+                UserCardState.deferred_cycle <= current,
+            ).limit(1)
+        )
+        if has_deferred is None:
+            return False
+
+        await self._session.execute(
+            pg_insert(UserTopicCycle)
+            .values(user_id=user_id, topic_id=topic_id, difficulty=difficulty, cycle=current + 1)
+            .on_conflict_do_update(
+                index_elements=["user_id", "topic_id", "difficulty"],
+                set_={"cycle": UserTopicCycle.cycle + 1},
+            )
+        )
+        await self._session.flush()
+        return True
+
     async def _candidates(
         self, user_id: UUID, topic_id: UUID, difficulty: Difficulty
     ) -> list[Candidate]:
@@ -458,6 +577,27 @@ class FeedService:
         if found is None or not found[1]:
             return 0.0
         return float(found[0]) / float(found[1])
+
+    async def _any_recycling(self, user_id: UUID, topic_ids: list[UUID]) -> bool:
+        """Is any topic on this page past its first pass?
+
+        One indexed lookup against `user_topic_cycle`, whose rows only exist once
+        a difficulty has actually turned over -- so for a reader still on fresh
+        content this finds nothing and costs nothing.
+        """
+
+        if not topic_ids:
+            return False
+        found = await self._session.scalar(
+            select(UserTopicCycle.cycle)
+            .where(
+                UserTopicCycle.user_id == user_id,
+                UserTopicCycle.topic_id.in_(topic_ids),
+                UserTopicCycle.cycle > 0,
+            )
+            .limit(1)
+        )
+        return found is not None
 
     async def _starved_slots(
         self, user_id: UUID, topic_ids: list[UUID]

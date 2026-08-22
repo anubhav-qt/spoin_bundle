@@ -91,6 +91,7 @@ async def get_feed(
         next_position=page.next_position,
         degraded=page.degraded,
         exhausted=page.exhausted,
+        recycling=page.recycling,
     )
 
 

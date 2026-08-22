@@ -58,6 +58,9 @@ export interface Feed {
   degraded: boolean;
   /** True end of feed. Show "more coming soon" — never an indefinite spinner. */
   exhausted: boolean;
+  /** This page includes a repeat pass — everything at some difficulty has been
+   *  shown once and is being served again in a fresh order. */
+  recycling: boolean;
 }
 
 export interface Topic {

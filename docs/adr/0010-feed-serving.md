@@ -3,6 +3,12 @@
 - **Status:** Accepted
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0050](0050-shown-consumes-a-card.md) -- "Scrolling past never
+  counts" below now applies to *progression* only: an impression marks a card
+  DEFERRED and removes it from rotation, while still contributing nothing to the 80%
+  coverage gate. ADR-0050 also implements "the cycle advances when no `UNSEEN` cards
+  remain at that difficulty", which this ADR specified and nothing ever built. The
+  body below is left as originally written.
 
 > **Update (2026-08-18):** `DIFFICULTY_MIX[tier]` below is now the *ceiling* a
 > user's mix ramps toward, not a flat value from card one. A topic+tier starts

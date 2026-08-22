@@ -132,9 +132,22 @@ class EngagementService:
         assert isinstance(kind, EngagementKind)
 
         if kind is EngagementKind.IMPRESSION:
-            # Scrolling past never counts. An impression records that the card was
-            # shown and nothing more.
-            await self._ensure_state(user_id, row, SeenState.UNSEEN)
+            # An impression means the card was actually on screen long enough to
+            # be looked at (the client only emits one after ~1s of continuous
+            # visibility, not on a fast flick past). That makes it "shown", which
+            # is DEFERRED -- eligible again, but only after the rest of this
+            # difficulty has had its turn.
+            #
+            # This used to write UNSEEN with the comment "scrolling past never
+            # counts", which meant nothing except deliberate reading ever
+            # consumed a card. A reader who scrolled without opening anything got
+            # the same slate back forever, because every card stayed eligible.
+            #
+            # DEFERRED is deliberately NOT counted anywhere coverage is: the 80%
+            # quiz gate reads `state == SEEN` exclusively (see
+            # `_bump_subtopic_progress` below), so being shown a card never
+            # advances progression. Only reading it does.
+            await self._defer(user_id, row)
             return
 
         if kind is EngagementKind.SKIP:
@@ -170,21 +183,12 @@ class EngagementService:
                 )
             )
 
-    async def _ensure_state(self, user_id: UUID, row: dict[str, object], state: SeenState) -> None:
-        await self._session.execute(
-            pg_insert(UserCardState)
-            .values(
-                user_id=user_id,
-                card_id=row["card_id"],
-                topic_id=row["topic_id"],
-                subtopic_id=row["subtopic_id"],
-                state=state,
-            )
-            .on_conflict_do_nothing(index_elements=["user_id", "card_id"])
-        )
-
     async def _defer(self, user_id: UUID, row: dict[str, object]) -> None:
-        """DEFERRED: shown but not expanded. Returns after the cycle completes."""
+        """DEFERRED: shown, but not read. Comes back once this difficulty's
+        cycle advances -- see `feed/service.py`'s `_maybe_advance_cycle`.
+
+        Reached from an impression (the common path: the card was on screen and
+        the reader moved on) and from an explicit SKIP."""
 
         cycle = await self._current_cycle(user_id, row)
         statement = pg_insert(UserCardState).values(

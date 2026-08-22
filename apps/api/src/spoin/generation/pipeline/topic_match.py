@@ -131,7 +131,9 @@ async def match_and_create_topics(
                 )
                 outcomes.append(
                     TopicMatchOutcome(
-                        topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=True
+                        topic_id=str(topic.id),
+                        topic_name=topic.canonical_name,
+                        matched_existing=True,
                     )
                 )
             else:
@@ -143,10 +145,14 @@ async def match_and_create_topics(
                 session.add(topic)
                 await session.flush()
                 topic.embedding = embedding
-                logger.info("topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id)
+                logger.info(
+                    "topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id
+                )
                 outcomes.append(
                     TopicMatchOutcome(
-                        topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=False
+                        topic_id=str(topic.id),
+                        topic_name=topic.canonical_name,
+                        matched_existing=False,
                     )
                 )
 

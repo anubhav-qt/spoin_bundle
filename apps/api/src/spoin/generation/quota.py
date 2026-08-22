@@ -325,7 +325,8 @@ class QuotaGovernor:
                     day.date(),
                 )
                 raise QuotaExhaustedError(
-                    f"All {self.key_count} key(s) x {len(self.ladder)} model(s) exhausted for {day.date()}"
+                    f"All {self.key_count} key(s) x {len(self.ladder)} model(s) "
+                    f"exhausted for {day.date()}"
                 )
 
             # All candidate keys have daily quota remaining but are temporarily rate-limited
@@ -333,7 +334,8 @@ class QuotaGovernor:
             min_wait = min(candidate_wait_times) if candidate_wait_times else 2.0
             sleep_duration = max(0.5, min(min_wait + 0.2, 60.0))
             logger.info(
-                "quota: all available cells at temporary RPM/cooldown limit -- waiting %.1fs before retrying...",
+                "quota: all available cells at temporary RPM/cooldown limit -- "
+                "waiting %.1fs before retrying...",
                 sleep_duration,
             )
             await asyncio.sleep(sleep_duration)

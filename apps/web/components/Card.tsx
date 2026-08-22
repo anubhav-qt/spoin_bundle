@@ -81,6 +81,15 @@ function claimHeroTutorial(): boolean {
  *  decides when the client stops waiting and reports. */
 const DWELL_COMPLETE_MS = 10000;
 
+/** How long a card must stay ≥50% on screen before it counts as shown.
+ *
+ *  An impression is no longer free: it marks the card DEFERRED server-side, so
+ *  it drops out of rotation until this difficulty's cycle comes round again.
+ *  Without a threshold, one fast flick down the feed would consume every card
+ *  it passed. A second is long enough that the reader plausibly saw the card
+ *  and short enough that ordinary browsing still advances the feed. */
+const IMPRESSION_DWELL_MS = 1000;
+
 const DIFFICULTY_RANK: Record<Difficulty, number> = {
   beginner: 1,
   intermediate: 2,
@@ -251,23 +260,47 @@ export function Card({
   // An impression is logged when the card actually enters the viewport, not on
   // render. Without a true denominator `card_quality` is not a rate, and a rate
   // is the only thing stopping old cards dominating the ranker forever.
+  //
+  // It now also has to be *earned*: an impression marks the card shown, which
+  // makes it DEFERRED server-side and takes it out of rotation until this
+  // difficulty's cycle comes round again. Firing the instant 50% of the card
+  // crosses the viewport would let one fast flick burn a whole slate, so the
+  // card must hold that visibility continuously for IMPRESSION_DWELL_MS. Scroll
+  // away before then and the timer is cleared and re-armed next time.
   useEffect(() => {
     const el = article.current;
     if (el === null || impressed.current) return;
 
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const clear = () => {
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !impressed.current) {
+        if (!entry.isIntersecting) {
+          clear();
+          return;
+        }
+        if (impressed.current || timer !== null) return;
+        timer = setTimeout(() => {
+          timer = null;
           impressed.current = true;
           engagement.record(card.id, "impression");
           observer.disconnect();
-        }
+        }, IMPRESSION_DWELL_MS);
       },
       { threshold: 0.5 },
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      clear();
+      observer.disconnect();
+    };
   }, [card.id]);
 
   // Focus pull (ADR-0017): a card mostly in view reads as scale-100/opacity-100,

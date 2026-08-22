@@ -109,6 +109,10 @@ class FeedOut(BaseModel):
     #: True end of feed. The client shows "more coming soon" — never an indefinite
     #: spinner, because on free tier a fill can take hours rather than seconds.
     exhausted: bool
+    #: This page includes a repeat pass: everything at some difficulty has been
+    #: shown once, so it is being served again in a fresh order. Announced once
+    #: rather than silently looping — an unexplained repeat reads as a bug.
+    recycling: bool = False
 
 
 class EngagementEventIn(BaseModel):

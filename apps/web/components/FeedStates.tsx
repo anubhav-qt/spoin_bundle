@@ -23,6 +23,20 @@ export function DegradedNotice() {
   );
 }
 
+export function RecyclingNotice() {
+  return (
+    <div className="notice">
+      <p className="notice-kicker">Second pass</p>
+      <p className="notice-title">You&rsquo;ve seen everything at this level</p>
+      <p className="notice-body">
+        Rather than stopping, these are coming round again in a different order. Nothing
+        new is being hidden from you &mdash; more cards are still being written, and they
+        will appear here as they land.
+      </p>
+    </div>
+  );
+}
+
 export function EndOfFeed() {
   return (
     <div className="notice">

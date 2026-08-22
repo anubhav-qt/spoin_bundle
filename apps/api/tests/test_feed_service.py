@@ -132,11 +132,67 @@ async def test_seen_cards_never_return(
     assert completed not in rebuilt.card_ids
 
 
-async def test_deferred_cards_return_only_after_the_cycle_advances(
+async def test_deferred_is_held_back_while_unseen_cards_remain(
     session: AsyncSession, corpus: dict[str, Any], settings: Settings
 ) -> None:
     """Scrolling past costs the user nothing — but the card does not come straight
-    back either, or the feed would loop on whatever they skipped."""
+    back either, or the feed would loop on whatever they skipped.
+
+    Fresh material always outranks a repeat: while ANY unseen card is left at this
+    difficulty, the deferred one waits.
+    """
+
+    user_id = corpus["user"].id
+    topic_id = corpus["topic"].id
+    service = FeedService(session, Settings(slate_size=10, rank_epsilon=0.0))
+    engagement = EngagementService(session, settings)
+
+    beginners = [card for card in corpus["cards"] if card.difficulty is Difficulty.BEGINNER]
+    skipped = beginners[0].id
+
+    await engagement.ingest(
+        user_id,
+        [IncomingEvent(id=UUID(int=2), card_id=skipped, kind=EngagementKind.SKIP)],
+    )
+
+    state = await session.scalar(
+        select(UserCardState).where(
+            UserCardState.user_id == user_id, UserCardState.card_id == skipped
+        )
+    )
+    assert state is not None
+    assert state.state is SeenState.DEFERRED
+    assert state.deferred_cycle == 0
+
+    # Every other beginner card is still UNSEEN, so there is plenty to serve.
+    slate = await service.build_slate(user_id, topic_id, rng=RNG)
+    assert slate is not None
+    assert skipped not in slate.card_ids, "deferred must wait while unseen cards remain"
+
+    cycle = await session.scalar(
+        select(UserTopicCycle.cycle).where(
+            UserTopicCycle.user_id == user_id,
+            UserTopicCycle.topic_id == topic_id,
+            UserTopicCycle.difficulty == Difficulty.BEGINNER,
+        )
+    )
+    assert cycle is None, "nothing was exhausted, so nothing should have turned over"
+
+
+async def test_difficulty_turns_over_once_everything_has_been_shown(
+    session: AsyncSession, corpus: dict[str, Any], settings: Settings
+) -> None:
+    """The second pass, which is the whole point of DEFERRED.
+
+    `UserTopicCycle` promised this in its docstring and nothing implemented it:
+    the table was read in two places and written in none, so `cycle` was
+    permanently 0 and the eligibility predicate `deferred_cycle < current_cycle`
+    was `0 < 0` — the deferred pile could never be released. A reader who reached
+    the end of a difficulty simply ran out of feed.
+
+    Now the difficulty turns over on its own, in `build_slate`, the moment
+    nothing unseen is left and something is waiting.
+    """
 
     user_id = corpus["user"].id
     topic_id = corpus["topic"].id
@@ -165,29 +221,59 @@ async def test_deferred_cards_return_only_after_the_cycle_advances(
         ],
     )
 
-    state = await session.scalar(
-        select(UserCardState).where(
-            UserCardState.user_id == user_id, UserCardState.card_id == skipped
+    slate = await service.build_slate(user_id, topic_id, rng=RNG)
+    assert slate is not None
+    assert skipped in slate.card_ids, "the deferred card must come back once nothing else is left"
+
+    cycle = await session.scalar(
+        select(UserTopicCycle.cycle).where(
+            UserTopicCycle.user_id == user_id,
+            UserTopicCycle.topic_id == topic_id,
+            UserTopicCycle.difficulty == Difficulty.BEGINNER,
         )
     )
-    assert state is not None
-    assert state.state is SeenState.DEFERRED
-    assert state.deferred_cycle == 0
+    assert cycle == 1, "the difficulty should have advanced exactly one cycle"
 
-    during_cycle = await service.build_slate(user_id, topic_id, rng=RNG)
-    assert during_cycle is not None
-    assert skipped not in during_cycle.card_ids, "deferred must not return within the cycle"
 
-    # Advance the cycle, as the worker does once no UNSEEN cards remain.
-    card_difficulty = await session.scalar(select(Card.difficulty).where(Card.id == skipped))
-    session.add(
-        UserTopicCycle(user_id=user_id, topic_id=topic_id, difficulty=card_difficulty, cycle=1)
+async def test_an_empty_difficulty_does_not_turn_over(
+    session: AsyncSession, corpus: dict[str, Any], settings: Settings
+) -> None:
+    """Turning over requires something to release.
+
+    A difficulty with nothing deferred is not finished, it is starved — and
+    bumping its counter would paper over a pool that ought to be reported and
+    generated into instead.
+    """
+
+    user_id = corpus["user"].id
+    topic_id = corpus["topic"].id
+    service = FeedService(session, Settings(slate_size=10, rank_epsilon=0.0))
+    engagement = EngagementService(session, settings)
+
+    beginners = [card for card in corpus["cards"] if card.difficulty is Difficulty.BEGINNER]
+    # Everything READ, nothing merely shown: the deferred pile is empty.
+    await engagement.ingest(
+        user_id,
+        [
+            IncomingEvent(
+                id=UUID(int=200 + index),
+                card_id=card.id,
+                kind=EngagementKind.EXPLICIT_COMPLETE,
+            )
+            for index, card in enumerate(beginners)
+        ],
     )
-    await session.flush()
 
-    after_cycle = await service.build_slate(user_id, topic_id, rng=RNG)
-    assert after_cycle is not None
-    assert skipped in after_cycle.card_ids, "deferred must return once the cycle advances"
+    await service.build_slate(user_id, topic_id, rng=RNG)
+
+    cycle = await session.scalar(
+        select(UserTopicCycle.cycle).where(
+            UserTopicCycle.user_id == user_id,
+            UserTopicCycle.topic_id == topic_id,
+            UserTopicCycle.difficulty == Difficulty.BEGINNER,
+        )
+    )
+    assert cycle is None, "nothing deferred means nothing to release"
 
 
 async def test_skip_cannot_walk_a_seen_card_backwards(

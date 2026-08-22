@@ -27,7 +27,21 @@ import { useRefreshEffect } from "@/lib/refresh";
 import { groupIntoStations, stationKey, stationKind } from "@/lib/stations";
 import { topicHue } from "@/lib/topicColor";
 import { Card } from "./Card";
-import { CardSkeleton, DegradedNotice, EmptyFeed, EndOfFeed, ErrorNotice } from "./FeedStates";
+import {
+  CardSkeleton,
+  DegradedNotice,
+  EmptyFeed,
+  EndOfFeed,
+  ErrorNotice,
+  RecyclingNotice,
+} from "./FeedStates";
+
+/** How far back duplicate suppression looks, in cards.
+ *
+ *  Comfortably more than a page (10) so a slate refill can never surface the
+ *  same card near itself, and far short of a full pass so the recycled second
+ *  pass is allowed through. See the note in `loadPage`. */
+const DUPLICATE_WINDOW = 40;
 
 interface Props {
   topics: Topic[];
@@ -44,6 +58,15 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [degraded, setDegraded] = useState(false);
   const [exhausted, setExhausted] = useState(false);
+  // Announced once, on the page where it first becomes true, rather than every
+  // page for the rest of the session — a banner that never goes away stops
+  // being information.
+  //
+  // A ref, not state: `loadPage` is memoized on [selected], so a state value
+  // read from its closure would be stale and the notice would re-fire on every
+  // subsequent page. A ref is always current and needs no dependency.
+  const recyclingAnnounced = useRef(false);
+  const [showRecycling, setShowRecycling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const sentinel = useRef<HTMLDivElement>(null);
@@ -112,25 +135,29 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
         position.current = page.next_position;
 
-        // A card the server ranks as UNSEEN can still be one this reader has
-        // already scrolled past without dwelling on it long enough to
-        // register as SEEN server-side (ADR-0010/0011 — a scroll-past alone
-        // is deliberately not enough). Once a slate rebuilds, ranking is
-        // mostly stable short-term (quality/affinity/coverage don't move
-        // without new engagement, only a small exploration slice is
-        // randomized), so a fast scroll with nothing actually read can get
-        // handed back mostly the same page it already has. `addedCount`
-        // catches that: a page that resolved fine but contributed nothing
-        // new is functionally the end of what's servable RIGHT NOW.
+        // Duplicate suppression, scoped to a WINDOW rather than the whole
+        // session.
+        //
+        // Two different repeats have to be told apart. A card reappearing a few
+        // rows below where it already sits is a slate-refill glitch and the most
+        // damaging feed bug there is. A card reappearing hundreds of rows later,
+        // once the server has flagged `recycling`, is the entire point of the
+        // second pass — everything at this difficulty has been shown, so it is
+        // being served again in a fresh order.
+        //
+        // Deduping against every card ever loaded cannot distinguish them: it
+        // swallows the whole repeat pass, `addedCount` lands on 0, and the feed
+        // declares itself exhausted exactly when it has more to give. Comparing
+        // against only the recent tail keeps the adjacent case impossible while
+        // letting a genuine recycle through.
         let addedCount = 0;
         setCards((current) => {
           if (reset) {
             addedCount = page.cards.length;
             return page.cards;
           }
-          // Belt and braces against a duplicate slipping through a slate refill.
-          // A visibly repeated card is the most damaging feed bug there is.
-          const known = new Set(current.map((c) => c.id));
+          const window = current.slice(-DUPLICATE_WINDOW);
+          const known = new Set(window.map((c) => c.id));
           const fresh = page.cards.filter((c) => !known.has(c.id));
           addedCount = fresh.length;
           return [...current, ...fresh];
@@ -138,6 +165,10 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
         setDegraded(page.degraded);
         setExhausted(page.exhausted);
+        if (page.recycling && !recyclingAnnounced.current) {
+          recyclingAnnounced.current = true;
+          setShowRecycling(true);
+        }
         setError(null);
         return !page.exhausted && addedCount > 0;
       } catch (cause) {
@@ -268,9 +299,12 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
             <AnimatePresence initial={false}>
               {station.cards
-                .map((card) => (
+                .map((card, cardIndex) => (
                   <Card
-                    key={card.id}
+                    // Position-scoped, not `card.id`: a recycled card genuinely
+                    // appears more than once in the list now, and duplicate keys
+                    // would make React reuse the wrong node.
+                    key={`${card.id}-${index}-${cardIndex}`}
                     card={card}
                     topicName={topicName(card.topic_id)}
                     accentHue={topicAccentHue(card.topic_id)}
@@ -287,6 +321,7 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
         ))}
 
         {loadingMore ? <CardSkeleton /> : null}
+        {showRecycling && !loading ? <RecyclingNotice /> : null}
         {degraded && !loading ? <DegradedNotice /> : null}
         {exhausted && cards.length > 0 && !degraded ? <EndOfFeed /> : null}
 

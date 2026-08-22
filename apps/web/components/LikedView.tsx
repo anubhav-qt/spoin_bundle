@@ -16,13 +16,15 @@
  * This is purely a retrieval + presentation surface.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { api, type LikedCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { likedStore } from "@/lib/engagementState";
 import { useRefreshEffect } from "@/lib/refresh";
 import { explicitTopicHue, topicHue } from "@/lib/topicColor";
+import { offerUndo } from "@/lib/undo";
 import { Card } from "./Card";
 import { HeartIcon, HomeIcon } from "./icons";
 
@@ -49,6 +51,14 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   const [sort, setSort] = useState<SortKey>("recent");
   const [search, setSearch] = useState("");
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  // Set right when this view's own unlike already updated `rows` locally --
+  // engagement.record's "unlike" branch invalidates the "liked" scope
+  // synchronously, which would otherwise force an immediate, visible
+  // null-then-refetch cycle (a loading-skeleton flash) on top of a removal
+  // this view already reflected correctly. Consumed once by the very next
+  // "liked" invalidation, so an invalidation from elsewhere (liking a card
+  // in the feed while this view is mounted) still refetches normally.
+  const skipNextRefreshRef = useRef(false);
 
   // Build a lookup of topicId → accent_hue from the followed-topics list.
   const hueByTopicId = useMemo(
@@ -78,8 +88,15 @@ export function LikedView({ topics, onNavigateHome }: Props) {
 
   // Manual refresh, or an invalidation from elsewhere (liking/unliking a
   // card anywhere in the app) — re-fetches the current filter/sort without
-  // needing a remount.
-  useRefreshEffect("liked", () => void load(activeTopicId, sort));
+  // needing a remount. Skipped once right after this view's own unlike,
+  // which already updated `rows` locally (see skipNextRefreshRef above).
+  useRefreshEffect("liked", () => {
+    if (skipNextRefreshRef.current) {
+      skipNextRefreshRef.current = false;
+      return;
+    }
+    void load(activeTopicId, sort);
+  });
 
   // Client-side search filter over the already-fetched rows.
   const visible = useMemo(() => {
@@ -107,8 +124,36 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   }, [rows]);
 
   const handleUnliked = useCallback((cardId: string) => {
-    // Optimistically remove from local collection after unlike.
-    setRows((current) => current?.filter((r) => r.card.id !== cardId) ?? current);
+    // Optimistically remove from local collection after unlike, offering a
+    // 5-second undo that re-likes and re-inserts the captured row. The
+    // re-like is a fresh `card_like` row server-side (created_at resets) --
+    // an accepted tradeoff of delete-now-undo-by-redo, see lib/undo.ts.
+    setRows((current) => {
+      if (!current) return current;
+      const removed = current.find((r) => r.card.id === cardId);
+      if (!removed) return current;
+
+      skipNextRefreshRef.current = true;
+      offerUndo({
+        label: "Removed from Liked",
+        onUndo: () => {
+          skipNextRefreshRef.current = true;
+          // Write through so a Card mounted elsewhere for this same card_id
+          // (e.g. the Feed) also flips back to liked -- see
+          // lib/engagementState.ts. Card's own click handler does this for
+          // a direct unlike; undo bypasses that handler entirely.
+          likedStore.set(removed.card.id, true);
+          engagement.record(removed.card.id, "like");
+          setRows((cur) => {
+            if (!cur) return [removed];
+            if (cur.some((r) => r.card.id === removed.card.id)) return cur;
+            return [removed, ...cur];
+          });
+        },
+      });
+
+      return current.filter((r) => r.card.id !== cardId);
+    });
   }, []);
 
   const handleTopicFilter = (topicId: string | undefined) => {

@@ -24,8 +24,10 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { api, type SavedCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
+import { bookmarkedStore } from "@/lib/engagementState";
 import { useRefreshEffect } from "@/lib/refresh";
 import { explicitTopicHue, topicHue } from "@/lib/topicColor";
+import { offerUndo } from "@/lib/undo";
 import { Card } from "./Card";
 import { BookmarkIcon, HomeIcon } from "./icons";
 
@@ -181,6 +183,12 @@ export function SavedView({ topics, onNavigateHome }: Props) {
   const [search, setSearch] = useState("");
   const [openRow, setOpenRow] = useState<SavedCard | null>(null);
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  // Set right when this view's own unbookmark already updated `rows`
+  // locally -- see LikedView's identical guard for the full reasoning
+  // (engagement.record's "unbookmark" branch invalidates "saved"
+  // synchronously, which would otherwise force a visible refetch flash on
+  // top of a removal this view already reflected).
+  const skipNextRefreshRef = useRef(false);
 
   // Lookup: topicId → accent_hue from followed topics
   const hueByTopicId = useMemo(
@@ -210,8 +218,14 @@ export function SavedView({ topics, onNavigateHome }: Props) {
 
   // Manual refresh, or an invalidation from elsewhere (bookmarking/unbookmarking
   // a card anywhere in the app) — re-fetches the current filter/sort without
-  // needing a remount.
-  useRefreshEffect("saved", () => void load(activeTopicId, sort));
+  // needing a remount. Skipped once right after this view's own unbookmark.
+  useRefreshEffect("saved", () => {
+    if (skipNextRefreshRef.current) {
+      skipNextRefreshRef.current = false;
+      return;
+    }
+    void load(activeTopicId, sort);
+  });
 
   // Client-side search across title + summary + topic name
   const visible = useMemo(() => {
@@ -239,7 +253,30 @@ export function SavedView({ topics, onNavigateHome }: Props) {
   }, [rows]);
 
   const handleUnbookmarked = useCallback((cardId: string) => {
-    setRows((current) => current?.filter((r) => r.card.id !== cardId) ?? current);
+    setRows((current) => {
+      if (!current) return current;
+      const removed = current.find((r) => r.card.id === cardId);
+      if (!removed) return current;
+
+      skipNextRefreshRef.current = true;
+      offerUndo({
+        label: "Removed from Saved",
+        onUndo: () => {
+          skipNextRefreshRef.current = true;
+          // Write through so a Card mounted elsewhere for this same card_id
+          // also flips back to bookmarked -- see lib/engagementState.ts.
+          bookmarkedStore.set(removed.card.id, true);
+          engagement.record(removed.card.id, "bookmark");
+          setRows((cur) => {
+            if (!cur) return [removed];
+            if (cur.some((r) => r.card.id === removed.card.id)) return cur;
+            return [removed, ...cur];
+          });
+        },
+      });
+
+      return current.filter((r) => r.card.id !== cardId);
+    });
     setOpenRow(null);
   }, []);
 

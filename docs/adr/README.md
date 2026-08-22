@@ -88,4 +88,5 @@ useful than the decision itself.
 | [0049](0049-no-message-broker-in-v1.md) | No message broker in v1; Kafka rejected, not deferred-by-accident | Accepted (extends 0003 §4) |
 | [0050](0050-shown-consumes-a-card.md) | Being shown a card consumes it; a difficulty turns over instead of running dry | Accepted (amends 0010) |
 | [0051](0051-topic-color-opt-out.md) | A "no color" opt-out for per-topic accent, via a sentinel hue | Accepted (amends 0034) |
+| [0052](0052-undo-toast-for-collection-removal.md) | A single-slot undo toast for removal in Notes/Liked/Saved | Accepted |
 

@@ -4068,6 +4068,64 @@ body.custom-cursor-active textarea {
 }
 
 /* ============================================================================
+   Undo toast (Notes/Liked/Saved removal undo -- lib/undo.ts)
+   ========================================================================= */
+
+.undo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  box-shadow: 0 8px 24px var(--shadow);
+  padding: 10px 10px 10px 18px;
+  font-size: 13px;
+  color: var(--fg-2);
+  max-width: min(90vw, 420px);
+}
+
+.undo-toast-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.undo-toast-action {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 2px;
+  white-space: nowrap;
+}
+
+.undo-toast-action:hover {
+  color: var(--accent-2);
+}
+
+.undo-toast-dismiss {
+  background: none;
+  border: none;
+  color: var(--fg-3);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.undo-toast-dismiss:hover {
+  color: var(--fg);
+}
+
+/* ============================================================================
    Onboarding
    ========================================================================= */
 

@@ -104,6 +104,11 @@ async def subscribe_topic(
     return await _service(session).subscribe(user_id, topic_id, entry_difficulty)
 
 
+@router.delete("/{topic_id}/subscribe", status_code=status.HTTP_204_NO_CONTENT)
+async def unsubscribe_topic(topic_id: UUID, session: SessionDep, user_id: UserDep) -> None:
+    await _service(session).unsubscribe(user_id, topic_id)
+
+
 @router.post("/onboarding/complete", response_model=list[TopicOut])
 async def complete_onboarding(
     payload: OnboardingCompleteIn, session: SessionDep, user_id: UserDep

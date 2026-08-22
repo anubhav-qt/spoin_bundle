@@ -42,9 +42,16 @@ interface Props {
   progress: Record<string, TopicProgress>;
   onProgressChanged: (topicId: string) => void;
   onTopicColorChanged: (topicId: string, accentHue: number | null) => void;
+  onUnfollowed: (topicId: string) => void | Promise<void>;
 }
 
-export function TopicsProgressBox({ topics, progress, onProgressChanged, onTopicColorChanged }: Props) {
+export function TopicsProgressBox({
+  topics,
+  progress,
+  onProgressChanged,
+  onTopicColorChanged,
+  onUnfollowed,
+}: Props) {
   const [mode, setMode] = useState<FilterMode>("active");
   const [openTopicId, setOpenTopicId] = useState<string | null>(null);
   const openTopic = topics.find((t) => t.id === openTopicId) ?? null;
@@ -94,6 +101,10 @@ export function TopicsProgressBox({ topics, progress, onProgressChanged, onTopic
           onColorChanged={(hue) => onTopicColorChanged(openTopic.id, hue)}
           onClose={() => setOpenTopicId(null)}
           onProgressChanged={onProgressChanged}
+          onUnfollow={async () => {
+            await onUnfollowed(openTopic.id);
+            setOpenTopicId(null);
+          }}
         />
       ) : null}
     </div>

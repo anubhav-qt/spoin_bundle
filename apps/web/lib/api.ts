@@ -12,7 +12,17 @@
  * with the API up. CI fails the build on drift (ADR-0001).
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+export function getBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+      return envUrl;
+    }
+    const { protocol, hostname } = window.location;
+    return `${protocol}//${hostname}:8000`;
+  }
+  return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+}
 
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 
@@ -131,7 +141,7 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
     }
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
     ...init,
     headers,
     cache: "no-store",
@@ -141,7 +151,7 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
     const refreshToken = localStorage.getItem("spoin_refresh_token");
     if (refreshToken) {
       try {
-        const refreshResp = await fetch(`${BASE_URL}/auth/refresh`, {
+        const refreshResp = await fetch(`${getBaseUrl()}/auth/refresh`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refresh_token: refreshToken })
@@ -445,6 +455,9 @@ export const api = {
   subscribeTopic: (topicId: string) =>
     request<Topic>(`/topics/${topicId}/subscribe`, { method: "POST" }),
 
+  unsubscribeTopic: (topicId: string) =>
+    request<void>(`/topics/${topicId}/subscribe`, { method: "DELETE" }),
+
   requestTopic: (name: string, entryDifficulty?: Difficulty, description?: string) =>
     request<TopicRequestResult>("/topics", {
       method: "POST",
@@ -543,7 +556,7 @@ export const api = {
     formData.append("file", file);
   
     const token = localStorage.getItem("spoin_access_token");
-    const response = await fetch(`${BASE_URL}/profile/me/avatar`, {
+    const response = await fetch(`${getBaseUrl()}/profile/me/avatar`, {
       method: "POST",
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -585,7 +598,7 @@ export const api = {
    * render) re-fetched the image on every single re-render. */
   avatarObjectUrl: async () => {
     const token = localStorage.getItem("spoin_access_token");
-    const response = await fetch(`${BASE_URL}/profile/me/avatar/image`, {
+    const response = await fetch(`${getBaseUrl()}/profile/me/avatar/image`, {
       headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     });
     if (!response.ok) {

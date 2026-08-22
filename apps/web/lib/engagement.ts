@@ -18,6 +18,26 @@ import { invalidate } from "./refresh";
 
 const FLUSH_INTERVAL_MS = 5000;
 
+/** `crypto.randomUUID` only exists in a secure context (HTTPS or localhost) --
+ *  on a phone hitting the dev server over plain HTTP by LAN IP it's simply
+ *  undefined, which crashed every event record() call before this fell back
+ *  to `crypto.getRandomValues` (present in any context) or, failing that, a
+ *  `Math.random`-based id. Good enough for an idempotency key that only needs
+ *  to be unique per client, not cryptographically strong. */
+function generateEventId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
+}
+
 /** Sent immediately rather than buffered — progression depends on them. */
 const URGENT: ReadonlySet<EngagementKind> = new Set([
   "expand",
@@ -58,7 +78,7 @@ class EngagementBuffer {
 
   record(cardId: string, kind: EngagementKind, dwellMs?: number): void {
     this.queue.push({
-      id: crypto.randomUUID(),
+      id: generateEventId(),
       card_id: cardId,
       kind,
       ...(dwellMs === undefined ? {} : { dwell_ms: dwellMs }),

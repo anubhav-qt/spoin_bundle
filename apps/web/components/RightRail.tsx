@@ -29,6 +29,7 @@ interface Props {
   onEnterFocus: () => void;
   onProgressChanged: (topicId: string) => void;
   onTopicColorChanged: (topicId: string, accentHue: number | null) => void;
+  onUnfollowed: (topicId: string) => void | Promise<void>;
 }
 
 export function RightRail({
@@ -40,6 +41,7 @@ export function RightRail({
   onEnterFocus,
   onProgressChanged,
   onTopicColorChanged,
+  onUnfollowed,
 }: Props) {
   const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const [discoveryView, setDiscoveryView] = useState<"topics" | "custom" | "request">("topics");
@@ -72,6 +74,7 @@ export function RightRail({
         progress={progress}
         onProgressChanged={onProgressChanged}
         onTopicColorChanged={onTopicColorChanged}
+        onUnfollowed={onUnfollowed}
       />
 
       {/* The inline Discover box (ADR-0038), restored below "Your topics" --

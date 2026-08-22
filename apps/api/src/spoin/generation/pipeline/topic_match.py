@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import uuid
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
@@ -116,20 +117,38 @@ async def match_and_create_topics(
                 )
             )
         else:
-            topic = Topic(
-                slug=_slugify(request["name"]),
-                canonical_name=request["name"],
-                description=request["description"],
-            )
-            session.add(topic)
-            await session.flush()
-            topic.embedding = embedding
-            logger.info("topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id)
-            outcomes.append(
-                TopicMatchOutcome(
-                    topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=False
+            slug = _slugify(request["name"])
+            existing_by_slug = await session.scalar(select(Topic).where(Topic.slug == slug))
+            if existing_by_slug is not None:
+                topic = existing_by_slug
+                if topic.embedding is None:
+                    topic.embedding = embedding
+                logger.info(
+                    "topic '%s': matched existing topic by slug '%s' (id=%s)",
+                    request["name"],
+                    topic.canonical_name,
+                    topic.id,
                 )
-            )
+                outcomes.append(
+                    TopicMatchOutcome(
+                        topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=True
+                    )
+                )
+            else:
+                topic = Topic(
+                    slug=slug,
+                    canonical_name=request["name"],
+                    description=request["description"],
+                )
+                session.add(topic)
+                await session.flush()
+                topic.embedding = embedding
+                logger.info("topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id)
+                outcomes.append(
+                    TopicMatchOutcome(
+                        topic_id=str(topic.id), topic_name=topic.canonical_name, matched_existing=False
+                    )
+                )
 
     await session.flush()
     return outcomes

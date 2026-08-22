@@ -559,6 +559,33 @@ class TopicsService:
             current_difficulty=entry_difficulty,
         )
 
+    async def unsubscribe(self, user_id: UUID, topic_id: UUID) -> None:
+        """Drops the `UserTopic` row and its progress. Engagement history
+        (likes/saves/notes) is left alone -- it's the user's own record of
+        having read those cards, not membership state -- and the feed's
+        cached plan is cleared so a re-follow doesn't serve a stale mix."""
+
+        user_topic = await self._session.scalar(
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+        )
+        if user_topic is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not subscribed to this topic")
+
+        topic = await self._session.get(Topic, topic_id)
+        if topic is not None:
+            topic.subscriber_count = max(0, topic.subscriber_count - 1)
+
+        await self._session.execute(
+            delete(UserTopicProgress).where(
+                UserTopicProgress.user_id == user_id, UserTopicProgress.topic_id == topic_id
+            )
+        )
+        await self._session.execute(
+            delete(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+        )
+        await self._session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
+        await self._session.commit()
+
     async def complete_onboarding(
         self, user_id: UUID, choices: list[OnboardingTopicChoice]
     ) -> list[TopicOut]:

@@ -185,8 +185,5 @@ make scan
 
 ## Team
 
-Spoin is open source, and we'd genuinely welcome contributors. Right now it's a
-two-person project: [Anubhav](https://github.com/anubhav-qt) owns architecture, planning,
-and design, and [Mayank](https://github.com/mayanks0ni) shares implementation with Anubhav.
-That's a starting point, not a ceiling. If something here is interesting to you, open an
-issue or a PR.
+A two-person project. Anubhav owns architecture, planning, and design; implementation
+is split between Anubhav and Mayank.

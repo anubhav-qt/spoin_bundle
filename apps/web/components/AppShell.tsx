@@ -182,6 +182,20 @@ export function AppShell() {
     setTopics((current) => current.map((t) => (t.id === topicId ? { ...t, accent_hue: accentHue } : t)));
   }, []);
 
+  // Called after a successful unfollow (TopicsProgressBox's modal) -- drops
+  // the topic from every piece of local state that mirrors the server's
+  // subscription list, mirroring `onFollowed` in reverse.
+  const onUnfollowed = useCallback(async (topicId: string) => {
+    await api.unsubscribeTopic(topicId);
+    setTopics((current) => current.filter((t) => t.id !== topicId));
+    setProgress((current) => {
+      const { [topicId]: _removed, ...rest } = current;
+      return rest;
+    });
+    setSelected((current) => current.filter((id) => id !== topicId));
+    invalidate("feed");
+  }, []);
+
   const onReset = useCallback(async () => {
     const list = await api.resetDemo();
     setTopics(list);
@@ -278,6 +292,7 @@ export function AppShell() {
             onEnterFocus={() => setFocusModeAnimated(true)}
             onProgressChanged={refreshProgress}
             onTopicColorChanged={onTopicColorChanged}
+            onUnfollowed={onUnfollowed}
           />
         )}
       </div>

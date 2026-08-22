@@ -40,6 +40,10 @@ interface Props {
    *  the user hasn't started. */
   onFollow?: () => void | Promise<void>;
   following?: boolean;
+  /** Present only for an already-followed topic (mirrors `onFollow`'s
+   *  Discover-only presence in reverse) — renders an Unfollow action instead
+   *  of assuming the caller wants it unconditionally offered. */
+  onUnfollow?: () => void | Promise<void>;
   /** Called after a quiz attempt is graded, so the app-wide progress map
    *  (right-rail rows, InsightsPanel) picks up the change immediately
    *  instead of only this modal's own `stats`. */
@@ -81,6 +85,7 @@ export function TopicStatsModal({
   onClose,
   onFollow,
   following = false,
+  onUnfollow,
   onProgressChanged,
   accentHue,
   onColorChanged,
@@ -96,6 +101,18 @@ export function TopicStatsModal({
   // (and still-locked) next tier, wiping the results screen the user just
   // earned.
   const [quizDifficulty, setQuizDifficulty] = useState<Difficulty | null>(null);
+  const [unfollowing, setUnfollowing] = useState(false);
+  const [confirmingUnfollow, setConfirmingUnfollow] = useState(false);
+
+  const handleUnfollow = async () => {
+    if (unfollowing || !onUnfollow) return;
+    setUnfollowing(true);
+    try {
+      await onUnfollow();
+    } finally {
+      setUnfollowing(false);
+    }
+  };
 
   const loadStats = () => {
     void api.topicStats(topicId).then(setStats);
@@ -151,6 +168,40 @@ export function TopicStatsModal({
             ×
           </button>
         </div>
+
+        {onUnfollow !== undefined ? (
+          confirmingUnfollow ? (
+            <div className="modal-unfollow-confirm">
+              <span className="mono">Unfollow {topicName}? Your notes, likes, and saves stay.</span>
+              <div className="modal-unfollow-confirm-actions">
+                <button
+                  type="button"
+                  className="modal-unfollow modal-unfollow-confirm-yes"
+                  disabled={unfollowing}
+                  onClick={() => void handleUnfollow()}
+                >
+                  {unfollowing ? "Unfollowing…" : "Unfollow"}
+                </button>
+                <button
+                  type="button"
+                  className="modal-unfollow-cancel"
+                  disabled={unfollowing}
+                  onClick={() => setConfirmingUnfollow(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="modal-unfollow"
+              onClick={() => setConfirmingUnfollow(true)}
+            >
+              Unfollow this topic
+            </button>
+          )
+        ) : null}
 
         {onFollow !== undefined ? (
           <button

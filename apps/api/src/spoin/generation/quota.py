@@ -244,33 +244,58 @@ class QuotaGovernor:
         to the next model instead."""
 
         day = _day_start(now)
-        for rung in self.ladder:
-            if rung.model in exclude_models:
-                logger.debug(
-                    "quota: model %s excluded (persistently unavailable), skipping", rung.model
-                )
-                continue
-            for key_index in range(self.key_count):
-                cooldown_until = self._flash_lite_cooldowns.get((key_index, rung.model))
-                if cooldown_until is not None and time.monotonic() < cooldown_until:
+        while True:
+            candidate_wait_times: list[float] = []
+            has_unexhausted_cell = False
+
+            for rung in self.ladder:
+                if rung.model in exclude_models:
                     logger.debug(
-                        "quota: key %d model %s is in flash-lite cooldown (%.1fs remaining), "
-                        "trying next",
-                        key_index,
-                        rung.model,
-                        cooldown_until - time.monotonic(),
+                        "quota: model %s excluded (persistently unavailable), skipping", rung.model
                     )
                     continue
-                if not self._rpm_has_room(key_index, rung):
-                    logger.debug(
-                        "quota: key %d model %s at RPM ceiling (%d/min), trying next",
-                        key_index,
-                        rung.model,
-                        rung.rpm,
-                    )
-                    continue
-                ledger = await self._ledger_row(session, day, key_index, rung.model)
-                if ledger.requests_spent < rung.rpd:
+                for key_index in range(self.key_count):
+                    ledger = await self._ledger_row(session, day, key_index, rung.model)
+                    if ledger.requests_spent >= rung.rpd:
+                        logger.debug(
+                            "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
+                            key_index,
+                            rung.model,
+                            day.date(),
+                            ledger.requests_spent,
+                            rung.rpd,
+                        )
+                        continue
+
+                    has_unexhausted_cell = True
+
+                    cooldown_until = self._flash_lite_cooldowns.get((key_index, rung.model))
+                    if cooldown_until is not None and time.monotonic() < cooldown_until:
+                        wait_cd = cooldown_until - time.monotonic()
+                        candidate_wait_times.append(wait_cd)
+                        logger.debug(
+                            "quota: key %d model %s is in flash-lite cooldown (%.1fs remaining), "
+                            "trying next",
+                            key_index,
+                            rung.model,
+                            wait_cd,
+                        )
+                        continue
+
+                    if not self._rpm_has_room(key_index, rung):
+                        window = self._rpm_windows[(key_index, rung.model)]
+                        if window:
+                            wait_rpm = (window[0] + _RPM_WINDOW_SECONDS) - time.monotonic()
+                            if wait_rpm > 0:
+                                candidate_wait_times.append(wait_rpm)
+                        logger.debug(
+                            "quota: key %d model %s at RPM ceiling (%d/min), trying next",
+                            key_index,
+                            rung.model,
+                            rung.rpm,
+                        )
+                        continue
+
                     ledger.requests_spent += 1
                     if ledger.requests_spent >= rung.rpd:
                         ledger.exhausted_at = now
@@ -291,23 +316,27 @@ class QuotaGovernor:
                         rung.rpd,
                     )
                     return key_index, rung.model
-                logger.debug(
-                    "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
-                    key_index,
-                    rung.model,
+
+            if not has_unexhausted_cell:
+                logger.warning(
+                    "quota: ALL %d key(s) x %d model(s) exhausted for %s",
+                    self.key_count,
+                    len(self.ladder),
                     day.date(),
-                    ledger.requests_spent,
-                    rung.rpd,
                 )
-        logger.warning(
-            "quota: ALL %d key(s) x %d model(s) exhausted for %s",
-            self.key_count,
-            len(self.ladder),
-            day.date(),
-        )
-        raise QuotaExhaustedError(
-            f"All {self.key_count} key(s) x {len(self.ladder)} model(s) exhausted for {day.date()}"
-        )
+                raise QuotaExhaustedError(
+                    f"All {self.key_count} key(s) x {len(self.ladder)} model(s) exhausted for {day.date()}"
+                )
+
+            # All candidate keys have daily quota remaining but are temporarily rate-limited
+            # (in RPM window or 60s flash-lite cooldown). Sleep until the earliest slot opens.
+            min_wait = min(candidate_wait_times) if candidate_wait_times else 2.0
+            sleep_duration = max(0.5, min(min_wait + 0.2, 60.0))
+            logger.info(
+                "quota: all available cells at temporary RPM/cooldown limit -- waiting %.1fs before retrying...",
+                sleep_duration,
+            )
+            await asyncio.sleep(sleep_duration)
 
     def cell_lock(self, key_index: int, model: str) -> asyncio.Lock:
         """Returns the lock for this `(key, model)` cell, creating it on first

@@ -15,13 +15,14 @@
  * than round-tripping through engagement/progress like the feed does.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { api, type NoteWithCard, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
-import { useRefreshEffect } from "@/lib/refresh";
-import { topicHue } from "@/lib/topicColor";
+import { invalidate, useRefreshEffect } from "@/lib/refresh";
+import { explicitTopicHue, topicHue } from "@/lib/topicColor";
+import { offerUndo } from "@/lib/undo";
 import { Card } from "./Card";
 import { HomeIcon, NoteIcon } from "./icons";
 
@@ -54,6 +55,11 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
   const [sort, setSort] = useState<SortKey>("recent");
   const [search, setSearch] = useState("");
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  // Set right when this view's own note delete/undo already updated `rows`
+  // locally -- see LikedView's identical guard for the full reasoning
+  // (Card.tsx's own invalidate("notes") after a save/delete would otherwise
+  // force a visible refetch flash on top of a change already reflected).
+  const skipNextRefreshRef = useRef(false);
 
   // Build a lookup of topicId → accent_hue from the followed-topics list.
   const hueByTopicId = useMemo(
@@ -79,7 +85,15 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
 
   // Manual refresh, or an invalidation from elsewhere (a note saved/deleted
   // from a card in the feed, say) — re-fetches without needing a remount.
-  useRefreshEffect("notes", () => void load());
+  // Skipped once right after this view's own note change (see
+  // skipNextRefreshRef above).
+  useRefreshEffect("notes", () => {
+    if (skipNextRefreshRef.current) {
+      skipNextRefreshRef.current = false;
+      return;
+    }
+    void load();
+  });
 
   // Derive unique topics present in the notes collection for the filter bar.
   const notesTopics = useMemo(() => {
@@ -140,8 +154,31 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
   const onNoteChange = (cardId: string, body: string | null) => {
     if (body === null) {
       // A note cleared to empty deletes it — drop the row rather than leaving
-      // a card with no note content sitting in a "notes" view.
-      setRows((current) => current?.filter((row) => row.card.id !== cardId) ?? current);
+      // a card with no note content sitting in a "notes" view. Capture the
+      // body before it's gone so undo can re-`PUT` the exact same text
+      // (Card.tsx has already issued the DELETE by the time this fires).
+      setRows((current) => {
+        if (!current) return current;
+        const removed = current.find((row) => row.card.id === cardId);
+        if (!removed) return current;
+
+        skipNextRefreshRef.current = true;
+        offerUndo({
+          label: "Note deleted",
+          onUndo: async () => {
+            await api.saveNote(removed.card.id, removed.note.body);
+            skipNextRefreshRef.current = true;
+            invalidate("notes");
+            setRows((cur) => {
+              if (!cur) return [removed];
+              if (cur.some((row) => row.card.id === removed.card.id)) return cur;
+              return [removed, ...cur];
+            });
+          },
+        });
+
+        return current.filter((row) => row.card.id !== cardId);
+      });
     } else {
       setRows((current) =>
         current?.map((row) =>
@@ -306,7 +343,7 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
             ALL
           </button>
           {notesTopics.map((t) => {
-            const hue = hueByTopicId[t.id];
+            const hue = explicitTopicHue(hueByTopicId[t.id]);
             return (
               <button
                 key={t.id}
@@ -314,11 +351,7 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
                 className="collection-chip"
                 data-selected={activeTopicId === t.id}
                 onClick={() => handleTopicFilter(t.id)}
-                style={
-                  hue !== undefined && hue !== null
-                    ? ({ "--topic-hue": hue } as React.CSSProperties)
-                    : undefined
-                }
+                style={hue !== null ? ({ "--topic-hue": hue } as React.CSSProperties) : undefined}
               >
                 {t.name.toUpperCase()}
               </button>

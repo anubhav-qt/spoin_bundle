@@ -10,6 +10,7 @@ from __future__ import annotations
 import uuid
 
 import pytest
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
@@ -203,3 +204,52 @@ async def test_unlock_latches_and_survives_new_cards_landing(
     _p, _t, coverage, still_unlocked, _m = await service.ensure_unlock_latched(user_id, topic_id)
     assert coverage == pytest.approx(0.4)
     assert still_unlocked is True, "the latch must not be recomputed away"
+
+
+# ------------------------------------------------------------ set_color -----
+
+
+async def test_set_color_stores_a_chosen_hue(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
+    service = TopicsService(session, service_settings)
+
+    out = await service.set_color(user_id, topic_id, 200)
+
+    assert out.accent_hue == 200
+    user_topic = await session.scalar(
+        select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+    )
+    assert user_topic is not None
+    assert user_topic.accent_hue == 200
+
+
+async def test_set_color_none_resets_to_the_deterministic_default(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    """`hue=None` clears any stored value -- the client, not the row, owns the
+    default (ADR-0034)."""
+
+    user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
+    service = TopicsService(session, service_settings)
+    await service.set_color(user_id, topic_id, 200)
+
+    out = await service.set_color(user_id, topic_id, None)
+
+    assert out.accent_hue is None
+
+
+async def test_set_color_sentinel_opts_out_of_topic_color(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    """ADR-0051: `-1` is stored as-is, a third state alongside a real hue and
+    the null default -- the sentinel is purely a client-side convention, the
+    service has no special-casing for it."""
+
+    user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
+    service = TopicsService(session, service_settings)
+
+    out = await service.set_color(user_id, topic_id, -1)
+
+    assert out.accent_hue == -1

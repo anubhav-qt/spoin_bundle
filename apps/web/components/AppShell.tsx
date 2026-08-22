@@ -30,6 +30,7 @@ import { RightRail } from "./RightRail";
 import { SavedView } from "./SavedView";
 import { SettingsView } from "./SettingsView";
 import { Sidebar, type ShellView } from "./Sidebar";
+import { UndoToast } from "./UndoToast";
 
 function toTopicProgress(p: {
   current_difficulty: Difficulty;
@@ -214,6 +215,7 @@ export function AppShell() {
     <MotionConfig reducedMotion={reducedMotion ? "always" : "user"}>
       <CustomCursor />
       <GuestNotice />
+      <UndoToast />
       <div className="app-grid" data-focused={focusMode}>
         {/* Both rails keep reserving their grid track even when hidden — an
             empty spacer, not a removed column — so toggling focus mode never

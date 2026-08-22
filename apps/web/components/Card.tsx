@@ -41,6 +41,7 @@ import katex from "katex";
 
 import { api, type ArchetypeTag, type Card as CardModel, type Difficulty } from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
+import { bookmarkedStore, likedStore } from "@/lib/engagementState";
 import { invalidate } from "@/lib/refresh";
 import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
 import {
@@ -99,10 +100,12 @@ const DIFFICULTY_RANK: Record<Difficulty, number> = {
 interface Props {
   card: CardModel;
   topicName: string;
-  /** 0-359, or undefined for a mixed/unknown topic — omitted entirely rather
-   *  than defaulted here, so --topic-accent falls back to the plain palette
-   *  accent (ADR-0034) instead of every card converging on hue 0 (red). */
-  accentHue: number | undefined;
+  /** 0-359, null when the topic has explicitly opted out of coloring
+   *  (ADR-0051), or undefined for a mixed/unknown topic — all three leave
+   *  no `--topic-hue` set below, so --topic-accent falls back to the plain
+   *  palette accent (ADR-0034) instead of every card converging on hue 0
+   *  (red). */
+  accentHue: number | null | undefined;
   seen: boolean;
   onSeen: (cardId: string) => void;
   onUnseen: (cardId: string) => void;
@@ -151,8 +154,15 @@ export function Card({
   // making `toggle` a no-op for hero reuses every bit of existing dwell/reveal
   // logic below instead of forking a parallel code path for it.
   const [expanded, setExpanded] = useState(isHero);
-  const [liked, setLiked] = useState(initialLiked ?? false);
-  const [bookmarked, setBookmarked] = useState(initialBookmarked ?? false);
+  // Seeded from the cross-instance store first (lib/engagementState.ts) so
+  // a card already toggled by ANOTHER mounted Card for the same card_id
+  // (e.g. unliked from LikedView while this Feed card is still mounted)
+  // renders correctly on mount rather than defaulting stale. `initialLiked`/
+  // `initialBookmarked` only wins when the store has nothing yet.
+  const [liked, setLiked] = useState(() => likedStore.get(card.id) ?? initialLiked ?? false);
+  const [bookmarked, setBookmarked] = useState(
+    () => bookmarkedStore.get(card.id) ?? initialBookmarked ?? false,
+  );
   const [noteOpen, setNoteOpen] = useState(initialNoteOpen ?? false);
   const [noteDraft, setNoteDraft] = useState(card.note ?? "");
   const [savedNote, setSavedNote] = useState(card.note ?? null);
@@ -176,6 +186,24 @@ export function Card({
   const node = useRef<HTMLDivElement>(null);
   const gotItButton = useRef<HTMLButtonElement>(null);
   const impressed = useRef(false);
+
+  // A caller that passes `initialLiked`/`initialBookmarked` explicitly
+  // (LikedView, SavedView) actually knows the server state -- its own list
+  // membership implies it -- so it's authoritative and pushed into the
+  // shared store for any other mounted instance of this same card to pick
+  // up. A caller that omits the prop (Feed, Notes, Share) contributes
+  // nothing here and instead reads whatever the store already has.
+  useEffect(() => {
+    if (initialLiked !== undefined) likedStore.set(card.id, initialLiked);
+  }, [card.id, initialLiked]);
+  useEffect(() => {
+    if (initialBookmarked !== undefined) bookmarkedStore.set(card.id, initialBookmarked);
+  }, [card.id, initialBookmarked]);
+
+  // Stay in sync with every OTHER mounted Card for this same card_id --
+  // see lib/engagementState.ts for why more than one can be mounted at once.
+  useEffect(() => likedStore.subscribe(card.id, setLiked), [card.id]);
+  useEffect(() => bookmarkedStore.subscribe(card.id, setBookmarked), [card.id]);
 
   useEffect(() => {
     if (!shareOpen) return;
@@ -524,7 +552,11 @@ export function Card({
           data-hero={isHero}
           onClick={toggle}
           aria-expanded={expanded}
-          style={accentHue !== undefined ? ({ "--topic-hue": accentHue } as CSSProperties) : undefined}
+          style={
+            accentHue !== null && accentHue !== undefined
+              ? ({ "--topic-hue": accentHue } as CSSProperties)
+              : undefined
+          }
         >
           <div className="card-head">
             {/* Always this user's own name for the topic (ADR-0004). */}
@@ -589,8 +621,18 @@ export function Card({
                 act(e, () => {
                   const wasLiked = liked;
                   setLiked(!wasLiked);
-                  engagement.record(card.id, wasLiked ? "unlike" : "like");
+                  // Write through so every OTHER mounted Card for this same
+                  // card_id (Feed, Notes, Share...) updates immediately too
+                  // -- see lib/engagementState.ts.
+                  likedStore.set(card.id, !wasLiked);
+                  // Let the caller's own optimistic removal (and any undo
+                  // offer it makes) run BEFORE engagement.record, whose
+                  // "unlike"/"unbookmark" branch synchronously invalidates
+                  // the "liked" scope -- a caller that captures its row
+                  // after that point would find its own state already
+                  // cleared by the resulting refetch.
                   if (wasLiked) onUnliked?.(card.id);
+                  engagement.record(card.id, wasLiked ? "unlike" : "like");
                 })
               }
               type="button"
@@ -607,8 +649,12 @@ export function Card({
                 act(e, () => {
                   const wasBookmarked = bookmarked;
                   setBookmarked(!wasBookmarked);
-                  engagement.record(card.id, wasBookmarked ? "unbookmark" : "bookmark");
+                  // Same write-through as the like button above.
+                  bookmarkedStore.set(card.id, !wasBookmarked);
+                  // Same ordering reason as the like button above, for the
+                  // "saved" scope.
                   if (wasBookmarked) onUnbookmarked?.(card.id);
+                  engagement.record(card.id, wasBookmarked ? "unbookmark" : "bookmark");
                 })
               }
               type="button"

@@ -25,14 +25,17 @@ class TopicOut(BaseModel):
     slug: str
     is_custom: bool
     current_difficulty: Difficulty
-    #: 0-359 hue, or null to use the deterministic default (ADR-0034). Per
-    #: subscription, same personal-label split as `display_name`.
+    #: 0-359 hue, -1 to opt out of topic color entirely (ADR-0051, follow
+    #: the palette's plain --accent), or null to use the deterministic
+    #: default (ADR-0034). Per subscription, same personal-label split as
+    #: `display_name`.
     accent_hue: int | None = None
 
 
 class TopicColorIn(BaseModel):
-    #: null resets to the deterministic default.
-    hue: int | None = Field(default=None, ge=0, le=359)
+    #: -1 opts out of topic color (ADR-0051); null resets to the
+    #: deterministic default (ADR-0034).
+    hue: int | None = Field(default=None, ge=-1, le=359)
 
 
 class TopicRequestIn(BaseModel):

@@ -143,9 +143,12 @@ interface Props {
   /** AppShell owns the followed-topics list; following from here has to tell
    *  it, or the rails go stale until a reload. */
   onTopicFollowed: (topic: Topic) => void;
+  /** Same reasoning, for a pending generation request cancelled from this
+   *  modal's "Request a topic"/"Your custom topics" tabs. */
+  onTopicRemoved: (topicId: string) => void;
 }
 
-export function SettingsView({ topics, onNavigateProfile, onTopicFollowed }: Props) {
+export function SettingsView({ topics, onNavigateProfile, onTopicFollowed, onTopicRemoved }: Props) {
   const { user, applyUser } = useAuth();
 
   const [goal, setGoal] = useState<number>(user?.daily_card_goal ?? 10);
@@ -366,6 +369,7 @@ export function SettingsView({ topics, onNavigateProfile, onTopicFollowed }: Pro
         <TopicDiscoveryModal
           onClose={() => setTopicsOpen(false)}
           onFollowed={onTopicFollowed}
+          onTopicRemoved={onTopicRemoved}
         />
       ) : null}
     </div>

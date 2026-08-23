@@ -121,6 +121,14 @@ class Settings(BaseSettings):
     # quality-gate rejection rates exist.
     min_cards_fraction: float = 0.6
 
+    #: Fraction of a topic's subtopics that must individually reach their own
+    #: `min_cards` coverage before the topic is "live" — shown to users who
+    #: didn't request it (ADR-0053, resolving the open question ADR-0026 left
+    #: about read-path discoverability). The requester follows immediately
+    #: regardless and watches real progress the whole time; this only gates
+    #: what everyone else sees in Topics/Discover.
+    topic_live_coverage_fraction: float = 0.5
+
     # -- embeddings (hard rule 5) ----------------------------------------------
     embedder: EmbedderBackend = "hash"
     embedding_model: str = "BAAI/bge-small-en-v1.5"

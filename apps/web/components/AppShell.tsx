@@ -182,11 +182,12 @@ export function AppShell() {
     setTopics((current) => current.map((t) => (t.id === topicId ? { ...t, accent_hue: accentHue } : t)));
   }, []);
 
-  // Called after a successful unfollow (TopicsProgressBox's modal) -- drops
-  // the topic from every piece of local state that mirrors the server's
-  // subscription list, mirroring `onFollowed` in reverse.
-  const onUnfollowed = useCallback(async (topicId: string) => {
-    await api.unsubscribeTopic(topicId);
+  // Drops a topic from every piece of local state that mirrors the server's
+  // subscription list, mirroring `onFollowed` in reverse -- the shared tail
+  // end of both an explicit unfollow and a cancelled generation request
+  // (GenerationProgressPanel), which has already removed the subscription
+  // server-side itself and just needs the client to catch up.
+  const removeTopicLocally = useCallback((topicId: string) => {
     setTopics((current) => current.filter((t) => t.id !== topicId));
     setProgress((current) => {
       const { [topicId]: _removed, ...rest } = current;
@@ -195,6 +196,15 @@ export function AppShell() {
     setSelected((current) => current.filter((id) => id !== topicId));
     invalidate("feed");
   }, []);
+
+  // Called after a successful unfollow (TopicsProgressBox's modal).
+  const onUnfollowed = useCallback(
+    async (topicId: string) => {
+      await api.unsubscribeTopic(topicId);
+      removeTopicLocally(topicId);
+    },
+    [removeTopicLocally],
+  );
 
   const onReset = useCallback(async () => {
     const list = await api.resetDemo();
@@ -272,6 +282,7 @@ export function AppShell() {
                 topics={topics}
                 onNavigateProfile={() => setView("profile")}
                 onTopicFollowed={onFollowed}
+                onTopicRemoved={removeTopicLocally}
               />
             </div>
           ) : null}
@@ -293,6 +304,7 @@ export function AppShell() {
             onProgressChanged={refreshProgress}
             onTopicColorChanged={onTopicColorChanged}
             onUnfollowed={onUnfollowed}
+            onTopicRemoved={removeTopicLocally}
           />
         )}
       </div>

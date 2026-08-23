@@ -7,6 +7,13 @@
  * generation is never synchronous on free tier (ADR-0003), so a "generating"
  * response gets an honest "building this" message instead of cards.
  *
+ * The form stays visible alongside any in-flight generations (not swapped
+ * out for a single progress panel) — a reader can queue a second or third
+ * custom topic while the first is still generating, up to the same
+ * custom-topic limit the backend enforces. Which topics are still being
+ * watched lives in GenerationTrackerProvider, not local state, so switching
+ * tabs in TopicDiscoveryModal or closing and reopening it doesn't lose them.
+ *
  * Mirrors `.discover-box`'s look (see that file's header comment on why) —
  * this is one more "titled box in the right rail," not a bespoke form.
  */
@@ -14,25 +21,23 @@
 import { useState } from "react";
 
 import { ApiError, api, type Topic } from "@/lib/api";
+import { useGenerationTracker } from "./GenerationTrackerProvider";
 import { GenerationProgressPanel } from "./GenerationProgressPanel";
 
 interface Props {
   onFollowed: (topic: Topic) => void;
+  /** A pending request was cancelled from one of the panels below -- see
+   *  RightRail's docstring on the same prop. */
+  onTopicRemoved: (topicId: string) => void;
 }
 
 const CUSTOM_TOPIC_LIMIT_MESSAGE = "You've used all 3 custom topics";
 
-export function RequestTopicBox({ onFollowed }: Props) {
+export function RequestTopicBox({ onFollowed, onTopicRemoved }: Props) {
+  const { generations, track, dismiss } = useGenerationTracker();
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<{ tone: "info" | "error"; text: string } | null>(null);
-  // Set only for the "generating" outcome -- a brand-new topic with a job to
-  // stream progress for. The "subscribed" outcome (matched an existing,
-  // already-generated topic) has nothing to stream, so it stays on the plain
-  // `notice` text below instead.
-  const [generating, setGenerating] = useState<{ topicId: string; displayName: string } | null>(
-    null,
-  );
 
   const submit = async () => {
     const trimmed = name.trim();
@@ -45,7 +50,7 @@ export function RequestTopicBox({ onFollowed }: Props) {
       onFollowed(result.topic);
       setName("");
       if (result.status === "generating") {
-        setGenerating({ topicId: result.topic.id, displayName: result.topic.display_name });
+        track({ topicId: result.topic.id, displayName: result.topic.display_name });
       } else {
         setNotice({ tone: "info", text: `Following "${result.topic.display_name}"` });
       }
@@ -70,50 +75,57 @@ export function RequestTopicBox({ onFollowed }: Props) {
         <h3 className="discover-title mono">Request a topic</h3>
       </div>
 
-      {generating !== null ? (
-        <GenerationProgressPanel
-          topicId={generating.topicId}
-          topicDisplayName={generating.displayName}
-          onRequestAnother={() => setGenerating(null)}
+      <form
+        className="request-topic-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void submit();
+        }}
+      >
+        <input
+          type="text"
+          className="request-topic-input"
+          placeholder="e.g. Quantum computing"
+          value={name}
+          maxLength={120}
+          onChange={(e) => setName(e.target.value)}
+          disabled={submitting}
         />
-      ) : (
-        <>
-          <form
-            className="request-topic-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void submit();
-            }}
-          >
-            <input
-              type="text"
-              className="request-topic-input"
-              placeholder="e.g. Quantum computing"
-              value={name}
-              maxLength={120}
-              onChange={(e) => setName(e.target.value)}
-              disabled={submitting}
-            />
-            <button
-              type="submit"
-              className="discover-follow"
-              disabled={submitting || name.trim().length === 0}
-            >
-              {submitting ? "Adding…" : "Add"}
-            </button>
-          </form>
+        <button
+          type="submit"
+          className="discover-follow"
+          disabled={submitting || name.trim().length === 0}
+        >
+          {submitting ? "Adding…" : "Add"}
+        </button>
+      </form>
 
-          {notice ? (
-            <p className={`request-topic-notice mono${notice.tone === "error" ? " error" : ""}`}>
-              {notice.text}
-            </p>
-          ) : (
-            <p className="discover-note request-topic-hint">
-              Up to 3 custom topics. New topics take a while to generate.
-            </p>
-          )}
-        </>
+      {notice ? (
+        <p className={`request-topic-notice mono${notice.tone === "error" ? " error" : ""}`}>
+          {notice.text}
+        </p>
+      ) : (
+        <p className="discover-note request-topic-hint">
+          Up to 3 custom topics. New topics take a while to generate.
+        </p>
       )}
+
+      {generations.length > 0 ? (
+        <div className="generation-progress-list">
+          {generations.map((generation) => (
+            <GenerationProgressPanel
+              key={generation.topicId}
+              topicId={generation.topicId}
+              topicDisplayName={generation.displayName}
+              onDismiss={() => dismiss(generation.topicId)}
+              onCancelled={() => {
+                dismiss(generation.topicId);
+                onTopicRemoved(generation.topicId);
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

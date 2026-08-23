@@ -70,6 +70,11 @@ async def generation_progress(
     return await _service(session).generation_progress(topic_id)
 
 
+@router.delete("/{topic_id}/generation-job", status_code=status.HTTP_204_NO_CONTENT)
+async def cancel_generation(topic_id: UUID, session: SessionDep, user_id: UserDep) -> None:
+    await _service(session).cancel_generation(user_id, topic_id)
+
+
 @router.patch("/{topic_id}/color", response_model=TopicOut)
 async def set_topic_color(
     topic_id: UUID, payload: TopicColorIn, session: SessionDep, user_id: UserDep

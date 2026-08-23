@@ -1,22 +1,12 @@
 "use client";
 
 /**
- * The app's first modal (ADR-0015). Detailed per-topic stats: progress fields
- * plus engagement counts (likes/saves/notes/shares — ask-AI excluded, per
- * instruction, since it isn't a comprehension/ownership signal the way the
- * other four are).
- *
- * Rendered via a portal into `document.body`, not in place. This component
- * is mounted from TopicsProgressBox, which lives inside `.rail-right` — a
- * `position: sticky` element with its own `overflow-y: auto` scroll. Sticky
- * and fixed elements always create a stacking context (CSS Position spec),
- * so a `.modal-overlay` nested there is still stacked *within* `.rail-right`'s
- * context rather than at the document root: card titles and other positioned
- * content elsewhere in the tree (`.station`'s sticky headers, `.notice`'s
- * `z-index: 2`) could end up painting through it depending on compositor
- * layer order, `z-index: 100` notwithstanding. A portal makes `.modal-overlay`
- * an actual direct child of `<body>`, sidestepping the ancestor entirely
- * instead of trying to out-layer it with `transform`/`will-change` hacks.
+ * Redesigned TopicStatsModal:
+ * - Clean, space-efficient header with inline quick actions (color swatch, follow/unfollow).
+ * - High-impact Mastery & Progress Gauge (difficulty badge, overall completion %, cards seen/total).
+ * - Interactive Tier Quiz Cards (Beginner, Intermediate, Advanced with unlock states & take quiz CTA).
+ * - Clean 4-stat engagement bar (likes, saves, notes, shares).
+ * - Interactive Curriculum Roadmap tree.
  */
 
 import { useEffect, useState, type CSSProperties } from "react";
@@ -31,39 +21,15 @@ interface Props {
   topicId: string;
   topicName: string;
   onClose: () => void;
-  /** Present only when opened from Discover, for a topic not yet followed —
-   *  renders a Follow action in the modal instead of assuming the caller
-   *  already knows the topic is followed. `/topics/{id}/stats` itself works
-   *  fine with no UserTopicProgress row (defaults to 0% coverage, beginner
-   *  tier), so this reuses the same modal rather than a separate "preview"
-   *  component — the stats it shows are simply honestly empty for a topic
-   *  the user hasn't started. */
   onFollow?: () => void | Promise<void>;
   following?: boolean;
-  /** Present only for an already-followed topic (mirrors `onFollow`'s
-   *  Discover-only presence in reverse) — renders an Unfollow action instead
-   *  of assuming the caller wants it unconditionally offered. */
   onUnfollow?: () => void | Promise<void>;
-  /** Called after a quiz attempt is graded, so the app-wide progress map
-   *  (right-rail rows, InsightsPanel) picks up the change immediately
-   *  instead of only this modal's own `stats`. */
   onProgressChanged?: (topicId: string) => void;
-  /** ADR-0034. Present only for an already-followed topic (there's no
-   *  UserTopic row to color for a Discover preview) — omitted from Discover's
-   *  call, same pattern as `onFollow` being absent there in reverse. */
   accentHue?: number | null;
   onColorChanged?: (hue: number | null) => void;
-  /** This topic's position in the followed-topics list (subscription order)
-   *  — feeds the same curated first-10 default `Feed.tsx` uses, so the
-   *  swatch highlighted as "current" here matches what's actually rendered
-   *  on the card. Omitted from Discover's call (no ordered membership yet). */
   topicIndex?: number;
 }
 
-/** 8 preset hues, evenly spaced — a discrete swatch picker (ThemePicker's
- *  pattern) rather than a continuous color wheel, since the actual rendered
- *  color is always derived from the active palette (ADR-0034), not this
- *  swatch's own color. */
 const HUE_PRESETS = [355, 25, 45, 90, 150, 200, 230, 280];
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -71,10 +37,11 @@ const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   intermediate: "Intermediate",
   advanced: "Advanced",
 };
-const TIERS: { key: Difficulty; label: string }[] = [
-  { key: "beginner", label: "Beginner quiz" },
-  { key: "intermediate", label: "Intermediate quiz" },
-  { key: "advanced", label: "Advanced quiz" },
+
+const TIERS: { key: Difficulty; label: string; desc: string }[] = [
+  { key: "beginner", label: "Beginner Tier", desc: "Core concepts & fundamentals" },
+  { key: "intermediate", label: "Intermediate Tier", desc: "Real-world design & trade-offs" },
+  { key: "advanced", label: "Advanced Tier", desc: "Internals, optimization & mastery" },
 ];
 
 const TIER_ORDER: Difficulty[] = ["beginner", "intermediate", "advanced"];
@@ -93,13 +60,6 @@ export function TopicStatsModal({
 }: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
   const [subtopics, setSubtopics] = useState<SubtopicProgress[] | null>(null);
-  // The tier being quizzed, frozen at the moment the quiz opens — NOT read
-  // live from `stats.current_difficulty` while the modal is open. A pass
-  // advances that field via `loadStats` (below), and QuizModal keys its
-  // fetch off its `difficulty` prop: if that prop tracked `stats` live, a
-  // promotion mid-quiz would silently restart QuizModal against the newly
-  // (and still-locked) next tier, wiping the results screen the user just
-  // earned.
   const [quizDifficulty, setQuizDifficulty] = useState<Difficulty | null>(null);
   const [unfollowing, setUnfollowing] = useState(false);
   const [confirmingUnfollow, setConfirmingUnfollow] = useState(false);
@@ -127,9 +87,6 @@ export function TopicStatsModal({
     void api.topicCurriculum(topicId).then((c) => setSubtopics(c.subtopics));
   }, [topicId]);
 
-  // QuizModal's onGraded: refresh this modal's own stats, and also the
-  // app-wide progress map (right-rail rows, InsightsPanel), which otherwise
-  // stays stale until a full reload — see AppShell's `refreshProgress`.
   const onQuizGraded = () => {
     loadStats();
     onProgressChanged?.(topicId);
@@ -143,8 +100,6 @@ export function TopicStatsModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  // The thread scrolls at the window/body level (no inner scroll container),
-  // so without this the feed keeps scrolling right underneath an open modal.
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -153,71 +108,89 @@ export function TopicStatsModal({
     };
   }, []);
 
+  const totalCardsInTopic = subtopics ? subtopics.reduce((acc, s) => acc + s.total_cards, 0) : 0;
+  const totalCardsSeenInTopic = subtopics ? subtopics.reduce((acc, s) => acc + s.seen_cards, 0) : 0;
+  const completedSubtopicsCount = subtopics ? subtopics.filter((s) => s.covered).length : 0;
+
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-panel modal-panel-curriculum"
+        className="modal-panel modal-panel-wide topic-stats-modal-redesign"
         role="dialog"
         aria-modal="true"
         aria-label={`${topicName} details`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-head">
-          <h2 className="modal-title">{topicName}</h2>
-          <button type="button" className="modal-close" aria-label="Close" onClick={onClose}>
-            ×
-          </button>
+        {/* Streamlined Header */}
+        <div className="topic-stats-head">
+          <div className="topic-stats-title-col">
+            <div className="topic-stats-title-row">
+              <h2 className="topic-stats-title">{topicName}</h2>
+              {stats?.mastered ? (
+                <span className="topic-stats-badge-mastered mono">Mastered</span>
+              ) : null}
+            </div>
+            {subtopics && subtopics.length > 0 ? (
+              <span className="topic-stats-subtitle mono">
+                {subtopics.length} subtopics · {totalCardsInTopic} total cards
+              </span>
+            ) : null}
+          </div>
+
+          <div className="topic-stats-head-actions">
+            {onFollow !== undefined ? (
+              <button
+                type="button"
+                className="topic-stats-follow-btn mono"
+                disabled={following}
+                onClick={() => void onFollow()}
+              >
+                {following ? "Following" : "+ Follow"}
+              </button>
+            ) : null}
+
+            {onUnfollow !== undefined ? (
+              confirmingUnfollow ? (
+                <div className="topic-stats-unfollow-confirm">
+                  <button
+                    type="button"
+                    className="topic-stats-confirm-yes mono"
+                    disabled={unfollowing}
+                    onClick={() => void handleUnfollow()}
+                  >
+                    {unfollowing ? "…" : "Confirm Unfollow"}
+                  </button>
+                  <button
+                    type="button"
+                    className="topic-stats-confirm-no mono"
+                    onClick={() => setConfirmingUnfollow(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="topic-stats-unfollow-btn mono"
+                  onClick={() => setConfirmingUnfollow(true)}
+                  title="Unfollow topic"
+                >
+                  Unfollow
+                </button>
+              )
+            ) : null}
+
+            <button type="button" className="modal-close" aria-label="Close" onClick={onClose}>
+              ×
+            </button>
+          </div>
         </div>
 
-        {onUnfollow !== undefined ? (
-          confirmingUnfollow ? (
-            <div className="modal-unfollow-confirm">
-              <span className="mono">Unfollow {topicName}? Your notes, likes, and saves stay.</span>
-              <div className="modal-unfollow-confirm-actions">
-                <button
-                  type="button"
-                  className="modal-unfollow modal-unfollow-confirm-yes"
-                  disabled={unfollowing}
-                  onClick={() => void handleUnfollow()}
-                >
-                  {unfollowing ? "Unfollowing…" : "Unfollow"}
-                </button>
-                <button
-                  type="button"
-                  className="modal-unfollow-cancel"
-                  disabled={unfollowing}
-                  onClick={() => setConfirmingUnfollow(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              type="button"
-              className="modal-unfollow"
-              onClick={() => setConfirmingUnfollow(true)}
-            >
-              Unfollow this topic
-            </button>
-          )
-        ) : null}
-
-        {onFollow !== undefined ? (
-          <button
-            type="button"
-            className="modal-follow"
-            disabled={following}
-            onClick={() => void onFollow()}
-          >
-            {following ? "Following…" : "Follow this topic"}
-          </button>
-        ) : null}
-
+        {/* Color Palette Row */}
         {onColorChanged !== undefined ? (
-          <div className="modal-color-picker">
-            <span className="modal-color-picker-label mono">Card color</span>
-            <div className="modal-color-swatches" role="group" aria-label="Topic accent color">
+          <div className="topic-color-bar">
+            <span className="topic-color-label mono">Accent Hue:</span>
+            <div className="topic-color-swatches" role="group" aria-label="Topic accent color">
               <button
                 type="button"
                 className="modal-color-swatch modal-color-swatch-none"
@@ -241,65 +214,137 @@ export function TopicStatsModal({
         ) : null}
 
         {stats === null ? (
-          <p className="modal-loading mono">Loading…</p>
+          <div className="modal-loading mono">Loading topic data…</div>
         ) : (
-          <>
-            <div className="modal-progress-row">
-              <span className="mono">{DIFFICULTY_LABEL[stats.current_difficulty]}</span>
-              <span className="mono">{Math.round(stats.coverage * 100)}% coverage</span>
-              {stats.mastered ? <span className="modal-badge">Completed</span> : null}
-            </div>
-
-            <div className="modal-tiers">
-              {TIERS.map(({ key, label }, i) => (
-                <span key={key} className="modal-tier" data-passed={stats.tier_quiz_passed[i] ?? false}>
-                  <CheckIcon />
-                  {label}
+          <div className="topic-stats-body">
+            {/* Top Overview Cards */}
+            <div className="topic-stats-overview-grid">
+              <div className="topic-overview-card">
+                <span className="overview-card-label mono">Current Tier</span>
+                <span className="overview-card-value">{DIFFICULTY_LABEL[stats.current_difficulty]}</span>
+                <span className="overview-card-hint mono">
+                  {stats.tier_quiz_passed[TIER_ORDER.indexOf(stats.current_difficulty)]
+                    ? "Tier Quiz Passed ✓"
+                    : "Quiz Incomplete"}
                 </span>
-              ))}
+              </div>
+
+              <div className="topic-overview-card">
+                <span className="overview-card-label mono">Topic Coverage</span>
+                <span className="overview-card-value">{Math.round(stats.coverage * 100)}%</span>
+                <div className="overview-card-meter-bar">
+                  <div
+                    className="overview-card-meter-fill"
+                    style={{ width: `${Math.round(stats.coverage * 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="topic-overview-card">
+                <span className="overview-card-label mono">Cards Studied</span>
+                <span className="overview-card-value">
+                  {totalCardsSeenInTopic} <span className="overview-card-total">/ {totalCardsInTopic}</span>
+                </span>
+                <span className="overview-card-hint mono">
+                  {completedSubtopicsCount} of {subtopics?.length ?? 0} subtopics completed
+                </span>
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="modal-quiz"
-              data-locked={!stats.quiz_unlocked}
-              disabled={!stats.quiz_unlocked}
-              onClick={() => setQuizDifficulty(stats.current_difficulty)}
-            >
-              {!stats.quiz_unlocked
-                ? "Quiz locked — reach 80% coverage"
-                : `Take the ${DIFFICULTY_LABEL[stats.current_difficulty]} quiz`}
-            </button>
+            {/* Quiz Tier Progression Section */}
+            <div className="topic-quizzes-section">
+              <div className="topic-section-header">
+                <span className="topic-section-title mono">Tier Certification Quizzes</span>
+                <span className="topic-section-subtitle mono">Requires 80% coverage in tier</span>
+              </div>
 
-            <div className="modal-engagement">
-              <div className="modal-engagement-stat">
+              <div className="topic-quizzes-grid">
+                {TIERS.map(({ key, label, desc }, i) => {
+                  const passed = stats.tier_quiz_passed[i] ?? false;
+                  const isCurrent = stats.current_difficulty === key;
+                  const canTake = isCurrent && stats.quiz_unlocked;
+
+                  return (
+                    <div
+                      key={key}
+                      className="topic-quiz-card"
+                      data-passed={passed}
+                      data-current={isCurrent}
+                    >
+                      <div className="topic-quiz-card-head">
+                        <div className="topic-quiz-card-title-row">
+                          <span className="topic-quiz-badge mono">Level {i + 1}</span>
+                          {passed ? (
+                            <span className="topic-quiz-status passed mono">✓ Passed</span>
+                          ) : isCurrent ? (
+                            <span className="topic-quiz-status active mono">Active</span>
+                          ) : (
+                            <span className="topic-quiz-status locked mono">Locked</span>
+                          )}
+                        </div>
+                        <span className="topic-quiz-card-name">{label}</span>
+                        <p className="topic-quiz-card-desc">{desc}</p>
+                      </div>
+
+                      <div className="topic-quiz-card-footer">
+                        {passed ? (
+                          <button
+                            type="button"
+                            className="topic-quiz-action-btn passed mono"
+                            onClick={() => setQuizDifficulty(key)}
+                          >
+                            Retake Quiz
+                          </button>
+                        ) : isCurrent ? (
+                          <button
+                            type="button"
+                            className="topic-quiz-action-btn active mono"
+                            disabled={!stats.quiz_unlocked}
+                            onClick={() => setQuizDifficulty(key)}
+                          >
+                            {stats.quiz_unlocked ? "Start Quiz →" : "Reach 80% to Unlock"}
+                          </button>
+                        ) : (
+                          <span className="topic-quiz-locked-note mono">Complete Level {i} First</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Engagement Metrics Bar */}
+            <div className="topic-stats-engagement-bar">
+              <div className="engagement-stat-cell">
                 <HeartIcon />
-                <span>{stats.likes}</span>
-                <span className="mono">likes</span>
+                <span className="stat-value">{stats.likes}</span>
+                <span className="stat-label mono">Likes</span>
               </div>
-              <div className="modal-engagement-stat">
+              <div className="engagement-stat-cell">
                 <BookmarkIcon />
-                <span>{stats.saves}</span>
-                <span className="mono">saves</span>
+                <span className="stat-value">{stats.saves}</span>
+                <span className="stat-label mono">Saves</span>
               </div>
-              <div className="modal-engagement-stat">
+              <div className="engagement-stat-cell">
                 <NoteIcon />
-                <span>{stats.notes}</span>
-                <span className="mono">notes</span>
+                <span className="stat-value">{stats.notes}</span>
+                <span className="stat-label mono">Notes</span>
               </div>
-              <div className="modal-engagement-stat">
+              <div className="engagement-stat-cell">
                 <ShareIcon />
-                <span>{stats.shares}</span>
-                <span className="mono">shares</span>
+                <span className="stat-value">{stats.shares}</span>
+                <span className="stat-label mono">Shares</span>
               </div>
             </div>
 
+            {/* Interactive Curriculum Roadmap */}
             <div className="curriculum-tree-section">
               <div className="curriculum-tree-head">
                 <span className="curriculum-tree-title mono">Curriculum Roadmap</span>
                 {subtopics ? (
                   <span className="curriculum-tree-count mono">
-                    {subtopics.filter((s) => s.covered).length} / {subtopics.length} completed
+                    {completedSubtopicsCount} / {subtopics.length} completed
                   </span>
                 ) : null}
               </div>
@@ -420,7 +465,7 @@ export function TopicStatsModal({
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
 

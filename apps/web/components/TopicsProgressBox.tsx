@@ -121,26 +121,29 @@ function TopicProgressRow({
   onOpen: () => void;
 }) {
   const coverage = progress?.coverage ?? 0;
+  const pct = Math.round(Math.min(coverage, 1) * 100);
   const unlocked = progress?.quizUnlocked ?? false;
+  const difficulty = progress?.currentDifficulty ?? "beginner";
 
   return (
     <div className="progress-row" onClick={onOpen} role="button" tabIndex={0}>
       <div className="progress-row-text">
         <div className="progress-row-top">
           <span className="progress-row-name">{topic.display_name}</span>
-          <span className="progress-row-difficulty mono">
-            {DIFFICULTY_LABEL[progress?.currentDifficulty ?? "beginner"]}
-          </span>
+          <div className="progress-row-meta-right">
+            <span className="progress-row-pct mono">{pct}%</span>
+            <span className="progress-row-difficulty mono" data-tier={difficulty}>
+              {DIFFICULTY_LABEL[difficulty]}
+            </span>
+          </div>
         </div>
-        {/* Where Discover's row shows "X followers" — this row's equivalent
-            meta line is the coverage bar. */}
-        <span className="meter">
-          <span
-            className="meter-fill"
+        <div className="progress-row-meter-wrap">
+          <div
+            className="progress-row-meter-fill"
             data-complete={unlocked}
-            style={{ width: `${Math.min(coverage, 1) * 100}%` }}
+            style={{ width: `${pct}%` }}
           />
-        </span>
+        </div>
       </div>
     </div>
   );

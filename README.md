@@ -16,7 +16,9 @@ Web first; a React Native app comes later and shares this backend.
 > auth (email/password + Google OAuth + guest sessions; see
 > [ADR-0033](docs/adr/0033-jwt-auth-and-guest-identity.md)) are live against `spoin_db`,
 > which holds real verified production data from the generation pipeline (seeded mock
-> data has been purged; see [generation-pipeline-test-run.md](docs/architecture/generation-pipeline-test-run.md) and `CLAUDE.md`).
+> data has been purged; see [generation-pipeline-test-run.md](docs/architecture/generation-pipeline-test-run.md),
+> [generation-pipeline-run-3-benchmark.md](docs/architecture/generation-pipeline-run-3-benchmark.md)
+> for the 10,000+ card milestone, and `CLAUDE.md`).
 > The web app's feed visual design is in [ADR-0012](docs/adr/0012-feed-visual-design.md).
 > The generation pipeline (curriculum, topic merging, card generation, the two-pass
 > quality gate; see [generation-pipeline.md](docs/architecture/generation-pipeline.md) and

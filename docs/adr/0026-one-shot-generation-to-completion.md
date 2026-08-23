@@ -135,6 +135,11 @@ threshold against) is a feed-serving/read-path question this ADR deliberately le
 rather than deciding as a side effect of a generation-side change. `content-model.md`'s
 "When the pool cannot satisfy the mix" section is flagged accordingly.
 
+**Update (2026-08-23):** the discoverability half of this question — when a brand-new
+topic starts showing up for users who didn't request it — is resolved by
+[ADR-0053](0053-topic-live-coverage-threshold.md). The degraded-mode/`POOL_LOW`/`POOL_HIGH`
+half, for a *follower's* feed while a topic is still filling in, remains open.
+
 ## Consequences
 
 **Easier**

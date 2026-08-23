@@ -30,6 +30,10 @@ interface Props {
   onProgressChanged: (topicId: string) => void;
   onTopicColorChanged: (topicId: string, accentHue: number | null) => void;
   onUnfollowed: (topicId: string) => void | Promise<void>;
+  /** A generation request was cancelled (GenerationProgressPanel) -- the
+   *  server already dropped the subscription; this just catches up local
+   *  state, same tail end as `onUnfollowed` without a second API call. */
+  onTopicRemoved: (topicId: string) => void;
 }
 
 export function RightRail({
@@ -42,6 +46,7 @@ export function RightRail({
   onProgressChanged,
   onTopicColorChanged,
   onUnfollowed,
+  onTopicRemoved,
 }: Props) {
   const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const [discoveryView, setDiscoveryView] = useState<"topics" | "custom" | "request">("topics");
@@ -65,7 +70,7 @@ export function RightRail({
 
       {/* Right below the topic filters — opens straight to the full topic
           list (ADR-0038), not the 5-row-capped inline box below. */}
-      <button type="button" className="discover-follow view-all-topics" onClick={() => openDiscovery("topics")}>
+      <button type="button" className="view-all-topics" onClick={() => openDiscovery("topics")}>
         View all topics
       </button>
 
@@ -84,6 +89,7 @@ export function RightRail({
       {discoveryOpen ? (
         <TopicDiscoveryModal
           onFollowed={onFollowed}
+          onTopicRemoved={onTopicRemoved}
           onClose={() => setDiscoveryOpen(false)}
           initialView={discoveryView}
         />

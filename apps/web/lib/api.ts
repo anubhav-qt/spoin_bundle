@@ -300,6 +300,10 @@ export interface GenerationProgress {
   topic_name: string | null;
   subtopics: GenerationSubtopicProgress[];
   error: string | null;
+  /** Crossed ADR-0053's live-coverage threshold -- the same moment this
+   *  topic starts appearing in Topics/Discover for users who didn't request
+   *  it. A separate, usually-earlier milestone than `status === "completed"`. */
+  topic_live: boolean;
 }
 
 export interface QuizMcqQuestion {
@@ -476,6 +480,12 @@ export const api = {
 
   generationProgress: (topicId: string) =>
     request<GenerationProgress>(`/topics/${topicId}/generation-progress`),
+
+  /** Only works while the job is still "pending" (not yet claimed by a
+   *  worker) -- 409s otherwise. Removes the job, the caller's own
+   *  subscription, and the topic itself if nobody else was following it. */
+  cancelGeneration: (topicId: string) =>
+    request<void>(`/topics/${topicId}/generation-job`, { method: "DELETE" }),
 
   setTopicColor: (topicId: string, hue: number | null) =>
     request<Topic>(`/topics/${topicId}/color`, {

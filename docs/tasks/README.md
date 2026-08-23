@@ -29,6 +29,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0019](0019-transaction-retry-boundary.md) | A transaction retry boundary for CockroachDB's `40001` errors | blocked on 0016 |
 | [0020](0020-corpus-migration-and-parity.md) | Move the live corpus to CockroachDB, and prove nothing was lost | blocked on 0017-0019 |
 | [0021](0021-cockroachdb-cutover.md) | Cut over to CockroachDB Basic, and instrument both meters | blocked on 0020 |
+| [0022](0022-slug-collision-skips-alias.md) | Slug-collision fallback in topic matching skips alias recording (ADR-0025) | unassigned |
 
 Tasks 0016-0021 are one sequence, gated on 0016. Read
 [ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and

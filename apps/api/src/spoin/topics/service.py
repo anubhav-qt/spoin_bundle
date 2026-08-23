@@ -25,6 +25,7 @@ user-initiated write, never the feed read path.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal, cast
 from uuid import UUID
@@ -190,6 +191,52 @@ class TopicsService:
         )
         return {job.topic_id: job for job in rows}
 
+    async def _live_topic_ids(self, topic_ids: Sequence[UUID]) -> set[UUID]:
+        """Which of `topic_ids` have crossed the "browsable" bar: at least
+        `topic_live_coverage_fraction` of their subtopics have each reached
+        their own `min_cards` (ADR-0053). Computed at read time against live
+        card counts rather than cached on `Topic`, so it reflects reality even
+        if content is later rejected/superseded, and needs no backfill for the
+        existing corpus.
+
+        Shared by `list_all`/`discover` (gates visibility for topics the
+        caller doesn't already follow) and `generation_progress` (tells the
+        requester's own progress view the same moment everyone else's list
+        would start showing it).
+        """
+
+        if not topic_ids:
+            return set()
+
+        per_subtopic = (
+            select(
+                Subtopic.topic_id.label("topic_id"),
+                Subtopic.id.label("subtopic_id"),
+                Subtopic.min_cards.label("min_cards"),
+                func.count(Card.id).filter(Card.status == CardStatus.ACTIVE).label("active_count"),
+            )
+            .select_from(Subtopic)
+            .outerjoin(Card, Card.subtopic_id == Subtopic.id)
+            .where(Subtopic.topic_id.in_(topic_ids))
+            .group_by(Subtopic.topic_id, Subtopic.id, Subtopic.min_cards)
+            .subquery()
+        )
+        coverage = select(
+            per_subtopic.c.topic_id,
+            func.count(per_subtopic.c.subtopic_id)
+            .filter(per_subtopic.c.active_count >= per_subtopic.c.min_cards)
+            .label("covered"),
+            func.count(per_subtopic.c.subtopic_id).label("total"),
+        ).group_by(per_subtopic.c.topic_id)
+
+        rows = (await self._session.execute(coverage)).all()
+        threshold = self._settings.topic_live_coverage_fraction
+        return {
+            topic_id
+            for topic_id, covered, total in rows
+            if total > 0 and (covered / total) >= threshold
+        }
+
     async def generation_progress(self, topic_id: UUID) -> GenerationProgressOut:
         """Polled by the request-a-topic streaming UI while a custom topic's
         `GenerationJob` is in flight.
@@ -214,6 +261,7 @@ class TopicsService:
         progress = job.progress or {}
         stage = None if job.status == "pending" else progress.get("stage", "curriculum")
         raw_subtopics = cast("list[dict[str, object]]", progress.get("subtopics", []))
+        live_ids = await self._live_topic_ids([topic_id])
 
         return GenerationProgressOut(
             status=cast(Literal["pending", "running", "completed", "failed"], job.status),
@@ -221,7 +269,71 @@ class TopicsService:
             topic_name=cast("str | None", progress.get("topic_name")),
             subtopics=[GenerationSubtopicProgressOut(**entry) for entry in raw_subtopics],
             error=job.last_error if job.status == "failed" else None,
+            topic_live=topic_id in live_ids,
         )
+
+    async def cancel_generation(self, user_id: UUID, topic_id: UUID) -> None:
+        """Cancels a still-`pending` `GenerationJob` -- the queue slot this
+        user's own request created, before any worker has claimed it. Removes
+        the job, the user's own subscription to it, and (if nobody else was
+        already following it) the `Topic` row itself, so an abandoned request
+        leaves nothing behind in the corpus or the queue.
+
+        Guarded to `status == 'pending'` only, atomically (the `DELETE ...
+        RETURNING` below either removes a still-pending row or nothing at
+        all): once a worker claims the job (`pending` -> `running`), real
+        quota has likely already been spent on it, and the run is a
+        concurrent writer to the same row -- this refuses rather than racing
+        it or trying to interrupt work already in flight.
+        """
+
+        user_topic = await self._session.scalar(
+            select(UserTopic).where(
+                UserTopic.user_id == user_id,
+                UserTopic.topic_id == topic_id,
+                UserTopic.is_custom.is_(True),
+            )
+        )
+        if user_topic is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No custom topic request found")
+
+        deleted_job_id = await self._session.scalar(
+            delete(GenerationJob)
+            .where(GenerationJob.topic_id == topic_id, GenerationJob.status == "pending")
+            .returning(GenerationJob.id)
+        )
+        if deleted_job_id is None:
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                detail="Generation has already started -- can no longer be cancelled",
+            )
+
+        topic = await self._session.get(Topic, topic_id)
+        if topic is not None:
+            topic.subscriber_count = max(0, topic.subscriber_count - 1)
+
+        await self._session.execute(
+            delete(UserTopicProgress).where(
+                UserTopicProgress.user_id == user_id, UserTopicProgress.topic_id == topic_id
+            )
+        )
+        await self._session.execute(
+            delete(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+        )
+
+        # Nothing was ever generated for a still-pending job (guaranteed by
+        # the atomic guard above), so if this was the only follower, the
+        # topic is dead weight -- clean it up rather than leaving an empty,
+        # unreachable row in the corpus. `subtopics`/`aliases` cascade
+        # (ondelete=CASCADE); both are already empty here regardless.
+        remaining_followers = await self._session.scalar(
+            select(func.count()).select_from(UserTopic).where(UserTopic.topic_id == topic_id)
+        )
+        if topic is not None and (remaining_followers or 0) == 0:
+            await self._session.delete(topic)
+
+        await self._session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
+        await self._session.commit()
 
     async def list_all(self, user_id: UUID) -> list[TopicDiscoverOut]:
         """Every topic in the corpus, not just the top-5 unfollowed slice
@@ -230,7 +342,8 @@ class TopicsService:
         `followed` lets the client grey out Follow on a row instead of offering
         a second subscribe -- cheaper than filtering those rows out entirely,
         since "browse everything" should still show what you're already
-        following.
+        following. A followed topic bypasses the live-coverage filter below
+        for the same reason -- you already have it, mid-generation or not.
         """
 
         followed_ids = set(
@@ -248,6 +361,7 @@ class TopicsService:
             .scalars()
             .all()
         )
+        live_ids = await self._live_topic_ids([t.id for t in rows if t.id not in followed_ids])
 
         return [
             TopicDiscoverOut(
@@ -257,6 +371,7 @@ class TopicsService:
                 followed=topic.id in followed_ids,
             )
             for topic in rows
+            if topic.id in followed_ids or topic.id in live_ids
         ]
 
     async def discover(self, user_id: UUID) -> list[TopicDiscoverOut]:
@@ -268,21 +383,27 @@ class TopicsService:
         personalize from for topics a user hasn't subscribed to), and a
         parameter this method ignores would be a lie about what it does. The
         route keeps accepting it so the client toggle doesn't change shape.
+
+        The `LIMIT` moves into Python (ADR-0053): a topic just past its live
+        threshold can still outrank an established one on `subscriber_count`
+        (a brand-new custom topic starts at 1), so the top N by subscriber
+        count and the top N that are actually live aren't the same slice --
+        filtering has to happen before the cut, not after a DB-side LIMIT.
         """
 
         followed = select(UserTopic.topic_id).where(UserTopic.user_id == user_id)
-        rows = (
+        candidates = (
             (
                 await self._session.execute(
                     select(Topic)
                     .where(Topic.id.not_in(followed))
                     .order_by(Topic.subscriber_count.desc())
-                    .limit(_DISCOVER_LIMIT)
                 )
             )
             .scalars()
             .all()
         )
+        live_ids = await self._live_topic_ids([t.id for t in candidates])
 
         return [
             TopicDiscoverOut(
@@ -290,8 +411,9 @@ class TopicsService:
                 display_name=topic.canonical_name,
                 subscriber_count=topic.subscriber_count,
             )
-            for topic in rows
-        ]
+            for topic in candidates
+            if topic.id in live_ids
+        ][:_DISCOVER_LIMIT]
 
     async def stats(self, user_id: UUID, topic_id: UUID) -> TopicStatsOut:
         tier, coverage, unlocked, mastered = await self.progress_snapshot(user_id, topic_id)

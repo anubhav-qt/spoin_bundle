@@ -1764,6 +1764,16 @@ body.custom-cursor-active textarea {
 .rail-right {
   position: sticky;
   top: 0;
+  /* Tight enough (this rule's padding, `.rail-right`'s own 20px->12px inter-
+     section gap, `.progress-box-list`/`.discover-box-list`'s trimmed 3-row
+     heights) that real content stays under a typical viewport height on its
+     own -- the rail is meant to just sit at `top: 0` and never need to move
+     or scroll internally, only the feed scrolls (infinite-loads more cards
+     as the page scrolls; see Feed.tsx). `max-height`/`overflow-y` stay on as
+     a silent (`scrollbar-width: none`) fallback for a viewport short enough
+     that even the trimmed content doesn't fit, not as the intended way to
+     reach anything -- removing them outright would clip content on a short
+     screen instead of degrading gracefully. */
   max-height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -1774,7 +1784,7 @@ body.custom-cursor-active textarea {
      column out past its track and overflow the whole `.app-grid`. */
   min-width: 0;
   scrollbar-width: none;
-  padding: 20px 0 24px;
+  padding: 12px 0 14px;
 }
 
 .rail-left::-webkit-scrollbar,
@@ -1971,19 +1981,19 @@ body.custom-cursor-active textarea {
 .rail-right {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 8px;
 }
 
 .rail-top-row {
   display: flex;
   align-items: stretch;
-  gap: 9px;
+  gap: 8px;
 }
 
 .theme-picker {
   display: flex;
-  gap: 9px;
-  padding: 2px 4px;
+  gap: 6px;
+  padding: 0;
 }
 
 /* Fills the leftover width next to the swatches when entering; fixed
@@ -2215,7 +2225,7 @@ body.custom-cursor-active textarea {
 
 /* -- font picker (ADR-0023, wired up by ADR-0037) -- */
 .font-picker {
-  padding: 0 4px 8px;
+  padding: 0;
 }
 
 .font-picker-row {
@@ -2372,17 +2382,7 @@ body.custom-cursor-active textarea {
    base `.topic-chip`. */
 .rail-right .topic-rail {
   margin: 0;
-  /* Symmetric top/bottom (was `0 0 4px`) — this rule, not the base
-     `.topic-rail` padding above, is what actually wins here (higher
-     specificity), so the asymmetry that pushed the pills' true center below
-     the wrap's midpoint — where `.topic-rail-arrow` is positioned at
-     `top: 50%` — lived here all along. */
-  padding: 2px 0;
-  /* Flex items default to `min-width: auto`, which for a row of
-     `flex: 0 0 auto` chips is the sum of every chip's width — with no
-     explicit min-width the rail grows to fit all chips instead of being
-     clamped by its column-flex parent, so `overflow-x: auto` above never
-     has anything to actually clip/scroll. */
+  padding: 0;
   min-width: 0;
   /* Soft fade at both edges rather than an abrupt clip — reads as
      intentional (there's more here, scroll for it) instead of content just
@@ -2527,14 +2527,16 @@ body.custom-cursor-active textarea {
   color: var(--fg-3);
 }
 
-/* Fixed to ~5 rows' worth of height regardless of how many topics are
-   followed — fewer than 5 leaves matching empty space rather than the box
-   shrinking, more than 5 scrolls internally, so the box never pushes
-   `.rail-right`'s own height around. */
+/* Fixed to ~3 rows' worth of height regardless of how many topics are
+   followed — fewer than 3 leaves matching empty space rather than the box
+   shrinking, more than 3 scrolls internally, so the box never pushes
+   `.rail-right`'s own height around. Trimmed from 5 rows (230px) so the
+   whole right rail fits inside the viewport without its own scroll (see
+   `.rail-left, .rail-right` below) -- the internal scroll here is what
+   stays reachable for a long followed-topics list, not the rail itself. */
 .progress-box-list {
-  height: 230px;
+  max-height: 180px;
   overflow-y: auto;
-  /* See `.discover-box-list` -- same latent horizontal-scroll bug. */
   overflow-x: hidden;
   scrollbar-width: none;
 }
@@ -2546,20 +2548,16 @@ body.custom-cursor-active textarea {
 .progress-row {
   display: flex;
   align-items: center;
-  padding: 9px 0;
+  padding: 8px 0;
   border-top: 1px solid var(--line);
   cursor: pointer;
-  transition: background var(--dur-1) var(--ease);
+  transition: all var(--dur-1) var(--ease);
 }
 
 .progress-row:first-of-type {
   border-top: none;
 }
 
-/* Discover's rows aren't themselves a click target (only the Follow button
-   is), so they don't need hover feedback — this one is, so it gets a subtle
-   one, expanding into the row's own horizontal padding via negative margin
-   rather than shifting layout. */
 .progress-row:hover {
   background: var(--bg-3);
   margin: 0 -14px;
@@ -2573,20 +2571,20 @@ body.custom-cursor-active textarea {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .progress-row-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .progress-row-name {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--fg);
   overflow: hidden;
@@ -2594,15 +2592,57 @@ body.custom-cursor-active textarea {
   white-space: nowrap;
 }
 
-.progress-row-difficulty {
+.progress-row-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex: 0 0 auto;
-  padding: 2px 8px;
+}
+
+.progress-row-pct {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fg-2);
+}
+
+.progress-row-difficulty {
+  padding: 1px 6px;
   border-radius: var(--r-pill);
   background: var(--bg-3);
-  font-size: 9px;
-  letter-spacing: 0.05em;
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--fg-3);
+  font-weight: 600;
+}
+
+.progress-row-difficulty[data-tier="intermediate"] {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-3));
+}
+
+.progress-row-difficulty[data-tier="advanced"] {
+  color: var(--good);
+  background: color-mix(in srgb, var(--good) 12%, var(--bg-3));
+}
+
+.progress-row-meter-wrap {
+  width: 100%;
+  height: 3.5px;
+  border-radius: 2px;
+  background: var(--bg-3);
+  overflow: hidden;
+}
+
+.progress-row-meter-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width var(--dur-2) var(--ease);
+}
+
+.progress-row-meter-fill[data-complete="true"] {
+  background: var(--good);
 }
 
 /* -- discover box (ADR-0015) -- */
@@ -2666,9 +2706,10 @@ body.custom-cursor-active textarea {
   color: var(--fg-3);
 }
 
-/* Same fixed-height/overflow-scroll treatment as `.progress-box-list`. */
+/* Same fixed-height/overflow-scroll treatment as `.progress-box-list`,
+   trimmed the same way and for the same reason -- see that comment. */
 .discover-box-list {
-  height: 290px;
+  height: 170px;
   overflow-y: auto;
   /* Without an explicit overflow-x, the used value computes to `auto` too
      (per spec, whenever one axis is a scrolling value and the other isn't
@@ -2760,72 +2801,306 @@ body.custom-cursor-active textarea {
 /* -- "View all topics" rail entry point (ADR-0036) -- */
 .view-all-topics {
   width: 100%;
-  margin-top: 12px;
-  padding: 9px 12px;
+  margin: 0;
+  padding: 6px 12px;
   text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--fg-3);
+  transition: all var(--dur-1) var(--ease);
 }
 
-/* -- TopicDiscoveryModal (ADR-0036, restructured by ADR-0038) -- */
-.discover-modal-view-toggle {
-  width: 100%;
+.view-all-topics:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+  background: var(--bg-3);
+}
+
+/* -- TopicDiscoveryModal Redesign -- */
+.discover-modal-redesign {
+  padding: 16px 20px 20px;
+  max-width: 620px;
+}
+
+.discover-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
 }
 
-.discover-modal-view-toggle button {
-  flex: 1;
+.discover-modal-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* Fixed across all three tabs (ADR-0038) -- switching between a long topic
-   list and a five-field form used to resize the whole modal panel, since
-   each tab's natural content height differed. A constant height plus
-   internal scroll means the panel itself never moves; only this pane's
-   content scrolls when it's taller than the box. */
-.discovery-modal-body {
-  height: 50vh;
-  overflow-y: auto;
-  /* See `.discover-box-list` -- an unset overflow-x next to overflow-y:auto
-     computes to auto, not visible, so this silently gains a horizontal
-     scrollbar on any row wider than the panel. */
-  overflow-x: hidden;
-  /* Minimal scrollbar: a bare thin thumb, no track outline, no up/down
-     buttons -- the browser default here is a full gray rectangle with
-     arrow buttons, which reads as chrome the modal doesn't otherwise have
-     anywhere else. Firefox honors `scrollbar-width`/`scrollbar-color`
-     directly; the `::-webkit-scrollbar*` rules below do the same for
-     Chrome/Edge/Safari, which ignore those two properties entirely. */
-  scrollbar-width: thin;
-  scrollbar-color: #000 transparent;
+.discover-modal-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
-.discovery-modal-body::-webkit-scrollbar {
-  width: 4px;
+.discover-modal-count {
+  font-size: 11px;
+  color: var(--fg-3);
 }
 
-.discovery-modal-body::-webkit-scrollbar-track {
+.discover-modal-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.discover-modal-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+}
+
+.discover-modal-tabs button {
+  padding: 5px 12px;
+  border: none;
+  border-radius: var(--r-pill);
   background: transparent;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
 }
 
-.discovery-modal-body::-webkit-scrollbar-thumb {
-  background: #000;
-  border-radius: 4px;
+.discover-modal-tabs button[data-active="true"] {
+  background: var(--bg-2);
+  color: var(--fg);
+  font-weight: 600;
+  box-shadow: 0 1px 4px var(--shadow);
 }
 
-.discovery-modal-body::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
+.discover-search-wrap {
+  position: relative;
+  flex: 1 1 180px;
+  max-width: 220px;
 }
 
-.discover-modal-list {
-  /* No height of its own -- fills and scrolls with .discovery-modal-body,
-     the shared fixed-height wrapper around every tab. */
-  height: auto;
-  overflow-x: hidden;
+.discover-search-input {
+  width: 100%;
+  padding: 5px 24px 5px 10px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+  color: var(--fg);
+  transition: border-color var(--dur-1) var(--ease);
 }
 
-.custom-topic-status {
+.discover-search-input:focus {
+  outline: none;
+  border-color: var(--line-strong);
+}
+
+.discover-search-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--fg-3);
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px;
+}
+
+.discover-grid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.discover-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-2);
+  cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.discover-card-item:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-3);
+  transform: translateY(-1px);
+}
+
+.discover-card-item[data-followed="true"] {
+  border-color: color-mix(in srgb, var(--line) 80%, var(--good));
+}
+
+.discover-card-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.discover-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discover-card-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discover-card-status-badge {
   flex: 0 0 auto;
-  padding: 4px 10px;
+  padding: 2px 6px;
+  border-radius: var(--r-pill);
+  font-size: 9.5px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--good) 14%, var(--bg-3));
+  color: var(--good);
+}
+
+.discover-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discover-card-badge {
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.discover-card-tier-tag {
+  font-size: 10px;
+  color: var(--fg-3);
+  opacity: 0.8;
+}
+
+.discover-card-actions {
+  flex: 0 0 auto;
+}
+
+.discover-follow-btn {
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.discover-follow-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.discover-follow-btn[data-followed="true"] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.discover-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--fg-3);
+  font-size: 12px;
+}
+
+.discover-empty-action-btn {
+  padding: 7px 16px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Custom Topic Card in Discover Modal */
+.custom-topic-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-2);
+  overflow: hidden;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.custom-topic-card:hover {
+  border-color: var(--line-strong);
+}
+
+.custom-topic-card-header {
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease);
+}
+
+.custom-topic-card-header:hover {
+  background: var(--bg-3);
+}
+
+.custom-topic-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.custom-topic-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.custom-topic-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.custom-topic-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
   border-radius: var(--r-pill);
   font-size: 10px;
   font-weight: 600;
@@ -2833,15 +3108,56 @@ body.custom-cursor-active textarea {
   color: var(--fg-3);
 }
 
-.custom-topic-status[data-status="completed"],
-.custom-topic-status[data-status="ready"] {
-  background: color-mix(in srgb, var(--good) 16%, var(--bg-3));
+.custom-topic-status-pill[data-status="running"] {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg-3));
+  color: var(--accent);
+}
+
+.custom-topic-status-pill[data-status="completed"],
+.custom-topic-status-pill[data-status="ready"] {
+  background: color-mix(in srgb, var(--good) 15%, var(--bg-3));
   color: var(--good);
 }
 
-.custom-topic-status[data-status="failed"] {
-  background: color-mix(in srgb, var(--accent) 16%, var(--bg-3));
+.custom-topic-status-pill[data-status="failed"] {
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg-3));
   color: var(--accent);
+}
+
+.custom-topic-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.custom-topic-status-dot[data-status="running"] {
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+.custom-topic-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.custom-topic-view-toggle {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.custom-topic-expanded-panel {
+  padding: 0 14px 14px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-1);
 }
 
 /* -- request-a-topic box -- mirrors .discover-box, see RequestTopicBox.tsx */
@@ -2887,130 +3203,341 @@ body.custom-cursor-active textarea {
 }
 
 /* -- request-a-topic live generation progress (GenerationProgressPanel) -- */
-.generation-progress {
-  margin-top: 10px;
+.generation-progress-list {
   display: flex;
   flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+/* -- Live Generation Progress Visualizer (.gen-visualizer) -- */
+.gen-visualizer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0 6px;
+}
+
+.gen-visualizer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
 }
 
-.generation-progress-message {
-  margin: 0;
-  font-size: 11.5px;
-  color: var(--fg-2);
-}
-
-.generation-progress-message[data-tone="error"] {
-  color: var(--accent);
-}
-
-.generation-progress-note {
-  margin: -4px 0 0;
-  font-size: 10px;
-  color: var(--fg-3);
-}
-
-.generation-progress-error {
-  margin: 0;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg-3));
-  color: var(--fg-2);
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.generation-curriculum {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.gen-visualizer-title-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.generation-curriculum li {
-  font-size: 11.5px;
-  font-weight: 600;
+.gen-visualizer-name {
+  font-size: 13.5px;
+  font-weight: 700;
   color: var(--fg);
 }
 
-.generation-curriculum li::before {
-  content: "— ";
+.gen-visualizer-stage-badge {
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  font-size: 9.5px;
+  font-weight: 600;
+  background: var(--bg-3);
   color: var(--fg-3);
-  font-weight: 400;
 }
 
-.generation-subtopics {
+.gen-visualizer-stage-badge[data-status="running"] {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg-3));
+  color: var(--accent);
+}
+
+.gen-visualizer-stage-badge[data-status="completed"] {
+  background: color-mix(in srgb, var(--good) 18%, var(--bg-3));
+  color: var(--good);
+}
+
+.gen-visualizer-dismiss {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--fg-3);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.gen-visualizer-dismiss:hover {
+  background: var(--bg-3);
+  color: var(--fg);
+}
+
+.gen-visualizer-live-pill {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--good) 12%, var(--bg-3));
+  color: var(--good);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+/* Overall Progress Card */
+.gen-visualizer-progress-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 260px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: #000 transparent;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
 }
 
-.generation-subtopics::-webkit-scrollbar {
-  width: 4px;
-}
-
-.generation-subtopics::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.generation-subtopics::-webkit-scrollbar-thumb {
-  background: #000;
-  border-radius: 4px;
-}
-
-.generation-subtopics::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-.generation-subtopic-row {
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.generation-subtopic-head {
+.gen-progress-card-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
 }
 
-.generation-subtopic-name {
+.gen-progress-label-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gen-progress-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-2);
+}
+
+.gen-progress-subtitle {
+  font-size: 10px;
+  color: var(--fg-3);
+}
+
+.gen-progress-pct {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.gen-meter-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-3);
+  overflow: hidden;
+}
+
+.gen-meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--good) 100%);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.gen-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.gen-stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--bg-3);
+}
+
+.gen-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.gen-stat-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.gen-stat-tot {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--fg-3);
+}
+
+.gen-cancel-btn {
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid #c0392b;
+  background: transparent;
+  color: #c0392b;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.gen-cancel-btn:hover:not(:disabled) {
+  background: #c0392b;
+  color: #fff;
+}
+
+.gen-subtopics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gen-subtopics-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gen-subtopics-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gen-filter-toggle {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+}
+
+.gen-filter-toggle button {
+  padding: 3px 8px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.gen-filter-toggle button[data-active="true"] {
+  background: var(--bg-2);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.gen-subtopics-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.gen-subtopic-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.gen-subtopic-card[data-complete="true"] {
+  border-color: color-mix(in srgb, var(--good) 30%, var(--line));
+}
+
+.gen-subtopic-card-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gen-subtopic-title {
   font-size: 12px;
   font-weight: 600;
   color: var(--fg);
 }
 
-.generation-subtopic-difficulty {
-  font-size: 9.5px;
-  letter-spacing: 0.03em;
-  color: var(--fg-3);
+.gen-subtopic-tier-tag {
+  font-size: 9px;
   text-transform: uppercase;
+  color: var(--fg-3);
+  background: var(--bg-2);
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
 }
 
-.generation-bar-row {
-  display: flex;
-  align-items: center;
+.gen-subtopic-bars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.generation-bar-label {
-  flex: 0 0 auto;
-  width: 52px;
-  font-size: 9.5px;
+.gen-subtopic-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gen-bar-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 9px;
   color: var(--fg-3);
+}
+
+.gen-mini-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+
+.gen-mini-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.gen-mini-fill[data-complete="true"] {
+  background: var(--good);
+}
+
+.gen-terminal-note {
+  font-size: 11px;
+  color: var(--good);
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--good) 10%, var(--bg-3));
 }
 
 .generation-bar-row .meter {
@@ -3022,25 +3549,6 @@ body.custom-cursor-active textarea {
   font-size: 9.5px;
   color: var(--fg-3);
   white-space: nowrap;
-}
-
-.generation-request-another {
-  align-self: flex-start;
-  padding: 6px 12px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
-}
-
-.generation-request-another:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 /* -- hero card first-time tutorial overlay (ADR-0035) -- */
@@ -3552,6 +4060,389 @@ body.custom-cursor-active textarea {
     var(--bg) calc(50% - 1px) calc(50% + 1px),
     transparent calc(50% + 1px)
   );
+}
+
+/* -- TopicStatsModal Redesign -- */
+.topic-stats-modal-redesign {
+  padding: 16px 20px 20px;
+  max-width: 640px;
+}
+
+.topic-stats-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.topic-stats-title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topic-stats-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.topic-stats-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.topic-stats-badge-mastered {
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  background: var(--good);
+  color: var(--bg);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.topic-stats-subtitle {
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.topic-stats-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topic-stats-follow-btn {
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--dur-1) var(--ease);
+}
+
+.topic-stats-follow-btn:hover {
+  opacity: 0.9;
+}
+
+.topic-stats-unfollow-btn {
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-3);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.topic-stats-unfollow-btn:hover {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+.topic-stats-unfollow-confirm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topic-stats-confirm-yes {
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid #c0392b;
+  background: #c0392b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.topic-stats-confirm-no {
+  padding: 4px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-3);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.topic-color-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--bg-3);
+  margin-bottom: 12px;
+}
+
+.topic-color-label {
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.topic-color-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topic-stats-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Overview Metric Cards */
+.topic-stats-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.topic-overview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+}
+
+.overview-card-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  letter-spacing: 0.04em;
+}
+
+.overview-card-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.overview-card-total {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fg-3);
+}
+
+.overview-card-hint {
+  font-size: 9.5px;
+  color: var(--fg-3);
+}
+
+.overview-card-meter-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-2);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.overview-card-meter-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--good);
+  transition: width var(--dur-2) var(--ease);
+}
+
+/* Quiz Section */
+.topic-quizzes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.topic-section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-3);
+}
+
+.topic-section-subtitle {
+  font-size: 10px;
+  color: var(--fg-3);
+  opacity: 0.8;
+}
+
+.topic-quizzes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.topic-quiz-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.topic-quiz-card[data-current="true"] {
+  border-color: var(--accent);
+}
+
+.topic-quiz-card[data-passed="true"] {
+  border-color: color-mix(in srgb, var(--good) 40%, var(--line));
+}
+
+.topic-quiz-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.topic-quiz-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.topic-quiz-badge {
+  font-size: 9px;
+  color: var(--fg-3);
+}
+
+.topic-quiz-status {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: var(--r-pill);
+}
+
+.topic-quiz-status.passed {
+  background: color-mix(in srgb, var(--good) 15%, var(--bg-3));
+  color: var(--good);
+}
+
+.topic-quiz-status.active {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg-3));
+  color: var(--accent);
+}
+
+.topic-quiz-status.locked {
+  background: var(--bg-3);
+  color: var(--fg-3);
+}
+
+.topic-quiz-card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.topic-quiz-card-desc {
+  margin: 0;
+  font-size: 10px;
+  color: var(--fg-3);
+  line-height: 1.35;
+}
+
+.topic-quiz-card-footer {
+  margin-top: 4px;
+}
+
+.topic-quiz-action-btn {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--dur-1) var(--ease);
+}
+
+.topic-quiz-action-btn.active {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.topic-quiz-action-btn.active:disabled {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--fg-3);
+  cursor: default;
+}
+
+.topic-quiz-action-btn.passed {
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--good);
+}
+
+.topic-quiz-locked-note {
+  font-size: 9.5px;
+  color: var(--fg-3);
+  display: block;
+  text-align: center;
+}
+
+/* Engagement Bar */
+.topic-stats-engagement-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-3);
+}
+
+.engagement-stat-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg-2);
+}
+
+.engagement-stat-cell svg {
+  width: 13px;
+  height: 13px;
+  stroke: var(--fg-3);
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.engagement-stat-cell .stat-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.engagement-stat-cell .stat-label {
+  font-size: 9.5px;
+  color: var(--fg-3);
 }
 
 /* -- quiz (ADR-0009) -- */

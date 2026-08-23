@@ -54,6 +54,10 @@ export function useAuth(): AuthContextValue {
 function clearTokens() {
   localStorage.removeItem("spoin_access_token");
   localStorage.removeItem("spoin_refresh_token");
+  // Not this user's generations to watch anymore -- GenerationTrackerProvider
+  // re-reads this key lazily on next mount, so clearing it directly here
+  // (rather than threading a second context in) is enough.
+  localStorage.removeItem("spoin_active_generations");
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

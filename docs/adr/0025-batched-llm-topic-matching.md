@@ -117,3 +117,10 @@ drop it just because the LLM is now always in the loop.
   prompt (e.g. subtopic titles, not just names/descriptions) -- same class of information
   ADR-0004's old mid-band judge already had access to (`judge_topic_match`'s
   `matched_subtopic_titles`) and this batched version should probably keep.
+
+**Known gap (2026-08-23):** the "every merge decision has an LLM behind it" claim above has
+one exception. `match_and_create_topics`'s slug-collision fallback (added in commit
+`e6947a6` to fix an `IntegrityError` on insert) reuses an existing `Topic` on a raw slug
+match with no LLM judgment and, unlike the LLM-match branch, never records an alias -- so
+that merge decision isn't cached the way this ADR commits `topic_alias` decisions should be.
+See [task 0022](../tasks/0022-slug-collision-skips-alias.md).

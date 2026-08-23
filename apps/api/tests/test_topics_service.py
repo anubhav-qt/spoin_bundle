@@ -10,6 +10,7 @@ from __future__ import annotations
 import uuid
 
 import pytest
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +19,7 @@ from spoin.domain.enums import CardStatus, Difficulty, SeenState
 from spoin.domain.models import (
     Card,
     CardStats,
+    GenerationJob,
     Subtopic,
     Topic,
     User,
@@ -253,3 +255,175 @@ async def test_set_color_sentinel_opts_out_of_topic_color(
     out = await service.set_color(user_id, topic_id, -1)
 
     assert out.accent_hue == -1
+
+
+# --------------------------------------------- live-coverage threshold (ADR-0053) --
+
+
+async def test_list_all_hides_unfollowed_topics_below_the_live_threshold(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    """`_topic_with_cards` fixes `min_cards=5` per subtopic. One covered
+    subtopic out of two is exactly the 0.5 boundary -- live. Zero out of two
+    is not."""
+
+    _owner_id, live_topic_id, _cards = await _topic_with_cards(session, subtopics=[5, 0])
+    _other_id, not_live_topic_id, _cards2 = await _topic_with_cards(session, subtopics=[0, 0])
+    viewer_id, own_topic_id, _cards3 = await _topic_with_cards(session, subtopics=[])
+
+    out = await TopicsService(session, service_settings).list_all(viewer_id)
+    ids = {t.topic_id for t in out}
+
+    assert live_topic_id in ids
+    assert not_live_topic_id not in ids
+    # Followed (it's the viewer's own topic) bypasses the filter entirely,
+    # even with zero subtopics -- otherwise a reader would lose their own
+    # just-requested topic from "Topics" while it's still generating.
+    assert own_topic_id in ids
+
+
+async def test_discover_applies_the_same_live_filter(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    _owner_id, live_topic_id, _cards = await _topic_with_cards(session, subtopics=[5, 0])
+    _other_id, not_live_topic_id, _cards2 = await _topic_with_cards(session, subtopics=[0, 0])
+    viewer_id, _own_topic_id, _cards3 = await _topic_with_cards(session, subtopics=[])
+
+    out = await TopicsService(session, service_settings).discover(viewer_id)
+    ids = {t.topic_id for t in out}
+
+    assert live_topic_id in ids
+    assert not_live_topic_id not in ids
+
+
+async def test_generation_progress_reports_topic_live_once_threshold_crossed(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    _owner_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[5, 0])
+    session.add(
+        GenerationJob(
+            topic_id=topic_id, status="running", progress={"stage": "cards", "subtopics": []}
+        )
+    )
+    await session.flush()
+
+    out = await TopicsService(session, service_settings).generation_progress(topic_id)
+
+    assert out.topic_live is True
+
+
+async def test_generation_progress_reports_topic_not_live_below_threshold(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    _owner_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[0, 0])
+    session.add(
+        GenerationJob(
+            topic_id=topic_id, status="running", progress={"stage": "cards", "subtopics": []}
+        )
+    )
+    await session.flush()
+
+    out = await TopicsService(session, service_settings).generation_progress(topic_id)
+
+    assert out.topic_live is False
+
+
+# ------------------------------------------------- cancel_generation --
+
+
+async def _pending_custom_request(
+    session: AsyncSession, *, job_status: str = "pending"
+) -> tuple[uuid.UUID, uuid.UUID]:
+    """A user's own custom-topic request, still in the state right after
+    `request_topic` created it: subscribed, no cards, one job."""
+
+    user = User(email=f"{uuid.uuid4()}@test.local", display_name="Test")
+    topic = Topic(slug=f"t-{uuid.uuid4().hex[:8]}", canonical_name="Requested Topic")
+    session.add_all([user, topic])
+    await session.flush()
+
+    session.add(
+        UserTopic(user_id=user.id, topic_id=topic.id, display_name="Requested Topic", is_custom=True)
+    )
+    session.add(
+        UserTopicProgress(
+            user_id=user.id,
+            topic_id=topic.id,
+            current_difficulty=Difficulty.BEGINNER,
+            tier_unlocked=entry_tier_unlock(Difficulty.BEGINNER),
+        )
+    )
+    session.add(GenerationJob(topic_id=topic.id, status=job_status))
+    await session.flush()
+    return user.id, topic.id
+
+
+async def test_cancel_generation_removes_job_subscription_and_orphaned_topic(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    user_id, topic_id = await _pending_custom_request(session)
+
+    await TopicsService(session, service_settings).cancel_generation(user_id, topic_id)
+
+    assert (
+        await session.scalar(select(GenerationJob).where(GenerationJob.topic_id == topic_id))
+    ) is None
+    assert (
+        await session.scalar(
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+        )
+    ) is None
+    assert await session.get(Topic, topic_id) is None
+
+
+async def test_cancel_generation_refuses_once_running(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    """A worker already claimed it -- real quota may be spent, so this
+    refuses rather than racing the worker's own writes."""
+
+    user_id, topic_id = await _pending_custom_request(session, job_status="running")
+
+    with pytest.raises(HTTPException) as exc_info:
+        await TopicsService(session, service_settings).cancel_generation(user_id, topic_id)
+    assert exc_info.value.status_code == 409
+
+    # Nothing was touched -- the job, subscription, and topic all survive.
+    assert (
+        await session.scalar(select(GenerationJob).where(GenerationJob.topic_id == topic_id))
+    ) is not None
+    assert await session.get(Topic, topic_id) is not None
+
+
+async def test_cancel_generation_keeps_topic_when_other_followers_remain(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    user_id, topic_id = await _pending_custom_request(session)
+
+    other = User(email=f"{uuid.uuid4()}@test.local", display_name="Other")
+    session.add(other)
+    await session.flush()
+    session.add(UserTopic(user_id=other.id, topic_id=topic_id, display_name="Shared"))
+    await session.flush()
+
+    await TopicsService(session, service_settings).cancel_generation(user_id, topic_id)
+
+    assert await session.get(Topic, topic_id) is not None
+    assert (
+        await session.scalar(
+            select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
+        )
+    ) is None
+
+
+async def test_cancel_generation_404s_for_a_non_requester(
+    session: AsyncSession, service_settings: Settings
+) -> None:
+    _owner_id, topic_id = await _pending_custom_request(session)
+    stranger = User(email=f"{uuid.uuid4()}@test.local", display_name="Stranger")
+    session.add(stranger)
+    await session.flush()
+
+    with pytest.raises(HTTPException) as exc_info:
+        await TopicsService(session, service_settings).cancel_generation(stranger.id, topic_id)
+    assert exc_info.value.status_code == 404

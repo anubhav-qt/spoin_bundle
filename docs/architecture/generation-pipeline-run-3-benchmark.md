@@ -97,7 +97,9 @@ The model fallback ladder functioned with 100% fidelity: as top-tier models (`3.
 
 ## 6. Live Database Corpus in `spoin_db`
 
-As of August 23, 2026, `spoin_db` contains verified, authentic production content across 12 completed topics:
+As of August 23, 2026, `spoin_db` contains verified, authentic production content across 19 topics
+(12 fully generated with cards; the other 7 were created by the curriculum agents and have not
+had a generation pass run against them yet):
 
 ```sql
 SELECT t.canonical_name, count(distinct st.id) as subtopics, count(distinct c.id) as cards, count(distinct q.id) as questions
@@ -109,23 +111,38 @@ GROUP BY t.canonical_name ORDER BY t.canonical_name;
 ```
 
 ```
-                             topic                             | subtopics | cards | questions 
+                             topic                             | subtopics | cards | questions
 ---------------------------------------------------------------+-----------+-------+-----------
  10M Air Pistol Shooting                                       |        35 |   589 |       581
  Building a Successful Kurtis Business in e-commerce for India |        41 |   543 |       503
+ CI/CD and GitOps                                              |         0 |     0 |         0
  Claude Code (Becoming a 10x Developer)                        |        32 |   619 |       611
+ Cloud Native Infrastructure & Service Mesh                    |         0 |     0 |         0
+ Cloud Native Security                                         |         0 |     0 |         0
  Computer Networking                                           |        40 |  1283 |      1244
  Current AI Capabilities and Scope                             |        22 |   476 |       475
  Docker                                                        |        65 |  1641 |       963
+ eBPF Systems Programming                                      |         0 |     0 |         0
  FastAPI                                                       |        44 |   625 |       607
  German (Language)                                             |        39 |   715 |       687
  Gym (Physical Fitness)                                        |        48 |   613 |       546
  Kubernetes                                                    |        38 |   701 |       687
+ Linux Kernel Internals                                        |         0 |     0 |         0
+ Network Security & Cryptography                               |         0 |     0 |         0
  Operating Systems                                             |        71 |  1739 |       894
  Study Abroad (Full Guide)                                     |        36 |   503 |       497
+ Wireless & Mobile Communication                                |         0 |     0 |         0
 ---------------------------------------------------------------+-----------+-------+-----------
- TOTAL VERIFIED PRODUCTION CORPUS                              |       449 | 10247 |      8382
+ TOTAL VERIFIED PRODUCTION CORPUS                              |       511 | 10047 |      8295
 ```
+
+> **Note:** this table was re-queried live against `spoin_db` while updating these docs and
+> differs slightly from the figures quoted in §1/§2 above (10,247 cards / 8,382 questions /
+> 449 subtopics), which were the numbers reported at the moment Run 3 finished. The gap
+> (-200 cards, -87 questions, +62 subtopics) wasn't investigated further here — it may reflect
+> quality-gate corrections, near-dup drops, or reporting rounding rather than data loss. If the
+> exact delta matters, check `QuotaLedger`/pipeline logs from the Run 3 window rather than
+> trusting either snapshot at face value.
 
 ---
 

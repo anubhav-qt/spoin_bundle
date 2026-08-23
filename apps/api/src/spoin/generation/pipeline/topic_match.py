@@ -120,6 +120,10 @@ async def match_and_create_topics(
             slug = _slugify(request["name"])
             existing_by_slug = await session.scalar(select(Topic).where(Topic.slug == slug))
             if existing_by_slug is not None:
+                # Known gap, not fixed here: unlike the LLM-match branch above, this merge
+                # has no LLM judgment behind it and doesn't call _ensure_alias, so it isn't
+                # cached the way ADR-0025 commits every match decision should be. See
+                # docs/tasks/0022-slug-collision-skips-alias.md.
                 topic = existing_by_slug
                 if topic.embedding is None:
                     topic.embedding = embedding

@@ -171,6 +171,9 @@ export function ShareTopicRail({
       {discoveryOpen ? (
         <TopicDiscoveryModal
           onFollowed={onFollowed}
+          // This standalone page tracks no followed-topics list of its own
+          // (unlike AppShell) -- nothing local to clean up after a cancel.
+          onTopicRemoved={() => {}}
           onClose={() => setDiscoveryOpen(false)}
           initialView="topics"
         />

@@ -216,6 +216,12 @@ class GenerationProgressOut(BaseModel):
     subtopics: list[GenerationSubtopicProgressOut]
     #: Set only when `status == "failed"` -- `GenerationJob.last_error`.
     error: str | None
+    #: True once the topic has crossed ADR-0053's live-coverage threshold --
+    #: the same moment it starts appearing in Topics/Discover for users who
+    #: didn't request it. Lets the requester's own progress view show a
+    #: distinct "now live in the feed" milestone, separate from `status ==
+    #: "completed"` (which can still be a while off).
+    topic_live: bool
 
 
 class TopicStatsOut(BaseModel):

@@ -15,6 +15,7 @@ import {
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { GenerationTrackerProvider } from "@/components/GenerationTrackerProvider";
 
 /**
  * Applies the persisted palette before first paint. Without this, the page
@@ -244,7 +245,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="apply-font" strategy="beforeInteractive">
           {APPLY_FONT_SCRIPT}
         </Script>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <GenerationTrackerProvider>{children}</GenerationTrackerProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -15,7 +15,7 @@ from typing import Literal
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from spoin.domain.enums import Difficulty
+from spoin.domain.enums import Difficulty, EngagementKind
 
 GeneratorBackend = Literal["fake", "gemini", "local"]
 EmbedderBackend = Literal["hash", "fastembed"]
@@ -181,13 +181,15 @@ class Settings(BaseSettings):
 
     #: Consecutive slots one topic wins in the interleave plan.
     #:
-    #: ADR-0010 specifies slots "spread evenly rather than clumped", which is
-    #: `1` — and at 1 an unfiltered feed alternates topics every single card, so
-    #: the client's per-topic headings appear before every card and stop being
-    #: headings at all. Above 1 each topic's *share* is unchanged; only the
-    #: granularity of alternation is. Config rather than code, so the two
-    #: concerns can be balanced against real engagement data.
-    feed_topic_run: int = 3
+    #: ADR-0010 specifies slots "spread evenly rather than clumped", which is `1`.
+    #: This was briefly `3` so the client's per-topic headings did not appear
+    #: before every single card; ADR-0055 put it back, because a run of 3 out of
+    #: `plan_size` 50 makes the smallest allocation a topic can win 3/50 = 6% —
+    #: which means the 5% share floor is not representable in the emitted plan at
+    #: all. At 1 the granularity is 2% and the floor is honoured. The per-card
+    #: heading repetition is the accepted cost; do not raise this without also
+    #: raising `plan_size` enough to keep one run under `session_share_floor`.
+    feed_topic_run: int = 1
 
     # Degraded-mode hysteresis (ADR-0006 §3). Two thresholds, deliberately: a
     # single one flaps as the pool sits on the line.
@@ -204,6 +206,50 @@ class Settings(BaseSettings):
     # collect. At/above end, DIFFICULTY_MIX[tier] applies exactly, unchanged.
     mix_ramp_start: float = 0.20
     mix_ramp_end: float = 0.60
+
+    # -- session taste profile (ADR-0055) ---------------------------------------
+    #
+    # Drives each topic's SHARE of the interleave plan from what the user has done
+    # in the current session. Every number here is a guess until there is real
+    # engagement data to tune against, which is exactly why they are config.
+
+    #: A session is a run of activity with no gap this long. Deliberately NOT
+    #: sharing `slate_ttl_seconds` despite both being 1800: how long a ranked slate
+    #: stays fresh and how long a taste profile survives are unrelated facts that
+    #: happen to agree today, and tuning one must not silently move the other.
+    session_window_seconds: int = 1800
+
+    #: Share bounds, as a fraction of the topics the feed is currently drawing
+    #: from. Both degrade to `1/n` when arithmetically impossible — a 5% floor
+    #: cannot hold for 21+ topics, and a 50% ceiling is meaningless for one.
+    session_share_floor: float = 0.05
+    session_share_ceiling: float = 0.50
+    #: Share-fingerprint quantization. Below this, drift does not rebuild the plan.
+    session_share_bucket: float = 0.05
+
+    #: Signal score at which a topic reaches half its maximum boost. Sets how much
+    #: reading it takes to visibly move the feed.
+    session_signal_k: float = 10.0
+    #: Ceiling on the multiplier a topic's weight can reach above the uniform
+    #: baseline of 1.0, so a saturated topic peaks at `1 + boost`.
+    session_signal_boost: float = 2.0
+
+    #: Per-event contribution to the session score. `explicit_complete` outweighs
+    #: `dwell_complete` deliberately — engagement/service.py's module docstring
+    #: makes the point that the two are separate events precisely because a
+    #: deliberate "Got it" and a card left open are different evidence.
+    session_w_dwell_per_second: float = 0.05
+    session_w_expand: float = 0.5
+    session_w_explicit_complete: float = 4.0
+    session_w_dwell_complete: float = 2.0
+    session_w_like: float = 3.0
+    session_w_bookmark: float = 3.0
+    session_w_note: float = 4.0
+    session_w_share: float = 4.0
+    session_w_ask_ai: float = 3.0
+    #: Negative. A skip is evidence, not the absence of it — without this a topic
+    #: the user is actively scrolling past only ever fails to rise.
+    session_w_skip: float = -1.5
 
     # -- engagement (ADR-0011) --------------------------------------------------
     dwell_complete_ms: int = 10000
@@ -275,6 +321,29 @@ class Settings(BaseSettings):
             "affinity": self.rank_w_affinity,
             "coverage": self.rank_w_coverage,
             "freshness": self.rank_w_freshness,
+        }
+
+    def session_signal_weights(self) -> dict[EngagementKind, float]:
+        """Per-kind session-score contribution (ADR-0055).
+
+        Kinds absent from this map contribute nothing. That is the right default
+        for `impression` and `collapse` in particular: being shown a card, or
+        closing one, is not evidence of interest in its topic. Undoing an action
+        subtracts exactly what taking it added, so a mis-tap leaves no residue.
+        """
+
+        return {
+            EngagementKind.EXPAND: self.session_w_expand,
+            EngagementKind.EXPLICIT_COMPLETE: self.session_w_explicit_complete,
+            EngagementKind.DWELL_COMPLETE: self.session_w_dwell_complete,
+            EngagementKind.LIKE: self.session_w_like,
+            EngagementKind.UNLIKE: -self.session_w_like,
+            EngagementKind.BOOKMARK: self.session_w_bookmark,
+            EngagementKind.UNBOOKMARK: -self.session_w_bookmark,
+            EngagementKind.NOTE: self.session_w_note,
+            EngagementKind.SHARE: self.session_w_share,
+            EngagementKind.ASK_AI: self.session_w_ask_ai,
+            EngagementKind.SKIP: self.session_w_skip,
         }
 
 

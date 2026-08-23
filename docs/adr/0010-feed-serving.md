@@ -9,6 +9,14 @@
   coverage gate. ADR-0050 also implements "the cycle advances when no `UNSEEN` cards
   remain at that difficulty", which this ADR specified and nothing ever built. The
   body below is left as originally written.
+- **Amended by:** [ADR-0055](0055-session-scoped-topic-shares.md) -- the interleave
+  plan is no longer weighted by `UserTopicAffinity`. It is weighted by a
+  session-scoped engagement signal that resets after 30 minutes of inactivity, with
+  each topic's share clamped to [5%, 50%]. Everywhere "affinity-weighted" appears
+  below, read "session-share-weighted"; the round-robin mechanism itself is
+  unchanged. `UserTopicAffinity` still feeds `topic_affinity` in the per-card score.
+  ADR-0055 also returns `feed_topic_run` to `1` -- a run of 3 makes the 5% share
+  floor unrepresentable in a 50-slot plan.
 
 > **Update (2026-08-18):** `DIFFICULTY_MIX[tier]` below is now the *ceiling* a
 > user's mix ramps toward, not a flat value from card one. A topic+tier starts

@@ -3,6 +3,11 @@
 - **Status:** Accepted
 - **Date:** 2026-08-15
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0055](0055-session-scoped-topic-shares.md) -- adds
+  `user_session_topic_signal` to the derived aggregates below. It follows this
+  ADR's rules (incrementally maintained at ingest, read as a plain column) with one
+  difference worth knowing: it is maintained synchronously inside `ingest` rather
+  than by a batch job, and it *resets* rather than only accumulating.
 
 ## Context
 
@@ -51,7 +56,11 @@ event** so the log stays complete.
 ```
 card_stats             impressions, expands, likes, saves, avg_dwell, skip_rate
                        -> card_quality  (RATE, not count)
-user_topic_affinity    per-user engagement weight per topic
+user_topic_affinity    per-user engagement weight per topic (long-run)
+user_session_topic_signal
+                       per-user engagement weight per topic for the CURRENT
+                       session; resets after 30 min idle -> the interleave
+                       plan's topic shares (ADR-0055)
 user_subtopic_progress seen_count, total_count  -> the 80% gate
 user_seen_bitmap       derived read model (ADR-0010)
 ```

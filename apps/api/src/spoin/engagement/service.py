@@ -12,10 +12,10 @@ Two things in here are easy to get wrong and expensive to fix later:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,6 +27,7 @@ from spoin.domain.models import (
     CardLike,
     EngagementEvent,
     UserCardState,
+    UserSessionTopicSignal,
     UserSubtopicProgress,
     UserTopicCycle,
     UserTopicDifficultyProgress,
@@ -116,8 +117,13 @@ class EngagementService:
         # their chronological order from the client batch.
         rows.sort(key=lambda r: (r["subtopic_id"], r["card_id"]))
 
+        now = datetime.now(UTC)
         for row in rows:
             await self._apply_state(user_id, row)
+            # Driven from here rather than from `_apply_state`, which returns early
+            # for impressions, skips and completions — the session profile needs
+            # every kind, including the ones that state machine handles and stops.
+            await self._bump_session_signal(user_id, row, now=now)
 
         await self._session.flush()
         return IngestResult(
@@ -320,6 +326,64 @@ class EngagementService:
             .on_conflict_do_update(
                 index_elements=["user_id", "topic_id", "difficulty"],
                 set_={"seen_count": seen_count or 0, "total_count": total_count or 0},
+            )
+        )
+
+    # -------------------------------------------------------- session profile --
+    async def _bump_session_signal(
+        self, user_id: UUID, row: dict[str, object], *, now: datetime
+    ) -> None:
+        """Accumulate this event into the current session's weight for its topic.
+
+        The feed reads the result as a plain column, so the aggregation happens
+        here at write time and never in the read path (ADR-0011). See
+        `feed/session_profile.py` for what the score is eventually turned into.
+        """
+
+        kind = row["kind"]
+        assert isinstance(kind, EngagementKind)
+        topic_id = row["topic_id"]
+        assert isinstance(topic_id, UUID)
+
+        contribution = self._settings.session_signal_weights().get(kind, 0.0)
+        dwell_ms = row["dwell_ms"]
+        if isinstance(dwell_ms, int):
+            # Already bounded by `_sanitize_dwell`, so this cannot be an overnight
+            # tab masquerading as sustained interest.
+            contribution += dwell_ms / 1000.0 * self._settings.session_w_dwell_per_second
+
+        if contribution == 0.0:
+            return
+
+        window = timedelta(seconds=self._settings.session_window_seconds)
+        statement = pg_insert(UserSessionTopicSignal).values(
+            user_id=user_id,
+            topic_id=topic_id,
+            score=contribution,
+            last_event_at=now,
+        )
+        await self._session.execute(
+            statement.on_conflict_do_update(
+                index_elements=["user_id", "topic_id"],
+                set_={
+                    # Reset-or-accumulate in one statement. Postgres holds a row
+                    # lock across the conflicting update, so two concurrent
+                    # ingests for the same (user, topic) serialize rather than
+                    # losing one of the contributions -- the same guarantee
+                    # `UserTopicCycle`'s `cycle + 1` upsert already leans on.
+                    #
+                    # The reset is what makes the session end: an event arriving
+                    # after the window has lapsed starts a new profile instead of
+                    # resuming one built hours ago.
+                    "score": case(
+                        (
+                            UserSessionTopicSignal.last_event_at < now - window,
+                            statement.excluded.score,
+                        ),
+                        else_=UserSessionTopicSignal.score + statement.excluded.score,
+                    ),
+                    "last_event_at": statement.excluded.last_event_at,
+                },
             )
         )
 

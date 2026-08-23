@@ -35,6 +35,7 @@ from spoin.domain.models import (
     FeedSlate,
     Subtopic,
     UserCardState,
+    UserSessionTopicSignal,
     UserSubtopicProgress,
     UserTopic,
     UserTopicAffinity,
@@ -44,6 +45,7 @@ from spoin.domain.models import (
 )
 from spoin.feed.interleave import build_plan, filter_key
 from spoin.feed.ranking import Candidate, diversify, rank
+from spoin.feed.session_profile import clamp_shares, raw_weight, share_fingerprint
 from spoin.feed.strata import MixOutcome, dynamic_mix, resolve_mix
 
 
@@ -174,11 +176,17 @@ class FeedService:
     async def _ensure_plan(self, user_id: UUID, topic_filter: list[UUID] | None) -> FeedPlan:
         key = filter_key(topic_filter)
         existing = await self._session.scalar(select(FeedPlan).where(FeedPlan.user_id == user_id))
-        affinities = await self._affinities(user_id, topic_filter)
+        affinities = await self._topic_shares(user_id, topic_filter)
+        fingerprint = share_fingerprint(affinities, self._settings.session_share_bucket)
 
         if (
             existing is not None
             and existing.filter_key == key
+            # The third trigger (ADR-0055): the session profile has shifted enough
+            # to reorder the feed. Without this the plan would be reused until the
+            # topic set or filter happened to change, and the session signal would
+            # be computed and then thrown away.
+            and existing.share_fingerprint == fingerprint
             and (
                 set(existing.topic_order) == set(affinities.keys())
                 or (not affinities and not existing.topic_order)
@@ -202,10 +210,21 @@ class FeedService:
             # update in place instead of crashing with a 500.
             statement = (
                 pg_insert(FeedPlan)
-                .values(user_id=user_id, topic_order=order, position=0, filter_key=key)
+                .values(
+                    user_id=user_id,
+                    topic_order=order,
+                    position=0,
+                    filter_key=key,
+                    share_fingerprint=fingerprint,
+                )
                 .on_conflict_do_update(
                     index_elements=["user_id"],
-                    set_={"topic_order": order, "position": 0, "filter_key": key},
+                    set_={
+                        "topic_order": order,
+                        "position": 0,
+                        "filter_key": key,
+                        "share_fingerprint": fingerprint,
+                    },
                 )
             )
             await self._session.execute(statement)
@@ -215,24 +234,47 @@ class FeedService:
         else:
             # A filter change regenerates the plan only. Slates are retained, not
             # discarded, so unfiltering resumes every topic exactly where it was.
+            #
+            # `position` resets on a share-driven rebuild too, and must: it is an
+            # index into `topic_order`, not a reference to a topic, so carrying it
+            # across a reordered list would land on an unrelated topic. Nothing is
+            # lost by resetting -- WHICH card each topic serves next lives in its
+            # own `FeedSlate.position`, which a plan rebuild never touches.
             existing.topic_order = order
             existing.position = 0
             existing.filter_key = key
+            existing.share_fingerprint = fingerprint
 
         await self._session.flush()
         return existing
 
-    async def _affinities(
+    async def _topic_shares(
         self, user_id: UUID, topic_filter: list[UUID] | None
     ) -> dict[UUID, float]:
+        """Each topic's share of the interleave plan, summing to 1.0 (ADR-0055).
+
+        Driven by the CURRENT session's engagement, not by `UserTopicAffinity` —
+        which still feeds `Candidate.topic_affinity` for per-card ranking, a
+        separate concern. A session with no activity yet scores 0 everywhere and
+        comes out uniform, which is the "open to anything" reset.
+
+        One indexed row read per subscribed topic, no aggregation (ADR-0011): the
+        score is maintained incrementally by `EngagementService._bump_session_signal`.
+        """
+
+        now = datetime.now(UTC)
         stmt = (
-            select(UserTopic.topic_id, func.coalesce(UserTopicAffinity.affinity, 1.0))
+            select(
+                UserTopic.topic_id,
+                UserSessionTopicSignal.score,
+                UserSessionTopicSignal.last_event_at,
+            )
             .select_from(UserTopic)
             .outerjoin(
-                UserTopicAffinity,
+                UserSessionTopicSignal,
                 and_(
-                    UserTopicAffinity.user_id == UserTopic.user_id,
-                    UserTopicAffinity.topic_id == UserTopic.topic_id,
+                    UserSessionTopicSignal.user_id == UserTopic.user_id,
+                    UserSessionTopicSignal.topic_id == UserTopic.topic_id,
                 ),
             )
             .where(UserTopic.user_id == user_id)
@@ -241,7 +283,22 @@ class FeedService:
             stmt = stmt.where(UserTopic.topic_id.in_(topic_filter))
 
         rows = (await self._session.execute(stmt)).all()
-        return {row[0]: float(row[1]) for row in rows}
+        window = timedelta(seconds=self._settings.session_window_seconds)
+
+        raw: dict[UUID, float] = {}
+        for topic_id, score, last_event_at in rows:
+            # Expiry is also checked here, not only at ingest. The write-side reset
+            # is lazy -- it fires on the next event -- so a reader who comes back
+            # the next morning and loads the feed before touching anything would
+            # otherwise be served yesterday's profile.
+            stale = last_event_at is None or now - last_event_at > window
+            raw[topic_id] = raw_weight(0.0 if stale else float(score), self._settings)
+
+        return clamp_shares(
+            raw,
+            lo=self._settings.session_share_floor,
+            hi=self._settings.session_share_ceiling,
+        )
 
     # ----------------------------------------------------------------- slate --
     async def _ensure_slate(

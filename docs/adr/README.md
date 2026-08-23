@@ -91,4 +91,5 @@ useful than the decision itself.
 | [0052](0052-undo-toast-for-collection-removal.md) | A single-slot undo toast for removal in Notes/Liked/Saved | Accepted |
 | [0053](0053-topic-live-coverage-threshold.md) | Topic live coverage threshold for partial feed serving | Accepted |
 | [0054](0054-sequential-subtopic-ordering-and-infinite-filtered-feed.md) | Sequential subtopic curriculum ordering and true infinite filtered feed | Accepted (amends 0010, 0050) |
+| [0055](0055-session-scoped-topic-shares.md) | The interleave plan is weighted by the current session, not long-run affinity | Accepted (amends 0010, 0011) |
 

@@ -204,6 +204,40 @@ class UserTopicAffinity(Base, Timestamps):
     recomputed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class UserSessionTopicSignal(Base, Timestamps):
+    """This user's engagement weight per topic for the CURRENT session (ADR-0055).
+
+    Deliberately a separate table from `UserTopicAffinity` rather than a column on
+    it. That one is the long-run, batch-recomputed taste; this one is a short-lived
+    signal that resets outright once the gap since `last_event_at` exceeds
+    `session_window_seconds`. Merging them would make "what do they like" and "what
+    are they doing right now" the same number, and the reset would destroy history
+    that took weeks to accumulate.
+
+    A derived aggregate, fully rebuildable from `engagement_event` — maintained
+    incrementally by `EngagementService._bump_session_signal` only so the feed read
+    path can read a column instead of aggregating (ADR-0011).
+    """
+
+    __tablename__ = "user_session_topic_signal"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("app_user.id", ondelete="CASCADE"), primary_key=True
+    )
+    topic_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), primary_key=True
+    )
+    #: Signed. Skips and un-likes subtract, so a topic can score below zero and be
+    #: pushed toward its floor share rather than merely failing to rise.
+    score: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    #: The session boundary. Server-assigned at ingest, never client-supplied — a
+    #: client-minted session id would fragment across tabs and devices and be
+    #: trivially spoofable (ADR-0055, alternatives considered).
+    last_event_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
 class UserSubtopicProgress(Base, Timestamps):
     """seen_count / total_count — the 80% coverage gate's inputs."""
 
@@ -325,3 +359,10 @@ class FeedPlan(Base, UUIDPrimaryKey, Timestamps):
     #: The topic filter this plan was built for; a change regenerates the plan but
     #: leaves every slate intact.
     filter_key: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    #: Quantized fingerprint of the topic shares this plan was built from
+    #: (ADR-0055). Session signal moves on every event, so without a coarse
+    #: fingerprint the plan would rebuild on each ingest; bucketing means only a
+    #: share that crosses a boundary counts as a real shift.
+    share_fingerprint: Mapped[str] = mapped_column(
+        String(64), nullable=False, default="", server_default=""
+    )

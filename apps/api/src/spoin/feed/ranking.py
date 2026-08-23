@@ -40,6 +40,8 @@ class Candidate:
     #: back. Never a scoring input — this is a slate-ordering concern, not a
     #: ranking one.
     archetype: tuple[str, ...] = ()
+    #: Pedagogical sequence within the topic curriculum tier (lower = earlier concept).
+    subtopic_position: int = 0
 
 
 def freshness(created_at: datetime, *, now: datetime) -> float:
@@ -85,7 +87,10 @@ def rank(
         return []
 
     rng = rng or random.Random()
-    ordered = sorted(candidates, key=lambda c: score(c, settings, now=now), reverse=True)
+    ordered = sorted(
+        candidates,
+        key=lambda c: (c.subtopic_position, -score(c, settings, now=now)),
+    )
 
     explore_slots = min(int(limit * settings.rank_epsilon), max(len(ordered) - limit, 0))
     exploit_count = limit - explore_slots

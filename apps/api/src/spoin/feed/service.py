@@ -141,8 +141,21 @@ class FeedService:
             attempts = 0
 
         if len(card_ids) < settings.page_size:
-            exhausted = True
-            starved = await self._starved_slots(user_id, plan.topic_order)
+            has_active_cards = False
+            for tid in plan.topic_order:
+                cnt = await self._session.scalar(
+                    select(func.count(Card.id)).where(
+                        Card.topic_id == tid, Card.status == CardStatus.ACTIVE
+                    )
+                )
+                if cnt and cnt > 0:
+                    has_active_cards = True
+                    break
+            if not has_active_cards:
+                exhausted = True
+                starved = await self._starved_slots(user_id, plan.topic_order)
+            else:
+                exhausted = False
         recycling = await self._any_recycling(user_id, plan.topic_order)
 
         plan.position = cursor
@@ -290,8 +303,18 @@ class FeedService:
                 found = await self._candidates(user_id, topic_id, difficulty)
             candidates_by_tier[difficulty] = [c for c in found if c.card_id not in blocked]
 
-        cycles = await self._cycles(user_id, topic_id)
-        recycled = {d for d, cycle in cycles.items() if cycle > 0}
+        # Truly infinite feed fallback: if all eligible cards have been consumed in this
+        # session or in the current pass, replenish from the topic's active card pool
+        # so filtered (and general) feeds continue infinitely instead of abruptly ending.
+        if not any(candidates_by_tier.values()):
+            for difficulty in Difficulty:
+                all_cards = await self._all_active_cards(user_id, topic_id, difficulty)
+                unblocked = [c for c in all_cards if c.card_id not in blocked]
+                candidates_by_tier[difficulty] = unblocked if unblocked else all_cards
+            recycled = set(Difficulty)
+        else:
+            cycles = await self._cycles(user_id, topic_id)
+            recycled = {d for d, cycle in cycles.items() if cycle > 0}
 
         read_fraction = await self._tier_read_fraction(user_id, topic_id, tier)
         mix_override = dynamic_mix(
@@ -360,7 +383,7 @@ class FeedService:
     # driver actually hands back.
     def _eligible_cards(
         self, user_id: UUID, topic_id: UUID, difficulty: Difficulty
-    ) -> Select[tuple[UUID, UUID, datetime, float, float | Decimal, list[str]]]:
+    ) -> Select[tuple[UUID, UUID, datetime, float, float | Decimal, list[str], int]]:
         """Eligible = UNSEEN, or DEFERRED in an earlier cycle.
 
         SEEN never returns — it counts toward the 80% gate. DEFERRED comes back
@@ -395,6 +418,7 @@ class FeedService:
                     1.0,
                 ),
                 Card.archetype,
+                Subtopic.position,
             )
             .select_from(Card)
             .join(Subtopic, Subtopic.id == Card.subtopic_id)
@@ -423,9 +447,10 @@ class FeedService:
                     ),
                 ),
             )
+            .order_by(Subtopic.position.asc(), Card.created_at.asc())
             # A generous multiple of the slate, so ranking has something to choose
             # between without pulling the whole corpus into memory.
-            .limit(self._settings.slate_size * 4)
+            .limit(self._settings.slate_size * 6)
         )
 
     async def _cycles(self, user_id: UUID, topic_id: UUID) -> dict[Difficulty, int]:
@@ -540,6 +565,64 @@ class FeedService:
                 topic_affinity=float(affinity if affinity is not None else 1.0),
                 coverage_need=float(row[4]),
                 archetype=tuple(row[5]),
+                subtopic_position=int(row[6]),
+            )
+            for row in rows
+        ]
+
+    async def _all_active_cards(
+        self, user_id: UUID, topic_id: UUID, difficulty: Difficulty
+    ) -> list[Candidate]:
+        affinity = await self._session.scalar(
+            select(UserTopicAffinity.affinity).where(
+                UserTopicAffinity.user_id == user_id,
+                UserTopicAffinity.topic_id == topic_id,
+            )
+        )
+        stmt = (
+            select(
+                Card.id,
+                Card.subtopic_id,
+                Card.created_at,
+                func.coalesce(CardStats.quality, 0.0),
+                func.coalesce(
+                    1.0
+                    - cast(UserSubtopicProgress.seen_count, Float)
+                    / func.nullif(UserSubtopicProgress.total_count, 0),
+                    1.0,
+                ),
+                Card.archetype,
+                Subtopic.position,
+            )
+            .select_from(Card)
+            .join(Subtopic, Subtopic.id == Card.subtopic_id)
+            .outerjoin(CardStats, CardStats.card_id == Card.id)
+            .outerjoin(
+                UserSubtopicProgress,
+                and_(
+                    UserSubtopicProgress.subtopic_id == Card.subtopic_id,
+                    UserSubtopicProgress.user_id == user_id,
+                ),
+            )
+            .where(
+                Card.topic_id == topic_id,
+                Card.difficulty == difficulty,
+                Card.status == CardStatus.ACTIVE,
+            )
+            .order_by(Subtopic.position.asc(), Card.created_at.asc())
+            .limit(self._settings.slate_size * 6)
+        )
+        rows = (await self._session.execute(stmt)).all()
+        return [
+            Candidate(
+                card_id=row[0],
+                subtopic_id=row[1],
+                created_at=row[2],
+                card_quality=float(row[3]),
+                topic_affinity=float(affinity if affinity is not None else 1.0),
+                coverage_need=float(row[4]),
+                archetype=tuple(row[5]),
+                subtopic_position=int(row[6]),
             )
             for row in rows
         ]

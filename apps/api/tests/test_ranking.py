@@ -21,6 +21,7 @@ def make_candidate(
     age_days: int = 0,
     subtopic_id: object | None = None,
     archetype: tuple[str, ...] = (),
+    subtopic_position: int = 0,
 ) -> Candidate:
     return Candidate(
         card_id=uuid4(),
@@ -30,7 +31,18 @@ def make_candidate(
         topic_affinity=affinity,
         coverage_need=coverage,
         archetype=archetype,
+        subtopic_position=subtopic_position,
     )
+
+
+def test_earlier_subtopic_position_ranked_first() -> None:
+    settings = Settings(rank_epsilon=0.0)
+    later_subtopic_card = make_candidate(quality=0.9, subtopic_position=5)
+    earlier_subtopic_card = make_candidate(quality=0.1, subtopic_position=1)
+
+    chosen = rank([later_subtopic_card, earlier_subtopic_card], settings, now=NOW, limit=2)
+    assert chosen[0].card_id == earlier_subtopic_card.card_id
+    assert chosen[1].card_id == later_subtopic_card.card_id
 
 
 def test_freshness_decays() -> None:

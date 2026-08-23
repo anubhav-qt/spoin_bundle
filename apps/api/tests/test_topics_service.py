@@ -343,7 +343,9 @@ async def _pending_custom_request(
     await session.flush()
 
     session.add(
-        UserTopic(user_id=user.id, topic_id=topic.id, display_name="Requested Topic", is_custom=True)
+        UserTopic(
+            user_id=user.id, topic_id=topic.id, display_name="Requested Topic", is_custom=True
+        )
     )
     session.add(
         UserTopicProgress(

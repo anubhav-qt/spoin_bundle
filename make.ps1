@@ -40,11 +40,15 @@ switch ($Target) {
     'dev'       { Invoke-Compose @('up') }
     'seed'      { Invoke-Compose @('run', '--rm', 'seed') }
     'test'      { Invoke-Compose @('--profile', 'test', 'run', '--rm', 'test') }
-    'lint'      { Invoke-Compose ($api + @('ruff', 'check', 'src', 'tests')) }
+    'lint' {
+        Invoke-Compose ($api + @('ruff', 'check', 'src', 'tests'))
+        Invoke-Compose ($api + @('ruff', 'format', '--check', 'src', 'tests'))
+    }
     'fmt'       { Invoke-Compose ($api + @('ruff', 'format', 'src', 'tests')) }
     'types'     { Invoke-Compose ($api + @('mypy', 'src')) }
     'check' {
         Invoke-Compose ($api + @('ruff', 'check', 'src', 'tests'))
+        Invoke-Compose ($api + @('ruff', 'format', '--check', 'src', 'tests'))
         Invoke-Compose ($api + @('mypy', 'src'))
         Invoke-Compose @('--profile', 'test', 'run', '--rm', 'test')
     }
@@ -67,7 +71,7 @@ switch ($Target) {
             'dev         Run the whole stack with hot reload'
             'seed        Apply migrations to spoin_db (no fixtures -- see CLAUDE.md)'
             'test        Run the test suite'
-            'lint        ruff check'
+            'lint        ruff check + ruff format --check'
             'fmt         ruff format'
             'types       mypy --strict'
             'check       Everything CI runs'

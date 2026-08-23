@@ -32,8 +32,9 @@ seed: ## Apply migrations to spoin_db (no fixtures -- see CLAUDE.md)
 test: ## Run the test suite (against its own database)
 	$(COMPOSE) --profile test run --rm test
 
-lint: ## ruff check
+lint: ## ruff check + ruff format --check
 	$(API) ruff check src tests
+	$(API) ruff format --check src tests
 
 fmt: ## ruff format
 	$(API) ruff format src tests

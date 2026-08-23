@@ -89,7 +89,7 @@ useful than the decision itself.
 | [0050](0050-shown-consumes-a-card.md) | Being shown a card consumes it; a difficulty turns over instead of running dry | Accepted (amends 0010) |
 | [0051](0051-topic-color-opt-out.md) | A "no color" opt-out for per-topic accent, via a sentinel hue | Accepted (amends 0034) |
 | [0052](0052-undo-toast-for-collection-removal.md) | A single-slot undo toast for removal in Notes/Liked/Saved | Accepted |
-| [0053](0053-topic-live-coverage-threshold.md) | Topic live coverage threshold for partial feed serving | Accepted |
+| [0053](0053-topic-live-coverage-threshold.md) | Topic live coverage threshold for partial feed serving | Accepted (amends 0026) |
 | [0054](0054-sequential-subtopic-ordering-and-infinite-filtered-feed.md) | Sequential subtopic curriculum ordering and true infinite filtered feed | Accepted (amends 0010, 0050) |
 | [0055](0055-session-scoped-topic-shares.md) | The interleave plan is weighted by the current session, not long-run affinity | Accepted (amends 0010, 0011) |
 

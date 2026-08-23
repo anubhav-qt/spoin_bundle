@@ -2,8 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-24
-- **Deciders:** Anubhav, Antigravity Team
-- **Amends:** [0010-feed-serving.md](0010-feed-serving.md), [0050-shown-consumes-a-card.md](0050-shown-consumes-a-card.md)
+- **Deciders:** Anubhav
+- **Amends:** [ADR-0010](0010-feed-serving.md), [ADR-0050](0050-shown-consumes-a-card.md)
 
 ## Context
 
@@ -27,18 +27,32 @@ Two critical pedagogical and usability issues were present in feed serving:
 
 ## Consequences
 
-### What becomes easier:
-- Concepts build naturally on top of earlier foundations without jumping to advanced nuances prematurely.
-- Users can filter to any topic (e.g., PostgreSQL, System Design) and scroll infinitely without hitting dead ends.
-- The system automatically transitions into smooth, diversified repeat cycles (`recycling = true`) once all material has been read.
+**Easier.** Concepts build naturally on top of earlier foundations without jumping to
+advanced nuances prematurely. Users can filter to any topic and scroll infinitely without
+hitting dead ends. The system transitions into diversified repeat cycles
+(`recycling = true`) once all material has been read, rather than stopping.
 
-### What becomes harder / Tradeoffs:
-- Top-scoring cards in later subtopics wait until earlier subtopics have been served, rather than dominating the top of the feed immediately. This is an intentional pedagogical choice: correctness and comprehension precede raw engagement optimization.
+**Harder.** Top-scoring cards in later subtopics wait until earlier subtopics have been
+served, rather than dominating the top of the feed immediately. This is an intentional
+pedagogical choice: correctness and comprehension precede raw engagement optimization. A
+single-topic filter that never runs dry also means `FeedPage.exhausted` now means
+something narrower than it used to — see ADR-0050's own note on `FeedPage.starved`, whose
+"nothing currently reads this" caveat this change makes more true, not less: a topic that
+is short on fresh material now recycles instead of ever reporting starved slots for a
+fill job.
 
 ## Alternatives considered
 
-- **Sorting by `Card.created_at` or `Subtopic.created_at`**: Rejected because background workers generate subtopics in parallel, and retry passes write cards at arbitrary times. `created_at` does not reflect curriculum order.
-- **Requiring manual topic unfiltering when a topic ends**: Rejected because users expect modern social and educational feeds to provide continuous reading streams.
+- **Sorting by `Card.created_at` or `Subtopic.created_at`.** Background workers generate
+  subtopics in parallel, and retry passes write cards at arbitrary times, so `created_at`
+  reflects generation order, not curriculum order — a subtopic generated late would sort
+  late even if it comes first pedagogically. `Subtopic.position` is assigned by the
+  curriculum generator specifically to be that ordering signal, and already existed on the
+  model; nothing else could substitute for it.
+- **Requiring manual topic unfiltering when a topic ends.** Would have been simpler to
+  ship, but it reintroduces exactly the dead end ADR-0050 already spent an ADR removing
+  from the general feed, just scoped to filtered feeds instead. Users have no reason to
+  expect a filtered feed to behave differently from the general one on this axis.
 
 ## Revisit when
 

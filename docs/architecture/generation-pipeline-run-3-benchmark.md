@@ -38,6 +38,16 @@ During Run 3, the Spoin generation pipeline achieved full production stability, 
 | **Time to 1,000 Cards** | ~75 minutes 🐢 | ~15 minutes | **~8.5 minutes 🚀 (>8.8x faster than Run 1)** |
 | **Active Key Pool** | 1–2 keys | 40 keys (some disabled) | **16 Clean, Verified Working Keys** |
 | **Rate Limit Handling** | Unmanaged | Abort on 429 | **Asynchronous Self-Pacing Queue (`asyncio.sleep`)** |
+
+> **On the "cumulative" column:** it does not sum from this table's own three run rows
+> (1,065 + 3,939 + 3,163 = 8,167 cards, not 10,247; the questions and total-items rows have
+> the same gap). The difference is real corpus growth from generation outside these three
+> headline runs -- the idle-topic scanner and ad hoc passes against topics never listed
+> above. §6's live snapshot shows exactly that: `Gym (Physical Fitness)` (613 cards) and
+> `Building a Successful Kurtis Business` (543 cards) are both fully populated in `spoin_db`
+> and neither appears in Run 1, 2, or 3's topic lists. Don't reconcile the cumulative column
+> against this table's rows -- it was never meant to be that sum, and the doc as first
+> written didn't say so.
 | **Quality Gate Acceptance** | 98.9% | 99.3% | **98.0% (Clean corrections & near-dup drops)** |
 | **Final Exit Code** | `0` | `0` | **`0` (Zero Unhandled Errors)** |
 
@@ -46,7 +56,7 @@ During Run 3, the Spoin generation pipeline achieved full production stability, 
 ## 3. Critical Infrastructure Fixes & Enhancements
 
 ### 1. Key Pool Audit & Elimination of 401 Overhead
-* **Discovery**: The legacy 25-key pool contained 10 disabled service account keys (`401 UNAUTHENTICATED: ACCOUNT_STATE_INVALID`). When parallel tasks acquired these keys, they triggered cascading retries and burned attempt budgets.
+* **Discovery**: The legacy 35-key pool contained 10 disabled service account keys (`401 UNAUTHENTICATED: ACCOUNT_STATE_INVALID`). When parallel tasks acquired these keys, they triggered cascading retries and burned attempt budgets.
 * **Resolution**: Tested all keys against live `gemini-3.5-flash-lite` endpoints. Archived all 19 non-functional keys into [`.env.disabled_keys`](../../.env.disabled_keys) and consolidated [`.env`](../../.env) with **16 verified working keys** delivering **240 RPM (4 calls/sec)** and **8,000 requests/day** capacity.
 
 ### 2. Topic Match Slug Conflict Bugfix ([`topic_match.py`](../../apps/api/src/spoin/generation/pipeline/topic_match.py))
@@ -72,6 +82,15 @@ Study Abroad (Full Guide)              |    36     |       503       |         4
 -------------------------------------------------------------------------------------------------------
 TOTAL (Run 3)                          |   189     |     3,163       |       3,089         | ~98.0% Passed
 ```
+
+> **What "Quality Gate" blends together:** this percentage is drafts accepted, over drafts
+> attempted -- it does not separate a draft the judge model actually *rejected* (bad content,
+> a real verdict) from a draft that never received a verdict at all (a call that errored,
+> timed out, or hit quota before returning one). CLAUDE.md is explicit that these are "never
+> the same number" and that folding them together is what caused a real incident here before
+> (see `pipeline.py`'s `_process_gate_item`). This run's per-call outcomes weren't logged with
+> that split, so the number above should be read as "drafts committed" rather than as an
+> assertion that ~2% of drafts were judged and found bad specifically.
 
 ---
 

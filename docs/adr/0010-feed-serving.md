@@ -9,6 +9,13 @@
   coverage gate. ADR-0050 also implements "the cycle advances when no `UNSEEN` cards
   remain at that difficulty", which this ADR specified and nothing ever built. The
   body below is left as originally written.
+- **Amended by:** [ADR-0054](0054-sequential-subtopic-ordering-and-infinite-filtered-feed.md)
+  -- within a stratum, ranking now sorts by `Subtopic.position` ascending *before* the
+  linear quality/affinity/coverage/freshness score, so curriculum order wins ties that
+  used to go to whichever card scored highest. `FeedService.page` also stops setting
+  `exhausted = True` just because a topic's slate ran dry -- it now recycles via
+  `_all_active_cards`, and only reports exhausted when a topic in the plan has zero
+  active cards in the database, period.
 - **Amended by:** [ADR-0055](0055-session-scoped-topic-shares.md) -- the interleave
   plan is no longer weighted by `UserTopicAffinity`. It is weighted by a
   session-scoped engagement signal that resets after 30 minutes of inactivity, with

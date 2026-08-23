@@ -15,6 +15,8 @@
   section already says cards should persist as soon as their subtopic/tier's batch
   completes, but the actual graph wiring implemented a global fan-in barrier instead. ADR-
   0041 closes that gap; nothing else in this ADR changes.
+- **Amended by:** [ADR-0053](0053-topic-live-coverage-threshold.md) -- resolves the
+  discoverability half of the "Open question" below (see the 2026-08-23 update inline).
 
 ## Context
 

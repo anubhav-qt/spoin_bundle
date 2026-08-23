@@ -8,6 +8,11 @@
 - **Fixes a drift from:** [ADR-0010](0010-feed-serving.md), whose own seen-state
   section already specified "the cycle advances when no `UNSEEN` cards remain at that
   difficulty across all subtopics". Nothing ever implemented that sentence.
+- **Amended by:** [ADR-0054](0054-sequential-subtopic-ordering-and-infinite-filtered-feed.md)
+  -- `FeedPage.starved`'s "gains a consumer" revisit condition below is answered in the
+  opposite direction: a single-topic filter running dry now recycles instead of ever
+  reaching the starved path, so the demand-driven fill loop stays exactly as half-wired
+  as it was here, just less visibly.
 
 ## Context
 

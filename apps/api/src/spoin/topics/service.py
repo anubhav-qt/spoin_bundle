@@ -136,10 +136,10 @@ class TopicsService:
         pending/running at once (the model's coalescing index) -- so this reads
         the latest by `created_at`, not an unqualified join.
 
-        The status lookup was a query per topic in a loop. Bounded by
-        `custom_topic_limit` (3), so never pathological, but it is one grouped
-        query now rather than N+1 — the row count is a product decision that
-        could change, and the query shouldn't have to change with it.
+        The status lookup was a query per topic in a loop; it's one grouped
+        query now rather than N+1. Currently unbounded per user (task 0024 --
+        the per-user cap this used to be bounded by is gone for now), so this
+        matters more than it did when it was defensive-only.
         """
 
         rows = (
@@ -783,9 +783,9 @@ class TopicsService:
         case happened rather than returning cards.
 
         Custom topics are gated to non-guest users -- a guest's account is
-        ephemeral, so letting it spend one of the custom-topic slots (and
-        trigger a real generation job) has no durable payoff and is easy to
-        abuse anonymously.
+        ephemeral, so letting it trigger a real generation job has no durable
+        payoff and is easy to abuse anonymously. (The per-user count limit
+        that used to sit alongside this is gone for now -- see task 0024.)
 
         `generator` and `embedder` are parameters rather than module-level
         singleton lookups so a test can drive this with `FakeContentGenerator`
@@ -821,17 +821,6 @@ class TopicsService:
             raise HTTPException(
                 status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=verdict.reason or "That doesn't look like a learnable topic",
-            )
-
-        custom_count = await session.scalar(
-            select(func.count())
-            .select_from(UserTopic)
-            .where(UserTopic.user_id == user_id, UserTopic.is_custom.is_(True))
-        )
-        if (custom_count or 0) >= settings.custom_topic_limit:
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN,
-                detail=f"Custom topic limit reached ({settings.custom_topic_limit})",
             )
 
         outcomes = await match_and_create_topics(

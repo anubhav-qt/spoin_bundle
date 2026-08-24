@@ -466,11 +466,12 @@ confirm completion after a look, not a way to skip the look.
 
 ## Custom topics
 
-Three free custom topics per user. Unlimited is a planned premium feature.
-
-The limit is on `user_topic` rows and is **enforced server-side**. Note the interaction
-with ADR-0004: if a user's custom topic canonicalizes onto an existing topic, it still
-consumes one of their three slots. They are buying slots in their own topic list, not
+Unmetered for now (2026-08-24) — the three-custom-topic-per-user cap was removed to
+unblock testing/dogfooding ahead of an actual free/premium split; see
+[task 0024](../tasks/0024-reintroduce-custom-topic-limit.md) for re-introducing it as
+a premium gate. Note the interaction with ADR-0004 that still applies whenever a limit
+comes back: if a user's custom topic canonicalizes onto an existing topic, it should
+still consume one of their slots — they are buying slots in their own topic list, not
 new entries in the shared corpus.
 
 ## Open questions

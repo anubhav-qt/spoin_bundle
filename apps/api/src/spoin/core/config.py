@@ -275,12 +275,6 @@ class Settings(BaseSettings):
     #: cannot strand a user at an unreachable bar.
     coverage_gate: float = 0.80
 
-    #: content-model.md's "Custom topics" section. Enforced server-side on
-    #: `UserTopic.is_custom` rows -- a custom topic that canonicalizes onto an
-    #: existing topic still consumes a slot (ADR-0004): users are buying slots
-    #: in their own topic list, not new entries in the shared corpus.
-    custom_topic_limit: int = 3
-
     #: A constraint, not taste -- enforced in code rather than asked of the
     #: model, per the "generator is trusted for taste, never for constraints"
     #: rule. Keeps the box a topic name, not a sentence describing one.

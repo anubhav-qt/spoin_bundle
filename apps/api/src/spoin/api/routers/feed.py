@@ -189,7 +189,7 @@ async def _collection(
     ]
 
 
-def _card_out(card: Card, subtopic_title: str, note: str | None, seen: bool = False) -> CardOut:
+def _card_out(card: Card, subtopic_title: str, note: str | None, *, seen: bool) -> CardOut:
     return CardOut(
         id=card.id,
         topic_id=card.topic_id,
@@ -221,7 +221,7 @@ async def get_liked_cards(
     rows = await _collection(session, user_id, CardLike, topic_id, sort)
     return [
         LikedCardOut(
-            card=_card_out(card, subtopic_title, note, seen),
+            card=_card_out(card, subtopic_title, note, seen=seen),
             topic_name=topic_display_name,
             liked_at=collected_at,
         )
@@ -242,7 +242,7 @@ async def get_saved_cards(
     rows = await _collection(session, user_id, CardBookmark, topic_id, sort)
     return [
         SavedCardOut(
-            card=_card_out(card, subtopic_title, note, seen),
+            card=_card_out(card, subtopic_title, note, seen=seen),
             topic_name=topic_display_name,
             saved_at=collected_at,
         )
@@ -271,4 +271,4 @@ async def get_card(
     if user_id is not None:
         notes_by_card = await NotesService(session).get_for_cards(user_id, [card_id])
         note = notes_by_card.get(card_id)
-    return _card_out(card, subtopic_title, note)
+    return _card_out(card, subtopic_title, note, seen=False)

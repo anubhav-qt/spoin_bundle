@@ -23,6 +23,10 @@ from spoin.generation.pipeline import (
     match_and_create_topics,
     run_generation_pipeline,
 )
+from spoin.generation.pipeline.persistence import (
+    _load_subtopic_plans,
+    _recent_rejection_context,
+)
 
 
 async def _plan_and_generate(
@@ -568,3 +572,62 @@ async def test_redraft_loop_stuck_guard_stops_on_persistent_rejection(
 
     cards = (await session.execute(select(Card).where(Card.topic_id == topic_id))).scalars().all()
     assert len(cards) == 0
+
+
+async def test_structural_rejection_feeds_forward_into_next_run(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """A STRUCTURAL-stage rejection carries a judged reason exactly like a
+    VERIFICATION-stage one -- both belong in `rejection_feedback`, the list
+    shown to the writer on a later run/redraft round. Before this fix, only
+    VERIFICATION rejections were ever queried back out, so a tier that kept
+    failing the cheap structural check (missing element, wrong length --
+    generation/gate.py) looked, to a rerun, identical to a tier that had
+    never been rejected at all. Exercises `_load_subtopic_plans` (the initial-
+    round query) and `_recent_rejection_context` (the redraft loop's re-query)
+    directly rather than through a full second pipeline run, since a tier
+    that already cleared its completion bar on the first pass never drafts
+    again and so never proves anything about what it WOULD have been shown."""
+
+    outcomes = await _plan_and_generate(session, settings, "Volcanology")
+    topic_id = uuid.UUID(outcomes["topics"][0]["topic_id"])  # type: ignore[index]
+
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+    subtopic = (
+        await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id).limit(1))
+    ).scalar_one()
+
+    structural_reason = "missing a required code block for this card type"
+    session.add(
+        RejectedCard(
+            topic_id=topic_id,
+            subtopic_id=subtopic.id,
+            requested_difficulty=subtopic.difficulty,
+            title="Structurally broken draft",
+            canonical_title="structurally broken draft",
+            summary="n/a",
+            body="incomplete body",
+            stage=RejectionStage.STRUCTURAL,
+            reason=structural_reason,
+        )
+    )
+    await session.commit()
+
+    plans = await _load_subtopic_plans(
+        session,
+        topic,
+        max_duplicate_feedback_bodies=settings.max_duplicate_feedback_bodies,
+        max_verification_feedback_bodies=settings.max_verification_feedback_bodies,
+        max_existing_question_stems=settings.max_existing_question_stems,
+    )
+    plan = next(p for p in plans if p["subtopic_id"] == str(subtopic.id))
+    assert any(fb["reason"] == structural_reason for fb in plan["rejection_feedback"])
+
+    _avoid_bodies, redraft_feedback = await _recent_rejection_context(
+        session,
+        subtopic_id=subtopic.id,
+        max_duplicate_feedback_bodies=settings.max_duplicate_feedback_bodies,
+        max_verification_feedback_bodies=settings.max_verification_feedback_bodies,
+    )
+    assert any(reason == structural_reason for _body, reason in redraft_feedback)

@@ -192,7 +192,15 @@ async def _load_subtopic_plans(
                 select(RejectedCard.body, RejectedCard.reason)
                 .where(
                     RejectedCard.subtopic_id == subtopic.id,
-                    RejectedCard.stage == RejectionStage.VERIFICATION,
+                    # Both stages carry a judged reason worth showing the writer
+                    # (unlike NEAR_DUPLICATE above, which is a body-similarity
+                    # match with nothing to explain) -- STRUCTURAL was persisted
+                    # but never fed back until this was added, so a tier that
+                    # keeps failing structural checks looked identical to one
+                    # never rejected at all, on every rerun.
+                    RejectedCard.stage.in_(
+                        [RejectionStage.STRUCTURAL, RejectionStage.VERIFICATION]
+                    ),
                 )
                 .order_by(RejectedCard.created_at.desc())
                 .limit(max_verification_feedback_bodies)
@@ -209,20 +217,10 @@ async def _load_subtopic_plans(
                 )
             )
         ).all()
-        existing_question_stems = (
-            (
-                await session.execute(
-                    select(Question.stem)
-                    .where(
-                        Question.subtopic_id == subtopic.id,
-                        Question.status == QuestionStatus.ACTIVE,
-                    )
-                    .order_by(Question.created_at.desc())
-                    .limit(max_existing_question_stems)
-                )
-            )
-            .scalars()
-            .all()
+        existing_question_stems = await _current_question_stems(
+            session,
+            subtopic_id=subtopic.id,
+            max_existing_question_stems=max_existing_question_stems,
         )
         # Subtopic-scoped (not group-wide, unlike `existing` above) -- a hero
         # is one-per-subtopic-tier, matching `CardDraft.is_hero`'s scope.
@@ -265,6 +263,35 @@ async def _load_subtopic_plans(
     return plans
 
 
+async def _current_question_stems(
+    session: AsyncSession,
+    *,
+    subtopic_id: uuid.UUID,
+    max_existing_question_stems: int,
+) -> list[str]:
+    """Factored out of `_load_subtopic_plans` so `generate_subtopic_cards`'s
+    redraft loop (nodes.py's `_redraft_until_bar`) can re-query it mid-run --
+    a redraft round writes its own Question rows via `_gate_and_persist_results`,
+    and the NEXT redraft round for that same tier needs to see them, not just
+    whatever existed when `_load_subtopic_plans` ran at the start of this run."""
+
+    return list(
+        (
+            await session.execute(
+                select(Question.stem)
+                .where(
+                    Question.subtopic_id == subtopic_id,
+                    Question.status == QuestionStatus.ACTIVE,
+                )
+                .order_by(Question.created_at.desc())
+                .limit(max_existing_question_stems)
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+
 async def _recent_rejection_context(
     session: AsyncSession,
     *,
@@ -300,7 +327,9 @@ async def _recent_rejection_context(
             select(RejectedCard.body, RejectedCard.reason)
             .where(
                 RejectedCard.subtopic_id == subtopic_id,
-                RejectedCard.stage == RejectionStage.VERIFICATION,
+                # Same STRUCTURAL+VERIFICATION pairing as _load_subtopic_plans --
+                # see that query's comment.
+                RejectedCard.stage.in_([RejectionStage.STRUCTURAL, RejectionStage.VERIFICATION]),
             )
             .order_by(RejectedCard.created_at.desc())
             .limit(max_verification_feedback_bodies)

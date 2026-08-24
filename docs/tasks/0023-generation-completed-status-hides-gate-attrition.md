@@ -13,10 +13,17 @@ gets set the moment `run_generation_pipeline(...)` returns without raising
 "every subtopic hit `target_cards`."
 
 Within one run, the quality gate (dedup, structural checks, pass-2 verification, ADR-0030)
-runs once, *after* the drafting loop finishes requesting cards -- there's no loop-back to
-draft replacements for whatever the gate rejects. Landing at e.g. 97% of `target_cards`
-instead of 100% is a completely normal single-run outcome, and the job is still marked
-`"completed"` regardless.
+used to run once, *after* the drafting loop finished requesting cards, with no loop-back to
+draft replacements for whatever the gate rejected. **That drafting gap is closed as of
+2026-08-24 (ADR-0057):** `generate_subtopic_cards`'s redraft loop now keeps drafting and
+gating a tier, round after round, until it clears a completion bar (90% of `target_cards` on
+a tier's first-ever pass, 100% on any later pass) or a per-tier stuck guard concludes the
+gate is genuinely, repeatedly rejecting its content, or the generator calls are failing. A
+job can still land under 100% -- the redraft loop's first-pass bar is 90%, not 100%, and the
+stuck guard can still give up on a genuinely-failing tier -- so `status == "completed"`
+still does not mean "every subtopic hit `target_cards`." What changed is that "under target"
+is no longer a silent single-round outcome nobody tried to fix; it is now the specific,
+logged result of a tier failing to clear its bar after real, repeated attempts.
 
 Separately, `scan_and_generate.py`'s `find_incomplete_topics` (`status: "under_target"`,
 `scan_and_generate.py:116-130`) does exist specifically to top up under-target topics, wired

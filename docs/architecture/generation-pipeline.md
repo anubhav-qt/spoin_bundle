@@ -90,6 +90,17 @@ generate_subtopic_cards
     those too (Question rows) -- all before this branch returns, so a card
     goes live in the feed as soon as ITS OWN group is done, not held back for
     every other group/topic in the run.
+  - the first draft-and-gate round above is NOT the end of a tier's work: the
+    gate rejects some fraction of every batch, so drafting a tier to its full
+    `target_cards` exactly once and gating once routinely lands under target
+    even on a run that returns without error. `_redraft_until_bar` (ADR-0057)
+    runs after every group's first round completes, redrafting and re-gating
+    per subtopic-tier, round after round, until each tier clears a completion
+    bar (90% of target on a tier's first-ever pass, 100% on any later pass --
+    e.g. a `scan_and_generate` backfill) or a per-tier stuck guard concludes
+    the gate is genuinely, repeatedly rejecting its content (logged as
+    REJECTED) or the generator calls themselves are failing (logged as
+    FAILED, tracked separately -- see ADR-0057).
   |
   | fan-in (every branch's item_reports merge, across every topic in the run)
   v

@@ -215,9 +215,13 @@ export function SavedView({ topics, onNavigateHome }: Props) {
         await engagement.whenIdle();
         const data = await api.savedCards(topicId, sortKey ?? sort);
         setRows(data);
-        // Server-authoritative seen state (ADR-0010) -- merged in rather than
-        // replacing local state so a card just marked read this session, whose
-        // write hasn't round-tripped yet, doesn't flicker back to unseen.
+        // Server-authoritative seen state (ADR-0010) -- merged in (union),
+        // never replacing local state outright, for two reasons: a card just
+        // marked read this session whose write hasn't round-tripped yet must
+        // not flicker back to unseen, and server-side SEEN deliberately never
+        // reverts to unseen (ADR-0010) -- the local "unseen" toggle (Card.tsx's
+        // `gotIt`) is a same-session cosmetic-only undo that was never sent to
+        // the server, so there is no server "unseen" signal to merge back in.
         setSeenIds((prev) => {
           const next = new Set(prev);
           for (const row of data) if (row.card.seen) next.add(row.card.id);

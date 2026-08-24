@@ -92,4 +92,6 @@ useful than the decision itself.
 | [0053](0053-topic-live-coverage-threshold.md) | Topic live coverage threshold for partial feed serving | Accepted (amends 0026) |
 | [0054](0054-sequential-subtopic-ordering-and-infinite-filtered-feed.md) | Sequential subtopic curriculum ordering and true infinite filtered feed | Accepted (amends 0010, 0050) |
 | [0055](0055-session-scoped-topic-shares.md) | The interleave plan is weighted by the current session, not long-run affinity | Accepted (amends 0010, 0011) |
+| [0056](0056-generation-call-timeout-and-recovery-probe.md) | Client-side request timeout, and a background recovery probe for a stalled model | Accepted (amends 0028) |
+| [0057](0057-redraft-loop-for-gate-attrition.md) | A per-tier redraft loop closes the gate-rejection gap left by a single draft-and-gate pass | Accepted (amends 0026) |
 

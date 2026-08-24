@@ -35,6 +35,7 @@ from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
 from spoin.generation.pipeline.persistence import (
     _create_deep_dive_stubs,
+    _current_question_stems,
     _existing_subtopic_hints,
     _load_subtopic_plans,
     _mark_progress_done,
@@ -495,7 +496,14 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 #: cards for it -- one or two unlucky rounds can happen by chance (a small
 #: batch, a borderline dedup call), so the guard needs enough consecutive
 #: misses to actually distinguish "this tier cannot pass the gate right now"
-#: from ordinary variance before it gives up on it for the run.
+#: from ordinary variance before it gives up on it for the run. Shared between
+#: `stuck_rounds` (gate rejected every draft -- a REJECTED outcome) and
+#: `no_verdict_rounds` (the generator call itself returned nothing -- a
+#: FAILED outcome, e.g. quota exhaustion or the ADR-0056 client timeout) --
+#: same threshold, but tracked as two separate counters so the give-up log
+#: names which one actually happened instead of asserting rejection when the
+#: real cause was a call that never returned a verdict (CLAUDE.md's "failed
+#: vs rejected are never the same number" rule).
 _STUCK_ROUND_THRESHOLD = 5
 
 #: Pure defensive backstop against a bug in `_redraft_until_bar`'s own
@@ -538,15 +546,21 @@ async def _redraft_until_bar(
       the full 100%: this run IS "the next time a worker picks it back up,"
       so it should not hand off early again.
 
-    Neither case has a round limit. The only stop condition is a per-tier
-    stuck guard: `_STUCK_ROUND_THRESHOLD` consecutive rounds accepting zero
-    cards for a tier means the gate is genuinely, repeatedly rejecting its
-    content for a real reason (e.g. the missing difficulty-example catalog,
-    task 0011), not an unlucky round or two -- logged clearly as REJECTED,
-    not FAILED (CLAUDE.md's rule) -- and redrafting stops for that tier this
-    run rather than spending forever on one subtopic that cannot currently
-    pass. `_ABSOLUTE_MAX_REDRAFT_ROUNDS` is a pure defensive backstop
-    against a bug in the stuck guard itself, not a real operating limit.
+    Neither case has a round limit. There are two independent stop
+    conditions, each `_STUCK_ROUND_THRESHOLD` consecutive rounds:
+    - `stuck_rounds`: the gate accepted zero of this tier's drafts -- the
+      content is genuinely, repeatedly rejected for a real reason (e.g. the
+      missing difficulty-example catalog, task 0011), not an unlucky round or
+      two. Logged as REJECTED.
+    - `no_verdict_rounds`: the generator call itself came back with zero
+      items -- quota exhaustion, a malformed batch response, the ADR-0056
+      client-side timeout. The gate never saw this content at all, so it is
+      not evidence the content is bad. Logged as FAILED, distinctly (CLAUDE.md's
+      "failed vs rejected are never the same number" rule) -- conflating the
+      two would misread a quota-exhausted run's give-up log as a content-
+      quality problem instead of an availability one.
+    `_ABSOLUTE_MAX_REDRAFT_ROUNDS` is a pure defensive backstop against a bug
+    in either guard, not a real operating limit -- see its own docstring.
     """
 
     if not tier_meta:
@@ -558,12 +572,16 @@ async def _redraft_until_bar(
         if sid in tier_meta:
             accepted_by_tier[sid] = accepted_by_tier.get(sid, 0) + cast(int, report["accepted"])
     stuck_rounds: dict[str, int] = dict.fromkeys(tier_meta, 0)
+    no_verdict_rounds: dict[str, int] = dict.fromkeys(tier_meta, 0)
     all_reports = list(item_reports)
 
     for round_number in range(1, _ABSOLUTE_MAX_REDRAFT_ROUNDS + 1):
         deficits: dict[str, int] = {}
         for sid, meta in tier_meta.items():
-            if stuck_rounds[sid] >= _STUCK_ROUND_THRESHOLD:
+            if (
+                stuck_rounds[sid] >= _STUCK_ROUND_THRESHOLD
+                or no_verdict_rounds[sid] >= _STUCK_ROUND_THRESHOLD
+            ):
                 continue
             target = cast(int, meta["target"])
             existing_count = cast(int, meta["existing_count"])
@@ -599,6 +617,17 @@ async def _redraft_until_bar(
                     max_duplicate_feedback_bodies=runtime.settings.max_duplicate_feedback_bodies,
                     max_verification_feedback_bodies=runtime.settings.max_verification_feedback_bodies,
                 )
+                # Re-queried fresh each round, same reasoning as the
+                # rejection context above: round 1 (and any earlier redraft
+                # round) may have just persisted new Question rows for this
+                # SAME tier, and this round's own question generation needs
+                # to avoid repeating those angles, not just whatever existed
+                # before this run started.
+                existing_question_stems = await _current_question_stems(
+                    runtime.session,
+                    subtopic_id=uuid.UUID(sid),
+                    max_existing_question_stems=runtime.settings.max_existing_question_stems,
+                )
 
             result = await runtime.generator.generate_cards(
                 topic_name=topic_name,
@@ -625,7 +654,16 @@ async def _redraft_until_bar(
                 len(result.failures),
             )
             if not result.items:
-                stuck_rounds[sid] += 1
+                no_verdict_rounds[sid] += 1
+                if no_verdict_rounds[sid] >= _STUCK_ROUND_THRESHOLD:
+                    logger.info(
+                        "redraft: subtopic %s giving up after %d consecutive round(s) with no "
+                        "generator verdict at all -- the CALL is FAILING (quota, timeout, or a "
+                        "malformed response), not the gate rejecting content -- see the "
+                        "generator failure log lines above, not rejected_card rows",
+                        sid,
+                        no_verdict_rounds[sid],
+                    )
                 continue
             existing_titles.extend(
                 _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in result.items
@@ -639,11 +677,11 @@ async def _redraft_until_bar(
                     generator_failures=result.failures,
                     is_standalone=is_standalone,
                     # Round 1 already drained this tier's pre-run
-                    # missing-question backfill and its own existing question
-                    # stems; a redraft round only ever adds brand-new cards,
-                    # so there is nothing left to backfill here.
+                    # missing-question backfill; a redraft round only ever
+                    # adds brand-new cards, so there is nothing left to
+                    # backfill here.
                     cards_missing_questions=[],
-                    existing_question_stems=[],
+                    existing_question_stems=existing_question_stems,
                 )
             )
 
@@ -673,6 +711,20 @@ async def _redraft_until_bar(
                     stuck_rounds[sid],
                 )
         all_reports.extend(round_reports)
+    else:
+        # The loop ran out of rounds without `break`ing (every tier cleared
+        # its bar or hit a stuck guard) -- per this function's own docstring,
+        # this should never happen; if it does, the stuck guards themselves
+        # have a bug and are letting a tier spin instead of giving up on it.
+        # Logged loudly rather than silently returning under-target, which is
+        # exactly the "completed but nothing says why" gap task 0023 is about.
+        logger.warning(
+            "redraft: hit _ABSOLUTE_MAX_REDRAFT_ROUNDS (%d) without every tier clearing its "
+            "bar or its stuck guard -- this indicates a bug in the stuck guard logic, not a "
+            "legitimately slow subtopic; still-deficient tiers: %s",
+            _ABSOLUTE_MAX_REDRAFT_ROUNDS,
+            deficits,
+        )
 
     return all_reports
 

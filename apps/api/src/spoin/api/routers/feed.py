@@ -14,7 +14,16 @@ from sqlalchemy import func, select
 
 from spoin.api.deps import OptionalUserDep, SessionDep, SettingsDep, UserDep
 from spoin.api.schemas import CardOut, FeedOut, LikedCardOut, SavedCardOut
-from spoin.domain.models import Card, CardBookmark, CardLike, Subtopic, Topic, UserTopic
+from spoin.domain.enums import SeenState
+from spoin.domain.models import (
+    Card,
+    CardBookmark,
+    CardLike,
+    Subtopic,
+    Topic,
+    UserCardState,
+    UserTopic,
+)
 from spoin.feed.service import FeedService
 from spoin.notes.service import NotesService
 
@@ -110,9 +119,9 @@ async def _collection(
     model: _CollectionModel,
     topic_id: UUID | None,
     sort: CollectionSort,
-) -> list[tuple[datetime, Card, str, str, str | None]]:
+) -> list[tuple[datetime, Card, str, str, str | None, bool]]:
     """Rows for one card collection: (collected_at, card, subtopic title, topic
-    label, note body).
+    label, note body, seen).
 
     Pure retrieval — no LLM, no generation, no ranking. Returns in the requested
     sort order so the client never has to re-sort a large collection in JS.
@@ -124,13 +133,26 @@ async def _collection(
     display_name = func.coalesce(UserTopic.display_name, Topic.canonical_name)
 
     stmt = (
-        select(model.created_at, Card, Subtopic.title, display_name)
+        select(
+            model.created_at,
+            Card,
+            Subtopic.title,
+            display_name,
+            UserCardState.state == SeenState.SEEN,
+        )
         .join(Card, Card.id == model.card_id)
         .join(Subtopic, Subtopic.id == Card.subtopic_id)
         .join(Topic, Topic.id == Card.topic_id)
         .outerjoin(
             UserTopic,
             (UserTopic.user_id == model.user_id) & (UserTopic.topic_id == Card.topic_id),
+        )
+        # Left, not inner: a card can be bookmarked/liked without ever having
+        # been dwelt on or explicitly marked read, and must still show up here
+        # as unseen rather than being dropped from the collection entirely.
+        .outerjoin(
+            UserCardState,
+            (UserCardState.user_id == model.user_id) & (UserCardState.card_id == Card.id),
         )
         .where(model.user_id == user_id)
     )
@@ -152,15 +174,22 @@ async def _collection(
         return []
 
     notes_by_card = await NotesService(session).get_for_cards(
-        user_id, [card.id for _, card, _, _ in rows]
+        user_id, [card.id for _, card, _, _, _ in rows]
     )
     return [
-        (collected_at, card, subtopic_title, topic_display_name, notes_by_card.get(card.id))
-        for collected_at, card, subtopic_title, topic_display_name in rows
+        (
+            collected_at,
+            card,
+            subtopic_title,
+            topic_display_name,
+            notes_by_card.get(card.id),
+            bool(seen),
+        )
+        for collected_at, card, subtopic_title, topic_display_name, seen in rows
     ]
 
 
-def _card_out(card: Card, subtopic_title: str, note: str | None) -> CardOut:
+def _card_out(card: Card, subtopic_title: str, note: str | None, seen: bool = False) -> CardOut:
     return CardOut(
         id=card.id,
         topic_id=card.topic_id,
@@ -176,6 +205,7 @@ def _card_out(card: Card, subtopic_title: str, note: str | None) -> CardOut:
         visual_slots=card.visual_slots,
         created_at=card.created_at,
         note=note,
+        seen=seen,
     )
 
 
@@ -191,11 +221,11 @@ async def get_liked_cards(
     rows = await _collection(session, user_id, CardLike, topic_id, sort)
     return [
         LikedCardOut(
-            card=_card_out(card, subtopic_title, note),
+            card=_card_out(card, subtopic_title, note, seen),
             topic_name=topic_display_name,
             liked_at=collected_at,
         )
-        for collected_at, card, subtopic_title, topic_display_name, note in rows
+        for collected_at, card, subtopic_title, topic_display_name, note, seen in rows
     ]
 
 
@@ -212,11 +242,11 @@ async def get_saved_cards(
     rows = await _collection(session, user_id, CardBookmark, topic_id, sort)
     return [
         SavedCardOut(
-            card=_card_out(card, subtopic_title, note),
+            card=_card_out(card, subtopic_title, note, seen),
             topic_name=topic_display_name,
             saved_at=collected_at,
         )
-        for collected_at, card, subtopic_title, topic_display_name, note in rows
+        for collected_at, card, subtopic_title, topic_display_name, note, seen in rows
     ]
 
 

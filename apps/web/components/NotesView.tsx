@@ -55,6 +55,17 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
   const [sort, setSort] = useState<SortKey>("recent");
   const [search, setSearch] = useState("");
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  const handleSeen = useCallback((id: string) => {
+    setSeenIds((s) => (s.has(id) ? s : new Set(s).add(id)));
+  }, []);
+  const handleUnseen = useCallback((id: string) => {
+    setSeenIds((s) => {
+      if (!s.has(id)) return s;
+      const next = new Set(s);
+      next.delete(id);
+      return next;
+    });
+  }, []);
   // Set right when this view's own note delete/undo already updated `rows`
   // locally -- see LikedView's identical guard for the full reasoning
   // (Card.tsx's own invalidate("notes") after a save/delete would otherwise
@@ -74,6 +85,14 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
       await engagement.whenIdle();
       const data = await api.listNotes();
       setRows(data);
+      // Server-authoritative seen state (ADR-0010) -- merged in rather than
+      // replacing local state so a card just marked read this session, whose
+      // write hasn't round-tripped yet, doesn't flicker back to unseen.
+      setSeenIds((prev) => {
+        const next = new Set(prev);
+        for (const row of data) if (row.card.seen) next.add(row.card.id);
+        return next;
+      });
     } catch {
       setError(true);
     }
@@ -377,14 +396,8 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
               topicName={row.topic_name}
               accentHue={topicHue(row.card.topic_id, hueByTopicId[row.card.topic_id])}
               seen={seenIds.has(row.card.id)}
-              onSeen={(cardId) => setSeenIds((s) => new Set(s).add(cardId))}
-              onUnseen={(cardId) => {
-                setSeenIds((s) => {
-                  const next = new Set(s);
-                  next.delete(cardId);
-                  return next;
-                });
-              }}
+              onSeen={handleSeen}
+              onUnseen={handleUnseen}
               isHero={false}
               initialNoteOpen
               onNoteChange={onNoteChange}

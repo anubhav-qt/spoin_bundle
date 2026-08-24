@@ -183,6 +183,17 @@ export function SavedView({ topics, onNavigateHome }: Props) {
   const [search, setSearch] = useState("");
   const [openRow, setOpenRow] = useState<SavedCard | null>(null);
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  const handleSeen = useCallback((id: string) => {
+    setSeenIds((s) => (s.has(id) ? s : new Set(s).add(id)));
+  }, []);
+  const handleUnseen = useCallback((id: string) => {
+    setSeenIds((s) => {
+      if (!s.has(id)) return s;
+      const next = new Set(s);
+      next.delete(id);
+      return next;
+    });
+  }, []);
   // Set right when this view's own unbookmark already updated `rows`
   // locally -- see LikedView's identical guard for the full reasoning
   // (engagement.record's "unbookmark" branch invalidates "saved"
@@ -204,6 +215,14 @@ export function SavedView({ topics, onNavigateHome }: Props) {
         await engagement.whenIdle();
         const data = await api.savedCards(topicId, sortKey ?? sort);
         setRows(data);
+        // Server-authoritative seen state (ADR-0010) -- merged in rather than
+        // replacing local state so a card just marked read this session, whose
+        // write hasn't round-tripped yet, doesn't flicker back to unseen.
+        setSeenIds((prev) => {
+          const next = new Set(prev);
+          for (const row of data) if (row.card.seen) next.add(row.card.id);
+          return next;
+        });
       } catch {
         setError(true);
       }
@@ -379,14 +398,8 @@ export function SavedView({ topics, onNavigateHome }: Props) {
             onClose={() => setOpenRow(null)}
             onUnbookmarked={handleUnbookmarked}
             seenIds={seenIds}
-            onSeen={(id) => setSeenIds((s) => new Set(s).add(id))}
-            onUnseen={(id) => {
-              setSeenIds((s) => {
-                const next = new Set(s);
-                next.delete(id);
-                return next;
-              });
-            }}
+            onSeen={handleSeen}
+            onUnseen={handleUnseen}
           />
         )}
       </AnimatePresence>

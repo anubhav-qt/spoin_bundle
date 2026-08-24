@@ -101,6 +101,12 @@ class CardOut(BaseModel):
     #: Populated by a second query keyed on the feed page's card_ids — never
     #: joined into ranking, per `CardNote`'s "never fed to ranking" contract.
     note: str | None = None
+    #: True iff `UserCardState.state == SEEN` (ADR-0010). The feed itself never
+    #: needs this — a page is served once and not revisited — but the saved,
+    #: liked, and notes collections re-show the same cards across page loads,
+    #: and without this the client's "seen" state was purely local and reset
+    #: to unmarked on every reload despite the server having recorded it.
+    seen: bool = False
 
 
 class FeedOut(BaseModel):

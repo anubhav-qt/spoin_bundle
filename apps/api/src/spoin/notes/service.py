@@ -14,7 +14,8 @@ from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from spoin.domain.models import Card, CardNote, Subtopic, UserTopic
+from spoin.domain.enums import SeenState
+from spoin.domain.models import Card, CardNote, Subtopic, UserCardState, UserTopic
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,7 @@ class NoteWithCard:
     card: Card
     subtopic_title: str
     topic_name: str
+    seen: bool
 
 
 class NotesService:
@@ -76,12 +78,25 @@ class NotesService:
 
         rows = (
             await self._session.execute(
-                select(CardNote, Card, Subtopic.title, UserTopic.display_name)
+                select(
+                    CardNote,
+                    Card,
+                    Subtopic.title,
+                    UserTopic.display_name,
+                    UserCardState.state == SeenState.SEEN,
+                )
                 .join(Card, Card.id == CardNote.card_id)
                 .join(Subtopic, Subtopic.id == Card.subtopic_id)
                 .join(
                     UserTopic,
                     (UserTopic.user_id == CardNote.user_id) & (UserTopic.topic_id == Card.topic_id),
+                )
+                # Left, not inner: a note can exist on a card the user never
+                # dwelt on or explicitly marked read.
+                .outerjoin(
+                    UserCardState,
+                    (UserCardState.user_id == CardNote.user_id)
+                    & (UserCardState.card_id == Card.id),
                 )
                 .where(CardNote.user_id == user_id)
                 .order_by(CardNote.updated_at.desc())
@@ -95,6 +110,7 @@ class NotesService:
                 card=card,
                 subtopic_title=subtopic_title,
                 topic_name=topic_display_name,
+                seen=bool(seen),
             )
-            for note, card, subtopic_title, topic_display_name in rows
+            for note, card, subtopic_title, topic_display_name, seen in rows
         ]

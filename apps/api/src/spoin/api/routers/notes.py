@@ -53,6 +53,7 @@ async def list_notes(session: SessionDep, user_id: UserDep) -> list[NoteWithCard
                 visual_slots=row.card.visual_slots,
                 created_at=row.card.created_at,
                 note=row.body,
+                seen=row.seen,
             ),
             topic_name=row.topic_name,
         )

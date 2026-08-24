@@ -51,6 +51,17 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   const [sort, setSort] = useState<SortKey>("recent");
   const [search, setSearch] = useState("");
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+  const handleSeen = useCallback((id: string) => {
+    setSeenIds((s) => (s.has(id) ? s : new Set(s).add(id)));
+  }, []);
+  const handleUnseen = useCallback((id: string) => {
+    setSeenIds((s) => {
+      if (!s.has(id)) return s;
+      const next = new Set(s);
+      next.delete(id);
+      return next;
+    });
+  }, []);
   // Set right when this view's own unlike already updated `rows` locally --
   // engagement.record's "unlike" branch invalidates the "liked" scope
   // synchronously, which would otherwise force an immediate, visible
@@ -74,6 +85,14 @@ export function LikedView({ topics, onNavigateHome }: Props) {
         await engagement.whenIdle();
         const data = await api.likedCards(topicId, sortKey ?? sort);
         setRows(data);
+        // Server-authoritative seen state (ADR-0010) -- merged in rather than
+        // replacing local state so a card just marked read this session, whose
+        // write hasn't round-tripped yet, doesn't flicker back to unseen.
+        setSeenIds((prev) => {
+          const next = new Set(prev);
+          for (const row of data) if (row.card.seen) next.add(row.card.id);
+          return next;
+        });
       } catch {
         setError(true);
       }
@@ -344,14 +363,8 @@ export function LikedView({ topics, onNavigateHome }: Props) {
                 topicName={row.topic_name}
                 accentHue={topicHue(row.card.topic_id, hueByTopicId[row.card.topic_id])}
                 seen={seenIds.has(row.card.id)}
-                onSeen={(cardId) => setSeenIds((s) => new Set(s).add(cardId))}
-                onUnseen={(cardId) => {
-                  setSeenIds((s) => {
-                    const next = new Set(s);
-                    next.delete(cardId);
-                    return next;
-                  });
-                }}
+                onSeen={handleSeen}
+                onUnseen={handleUnseen}
                 isHero={false}
                 initialLiked
                 onUnliked={handleUnliked}

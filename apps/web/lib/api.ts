@@ -59,6 +59,10 @@ export interface Card {
   created_at: string;
   /** This user's private note on this card, or null if they never wrote one. */
   note: string | null;
+  /** True iff this user has already marked this card SEEN (ADR-0010) —
+   *  server-authoritative so collections that re-show the same card across
+   *  page loads (saved, liked, notes) don't reset it to unmarked on reload. */
+  seen: boolean;
 }
 
 export interface Feed {

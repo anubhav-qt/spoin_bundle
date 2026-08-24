@@ -188,6 +188,17 @@ cell and returning before the actual call fires let concurrent tasks burst a sin
 past its real RPM, producing 429s the local ledger didn't expect. Fixed by serializing
 same-cell calls; see that ADR for the full story.
 
+**A stalled call now has a client-side timeout and its own recovery path**
+([ADR-0056](../adr/0056-generation-call-timeout-and-recovery-probe.md)), found the same way
+as ADR-0040: a real hang (`POST /topics` never resolving) traced back to
+`ChatGoogleGenerativeAI` having no `timeout`, so a stalled call never raised anything for
+`_invoke_with_retry` to catch. Fixed with a configured timeout
+(`gemini_request_timeout_seconds`) plus a persistent, cross-call model exclusion and a
+background probe that cycles through a different key each attempt to check when the model's
+come back -- read that ADR for why the exclusion needed to outlive a single call, and for the
+caveat that the probe mostly only completes in a long-lived process (the API process, not
+the worker's short cron pass).
+
 ## What's missing
 
 - **Only one thing creates `GenerationJob` rows so far.** `POST /topics`

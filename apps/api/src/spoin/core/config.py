@@ -91,6 +91,12 @@ class Settings(BaseSettings):
     #: 2026-08-17 — `gemini-2.5-flash-lite` is retired for new accounts (404,
     #: same as `gemini-2.5-flash` above) and dropped.
     gemini_generator_ladder: str = "gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15"
+    #: `ChatGoogleGenerativeAI`'s own `timeout` — without it, a stalled call (the
+    #: TCP stream stays open but the provider never responds) blocks forever:
+    #: nothing raises, so `_invoke_with_retry` never gets a chance to rotate to
+    #: the next (key, model) cell, and the request never resolves. Bounds a
+    #: single attempt so a stall degrades the same way a 429/503 already does.
+    gemini_request_timeout_seconds: float = 60.0
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
 

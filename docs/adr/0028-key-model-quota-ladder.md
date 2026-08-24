@@ -1,7 +1,7 @@
 # ADR-0028: Per-key-per-model quota grid, with a two-pool model fallback ladder
 
 - **Status:** Accepted (amended by [ADR-0029](0029-questions-join-generator-pool.md),
-  [ADR-0030](0030-two-pass-quality-gate.md))
+  [ADR-0030](0030-two-pass-quality-gate.md), [ADR-0056](0056-generation-call-timeout-and-recovery-probe.md))
 - **Date:** 2026-08-17
 - **Deciders:** Anubhav
 - **Resolves:** [ADR-0008](0008-local-gpu-generation.md)'s open question on cloud model choice
@@ -20,6 +20,12 @@
   returns before the actual call fires, so concurrent tasks could burst a single cell past
   its real RPM and trigger false 429s. `QuotaGovernor` now also serializes same-cell calls;
   the grid/ladder/RPD-RPM-split mechanics described below are otherwise unchanged.
+- **Amended by:** [ADR-0056](0056-generation-call-timeout-and-recovery-probe.md) -- a stalled
+  call (open connection, provider never responds) now has a client-side timeout and rotates
+  the same way a real 429 does, plus a background probe that checks when an excluded model
+  has come back. The grid/ladder mechanism below is unchanged; this ADR adds a third kind of
+  cell failure (timeout) alongside 429 and 503, and a persistent (cross-call) exclusion on
+  top of the per-call one this ADR originally described.
 
 ## Context
 

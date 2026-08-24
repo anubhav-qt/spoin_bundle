@@ -137,6 +137,13 @@ class QuotaGovernor:
     _flash_lite_reset_counts: dict[tuple[int, str], int] = field(
         default_factory=lambda: defaultdict(int), init=False, repr=False
     )
+    #: Models currently believed unavailable after a client-side timeout
+    #: (`langchain_impl.py`'s `DeadlineExceeded` handler) -- excluded from
+    #: `acquire()` entirely while a background probe (`_probe_model`) checks
+    #: whether they've come back. In-memory only, same posture as the
+    #: cooldown/RPM state above: this is a live-availability signal, not a
+    #: persisted fact, and doesn't need to survive a restart.
+    _excluded_models: set[str] = field(default_factory=set, init=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.key_count < 1:
@@ -250,8 +257,11 @@ class QuotaGovernor:
 
             for rung in self.ladder:
                 if rung.model in exclude_models:
+                    logger.debug("quota: model %s excluded for this call, skipping", rung.model)
+                    continue
+                if rung.model in self._excluded_models:
                     logger.debug(
-                        "quota: model %s excluded (persistently unavailable), skipping", rung.model
+                        "quota: model %s excluded pending a recovery probe, skipping", rung.model
                     )
                     continue
                 for key_index in range(self.key_count):
@@ -339,6 +349,51 @@ class QuotaGovernor:
                 sleep_duration,
             )
             await asyncio.sleep(sleep_duration)
+
+    def exclude_model(self, model: str) -> None:
+        """Stop routing real traffic to `model` -- called the moment a call
+        times out (see langchain_impl.py's `DeadlineExceeded` handler), before
+        the background probe even starts, so nothing else pays that same
+        timeout while recovery is being checked."""
+        self._excluded_models.add(model)
+
+    def include_model(self, model: str) -> None:
+        """Reverses `exclude_model` -- called by the probe either on success
+        (model responded again) or once it gives up (every key it tried is
+        separately marked exhausted via `mark_exhausted`, so the ledger itself
+        keeps those cells out of rotation for the rest of today; releasing the
+        flag here only matters for any key the probe didn't get to)."""
+        self._excluded_models.discard(model)
+
+    async def record_probe_attempt(self, key_index: int, model: str, *, now: datetime) -> None:
+        """One background-probe call against `(key_index, model)` -- counts
+        against today's ledger exactly like a real acquired call. A probe is
+        not free reconnaissance; it is one real request against the
+        provider's own daily limit, so it must be accounted for the same way."""
+
+        async with self._lock, session_scope() as session:
+            await self._record_probe_attempt_locked(session, key_index, model, now=now)
+
+    async def record_probe_attempt_with_session(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime
+    ) -> None:
+        """Same as `record_probe_attempt`, but reuses a caller-supplied session
+        instead of opening its own — for tests, same reasoning as
+        `acquire_with_session`."""
+
+        async with self._lock:
+            await self._record_probe_attempt_locked(session, key_index, model, now=now)
+
+    async def _record_probe_attempt_locked(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime
+    ) -> None:
+        rung = next((r for r in self.ladder if r.model == model), None)
+        if rung is None:
+            raise ValueError(f"record_probe_attempt: {model!r} is not in this pool's ladder")
+        day = _day_start(now)
+        ledger = await self._ledger_row(session, day, key_index, model)
+        ledger.requests_spent += 1
+        await session.flush()
 
     def cell_lock(self, key_index: int, model: str) -> asyncio.Lock:
         """Returns the lock for this `(key, model)` cell, creating it on first

@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from datetime import UTC, datetime
 from typing import Any, TypeVar
 
@@ -94,6 +95,13 @@ _SchemaT = TypeVar("_SchemaT", bound=BaseModel)
 #: cell before `_invoke_with_retry` moves on to the next cell in the ladder.
 _SERVER_ERROR_RETRIES = 3
 _SERVER_ERROR_BASE_DELAY_S = 2.0
+
+#: How long the background recovery probe keeps checking a timed-out model
+#: before giving up and leaving it excluded for the rest of today.
+_PROBE_BUDGET_SECONDS = 1200.0  # 20 minutes
+#: Floor on the gap between probe attempts, so a pool with very few keys
+#: doesn't hammer the provider every few seconds.
+_PROBE_MIN_INTERVAL_SECONDS = 20.0
 
 # ------------------------------------------------------------- wire schemas --
 
@@ -382,6 +390,7 @@ class GeminiContentGenerator(ContentGenerator):
                 "(comma-separated) — none configured."
             )
         self._keys = keys
+        self._request_timeout_s = settings.gemini_request_timeout_seconds
         self._thinking = QuotaGovernor(
             key_count=len(keys), ladder=parse_ladder(settings.gemini_thinking_ladder)
         )
@@ -389,6 +398,10 @@ class GeminiContentGenerator(ContentGenerator):
             key_count=len(keys), ladder=parse_ladder(settings.gemini_generator_ladder)
         )
         self._clients: dict[tuple[int, str], ChatGoogleGenerativeAI] = {}
+        #: (id(pool), model) -> the running recovery-probe task for that
+        #: model, if any -- keeps a stalled model from spawning a second probe
+        #: on every subsequent timeout while the first one is still running.
+        self._active_probes: dict[tuple[int, str], asyncio.Task[None]] = {}
 
     def _client(self, key_index: int, model: str) -> ChatGoogleGenerativeAI:
         cache_key = (key_index, model)
@@ -397,6 +410,11 @@ class GeminiContentGenerator(ContentGenerator):
                 model=model,
                 google_api_key=self._keys[key_index],
                 temperature=0.7,
+                # Without this, a stalled call (open connection, no response)
+                # hangs forever -- see config.py's gemini_request_timeout_seconds
+                # docstring. `_invoke_with_retry` treats the resulting timeout
+                # like any other cell failure and rotates to the next one.
+                timeout=self._request_timeout_s,
                 # LangChain's own client retries a 429 in-place with
                 # exponential backoff (default max_retries=6, ~2 minutes of
                 # wall time) before ever raising a ClientError up to
@@ -422,14 +440,21 @@ class GeminiContentGenerator(ContentGenerator):
         It has nothing to do with OUR quota, so unlike a real 429 it does not
         mark the cell exhausted; instead retry the SAME cell a few times with
         exponential backoff before `_invoke_with_retry` gives up on it and
-        rotates to the next cell in the ladder."""
+        rotates to the next cell in the ladder.
+
+        A 504 (also a `ServerError` -- confirmed live: `gemini_request_timeout_seconds`
+        firing on a genuinely stalled call surfaces as `google.genai.errors.ServerError`
+        with `.code == 504`, NOT a distinct exception class) skips this same-cell
+        retry entirely: the call already burned its FULL timeout budget once,
+        so retrying it again would just burn that budget again for nothing --
+        raise immediately and let `_invoke_with_retry` move to the next cell."""
 
         delay = _SERVER_ERROR_BASE_DELAY_S
         for attempt in range(1, _SERVER_ERROR_RETRIES + 1):
             try:
                 return await structured.ainvoke(prompt)  # type: ignore[attr-defined]
-            except ServerError:
-                if attempt == _SERVER_ERROR_RETRIES:
+            except ServerError as exc:
+                if exc.code == 504 or attempt == _SERVER_ERROR_RETRIES:
                     raise
                 logger.warning(
                     "quota: key=%d model=%s got a transient 503 (high demand, attempt "
@@ -455,8 +480,9 @@ class GeminiContentGenerator(ContentGenerator):
 
         max_attempts = pool.key_count * len(pool.ladder)
         last_server_error: ServerError | None = None
-        # A 503 overload is per-MODEL, not per-key (every key hits the same
-        # wall) -- once a model has stayed UNAVAILABLE through its own
+        # A 503 overload -- and a 504 timeout, see the ServerError handler
+        # below -- is treated as per-MODEL, not per-key (every key hits the
+        # same wall) -- once a model has stayed UNAVAILABLE through its own
         # backoff, exclude it entirely so the next acquire() jumps straight
         # to the next model in the ladder instead of burning through every
         # remaining key on a model that's already proven overloaded.
@@ -527,9 +553,16 @@ class GeminiContentGenerator(ContentGenerator):
                 continue
             except ServerError as exc:
                 # Persistently UNAVAILABLE even after _invoke_with_backoff's own
-                # retries -- this cell's ledger entry is untouched (503 isn't a
-                # quota condition). Exclude the whole MODEL (not just this key)
-                # since the overload applies to every key alike.
+                # retries (or, for a 504, on the very first attempt -- see that
+                # method's docstring) -- this cell's ledger entry is untouched
+                # (neither 503 nor 504 is a quota condition). Exclude the whole
+                # MODEL, not just this key or this call: a 503 overload hits
+                # every key alike, and a 504 stall observed on one key isn't
+                # evidence the others would respond any faster either. The
+                # exclusion outlives this call (`pool.exclude_model`, not just
+                # the local `unavailable_models` below) and a background probe
+                # checks in the background whether it's come back, cycling
+                # through a different key each attempt.
                 logger.warning(
                     "quota: model=%s still UNAVAILABLE after backoff on key=%d -- "
                     "excluding this model, trying next one (attempt %d/%d): %s",
@@ -539,6 +572,8 @@ class GeminiContentGenerator(ContentGenerator):
                     max_attempts,
                     exc,
                 )
+                pool.exclude_model(model)
+                self._start_recovery_probe(pool, model)
                 unavailable_models.add(model)
                 last_server_error = exc
                 continue
@@ -555,6 +590,85 @@ class GeminiContentGenerator(ContentGenerator):
         # start, and propagates to the caller like any other failure.
         await pool.acquire(now=datetime.now(UTC))
         raise AssertionError("unreachable: acquire() should have raised QuotaExhaustedError")
+
+    def _start_recovery_probe(self, pool: QuotaGovernor, model: str) -> None:
+        """Fire-and-forget: called the moment `_invoke_with_retry` excludes a
+        model after a timeout. Only ever one probe in flight per (pool,
+        model) -- a second timeout on the same model while a probe is already
+        running just excludes it again (already true) rather than piling up
+        duplicate probes."""
+
+        key = (id(pool), model)
+        existing = self._active_probes.get(key)
+        if existing is not None and not existing.done():
+            return
+        self._active_probes[key] = asyncio.create_task(self._probe_model(pool, model))
+
+    async def _probe_model(self, pool: QuotaGovernor, model: str) -> None:
+        """Runs off the request path, checking whether a model excluded after
+        a timeout has come back. Cycles through a DIFFERENT key each attempt
+        (not just the one that originally stalled) so a single bad key isn't
+        mistaken for the whole model being down, spaced out so every
+        configured key gets tried at least once inside the budget. A
+        successful probe call counts against today's ledger exactly like a
+        real acquired call (`record_probe_attempt`) -- it is one real request
+        against the provider, not free reconnaissance.
+
+        Only matters for as long as this process stays alive -- fine for the
+        API process and local dev's `--watch` worker loop, but the production
+        worker is a short-lived batch cron pass (apps/worker/README.md) that
+        will usually exit before a 20-minute probe finishes; the next cron
+        run just rediscovers the same model fresh, at the cost of one more
+        timeout.
+        """
+
+        interval = max(_PROBE_MIN_INTERVAL_SECONDS, _PROBE_BUDGET_SECONDS / len(self._keys))
+        deadline = time.monotonic() + _PROBE_BUDGET_SECONDS
+        tried_keys: set[int] = set()
+        attempt = 0
+        while time.monotonic() < deadline:
+            key_index = attempt % len(self._keys)
+            attempt += 1
+            tried_keys.add(key_index)
+            await pool.record_probe_attempt(key_index, model, now=datetime.now(UTC))
+            try:
+                async with pool.cell_lock(key_index, model):
+                    client = self._client(key_index, model)
+                    await client.ainvoke([("human", "ping")])
+            except Exception as exc:
+                logger.info(
+                    "probe: key=%d model=%s still unavailable (%s) -- next attempt "
+                    "in %.0fs with a different key",
+                    key_index,
+                    model,
+                    exc,
+                    interval,
+                )
+                await asyncio.sleep(interval)
+                continue
+            logger.warning(
+                "probe: key=%d model=%s responded -- resuming normal rotation "
+                "(today's ledger counts are kept as-is, not reset)",
+                key_index,
+                model,
+            )
+            pool.include_model(model)
+            return
+
+        logger.warning(
+            "probe: model=%s did not respond from any of %d key(s) tried within %.0fs -- "
+            "marking every tried key exhausted, staying excluded for the rest of today",
+            model,
+            len(tried_keys),
+            _PROBE_BUDGET_SECONDS,
+        )
+        for key_index in tried_keys:
+            await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
+        # The ledger now keeps every TRIED key out of rotation for the rest of
+        # today on its own; releasing the manual flag only matters for a key
+        # this probe never got to (e.g. a key pool larger than fit in the
+        # budget), which real traffic is then free to discover for itself.
+        pool.include_model(model)
 
     # --------------------------------------------------------------- curriculum --
 

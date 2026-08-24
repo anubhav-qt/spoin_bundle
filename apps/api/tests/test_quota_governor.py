@@ -92,6 +92,67 @@ async def test_mark_exhausted_forces_a_cell_off_the_ladder(session: AsyncSession
     assert result == (1, "model-a")
 
 
+async def test_excluded_model_is_skipped_until_included_again(session: AsyncSession) -> None:
+    """`exclude_model` (called the moment a call times out -- see
+    langchain_impl.py's DeadlineExceeded handler) must keep EVERY key off that
+    model, not just one -- and `include_model` must restore it exactly as it
+    was, with no ledger side effects either way."""
+
+    governor = QuotaGovernor(
+        key_count=2, ladder=_ladder(("model-a", 20, 100), ("model-b", 20, 100))
+    )
+    now = datetime.now(UTC)
+
+    governor.exclude_model("model-a")
+    first = await governor.acquire_with_session(session, now=now)
+    second = await governor.acquire_with_session(session, now=now)
+    assert first == (0, "model-b")
+    assert second == (0, "model-b")
+
+    governor.include_model("model-a")
+    third = await governor.acquire_with_session(session, now=now)
+    assert third == (0, "model-a")
+
+
+async def test_record_probe_attempt_spends_ledger_like_a_real_acquire(
+    session: AsyncSession,
+) -> None:
+    """A background recovery probe's own calls count against today's ledger
+    exactly like a real acquired call -- it is one real request against the
+    provider, not free reconnaissance (see langchain_impl.py's _probe_model)."""
+
+    governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 20, 100)))
+    now = datetime.now(UTC)
+
+    await governor.record_probe_attempt_with_session(session, 0, "model-a", now=now)
+    await governor.record_probe_attempt_with_session(session, 0, "model-a", now=now)
+
+    ledger = await session.scalar(
+        select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
+    )
+    assert ledger is not None
+    assert ledger.requests_spent == 2
+
+    # A subsequent real acquire() picks up from the ledger the probe already
+    # spent against, not from zero -- "already filled data for today's quota
+    # from before" is kept, never reset.
+    result = await governor.acquire_with_session(session, now=now)
+    assert result == (0, "model-a")
+    ledger = await session.scalar(
+        select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
+    )
+    assert ledger is not None
+    assert ledger.requests_spent == 3
+
+
+async def test_record_probe_attempt_rejects_unknown_model(session: AsyncSession) -> None:
+    governor = QuotaGovernor(key_count=1, ladder=_ladder(("model-a", 20, 100)))
+    with pytest.raises(ValueError, match="not in this pool's ladder"):
+        await governor.record_probe_attempt_with_session(
+            session, 0, "model-b", now=datetime.now(UTC)
+        )
+
+
 async def test_raises_once_every_key_and_model_exhausted(session: AsyncSession) -> None:
     governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 1, 100)))
     now = datetime.now(UTC)

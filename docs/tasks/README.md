@@ -30,6 +30,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0020](0020-corpus-migration-and-parity.md) | Move the live corpus to CockroachDB, and prove nothing was lost | blocked on 0017-0019 |
 | [0021](0021-cockroachdb-cutover.md) | Cut over to CockroachDB Basic, and instrument both meters | blocked on 0020 |
 | [0022](0022-slug-collision-skips-alias.md) | Slug-collision fallback in topic matching skips alias recording (ADR-0025) | unassigned |
+| [0023](0023-generation-completed-status-hides-gate-attrition.md) | "Ready" status doesn't reflect actual card completion, and the idle scanner's backfill never reconciles with it | unassigned |
 
 Tasks 0016-0021 are one sequence, gated on 0016. Read
 [ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and

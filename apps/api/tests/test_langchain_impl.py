@@ -11,11 +11,12 @@ explicitly NOT covered here — there is no real key to verify that against.
 
 from __future__ import annotations
 
+import asyncio
 from typing import cast
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, Mock, call, patch
 
 import pytest
-from google.genai.errors import ClientError
+from google.genai.errors import ClientError, ServerError
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from spoin.core.config import Settings
@@ -52,6 +53,17 @@ def _real_429(message: str = "quota exceeded") -> ClientError:
 
     return ClientError(
         429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "message": message}}
+    )
+
+
+def _real_504(message: str = "Deadline expired before operation could complete.") -> ServerError:
+    """`gemini_request_timeout_seconds` firing on a genuinely stalled call, in
+    the shape confirmed live against the real API (not a distinct exception
+    class -- `google.genai.errors.ServerError` with `.code == 504`, same class
+    as an ordinary 503 "high demand" overload, distinguished only by code)."""
+
+    return ServerError(
+        504, {"error": {"code": 504, "status": "DEADLINE_EXCEEDED", "message": message}}
     )
 
 
@@ -102,6 +114,47 @@ def test_client_is_cached_per_key_and_model() -> None:
     assert first is second
     assert first is not third_key
     assert first is not third_model
+
+
+async def test_invoke_with_backoff_retries_503_on_the_same_cell() -> None:
+    """A 503 'high demand' is retried in place with backoff -- Google's own
+    docs call it usually temporary, so it's worth a couple of same-cell
+    attempts before giving up."""
+
+    generator = _generator()
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(
+        side_effect=[
+            ServerError(503, {"error": {"code": 503, "status": "UNAVAILABLE"}}),
+            "ok-result",
+        ]
+    )
+    with patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()) as mock_sleep:
+        result = await generator._invoke_with_backoff(
+            runnable, [], key_index=0, model=_THINKING_MODEL
+        )
+
+    assert result == "ok-result"
+    mock_sleep.assert_awaited_once()
+
+
+async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> None:
+    """Confirmed live: `gemini_request_timeout_seconds` firing surfaces as a
+    504 `ServerError`, not a distinct exception class. Unlike a 503, the cell
+    already burned its FULL timeout budget just getting this error -- retrying
+    it again here would burn that budget a second time for nothing, so this
+    must raise on the very first attempt instead of sleeping and retrying."""
+
+    generator = _generator()
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=_real_504())
+    with (
+        patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()) as mock_sleep,
+        pytest.raises(ServerError),
+    ):
+        await generator._invoke_with_backoff(runnable, [], key_index=0, model=_THINKING_MODEL)
+
+    mock_sleep.assert_not_awaited()
 
 
 async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> None:
@@ -157,6 +210,146 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
         await generator.generate_curriculum("Topic", "desc")
 
     assert generator._thinking.mark_exhausted.await_count == 2
+
+
+async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same_cell() -> None:
+    """Confirmed live: key 0/gemini-3.7-flash hung with no response until the
+    client-side timeout fired, raising a 504 `ServerError`. Unlike an
+    ordinary 503, the cell already burned its full timeout budget once, so
+    this must NOT retry the same cell via `_invoke_with_backoff` -- it should
+    exclude the whole model and move to the next rung on the very next
+    attempt, and it must not call `mark_exhausted` (a timeout isn't a quota
+    condition)."""
+
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(0, _THINKING_MODEL), (0, "gemini-fallback-model")]
+    )
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+
+    draft = CurriculumDraft(
+        subtopics=[
+            SubtopicGroupDraft(
+                title="G",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
+                    )
+                ],
+            )
+        ]
+    )
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=[_real_504(), draft])
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_curriculum("Topic", "desc")
+
+    assert result is draft
+    generator._thinking.mark_exhausted.assert_not_awaited()
+    second_call_kwargs = generator._thinking.acquire.await_args_list[1].kwargs
+    assert second_call_kwargs["exclude_models"] == frozenset({_THINKING_MODEL})
+
+
+async def test_invoke_with_retry_starts_a_recovery_probe_on_timeout() -> None:
+    """A timeout must both exclude the model from real traffic immediately
+    (`pool.exclude_model`) and kick off exactly one background probe -- not
+    block the caller waiting for it."""
+
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(0, _THINKING_MODEL), (0, "gemini-fallback-model")]
+    )
+    generator._thinking.exclude_model = Mock()  # type: ignore[method-assign]
+    probe_started = asyncio.Event()
+
+    async def _fake_probe(pool: object, model: str) -> None:
+        probe_started.set()
+
+    generator._probe_model = _fake_probe  # type: ignore[method-assign]
+
+    draft = CurriculumDraft(
+        subtopics=[
+            SubtopicGroupDraft(
+                title="G",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
+                    )
+                ],
+            )
+        ]
+    )
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=[_real_504(), draft])
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_curriculum("Topic", "desc")
+        await asyncio.wait_for(probe_started.wait(), timeout=1)
+
+    assert result is draft
+    generator._thinking.exclude_model.assert_called_once_with(_THINKING_MODEL)
+    assert len(generator._active_probes) == 1
+
+
+async def test_probe_model_stops_at_first_key_that_responds() -> None:
+    """The probe must try a DIFFERENT key each attempt (not the one that
+    originally stalled), and stop as soon as any key responds -- it must NOT
+    burn through the rest of the budget once the model is confirmed back, and
+    must NOT touch mark_exhausted (nothing here is out of quota)."""
+
+    generator = _generator(gemini_api_keys="key-a,key-b,key-c")
+    pool = generator._thinking
+    pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
+    pool.include_model = Mock()  # type: ignore[method-assign]
+    pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+
+    fail_client = AsyncMock()
+    fail_client.ainvoke = AsyncMock(side_effect=_real_504())
+    ok_client = AsyncMock()
+    ok_client.ainvoke = AsyncMock(return_value=None)
+    generator._client = Mock(side_effect=[fail_client, ok_client])  # type: ignore[method-assign]
+
+    with (
+        patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()),
+        patch("spoin.generation.langchain_impl.time.monotonic", return_value=0.0),
+    ):
+        await generator._probe_model(pool, _THINKING_MODEL)
+
+    assert generator._client.call_args_list == [call(0, _THINKING_MODEL), call(1, _THINKING_MODEL)]
+    assert pool.record_probe_attempt.await_count == 2
+    pool.include_model.assert_called_once_with(_THINKING_MODEL)
+    pool.mark_exhausted.assert_not_awaited()
+
+
+async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires() -> None:
+    """If nothing responds within the probe budget, every key actually tried
+    gets marked exhausted (same posture as a real 429) rather than the model
+    just quietly staying excluded with no ledger record of why."""
+
+    generator = _generator(gemini_api_keys="key-a,key-b")
+    pool = generator._thinking
+    pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
+    pool.include_model = Mock()  # type: ignore[method-assign]
+    pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+
+    fail_client = AsyncMock()
+    fail_client.ainvoke = AsyncMock(side_effect=_real_504())
+    generator._client = Mock(return_value=fail_client)  # type: ignore[method-assign]
+
+    # deadline call, then 3 while-checks: two attempts inside budget (key 0,
+    # then key 1), the third past it -- so exactly 2 attempts run.
+    with (
+        patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()),
+        patch(
+            "spoin.generation.langchain_impl.time.monotonic",
+            side_effect=[0.0, 0.0, 0.0, 2000.0],
+        ),
+    ):
+        await generator._probe_model(pool, _THINKING_MODEL)
+
+    assert pool.record_probe_attempt.await_count == 2
+    tried = {c.args for c in pool.mark_exhausted.await_args_list}
+    assert tried == {(0, _THINKING_MODEL), (1, _THINKING_MODEL)}
+    pool.include_model.assert_called_once_with(_THINKING_MODEL)
 
 
 async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() -> None:

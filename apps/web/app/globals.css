@@ -3257,6 +3257,15 @@ body.custom-cursor-active textarea {
   color: var(--good);
 }
 
+/* "completed" but under the card/question target -- the pipeline run
+   finished without error, not that every subtopic hit target (task 0023).
+   Visually distinct from a genuinely full "Ready" so it doesn't read as
+   done-done. */
+.gen-visualizer-stage-badge[data-status="completed"][data-under-target="true"] {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg-3));
+  color: var(--accent);
+}
+
 .gen-visualizer-dismiss {
   width: 22px;
   height: 22px;
@@ -3538,6 +3547,11 @@ body.custom-cursor-active textarea {
   padding: 8px 10px;
   border-radius: 8px;
   background: color-mix(in srgb, var(--good) 10%, var(--bg-3));
+}
+
+.gen-terminal-note[data-under-target="true"] {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-3));
 }
 
 .generation-bar-row .meter {

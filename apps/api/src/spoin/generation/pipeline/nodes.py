@@ -11,6 +11,7 @@ exist. What they no longer contain is the persistence — that is
 from __future__ import annotations
 
 import asyncio
+import math
 import uuid
 from datetime import UTC, datetime
 from typing import Any, cast
@@ -37,6 +38,7 @@ from spoin.generation.pipeline.persistence import (
     _existing_subtopic_hints,
     _load_subtopic_plans,
     _mark_progress_done,
+    _recent_rejection_context,
     _reuse_or_create_subtopic,
     _seed_progress,
     _update_subtopic_progress,
@@ -239,6 +241,11 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 
     results: list[SubtopicCardsResult] = []
     lower_tier_bodies: list[str] = []
+    #: Per-tier state the redraft loop below needs after this first round's
+    #: gate call -- keyed by subtopic_id (one entry per tier that actually
+    #: drafted this round; an already-full tier from the `continue` above
+    #: never enters the redraft loop, it has nothing left to close).
+    tier_meta: dict[str, dict[str, object]] = {}
 
     all_card_types = [
         CardType.PROSE.value,
@@ -275,15 +282,41 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         drafts: list[CardDraft] = []
         failures: list[str] = []
         existing_titles = list(tier["existing_titles"])
+        # The actual DEFICIT this call should draft -- not the tier's full
+        # `target_cards`. A fresh tier (existing_count == 0) has want == target,
+        # unchanged from before; a tier a LATER pass is topping up (existing_count
+        # > 0, e.g. a scan_and_generate backfill re-invoking this same topic_id)
+        # must only draft what's still missing, or every re-run drafts a whole
+        # extra `target_cards`-sized batch on top of what's already active --
+        # confirmed live: a topic backfilled a second time landed three tiers at
+        # roughly DOUBLE their target_cards before this fix.
+        want = target - tier["existing_count"]
 
-        # Determine target quotas for each card type in this tier
+        # Determine target quotas for each card type in this tier, scaled to
+        # the deficit being drafted THIS call, not the tier's full target --
+        # otherwise a topped-up tier's type mix skews toward whatever `want`
+        # happens to round-robin into rather than the intended split.
         tier_quotas = dict(tier.get("card_type_quotas") or {})
         if not tier_quotas or sum(tier_quotas.values()) != target:
-            base_qty = target // len(all_card_types)
-            rem = target % len(all_card_types)
+            base_qty = want // len(all_card_types)
+            rem = want % len(all_card_types)
             tier_quotas = {
                 ct: base_qty + (1 if i < rem else 0) for i, ct in enumerate(all_card_types)
             }
+        elif want != target:
+            # Original per-type quotas summed to the full target -- rescale
+            # proportionally to the deficit so a topping-up call doesn't chase
+            # the FULL original quota per type on top of cards already active.
+            scale = want / target
+            scaled = {ct: round(qty * scale) for ct, qty in tier_quotas.items()}
+            drift = want - sum(scaled.values())
+            if drift and scaled:
+                # Rounding can leave the sum off by a card or two -- put the
+                # difference on the type with the largest quota rather than
+                # leaving `want` unmet or overshot.
+                biggest = max(scaled, key=lambda ct: scaled[ct])
+                scaled[biggest] = max(0, scaled[biggest] + drift)
+            tier_quotas = scaled
 
         # One-time hero call (task 0006 / ADR-0018), before this tier's
         # normal rounds. Gated on `existing_count == 0` (not just `has_hero`)
@@ -337,11 +370,11 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in hero_items
             )
 
-        # Unbounded drafting: cycle through card types until target quota is satisfied
+        # Unbounded drafting: cycle through card types until the deficit is filled
         round_number = 0
-        while len(drafts) < target:
+        while len(drafts) < want:
             round_number += 1
-            remaining = target - len(drafts)
+            remaining = want - len(drafts)
 
             # Find card types that still have remaining capacity to fill
             unfilled_types = [
@@ -368,13 +401,16 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 request_count = min(batch_size, remaining)
 
             logger.info(
-                "subtopic '%s' [%s]: round %d (type=%s) -- requesting %d card(s) (%d/%d so far)",
+                "subtopic '%s' [%s]: round %d (type=%s) -- requesting %d card(s) "
+                "(%d/%d so far, existing=%d target=%d)",
                 tier["title"],
                 difficulty.value,
                 round_number,
                 chosen_type or "general",
                 request_count,
                 len(drafts),
+                want,
+                tier["existing_count"],
                 target,
             )
             result = await runtime.generator.generate_cards(
@@ -421,6 +457,13 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
             )
         )
         lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
+        tier_meta[tier["subtopic_id"]] = {
+            "tier": tier,
+            "difficulty": difficulty,
+            "target": target,
+            "existing_count": tier["existing_count"],
+            "existing_titles": existing_titles,
+        }
 
     # Gate+persist THIS group's results right now (ADR-0026) rather than
     # handing them to a later global writer -- see this function's docstring.
@@ -434,7 +477,204 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
         backend=runtime.settings.generator,
         threshold=runtime.settings.card_duplicate_threshold,
     )
+    item_reports = await _redraft_until_bar(
+        runtime,
+        tier_meta=tier_meta,
+        item_reports=item_reports,
+        topic_name=job["topic_name"],
+        topic_description=job["topic_description"],
+        generated_at=generated_at,
+        is_standalone=is_standalone,
+        difficulty_examples=difficulty_examples,
+        batch_size=batch_size,
+    )
     return {"item_reports": item_reports}
+
+
+#: A tier stops redrafting once this many consecutive rounds accept zero
+#: cards for it -- one or two unlucky rounds can happen by chance (a small
+#: batch, a borderline dedup call), so the guard needs enough consecutive
+#: misses to actually distinguish "this tier cannot pass the gate right now"
+#: from ordinary variance before it gives up on it for the run.
+_STUCK_ROUND_THRESHOLD = 5
+
+#: Pure defensive backstop against a bug in `_redraft_until_bar`'s own
+#: per-tier stuck guard letting a loop run away -- not user-configurable,
+#: should never actually trigger in normal operation (the stuck guard
+#: resolves in at most `_STUCK_ROUND_THRESHOLD` unproductive rounds per
+#: tier). If this ever fires, it means the stuck guard itself is broken,
+#: not that a subtopic is legitimately taking this long.
+_ABSOLUTE_MAX_REDRAFT_ROUNDS = 200
+
+
+async def _redraft_until_bar(
+    runtime: _Runtime,
+    *,
+    tier_meta: dict[str, dict[str, object]],
+    item_reports: list[dict[str, object]],
+    topic_name: str,
+    topic_description: str,
+    generated_at: str,
+    is_standalone: bool,
+    difficulty_examples: dict[Difficulty, list[str]],
+    batch_size: int,
+) -> list[dict[str, object]]:
+    """The round above drafts every tier to its full `target_cards` exactly
+    once and gates once -- the quality gate then rejects some fraction with
+    no loop-back to draft replacements, so a run routinely lands short of
+    target even though it "completed" (docs/tasks/0023). This closes that
+    gap per subtopic-tier, redrafting round after round -- accepted cards
+    only ever go up, never lost, so more rounds strictly cannot make a tier
+    worse -- until it clears its bar:
+
+    - A tier with no cards before this run started (`existing_count == 0` --
+      its first-ever pass) only has to clear
+      `settings.first_pass_completion_fraction` (90% by default). Some
+      shortfall on a first pass is normal -- the gate rejecting a fraction
+      of every batch isn't a bug -- so a first pass doesn't have to chase
+      literal 100% itself.
+    - A tier that already had cards before this run started (a LATER pass --
+      e.g. a `scan_and_generate` backfill picking the topic back up) chases
+      the full 100%: this run IS "the next time a worker picks it back up,"
+      so it should not hand off early again.
+
+    Neither case has a round limit. The only stop condition is a per-tier
+    stuck guard: `_STUCK_ROUND_THRESHOLD` consecutive rounds accepting zero
+    cards for a tier means the gate is genuinely, repeatedly rejecting its
+    content for a real reason (e.g. the missing difficulty-example catalog,
+    task 0011), not an unlucky round or two -- logged clearly as REJECTED,
+    not FAILED (CLAUDE.md's rule) -- and redrafting stops for that tier this
+    run rather than spending forever on one subtopic that cannot currently
+    pass. `_ABSOLUTE_MAX_REDRAFT_ROUNDS` is a pure defensive backstop
+    against a bug in the stuck guard itself, not a real operating limit.
+    """
+
+    if not tier_meta:
+        return item_reports
+
+    accepted_by_tier: dict[str, int] = {}
+    for report in item_reports:
+        sid = cast(str, report["subtopic_id"])
+        if sid in tier_meta:
+            accepted_by_tier[sid] = accepted_by_tier.get(sid, 0) + cast(int, report["accepted"])
+    stuck_rounds: dict[str, int] = dict.fromkeys(tier_meta, 0)
+    all_reports = list(item_reports)
+
+    for round_number in range(1, _ABSOLUTE_MAX_REDRAFT_ROUNDS + 1):
+        deficits: dict[str, int] = {}
+        for sid, meta in tier_meta.items():
+            if stuck_rounds[sid] >= _STUCK_ROUND_THRESHOLD:
+                continue
+            target = cast(int, meta["target"])
+            existing_count = cast(int, meta["existing_count"])
+            is_first_pass = existing_count == 0
+            total_active = existing_count + accepted_by_tier.get(sid, 0)
+            fraction = runtime.settings.first_pass_completion_fraction if is_first_pass else 1.0
+            bar = min(target, math.ceil(target * fraction))
+            if total_active < bar:
+                deficits[sid] = bar - total_active
+
+        if not deficits:
+            break
+
+        logger.info(
+            "redraft round %d: %d subtopic-tier(s) still under their completion bar -- %s",
+            round_number,
+            len(deficits),
+            deficits,
+        )
+
+        round_results: list[SubtopicCardsResult] = []
+        for sid, want in deficits.items():
+            meta = tier_meta[sid]
+            tier = cast(SubtopicPlan, meta["tier"])
+            difficulty = cast(Difficulty, meta["difficulty"])
+            existing_titles = cast(list[str], meta["existing_titles"])
+            count = min(want, batch_size)
+
+            async with runtime.session_lock:
+                avoid_bodies, rejection_feedback = await _recent_rejection_context(
+                    runtime.session,
+                    subtopic_id=uuid.UUID(sid),
+                    max_duplicate_feedback_bodies=runtime.settings.max_duplicate_feedback_bodies,
+                    max_verification_feedback_bodies=runtime.settings.max_verification_feedback_bodies,
+                )
+
+            result = await runtime.generator.generate_cards(
+                topic_name=topic_name,
+                subtopic_title=tier["title"],
+                subtopic_description=tier["description"],
+                difficulty=difficulty,
+                count=count,
+                existing_titles=existing_titles,
+                builds_on=[],
+                difficulty_examples=(
+                    difficulty_examples if is_standalone else _NO_DIFFICULTY_EXAMPLES
+                ),
+                avoid_bodies=avoid_bodies,
+                rejection_feedback=rejection_feedback,
+            )
+            logger.info(
+                "redraft round %d: subtopic '%s' [%s] -- requested %d, got %d card(s), "
+                "%d generator failure(s)",
+                round_number,
+                tier["title"],
+                difficulty.value,
+                count,
+                len(result.items),
+                len(result.failures),
+            )
+            if not result.items:
+                stuck_rounds[sid] += 1
+                continue
+            existing_titles.extend(
+                _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in result.items
+            )
+            round_results.append(
+                SubtopicCardsResult(
+                    topic_id=tier["topic_id"],
+                    subtopic_id=sid,
+                    difficulty=tier["difficulty"],
+                    drafts=result.items,
+                    generator_failures=result.failures,
+                    is_standalone=is_standalone,
+                    # Round 1 already drained this tier's pre-run
+                    # missing-question backfill and its own existing question
+                    # stems; a redraft round only ever adds brand-new cards,
+                    # so there is nothing left to backfill here.
+                    cards_missing_questions=[],
+                    existing_question_stems=[],
+                )
+            )
+
+        if not round_results:
+            continue  # every deficit tier's call returned nothing this round
+
+        round_reports = await _gate_and_persist_results(
+            runtime,
+            topic_name=topic_name,
+            topic_description=topic_description,
+            results=round_results,
+            generated_at=generated_at,
+            backend=runtime.settings.generator,
+            threshold=runtime.settings.card_duplicate_threshold,
+        )
+        for report in round_reports:
+            sid = cast(str, report["subtopic_id"])
+            accepted_this_round = cast(int, report["accepted"])
+            accepted_by_tier[sid] = accepted_by_tier.get(sid, 0) + accepted_this_round
+            stuck_rounds[sid] = 0 if accepted_this_round > 0 else stuck_rounds[sid] + 1
+            if stuck_rounds[sid] >= _STUCK_ROUND_THRESHOLD:
+                logger.info(
+                    "redraft: subtopic %s giving up after %d consecutive round(s) with no "
+                    "accepted cards -- the gate is REJECTING this tier's content for a real "
+                    "reason (see its rejected_card rows), not failing to run",
+                    sid,
+                    stuck_rounds[sid],
+                )
+        all_reports.extend(round_reports)
+
+    return all_reports
 
 
 async def _correct_subtopic_drafts(

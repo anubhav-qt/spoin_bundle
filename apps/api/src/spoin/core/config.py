@@ -172,6 +172,16 @@ class Settings(BaseSettings):
     #: a subtopic-tier's whole question set (target_cards-bounded, ADR-0026) is
     #: already a naturally small number.
     max_existing_question_stems: int = 30
+    #: A subtopic-tier with no cards before a run started (its first-ever
+    #: pass) only has to clear this fraction of `target_cards` before
+    #: `generate_subtopic_cards`'s redraft loop (nodes.py's
+    #: `_redraft_until_bar`) hands it off. A tier that already had cards
+    #: before the run started (a LATER pass -- e.g. a `scan_and_generate`
+    #: backfill) is not capped by this fraction at all -- it keeps
+    #: redrafting until it hits 100%, with no round limit either way; the
+    #: only stop condition is the redraft loop's own per-tier stuck guard.
+    #: See that loop's docstring for the full reasoning (docs/tasks/0023).
+    first_pass_completion_fraction: float = 0.9
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

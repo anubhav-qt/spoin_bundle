@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
-from spoin.domain.enums import RejectionStage
+from spoin.domain.enums import CardStatus, RejectionStage
 from spoin.domain.models import Card, Question, RejectedCard, Subtopic, Topic, TopicAlias
 from spoin.embeddings import HashEmbedder
-from spoin.generation.base import BatchResult, ContentGenerator
+from spoin.generation.base import BatchResult, CardVerificationResult, ContentGenerator
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.pipeline import (
     TopicRequest,
@@ -398,3 +398,173 @@ async def test_subtopic_card_type_quotas_and_diverse_archetypes(
     assert has_code, "Expected generated cards to include code cards"
     assert has_comparison, "Expected generated cards to include comparison cards"
     assert has_diagram, "Expected generated cards to include diagram cards"
+
+
+async def _active_count(session: AsyncSession, subtopic_id: uuid.UUID) -> int:
+    return (
+        await session.scalar(
+            select(func.count())
+            .select_from(Card)
+            .where(Card.subtopic_id == subtopic_id, Card.status == CardStatus.ACTIVE)
+        )
+        or 0
+    )
+
+
+async def test_second_pass_only_drafts_the_true_deficit(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """A tier under target after one run must only draft its remaining
+    deficit on a second pass -- not another full `target_cards` batch on top
+    of what's already active. Confirmed live 2026-08-24: a real topic
+    backfilled a second time landed three subtopics at roughly DOUBLE their
+    target_cards, before this fix (`generate_subtopic_cards`'s draft loop
+    used to bound itself by the tier's absolute target, ignoring
+    `existing_count` entirely)."""
+
+    embedder = HashEmbedder(settings.embedding_dim)
+    # Rejects exactly one card per tier's verify batch -- every tier lands at
+    # target-1 (9/10 for the fake curriculum) after round 1, cleanly meeting
+    # the 90% first-pass bar, so the redraft loop above does not fire and
+    # every tier's true deficit going into pass two is exactly 1.
+    generator = FakeContentGenerator(reject_one_per_verify_batch=True)
+    first = await _plan_and_generate(session, settings, "Plate Tectonics", generator=generator)
+    topic_id = uuid.UUID(first["topics"][0]["topic_id"])  # type: ignore[arg-type]
+
+    subtopics = (
+        (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id)))
+        .scalars()
+        .all()
+    )
+    assert subtopics
+    before = {s.id: await _active_count(session, s.id) for s in subtopics}
+    assert all(before[s.id] < s.target_cards for s in subtopics), (
+        "test setup assumption broken: every tier should be under target after round 1"
+    )
+
+    # A second pass -- "a worker picking the topic back up". Reuses the SAME
+    # generator instance (not a fresh `FakeContentGenerator()`) so its
+    # internal card counter keeps incrementing rather than resetting -- a
+    # fresh instance would produce near-identical bodies to pass one's,
+    # which the dedup gate would then legitimately reject, muddying what
+    # this test is actually about.
+    generator._reject_one = False
+    await run_generation_pipeline(session, generator, embedder, settings, topic_ids=[topic_id])
+
+    improved = False
+    for subtopic in subtopics:
+        after = await _active_count(session, subtopic.id)
+        # The actual bug this guards against: before this fix, a second pass
+        # drafted a WHOLE EXTRA `target_cards` batch regardless of what was
+        # already active, landing real subtopics at roughly double target.
+        # `after` may still land short of `target_cards` for a subtopic
+        # whose one deficit card happens to collide as a near-duplicate of
+        # an earlier fake card (HashEmbedder has no real semantics, and the
+        # fake generator's bodies are near-boilerplate for one subtopic-tier
+        # -- an artifact of this test double, not a redraft-loop failure);
+        # exceeding it is never legitimate.
+        assert after <= subtopic.target_cards, (
+            f"subtopic {subtopic.id} ended with {after} active cards after a second pass "
+            f"(target {subtopic.target_cards}, had {before[subtopic.id]} before it) -- a "
+            "second pass must never draft past the tier's real target"
+        )
+        assert after >= before[subtopic.id]
+        improved = improved or after > before[subtopic.id]
+    # At least the common case (no dedup collision) must actually close a
+    # real deficit, not merely fail to make things worse.
+    assert improved
+
+
+class _FractionRejectGenerator(FakeContentGenerator):
+    """Deterministically rejects every Nth card (by index) in every
+    `verify_cards` batch -- unlike `reject_one_per_verify_batch` (drops
+    exactly one card total), this lands a tier meaningfully under its
+    completion bar after round 1, giving the redraft loop real work to do."""
+
+    def __init__(self, *, reject_every: int) -> None:
+        super().__init__()
+        self._reject_every = reject_every
+
+    async def verify_cards(self, queries, **kwargs):  # type: ignore[no-untyped-def,override]
+        return BatchResult(
+            items=[
+                CardVerificationResult(
+                    index=query.index,
+                    accepted=query.index % self._reject_every != 0,
+                    confirmed_difficulty=query.requested_difficulty,
+                    reason="" if query.index % self._reject_every != 0 else "simulated rejection",
+                )
+                for query in queries
+            ]
+        )
+
+
+class _AlwaysRejectGenerator(FakeContentGenerator):
+    """Rejects every single card in `verify_cards`, always -- proves the
+    redraft loop's per-tier stuck guard actually stops it rather than
+    spinning until the absolute backstop."""
+
+    async def verify_cards(self, queries, **kwargs):  # type: ignore[no-untyped-def,override]
+        return BatchResult(
+            items=[
+                CardVerificationResult(
+                    index=query.index,
+                    accepted=False,
+                    confirmed_difficulty=query.requested_difficulty,
+                    reason="simulated: always reject",
+                )
+                for query in queries
+            ]
+        )
+
+
+async def test_redraft_loop_improves_on_a_single_round(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """Round 1 alone would land a 50%-rejected tier at half its target (5/10
+    for the fake curriculum) and stop there -- the exact "completed" but
+    well-under-target outcome docs/tasks/0023 documents. The redraft loop
+    should close a meaningful chunk of that gap within its round budget."""
+
+    report = await _plan_and_generate(
+        session, settings, "Igneous Rocks", generator=_FractionRejectGenerator(reject_every=2)
+    )
+    topic_id = uuid.UUID(report["topics"][0]["topic_id"])  # type: ignore[arg-type]
+
+    subtopics = (
+        (await session.execute(select(Subtopic).where(Subtopic.topic_id == topic_id)))
+        .scalars()
+        .all()
+    )
+    assert subtopics
+    for subtopic in subtopics:
+        active = await _active_count(session, subtopic.id)
+        # A single round with this generator accepts exactly half of
+        # target_cards (5/10); the redraft loop must do meaningfully better
+        # than that without ever exceeding the tier's real target.
+        assert active > subtopic.target_cards // 2
+        assert active <= subtopic.target_cards
+
+
+async def test_redraft_loop_stuck_guard_stops_on_persistent_rejection(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """A tier the gate rejects every single time (a real, systemic content
+    problem -- e.g. the missing difficulty_examples catalog, task 0011, not
+    a fluke) must stop redrafting on its own rather than spending the rest
+    of a day's quota on itself. This is the safety property the whole
+    redraft loop depends on."""
+
+    report = await _plan_and_generate(
+        session, settings, "Metamorphic Rocks", generator=_AlwaysRejectGenerator()
+    )
+    topic_id = uuid.UUID(report["topics"][0]["topic_id"])  # type: ignore[arg-type]
+    topic_report = report["topics"][0]
+
+    # Every draft this run was rejected -- nothing became an active card,
+    # and the run still terminated (proven simply by reaching this line).
+    assert topic_report["accepted"] == 0
+    assert topic_report["rejected"] > 0
+
+    cards = (await session.execute(select(Card).where(Card.topic_id == topic_id))).scalars().all()
+    assert len(cards) == 0

@@ -265,6 +265,50 @@ async def _load_subtopic_plans(
     return plans
 
 
+async def _recent_rejection_context(
+    session: AsyncSession,
+    *,
+    subtopic_id: uuid.UUID,
+    max_duplicate_feedback_bodies: int,
+    max_verification_feedback_bodies: int,
+) -> tuple[list[str], list[tuple[str, str]]]:
+    """The same two queries `_load_subtopic_plans` runs once at the top of a
+    run, callable again mid-run. `generate_subtopic_cards`'s redraft loop
+    (nodes.py) needs a subtopic-tier's own just-persisted rejections as
+    feedback for its next round -- those rows didn't exist yet when
+    `_load_subtopic_plans` ran at the start of THIS run, so re-querying is
+    the only way a redraft round sees them (this is what makes the feedback
+    genuinely same-run, not just carried over from an earlier invocation)."""
+
+    avoid_bodies = (
+        (
+            await session.execute(
+                select(RejectedCard.body)
+                .where(
+                    RejectedCard.subtopic_id == subtopic_id,
+                    RejectedCard.stage == RejectionStage.NEAR_DUPLICATE,
+                )
+                .order_by(RejectedCard.created_at.desc())
+                .limit(max_duplicate_feedback_bodies)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    rejection_feedback_rows = (
+        await session.execute(
+            select(RejectedCard.body, RejectedCard.reason)
+            .where(
+                RejectedCard.subtopic_id == subtopic_id,
+                RejectedCard.stage == RejectionStage.VERIFICATION,
+            )
+            .order_by(RejectedCard.created_at.desc())
+            .limit(max_verification_feedback_bodies)
+        )
+    ).all()
+    return list(avoid_bodies), [(body, reason) for body, reason in rejection_feedback_rows]
+
+
 async def _running_job(runtime: _Runtime, topic_id: uuid.UUID) -> GenerationJob | None:
     job: GenerationJob | None = await runtime.session.scalar(
         select(GenerationJob).where(

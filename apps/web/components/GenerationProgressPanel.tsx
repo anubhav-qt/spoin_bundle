@@ -136,6 +136,17 @@ export function GenerationProgressPanel({
 
   const terminal = progress?.status === "completed" || progress?.status === "failed";
   const showLiveBanner = progress !== null && progress.topic_live && progress.status !== "failed";
+  // `status === "completed"` means the pipeline run returned without error --
+  // NOT that every subtopic hit its card/question target. The quality gate
+  // (dedup, structural checks, pass-2 verification) rejects some drafts every
+  // run with no loop-back to draft replacements within that same run, so
+  // landing under target on a "completed" job is normal, not broken (see
+  // docs/tasks/0023). Told apart here so the UI doesn't claim "all done" when
+  // there's still a real gap between what's generated and what's targeted.
+  const underTarget =
+    progress?.status === "completed" &&
+    metrics.totalSubtopics > 0 &&
+    metrics.subtopicsDone < metrics.totalSubtopics;
 
   return (
     <div className="gen-visualizer" role="status" aria-live="polite">
@@ -143,11 +154,17 @@ export function GenerationProgressPanel({
       <div className="gen-visualizer-head">
         <div className="gen-visualizer-title-row">
           <span className="gen-visualizer-name">{progress?.topic_name ?? topicDisplayName}</span>
-          <span className="gen-visualizer-stage-badge mono" data-status={progress?.status ?? "pending"}>
+          <span
+            className="gen-visualizer-stage-badge mono"
+            data-status={progress?.status ?? "pending"}
+            data-under-target={underTarget}
+          >
             {progress?.status === "running"
               ? "Generating…"
               : progress?.status === "completed"
-              ? "Ready"
+              ? underTarget
+                ? "Ready · filling in"
+                : "Ready"
               : progress?.status === "failed"
               ? "Failed"
               : "Queued"}
@@ -328,9 +345,11 @@ export function GenerationProgressPanel({
       ) : null}
 
       {terminal ? (
-        <div className="gen-terminal-note mono">
+        <div className="gen-terminal-note mono" data-under-target={underTarget}>
           {progress?.status === "completed"
-            ? "✓ Generation complete! All cards and quizzes are ready."
+            ? underTarget
+              ? `✓ Ready to read — ${metrics.cardsDone}/${metrics.cardsTarget} cards so far. The rest may fill in later.`
+              : "✓ Generation complete! All cards and quizzes are ready."
             : "✕ Generation stopped."}
         </div>
       ) : null}

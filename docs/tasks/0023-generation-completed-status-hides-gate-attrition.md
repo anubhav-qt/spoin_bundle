@@ -50,25 +50,32 @@ backfill* being invisible to the status the frontend actually renders.
 
 ## What to do
 
-Pick one (or both) of two directions, whichever fits the product intent better once decided:
+Two directions; the first is done, the second is still open.
 
-1. **Make the desync visible instead of silent.** Cheapest: have `TopicsService` compare the
-   topic's actual `active_cards` against `target_cards` (or reuse whatever fraction
-   `find_incomplete_topics` already computes) and surface a distinct state -- e.g. "Ready
-   (filling in more)" -- rather than a flat "Ready" indistinguishable from a topic that
-   genuinely hit 100%.
-2. **Make the scanner's backfill reconcile with `GenerationJob`.** Have
-   `scan_and_generate.py`'s topped-up runs write (or update) a `GenerationJob` row the same
-   way the queue-driven path does, so the frontend's existing status logic picks up the
-   change for free instead of needing a second, parallel completion signal.
+1. **Make the desync visible instead of silent -- done, 2026-08-24.**
+   `GenerationProgressPanel.tsx` already receives per-subtopic `cards_done`/`cards_target` and
+   `questions_done`/`questions_target` from `GenerationProgressOut.subtopics` (it was already
+   using them for the progress bar), so this ended up being purely client-side: no schema or
+   `TopicsService` change needed. It computes `underTarget = status === "completed" &&
+   subtopicsDone < totalSubtopics` and swaps the "Ready" badge for "Ready · filling in" (a
+   distinct accent color, not the "done" green) and the "✓ Generation complete!" banner for an
+   honest "✓ Ready to read — N/M cards so far. The rest may fill in later." Confirmed this was
+   also worth noting: `stage: "done"` in the job's progress blob is written unconditionally at
+   the end of every run (`_mark_progress_done` in `pipeline/nodes.py:1148`), same false signal
+   as `status == "completed"` -- so the fix had to derive real completion from the per-subtopic
+   counts, not from either `status` or `stage`.
+2. **Make the scanner's backfill reconcile with `GenerationJob` -- still open.**
+   `scan_and_generate.py`'s topped-up runs still bypass the `GenerationJob` table entirely (see
+   "The problem" above) -- confirmed still true 2026-08-24. Have those runs write/update a
+   `GenerationJob` row the same way the queue-driven path does, so a topic that gets backfilled
+   later flips back to a fresh "Ready" (not "Ready · filling in") without the requester having
+   to know a scan happened.
 
-Either way, this needs a decision recorded (a short ADR note, or at minimum an explicit
-statement in `generation-pipeline.md` or ADR-0053) about what "Ready" is actually promising
-a user, since right now it's an accident of "the job function returned," not a designed
-guarantee.
+This still needs a decision recorded (a short ADR note, or at minimum an explicit statement in
+`generation-pipeline.md` or ADR-0053) about what "Ready" is actually promising a user --
+direction 1 makes the gap visible in the UI, but nothing documents the guarantee (or lack of
+one) yet.
 
 ## Timebox
 
-Medium -- the code changes for either direction are small (one comparison, or one extra
-write), but scoping which of the two directions is wanted, and writing the doc that pins the
-answer down, is the larger part of this. Half a day.
+Small remaining -- direction 1 is done; direction 2 is one extra write plus the doc note.

@@ -87,6 +87,14 @@ second time on mobile.
   content. `.modal-panel`'s `max-height` moved from `84vh` to `84dvh` -- `vh` resolves
   against the largest possible viewport, so it overshoots once Safari's URL bar is
   actually showing.
+- **`DailyGoalRing`'s popover moved from CSS-anchored to a `document.body` portal**,
+  found after the fact: it's `position: absolute` inside `.daily-goal-wrap`, which now
+  lives inside two ancestors that didn't exist when that popover was designed --
+  `RightRail`'s rail (`overflow-x: hidden`, by design) and `MobileTopBar` (`position:
+  fixed`, sitting directly above the scrolling feed). Either could clip or bury it as the
+  page scrolled. `TopicDiscoveryModal` already escapes the same class of problem the same
+  way -- `getBoundingClientRect()` on open, `position: fixed` at those coordinates,
+  recomputed on scroll/resize while the popover is open.
 
 **Not done, explicitly deferred:** `HeroTutorialOverlay`'s callout positioning
 (`getBoundingClientRect` against the hero card, in viewport coordinates) is unaffected by

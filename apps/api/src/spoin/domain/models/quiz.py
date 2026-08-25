@@ -274,3 +274,49 @@ class QuotaLedger(Base, Timestamps):
     #: touched" timestamp doesn't distinguish "still has headroom" from "just hit
     #: the wall"), so a caller can query "which key ran out, and when" directly.
     exhausted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: Set by `QuotaGovernor.mark_rate_limited` when the provider returns a
+    #: per-MINUTE 429 for this cell -- `acquire()` skips the cell until it
+    #: passes, without spending `requests_spent` (ADR-0058). Shared rather than
+    #: in-memory so a throttle one process discovers is not re-discovered by
+    #: every other process that then routes straight into the same wall.
+    #: Wall-clock, unlike the monotonic value this replaced: it has to be
+    #: comparable across processes and hosts.
+    cooldown_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class QuotaRequest(Base, UUIDPrimaryKey):
+    """One request against a `(key, model)` cell, inside the trailing per-minute
+    window (ADR-0058).
+
+    The RPM counterpart to `QuotaLedger`'s daily count, and shared for the same
+    reason the ledger is: an in-memory window lets two processes each permit the
+    full ceiling, so the provider sees double what either believes it sent.
+
+    **Rows are disposable.** They matter for 60 seconds and are pruned after;
+    nothing reads this table for history. That is also why it is a plain row per
+    request rather than a counter -- a sliding window needs the individual
+    timestamps, and counting rows makes the reserve atomic in one statement
+    (see `quota.py`'s `_try_reserve_rpm`) instead of needing a read-modify-write
+    under a row lock.
+    """
+
+    __tablename__ = "quota_request"
+
+    #: Same `"gemini:{key_index}:{model}"` convention as `QuotaLedger.backend`,
+    #: deliberately: the two tables describe the same cell on two time horizons.
+    backend: Mapped[str] = mapped_column(String(64), nullable=False)
+    #: When the request actually went to the provider. Written at reservation
+    #: time and moved forward when the call really fires (`note_request_sent`) --
+    #: see `_RpmSlot`'s successor in quota.py for why the window has to be
+    #: anchored to the send rather than the grant.
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    #: False while the cell is granted but the request hasn't left yet. Reserved
+    #: rows count toward the ceiling exactly like sent ones -- otherwise
+    #: concurrent callers all see room and pile onto the same cell.
+    confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    __table_args__ = (
+        #: Every query here is "this cell, this last minute", and the prune is
+        #: "anything older than that" -- one composite index serves both.
+        Index("ix_quota_request_backend_sent_at", "backend", "sent_at"),
+    )

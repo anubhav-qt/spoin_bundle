@@ -94,4 +94,4 @@ useful than the decision itself.
 | [0055](0055-session-scoped-topic-shares.md) | The interleave plan is weighted by the current session, not long-run affinity | Accepted (amends 0010, 0011) |
 | [0056](0056-generation-call-timeout-and-recovery-probe.md) | Client-side request timeout, and a background recovery probe for a stalled model | Accepted (amends 0028) |
 | [0057](0057-redraft-loop-for-gate-attrition.md) | A per-tier redraft loop closes the gate-rejection gap left by a single draft-and-gate pass | Accepted (amends 0026) |
-
+| [0058](0058-per-minute-vs-per-day-429.md) | A per-minute 429 and a per-day 429 are different facts, read off the payload | Accepted (amends 0028) |

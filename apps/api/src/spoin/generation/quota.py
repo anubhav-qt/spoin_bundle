@@ -8,18 +8,30 @@ other model. `QuotaGovernor` walks that grid: for a call, try the strongest
 model in the ladder across every configured key; only fall to the next model
 once every key is exhausted for the current one.
 
-**RPD is persisted, RPM is not.** `QuotaLedger` (day, backend, requests_spent)
-tracks the daily count per `(key_index, model)` — `backend=f"gemini:{key_index}:
-{model}"` — because it must survive across the worker's separate cron passes
-within the same day. The per-minute count does NOT need to survive a restart:
-the worker is a short-lived batch pass (ADR-0003 §3), not a persistent
-process, so an in-memory sliding window that resets every run is sufficient
-and avoids a DB round-trip per request just to enforce RPM.
+**Both RPD and RPM are persisted** — `QuotaLedger` (day, backend,
+requests_spent, cooldown_until) for the day, `QuotaRequest` (backend, sent_at)
+for the trailing minute, both keyed on `f"gemini:{key_index}:{model}"`.
+
+RPM used to be an in-memory sliding window, on the reasoning that a short-lived
+batch worker (ADR-0003 §3) doesn't need it to survive a restart, and that a DB
+round-trip per request was too much to pay. The first half is still true and is
+not the point: the problem was never restarts, it was **concurrent processes**.
+The API (topic matching, quiz grading) and the worker both draw on the thinking
+pool at the same time, and an in-memory window means each one independently
+permits the full ceiling — so the provider sees double what either believes it
+sent, and 429s arrive that neither can explain. ADR-0058 has the reasoning and
+the measurements; the short version is that the round-trip objection turned out
+to be small next to `acquire()`'s existing per-cell ledger reads, and correctness
+across processes is worth more than saving one query.
+
+**These rows are disposable, unlike the ledger's.** A `QuotaRequest` matters for
+60 seconds; `prune_request_window` drops them opportunistically from `acquire()`.
 
 **Deliberately session-per-call, not session-per-instance.** A `QuotaGovernor`
 lives for the lifetime of a `GeminiContentGenerator` (one per generation run,
-potentially making many concurrent calls — see `generation/pipeline.py`'s
-concurrency semaphore). If it held one long-lived `AsyncSession`, every call
+potentially making many concurrent calls — since ADR-0047 removed the old
+global semaphore, this governor IS the only thing bounding that concurrency).
+If it held one long-lived `AsyncSession`, every call
 would have to share it, which reintroduces exactly the concurrency hazard the
 pipeline was built to avoid (`AsyncSession` isn't safe for concurrent task
 access). Each `acquire()` call instead opens its OWN short-lived session via
@@ -30,24 +42,37 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import time
-from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import delete, func, insert, literal, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.db import session_scope
-from spoin.domain.models.quiz import QuotaLedger
+from spoin.domain.models.quiz import QuotaLedger, QuotaRequest
 
 logger = logging.getLogger("spoin.generation.quota")
 
 #: The trailing window RPM is measured over. Fixed at 60s (what "requests per
 #: minute" means) — not a setting, since it isn't a tuning knob.
 _RPM_WINDOW_SECONDS = 60.0
-_FLASH_LITE_COOLDOWN_SECONDS = 60.0
-_FLASH_LITE_MAX_RESETS = 10
+#: Fallback cooldown for a per-minute 429 that arrived without a `RetryInfo`
+#: hint. One full RPM window is the longest a per-minute limit can possibly
+#: last, so waiting it out is correct by definition rather than a tuned guess.
+_DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS = _RPM_WINDOW_SECONDS
+#: How long a `QuotaRequest` row is kept before the opportunistic prune drops it.
+#: Deliberately a multiple of the window rather than equal to it: a row is
+#: useless once it ages out, but deleting it the instant it does would race the
+#: readers still counting it.
+_REQUEST_RETENTION_SECONDS = _RPM_WINDOW_SECONDS * 5
+
+
+def _backend(key_index: int, model: str) -> str:
+    """The `(key, model)` cell's key in both quota tables. One spelling, one
+    place -- `QuotaLedger` and `QuotaRequest` describe the same cell on two
+    different time horizons and must agree on how it is named."""
+
+    return f"gemini:{key_index}:{model}"
 
 
 class QuotaExhaustedError(RuntimeError):
@@ -103,21 +128,18 @@ class QuotaGovernor:
     for the next call to make: the highest-priority ladder rung that still has
     room, checked across every key before falling to the next rung.
 
-    The lock only guards the cheap DB check-and-increment plus the in-memory
-    RPM check — callers make the actual network call themselves after this
-    returns, so concurrent calls landing on different `(key, model)` cells
-    still run concurrently. Concurrent calls racing for the SAME cell are what
-    the lock actually serializes.
+    The lock only guards the cheap DB check-and-increment (RPD ledger, RPM
+    reservation) within THIS process — callers make the actual network call
+    themselves after this returns, so concurrent calls landing on different
+    `(key, model)` cells still run concurrently. Concurrent calls racing for
+    the SAME cell within one process are what the lock actually serializes;
+    across processes, `_try_reserve_rpm`'s atomic `INSERT ... WHERE` is what
+    does the equivalent job (ADR-0058) — there is no cross-process lock.
     """
 
     key_count: int
     ladder: list[LadderRung]
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
-    #: (key_index, model) -> timestamps (time.monotonic()) of calls within the
-    #: trailing RPM window. In-memory only — see module docstring.
-    _rpm_windows: dict[tuple[int, str], deque[float]] = field(
-        default_factory=lambda: defaultdict(deque), init=False, repr=False
-    )
     #: (key_index, model) -> a lock serializing the actual network calls on
     #: that ONE cell. `acquire()` grants a cell and returns immediately, so
     #: concurrent tasks routed to the same cell would otherwise all fire their
@@ -127,15 +149,6 @@ class QuotaGovernor:
     #: next fires; different cells (independent quota) still run concurrently.
     _cell_locks: dict[tuple[int, str], asyncio.Lock] = field(
         default_factory=dict, init=False, repr=False
-    )
-    #: (key_index, model) -> timestamp (time.monotonic()) until which flash-lite
-    #: cell is cooling off after a 429 before resetting spend to 0.
-    _flash_lite_cooldowns: dict[tuple[int, str], float] = field(
-        default_factory=dict, init=False, repr=False
-    )
-    #: (key_index, model) -> number of 60s cooldown resets done today for flash-lite
-    _flash_lite_reset_counts: dict[tuple[int, str], int] = field(
-        default_factory=lambda: defaultdict(int), init=False, repr=False
     )
     #: Models currently believed unavailable after a client-side timeout
     #: (`langchain_impl.py`'s `DeadlineExceeded` handler) -- excluded from
@@ -155,6 +168,7 @@ class QuotaGovernor:
         self, *, now: datetime, exclude_models: frozenset[str] = frozenset()
     ) -> tuple[int, str]:
         async with self._lock, session_scope() as session:
+            await self.prune_request_window(session, now=now)
             return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
 
     async def acquire_with_session(
@@ -168,16 +182,74 @@ class QuotaGovernor:
         async with self._lock:
             return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
 
-    async def mark_exhausted(self, key_index: int, model: str, *, now: datetime) -> None:
-        """A REAL 429 from the provider disagreed with our local ledger, which
-        believed this cell had room (ADR-0028's documented drift risk,
-        confirmed live rather than theoretical). Force the ledger to treat
-        this cell as exhausted for the rest of today, so the NEXT `acquire()`
-        -- ours or a concurrent caller's -- skips it immediately instead of
-        rediscovering the same 429 on every subsequent call.
+    async def mark_rate_limited(
+        self, key_index: int, model: str, *, now: datetime, retry_after_s: float | None = None
+    ) -> None:
+        """A PER-MINUTE 429 (`GenerateRequestsPerMinutePerProjectPerModel`) --
+        this cell has daily quota left and is simply being throttled right now.
 
-        For flash-lite models, we apply a 60s cooldown and reset spend to 0
-        up to 10 times per key before marking it permanently exhausted for today.
+        Deliberately does NOT touch `requests_spent` (ADR-0058). That column is
+        the day's real consumption; writing to it here is what made a burst of
+        per-minute throttling read back as "every key exhausted for today"
+        while the real daily quota sat untouched. All this does is park the
+        cell until `retry_after_s` has passed, which `_acquire_locked` already
+        knows how to wait out via its `candidate_wait_times` queue.
+
+        Persisted rather than in-memory so that a throttle ONE process discovers
+        is not something every other process has to rediscover the hard way, by
+        routing its next call into the same wall.
+
+        Deliberately does not take `self._lock`: `acquire()` holds that across
+        its own `asyncio.sleep`, so waiting for it here would make the caller
+        that just got throttled queue behind a sleeper before it could record
+        the very cooldown that sleeper is waiting to see. The database
+        serializes the write on its own; the lock buys nothing."""
+
+        delay = retry_after_s if retry_after_s is not None else _DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS
+        async with session_scope() as session:
+            await self._mark_rate_limited_with_session(
+                session, key_index, model, now=now, delay=delay
+            )
+
+    async def mark_rate_limited_with_session(
+        self,
+        session: AsyncSession,
+        key_index: int,
+        model: str,
+        *,
+        now: datetime,
+        retry_after_s: float | None = None,
+    ) -> None:
+        """Same as `mark_rate_limited`, reusing a caller-supplied session — for
+        tests, same reasoning as `acquire_with_session`."""
+
+        delay = retry_after_s if retry_after_s is not None else _DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS
+        await self._mark_rate_limited_with_session(session, key_index, model, now=now, delay=delay)
+
+    async def _mark_rate_limited_with_session(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime, delay: float
+    ) -> None:
+        ledger = await self._ledger_row(session, _day_start(now), key_index, model)
+        ledger.cooldown_until = now + timedelta(seconds=delay)
+        await session.flush()
+        logger.info(
+            "quota: key %d model %s hit a per-minute rate limit -- cooling down %.1fs "
+            "(daily ledger untouched)",
+            key_index,
+            model,
+            delay,
+        )
+
+    async def mark_exhausted(self, key_index: int, model: str, *, now: datetime) -> None:
+        """This cell is spent for the rest of TODAY -- a per-day 429, an auth
+        failure, or a model that never came back from a recovery probe. Force
+        the ledger to treat it as exhausted so the NEXT `acquire()` -- ours or
+        a concurrent caller's -- skips it immediately instead of rediscovering
+        the same failure on every subsequent call.
+
+        Only ever called for genuinely day-long conditions. A per-minute 429
+        goes to `mark_rate_limited` instead; conflating the two is the bug
+        ADR-0058 exists to fix.
 
         Unknown model (not in this pool's ladder) is a caller bug, not a
         runtime condition to degrade from -- raises rather than silently
@@ -205,29 +277,6 @@ class QuotaGovernor:
         day = _day_start(now)
         ledger = await self._ledger_row(session, day, key_index, model)
 
-        is_flash_lite = "flash-lite" in model.lower()
-        if (
-            is_flash_lite
-            and self._flash_lite_reset_counts[(key_index, model)] < _FLASH_LITE_MAX_RESETS
-        ):
-            self._flash_lite_reset_counts[(key_index, model)] += 1
-            reset_num = self._flash_lite_reset_counts[(key_index, model)]
-            self._flash_lite_cooldowns[(key_index, model)] = (
-                time.monotonic() + _FLASH_LITE_COOLDOWN_SECONDS
-            )
-            ledger.requests_spent = 0
-            ledger.exhausted_at = None
-            await session.flush()
-            logger.warning(
-                "quota: key %d flash-lite model %s 429'd -- rotated key, reset spend to 0 "
-                "with 60s cooldown (reset %d/%d)",
-                key_index,
-                model,
-                reset_num,
-                _FLASH_LITE_MAX_RESETS,
-            )
-            return
-
         ledger.requests_spent = max(ledger.requests_spent, rung.rpd)
         ledger.exhausted_at = now
         await session.flush()
@@ -250,8 +299,8 @@ class QuotaGovernor:
         found persistently unavailable this call so acquire() jumps straight
         to the next model instead."""
 
-        day = _day_start(now)
         while True:
+            day = _day_start(now)
             candidate_wait_times: list[float] = []
             has_unexhausted_cell = False
 
@@ -279,23 +328,28 @@ class QuotaGovernor:
 
                     has_unexhausted_cell = True
 
-                    cooldown_until = self._flash_lite_cooldowns.get((key_index, rung.model))
-                    if cooldown_until is not None and time.monotonic() < cooldown_until:
-                        wait_cd = cooldown_until - time.monotonic()
+                    if ledger.cooldown_until is not None and now < ledger.cooldown_until:
+                        wait_cd = (ledger.cooldown_until - now).total_seconds()
                         candidate_wait_times.append(wait_cd)
                         logger.debug(
-                            "quota: key %d model %s is in flash-lite cooldown (%.1fs remaining), "
-                            "trying next",
+                            "quota: key %d model %s is in a rate-limit cooldown (%.1fs "
+                            "remaining), trying next",
                             key_index,
                             rung.model,
                             wait_cd,
                         )
                         continue
 
-                    if not self._rpm_has_room(key_index, rung):
-                        window = self._rpm_windows[(key_index, rung.model)]
-                        if window:
-                            wait_rpm = (window[0] + _RPM_WINDOW_SECONDS) - time.monotonic()
+                    # Claims the RPM slot as part of the same check -- see
+                    # `_try_reserve_rpm` for why those cannot be two statements.
+                    if not await self._try_reserve_rpm(session, key_index, rung, now=now):
+                        earliest = await self._earliest_send_in_window(
+                            session, key_index, rung.model, now=now
+                        )
+                        if earliest is not None:
+                            wait_rpm = (
+                                earliest + timedelta(seconds=_RPM_WINDOW_SECONDS) - now
+                            ).total_seconds()
                             if wait_rpm > 0:
                                 candidate_wait_times.append(wait_rpm)
                         logger.debug(
@@ -317,7 +371,6 @@ class QuotaGovernor:
                             day.date(),
                         )
                     await session.flush()
-                    self._record_rpm(key_index, rung)
                     logger.info(
                         "quota: acquired key=%d model=%s (%d/%d spent today)",
                         key_index,
@@ -340,7 +393,8 @@ class QuotaGovernor:
                 )
 
             # All candidate keys have daily quota remaining but are temporarily rate-limited
-            # (in RPM window or 60s flash-lite cooldown). Sleep until the earliest slot opens.
+            # (our own RPM window, or a provider-signalled cooldown from a per-minute 429).
+            # Sleep until the earliest slot opens.
             min_wait = min(candidate_wait_times) if candidate_wait_times else 2.0
             sleep_duration = max(0.5, min(min_wait + 0.2, 60.0))
             logger.info(
@@ -349,6 +403,15 @@ class QuotaGovernor:
                 sleep_duration,
             )
             await asyncio.sleep(sleep_duration)
+            # `now` has to advance by (about) what we just slept, or every check
+            # above compares against the same instant forever and this loop
+            # never terminates -- confirmed live: it hung for real, in a test,
+            # for exactly this reason (a caller-fixed `now` re-entering the
+            # RPM/cooldown checks unchanged). Advancing by the slept duration
+            # rather than re-reading the wall clock keeps this loop's progress
+            # deterministic in terms of what it waited for, not what else the
+            # process happened to be doing meanwhile.
+            now = now + timedelta(seconds=sleep_duration)
 
     def exclude_model(self, model: str) -> None:
         """Stop routing real traffic to `model` -- called the moment a call
@@ -367,9 +430,14 @@ class QuotaGovernor:
 
     async def record_probe_attempt(self, key_index: int, model: str, *, now: datetime) -> None:
         """One background-probe call against `(key_index, model)` -- counts
-        against today's ledger exactly like a real acquired call. A probe is
-        not free reconnaissance; it is one real request against the
-        provider's own daily limit, so it must be accounted for the same way."""
+        against today's ledger AND the per-minute window, exactly like a real
+        acquired call. A probe is not free reconnaissance; it is one real
+        request against the provider's limits, so it must be accounted for the
+        same way. Reserving the RPM slot here (the probe confirms it with
+        `note_request_sent` when the ping actually goes out) is what keeps probe
+        traffic from being invisible to real traffic's ceiling -- the probe
+        deliberately does not ASK for room, but everything else has to know it
+        took some."""
 
         async with self._lock, session_scope() as session:
             await self._record_probe_attempt_locked(session, key_index, model, now=now)
@@ -394,6 +462,11 @@ class QuotaGovernor:
         ledger = await self._ledger_row(session, day, key_index, model)
         ledger.requests_spent += 1
         await session.flush()
+        # Reserved unconditionally, not via `_try_reserve_rpm`: a probe does not
+        # ASK for room (it is a deliberate availability check, not queued work),
+        # but everything else still has to see that it took some.
+        session.add(QuotaRequest(backend=_backend(key_index, model), sent_at=now, confirmed=False))
+        await session.flush()
 
     def cell_lock(self, key_index: int, model: str) -> asyncio.Lock:
         """Returns the lock for this `(key, model)` cell, creating it on first
@@ -408,20 +481,124 @@ class QuotaGovernor:
             self._cell_locks[cell] = lock
         return lock
 
-    def _rpm_has_room(self, key_index: int, rung: LadderRung) -> bool:
-        window = self._rpm_windows[(key_index, rung.model)]
-        cutoff = time.monotonic() - _RPM_WINDOW_SECONDS
-        while window and window[0] < cutoff:
-            window.popleft()
-        return len(window) < rung.rpm
+    async def note_request_sent(self, key_index: int, model: str, *, now: datetime) -> None:
+        """The request for this cell is going out to the provider RIGHT NOW.
 
-    def _record_rpm(self, key_index: int, rung: LadderRung) -> None:
-        self._rpm_windows[(key_index, rung.model)].append(time.monotonic())
+        `acquire()` reserves a slot when it *grants* a cell, but the call fires
+        later -- the caller still has to win `cell_lock`, which queues behind any
+        other call on the same cell. Under a parallel fan-out that gap is real
+        seconds, and it is what pulls our 60s window out of alignment with the
+        provider's: we would count a request in the minute it was reserved while
+        the provider counted it in the minute it arrived. Both then believe
+        they are under the ceiling, and the provider is the one that's right.
+
+        So the reservation is moved forward to the true send time. The row is
+        updated in place rather than replaced, so the count is unchanged and
+        only the moment it leaves the window moves -- always later, which is the
+        conservative direction.
+
+        With no reservation outstanding this inserts one already-confirmed --
+        the right answer for a genuine additional call on the same grant, like
+        `_invoke_with_backoff` retrying a 503 on the same cell.
+
+        Does not take `self._lock`, same reasoning as `mark_rate_limited`."""
+
+        async with session_scope() as session:
+            await self.note_request_sent_with_session(session, key_index, model, now=now)
+
+    async def note_request_sent_with_session(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime
+    ) -> None:
+        """Same as `note_request_sent`, reusing a caller-supplied session — for
+        tests, same reasoning as `acquire_with_session`."""
+
+        backend = _backend(key_index, model)
+        reservation = await session.scalar(
+            select(QuotaRequest)
+            .where(QuotaRequest.backend == backend, QuotaRequest.confirmed.is_(False))
+            .order_by(QuotaRequest.sent_at)
+            .limit(1)
+            .with_for_update(skip_locked=True)
+        )
+        if reservation is None:
+            session.add(QuotaRequest(backend=backend, sent_at=now, confirmed=True))
+        else:
+            reservation.sent_at = now
+            reservation.confirmed = True
+        await session.flush()
+
+    async def _try_reserve_rpm(
+        self, session: AsyncSession, key_index: int, rung: LadderRung, *, now: datetime
+    ) -> bool:
+        """Claim a place in this cell's trailing window, but only if the cell is
+        under its ceiling. Returns False when it is already full.
+
+        Checking and claiming are ONE statement on purpose. Split into a count
+        followed by an insert, two processes both read "4 of 5 used", both
+        insert, and the provider gets 6 -- exactly the cross-process gap this
+        table exists to close. `INSERT ... SELECT ... WHERE (count) < rpm` is
+        decided inside the database, so only one of them can win.
+        """
+
+        backend = _backend(key_index, rung.model)
+        cutoff = now - timedelta(seconds=_RPM_WINDOW_SECONDS)
+        in_window = (
+            select(func.count())
+            .select_from(QuotaRequest)
+            .where(QuotaRequest.backend == backend, QuotaRequest.sent_at > cutoff)
+            .scalar_subquery()
+        )
+        result = await session.execute(
+            insert(QuotaRequest)
+            .from_select(
+                ["id", "backend", "sent_at", "confirmed"],
+                select(
+                    func.gen_random_uuid(),
+                    literal(backend),
+                    literal(now),
+                    literal(False),
+                ).where(in_window < rung.rpm),
+            )
+            .returning(QuotaRequest.id)
+        )
+        return result.scalar_one_or_none() is not None
+
+    async def _earliest_send_in_window(
+        self, session: AsyncSession, key_index: int, model: str, *, now: datetime
+    ) -> datetime | None:
+        """When the oldest request still inside this cell's window will fall out
+        of it -- i.e. the soonest moment the cell could have room again."""
+
+        cutoff = now - timedelta(seconds=_RPM_WINDOW_SECONDS)
+        earliest: datetime | None = await session.scalar(
+            select(func.min(QuotaRequest.sent_at)).where(
+                QuotaRequest.backend == _backend(key_index, model),
+                QuotaRequest.sent_at > cutoff,
+            )
+        )
+        return earliest
+
+    async def prune_request_window(self, session: AsyncSession, *, now: datetime) -> int:
+        """Drop rows that have fallen out of every cell's window.
+
+        These rows are worthless the moment they age out -- nothing reads this
+        table for history -- so they are deleted rather than retained. Called
+        opportunistically from `acquire()` rather than on a schedule, since the
+        only process that needs the table small is one that is actively using
+        it.
+        """
+
+        result = await session.execute(
+            delete(QuotaRequest).where(
+                QuotaRequest.sent_at < now - timedelta(seconds=_REQUEST_RETENTION_SECONDS)
+            )
+        )
+        return int(result.rowcount or 0)  # type: ignore[attr-defined]
 
     async def _ledger_row(
         self, session: AsyncSession, day: datetime, key_index: int, model: str
     ) -> QuotaLedger:
-        backend = f"gemini:{key_index}:{model}"
+        backend = _backend(key_index, model)
         row = await session.scalar(
             select(QuotaLedger).where(QuotaLedger.day == day, QuotaLedger.backend == backend)
         )

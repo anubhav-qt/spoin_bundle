@@ -1,7 +1,8 @@
 # ADR-0028: Per-key-per-model quota grid, with a two-pool model fallback ladder
 
 - **Status:** Accepted (amended by [ADR-0029](0029-questions-join-generator-pool.md),
-  [ADR-0030](0030-two-pass-quality-gate.md), [ADR-0056](0056-generation-call-timeout-and-recovery-probe.md))
+  [ADR-0030](0030-two-pass-quality-gate.md), [ADR-0056](0056-generation-call-timeout-and-recovery-probe.md),
+  [ADR-0058](0058-per-minute-vs-per-day-429.md))
 - **Date:** 2026-08-17
 - **Deciders:** Anubhav
 - **Resolves:** [ADR-0008](0008-local-gpu-generation.md)'s open question on cloud model choice
@@ -26,6 +27,12 @@
   has come back. The grid/ladder mechanism below is unchanged; this ADR adds a third kind of
   cell failure (timeout) alongside 429 and 503, and a persistent (cross-call) exclusion on
   top of the per-call one this ADR originally described.
+- **Amended by:** [ADR-0058](0058-per-minute-vs-per-day-429.md) -- this ADR treats "a real
+  429" as one condition. It is two, and the provider's envelope says which: a per-MINUTE
+  throttle parks a cell for a few seconds without touching the ledger, and only a per-DAY
+  429 exhausts it. Conflating them made a burst of throttling read back as every key spent
+  for the day. See also the correction to "it never waits" below -- the grid/ladder and
+  RPD/RPM-split mechanics are otherwise unchanged.
 
 ## Context
 
@@ -80,6 +87,15 @@ is only skipped once *every* key is exhausted for it; a key that's merely RPM-ca
 second is skipped in favor of the next key or model, never slept on. Only once the entire
 grid (every key × every model in the pool) is exhausted does `acquire()` raise
 `QuotaExhaustedError`.
+
+> **Correction -- "it never waits" is no longer true, and hasn't been since e6947a6.**
+> Skipping a rate-limited cell in favour of the next one is still the first move, but when
+> *every* remaining cell is temporarily capped (our own RPM window, or a provider cooldown
+> from a per-minute 429 -- [ADR-0058](0058-per-minute-vs-per-day-429.md)) while still having
+> daily quota left, `acquire()` now sleeps until the earliest slot opens instead of raising.
+> Raising there is what turned a few seconds of throttling into a failed run.
+> `QuotaExhaustedError` is now reserved for what this paragraph's last sentence says: the
+> whole grid genuinely spent for the day.
 
 Total daily capacity for a pool is therefore *(each model's RPD) × (number of configured
 keys)*, summed down the ladder -- adding a key (from a genuinely separate project) adds a

@@ -42,14 +42,24 @@ rate-limit screenshot -- it can drift from what the provider actually enforces
 429'd immediately, quota already spent by out-of-band verification work). Every
 call in this module goes through `_invoke_with_retry`, which treats a real 429
 (`google.genai.errors.ClientError` with `.code == 429`) from the provider as ground
-truth: it marks that exact `(key, model)` cell exhausted in the ledger
-(`QuotaGovernor.mark_exhausted`, so a
-concurrent caller also stops retrying it) and retries the NEXT cell in the grid,
-bounded at one attempt per cell. Only once every cell has been tried does the
-final exception (a `QuotaExhaustedError` from `acquire()`, or a non-quota error)
-propagate to the caller -- generate_curriculum lets it raise hard (see above);
-every other method's existing `except Exception` already converts it to a
-`BatchResult` failure.
+truth.
+
+**But not every 429 means the same thing** (ADR-0058). Google's error envelope
+distinguishes them by `quotaId`, and the two demand opposite responses:
+
+- `...PerDay...` -- this cell really is spent until midnight. Mark it exhausted in
+  the ledger (`QuotaGovernor.mark_exhausted`, so a concurrent caller also stops
+  retrying it) and move to the next cell, bounded at one attempt per cell.
+- `...PerMinute...` -- this cell has daily quota left and is merely being throttled;
+  the envelope's `RetryInfo` even says for how long. Park it for that long
+  (`QuotaGovernor.mark_rate_limited`) and let `acquire()` wait it out. Spending a
+  cell's whole day on this is what ADR-0058 exists to stop.
+
+`_classify_rate_limit` reads that distinction off the payload. Only once every cell
+has been genuinely exhausted does the final exception (a `QuotaExhaustedError` from
+`acquire()`, or a non-quota error) propagate to the caller -- generate_curriculum
+lets it raise hard (see above); every other method's existing `except Exception`
+already converts it to a `BatchResult` failure.
 """
 
 from __future__ import annotations
@@ -57,6 +67,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, TypeVar
 
@@ -102,6 +113,78 @@ _PROBE_BUDGET_SECONDS = 1200.0  # 20 minutes
 #: Floor on the gap between probe attempts, so a pool with very few keys
 #: doesn't hammer the provider every few seconds.
 _PROBE_MIN_INTERVAL_SECONDS = 20.0
+
+#: A `RetryInfo` delay at or under one RPM window is, by definition, describing a
+#: per-minute limit -- no per-DAY exhaustion resolves itself inside a minute. Used
+#: only when `quotaId` is absent, as corroborating evidence (see
+#: `_classify_rate_limit`).
+_PER_MINUTE_RETRY_CEILING_S = 60.0
+
+
+@dataclass(frozen=True)
+class _RateLimit:
+    """How to react to one real 429 (ADR-0058).
+
+    `is_daily` is the whole point: it decides between spending this cell for the
+    rest of the day and parking it for `retry_after_s` seconds.
+    """
+
+    is_daily: bool
+    retry_after_s: float | None
+
+
+def _parse_retry_delay(raw: object) -> float | None:
+    """`RetryInfo.retryDelay` arrives as a duration string (`"13s"`, `"1.5s"`)."""
+
+    if not isinstance(raw, str) or not raw.endswith("s"):
+        return None
+    try:
+        return float(raw[:-1])
+    except ValueError:
+        return None
+
+
+def _classify_rate_limit(exc: ClientError) -> _RateLimit:
+    """Reads a 429's envelope to tell a per-MINUTE throttle from a per-DAY
+    exhaustion (module docstring, ADR-0058).
+
+    `APIError.details` is the parsed response body, which is either the whole
+    `{"error": {...}}` envelope or just the inner error object depending on which
+    SDK path raised -- both shapes are handled rather than assumed.
+
+    **Unknown scope falls back to daily.** That is the conservative direction: a
+    per-minute limit misread as daily costs one cell for a few hours, while a
+    daily exhaustion misread as per-minute would have us retry a genuinely dead
+    cell hundreds of times. `quotaId` is the primary signal; a short `RetryInfo`
+    is accepted as evidence on its own only when no `quotaId` was sent at all.
+    """
+
+    raw = getattr(exc, "details", None)
+    envelope = raw if isinstance(raw, dict) else {}
+    inner = envelope.get("error")
+    error = inner if isinstance(inner, dict) else envelope
+
+    quota_ids: list[str] = []
+    retry_after: float | None = None
+    for detail in error.get("details", []) or []:
+        if not isinstance(detail, dict):
+            continue
+        if detail.get("@type", "").endswith("RetryInfo"):
+            retry_after = _parse_retry_delay(detail.get("retryDelay"))
+        # A QuotaFailure carries its quotaIds one level down in `violations`;
+        # the API has also been observed inlining them on the detail itself.
+        violations = [v for v in detail.get("violations", []) or [] if isinstance(v, dict)]
+        quota_ids.extend(str(c["quotaId"]) for c in (detail, *violations) if c.get("quotaId"))
+
+    haystack = " ".join(quota_ids).lower()
+    if "perday" in haystack:
+        return _RateLimit(is_daily=True, retry_after_s=None)
+    if "perminute" in haystack:
+        return _RateLimit(is_daily=False, retry_after_s=retry_after)
+    if not quota_ids and retry_after is not None and retry_after <= _PER_MINUTE_RETRY_CEILING_S:
+        return _RateLimit(is_daily=False, retry_after_s=retry_after)
+    return _RateLimit(is_daily=True, retry_after_s=None)
+
 
 # ------------------------------------------------------------- wire schemas --
 
@@ -432,6 +515,7 @@ class GeminiContentGenerator(ContentGenerator):
         structured: object,
         prompt: list[tuple[str, str]],
         *,
+        pool: QuotaGovernor,
         key_index: int,
         model: str,
     ) -> Any:
@@ -447,11 +531,19 @@ class GeminiContentGenerator(ContentGenerator):
         with `.code == 504`, NOT a distinct exception class) skips this same-cell
         retry entirely: the call already burned its FULL timeout budget once,
         so retrying it again would just burn that budget again for nothing --
-        raise immediately and let `_invoke_with_retry` move to the next cell."""
+        raise immediately and let `_invoke_with_retry` move to the next cell.
+
+        This is the module's single outbound send site, so it is also where the
+        per-minute window is stamped (`note_request_sent`, ADR-0058): at the
+        moment the request actually leaves, not when `acquire()` reserved the
+        cell some seconds earlier. Being inside the retry loop means a 503
+        retried on this same cell is counted too -- it is another real request,
+        and the reservation only covered the first one."""
 
         delay = _SERVER_ERROR_BASE_DELAY_S
         for attempt in range(1, _SERVER_ERROR_RETRIES + 1):
             try:
+                await pool.note_request_sent(key_index, model, now=datetime.now(UTC))
                 return await structured.ainvoke(prompt)  # type: ignore[attr-defined]
             except ServerError as exc:
                 if exc.code == 504 or attempt == _SERVER_ERROR_RETRIES:
@@ -476,9 +568,20 @@ class GeminiContentGenerator(ContentGenerator):
         means our local ledger's belief disagreed with the provider's actual
         state (see this module's docstring). Mark that exact cell exhausted
         and retry the next cell in the grid, bounded at one attempt per
-        `(key, model)`."""
+        `(key, model)`.
+
+        **`max_attempts` counts cells BURNED, not calls made** (ADR-0058). A
+        per-minute 429 doesn't use a cell up -- it parks it for a few seconds --
+        so counting it here would let a brief throttle burn the whole grid's
+        attempt budget and surface as a hard failure. Those retries are instead
+        bounded by real quota: every `acquire()` increments a ledger that now
+        only ever counts UP, so a cell that keeps throttling still walks toward
+        its own RPD ceiling and drops out of rotation on its own. Once every
+        cell has, `acquire()` raises `QuotaExhaustedError` -- a real terminal
+        condition rather than an invented retry cap."""
 
         max_attempts = pool.key_count * len(pool.ladder)
+        cells_burned = 0
         last_server_error: ServerError | None = None
         # A 503 overload -- and a 504 timeout, see the ServerError handler
         # below -- is treated as per-MODEL, not per-key (every key hits the
@@ -487,7 +590,8 @@ class GeminiContentGenerator(ContentGenerator):
         # to the next model in the ladder instead of burning through every
         # remaining key on a model that's already proven overloaded.
         unavailable_models: set[str] = set()
-        for attempt in range(1, max_attempts + 1):
+        while cells_burned < max_attempts:
+            attempt = cells_burned + 1
             try:
                 key_index, model = await pool.acquire(
                     now=datetime.now(UTC), exclude_models=frozenset(unavailable_models)
@@ -504,7 +608,7 @@ class GeminiContentGenerator(ContentGenerator):
             try:
                 async with pool.cell_lock(key_index, model):
                     result = await self._invoke_with_backoff(
-                        structured, prompt, key_index=key_index, model=model
+                        structured, prompt, pool=pool, key_index=key_index, model=model
                     )
             except (ClientError, ChatGoogleGenerativeAIError) as exc:
                 # The new `google-genai` SDK (langchain-google-genai>=4.0) has no
@@ -527,10 +631,33 @@ class GeminiContentGenerator(ContentGenerator):
                     real_error.code not in (401, 403, 429)
                 ):
                     raise
-                if real_error.code in (401, 403):
+                if real_error.code == 429:
+                    limit = _classify_rate_limit(real_error)
+                    if not limit.is_daily:
+                        # Throttled, not spent. Park the cell for as long as the
+                        # provider asked and try another -- crucially WITHOUT
+                        # touching the ledger or burning a cell (ADR-0058).
+                        await pool.mark_rate_limited(
+                            key_index,
+                            model,
+                            now=datetime.now(UTC),
+                            retry_after_s=limit.retry_after_s,
+                        )
+                        continue
+                    logger.warning(
+                        "quota: key=%d model=%s got a per-day 429 from the provider despite "
+                        "our ledger showing room -- marking exhausted, trying next cell "
+                        "(cell %d/%d): %s",
+                        key_index,
+                        model,
+                        attempt,
+                        max_attempts,
+                        exc,
+                    )
+                else:
                     logger.warning(
                         "quota: key=%d model=%s got auth error %d (%s) -- marking exhausted, "
-                        "trying next cell (attempt %d/%d)",
+                        "trying next cell (cell %d/%d)",
                         key_index,
                         model,
                         real_error.code,
@@ -538,18 +665,8 @@ class GeminiContentGenerator(ContentGenerator):
                         attempt,
                         max_attempts,
                     )
-                else:
-                    logger.warning(
-                        "quota: key=%d model=%s got a REAL 429 from the provider despite our "
-                        "ledger showing room -- marking exhausted, trying next cell "
-                        "(attempt %d/%d): %s",
-                        key_index,
-                        model,
-                        attempt,
-                        max_attempts,
-                        exc,
-                    )
                 await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
+                cells_burned += 1
                 continue
             except ServerError as exc:
                 # Persistently UNAVAILABLE even after _invoke_with_backoff's own
@@ -576,6 +693,7 @@ class GeminiContentGenerator(ContentGenerator):
                 self._start_recovery_probe(pool, model)
                 unavailable_models.add(model)
                 last_server_error = exc
+                cells_burned += 1
                 continue
             assert isinstance(result, schema)
             return result
@@ -584,12 +702,17 @@ class GeminiContentGenerator(ContentGenerator):
             # (no cell was marked exhausted), so re-raise the actual 503 rather
             # than the misleading "unreachable" assertion below.
             raise last_server_error
-        # Every cell in the grid has now been marked exhausted by the loop
-        # above -- this raises QuotaExhaustedError, the same error acquire()
-        # would have raised directly had our ledger been accurate from the
-        # start, and propagates to the caller like any other failure.
-        await pool.acquire(now=datetime.now(UTC))
-        raise AssertionError("unreachable: acquire() should have raised QuotaExhaustedError")
+        # Every cell in the grid has now been marked exhausted by the loop above,
+        # so this is the same error acquire() would have raised directly had our
+        # ledger been accurate from the start. Raised here rather than by calling
+        # acquire() again: a re-acquire would spend a ledger slot on a call we
+        # have no intention of making, and -- now that a per-minute 429 leaves a
+        # cell alive but cooling -- could block on `acquire()`'s self-pacing sleep
+        # instead of returning the failure the caller is waiting on.
+        raise QuotaExhaustedError(
+            f"All {pool.key_count} key(s) x {len(pool.ladder)} model(s) exhausted "
+            f"for {datetime.now(UTC).date()}"
+        )
 
     def _start_recovery_probe(self, pool: QuotaGovernor, model: str) -> None:
         """Fire-and-forget: called the moment `_invoke_with_retry` excludes a
@@ -634,6 +757,7 @@ class GeminiContentGenerator(ContentGenerator):
             try:
                 async with pool.cell_lock(key_index, model):
                     client = self._client(key_index, model)
+                    await pool.note_request_sent(key_index, model, now=datetime.now(UTC))
                     await client.ainvoke([("human", "ping")])
             except Exception as exc:
                 logger.info(

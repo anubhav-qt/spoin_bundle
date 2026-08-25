@@ -199,6 +199,17 @@ cell and returning before the actual call fires let concurrent tasks burst a sin
 past its real RPM, producing 429s the local ledger didn't expect. Fixed by serializing
 same-cell calls; see that ADR for the full story.
 
+**Not every 429 is an exhaustion** ([ADR-0058](../adr/0058-per-minute-vs-per-day-429.md)).
+The provider's error envelope carries a `quotaId` saying which limit was hit, and the two
+demand opposite responses: a `...PerMinute...` 429 parks the cell for the `retryDelay` it
+also ships (`mark_rate_limited`, ledger untouched, `acquire()` sleeps it out), while only a
+`...PerDay...` 429 spends the cell for the day (`mark_exhausted`). Treating them alike is
+what produced a run that stopped with "All 17 key(s) x 2 model(s) exhausted" on keys holding
+nearly their full daily quota. **When a run reports exhaustion, check the logs for
+`hit a per-minute rate limit` before believing the daily count** -- and note that
+`quota_ledger.requests_spent` is only a truthful measure of the day's consumption *since*
+that ADR; before it, a 429 could reset the count to zero.
+
 **A stalled call now has a client-side timeout and its own recovery path**
 ([ADR-0056](../adr/0056-generation-call-timeout-and-recovery-probe.md)), found the same way
 as ADR-0040: a real hang (`POST /topics` never resolving) traced back to

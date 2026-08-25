@@ -62,6 +62,9 @@ started fire-and-forget the moment a model is excluded:
 - Bounded at **20 minutes** total. Each attempt counts against today's `QuotaLedger` exactly
   like a real acquired call (`record_probe_attempt`) -- a probe is one real request against
   the provider's own daily limit, not free reconnaissance.
+  ([ADR-0058](0058-per-minute-vs-per-day-429.md) extended this to the per-MINUTE window too,
+  which the original implementation of this bullet missed: probe traffic counted against RPD
+  but was invisible to RPM, so real traffic could be granted a cell the probe had just used.)
 - On success: `include_model()`, and today's ledger counts are left exactly as they are --
   probing does not reset spend, generation resumes from wherever the day's count already
   stood.
@@ -100,7 +103,10 @@ long-lived, which is exactly where the incident that motivated this ADR happened
   provider's own error envelope -- a future SDK version that stops setting `.code` accurately
   would silently break this distinction with no type-level guard.
 - The exclusion/probe state is in-memory only (same posture as the existing RPM window and
-  flash-lite cooldowns), so it does not survive a process restart, and does not coordinate
+  the rate-limit cooldowns -- called "flash-lite cooldowns" when this was written, since
+  reworked into a model-agnostic cooldown by
+  [ADR-0058](0058-per-minute-vs-per-day-429.md)), so it does not survive a process restart,
+  and does not coordinate
   across multiple processes (e.g. the API process and a concurrently-running worker) --
   each discovers a stalled model independently.
 - The probe budget (20 min) and cadence (spread across every configured key) are

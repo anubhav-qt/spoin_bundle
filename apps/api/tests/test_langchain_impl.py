@@ -30,6 +30,7 @@ from spoin.generation.base import (
 )
 from spoin.generation.langchain_impl import (
     GeminiContentGenerator,
+    _classify_rate_limit,
     _WireCard,
     _WireCardBatch,
     _WireCorrection,
@@ -53,6 +54,64 @@ def _real_429(message: str = "quota exceeded") -> ClientError:
 
     return ClientError(
         429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "message": message}}
+    )
+
+
+def _rpm_429(retry_delay: str = "13s") -> ClientError:
+    """A PER-MINUTE 429, in the exact shape the real API returns it (captured
+    live from a run that mistook a burst of these for a day-long exhaustion --
+    see ADR-0058). The `quotaId` is the discriminator that matters."""
+
+    return ClientError(
+        429,
+        {
+            "error": {
+                "code": 429,
+                "status": "RESOURCE_EXHAUSTED",
+                "message": "Quota exceeded for metric: generate_content_free_tier_requests",
+                "details": [
+                    {
+                        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+                        "violations": [
+                            {
+                                "quotaId": ("GenerateRequestsPerMinutePerProjectPerModel-FreeTier"),
+                                "quotaMetric": (
+                                    "generativelanguage.googleapis.com/"
+                                    "generate_content_free_tier_requests"
+                                ),
+                            }
+                        ],
+                    },
+                    {
+                        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+                        "retryDelay": retry_delay,
+                    },
+                ],
+            }
+        },
+    )
+
+
+def _rpd_429() -> ClientError:
+    """A genuine per-DAY exhaustion -- same status code, opposite meaning."""
+
+    return ClientError(
+        429,
+        {
+            "error": {
+                "code": 429,
+                "status": "RESOURCE_EXHAUSTED",
+                "message": "Quota exceeded",
+                "details": [
+                    {
+                        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+                        "violations": [
+                            {"quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier"}
+                        ],
+                    }
+                ],
+            }
+        },
     )
 
 
@@ -97,6 +156,12 @@ def _generator(**settings_overrides: object) -> GeminiContentGenerator:
     generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
         return_value=(0, _GENERATOR_MODEL)
     )
+    # Stubbed for the same reason `acquire` is: since ADR-0058 the per-minute
+    # window lives in the database, and these tests are about the LangChain
+    # plumbing, not quota bookkeeping (which test_quota_governor.py owns
+    # against a real session).
+    generator._thinking.note_request_sent = AsyncMock()  # type: ignore[method-assign]
+    generator._generator.note_request_sent = AsyncMock()  # type: ignore[method-assign]
     return generator
 
 
@@ -129,13 +194,19 @@ async def test_invoke_with_backoff_retries_503_on_the_same_cell() -> None:
             "ok-result",
         ]
     )
+    pool = generator._thinking
+    pool.note_request_sent = AsyncMock()  # type: ignore[method-assign]
     with patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()) as mock_sleep:
         result = await generator._invoke_with_backoff(
-            runnable, [], key_index=0, model=_THINKING_MODEL
+            runnable, [], pool=pool, key_index=0, model=_THINKING_MODEL
         )
 
     assert result == "ok-result"
     mock_sleep.assert_awaited_once()
+    # Two real requests left the process, so both are stamped into the
+    # per-minute window -- the retry is not covered by the original
+    # reservation (ADR-0058).
+    assert pool.note_request_sent.await_count == 2
 
 
 async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> None:
@@ -152,7 +223,11 @@ async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> 
         patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()) as mock_sleep,
         pytest.raises(ServerError),
     ):
-        await generator._invoke_with_backoff(runnable, [], key_index=0, model=_THINKING_MODEL)
+        pool = generator._thinking
+        pool.note_request_sent = AsyncMock()  # type: ignore[method-assign]
+        await generator._invoke_with_backoff(
+            runnable, [], pool=pool, key_index=0, model=_THINKING_MODEL
+        )
 
     mock_sleep.assert_not_awaited()
 
@@ -210,6 +285,118 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
         await generator.generate_curriculum("Topic", "desc")
 
     assert generator._thinking.mark_exhausted.await_count == 2
+
+
+def test_classify_rate_limit_reads_the_quota_id() -> None:
+    """The one distinction the whole ADR-0058 fix rests on."""
+
+    per_minute = _classify_rate_limit(_rpm_429())
+    assert per_minute.is_daily is False
+    assert per_minute.retry_after_s == 13.0
+
+    assert _classify_rate_limit(_rpd_429()).is_daily is True
+
+
+def test_classify_rate_limit_falls_back_to_daily_when_scope_is_unknown() -> None:
+    """A 429 carrying no `quotaId` and no `RetryInfo` tells us nothing, so it
+    must take the conservative branch: a per-minute limit misread as daily
+    costs one cell for a few hours, but a daily exhaustion misread as
+    per-minute would have us retry a genuinely dead cell hundreds of times."""
+
+    assert _classify_rate_limit(_real_429()).is_daily is True
+
+
+def test_classify_rate_limit_trusts_a_short_retry_delay_when_no_quota_id_is_sent() -> None:
+    """No per-DAY exhaustion resolves itself inside a minute, so a lone
+    `RetryInfo` under one RPM window is evidence enough on its own."""
+
+    no_quota_id = ClientError(
+        429,
+        {
+            "error": {
+                "code": 429,
+                "status": "RESOURCE_EXHAUSTED",
+                "details": [
+                    {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "8s"}
+                ],
+            }
+        },
+    )
+
+    limit = _classify_rate_limit(no_quota_id)
+    assert limit.is_daily is False
+    assert limit.retry_after_s == 8.0
+
+
+async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
+    """The live failure this fixes: a burst of per-minute 429s used to mark
+    cells exhausted one after another until the whole grid read as spent for
+    the day, on keys with their full daily quota still available."""
+
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(0, _THINKING_MODEL), (1, _THINKING_MODEL)]
+    )
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    generator._thinking.mark_rate_limited = AsyncMock()  # type: ignore[method-assign]
+
+    draft = CurriculumDraft(
+        subtopics=[
+            SubtopicGroupDraft(
+                title="G",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
+                    )
+                ],
+            )
+        ]
+    )
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=[_rpm_429(), draft])
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_curriculum("Topic", "desc")
+
+    assert result is draft
+    generator._thinking.mark_exhausted.assert_not_awaited()
+    generator._thinking.mark_rate_limited.assert_awaited_once_with(
+        0, _THINKING_MODEL, now=ANY, retry_after_s=13.0
+    )
+
+
+async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
+    """`max_attempts` counts cells BURNED, not calls made. A 2x2 grid gets 4
+    cell-attempts; throttling must not consume them, or a brief rate limit
+    surfaces as a hard failure while every key still has daily quota."""
+
+    generator = _generator()
+    # Far more throttled calls than the 2 keys x 1 model grid has cells.
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(i % 2, _THINKING_MODEL) for i in range(12)]
+    )
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    generator._thinking.mark_rate_limited = AsyncMock()  # type: ignore[method-assign]
+
+    draft = CurriculumDraft(
+        subtopics=[
+            SubtopicGroupDraft(
+                title="G",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
+                    )
+                ],
+            )
+        ]
+    )
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=[*([_rpm_429()] * 9), draft])
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_curriculum("Topic", "desc")
+
+    assert result is draft
+    assert generator._thinking.mark_rate_limited.await_count == 9
+    generator._thinking.mark_exhausted.assert_not_awaited()
 
 
 async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same_cell() -> None:
@@ -330,6 +517,10 @@ async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires()
     pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
     pool.include_model = Mock()  # type: ignore[method-assign]
     pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    # Also keeps the real implementation from consuming one of the scripted
+    # `time.monotonic` values below: patching that name via this module patches
+    # the shared `time` module, which quota.py reads from as well.
+    pool.note_request_sent = AsyncMock()  # type: ignore[method-assign]
 
     fail_client = AsyncMock()
     fail_client.ainvoke = AsyncMock(side_effect=_real_504())
@@ -347,6 +538,9 @@ async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires()
         await generator._probe_model(pool, _THINKING_MODEL)
 
     assert pool.record_probe_attempt.await_count == 2
+    # Each ping is a real outbound request, so it stamps the per-minute window
+    # at send time exactly like ordinary traffic (ADR-0058).
+    assert pool.note_request_sent.await_count == 2
     tried = {c.args for c in pool.mark_exhausted.await_args_list}
     assert tried == {(0, _THINKING_MODEL), (1, _THINKING_MODEL)}
     pool.include_model.assert_called_once_with(_THINKING_MODEL)

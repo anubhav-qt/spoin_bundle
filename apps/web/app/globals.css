@@ -2050,16 +2050,24 @@ body.custom-cursor-active textarea {
 
 /* Anchored to the ring's right edge rather than centered (`.share-popover`'s
    own pattern) -- this button sits near the rail's right edge, so a
-   centered popover would overhang it. Two-class selector, not just
-   `.daily-goal-popover`, so this outranks `.share-popover`'s own
-   centered-slide-up animation on specificity rather than depending on which
-   rule happens to come later in the file. */
+   centered popover would overhang it. `top`/`right` are set inline
+   (DailyGoalRing.tsx, from `getBoundingClientRect()`) since the element is
+   portaled to `<body>`, not a CSS-anchored child of `.daily-goal-wrap`
+   anymore -- `position: fixed` here just makes those inline pixel values
+   viewport-relative, matching what `getBoundingClientRect()` measured.
+   Two-class selector, not just `.daily-goal-popover`, so this outranks
+   `.share-popover`'s own `position: absolute` and centered-slide-up
+   animation on specificity rather than depending on which rule happens to
+   come later in the file. */
 .share-popover.daily-goal-popover {
-  top: calc(100% + 8px);
+  position: fixed;
   bottom: auto;
   left: auto;
-  right: 0;
   transform: none;
+  /* Comfortably above the rest of the shell's chrome (topbar/pill both sit
+     at 80, the rail sheet at 91) -- a portaled popover no longer inherits
+     any stacking-context headroom from an ancestor, so it needs its own. */
+  z-index: 150;
   gap: 3px;
   padding: 10px 12px;
   animation: popover-enter-down 0.15s var(--ease);

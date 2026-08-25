@@ -205,6 +205,17 @@ export function LogoutIcon(_: IconProps) {
   );
 }
 
+export function SlidersIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h13M21 18h-2" />
+      <circle cx="15" cy="6" r="2" />
+      <circle cx="7" cy="12" r="2" />
+      <circle cx="19" cy="18" r="2" />
+    </svg>
+  );
+}
+
 export function GearIcon(_: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

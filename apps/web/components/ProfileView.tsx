@@ -32,6 +32,8 @@ import { useRefreshEffect } from "@/lib/refresh";
 import { AvatarMark } from "./icons";
 import { useAuth } from "./AuthProvider";
 import { EditProfileModal } from "./EditProfileModal";
+import { MobileProfileNav } from "./MobileProfileNav";
+import type { ShellView } from "./Sidebar";
 
 const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
 
@@ -266,7 +268,14 @@ function TrendStrip({
 
 // ─── Main view ────────────────────────────────────────────────────────────────
 
-export function ProfileView() {
+interface Props {
+  /** ≤680px only -- `MobileProfileNav` below needs somewhere to send
+   *  Notes/Liked/Saved. CSS-hidden above that width, so this prop simply
+   *  goes unused there. */
+  onNavigate: (view: ShellView) => void;
+}
+
+export function ProfileView({ onNavigate }: Props) {
   const { user, applyUser } = useAuth();
 
   const [stats, setStats] = useState<ProfileStatsOut | null>(null);
@@ -393,6 +402,8 @@ export function ProfileView() {
           EDIT PROFILE
         </button>
       </div>
+
+      <MobileProfileNav onNavigate={onNavigate} />
 
       <hr className="collection-rule" />
 

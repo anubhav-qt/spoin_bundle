@@ -97,3 +97,4 @@ useful than the decision itself.
 | [0058](0058-per-minute-vs-per-day-429.md) | A per-minute 429 and a per-day 429 are different facts, read off the payload | Accepted (amends 0028) |
 | [0059](0059-card-planning-pass-and-prompt-versioning.md) | A planning pass before card writing, and a prompt version stamped on everything it produces | Accepted (amends 0026, 0030, 0057) |
 | [0060](0060-daily-goal-ring-and-local-day-semantics.md) | Daily goal ring in the right rail; "today" is the reader's local day | Accepted |
+| [0061](0061-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Accepted (amends 0013, 0015) |

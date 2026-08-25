@@ -104,3 +104,4 @@ real scope creep for this pass, and would bake in an unreviewed ranking heuristi
 - Task 0003 lands -- `for_you` gets real logic, this ADR's "identical query" note is stale.
 - Task 0005 lands -- the seed baseline is gone, `subscriber_count` is fully organic.
 - Task 0004 lands -- note-taking actually stores text, and "all my notes" becomes buildable.
+- **Superseded in part by [ADR-0061](0061-mobile-shell.md):** below 1150px, `RightRail` (this ADR's right rail) no longer renders inline -- it's a sheet, opened from `Sidebar`'s topbar rather than always visible. The right rail's own contents (per-topic progress, discovery, stats modal) are unchanged; only how you reach them on a narrow viewport is.

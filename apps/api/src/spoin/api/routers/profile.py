@@ -2,7 +2,13 @@ from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import Response
 
 from spoin.api.deps import SessionDep, UserDep
-from spoin.api.schemas import ProfileExportOut, ProfileStatsOut, UserOut, UserProfileUpdateIn
+from spoin.api.schemas import (
+    DailyGoalOut,
+    ProfileExportOut,
+    ProfileStatsOut,
+    UserOut,
+    UserProfileUpdateIn,
+)
 from spoin.domain.models import User
 from spoin.profile.images import read_validated_image
 from spoin.profile.service import ProfileService
@@ -87,3 +93,13 @@ async def get_profile_stats(
     """Returns the user's aggregated statistics, streaks, and heatmap."""
     service = ProfileService(session)
     return await service.get_profile_stats(user_id, year, month)
+
+
+@router.get("/me/today", response_model=DailyGoalOut)
+async def get_today_progress(
+    user_id: UserDep, session: SessionDep, tz_offset_minutes: int = 0
+) -> DailyGoalOut:
+    """Cards read today (the caller's local day, ADR-0060) against
+    `daily_card_goal` -- the right rail's daily-goal ring."""
+    service = ProfileService(session)
+    return await service.get_today_progress(user_id, tz_offset_minutes)

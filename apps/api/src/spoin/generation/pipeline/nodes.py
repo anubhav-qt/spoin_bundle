@@ -30,7 +30,12 @@ from spoin.domain.enums import (
     RejectionStage,
 )
 from spoin.domain.models import Card, CardStats, Question, Topic
-from spoin.generation.base import CardCorrectionQuery, CardDraft, CardVerificationQuery
+from spoin.generation.base import (
+    CardCorrectionQuery,
+    CardDraft,
+    CardPlan,
+    CardVerificationQuery,
+)
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
 from spoin.generation.pipeline.persistence import (
@@ -46,6 +51,7 @@ from spoin.generation.pipeline.persistence import (
 )
 from spoin.generation.pipeline.state import (
     _NO_DIFFICULTY_EXAMPLES,
+    CARD_PROMPT_VERSION,
     PipelineState,
     SubtopicCardsResult,
     SubtopicGroupPlan,
@@ -60,6 +66,101 @@ from spoin.generation.pipeline.state import (
     _runtime,
     logger,
 )
+
+
+async def _plan_tier_cards(
+    runtime: _Runtime,
+    *,
+    topic_name: str,
+    subtopic_title: str,
+    subtopic_description: str,
+    difficulty: Difficulty,
+    count: int,
+    type_quotas: dict[str, int],
+    existing_titles: list[str],
+    builds_on: list[str],
+    avoid_bodies: list[str],
+    rejection_feedback: list[tuple[str, str]],
+) -> list[CardPlan]:
+    """One planning call for a whole subtopic-tier (ADR-0059), returning the
+    pool of briefs the writer rounds below draw from.
+
+    Never raises for a planning failure and never fails the tier: an empty pool
+    means the writer calls run unplanned, which is exactly the pre-ADR-0059
+    behaviour. Planning improves what gets written; it is not a dependency of
+    writing anything at all, and a tier that lost its quota to a planning call
+    would be strictly worse than one that never planned.
+    `QuotaExhaustedError` is deliberately NOT caught -- that is the run-level
+    stop signal every other call in this pipeline propagates, not a per-call
+    failure to shrug off.
+    """
+
+    result = await runtime.generator.plan_cards(
+        topic_name=topic_name,
+        subtopic_title=subtopic_title,
+        subtopic_description=subtopic_description,
+        difficulty=difficulty,
+        count=count,
+        type_quotas=type_quotas,
+        existing_titles=existing_titles,
+        builds_on=builds_on,
+        avoid_bodies=avoid_bodies,
+        rejection_feedback=rejection_feedback,
+    )
+    # Failures and an empty plan are DIFFERENT facts and logged as such
+    # (CLAUDE.md: a "failed" outcome and a "rejected"/empty one are never the
+    # same number) -- a planning call that errored out is a reliability signal;
+    # one that returned nothing usable is a prompt signal.
+    if result.failures:
+        logger.warning(
+            "subtopic '%s' [%s]: planning reported %d failure(s) -- %s",
+            subtopic_title,
+            difficulty.value,
+            len(result.failures),
+            "; ".join(result.failures[:3]),
+        )
+    if not result.items:
+        logger.info(
+            "subtopic '%s' [%s]: no usable plan -- writing unplanned",
+            subtopic_title,
+            difficulty.value,
+        )
+        return []
+    logger.info(
+        "subtopic '%s' [%s]: planned %d card(s) for a request of %d",
+        subtopic_title,
+        difficulty.value,
+        len(result.items),
+        count,
+    )
+    return result.items
+
+
+def _take_plans(pool: list[CardPlan], card_type: str | None, count: int) -> list[CardPlan]:
+    """Pull up to `count` briefs for the type this round is writing, REMOVING
+    them from `pool` so no brief is ever written twice.
+
+    Matching on type is best-effort by design: the planner was given the tier's
+    quota as guidance, not as a rule (ADR-0059), so its mix can differ from what
+    the round-robin below asks for. A round that finds no brief of its type
+    falls back to any remaining brief rather than writing unplanned -- the
+    concept the brief names is the valuable part, and the round's own
+    `card_type` still drives the system prompt that shapes it.
+    """
+
+    if not pool:
+        return []
+    taken: list[CardPlan] = []
+    if card_type is not None:
+        for plan in list(pool):
+            if len(taken) >= count:
+                break
+            if plan.card_type.strip().lower() == card_type:
+                pool.remove(plan)
+                taken.append(plan)
+    while pool and len(taken) < count:
+        taken.append(pool.pop(0))
+    return taken
 
 
 async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
@@ -319,6 +420,28 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 scaled[biggest] = max(0, scaled[biggest] + drift)
             tier_quotas = scaled
 
+        # The pre-processing gate (ADR-0059): plan the whole deficit in one
+        # call before any of it is written, so the writer rounds below are
+        # each handed a brief instead of re-inventing the tier's coverage from
+        # a list of titles that happen to already exist. Deliberately placed
+        # AFTER `tier_quotas` is settled -- the plan is asked to match the
+        # shape budget this call actually intends to fill.
+        plan_pool = await _plan_tier_cards(
+            runtime,
+            topic_name=job["topic_name"],
+            subtopic_title=tier["title"],
+            subtopic_description=tier["description"],
+            difficulty=difficulty,
+            count=want,
+            type_quotas=tier_quotas,
+            existing_titles=existing_titles,
+            builds_on=lower_tier_bodies,
+            avoid_bodies=tier["avoid_duplicate_bodies"],
+            rejection_feedback=[
+                (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
+            ],
+        )
+
         # One-time hero call (task 0006 / ADR-0018), before this tier's
         # normal rounds. Gated on `existing_count == 0` (not just `has_hero`)
         # so it only fires the first time this subtopic-tier is ever
@@ -401,14 +524,16 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 chosen_type = None
                 request_count = min(batch_size, remaining)
 
+            round_plans = _take_plans(plan_pool, chosen_type, request_count)
             logger.info(
                 "subtopic '%s' [%s]: round %d (type=%s) -- requesting %d card(s) "
-                "(%d/%d so far, existing=%d target=%d)",
+                "(%d planned, %d/%d so far, existing=%d target=%d)",
                 tier["title"],
                 difficulty.value,
                 round_number,
                 chosen_type or "general",
                 request_count,
+                len(round_plans),
                 len(drafts),
                 want,
                 tier["existing_count"],
@@ -428,6 +553,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                     (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
                 ],
                 card_type=chosen_type,
+                plans=round_plans,
             )
             logger.info(
                 "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
@@ -629,6 +755,27 @@ async def _redraft_until_bar(
                     max_existing_question_stems=runtime.settings.max_existing_question_stems,
                 )
 
+            # Redraft rounds plan too (ADR-0059), rather than only the first
+            # pass. A tier that lands short is exactly the one whose remaining
+            # cards are hardest to place -- everything easy was already
+            # written and accepted -- and this is the only call that sees the
+            # tier's fresh rejection context BEFORE deciding what to attempt
+            # next. Leaving redrafts unplanned would also mean a v2 tier is a
+            # mix of planned and unplanned cards, which would muddy exactly
+            # the comparison `prompt_version` exists to make.
+            round_plans = await _plan_tier_cards(
+                runtime,
+                topic_name=topic_name,
+                subtopic_title=tier["title"],
+                subtopic_description=tier["description"],
+                difficulty=difficulty,
+                count=count,
+                type_quotas={},
+                existing_titles=existing_titles,
+                builds_on=[],
+                avoid_bodies=avoid_bodies,
+                rejection_feedback=rejection_feedback,
+            )
             result = await runtime.generator.generate_cards(
                 topic_name=topic_name,
                 subtopic_title=tier["title"],
@@ -642,6 +789,7 @@ async def _redraft_until_bar(
                 ),
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
+                plans=round_plans,
             )
             logger.info(
                 "redraft round %d: subtopic '%s' [%s] -- requested %d, got %d card(s), "
@@ -1098,6 +1246,7 @@ async def _process_gate_item(
                 "backend": backend,
                 "generated_at": generated_at,
                 "batch_id": str(runtime.batch_id),
+                "prompt_version": CARD_PROMPT_VERSION,
             },
         )
         for draft, embedding, confirmed_difficulty in item.verified
@@ -1235,6 +1384,7 @@ async def _process_gate_item(
                     "backend": backend,
                     "generated_at": generated_at,
                     "batch_id": str(runtime.batch_id),
+                    "prompt_version": CARD_PROMPT_VERSION,
                 },
             )
             for (draft, card_id), embedding in zip(all_question_drafts, embeddings, strict=True)

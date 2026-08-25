@@ -73,6 +73,19 @@ resolve_and_plan_topic
   v
 generate_subtopic_cards
   - concurrent across groups AND topics
+  - per subtopic-tier, ONE plan_cards() call first (ADR-0059, generator pool):
+    the pre-processing gate. It is the only call that sees a whole tier at
+    once, so it is the only one that can make the tier's cards differ
+    deliberately rather than by accident -- it returns one brief per card
+    (concept, form, what the diagram/code/art shows, and the angle that
+    separates it from its siblings), and the writer calls below are handed
+    their slice instead of re-inventing coverage from a list of titles that
+    happened to land first. A failed or empty plan falls back to unplanned
+    generation, which is exactly the pre-ADR-0059 path -- planning improves
+    what gets written, it is never a prerequisite for writing anything.
+    The plan's card_type is a REQUEST: the realised type mix is still counted
+    against the tier's quota in code afterwards, unchanged (trusted for taste,
+    never for constraints).
   - tiers WITHIN one group run sequentially, lowest difficulty first: a
     linked higher tier's generate_cards() call receives the lower tier's
     actual card BODIES as `builds_on` context, so it can genuinely build on
@@ -100,7 +113,17 @@ generate_subtopic_cards
     e.g. a `scan_and_generate` backfill) or a per-tier stuck guard concludes
     the gate is genuinely, repeatedly rejecting its content (logged as
     REJECTED) or the generator calls themselves are failing (logged as
-    FAILED, tracked separately -- see ADR-0057).
+    FAILED, tracked separately -- see ADR-0057). Redraft rounds plan too
+    (ADR-0059) -- a tier that landed short is the one whose remaining cards
+    are hardest to place, and the redraft's plan_cards() call is the only one
+    that sees the tier's fresh rejection context before choosing what to
+    attempt next.
+  - everything persisted here -- cards, questions, AND rejected drafts --
+    carries `gen_meta.prompt_version` (ADR-0059), recording which generation
+    of the prompts produced it. This is NOT `Card.version`, which is
+    family-scoped regeneration lineage and unrelated. Content written before
+    ADR-0059 has no such key and is v1 by absence; query it as
+    `gen_meta->>'prompt_version' IS NULL`.
   |
   | fan-in (every branch's item_reports merge, across every topic in the run)
   v
@@ -184,8 +207,9 @@ of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits are p
 per *model* independently (so exhausting one model's daily quota doesn't touch another's).
 `GeminiContentGenerator` holds TWO governors -- a "thinking" pool (curriculum, topic
 matching, judging, quiz grading -- `SPOIN_GEMINI_THINKING_LADDER`) and a "generator" pool
-(`generate_cards` AND `generate_questions`, both high-volume per-item prose --
-`SPOIN_GEMINI_GENERATOR_LADDER`), each an ordered model-fallback ladder. RPD is persisted in
+(`plan_cards`, `generate_cards` AND `generate_questions` -- high-volume, and upstream of the
+gate rather than a substitute for it, ADR-0029/0059 -- `SPOIN_GEMINI_GENERATOR_LADDER`), each
+an ordered model-fallback ladder. RPD is persisted in
 `QuotaLedger` (`backend=f"gemini:{key_index}:{model}"`); RPM is in-process only and resets
 each worker
 run. `QuotaExhaustedError` is caught specifically at the worker's job boundary and requeues

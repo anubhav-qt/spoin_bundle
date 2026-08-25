@@ -82,6 +82,50 @@ class CardDraft(BaseModel):
     is_hero: bool = False
 
 
+class CardPlan(BaseModel):
+    """One card's brief, written before anyone writes the card itself (ADR-0059).
+
+    The planning pass exists because a single call asked to *invent N distinct
+    concepts, pick a shape for each, and write all N well* is doing three
+    different jobs at once, and the prompt for it can only be generic enough to
+    cover all three. Splitting the first two out means each prompt gets to be
+    specific: the planner's whole job is coverage and shape, the writer's whole
+    job is prose against a brief it did not have to invent.
+
+    Note what is absent, same posture as `CardDraft`: no `body`, no `summary`,
+    no self-reported difficulty. A plan is a brief, not a draft -- if the
+    planner starts writing content, the writer has nothing left to do but
+    reformat, and the focused-prompt argument this stage rests on collapses.
+
+    `card_type` is a REQUEST, not a guarantee: the caller still counts the
+    realised type mix against the tier's quota afterwards (`_card_matches_type`)
+    exactly as it did before this stage existed. Trusted for taste, never for
+    constraints (CLAUDE.md) -- the planner picking a shape is taste; the mix
+    actually landing within budget is a constraint, so it stays in code.
+    """
+
+    #: The literal, descriptive concept this card should cover -- the same field
+    #: semantics as `CardDraft.canonical_title` (ADR-0022), and deliberately not
+    #: a display `title`: naming the concept is planning, writing the playful
+    #: face for it is the writer's job.
+    canonical_title: str = Field(max_length=160, min_length=1)
+    #: One of `CardType`'s values. Carried as a plain `str` rather than the enum
+    #: because a model can return anything; the caller normalises and, on a value
+    #: it doesn't recognise, falls back to the type it asked for.
+    card_type: str
+    #: What the card's non-prose asset should actually depict -- the scene a
+    #: stickman gag should stage, what the diagram's boxes and arrows are, what
+    #: the code block should demonstrate. Empty for a card whose type carries no
+    #: asset (`prose`).
+    asset_direction: str = ""
+    #: The angle this card takes, and how it differs from its siblings in the
+    #: same tier. This is the field that does the real work against
+    #: near-duplicate rejection: the planner sees all N briefs at once and can
+    #: separate them deliberately, where N independent writer calls could only
+    #: be shown the titles that happened to land before them.
+    content_direction: str = ""
+
+
 class SubtopicTierDraft(BaseModel):
     """One difficulty tier's treatment of a `SubtopicGroupDraft`."""
 
@@ -368,6 +412,50 @@ class ContentGenerator(ABC):
         """
 
     @abstractmethod
+    async def plan_cards(
+        self,
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        subtopic_description: str,
+        difficulty: Difficulty,
+        count: int,
+        type_quotas: dict[str, int],
+        existing_titles: list[str],
+        builds_on: list[str],
+        avoid_bodies: list[str],
+        rejection_feedback: list[tuple[str, str]],
+    ) -> BatchResult[CardPlan]:
+        """ADR-0059: one call per subtopic-tier, BEFORE any card is written, on
+        the generator ladder (not the thinking one -- this is planning, not
+        judgment, and the generator pool is where the request budget actually
+        is; see ADR-0028's ladder).
+
+        Returns `count` briefs in one batch, which is the whole point: the
+        planner is the only call in the pipeline that sees every card of a tier
+        at once, so it is the only one positioned to make them differ
+        deliberately rather than by accident. The writer calls that follow are
+        batched by type and each see only their own slice.
+
+        `type_quotas` is the tier's card-type budget, passed as guidance so the
+        plan's shape mix is roughly right on arrival. It is NOT enforced here:
+        the caller re-counts the realised mix against the same quota after the
+        cards come back, unchanged from before this stage existed.
+
+        Every other argument means exactly what it does on `generate_cards` --
+        `existing_titles`, `builds_on`, `avoid_bodies` and `rejection_feedback`
+        are the same avoid/build-on context, moved one step earlier so it steers
+        what gets PLANNED rather than only what gets written. The writer still
+        receives them too: the plan constrains the concept, that context
+        constrains the prose.
+
+        A failed or empty result is explicitly survivable -- the caller falls
+        back to unplanned generation (exactly the pre-ADR-0059 path) rather than
+        failing the tier. A planning call that never returns is a lost
+        improvement, never a lost card.
+        """
+
+    @abstractmethod
     async def generate_cards(
         self,
         *,
@@ -383,8 +471,17 @@ class ContentGenerator(ABC):
         rejection_feedback: list[tuple[str, str]],
         want_hero: bool = False,
         card_type: CardType | str | None = None,
+        plans: list[CardPlan] | None = None,
     ) -> BatchResult[CardDraft]:
-        """`existing_titles` is every card already in this subtopic **across all
+        """`plans` (ADR-0059) is this call's slice of the tier's briefs, from
+        `plan_cards` -- when present, the writer is told WHICH cards to write
+        and is expected to write exactly those, one per brief, instead of
+        inventing the set itself. `None`/empty means unplanned generation (a
+        planning call that failed, or the hero call, which is a single card with
+        its own framing and nothing to differentiate it from). Both paths must
+        keep working; the planned one is not a hard dependency.
+
+        `existing_titles` is every card already in this subtopic **across all
         difficulties, tagged with their level**. Cross-difficulty inclusion is
         deliberate: a beginner and an advanced card on the same subtopic must
         differ in depth, not merely in wording.

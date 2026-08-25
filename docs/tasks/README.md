@@ -33,6 +33,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0023](0023-generation-completed-status-hides-gate-attrition.md) | "Ready" status doesn't reflect actual card completion, and the idle scanner's backfill never reconciles with it | unassigned |
 | [0024](0024-reintroduce-custom-topic-limit.md) | Re-introduce the custom-topic limit, removed 2026-08-24, as a premium gate | unassigned |
 | [0025](0025-quota-governor-as-a-library.md) | Extract the quota governor into a standalone library -- deferred past spoin v1 | unassigned |
+| [0026](0026-few-shot-examples-from-manual-review.md) | Add worked good/bad examples to the card prompts, from hand review of v2 cards (ADR-0059) | unassigned |
 
 Tasks 0016-0021 are one sequence, gated on 0016. Read
 [ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and

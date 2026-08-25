@@ -294,6 +294,23 @@ class _GateItem:
     verification_failure_count: int = 0
 
 
+#: Stamped into every `gen_meta` this pipeline writes -- cards, questions, and
+#: rejected drafts alike (ADR-0059). This is the PROMPT/pipeline generation, not
+#: `Card.version`, which is family-scoped regeneration lineage and means
+#: something entirely different; the two are unrelated and must not be conflated
+#: in a query. Bump it when the prompts or the pipeline's shape change enough
+#: that content either side of the change shouldn't be pooled when judging
+#: quality -- which is the whole reason it is recorded.
+#:
+#: Corpus written before this existed carries NO `prompt_version` key at all
+#: (only `backend`/`generated_at`/`batch_id`), and is v1 by absence. Nothing
+#: backfills it: rewriting `gen_meta` across the live corpus would be a bulk
+#: UPDATE on real production content to record something the absence already
+#: says (CLAUDE.md's database rule). Query v1 as
+#: `gen_meta->>'prompt_version' IS NULL`.
+CARD_PROMPT_VERSION = 2
+
+
 def _rejected_card(
     *,
     topic_id: str,
@@ -315,5 +332,15 @@ def _rejected_card(
         body=draft.body,
         stage=stage,
         reason=reason,
-        gen_meta={"backend": backend, "generated_at": generated_at, "batch_id": str(batch_id)},
+        gen_meta={
+            "backend": backend,
+            "generated_at": generated_at,
+            "batch_id": str(batch_id),
+            # Rejections are stamped too, not just the cards that survived: a
+            # v2-vs-v1 comparison that only sees what passed the gate measures
+            # the gate, not the prompts (CLAUDE.md -- a rejected draft plus its
+            # reason is a labeled example, and it is only usable as one if you
+            # can tell which prompt version produced it).
+            "prompt_version": CARD_PROMPT_VERSION,
+        },
     )

@@ -19,6 +19,7 @@ from spoin.generation.base import (
     CardCorrectionQuery,
     CardCorrectionResult,
     CardDraft,
+    CardPlan,
     CardVerificationQuery,
     CardVerificationResult,
     ContentGenerator,
@@ -73,6 +74,7 @@ class FakeContentGenerator(ContentGenerator):
         #: everything) shouldn't be the only path a test ever exercises.
         self._reject_one = reject_one_per_verify_batch
         self._card_counter = 0
+        self._plan_counter = 0
 
     async def generate_curriculum(
         self,
@@ -141,6 +143,46 @@ class FakeContentGenerator(ContentGenerator):
         ]
         return BatchResult(items=items)
 
+    async def plan_cards(
+        self,
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        subtopic_description: str,
+        difficulty: Difficulty,
+        count: int,
+        type_quotas: dict[str, int],
+        existing_titles: list[str],
+        builds_on: list[str],
+        avoid_bodies: list[str],
+        rejection_feedback: list[tuple[str, str]],
+    ) -> BatchResult[CardPlan]:
+        """Hands back exactly `count` briefs whose type mix honours `type_quotas`
+        (ADR-0059), so a test exercising the planned path gets the same shape
+        distribution the real planner is asked for -- the caller's quota
+        accounting is what's usually under test, not the plan's prose."""
+
+        wanted = [ct for ct, qty in type_quotas.items() for _ in range(max(0, qty))]
+        items: list[CardPlan] = []
+        for n in range(count):
+            self._plan_counter += 1
+            idx = self._plan_counter
+            chosen = wanted[n] if n < len(wanted) else CardType.PROSE.value
+            items.append(
+                CardPlan(
+                    canonical_title=f"{subtopic_title}: planned concept {idx}",
+                    card_type=chosen,
+                    asset_direction=(
+                        "" if chosen == CardType.PROSE.value else f"a {chosen} showing case {idx}"
+                    ),
+                    content_direction=(
+                        f"angle {idx}: {_FAKE_ANGLES[idx % len(_FAKE_ANGLES)]}, "
+                        f"distinct from the other planned cards"
+                    ),
+                )
+            )
+        return BatchResult(items=items)
+
     async def generate_cards(
         self,
         *,
@@ -156,6 +198,7 @@ class FakeContentGenerator(ContentGenerator):
         rejection_feedback: list[tuple[str, str]],
         want_hero: bool = False,
         card_type: CardType | str | None = None,
+        plans: list[CardPlan] | None = None,
     ) -> BatchResult[CardDraft]:
         builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
 

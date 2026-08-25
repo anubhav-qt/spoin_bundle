@@ -14,6 +14,9 @@ from spoin.generation.prompts.cards import (
     CARDS_SYSTEM,
     CARDS_USER,
     HERO_CARDS_SYSTEM,
+    PLAN_SYSTEM,
+    PLAN_USER,
+    PLANNED_CARDS_INSTRUCTIONS,
 )
 from spoin.generation.prompts.curriculum import (
     CURRICULUM_SYSTEM,
@@ -56,6 +59,9 @@ __all__ = [
     "FREE_TEXT_GRADE_SYSTEM",
     "FREE_TEXT_GRADE_USER",
     "HERO_CARDS_SYSTEM",
+    "PLANNED_CARDS_INSTRUCTIONS",
+    "PLAN_SYSTEM",
+    "PLAN_USER",
     "QUESTIONS_SYSTEM",
     "QUESTIONS_USER",
     "TOPIC_BATCH_MATCH_SYSTEM",

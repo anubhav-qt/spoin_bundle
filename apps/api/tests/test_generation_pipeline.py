@@ -8,6 +8,7 @@ in for the LLM, so no network/quota is involved.
 from __future__ import annotations
 
 import uuid
+from typing import cast
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,6 +28,7 @@ from spoin.generation.pipeline.persistence import (
     _load_subtopic_plans,
     _recent_rejection_context,
 )
+from spoin.generation.pipeline.state import CARD_PROMPT_VERSION
 
 
 async def _plan_and_generate(
@@ -257,6 +259,94 @@ async def test_verification_rejection_is_persisted_to_rejected_card(
         .all()
     }
     assert not active_bodies & {row.body for row in rejected_rows}
+
+
+class _PlanRecordingGenerator(FakeContentGenerator):
+    """Records whether each `generate_cards` call arrived with briefs attached,
+    so a test can assert the planning stage's output actually reaches the
+    writer rather than just that the call happened (ADR-0059)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        #: (want_hero, number of plans) per generate_cards call, in call order.
+        self.calls: list[tuple[bool, int]] = []
+
+    async def generate_cards(self, **kwargs: object) -> BatchResult:  # type: ignore[override]
+        plans = kwargs.get("plans") or []
+        self.calls.append((bool(kwargs.get("want_hero")), len(cast(list[object], plans))))
+        return await super().generate_cards(**kwargs)  # type: ignore[arg-type]
+
+
+async def test_planned_cards_reach_the_writer_and_are_stamped_with_the_prompt_version(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """ADR-0059: the pre-processing gate briefs every ordinary writer call, and
+    everything the run persists records which prompt version produced it."""
+
+    generator = _PlanRecordingGenerator()
+    report = await _plan_and_generate(session, settings, "Plate Tectonics", generator=generator)
+    topic_report = report["topics"][0]
+
+    ordinary_calls = [count for want_hero, count in generator.calls if not want_hero]
+    assert ordinary_calls, "expected at least one non-hero writer call"
+    assert all(count > 0 for count in ordinary_calls), (
+        "every ordinary writer call should carry briefs from the planning stage"
+    )
+    # The hero call is deliberately unplanned -- one card with its own framing
+    # and nothing to differentiate it from (ADR-0059).
+    assert all(count == 0 for want_hero, count in generator.calls if want_hero)
+
+    cards = (
+        (await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"])))
+        .scalars()
+        .all()
+    )
+    assert cards
+    assert all(card.gen_meta["prompt_version"] == CARD_PROMPT_VERSION for card in cards)
+
+    questions = (
+        (
+            await session.execute(
+                select(Question)
+                .join(Card, Card.id == Question.card_id)
+                .where(Card.topic_id == topic_report["topic_id"])
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert all(q.gen_meta["prompt_version"] == CARD_PROMPT_VERSION for q in questions)
+
+
+class _FailingPlannerGenerator(FakeContentGenerator):
+    """Planning always fails. Everything downstream must still work."""
+
+    async def plan_cards(self, **kwargs: object) -> BatchResult:  # type: ignore[override]
+        return BatchResult(items=[], failures=["plan_cards call failed: simulated"])
+
+
+async def test_planning_failure_falls_back_to_unplanned_generation(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """ADR-0059: planning improves what gets written, it is not a dependency of
+    writing anything. A tier whose planning call dies must still produce cards --
+    a lost improvement, never a lost card."""
+
+    report = await _plan_and_generate(
+        session, settings, "Volcanology", generator=_FailingPlannerGenerator()
+    )
+    topic_report = report["topics"][0]
+
+    assert topic_report["accepted"] > 0
+    cards = (
+        (await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"])))
+        .scalars()
+        .all()
+    )
+    assert cards
+    # Still v2 content: the prompt version records which pipeline wrote the
+    # card, not whether that pipeline's planning call happened to succeed.
+    assert all(card.gen_meta["prompt_version"] == CARD_PROMPT_VERSION for card in cards)
 
 
 class _DuplicateCardsGenerator(FakeContentGenerator):

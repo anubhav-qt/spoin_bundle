@@ -84,6 +84,7 @@ from spoin.generation.base import (
     CardCorrectionQuery,
     CardCorrectionResult,
     CardDraft,
+    CardPlan,
     CardVerificationQuery,
     CardVerificationResult,
     ContentGenerator,
@@ -232,6 +233,17 @@ class _WireCardBatch(BaseModel):
     cards: list[_WireCard] = Field(default_factory=list)
 
 
+class _WireCardPlan(_LenientWireModel):
+    canonical_title: str = ""
+    card_type: str = ""
+    asset_direction: str = ""
+    content_direction: str = ""
+
+
+class _WireCardPlanBatch(BaseModel):
+    plans: list[_WireCardPlan] = Field(default_factory=list)
+
+
 class _WireQuestion(_LenientWireModel):
     card_index: int = Field(
         default=-1,
@@ -332,6 +344,45 @@ def _format_difficulty_examples(examples: dict[Difficulty, list[str]]) -> str:
         return ""
     header = "\nExample cards at each difficulty, for calibration only:\n"
     return header + "\n\n".join(blocks) + "\n"
+
+
+def _format_type_quotas(type_quotas: dict[str, int]) -> str:
+    """ADR-0059: the tier's shape budget, shown to the PLANNER as guidance. The
+    realised mix is still counted in code afterwards -- this only aims the plan,
+    it does not enforce anything (see `plan_cards` in base.py)."""
+
+    wanted = {ct: n for ct, n in type_quotas.items() if n > 0}
+    if not wanted:
+        return "(no particular mix — pick whatever shape each idea actually wants)"
+    return "\n".join(f"- {ct}: about {n}" for ct, n in wanted.items())
+
+
+def _format_plans(plans: list[CardPlan]) -> str:
+    """ADR-0059: this writer call's slice of the tier's briefs. Returns "" when
+    unplanned (the hero call, or a planning failure) so `CARDS_USER` renders
+    exactly as it did before the planning stage existed."""
+
+    if not plans:
+        return ""
+    blocks = []
+    for n, plan in enumerate(plans, start=1):
+        lines = [
+            f"--- card {n} ---",
+            f"concept: {plan.canonical_title}",
+            f"form: {plan.card_type}",
+        ]
+        if plan.asset_direction:
+            lines.append(f"what its code/diagram/art should show: {plan.asset_direction}")
+        if plan.content_direction:
+            lines.append(
+                f"angle (what makes it different from the others): {plan.content_direction}"
+            )
+        blocks.append("\n".join(lines))
+    return (
+        "\nThe briefs for the cards to write, one card each, in this order:\n"
+        + "\n\n".join(blocks)
+        + "\n"
+    )
 
 
 def _format_avoid_bodies(avoid_bodies: list[str]) -> str:
@@ -896,6 +947,61 @@ class GeminiContentGenerator(ContentGenerator):
 
     # ----------------------------------------------------------------------- cards --
 
+    async def plan_cards(
+        self,
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        subtopic_description: str,
+        difficulty: Difficulty,
+        count: int,
+        type_quotas: dict[str, int],
+        existing_titles: list[str],
+        builds_on: list[str],
+        avoid_bodies: list[str],
+        rejection_feedback: list[tuple[str, str]],
+    ) -> BatchResult[CardPlan]:
+        prompt = [
+            ("system", prompts.PLAN_SYSTEM),
+            (
+                "human",
+                prompts.PLAN_USER.format(
+                    topic_name=topic_name,
+                    subtopic_title=subtopic_title,
+                    subtopic_description=subtopic_description,
+                    difficulty=difficulty.value,
+                    count=count,
+                    type_quotas_block=_format_type_quotas(type_quotas),
+                    existing_titles_block=_format_existing_titles(existing_titles),
+                    avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
+                    rejection_feedback_block=_format_rejection_feedback(rejection_feedback),
+                    builds_on_block=_format_builds_on(builds_on),
+                ),
+            ),
+        ]
+        try:
+            wire_result = await self._invoke_with_retry(self._generator, _WireCardPlanBatch, prompt)
+        except QuotaExhaustedError:
+            raise
+        except Exception as exc:
+            return BatchResult(items=[], failures=[f"plan_cards call failed: {exc}"])
+
+        items: list[CardPlan] = []
+        failures: list[str] = []
+        for wire_plan in wire_result.plans:
+            try:
+                items.append(
+                    CardPlan(
+                        canonical_title=wire_plan.canonical_title,
+                        card_type=wire_plan.card_type,
+                        asset_direction=wire_plan.asset_direction,
+                        content_direction=wire_plan.content_direction,
+                    )
+                )
+            except ValidationError as exc:
+                failures.append(f"malformed card plan: {exc}")
+        return BatchResult(items=items, failures=failures)
+
     async def generate_cards(
         self,
         *,
@@ -911,6 +1017,7 @@ class GeminiContentGenerator(ContentGenerator):
         rejection_feedback: list[tuple[str, str]],
         want_hero: bool = False,
         card_type: CardType | str | None = None,
+        plans: list[CardPlan] | None = None,
     ) -> BatchResult[CardDraft]:
         if want_hero:
             system_prompt = prompts.HERO_CARDS_SYSTEM
@@ -927,6 +1034,12 @@ class GeminiContentGenerator(ContentGenerator):
         else:
             system_prompt = prompts.CARDS_SYSTEM
 
+        # The plan instructions ride on the SYSTEM prompt (ADR-0059) so they sit
+        # alongside the card-type requirement they qualify, rather than arriving
+        # after it as user content that reads like a competing request.
+        if plans:
+            system_prompt = system_prompt + prompts.PLANNED_CARDS_INSTRUCTIONS
+
         prompt = [
             ("system", system_prompt),
             (
@@ -937,6 +1050,7 @@ class GeminiContentGenerator(ContentGenerator):
                     subtopic_description=subtopic_description,
                     difficulty=difficulty.value,
                     count=count,
+                    plans_block=_format_plans(plans or []),
                     difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
                     existing_titles_block=_format_existing_titles(existing_titles),
                     avoid_bodies_block=_format_avoid_bodies(avoid_bodies),

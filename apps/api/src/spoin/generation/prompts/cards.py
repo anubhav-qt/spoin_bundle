@@ -1,6 +1,74 @@
-"""Card generation prompts and system instructions for all card types and hero cards."""
+"""Card planning and generation prompts, for all card types and hero cards.
+
+The planning prompts (ADR-0059) are deliberately narrow: they describe one job
+-- decide what the tier's cards are and what shape each takes -- and say nothing
+about how to write prose, because the call that uses them never writes any.
+See the ADR for the theory this split is testing.
+"""
 
 from __future__ import annotations
+
+PLAN_SYSTEM = """\
+You plan a batch of flashcard-style learning cards for one subtopic at one \
+difficulty. You do NOT write the cards. Someone else writes them, from the plan \
+you produce, one card per entry.
+
+Your entire job is coverage and shape:
+
+1. COVERAGE — decide which distinct ideas within this subtopic deserve a card, \
+so that the batch as a whole covers the subtopic without overlapping itself. \
+You are the only step that sees all of these at once. The writer sees one \
+entry's brief at a time and cannot tell that two entries are secretly the same \
+idea in different words — if two of your entries overlap, that becomes two \
+near-duplicate cards, and one of them gets thrown away. Make them differ in \
+SUBSTANCE: a different mechanism, a different failure mode, a different \
+tradeoff — not a different phrasing of one idea.
+
+2. SHAPE — decide, per card, which form actually teaches that idea best:
+   - prose: conceptual intuition, mental models, analogies. The default when \
+nothing else genuinely fits. Do not force a shape onto an idea that doesn't want one.
+   - code: a concrete command, query, config, or code pattern worth seeing literally.
+   - diagram: anything whose meaning is in how parts connect or in what order \
+things happen — request flow, a pipeline, a feedback loop, a timeline, a causal chain.
+   - comparison: a specific, commonly-held WRONG belief worth correcting. \
+Only when a real misconception exists — an invented one is worse than none.
+   - ascii: an idea a small, funny stick-figure scene would genuinely dramatize.
+
+For each entry give:
+- canonical_title: the literal, descriptive name of the idea. Never playful, \
+never a joke — the writer invents the playful display title, not you. This is \
+the name the concept is findable by.
+- card_type: exactly one of prose, code, diagram, comparison, ascii.
+- asset_direction: what the card's non-prose element should actually SHOW. \
+Be concrete and specific to the idea: for diagram, name the actual boxes and \
+what flows between them; for code, name the language and what the snippet \
+demonstrates; for ascii, describe the gag and what makes it land; for \
+comparison, state the specific myth and the specific fact that corrects it. \
+Leave EMPTY for prose.
+- content_direction: the angle this card takes, in a sentence or two — what it \
+teaches, and explicitly what separates it from the other entries in this batch. \
+This is what stops the writer from converging on the obvious framing everyone \
+else got.
+
+Write directions, not content. Do not draft body text, do not write the \
+explanation, do not draw the art. A brief that already contains the card leaves \
+the writer nothing to do but reformat it, and reformatting is not writing.
+"""
+
+PLAN_USER = """\
+Topic: {topic_name}
+Subtopic: {subtopic_title}
+Subtopic description: {subtopic_description}
+Difficulty: {difficulty}
+
+Plan exactly {count} NEW cards at this difficulty for this subtopic.
+
+Rough shape budget for this batch (guidance, not a rule to pad toward — an idea \
+that clearly wants a different shape should get that shape):
+{type_quotas_block}
+Already covered in this subtopic — plan around these, never re-plan one of them:
+{existing_titles_block}
+{avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
 
 ASCII_INSTRUCTIONS = r"""\
 Sometimes — not every card, only when a concept genuinely lends itself to it —
@@ -233,13 +301,37 @@ analogy fits the core idea, draw it!
 """
 )
 
+#: Appended to `CARDS_COMMON_HEADER` only when this call actually carries briefs
+#: (ADR-0059). Kept out of the shared header so an unplanned call -- the hero
+#: call, or a planning failure's fallback -- never sees instructions referring to
+#: a plan block that isn't there.
+PLANNED_CARDS_INSTRUCTIONS = """\
+
+THESE CARDS HAVE ALREADY BEEN PLANNED. Below you are given one brief per card: \
+its concept, its required form, what its visual/code element should show, and \
+the angle that separates it from its siblings. Write exactly one card per brief, \
+in the order given, covering the concept it names.
+
+The brief decides WHAT each card is about and WHAT FORM it takes. You decide how \
+well it reads: the display title, the hook, the prose, the actual code or art. \
+Do not substitute a different concept because you find it more interesting, and \
+do not merge two briefs into one card — the set was planned to cover this \
+subtopic without overlapping, and quietly changing one entry re-opens the \
+duplicate it was written to avoid.
+
+If a brief names a concept you genuinely cannot write accurately, write the \
+closest thing you can stand behind rather than inventing detail to fill it. A \
+card that is true and slightly off-brief survives review; a confident invention \
+does not.
+"""
+
 CARDS_USER = """\
 Topic: {topic_name}
 Subtopic: {subtopic_title}
 Subtopic description: {subtopic_description}
 Difficulty: {difficulty}
 Write exactly {count} NEW cards at this difficulty for this subtopic.
-{difficulty_examples_block}
+{plans_block}{difficulty_examples_block}
 Already covered in this subtopic (do not repeat any of these):
 {existing_titles_block}
 {avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""

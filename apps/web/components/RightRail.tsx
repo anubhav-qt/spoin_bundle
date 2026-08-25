@@ -10,8 +10,9 @@
 
 import { useState } from "react";
 
-import type { Topic } from "@/lib/api";
+import type { DailyGoalOut, Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
+import { DailyGoalRing } from "./DailyGoalRing";
 import { DiscoverBox } from "./DiscoverBox";
 import { FocusToggle } from "./FocusToggle";
 import { FontPicker } from "./FontPicker";
@@ -34,6 +35,7 @@ interface Props {
    *  server already dropped the subscription; this just catches up local
    *  state, same tail end as `onUnfollowed` without a second API call. */
   onTopicRemoved: (topicId: string) => void;
+  dailyGoal: DailyGoalOut;
 }
 
 export function RightRail({
@@ -47,6 +49,7 @@ export function RightRail({
   onTopicColorChanged,
   onUnfollowed,
   onTopicRemoved,
+  dailyGoal,
 }: Props) {
   const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const [discoveryView, setDiscoveryView] = useState<"topics" | "custom" | "request">("topics");
@@ -61,6 +64,7 @@ export function RightRail({
       <div className="rail-top-row">
         <ThemePicker />
         <FocusToggle focused={false} onToggle={onEnterFocus} />
+        <DailyGoalRing cardsRead={dailyGoal.cards_read} goal={dailyGoal.goal} />
       </div>
 
       {/* ADR-0037: right after the color-theme picker, per how it was asked for. */}

@@ -1987,7 +1987,97 @@ body.custom-cursor-active textarea {
 .rail-top-row {
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  /* Wraps rather than clipping: .rail-right is overflow-x: hidden by
+     design, so any item that doesn't fit on the first line must be able to
+     drop to its own line instead of being pushed past the visible edge
+     with no way to reach it. A wrapped item hugs the row's own left edge
+     (default justify-content: flex-start) rather than floating in with a
+     dead gap in front of it. */
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* -- daily goal ring (ADR-0060) -- */
+.daily-goal-wrap {
+  position: relative;
+  display: inline-flex;
+  /* Matches .focus-toggle's own reasoning just above: rail-top-row's
+     align-items: stretch only stretches auto-height children, so this
+     fixed-height sibling needs its own centering. */
+  align-self: center;
+}
+
+.daily-goal-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.daily-goal-ring:hover {
+  border-color: var(--line-strong);
+}
+
+.daily-goal-track {
+  stroke: var(--line-strong);
+}
+
+.daily-goal-progress {
+  stroke: var(--accent);
+  transition: stroke-dashoffset var(--dur-2) var(--ease), stroke var(--dur-1) var(--ease);
+}
+
+.daily-goal-ring[data-met="true"] .daily-goal-progress {
+  stroke: var(--accent-2);
+}
+
+/* Anchored to the ring's right edge rather than centered (`.share-popover`'s
+   own pattern) -- this button sits near the rail's right edge, so a
+   centered popover would overhang it. Two-class selector, not just
+   `.daily-goal-popover`, so this outranks `.share-popover`'s own
+   centered-slide-up animation on specificity rather than depending on which
+   rule happens to come later in the file. */
+.share-popover.daily-goal-popover {
+  top: calc(100% + 8px);
+  bottom: auto;
+  left: auto;
+  right: 0;
+  transform: none;
+  gap: 3px;
+  padding: 10px 12px;
+  animation: popover-enter-down 0.15s var(--ease);
+}
+
+@keyframes popover-enter-down {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.daily-goal-popover-head {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+  white-space: nowrap;
+}
+
+.daily-goal-popover-body {
+  font-size: 11.5px;
+  color: var(--fg-3);
+  white-space: nowrap;
 }
 
 .theme-picker {

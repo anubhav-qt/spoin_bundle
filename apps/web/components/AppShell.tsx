@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { MotionConfig } from "framer-motion";
 
-import { api, type Difficulty, type Topic } from "@/lib/api";
+import { api, type DailyGoalOut, type Difficulty, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
 import { getReducedMotion, subscribeReducedMotion } from "@/lib/motionPreference";
 import { invalidate } from "@/lib/refresh";
@@ -58,6 +58,10 @@ export function AppShell() {
   const [reducedMotion, setReducedMotionState] = useState(false);
   const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
   const [selected, setSelected] = useState<string[]>([]);
+  // The right rail's daily-goal ring. Starts at the DB default (0 of 10)
+  // rather than `null`, so the ring renders immediately as an empty track
+  // instead of popping in once `/profile/me/today` resolves.
+  const [dailyGoal, setDailyGoal] = useState<DailyGoalOut>({ cards_read: 0, goal: 10 });
   // Session-local, not server state: which cards have been marked seen so
   // far, so InsightsPanel can show a count that only grows once per card
   // even if a card gets marked seen more than once in a session.
@@ -107,6 +111,14 @@ export function AppShell() {
     setProgress((current) => ({ ...current, [topicId]: toTopicProgress(p) }));
   }, []);
 
+  const refreshDailyGoal = useCallback(async () => {
+    setDailyGoal(await api.getTodayProgress());
+  }, []);
+
+  useEffect(() => {
+    void refreshDailyGoal();
+  }, [refreshDailyGoal]);
+
   // Called when a card gets marked seen, so InsightsPanel's session count and
   // the topic's progress both reflect it immediately instead of only as of
   // the last full page load.
@@ -127,11 +139,14 @@ export function AppShell() {
       setReadCardIds((current) => {
         if (current.has(cardId)) return current;
         const next = new Set(current).add(cardId);
-        void engagement.whenIdle().then(() => refreshProgress(topicId));
+        void engagement.whenIdle().then(() => {
+          void refreshProgress(topicId);
+          void refreshDailyGoal();
+        });
         return next;
       });
     },
-    [refreshProgress],
+    [refreshProgress, refreshDailyGoal],
   );
 
   // Both rails swap for entirely different DOM (rail <-> empty spacer, and
@@ -305,6 +320,7 @@ export function AppShell() {
             onTopicColorChanged={onTopicColorChanged}
             onUnfollowed={onUnfollowed}
             onTopicRemoved={removeTopicLocally}
+            dailyGoal={dailyGoal}
           />
         )}
       </div>

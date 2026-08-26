@@ -55,7 +55,9 @@ distinguishes them by `quotaId`, and the two demand opposite responses:
   (`QuotaGovernor.mark_rate_limited`) and let `acquire()` wait it out. Spending a
   cell's whole day on this is what ADR-0058 exists to stop.
 
-`_classify_rate_limit` reads that distinction off the payload. Only once every cell
+`_classify_rate_limit` reads that distinction off the payload, and treats anything
+it cannot positively identify as per-minute (ADR-0060 -- the day-long branch is the
+one that costs the whole grid when guessed wrong). Only once every cell
 has been genuinely exhausted does the final exception (a `QuotaExhaustedError` from
 `acquire()`, or a non-quota error) propagate to the caller -- generate_curriculum
 lets it raise hard (see above); every other method's existing `except Exception`
@@ -153,11 +155,31 @@ def _classify_rate_limit(exc: ClientError) -> _RateLimit:
     `{"error": {...}}` envelope or just the inner error object depending on which
     SDK path raised -- both shapes are handled rather than assumed.
 
-    **Unknown scope falls back to daily.** That is the conservative direction: a
-    per-minute limit misread as daily costs one cell for a few hours, while a
-    daily exhaustion misread as per-minute would have us retry a genuinely dead
-    cell hundreds of times. `quotaId` is the primary signal; a short `RetryInfo`
-    is accepted as evidence on its own only when no `quotaId` was sent at all.
+    **Unknown scope falls back to per-MINUTE** (ADR-0060, reversing ADR-0058's
+    original choice). Daily needs positive evidence; ambiguity does not get to
+    spend a cell for the day.
+
+    ADR-0058 picked the opposite default and called it conservative, weighing
+    "one cell for a few hours" against "retry a genuinely dead cell hundreds of
+    times". That trade was measured against the wrong failure: per-minute 429s
+    do not arrive one at a time here. `gate_and_persist` fans out across every
+    subtopic-tier at once (pipeline/nodes.py), so they all crowd the same RPM
+    ceiling and all get throttled within seconds of each other -- and each one
+    read as daily. The cost of guessing wrong is therefore the WHOLE grid for
+    the rest of the day, not one cell; measured live on 2026-08-26, 64 of 66
+    generator cells were slammed to their 500-request cap inside 100 seconds
+    while the provider's own dashboard showed 37-87 requests actually spent.
+
+    The opposite error stays bounded by a mechanism that already exists: a cell
+    that keeps throttling still walks toward its own RPD ceiling on every
+    `acquire()` (the ledger only counts up) and retires itself from rotation --
+    the argument `_invoke_with_retry`'s docstring already makes for known
+    per-minute 429s. So the recoverable direction is also the cheap one.
+
+    `quotaId` remains the primary signal. `RetryInfo` is now read as evidence in
+    its OWN right rather than only when no `quotaId` was sent: a delay inside one
+    RPM window means per-minute whatever unrecognized quota id accompanied it,
+    and a delay beyond one is positive evidence FOR daily.
     """
 
     raw = getattr(exc, "details", None)
@@ -182,9 +204,21 @@ def _classify_rate_limit(exc: ClientError) -> _RateLimit:
         return _RateLimit(is_daily=True, retry_after_s=None)
     if "perminute" in haystack:
         return _RateLimit(is_daily=False, retry_after_s=retry_after)
-    if not quota_ids and retry_after is not None and retry_after <= _PER_MINUTE_RETRY_CEILING_S:
-        return _RateLimit(is_daily=False, retry_after_s=retry_after)
-    return _RateLimit(is_daily=True, retry_after_s=None)
+    if retry_after is not None:
+        if retry_after <= _PER_MINUTE_RETRY_CEILING_S:
+            return _RateLimit(is_daily=False, retry_after_s=retry_after)
+        return _RateLimit(is_daily=True, retry_after_s=None)
+    # Neither signal present. Logged rather than silently guessed at, because
+    # the guess below is the one thing standing between a throttle and a
+    # day-long grid outage -- and because the envelope shape is the only way a
+    # later session learns which quota ids this parser still doesn't know.
+    logger.warning(
+        "quota: a 429 arrived with no recognizable scope -- treating it as per-minute. "
+        "quotaIds=%s envelope=%r",
+        quota_ids or "(none)",
+        error,
+    )
+    return _RateLimit(is_daily=False, retry_after_s=None)
 
 
 # ------------------------------------------------------------- wire schemas --

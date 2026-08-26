@@ -32,6 +32,17 @@ async def _window_rows(session: AsyncSession, backend: str) -> list[QuotaRequest
     return list(result)
 
 
+async def _spent(session: AsyncSession, backend: str, on: datetime) -> int:
+    """Today's billed RPD for one cell -- the number the phantom refund moves."""
+
+    day = on.replace(hour=0, minute=0, second=0, microsecond=0)
+    ledger = await session.scalar(
+        select(QuotaLedger).where(QuotaLedger.day == day, QuotaLedger.backend == backend)
+    )
+    assert ledger is not None, f"no ledger row for {backend} on {day.date()}"
+    return ledger.requests_spent
+
+
 async def test_stays_on_first_key_and_model_while_under_target(session: AsyncSession) -> None:
     governor = QuotaGovernor(key_count=3, ladder=_ladder(("model-a", 5, 100)))
     now = datetime.now(UTC)
@@ -397,6 +408,69 @@ async def test_prune_drops_only_rows_past_every_cell_s_window(session: AsyncSess
     assert deleted == 1
     rows = await _window_rows(session, "gemini:0:model-a")
     assert [row.sent_at for row in rows] == [now]
+
+
+async def test_prune_refunds_a_grant_that_never_became_a_request(
+    session: AsyncSession,
+) -> None:
+    """ADR-0061: `acquire()` bills RPD at grant time, but the call fires later.
+    A task that dies in that gap leaves the cell billed for a request the
+    provider never saw, and nothing else ever reconciles it -- measured live as
+    a ~19% over-count (ledger 107 vs the provider's own 87)."""
+
+    governor = QuotaGovernor(key_count=1, ladder=_ladder(("model-a", 100, 15)))
+    now = datetime.now(UTC)
+    stale = now - timedelta(hours=1)
+
+    # Two grants an hour ago; only one of them ever reached the provider.
+    await governor.acquire_with_session(session, now=stale)
+    await governor.acquire_with_session(session, now=stale)
+    await governor.note_request_sent_with_session(session, 0, "model-a", now=stale)
+    assert await _spent(session, "gemini:0:model-a", stale) == 2
+
+    await governor.prune_request_window(session, now=now)
+
+    assert await _spent(session, "gemini:0:model-a", stale) == 1, (
+        "the never-sent grant must be refunded, the real send must not"
+    )
+
+
+async def test_prune_never_refunds_a_confirmed_send(session: AsyncSession) -> None:
+    """The over-count from a 429'd request is deliberate, not a leak to plug.
+
+    `_invoke_with_retry` retries a per-minute 429 WITHOUT burning a cell, so the
+    climbing ledger is the only thing that ends that loop -- and ADR-0060 routed
+    unidentifiable 429s down it too. Refunding a confirmed send would turn the
+    retry path into retry/refund/retry forever, so this stays pinned."""
+
+    governor = QuotaGovernor(key_count=1, ladder=_ladder(("model-a", 100, 15)))
+    now = datetime.now(UTC)
+    stale = now - timedelta(hours=1)
+
+    for _ in range(3):
+        await governor.acquire_with_session(session, now=stale)
+        await governor.note_request_sent_with_session(session, 0, "model-a", now=stale)
+
+    await governor.prune_request_window(session, now=now)
+
+    assert await _spent(session, "gemini:0:model-a", stale) == 3
+
+
+async def test_prune_leaves_an_exhausted_cell_retired(session: AsyncSession) -> None:
+    """Bookkeeping must never resurrect a cell `mark_exhausted` deliberately
+    retired for the day -- otherwise a phantom refund could drop a genuinely
+    dead cell back under its cap and put it straight back into rotation."""
+
+    governor = QuotaGovernor(key_count=1, ladder=_ladder(("model-a", 100, 15)))
+    now = datetime.now(UTC)
+    stale = now - timedelta(hours=1)
+
+    await governor.acquire_with_session(session, now=stale)  # never sent
+    await governor.mark_exhausted_with_session(session, 0, "model-a", now=stale)
+
+    await governor.prune_request_window(session, now=now)
+
+    assert await _spent(session, "gemini:0:model-a", stale) == 100
 
 
 async def test_mark_exhausted_is_day_long_for_every_model(session: AsyncSession) -> None:

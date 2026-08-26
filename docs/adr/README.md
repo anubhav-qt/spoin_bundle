@@ -96,3 +96,5 @@ useful than the decision itself.
 | [0057](0057-redraft-loop-for-gate-attrition.md) | A per-tier redraft loop closes the gate-rejection gap left by a single draft-and-gate pass | Accepted (amends 0026) |
 | [0058](0058-per-minute-vs-per-day-429.md) | A per-minute 429 and a per-day 429 are different facts, read off the payload | Accepted (amends 0028) |
 | [0059](0059-card-planning-pass-and-prompt-versioning.md) | A planning pass before card writing, and a prompt version stamped on everything it produces | Accepted (amends 0026, 0030, 0057) |
+| [0060](0060-unknown-429-scope-defaults-to-per-minute.md) | An unidentifiable 429 is a throttle, not an exhaustion | Accepted (amends 0058) |
+| [0061](0061-refund-grants-that-never-became-requests.md) | The prune refunds a grant that never became a request -- and only that | Accepted (amends 0058) |

@@ -140,31 +140,53 @@ to patch.
 
 ---
 
-## 4. Live corpus snapshot, `spoin_db` (2026-08-26, post-run)
+## 4. Peak throughput
+
+New records, both set during the Mental Models run and independently confirmed against
+`card.created_at` / `question.created_at` per-minute counts, not taken from any run's
+self-report:
+
+| Metric | Peak (per minute) | Rate | Timestamp |
+|---|---:|---:|---|
+| Cards persisted | 315 | ≈5.25/s | 2026-08-26 11:51 UTC |
+| Questions persisted | 184 | ≈3.07/s | 2026-08-26 11:51 UTC |
+| Combined items | 499 | ≈8.32/s | 2026-08-26 11:51 UTC |
+
+499 items/min beats [Run 4](generation-pipeline-run-4-benchmark.md)'s previous peak (218
+cards/min, cards-only) by more than double once questions are counted alongside cards, on
+the same free-tier key grid -- this run's throughput gain is the quota fix recovering
+capacity the misclassification bug was discarding, not new hardware or a bigger model.
+
+## 5. Live corpus snapshot, `spoin_db` (2026-08-26, post-run)
 
 ```
-Topic                                                              | Cards | Questions
----------------------------------------------------------------------+-------+----------
-Mental Models & Cognitive Biases                                    | 1,307 |    1,301
-System Design & Distributed Systems                                 |   756 |      736
-Bhagvad Geeta in Easy Language                                      |   753 |      752
-German (Language)                                                   |   715 |      687
-Kubernetes                                                          |   701 |      687
-PostgreSQL                                                          |   696 |      684
-How Everyday Things Work                                            |   691 |      691
-Rust (Programming Language)                                         |   659 |      647
-The Epic of Gilgamesh                                               |   655 |      649
-FastAPI                                                              |   625 |      607
-Claude Code (Becoming a 10x Developer)                               |   619 |      611
-Gym (Physical Fitness)                                               |   613 |      546
-10M Air Pistol Shooting                                              |   589 |      581
-Building a Successful Kurtis Business in e-commerce for India        |   543 |      503
-Study Abroad (Full Guide)                                            |   503 |      497
-Current AI Capabilities and Scope                                    |   476 |      475
-Financial Literacy & Investing Mechanics                             |   341 |      340
----------------------------------------------------------------------+-------+----------
-TOTAL (17 live topics)                                              | 11,242 |   10,994
+Topic                                                       | Subtopics | Cards | Questions | Rejected
+----------------------------------------------------------------------+-----------+-------+-----------+---------
+Mental Models & Cognitive Biases                             |        81 | 1,307 |     1,301 |       37
+System Design & Distributed Systems                          |        51 |   756 |       736 |       19
+Bhagvad Geeta in Easy Language                                |        41 |   753 |       752 |      528
+German (Language)                                             |        39 |   715 |       687 |       17
+Kubernetes                                                    |        38 |   701 |       687 |       21
+PostgreSQL                                                    |        44 |   696 |       684 |       13
+How Everyday Things Work                                      |        41 |   691 |       691 |       28
+Rust (Programming Language)                                   |        39 |   659 |       647 |       25
+The Epic of Gilgamesh                                         |        34 |   655 |       649 |        7
+FastAPI                                                        |        44 |   625 |       607 |       18
+Claude Code (Becoming a 10x Developer)                         |        32 |   619 |       611 |       23
+Gym (Physical Fitness)                                         |        48 |   613 |       546 |       66
+10M Air Pistol Shooting                                        |        35 |   589 |       581 |        4
+Building a Successful Kurtis Business in e-commerce for India  |        41 |   543 |       503 |       30
+Study Abroad (Full Guide)                                      |        36 |   503 |       497 |       15
+Current AI Capabilities and Scope                              |        22 |   476 |       475 |        8
+Financial Literacy & Investing Mechanics                       |        73 |   341 |       340 |        6
+----------------------------------------------------------------------+-----------+-------+-----------+---------
+TOTAL (17 live topics)                                        |       915 |11,242 |    10,994 |      964
 ```
+
+Lifetime quality-gate acceptance across the whole corpus: 11,242 / (11,242 + 964) = **92.1%**.
+Bhagvad Geeta in Easy Language is the outlier (58.8% acceptance on its own, 528 rejections
+against 753 accepted cards) -- every other topic sits at or above 89%, so that one topic's
+gate history is worth a closer look on its own rather than averaging it away here.
 
 Crossed 11,000 cards for the first time this run, with Mental Models & Cognitive Biases
 becoming the largest single topic in the corpus (1,307 cards) in one uninterrupted pass.

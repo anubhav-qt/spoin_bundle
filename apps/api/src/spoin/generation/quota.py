@@ -26,6 +26,9 @@ across processes is worth more than saving one query.
 
 **These rows are disposable, unlike the ledger's.** A `QuotaRequest` matters for
 60 seconds; `prune_request_window` drops them opportunistically from `acquire()`.
+They are read once more on the way out, though: a row still `confirmed=False`
+that late marks a cell billed for a call that never happened, and the prune
+refunds it (ADR-0061 -- see `prune_request_window`).
 
 **Deliberately session-per-call, not session-per-instance.** A `QuotaGovernor`
 lives for the lifetime of a `GeminiContentGenerator` (one per generation run,
@@ -63,7 +66,9 @@ _DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS = _RPM_WINDOW_SECONDS
 #: How long a `QuotaRequest` row is kept before the opportunistic prune drops it.
 #: Deliberately a multiple of the window rather than equal to it: a row is
 #: useless once it ages out, but deleting it the instant it does would race the
-#: readers still counting it.
+#: readers still counting it. The margin doubles as the grace period behind
+#: `prune_request_window`'s phantom refund -- it is what makes "still
+#: unconfirmed" mean "never sent" rather than "sent, slowly".
 _REQUEST_RETENTION_SECONDS = _RPM_WINDOW_SECONDS * 5
 
 
@@ -579,21 +584,86 @@ class QuotaGovernor:
         return earliest
 
     async def prune_request_window(self, session: AsyncSession, *, now: datetime) -> int:
-        """Drop rows that have fallen out of every cell's window.
+        """Drop rows that have fallen out of every cell's window, refunding the
+        day's ledger for any grant that never became a request (ADR-0061).
 
         These rows are worthless the moment they age out -- nothing reads this
         table for history -- so they are deleted rather than retained. Called
         opportunistically from `acquire()` rather than on a schedule, since the
         only process that needs the table small is one that is actively using
         it.
+
+        **A row still `confirmed=False` this late is a phantom charge.**
+        `acquire()` bills RPD when it GRANTS a cell, but the call fires later,
+        after the caller wins `cell_lock` -- and `note_request_sent` is the first
+        thing `_invoke_with_backoff` does, so all but a vanishing fraction of
+        real sends are confirmed within milliseconds. A reservation still
+        unconfirmed a full `_REQUEST_RETENTION_SECONDS` later therefore did not
+        slip through the gap; it never happened at all -- the task died between
+        the grant and the send (a cancelled `cell_lock` await, a client
+        construction error, the process exiting mid-fan-out). Nothing else ever
+        reconciles those, so they accumulate as permanent day-long loss.
+
+        **Only never-sent grants are refunded, never rejected sends.** A request
+        that reached the provider and came back 429 is confirmed, and stays
+        billed even though the provider did not count it against its own daily
+        total. That over-count is deliberate and load-bearing, not an oversight:
+        `_invoke_with_retry`'s per-minute branch retries WITHOUT burning a cell,
+        so the only thing that terminates it is the ledger climbing toward the
+        cap. Refunding a throttled call would make that loop retry, refund, and
+        retry forever -- and ADR-0060 widened the path into it by routing
+        unidentifiable 429s there too. See ADR-0058's "Harder" note, which
+        accepted this over-count knowingly.
+
+        **A cell already marked exhausted is left alone**, so bookkeeping can
+        never resurrect one that `mark_exhausted` deliberately retired for the
+        day.
         """
 
-        result = await session.execute(
-            delete(QuotaRequest).where(
-                QuotaRequest.sent_at < now - timedelta(seconds=_REQUEST_RETENTION_SECONDS)
+        dropped = (
+            await session.execute(
+                delete(QuotaRequest)
+                .where(QuotaRequest.sent_at < now - timedelta(seconds=_REQUEST_RETENTION_SECONDS))
+                .returning(
+                    QuotaRequest.backend, QuotaRequest.sent_at, QuotaRequest.confirmed
+                )
             )
-        )
-        return int(result.rowcount or 0)  # type: ignore[attr-defined]
+        ).all()
+
+        # Keyed on the row's OWN day, not today's: retention outlives midnight,
+        # so a run spanning it would otherwise refund yesterday's phantom
+        # against today's fresh budget.
+        phantoms: dict[tuple[datetime, str], int] = {}
+        for backend, sent_at, confirmed in dropped:
+            if confirmed:
+                continue
+            key = (_day_start(sent_at), backend)
+            phantoms[key] = phantoms.get(key, 0) + 1
+
+        for (day, backend), count in phantoms.items():
+            ledger = await session.scalar(
+                select(QuotaLedger).where(
+                    QuotaLedger.day == day,
+                    QuotaLedger.backend == backend,
+                    QuotaLedger.exhausted_at.is_(None),
+                )
+            )
+            if ledger is None:
+                continue
+            refunded = min(count, ledger.requests_spent)
+            if refunded == 0:
+                continue
+            ledger.requests_spent -= refunded
+            logger.info(
+                "quota: refunded %d never-sent grant(s) to %s (now %d spent for %s)",
+                refunded,
+                backend,
+                ledger.requests_spent,
+                day.date(),
+            )
+        if phantoms:
+            await session.flush()
+        return len(dropped)
 
     async def _ledger_row(
         self, session: AsyncSession, day: datetime, key_index: int, model: str

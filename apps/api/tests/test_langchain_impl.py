@@ -233,9 +233,13 @@ async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> 
 
 
 async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> None:
-    """ADR-0028's drift risk, confirmed live: a real 429 from the provider
-    means our local ledger disagreed with reality. The retry path must mark
-    that exact cell exhausted and try the next one, not just fail outright."""
+    """ADR-0028's drift risk, confirmed live: a real per-DAY 429 from the
+    provider means our local ledger disagreed with reality. The retry path must
+    mark that exact cell exhausted and try the next one, not just fail outright.
+
+    Deliberately a `_rpd_429`, not a bare `_real_429`: since ADR-0060 only a
+    positively-identified daily 429 spends a cell, so a scope-less envelope
+    would exercise the cooldown path instead of this one."""
 
     generator = _generator()
     generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
@@ -256,7 +260,7 @@ async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> Non
         ]
     )
     runnable = AsyncMock()
-    runnable.ainvoke = AsyncMock(side_effect=[_real_429(), draft])
+    runnable.ainvoke = AsyncMock(side_effect=[_rpd_429(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
         result = await generator.generate_curriculum("Topic", "desc")
 
@@ -277,7 +281,7 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
     generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
 
     runnable = AsyncMock()
-    runnable.ainvoke = AsyncMock(side_effect=_real_429())
+    runnable.ainvoke = AsyncMock(side_effect=_rpd_429())
     with (
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
         pytest.raises(QuotaExhaustedError),
@@ -297,13 +301,69 @@ def test_classify_rate_limit_reads_the_quota_id() -> None:
     assert _classify_rate_limit(_rpd_429()).is_daily is True
 
 
-def test_classify_rate_limit_falls_back_to_daily_when_scope_is_unknown() -> None:
+def test_classify_rate_limit_falls_back_to_per_minute_when_scope_is_unknown() -> None:
     """A 429 carrying no `quotaId` and no `RetryInfo` tells us nothing, so it
-    must take the conservative branch: a per-minute limit misread as daily
-    costs one cell for a few hours, but a daily exhaustion misread as
-    per-minute would have us retry a genuinely dead cell hundreds of times."""
+    takes the RECOVERABLE branch (ADR-0060, reversing ADR-0058).
 
-    assert _classify_rate_limit(_real_429()).is_daily is True
+    Guessing daily here is what cost a whole day of generation on 2026-08-26:
+    the pipeline's fan-out throttles every cell at once, so one wrong guess is
+    not one cell, it is the entire grid slammed to its cap. Guessing per-minute
+    instead is self-correcting -- the cell keeps walking toward its own RPD
+    ceiling on every acquire() and retires itself."""
+
+    assert _classify_rate_limit(_real_429()).is_daily is False
+
+
+def test_classify_rate_limit_trusts_a_short_retry_delay_over_an_unknown_quota_id() -> None:
+    """The exact hole that slammed the grid: `RetryInfo` used to be consulted
+    only when NO `quotaId` was present, so an unrecognized id riding along with
+    a 13-second delay fell through to daily. Nothing daily resolves in 13s --
+    the delay is evidence in its own right, whatever id accompanies it."""
+
+    unknown_id = ClientError(
+        429,
+        {
+            "error": {
+                "code": 429,
+                "status": "RESOURCE_EXHAUSTED",
+                "details": [
+                    {
+                        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+                        "violations": [{"quotaId": "SomeUnrecognizedQuotaId-FreeTier"}],
+                    },
+                    {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "13s"},
+                ],
+            }
+        },
+    )
+
+    limit = _classify_rate_limit(unknown_id)
+    assert limit.is_daily is False
+    assert limit.retry_after_s == 13.0
+
+
+def test_classify_rate_limit_reads_a_long_retry_delay_as_daily() -> None:
+    """The other half of trusting `RetryInfo`: a delay well past one RPM window
+    cannot be describing a per-minute limit, so it is positive evidence FOR
+    daily rather than something to discard."""
+
+    assert _classify_rate_limit(_rpm_429(retry_delay="3600s")).is_daily is False, (
+        "an explicit PerMinute quotaId still wins over the delay heuristic"
+    )
+
+    long_delay = ClientError(
+        429,
+        {
+            "error": {
+                "code": 429,
+                "status": "RESOURCE_EXHAUSTED",
+                "details": [
+                    {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "3600s"}
+                ],
+            }
+        },
+    )
+    assert _classify_rate_limit(long_delay).is_daily is True
 
 
 def test_classify_rate_limit_trusts_a_short_retry_delay_when_no_quota_id_is_sent() -> None:

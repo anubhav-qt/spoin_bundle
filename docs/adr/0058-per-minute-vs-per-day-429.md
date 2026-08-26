@@ -3,6 +3,13 @@
 - **Status:** Accepted (amends [ADR-0028](0028-key-model-quota-ladder.md))
 - **Date:** 2026-08-25
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0060](0060-unknown-429-scope-defaults-to-per-minute.md) -- the
+  unknown-scope fallback below is **reversed**: an unidentifiable 429 is now treated as
+  per-minute, and `RetryInfo` is read as evidence even when a `quotaId` accompanies it. The
+  `quotaId` reading, the `mark_rate_limited` path, and "cells burned, not calls made" are
+  all unchanged. This is the "Revisit when" condition below firing for real: the fallback
+  cost was measured at 65 of 66 cells slammed inside 100 seconds, because the pipeline's
+  fan-out makes misclassifications correlated rather than independent.
 
 ## Context
 
@@ -102,6 +109,13 @@ as daily costs one cell for a few hours, while a daily exhaustion misread as per
 retry a genuinely dead cell hundreds of times. A lone `RetryInfo` at or under one RPM window
 counts as per-minute on its own, since no per-day exhaustion resolves itself inside a minute.
 
+> **Reversed by [ADR-0060](0060-unknown-429-scope-defaults-to-per-minute.md).** "Costs one
+> cell for a few hours" assumed misclassifications are independent. They are correlated --
+> the pipeline fans out across subtopic-tiers at once, so every in-flight call is throttled
+> together and every one is misread together. The measured cost was the whole grid for the
+> rest of the day. Unknown scope now falls back to per-minute, and `RetryInfo` is read even
+> when a `quotaId` is present.
+
 **`max_attempts` now counts cells burned, not calls made.** A per-minute 429 doesn't use a cell
 up, so it no longer consumes the grid's attempt budget. Those retries are bounded by real
 quota instead of a cap: every `acquire()` increments a ledger that now only ever counts **up**,
@@ -199,6 +213,12 @@ Per-minute retries now consume real RPD, since `acquire()` increments before the
 rejected request may not count against the provider's own daily total. That over-counts in the
 safe direction, at the cost of some genuine daily headroom under sustained throttling.
 
+> **Measured, split in two, and half of it fixed by
+> [ADR-0061](0061-refund-grants-that-never-became-requests.md).** The drift was ~19% (ledger
+> 107 vs the provider's 87). A grant that never became a request at all is now refunded by
+> the prune. A *rejected* request stays counted, deliberately: this branch retries without
+> burning a cell, so the climbing ledger is the only thing that ends the loop.
+
 The RPM window is now slightly *more* restrictive than before at the same configured ceiling:
 slots expire from the send rather than the reservation, and probe and 503-retry traffic that
 used to be free now occupies slots. That is the point — it was under-counting real requests —
@@ -240,6 +260,11 @@ would be retried all day.
 **Treat unknown-scope 429s as per-minute.** Symmetrical, and self-corrects eventually since the
 ledger still counts up. But it burns hundreds of real requests against a dead key first. The
 asymmetry in the costs is what decides the fallback direction.
+
+> **This alternative was adopted the next day, by [ADR-0060](0060-unknown-429-scope-defaults-to-per-minute.md).**
+> The asymmetry was measured rather than assumed, and it runs the other way: the dead-key
+> retries are bounded (parked 60s, interleaved across 66 cells, cell retires itself via the
+> ledger), while the daily fallback's cost was the entire grid for a day.
 
 ## Revisit when
 

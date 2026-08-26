@@ -50,7 +50,7 @@ interface Props {
    *  "Topics" nav item below 1150px (a normal labeled row 681-1150px, a
    *  pill item in the mobile nav ≤680px). CSS-hidden above 1150px, where
    *  the rail is already visible inline and opening it makes no sense. */
-  onOpenRail: () => void;
+  onOpenRail?: () => void;
 }
 
 export function Sidebar({ onReset, onRefresh, view, onNavigate, onOpenRail }: Props) {
@@ -128,17 +128,19 @@ export function Sidebar({ onReset, onRefresh, view, onNavigate, onOpenRail }: Pr
         {/* Opens the right rail as a sheet/slide-over (below 1150px only --
             CSS-hidden above that, where the rail is already inline). Not a
             `view` -- doesn't take `aria-current`. */}
-        <button
-          type="button"
-          className="nav-item nav-item-topics-trigger"
-          onClick={onOpenRail}
-          aria-label="Open topic filters"
-        >
-          <span className="nav-item-icon">
-            <SlidersIcon />
-          </span>
-          <span className="nav-item-label">Topics</span>
-        </button>
+        {onOpenRail ? (
+          <button
+            type="button"
+            className="nav-item nav-item-topics-trigger"
+            onClick={onOpenRail}
+            aria-label="Open topic filters"
+          >
+            <span className="nav-item-icon">
+              <SlidersIcon />
+            </span>
+            <span className="nav-item-label">Topics</span>
+          </button>
+        ) : null}
 
         <button
           type="button"

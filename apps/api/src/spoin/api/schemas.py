@@ -502,6 +502,19 @@ class ProfileStatsOut(BaseModel):
     monthly_activity: list[DailyActivityOut]
 
 
+class DailyGoalOut(BaseModel):
+    """ADR-0062: "today" is the caller's local day, not UTC -- the client
+    tells the server its offset rather than the server guessing."""
+
+    #: Distinct cards completed within the local day (ADR-0062's
+    #: COUNT(DISTINCT card_id) fix -- a dwell_complete followed by an
+    #: explicit_complete on the same card is one card read, not two).
+    cards_read: int
+    #: Rides along rather than requiring a second `/profile/me` read --
+    #: the ring's denominator and its numerator arrive together.
+    goal: int
+
+
 # -- Data export (Settings -> Data & Privacy) ---------------------------------
 #
 # Everything below is the user's OWN content, read straight from their rows.

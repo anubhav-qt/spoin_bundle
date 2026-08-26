@@ -9,6 +9,7 @@ from sqlalchemy.orm import undefer
 
 from spoin.api.schemas import (
     DailyActivityOut,
+    DailyGoalOut,
     ExportedCardRefOut,
     ExportedNoteOut,
     ExportedTopicOut,
@@ -96,9 +97,13 @@ class ProfileService:
 
     async def get_profile_stats(self, user_id: UUID, year: int, month: int) -> ProfileStatsOut:
         # 1. Total cards read & topics
+        # COUNT(DISTINCT card_id), not COUNT(id): a card that trips the dwell
+        # threshold AND gets an explicit "Got it" tap writes two completion
+        # events for the same card (ADR-0060) -- counting rows would read
+        # that as two cards read.
         totals_query = text("""
             SELECT 
-                COUNT(id) as total_cards,
+                COUNT(DISTINCT card_id) as total_cards,
                 COUNT(DISTINCT topic_id) as total_topics
             FROM engagement_event
             WHERE user_id = :user_id 
@@ -119,7 +124,7 @@ class ProfileService:
         monthly_query = text("""
             SELECT 
                 date_trunc('day', occurred_at) as day,
-                COUNT(*) as cards_read
+                COUNT(DISTINCT card_id) as cards_read
             FROM engagement_event
             WHERE user_id = :user_id 
               AND kind IN ('explicit_complete', 'dwell_complete')
@@ -188,6 +193,43 @@ class ProfileService:
             total_topics=total_topics,
             monthly_activity=monthly_activity,
         )
+
+    async def get_today_progress(self, user_id: UUID, tz_offset_minutes: int) -> DailyGoalOut:
+        """Cards read in the caller's LOCAL day, not UTC (ADR-0062) -- the
+        client passes its own UTC offset (`-Date.prototype.getTimezoneOffset()`)
+        rather than the server guessing or defaulting to UTC, which would
+        reset a reader's ring at 5:30am IST instead of midnight.
+
+        `tz_offset_minutes` is added to UTC to land on local time; local
+        midnight is then converted back to a UTC range to query with, so this
+        stays a plain indexed `occurred_at` range scan -- no per-row timezone
+        conversion in SQL.
+        """
+        offset = datetime.timedelta(minutes=tz_offset_minutes)
+        local_now = datetime.datetime.now(datetime.UTC) + offset
+        local_midnight = datetime.datetime(
+            local_now.year, local_now.month, local_now.day, tzinfo=datetime.UTC
+        )
+        day_start = local_midnight - offset
+        day_end = day_start + datetime.timedelta(days=1)
+
+        count_query = text("""
+            SELECT COUNT(DISTINCT card_id) as cards_read
+            FROM engagement_event
+            WHERE user_id = :user_id
+              AND kind IN ('explicit_complete', 'dwell_complete')
+              AND occurred_at >= :start AND occurred_at < :end
+        """)
+        count_res = await self._session.execute(
+            count_query, {"user_id": user_id, "start": day_start, "end": day_end}
+        )
+        row = count_res.fetchone()
+        cards_read = row.cards_read if row else 0
+
+        user = await self._session.get(User, user_id)
+        goal = user.daily_card_goal if user else 10
+
+        return DailyGoalOut(cards_read=cards_read, goal=goal)
 
     async def export_data(self, user_id: UUID) -> ProfileExportOut:
         """Everything this user has produced, in one pass.

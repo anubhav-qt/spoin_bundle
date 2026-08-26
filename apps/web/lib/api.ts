@@ -558,6 +558,15 @@ export const api = {
   // --- Profile ---
   getProfileStats: (year: number, month: number) => 
     request<ProfileStatsOut>(`/profile/me/stats?year=${year}&month=${month}`),
+
+  /** Cards read in the CALLER's local day, not UTC (ADR-0062) -- passes its
+   *  own UTC offset (minutes to ADD to UTC to reach local time; note this is
+   *  the negation of `Date.prototype.getTimezoneOffset()`, which returns
+   *  UTC-minus-local) so the ring resets at local midnight, not 5:30am IST. */
+  getTodayProgress: () =>
+    request<DailyGoalOut>(
+      `/profile/me/today?tz_offset_minutes=${-new Date().getTimezoneOffset()}`,
+    ),
     
   updateProfile: (updates: UserProfileUpdateIn) => 
     request<User>("/profile/me", {
@@ -652,4 +661,9 @@ export interface ProfileStatsOut {
   total_cards_read: number;
   total_topics: number;
   monthly_activity: DailyActivityOut[];
+}
+
+export interface DailyGoalOut {
+  cards_read: number;
+  goal: number;
 }

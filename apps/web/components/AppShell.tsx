@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { MotionConfig } from "framer-motion";
 
-import { api, type Difficulty, type Topic } from "@/lib/api";
+import { api, type DailyGoalOut, type Difficulty, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
 import { getReducedMotion, subscribeReducedMotion } from "@/lib/motionPreference";
 import { invalidate } from "@/lib/refresh";
@@ -24,12 +24,14 @@ import { Feed } from "./Feed";
 import { FocusToggle } from "./FocusToggle";
 import { GuestNotice } from "./GuestNotice";
 import { LikedView } from "./LikedView";
+import { MobileTopBar } from "./MobileTopBar";
 import { NotesView } from "./NotesView";
 import { ProfileView } from "./ProfileView";
 import { RightRail } from "./RightRail";
 import { SavedView } from "./SavedView";
 import { SettingsView } from "./SettingsView";
 import { Sidebar, type ShellView } from "./Sidebar";
+import { TopicRail } from "./TopicRail";
 import { UndoToast } from "./UndoToast";
 
 function toTopicProgress(p: {
@@ -58,6 +60,10 @@ export function AppShell() {
   const [reducedMotion, setReducedMotionState] = useState(false);
   const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
   const [selected, setSelected] = useState<string[]>([]);
+  // The right rail's daily-goal ring. Starts at the DB default (0 of 10)
+  // rather than `null`, so the ring renders immediately as an empty track
+  // instead of popping in once `/profile/me/today` resolves.
+  const [dailyGoal, setDailyGoal] = useState<DailyGoalOut>({ cards_read: 0, goal: 10 });
   // Session-local, not server state: which cards have been marked seen so
   // far, so InsightsPanel can show a count that only grows once per card
   // even if a card gets marked seen more than once in a session.
@@ -66,6 +72,12 @@ export function AppShell() {
   // worth preserving across the toggle, so this is plain UI state — not
   // persisted, not lifted any further than it needs to be.
   const [focusMode, setFocusMode] = useState(false);
+  // Below 1150px, `.rail-right` stops rendering inline and becomes a sheet
+  // (slide-over on tablet, bottom sheet on phone) that this toggles. Above
+  // that width the CSS ignores `data-open` entirely and keeps the rail
+  // always visible inline, so this state simply never gets set there — the
+  // trigger button that flips it is itself CSS-hidden on desktop.
+  const [railOpen, setRailOpen] = useState(false);
   // Bumped on every dev-reset (Sidebar's wordmark easter egg) and used as a
   // `key` on Feed/RightRail below — the simplest correct way to guarantee
   // every bit of client-side state derived from the old server state (feed
@@ -107,6 +119,14 @@ export function AppShell() {
     setProgress((current) => ({ ...current, [topicId]: toTopicProgress(p) }));
   }, []);
 
+  const refreshDailyGoal = useCallback(async () => {
+    setDailyGoal(await api.getTodayProgress());
+  }, []);
+
+  useEffect(() => {
+    void refreshDailyGoal();
+  }, [refreshDailyGoal]);
+
   // Called when a card gets marked seen, so InsightsPanel's session count and
   // the topic's progress both reflect it immediately instead of only as of
   // the last full page load.
@@ -127,11 +147,14 @@ export function AppShell() {
       setReadCardIds((current) => {
         if (current.has(cardId)) return current;
         const next = new Set(current).add(cardId);
-        void engagement.whenIdle().then(() => refreshProgress(topicId));
+        void engagement.whenIdle().then(() => {
+          void refreshProgress(topicId);
+          void refreshDailyGoal();
+        });
         return next;
       });
     },
-    [refreshProgress],
+    [refreshProgress, refreshDailyGoal],
   );
 
   // Both rails swap for entirely different DOM (rail <-> empty spacer, and
@@ -228,6 +251,23 @@ export function AppShell() {
     invalidate(view);
   }, [view]);
 
+  // The rail sheet closes itself on navigation -- switching views while it's
+  // open would otherwise leave it floating over the new view with no
+  // relevance to what's now on screen.
+  const navigateAndCloseRail = useCallback((next: ShellView) => {
+    setView(next);
+    setRailOpen(false);
+  }, []);
+
+  // Entering focus mode unmounts both `RightRail` and `MobileTopBar`
+  // entirely (replaced by an aria-hidden spacer / nothing at all) -- if the
+  // sheet was open on mobile, leaving `railOpen` true would reopen it the
+  // moment focus mode exits and `RightRail` remounts.
+  const enterFocus = useCallback(() => {
+    setRailOpen(false);
+    setFocusModeAnimated(true);
+  }, [setFocusModeAnimated]);
+
   useEffect(() => {
     setReducedMotionState(getReducedMotion());
     return subscribeReducedMotion(() => setReducedMotionState(getReducedMotion()));
@@ -240,6 +280,22 @@ export function AppShell() {
       <CustomCursor />
       <GuestNotice />
       <UndoToast />
+      {/* ≤680px only (CSS-hidden above) -- merges `Sidebar`'s topbar and
+          `RightRail`'s theme/font/focus/goal row into one fixed bar, since a
+          phone has no vertical rail to host either inline. Sits outside
+          `.app-grid` like `GuestNotice`/`UndoToast` above -- it's a fixed
+          overlay, not a grid column -- and, like both rails, disappears in
+          focus mode rather than floating over a feed that's supposed to be
+          the only thing on screen. */}
+      {focusMode ? null : (
+        <MobileTopBar
+          onReset={() => void onReset()}
+          onRefresh={onRefresh}
+          view={view}
+          dailyGoal={dailyGoal}
+          onEnterFocus={enterFocus}
+        />
+      )}
       <div className="app-grid" data-focused={focusMode}>
         {/* Both rails keep reserving their grid track even when hidden — an
             empty spacer, not a removed column — so toggling focus mode never
@@ -247,13 +303,32 @@ export function AppShell() {
         {focusMode ? (
           <div className="rail-left" aria-hidden="true" />
         ) : (
-          <Sidebar onReset={() => void onReset()} onRefresh={onRefresh} view={view} onNavigate={setView} />
+          <Sidebar
+            onReset={() => void onReset()}
+            onRefresh={onRefresh}
+            view={view}
+            onNavigate={navigateAndCloseRail}
+            onOpenRail={() => setRailOpen(true)}
+          />
         )}
         <div className="shell">
           {/* Each view mounts once, the first time it's visited, and then stays
               mounted (hidden via the `hidden` attribute, never unmounted) so
               switching back to it never refetches on its own. */}
           <div hidden={view !== "feed"}>
+            {/* CSS-only ≤680px (see `.mobile-topic-strip`) -- `RightRail`'s
+                own `TopicRail` is the same filter, but below 1150px it's a
+                tap into the sheet away. This puts it back at zero taps on a
+                phone, which is the direct answer to "no way to ... apply
+                filters ... from the right rail" on mobile. Stateless (props
+                only, no fetch of its own), so a second mounted copy is safe --
+                exactly one of the two is ever visible at a given width. Hidden
+                in focus mode, same reasoning as `MobileTopBar` above. */}
+            {!focusMode && topics.length > 0 ? (
+              <div className="mobile-topic-strip">
+                <TopicRail topics={topics} selected={selected} onToggle={toggleTopic} />
+              </div>
+            ) : null}
             <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
           </div>
           {visited.has("notes") ? (
@@ -273,7 +348,7 @@ export function AppShell() {
           ) : null}
           {visited.has("profile") ? (
             <div hidden={view !== "profile"}>
-              <ProfileView />
+              <ProfileView onNavigate={navigateAndCloseRail} />
             </div>
           ) : null}
           {visited.has("settings") ? (
@@ -300,11 +375,14 @@ export function AppShell() {
             selected={selected}
             onToggle={toggleTopic}
             onFollowed={onFollowed}
-            onEnterFocus={() => setFocusModeAnimated(true)}
+            onEnterFocus={enterFocus}
             onProgressChanged={refreshProgress}
             onTopicColorChanged={onTopicColorChanged}
             onUnfollowed={onUnfollowed}
             onTopicRemoved={removeTopicLocally}
+            dailyGoal={dailyGoal}
+            open={railOpen}
+            onClose={() => setRailOpen(false)}
           />
         )}
       </div>

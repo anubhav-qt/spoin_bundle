@@ -50,3 +50,4 @@ Tasks 0016-0021 are one sequence, gated on 0016. Read
 | [0009](0009-batched-topic-matching.md) | Implement batched LLM topic matching (ADR-0025) | Done -- 2026-08-17 |
 | [0010](0010-one-shot-pipeline-redesign.md) | Redesign the generation pipeline for one-shot completion (ADR-0026) | Done -- 2026-08-17 |
 | [0008](0008-wire-generation-job-worker.md) | Wire `apps/worker` to the generation pipeline | Done -- 2026-08-17 |
+| [0027](0027-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Done -- 2026-08-26, see ADR-0063 |

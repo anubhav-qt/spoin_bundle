@@ -212,6 +212,11 @@ export const viewport: Viewport = {
   // Matches the Notebook palette's paper color (see ADR-0012) — the shipped
   // default until the palette picker (docs/tasks/0002) exists.
   themeColor: "#EDF0EA",
+  // Lets the fixed mobile topbar/bottom-nav (ADR-0063) paint into the
+  // notch/home-indicator safe areas instead of leaving a themeColor-only
+  // strip there; `env(safe-area-inset-*)` in globals.css's ≤680px block is
+  // what actually keeps content clear of them.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

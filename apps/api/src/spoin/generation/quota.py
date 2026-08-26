@@ -624,9 +624,7 @@ class QuotaGovernor:
             await session.execute(
                 delete(QuotaRequest)
                 .where(QuotaRequest.sent_at < now - timedelta(seconds=_REQUEST_RETENTION_SECONDS))
-                .returning(
-                    QuotaRequest.backend, QuotaRequest.sent_at, QuotaRequest.confirmed
-                )
+                .returning(QuotaRequest.backend, QuotaRequest.sent_at, QuotaRequest.confirmed)
             )
         ).all()
 

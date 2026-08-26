@@ -1984,118 +1984,10 @@ body.custom-cursor-active textarea {
   gap: 8px;
 }
 
-/* Wraps `.rail-top-row` + `FontPicker` so the pair can be hidden as one
-   unit ≤680px (`MobileTopBar` duplicates them there, see ADR-0063) without
-   losing the 8px gap `.rail-right`'s own flex column gave them as direct
-   children before this wrapper existed. */
-.rail-appearance {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .rail-top-row {
   display: flex;
   align-items: stretch;
-  /* Wraps rather than clipping: .rail-right is overflow-x: hidden by
-     design, so any item that doesn't fit on the first line must be able to
-     drop to its own line instead of being pushed past the visible edge
-     with no way to reach it. A wrapped item hugs the row's own left edge
-     (default justify-content: flex-start) rather than floating in with a
-     dead gap in front of it. */
-  flex-wrap: wrap;
-  gap: 9px;
-}
-
-/* -- daily goal ring (ADR-0062) -- */
-.daily-goal-wrap {
-  position: relative;
-  display: inline-flex;
-  /* Matches .focus-toggle's own reasoning just above: rail-top-row's
-     align-items: stretch only stretches auto-height children, so this
-     fixed-height sibling needs its own centering. */
-  align-self: center;
-}
-
-.daily-goal-ring {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  padding: 0;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: transparent;
-  cursor: pointer;
-  transition: border-color var(--dur-1) var(--ease);
-}
-
-.daily-goal-ring:hover {
-  border-color: var(--line-strong);
-}
-
-.daily-goal-track {
-  stroke: var(--line-strong);
-}
-
-.daily-goal-progress {
-  stroke: var(--accent);
-  transition: stroke-dashoffset var(--dur-2) var(--ease), stroke var(--dur-1) var(--ease);
-}
-
-.daily-goal-ring[data-met="true"] .daily-goal-progress {
-  stroke: var(--accent-2);
-}
-
-/* Anchored to the ring's right edge rather than centered (`.share-popover`'s
-   own pattern) -- this button sits near the rail's right edge, so a
-   centered popover would overhang it. `top`/`right` are set inline
-   (DailyGoalRing.tsx, from `getBoundingClientRect()`) since the element is
-   portaled to `<body>`, not a CSS-anchored child of `.daily-goal-wrap`
-   anymore -- `position: fixed` here just makes those inline pixel values
-   viewport-relative, matching what `getBoundingClientRect()` measured.
-   Two-class selector, not just `.daily-goal-popover`, so this outranks
-   `.share-popover`'s own `position: absolute` and centered-slide-up
-   animation on specificity rather than depending on which rule happens to
-   come later in the file. */
-.share-popover.daily-goal-popover {
-  position: fixed;
-  bottom: auto;
-  left: auto;
-  transform: none;
-  /* Comfortably above the rest of the shell's chrome (topbar/pill both sit
-     at 80, the rail sheet at 91) -- a portaled popover no longer inherits
-     any stacking-context headroom from an ancestor, so it needs its own. */
-  z-index: 150;
-  gap: 3px;
-  padding: 10px 12px;
-  animation: popover-enter-down 0.15s var(--ease);
-}
-
-@keyframes popover-enter-down {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.daily-goal-popover-head {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--fg);
-  white-space: nowrap;
-}
-
-.daily-goal-popover-body {
-  font-size: 11.5px;
-  color: var(--fg-3);
-  white-space: nowrap;
+  gap: 8px;
 }
 
 .theme-picker {
@@ -2157,16 +2049,6 @@ body.custom-cursor-active textarea {
   min-width: 0;
   background: var(--bg-2);
   box-shadow: 0 6px 20px var(--shadow);
-}
-
-@media (max-width: 680px) {
-  /* This button only renders while focus mode is on, and `MobileTopBar` is
-     unmounted for the same duration (AppShell) -- nothing to dodge, just
-     the notch. */
-  .focus-toggle[data-focused="true"] {
-    top: calc(env(safe-area-inset-top) + 14px);
-    right: 14px;
-  }
 }
 
 /* Entering/exiting focus mode swaps whole subtrees (rail <-> empty spacer,
@@ -3748,11 +3630,7 @@ body.custom-cursor-active textarea {
 .modal-panel {
   width: 100%;
   max-width: 380px;
-  /* `dvh`, not `vh` -- mobile Safari's collapsing URL bar makes `vh` resolve
-     against the LARGEST possible viewport, so `84vh` measured with the bar
-     hidden overshoots the actual visible height once it's shown, clipping
-     the panel's own bottom edge under it. */
-  max-height: 84dvh;
+  max-height: 84vh;
   overflow-y: auto;
   /* See `.discover-box-list` -- an unset overflow-x next to overflow-y:auto
      computes to auto, letting any modal's content grow a horizontal
@@ -4852,23 +4730,6 @@ body.custom-cursor-active textarea {
   margin-bottom: 0;
 }
 
-/* -- mobile rail sheet + nav (below 1150px), base state --
-   RightRail's backdrop/close, the "Topics" nav item that opens it, and the
-   feed's own topic strip only ever render meaningfully below 1150px (sheet)
-   or 680px (topic strip) -- see the breakpoints below. `MobileTopBar` and
-   `.mobile-profile-nav` only render below 680px. Hidden here rather than
-   inside the media queries themselves so each component can render this
-   markup unconditionally without a JS viewport check; desktop just never
-   sees it. */
-.nav-item-topics-trigger,
-.rail-sheet-backdrop,
-.rail-sheet-close,
-.mobile-topic-strip,
-.mobile-topbar,
-.mobile-profile-nav {
-  display: none;
-}
-
 /* ------------------------------ breakpoints ------------------------------- */
 
 /* The three fixed/capped tracks (275 + up to 640 + 350) plus gaps and padding
@@ -4894,86 +4755,8 @@ body.custom-cursor-active textarea {
   .app-grid {
     grid-template-columns: 275px minmax(0, 640px);
   }
-
-  /* `.rail-right` no longer has a grid track to live in -- it becomes a
-     fixed slide-over instead (bottom sheet below 680px, see that block),
-     opened by the "Topics" nav item (`.nav-item-topics-trigger`, a normal
-     row in `Sidebar`'s own list -- see `.nav-item` for its visual styling)
-     and by nothing else on this range, since the sidebar itself still
-     renders full-size down to 900px. `position: fixed` takes it out of grid
-     flow regardless of `grid-template-columns`, so there is no layout gap
-     to fill. */
-  .nav-item-topics-trigger {
-    display: flex;
-  }
-
-  .rail-sheet-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    background: color-mix(in srgb, var(--fg) 22%, transparent);
-    backdrop-filter: blur(1.5px);
-    -webkit-backdrop-filter: blur(1.5px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--dur-2) var(--ease);
-  }
-
-  .rail-sheet-backdrop[data-open="true"] {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .rail-right {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 91;
-    width: min(360px, 100vw);
-    height: auto;
-    max-height: none;
-    background: var(--bg-2);
-    border-left: 1px solid var(--line-strong);
-    box-shadow: -20px 0 50px var(--shadow);
-    padding: 20px 18px 24px;
-    transform: translateX(100%);
-    transition: transform var(--dur-2) var(--ease);
-  }
-
-  .rail-right[data-open="true"] {
-    transform: translateX(0);
-  }
-
-  .rail-sheet-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    align-self: flex-end;
-    width: 32px;
-    height: 32px;
-    margin-bottom: 4px;
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--fg-3);
-    cursor: pointer;
-  }
-
-  .rail-sheet-close svg {
-    width: 16px;
-    height: 16px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .rail-sheet-close:hover {
-    color: var(--fg);
-    background: var(--bg);
+    display: none;
   }
 }
 
@@ -5009,278 +4792,13 @@ body.custom-cursor-active textarea {
        max-width still caps the result. */
     align-items: stretch;
   }
-  :root {
-    --mobile-topbar-h: 52px;
-    --mobile-pill-h: 56px;
-    /* Gap between the floating pill and the viewport edge, and (doubled)
-       the clearance `.shell`/`.undo-toast` leave above it. */
-    --mobile-pill-gap: 14px;
-  }
-
-  /* `Sidebar`'s own topbar and `RightRail`'s theme/font/focus/goal row are
-     both replaced by `MobileTopBar` below -- see its own header comment for
-     why. */
-  .sidebar-topbar,
-  .rail-appearance {
-    display: none;
-  }
-
-  .mobile-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 80;
-    min-height: var(--mobile-topbar-h);
-    padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--line-strong);
-  }
-
-  /* Same visual treatment as `.sidebar-mark` (border/background/cursor/
-     type), but not that class itself -- `.sidebar-mark` is dropped globally
-     at 900px (`.sidebar-mark, .nav-item-label { display: none }` above),
-     which this bar must not inherit: it's a full-width bar with room for the
-     wordmark, not the squeezed 72px icon column that rule was written for. */
-  .mobile-topbar-mark {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--fg);
-    padding: 8px;
-    margin-left: -8px;
-  }
-
-  .mobile-topbar-controls {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* `.focus-toggle`'s base rule is `flex: 1 1 auto` -- correct inside
-     `.rail-top-row`, where it's meant to absorb the leftover width next to
-     the theme swatches, wrong here, where it would balloon to fill this
-     row's remaining space instead of sitting compact next to the other two
-     controls. */
-  .mobile-topbar-controls .focus-toggle {
-    flex: 0 0 auto;
-  }
-
-  .mobile-topbar-refresh {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: var(--fg-2);
-    border-radius: var(--r-pill);
-    cursor: pointer;
-  }
-
-  .mobile-topbar-refresh svg {
-    width: 18px;
-    height: 18px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .mobile-topbar-refresh:hover {
-    background: var(--bg-2);
-    color: var(--fg);
-  }
-
-  /* `.rail-left` (the `<nav>`) becomes the floating pill's own box, centered
-     and sized to its content instead of spanning the viewport -- everything
-     it renders besides `.nav-items`' four visible items (Home, Topics,
-     Profile, Settings; Notes/Liked/Saved/the stub/log out are all
-     CSS-hidden below) has already been hidden or moved elsewhere, so there
-     is nothing left in this box needing its own background/border --
-     `.nav-items` carries the pill's actual chrome. */
   .rail-left {
-    display: flex;
-    position: fixed;
-    /* The shared `.rail-left, .rail-right` rule sets `top: 0` for the
-       desktop/tablet sticky rail -- unset it, or it would combine with
-       `bottom` below to stretch this fixed box across the full viewport
-       height instead of sizing to its own content at the bottom edge. */
-    top: auto;
-    left: 50%;
-    right: auto;
-    bottom: calc(var(--mobile-pill-gap) + env(safe-area-inset-bottom));
-    transform: translateX(-50%);
-    z-index: 80;
-    width: auto;
-    max-height: none;
-    height: auto;
-    padding: 0;
-    background: none;
-    border: none;
-  }
-
-  .nav-items {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    min-height: var(--mobile-pill-h);
-    padding: 6px;
-    background: var(--bg-2);
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    box-shadow: 0 8px 24px var(--shadow);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-
-  .nav-item {
-    /* Base `.nav-item` sets `width: 100%` for the desktop/tablet column,
-       where each row fills the rail's fixed track width. In this row
-       layout every item claiming 100% of the pill's width would flex-shrink
-       against each other in a way that has nothing to do with how many
-       items there actually are -- pin it to content instead. */
-    width: auto;
-    flex: 0 0 auto;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
-    padding: 8px 14px;
-    min-width: 44px;
-    min-height: 44px;
-    border-radius: 999px;
-  }
-
-  /* Only Home, Topics, Profile, and Settings live in the pill -- Notes,
-     Liked, and Saved move under Profile (`.mobile-profile-nav`, rendered by
-     `ProfileView`), and the Deep Dive stub is a non-interactive placeholder
-     not worth a slot at all. Log out/sign up moves to the same place as
-     Notes/Liked/Saved. */
-  .nav-item-mobile-hidden,
-  .nav-item-stub,
-  .nav-item-logout-wrap {
     display: none;
   }
-
-  /* `.nav-item-label` is hidden globally at 900px, for the squeezed 72px
-     desktop/tablet icon column -- a floating pill with 4 icon-only targets
-     and no on-screen text for any of them needs its own opt back in, since
-     there's no hover state on touch to reveal a label the way
-     `.sidebar-refresh`'s desktop expand-on-hover pattern does. Higher
-     specificity than the 900px rule (two classes vs. one), so this wins
-     regardless of source order. */
-  .nav-items .nav-item-label {
-    display: block;
-    font-size: 9.5px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-  }
-
-  .nav-items .nav-item-icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  .shell {
-    padding-top: calc(var(--mobile-topbar-h) + env(safe-area-inset-top) + 12px);
-    padding-bottom: calc(
-      140px + var(--mobile-pill-h) + var(--mobile-pill-gap) * 2 + env(safe-area-inset-bottom)
-    );
-  }
-
-  /* Below the fixed topbar, above the feed -- the direct answer to "no way
-     to change topics ... from the right rail" on a phone: filtering the
-     feed no longer costs a trip into the sheet. Only meaningful on the feed
-     view itself (AppShell only renders it there); Notes/Liked/Saved/
-     Profile/Settings don't have a topic filter to begin with. */
-  .mobile-topic-strip {
-    display: block;
-    position: sticky;
-    top: calc(var(--mobile-topbar-h) + env(safe-area-inset-top));
-    z-index: 70;
-    margin: 0 -18px;
-    padding: 8px 0;
-    background: var(--bg);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .mobile-topic-strip .topic-rail {
-    padding: 0 18px;
-  }
-
-  /* Bottom sheet instead of the 1150px block's right-side slide-over --
-     same backdrop, same `data-open`, just a different edge and axis. Now
-     opened only via the "Topics" pill item -- everything else the sheet
-     used to also carry (theme/font/focus/goal) lives in `.mobile-topbar`
-     instead, so this is purely topic filtering + discovery below 680px. */
   .rail-right {
-    top: auto;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: auto;
-    max-height: 85dvh;
-    border-left: none;
-    border-top: 1px solid var(--line-strong);
-    border-radius: var(--r-card) var(--r-card) 0 0;
-    box-shadow: 0 -20px 50px var(--shadow);
-    padding: 16px 18px calc(20px + env(safe-area-inset-bottom));
-    transform: translateY(100%);
-  }
-
-  .rail-right[data-open="true"] {
-    transform: translateY(0);
-  }
-
-  /* Notes/Liked/Saved + log out/sign up, moved out of the pill -- see
-     `.nav-item-mobile-hidden` above. Reuses `.nav-item`'s own styling
-     (icon + label column, same as the pill items) inside a bordered card
-     instead of a floating row, since this isn't fixed chrome -- it scrolls
-     with the rest of `ProfileView`. */
-  .mobile-profile-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin: 4px 0 20px;
-    padding: 4px;
-    border: 1px solid var(--line);
-    border-radius: var(--r-card);
-    background: var(--bg-2);
-  }
-
-  .mobile-profile-nav .nav-item {
-    width: 100%;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 14px;
-    padding: 11px 14px;
-    border-radius: var(--r-pill);
-  }
-
-  /* `.nav-item:hover`'s base background is the same `--bg-2` this card
-     itself sits on -- one step further, or the hover state is invisible. */
-  .mobile-profile-nav .nav-item:hover {
-    background: var(--bg-3);
-  }
-
-  .mobile-profile-nav .nav-item-label {
-    display: block;
-    font-size: 15px;
-    font-weight: 400;
-    letter-spacing: normal;
-  }
-
-  .mobile-profile-nav .nav-item-icon {
-    width: 22px;
-    height: 22px;
+    position: static;
+    max-height: none;
+    padding: 0 18px 24px;
   }
 }
 
@@ -5520,15 +5038,6 @@ body.custom-cursor-active textarea {
   max-width: min(90vw, 380px);
 }
 
-@media (max-width: 680px) {
-  .guest-notice {
-    top: calc(var(--mobile-topbar-h) + env(safe-area-inset-top) + 10px);
-    left: 12px;
-    right: 12px;
-    max-width: none;
-  }
-}
-
 .guest-notice-link {
   color: var(--accent);
   font-weight: 600;
@@ -5559,10 +5068,9 @@ body.custom-cursor-active textarea {
    ========================================================================= */
 
 .undo-toast {
-  --undo-toast-bottom: 28px;
   position: fixed;
   left: 50%;
-  bottom: var(--undo-toast-bottom);
+  bottom: 28px;
   transform: translateX(-50%);
   z-index: 120;
   display: flex;
@@ -5576,17 +5084,6 @@ body.custom-cursor-active textarea {
   font-size: 13px;
   color: var(--fg-2);
   max-width: min(90vw, 420px);
-}
-
-@media (max-width: 680px) {
-  /* The floating pill nav (var(--mobile-pill-h)/var(--mobile-pill-gap), see
-     the breakpoints section) sits exactly where this would otherwise land. */
-  .undo-toast {
-    --undo-toast-bottom: calc(
-      var(--mobile-pill-h) + var(--mobile-pill-gap) * 2 + env(safe-area-inset-bottom)
-    );
-    max-width: calc(100vw - 24px);
-  }
 }
 
 .undo-toast-label {

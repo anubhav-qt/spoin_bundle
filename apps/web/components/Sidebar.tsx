@@ -21,7 +21,6 @@ import {
   LayersIcon,
   NoteIcon,
   RefreshIcon,
-  SlidersIcon,
   UserIcon,
   LogoutIcon,
 } from "./icons";
@@ -30,7 +29,7 @@ const STUBS = [{ label: "Deep Dive", icon: LayersIcon }] as const;
 
 export type ShellView = "feed" | "notes" | "liked" | "saved" | "profile" | "settings";
 
-export const VIEW_LABEL: Record<ShellView, string> = {
+const VIEW_LABEL: Record<ShellView, string> = {
   feed: "home",
   notes: "notes",
   liked: "liked",
@@ -46,14 +45,9 @@ interface Props {
   onRefresh: () => void;
   view: ShellView;
   onNavigate: (view: ShellView) => void;
-  /** Opens the right rail as a sheet/slide-over -- reachable via the
-   *  "Topics" nav item below 1150px (a normal labeled row 681-1150px, a
-   *  pill item in the mobile nav ≤680px). CSS-hidden above 1150px, where
-   *  the rail is already visible inline and opening it makes no sense. */
-  onOpenRail?: () => void;
 }
 
-export function Sidebar({ onReset, onRefresh, view, onNavigate, onOpenRail }: Props) {
+export function Sidebar({ onReset, onRefresh, view, onNavigate }: Props) {
   const { user, logout } = useAuth();
 
   return (
@@ -76,105 +70,86 @@ export function Sidebar({ onReset, onRefresh, view, onNavigate, onOpenRail }: Pr
         </button>
       </div>
 
-      <div className="nav-items">
-        <button
-          type="button"
-          className="nav-item"
-          aria-current={view === "feed" ? "page" : undefined}
-          onClick={() => onNavigate("feed")}
-        >
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "feed" ? "page" : undefined}
+        onClick={() => onNavigate("feed")}
+      >
+        <span className="nav-item-icon">
+          <HomeIcon />
+        </span>
+        <span className="nav-item-label">Home</span>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "notes" ? "page" : undefined}
+        onClick={() => onNavigate("notes")}
+      >
+        <span className="nav-item-icon">
+          <NoteIcon />
+        </span>
+        <span className="nav-item-label">Notes</span>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "liked" ? "page" : undefined}
+        onClick={() => onNavigate("liked")}
+      >
+        <span className="nav-item-icon">
+          <HeartIcon filled={view === "liked"} />
+        </span>
+        <span className="nav-item-label">Liked</span>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "saved" ? "page" : undefined}
+        onClick={() => onNavigate("saved")}
+      >
+        <span className="nav-item-icon">
+          <BookmarkIcon filled={view === "saved"} />
+        </span>
+        <span className="nav-item-label">Saved</span>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "profile" ? "page" : undefined}
+        onClick={() => onNavigate("profile")}
+      >
+        <span className="nav-item-icon">
+          <UserIcon filled={view === "profile"} />
+        </span>
+        <span className="nav-item-label">Profile</span>
+      </button>
+
+      <button
+        type="button"
+        className="nav-item"
+        aria-current={view === "settings" ? "page" : undefined}
+        onClick={() => onNavigate("settings")}
+      >
+        <span className="nav-item-icon">
+          <GearIcon />
+        </span>
+        <span className="nav-item-label">Settings</span>
+      </button>
+
+      {STUBS.map(({ label, icon: Icon }) => (
+        <span key={label} className="nav-item" aria-disabled="true">
           <span className="nav-item-icon">
-            <HomeIcon />
+            <Icon />
           </span>
-          <span className="nav-item-label">Home</span>
-        </button>
-
-        <button
-          type="button"
-          className="nav-item nav-item-mobile-hidden"
-          aria-current={view === "notes" ? "page" : undefined}
-          onClick={() => onNavigate("notes")}
-        >
-          <span className="nav-item-icon">
-            <NoteIcon />
-          </span>
-          <span className="nav-item-label">Notes</span>
-        </button>
-
-        <button
-          type="button"
-          className="nav-item nav-item-mobile-hidden"
-          aria-current={view === "liked" ? "page" : undefined}
-          onClick={() => onNavigate("liked")}
-        >
-          <span className="nav-item-icon">
-            <HeartIcon filled={view === "liked"} />
-          </span>
-          <span className="nav-item-label">Liked</span>
-        </button>
-
-        <button
-          type="button"
-          className="nav-item nav-item-mobile-hidden"
-          aria-current={view === "saved" ? "page" : undefined}
-          onClick={() => onNavigate("saved")}
-        >
-          <span className="nav-item-icon">
-            <BookmarkIcon filled={view === "saved"} />
-          </span>
-          <span className="nav-item-label">Saved</span>
-        </button>
-
-        {/* Opens the right rail as a sheet/slide-over (below 1150px only --
-            CSS-hidden above that, where the rail is already inline). Not a
-            `view` -- doesn't take `aria-current`. */}
-        {onOpenRail ? (
-          <button
-            type="button"
-            className="nav-item nav-item-topics-trigger"
-            onClick={onOpenRail}
-            aria-label="Open topic filters"
-          >
-            <span className="nav-item-icon">
-              <SlidersIcon />
-            </span>
-            <span className="nav-item-label">Topics</span>
-          </button>
-        ) : null}
-
-        <button
-          type="button"
-          className="nav-item"
-          aria-current={view === "profile" ? "page" : undefined}
-          onClick={() => onNavigate("profile")}
-        >
-          <span className="nav-item-icon">
-            <UserIcon filled={view === "profile"} />
-          </span>
-          <span className="nav-item-label">Profile</span>
-        </button>
-
-        <button
-          type="button"
-          className="nav-item"
-          aria-current={view === "settings" ? "page" : undefined}
-          onClick={() => onNavigate("settings")}
-        >
-          <span className="nav-item-icon">
-            <GearIcon />
-          </span>
-          <span className="nav-item-label">Settings</span>
-        </button>
-
-        {STUBS.map(({ label, icon: Icon }) => (
-          <span key={label} className="nav-item nav-item-stub" aria-disabled="true">
-            <span className="nav-item-icon">
-              <Icon />
-            </span>
-            <span className="nav-item-label">{label}</span>
-          </span>
-        ))}
-      </div>
+          <span className="nav-item-label">{label}</span>
+        </span>
+      ))}
 
       <div className="nav-item-logout-wrap">
         {user?.is_guest ? (

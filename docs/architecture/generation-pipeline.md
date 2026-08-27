@@ -210,11 +210,20 @@ matching, judging, quiz grading -- `SPOIN_GEMINI_THINKING_LADDER`) and a "genera
 (`plan_cards`, `generate_cards` AND `generate_questions` -- high-volume, and upstream of the
 gate rather than a substitute for it, ADR-0029/0059 -- `SPOIN_GEMINI_GENERATOR_LADDER`), each
 an ordered model-fallback ladder. RPD is persisted in
-`QuotaLedger` (`backend=f"gemini:{key_index}:{model}"`); RPM is in-process only and resets
-each worker
-run. `QuotaExhaustedError` is caught specifically at the worker's job boundary and requeues
+`QuotaLedger` (`backend=f"gemini:{key_index}:{model}"`); RPM is persisted too since
+ADR-0058 (`QuotaRequest`, a trailing-60s window). Within a rung, keys are tried
+**least-spent first** ([ADR-0065](../adr/0065-quota-governor-fairness-accounting-and-terminal-states.md)),
+not index order -- first-fit from key 0 was measured making a 33-key pool behave like a
+9-key one. That ADR also: refunds a cell's daily charge when the call comes back a
+per-minute 429 (the provider didn't count it, so neither do we); gives each cell a
+**learned effective rpm** that halves on a 429 and grows back on success, so the governor
+converges on the real per-project ceiling instead of trusting the configured number; and
+splits `QuotaExhaustedError` into `DailyQuotaExhaustedError` / `AllCellsThrottledError` /
+`AllModelsUnavailableError` so a provider outage can't be reported as a spent daily budget.
+The base `QuotaExhaustedError` is still caught at the worker's job boundary and requeues
 the job as `pending` rather than `failed` (safe because the pipeline is idempotent per
-topic, ADR-0026). Wired end to end and unit-tested (`tests/test_quota_governor.py`,
+topic, ADR-0026); the subclass is recorded in `GenerationJob.last_error` so a stalled queue
+says *why*. Wired end to end and unit-tested (`tests/test_quota_governor.py`,
 `tests/test_worker.py`'s requeue test). Each key's connectivity and each ladder model id
 is now live-confirmed (see above), and the grid's rotation under real exhaustion has now
 been triggered end to end for real (not just simulated) -- which is also how
@@ -229,21 +238,24 @@ demand opposite responses: a `...PerMinute...` 429 parks the cell for the `retry
 also ships (`mark_rate_limited`, ledger untouched, `acquire()` sleeps it out), while only a
 `...PerDay...` 429 spends the cell for the day (`mark_exhausted`). Treating them alike is
 what produced a run that stopped with "All 17 key(s) x 2 model(s) exhausted" on keys holding
-nearly their full daily quota. **When a run reports exhaustion, check the logs for
-`hit a per-minute rate limit` before believing the daily count** -- and note that
-`quota_ledger.requests_spent` is only a truthful measure of the day's consumption *since*
-that ADR; before it, a 429 could reset the count to zero.
+nearly their full daily quota. **When a run reports exhaustion, check which subclass**
+(ADR-0065) -- and, on the base message, check the logs for `hit a per-minute rate limit`
+before believing the daily count. Note that `quota_ledger.requests_spent` is only a
+truthful measure of the day's consumption *since* ADR-0058; before it, a 429 could reset
+the count to zero, and since ADR-0065 a per-minute 429 *decrements* it (the refund above).
 
 **A stalled call now has a client-side timeout and its own recovery path**
 ([ADR-0056](../adr/0056-generation-call-timeout-and-recovery-probe.md)), found the same way
 as ADR-0040: a real hang (`POST /topics` never resolving) traced back to
 `ChatGoogleGenerativeAI` having no `timeout`, so a stalled call never raised anything for
 `_invoke_with_retry` to catch. Fixed with a configured timeout
-(`gemini_request_timeout_seconds`) plus a persistent, cross-call model exclusion and a
-background probe that cycles through a different key each attempt to check when the model's
-come back -- read that ADR for why the exclusion needed to outlive a single call, and for the
-caveat that the probe mostly only completes in a long-lived process (the API process, not
-the worker's short cron pass).
+(`gemini_request_timeout_seconds`) plus a cross-call model exclusion and a background probe
+that cycles through a different key each attempt to check when the model's come back -- read
+that ADR for why the exclusion needed to outlive a single call, and for the caveat that the
+probe mostly only completes in a long-lived process (the API process, not the worker's short
+cron pass). Since ADR-0065 that exclusion is a `model_unavailable` DB row with an expiry
+(the probe's own budget), not per-process memory -- so a 504 outage one process finds isn't
+rediscovered, one timeout at a time, by every other process and both pools.
 
 ## What's missing
 

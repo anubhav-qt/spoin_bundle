@@ -101,3 +101,5 @@ useful than the decision itself.
 | [0062](0062-daily-goal-ring-and-local-day-semantics.md) | Daily goal ring in the right rail; "today" is the reader's local day | Accepted |
 | [0063](0063-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Superseded by 0064 |
 | [0064](0064-mobile-shell-tab-bar.md) | Mobile shell, take two -- an edge-to-edge tab bar and a Browse sheet | Accepted (supersedes 0063; amends 0013, 0015) |
+| [0065](0065-quota-governor-fairness-accounting-and-terminal-states.md) | Quota governor spreads load least-spent-first, refunds refused calls, learns its own rpm, and names why it stopped | Accepted (amends 0028, 0058, 0056) |
+| [0066](0066-redraw-over-budget-ascii-art.md) | Over-budget ASCII art is redrawn, then rejected with its card -- never silently dropped | Accepted (amends 0042, 0059) |

@@ -92,11 +92,16 @@ a single playful `title` both look fine on the handful of cards anyone actually 
 and degrade everywhere else.
 
 If a task touches **generation reliability** (quota, retries, the LLM call boundary), read
-[`docs/architecture/generation-pipeline.md`](docs/architecture/generation-pipeline.md) and
-[ADR-0028](docs/adr/0028-key-model-quota-ladder.md) first. The quota ladder has failure
-modes that look like content-quality problems until you trace them back — see the "gate:
-... failed" log lines' distinction between a genuine rejection and a call that never
-returned a verdict at all.
+[`docs/architecture/generation-pipeline.md`](docs/architecture/generation-pipeline.md),
+[ADR-0028](docs/adr/0028-key-model-quota-ladder.md), and
+[ADR-0065](docs/adr/0065-quota-governor-fairness-accounting-and-terminal-states.md) first.
+The quota ladder has failure modes that look like content-quality problems until you trace
+them back — see the "gate: ... failed" log lines' distinction between a genuine rejection
+and a call that never returned a verdict at all. ADR-0065 draws the matching line on the
+quota side: `QuotaExhaustedError` is an abstract base, and its three subclasses
+(`DailyQuotaExhaustedError`, `AllCellsThrottledError`, `AllModelsUnavailableError`) mean
+genuinely different things — a run that "hit quota" may have hit a provider outage with the
+day's budget barely touched.
 
 ## The rules that generalize
 

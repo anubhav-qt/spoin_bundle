@@ -182,3 +182,11 @@ thread, right rail with the theme switcher, topic filter, and a progress-stats p
 ADR-0014 for why that last slot isn't the relationship graph ADR-0013 originally shipped).
 The palette/typography/card decisions here are unchanged; only the outer shell around the
 thread changed.
+
+**Developer's pick marker (2026-08-27):** the theme picker shows a small accent dot on
+**Obsidian** (`phosphor`) and the font picker on **Space Grotesk** (`grotesk`) -- a
+`data-devchoice` attribute + `::before` corner dot, tooltip "… · developer's pick". It is
+cosmetic only: the shipped default is still Notebook / Literata (`DEFAULT_PALETTE` /
+`DEFAULT_FONT` unchanged), nothing is pre-selected, and this is not a re-run of the
+palette comparison above -- just a signposted recommendation. Font side:
+[ADR-0037](0037-site-wide-font-picker.md).

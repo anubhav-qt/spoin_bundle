@@ -25,6 +25,11 @@ Web first; a React Native app comes later and shares this backend.
 > [ADR-0030](docs/adr/0030-two-pass-quality-gate.md)) is built, tested, and wired to
 > `apps/worker` (task [0008](docs/tasks/0008-wire-generation-job-worker.md), done). The
 > palette picker (task [0002](docs/tasks/0002-palette-selection-ui.md)) is not built yet.
+> The **web feed frontend is finalized** — the swipe feed, the quiz UI, and the responsive
+> shell all the way down to a mobile tab bar and a Browse sheet
+> ([ADR-0064](docs/adr/0064-mobile-shell-tab-bar.md)); see
+> [`apps/web/README.md`](apps/web/README.md) for the full surface. The standalone pages
+> around it (Profile, Settings, Liked, Saved, Notes) are being finalized next.
 > Read [`docs/architecture/overview.md`](docs/architecture/overview.md) first; it is the
 > mental model everything else assumes.
 

@@ -556,8 +556,14 @@ export const api = {
   getCard: (cardId: string) => request<Card>(`/cards/${cardId}`),
 
   // --- Profile ---
-  getProfileStats: (year: number, month: number) => 
+  getProfileStats: (year: number, month: number) =>
     request<ProfileStatsOut>(`/profile/me/stats?year=${year}&month=${month}`),
+
+  /** Cards read today against the daily goal (ADR-0062). `tzOffsetMinutes`
+   *  is `-new Date().getTimezoneOffset()` — local-minus-UTC — so "today" is
+   *  the reader's calendar day. */
+  today: (tzOffsetMinutes: number) =>
+    request<DailyGoal>(`/profile/me/today?tz_offset_minutes=${tzOffsetMinutes}`),
     
   updateProfile: (updates: UserProfileUpdateIn) => 
     request<User>("/profile/me", {
@@ -652,4 +658,12 @@ export interface ProfileStatsOut {
   total_cards_read: number;
   total_topics: number;
   monthly_activity: DailyActivityOut[];
+}
+
+/** `GET /profile/me/today` (ADR-0062). `cards_read` is distinct cards
+ *  completed within the caller's LOCAL day — the client sends its own UTC
+ *  offset so the ring resets at the reader's midnight, not UTC's. */
+export interface DailyGoal {
+  cards_read: number;
+  goal: number;
 }

@@ -14,9 +14,13 @@
 
 import { useEffect, useState } from "react";
 import { CustomThemeModal } from "./CustomThemeModal";
+import { PickerDropdown } from "./PickerDropdown";
 
 const STORAGE_KEY = "spoin-palette";
 const DEFAULT_PALETTE = "notebook";
+// Not the default (that stays Notebook, ADR-0012) — just a marked recommendation
+// in the picker. See ADR-0012's "developer's pick" note.
+const DEV_CHOICE = "phosphor";
 
 const PALETTES = [
   { key: "notebook", name: "Notebook" },
@@ -39,15 +43,22 @@ const PALETTES = [
 const CUSTOM_PROPERTIES = ["--bg", "--fg", "--accent", "--accent-2"];
 
 interface Props {
-  /** "pills" (default): the compact right-rail swatch row. "previews": the
-   *  large onboarding layout with a live miniature card per palette (task
-   *  0002 — "not just color swatches"). Same component, same persistence,
-   *  per that task's "do not build two different pickers" requirement. */
-  variant?: "pills" | "previews";
+  /** "pills" (default): the compact swatch row (right-rail sheet / mobile
+   *  Browse). "dropdown": the same row inside a labelled `PickerDropdown`, for
+   *  the desktop rail's four-up utility row. "previews": the large onboarding
+   *  layout with a live miniature card per palette (task 0002 — "not just
+   *  color swatches"). Same component, same persistence, per that task's "do
+   *  not build two different pickers" requirement. */
+  variant?: "pills" | "dropdown" | "previews";
   /** Called after a palette is applied — onboarding uses this to know it's
    *  safe to advance past the step, without re-deriving it from localStorage. */
   onChoose?: (key: string) => void;
 }
+
+const PALETTE_NAME: Record<string, string> = {
+  ...Object.fromEntries(PALETTES.map((p) => [p.key, p.name])),
+  custom: "Custom",
+};
 
 export function ThemePicker({ variant = "pills", onChoose }: Props) {
   const [active, setActive] = useState(DEFAULT_PALETTE);
@@ -93,7 +104,7 @@ export function ThemePicker({ variant = "pills", onChoose }: Props) {
     );
   }
 
-  return (
+  const pills = (
     <div className="theme-picker" role="group" aria-label="Theme">
       {PALETTES.map(({ key, name }) => (
         <button
@@ -101,9 +112,10 @@ export function ThemePicker({ variant = "pills", onChoose }: Props) {
           type="button"
           className="theme-pill"
           data-active={active === key}
-          data-tooltip={name}
+          data-devchoice={key === DEV_CHOICE || undefined}
+          data-tooltip={key === DEV_CHOICE ? `${name} · developer's pick` : name}
           aria-pressed={active === key}
-          aria-label={name}
+          aria-label={key === DEV_CHOICE ? `${name} (developer's pick)` : name}
           onClick={() => choose(key)}
         >
           <span className="theme-pill-swatch" data-palette-preview={key}>
@@ -132,4 +144,14 @@ export function ThemePicker({ variant = "pills", onChoose }: Props) {
       ) : null}
     </div>
   );
+
+  if (variant === "dropdown") {
+    return (
+      <PickerDropdown label="Theme" value={PALETTE_NAME[active] ?? "Notebook"}>
+        {pills}
+      </PickerDropdown>
+    );
+  }
+
+  return pills;
 }

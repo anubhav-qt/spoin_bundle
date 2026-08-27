@@ -644,6 +644,25 @@ body {
   color: var(--fg-3);
 }
 
+/* Hair-thin coverage meter on the filter chip (ADR-0064 design canvas) —
+   deliberately simpler than `.meter`/`.progress-row-meter-*`: no gate mark,
+   no completion colour, just a 3px track since the chip is a glance, not the
+   status surface (that's `.progress-row`). */
+.topic-chip-track {
+  height: 3px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.topic-chip-track > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  transition: width var(--dur-2) var(--ease);
+}
+
 .meter {
   position: relative;
   height: 4px;
@@ -1751,7 +1770,11 @@ body.custom-cursor-active textarea {
 
 .app-grid {
   display: grid;
-  grid-template-columns: 275px minmax(0, 640px) 350px;
+  /* Side tracks are equal (350px) so the centre thread sits dead-centre in
+     the viewport; the left nav is narrower than its track and hugs the feed
+     (see `.rail-left` below), which trims its whitespace without moving the
+     thread. */
+  grid-template-columns: 350px minmax(0, 640px) 350px;
   justify-content: center;
   align-items: start;
   gap: 28px;
@@ -1798,6 +1821,11 @@ body.custom-cursor-active textarea {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  /* Narrower than the 350px track and pinned to its inner edge: the nav
+     labels are short, so this reclaims the dead space on the far left while
+     the centred thread stays put. */
+  width: 212px;
+  justify-self: end;
 }
 
 /* Also the dev-reset easter egg's click target (Sidebar.tsx) — a <button>
@@ -1920,19 +1948,20 @@ body.custom-cursor-active textarea {
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 
+/* No fill on hover or select — the item is a plain row, not a pill. Hover
+   just lifts the text; the current item takes the accent colour and fills
+   its icon. */
 .nav-item:hover {
-  background: var(--bg-2);
   color: var(--fg);
 }
 
-/* A step darker/stronger than the plain hover above — Home/Notes are real
-   nav items now (not just `<a>`s with no default chrome), so the selected
-   one needs to read as visibly "more" than a hovered-but-unselected one,
-   the same bg-2 -> bg-3 step other selected/active states in this file use. */
 .nav-item[aria-current="page"] {
-  background: var(--bg-3);
-  color: var(--fg);
+  color: var(--accent);
   font-weight: 600;
+}
+
+.nav-item[aria-current="page"] .nav-item-icon svg {
+  fill: currentColor;
 }
 
 .nav-item[aria-disabled="true"] {
@@ -2087,6 +2116,23 @@ body.custom-cursor-active textarea {
 
 .theme-pill[data-active="true"] {
   border-color: var(--accent);
+}
+
+/* "Developer's pick" marker — a small accent dot in the corner (ADR-0012's
+   note). Not a state, just a recommendation hint; `::after` is the tooltip,
+   so this rides `::before`. */
+.theme-pill[data-devchoice]::before,
+.font-pill[data-devchoice]::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg-2);
 }
 
 .theme-pill-swatch-custom {
@@ -2377,30 +2423,31 @@ body.custom-cursor-active textarea {
   color: var(--fg-3);
 }
 
-/* Topic rail, relocated here from the feed's own masthead. Name-only pills
-   now (ADR-0015) — no meta line, so this is just a smaller version of the
-   base `.topic-chip`. */
+/* Topic filter, relocated here from the feed's own masthead. Progress-bearing
+   chips again (ADR-0064 design canvas — see ADR-0015's forward note): name,
+   coverage %, difficulty tier, hair-thin meter. The strip scrolls by
+   wheel/trackpad/drag; the chevron pair below is a minimal fallback for a
+   plain mouse (no horizontal axis), not the old circular buttons. */
 .rail-right .topic-rail {
   margin: 0;
-  padding: 0;
+  padding: 2px 0;
   min-width: 0;
-  /* Soft fade at both edges rather than an abrupt clip — reads as
-     intentional (there's more here, scroll for it) instead of content just
-     getting cut off, and it holds together with the overlaid arrow buttons
-     whether or not either one is currently visible. */
   mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
 }
 
-/* Wraps the rail with click targets for horizontal scroll — the rail itself
-   scrolls fine by wheel/trackpad/drag, but nothing on screen signals that.
-   The arrows are ABSOLUTELY positioned overlays, not flex siblings of the
-   rail: as flex items they permanently reserved their own width even while
-   disabled/invisible at rest, which is what pushed the first pill in from
-   the left edge (out of step with every other flush-left thing in the rail)
-   and, since a 22px arrow's own box no longer has to share cross-axis
-   centering with the rail's content height, also fixes the arrows reading
-   as slightly below-center against the pills. */
+.rail-right .topic-chip {
+  min-width: 132px;
+  gap: 6px;
+  padding: 8px 12px 9px;
+}
+
+/* Overlay chevrons for mouse users (no horizontal wheel axis). Kept
+   deliberately minimal — no border, no filled circle; just a glyph with a
+   soft `--bg` halo so it stays legible where a chip scrolls under it.
+   Rendered by `TopicRail` only on the side that can actually scroll, and
+   absolutely positioned so they reserve no width — the first/last chip sits
+   flush when no arrow is on that side. */
 .topic-rail-wrap {
   position: relative;
 }
@@ -2410,57 +2457,48 @@ body.custom-cursor-active textarea {
   top: 50%;
   transform: translateY(-50%);
   z-index: 2;
-  width: 22px;
-  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--bg-2);
+  width: 18px;
+  height: 22px;
+  border: none;
+  background: none;
   color: var(--fg-3);
   cursor: pointer;
-  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), opacity var(--dur-1) var(--ease);
+  transition: color var(--dur-1) var(--ease);
 }
 
 .topic-rail-arrow[data-side="left"] {
-  left: 0;
+  left: -4px;
 }
 
 .topic-rail-arrow[data-side="right"] {
-  right: 0;
+  right: -4px;
 }
 
 .topic-rail-arrow svg {
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
   stroke: currentColor;
   fill: none;
-  stroke-width: 2;
+  stroke-width: 2.25;
   stroke-linecap: round;
   stroke-linejoin: round;
+  /* Halo so the chevron reads over a chip scrolling past underneath. */
+  filter: drop-shadow(0 0 3px var(--bg)) drop-shadow(0 0 3px var(--bg));
 }
 
-.topic-rail-arrow:hover:not(:disabled) {
-  border-color: var(--line-strong);
+.topic-rail-arrow:hover {
   color: var(--fg);
 }
 
-/* Fully hidden, not just faded — at rest (nothing to scroll to yet) the
-   first/last pill should sit flush against the rail's edge with nothing
-   overlaying it, which is only true if the disabled arrow takes up no
-   visual space at all. */
-.topic-rail-arrow:disabled {
-  opacity: 0;
-  pointer-events: none;
-  cursor: default;
+.rail-right .topic-chip .topic-chip-name {
+  font-size: 13px;
 }
 
-.rail-right .topic-chip {
-  min-width: 0;
-  padding: 7px 12px;
-  font-size: 12.5px;
-  font-weight: 600;
+.rail-right .topic-chip .topic-chip-meta {
+  font-size: 9.5px;
 }
 
 /* -- per-topic progress box, replaces the global quiz CTA (ADR-0015) --
@@ -2469,15 +2507,12 @@ body.custom-cursor-active textarea {
    and should read as the same kind of thing (head + toggle, flat rows split
    by a hairline, a two-line text block per row). */
 .progress-box {
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: var(--bg-2);
-  /* Matches `.discover-box`'s 14px side padding exactly — the two are
-     deliberately the same kind of box (see header comment above), and
-     `.progress-row:hover`'s -14px negative-margin expansion already assumes
-     this container padding, so a mismatch here left a gap the hover
-     highlight didn't reach on the outer edge. */
-  padding: 12px 14px 4px;
+  /* Border-free (ADR-0064 / task 0028): a hairline rule above the section,
+     not a bordered card. Zero side padding so "Your topics" sits at the same
+     edge as the utility row above it; the row hover highlight is then exactly
+     content-width (no negative-margin bleed — `.rail-right` clips it anyway). */
+  border-top: 1px solid var(--line);
+  padding: 16px 0 2px;
 }
 
 .progress-box-head {
@@ -2499,14 +2534,14 @@ body.custom-cursor-active textarea {
   display: flex;
   gap: 2px;
   padding: 2px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-cell);
   background: var(--bg-3);
 }
 
 .progress-toggle button {
   padding: 4px 9px;
   border: none;
-  border-radius: var(--r-pill);
+  border-radius: 3px;
   background: transparent;
   color: var(--fg-3);
   font-family: var(--font-mono);
@@ -2560,9 +2595,6 @@ body.custom-cursor-active textarea {
 
 .progress-row:hover {
   background: var(--bg-3);
-  margin: 0 -14px;
-  padding-left: 14px;
-  padding-right: 14px;
   border-radius: 8px;
 }
 
@@ -2647,10 +2679,10 @@ body.custom-cursor-active textarea {
 
 /* -- discover box (ADR-0015) -- */
 .discover-box {
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: var(--bg-2);
-  padding: 12px 14px 4px;
+  /* Border-free, hairline rule above, zero side padding — matches
+     .progress-box (ADR-0064), flush to the utility row's edge. */
+  border-top: 1px solid var(--line);
+  padding: 16px 0 2px;
 }
 
 .discover-head {
@@ -2672,14 +2704,14 @@ body.custom-cursor-active textarea {
   display: flex;
   gap: 2px;
   padding: 2px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-cell);
   background: var(--bg-3);
 }
 
 .discover-toggle button {
   padding: 4px 10px;
   border: none;
-  border-radius: var(--r-pill);
+  border-radius: 3px;
   background: transparent;
   color: var(--fg-3);
   font-family: var(--font-mono);
@@ -2750,13 +2782,9 @@ body.custom-cursor-active textarea {
    stays a separate action, via its own `stopPropagation`), but the hover
    highlight itself lives on `.discover-row` so it covers the full row width
    — including the gap behind the Follow button — rather than stopping short
-   of it. Mirrors `.progress-row:hover`'s -14px/14px figures, expanding into
-   `.discover-box`'s 14px side padding via negative margin. */
+   of it. Content-width now (`.discover-box` has no side padding). */
 .discover-row:hover {
   background: var(--bg-3);
-  margin: 0 -14px;
-  padding-left: 14px;
-  padding-right: 14px;
   border-radius: 8px;
 }
 
@@ -2798,25 +2826,29 @@ body.custom-cursor-active textarea {
   cursor: default;
 }
 
-/* -- "View all topics" rail entry point (ADR-0036) -- */
+/* -- "View all topics" rail entry point (ADR-0036) --
+   ADR-0064 design canvas: a plain uppercase mono text link sitting directly
+   under the filter chips, not a bordered pill. */
 .view-all-topics {
+  display: block;
   width: 100%;
   margin: 0;
-  padding: 6px 12px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line);
-  background: var(--bg-2);
-  color: var(--fg-3);
-  transition: all var(--dur-1) var(--ease);
+  padding: 0;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  transition: opacity var(--dur-1) var(--ease);
 }
 
 .view-all-topics:hover {
-  border-color: var(--line-strong);
-  color: var(--fg);
-  background: var(--bg-3);
+  opacity: 0.7;
 }
 
 /* -- TopicDiscoveryModal Redesign -- */
@@ -4732,47 +4764,52 @@ body.custom-cursor-active textarea {
 
 /* ------------------------------ breakpoints ------------------------------- */
 
-/* The three fixed/capped tracks (275 + up to 640 + 350) plus gaps and padding
-   need ~1369px to render at full size without squeezing — matches
-   `.app-grid`'s own 1400px max-width. Below that, the previous 1100px cutoff
-   let the grid attempt three columns in a width that didn't actually fit,
-   silently shrinking the center column (and its cards) by a few px depending
-   on exactly how much overflow there was — the "cards resize slightly" bug. */
-/* Between 1150-1400px there's still room for three columns if the center
-   and right tracks give up some of their max width -- hiding the right
-   rail here would take the theme/font pickers (and everything else in it)
-   out of reach on very common laptop viewports (1366x768 and similar),
-   which is indistinguishable from "the picker doesn't work" to a user who
-   never sees it. Only collapse to two columns once there genuinely isn't
-   room, at the same 1150px floor the old 1100px cutoff aimed for. */
+/* The ladder (see docs/design/mockups + the responsive design canvas):
+   >=1401   full 3-column shell, left nav hugs the thread
+   1151-1400  same shape, side tracks + nav give up width
+   1101-1150  still 3 columns, tighter — the right rail stays reachable
+   681-1100  tablet / narrow desktop: left rail out, MobileNav (bottom tab
+             bar) in, right rail stays as a compact 2nd column. The 3-column
+             shell gets too cramped below ~1120px (see the responsive canvas
+             review), so the left nav folds into MobileNav here, not at 900.
+   <=680     phone: single column, both rails gone (right rail moves into
+             the Browse sheet), MobileTopBar + MobileNav carry navigation */
 @media (max-width: 1400px) and (min-width: 1151px) {
   .app-grid {
-    grid-template-columns: 275px minmax(0, 480px) 280px;
+    grid-template-columns: 300px minmax(0, 500px) 300px;
+  }
+  .rail-left {
+    width: 196px;
   }
 }
 
-@media (max-width: 1150px) {
+@media (max-width: 1150px) and (min-width: 1101px) {
   .app-grid {
-    grid-template-columns: 275px minmax(0, 640px);
+    grid-template-columns: 264px minmax(0, 1fr) 284px;
+    gap: 20px;
+  }
+  .rail-left {
+    width: 188px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .app-grid {
+    grid-template-columns: minmax(0, 1fr) 250px;
+    gap: 20px;
+    max-width: 900px;
+    padding: 0 20px;
+  }
+  .rail-left {
+    display: none;
   }
   .rail-right {
-    display: none;
+    position: sticky;
+    top: 0;
   }
-}
-
-@media (max-width: 900px) {
-  .app-grid {
-    grid-template-columns: 72px minmax(0, 1fr);
-    gap: 4px;
-    padding: 0 8px;
-  }
-  .sidebar-mark,
-  .nav-item-label {
-    display: none;
-  }
-  .nav-item {
-    justify-content: center;
-    padding: 11px;
+  /* Clear the fixed MobileNav. */
+  .shell {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
   }
 }
 
@@ -4792,14 +4829,466 @@ body.custom-cursor-active textarea {
        max-width still caps the result. */
     align-items: stretch;
   }
-  .rail-left {
+  .rail-left,
+  .rail-right {
     display: none;
   }
-  .rail-right {
-    position: static;
-    max-height: none;
-    padding: 0 18px 24px;
+  .shell {
+    padding: 0 18px calc(96px + env(safe-area-inset-bottom));
   }
+  /* The MobileTopBar is sticky at top:0; the station labels have to stack
+     below it rather than slide underneath. */
+  .station {
+    top: calc(46px + env(safe-area-inset-top));
+  }
+  /* Fixed chrome that predates the mobile bars has to clear them. */
+  .guest-notice {
+    top: calc(52px + env(safe-area-inset-top));
+  }
+  .undo-toast {
+    bottom: calc(92px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ===================== phone / tablet chrome ============================
+   MobileTopBar (<=680px) and MobileNav (<=1100px) stand in for the rails on
+   narrow viewports. Both are display:none until their breakpoint so they
+   never affect the desktop shell. */
+
+.mobile-topbar,
+.mobile-nav {
+  display: none;
+}
+
+/* -- daily-goal ring (DailyGoalRing.tsx, ADR-0062) -- */
+.daily-goal-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+.daily-goal-trigger {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.daily-ring {
+  display: block;
+  flex: 0 0 auto;
+}
+
+/* Same chrome as `.share-popover`, re-anchored: this sits at the top of a
+   rail / bar, so it drops DOWN from its trigger and hugs the right edge
+   instead of rising centred from a card's action row. */
+.daily-goal-popover {
+  top: calc(100% + 8px);
+  right: 0;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  z-index: 70;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: max-content;
+  padding: 8px 12px;
+  animation: none;
+}
+
+.daily-goal-popover-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.daily-goal-popover-label {
+  font-size: 12px;
+  color: var(--fg-2);
+}
+
+.daily-ring-track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 4;
+}
+
+.daily-ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-2) var(--ease);
+}
+
+.daily-ring-fill[data-complete="true"] {
+  stroke: var(--good);
+}
+
+.daily-ring-num {
+  fill: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .mobile-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    background: var(--bg-2);
+    border-top: 1px solid var(--line-strong);
+    padding: 8px max(8px, env(safe-area-inset-left))
+      calc(8px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: none;
+    padding: 6px 4px;
+    color: var(--fg-3);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .mobile-nav-icon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+  }
+
+  .mobile-nav-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .mobile-nav-label {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .mobile-nav-item[aria-current="page"] {
+    color: var(--accent);
+  }
+
+  .mobile-nav-item[aria-current="page"] .mobile-nav-icon svg {
+    fill: currentColor;
+  }
+}
+
+@media (max-width: 680px) {
+  .mobile-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: max(6px, env(safe-area-inset-top)) 18px 8px;
+    /* Fades the thread out as it scrolls under, matching the `.station`
+       header idiom. */
+    background: linear-gradient(var(--bg) 82%, transparent);
+  }
+
+  .mobile-topbar-mark {
+    border: none;
+    background: transparent;
+    padding: 6px 2px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .mobile-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-topbar-btn {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--fg-2);
+    cursor: pointer;
+    transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  }
+
+  .mobile-topbar-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .mobile-topbar-btn-primary {
+    border-color: var(--line-strong);
+    background: var(--bg-2);
+    color: var(--fg);
+  }
+}
+
+/* -- Browse sheet: RightRail contents as a bottom sheet for phone width -- */
+.browse-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  background: color-mix(in srgb, var(--fg) 28%, transparent);
+}
+
+.browse-sheet {
+  width: 100%;
+  /* dvh, not vh: vh resolves against the largest viewport, so it overshoots
+     while the mobile URL bar is showing. */
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  background-image: var(--texture);
+  border: 1px solid var(--line-strong);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -12px 40px var(--shadow);
+}
+
+.browse-sheet-head {
+  flex: 0 0 auto;
+  padding: 10px 0 0;
+}
+
+.browse-sheet-grip {
+  display: block;
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 8px;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+}
+
+.browse-sheet-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 20px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.browse-sheet-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.browse-sheet-close {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  color: var(--fg-2);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.browse-sheet-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+}
+
+/* "Focus mode" hides the rails — meaningless from a sheet that only exists
+   because there are no rails. */
+.browse-sheet .focus-toggle {
+  display: none;
+}
+
+/* Same topic filter as the docked rail (shared component) — drop the
+   masthead-era bleed margin so the chips sit inside the sheet's own padding,
+   and mask the edges the same way the rail does. */
+.browse-sheet .topic-rail {
+  margin: 0;
+  padding: 2px 0;
+  mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
+}
+
+.browse-sheet-settings {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 4px 4px;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: none;
+  color: var(--fg-2);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.browse-sheet-settings-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+}
+
+.browse-sheet-settings-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ===================== right rail utility row (ADR-0064 / task 0028) =====
+   Four-up: daily-goal ring, Theme + Font as equal-width dropdown controls,
+   focus toggle. Replaces the old .rail-top-row + inline pickers in the
+   docked rail (the sheet keeps those expanded). Every column carries a
+   `.picker-dropdown-label` on top — "Today" over the ring, "Theme"/"Font"
+   from the dropdowns, a blank spacer over the focus icon — so the four
+   controls share one baseline (ADR-0064 design canvas). */
+.rail-utility {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* The ring and focus columns — the two that aren't a `PickerDropdown`. */
+.rail-utility-col {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.rail-utility-col .daily-goal-wrap {
+  align-self: center;
+}
+
+.rail-utility .picker-dropdown {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.rail-utility .focus-toggle {
+  min-width: 0;
+  width: 38px;
+  height: 38px;
+  gap: 0;
+}
+
+.picker-dropdown-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.picker-dropdown-trigger {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 11px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.picker-dropdown-trigger:hover,
+.picker-dropdown-trigger[aria-expanded="true"] {
+  border-color: var(--line-strong);
+}
+
+.picker-dropdown-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-dropdown-chevron {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--fg-3);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-1) var(--ease);
+}
+
+.picker-dropdown-trigger[aria-expanded="true"] .picker-dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+/* Portaled to <body> (see PickerDropdown.tsx) — `.rail-right` is
+   overflow:hidden and would clip it. Positioned inline via style. */
+.picker-dropdown-menu {
+  z-index: 80;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-2);
+  box-shadow: 0 10px 30px var(--shadow);
+}
+
+.picker-dropdown-menu .theme-picker,
+.picker-dropdown-menu .font-picker-row {
+  flex-wrap: wrap;
+  max-width: 216px;
 }
 
 /* ============================================================================

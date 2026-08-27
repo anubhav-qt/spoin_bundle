@@ -99,4 +99,5 @@ useful than the decision itself.
 | [0060](0060-unknown-429-scope-defaults-to-per-minute.md) | An unidentifiable 429 is a throttle, not an exhaustion | Accepted (amends 0058) |
 | [0061](0061-refund-grants-that-never-became-requests.md) | The prune refunds a grant that never became a request -- and only that | Accepted (amends 0058) |
 | [0062](0062-daily-goal-ring-and-local-day-semantics.md) | Daily goal ring in the right rail; "today" is the reader's local day | Accepted |
-| [0063](0063-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Accepted (amends 0013, 0015) |
+| [0063](0063-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Superseded by 0064 |
+| [0064](0064-mobile-shell-tab-bar.md) | Mobile shell, take two -- an edge-to-edge tab bar and a Browse sheet | Accepted (supersedes 0063; amends 0013, 0015) |

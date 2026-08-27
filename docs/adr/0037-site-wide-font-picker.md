@@ -102,3 +102,11 @@ against real content before committing is the actual value being asked for here.
 - If the Keep/Revert pattern proves confusing next to `ThemePicker`'s plain apply-and-save
   behavior, consider bringing both pickers to the same interaction model rather than
   leaving them permanently divergent.
+
+## Developer's pick marker (2026-08-27)
+
+The five-face row shows a small accent dot on **Space Grotesk** (`grotesk`) — same
+`data-devchoice` + `::before` treatment as the Obsidian marker in the theme picker
+([ADR-0012](0012-feed-visual-design.md)). Cosmetic only: `DEFAULT_FONT` stays `literata`,
+`applyFont` is unchanged, nothing is pre-selected. It's a signposted recommendation, not a
+default.

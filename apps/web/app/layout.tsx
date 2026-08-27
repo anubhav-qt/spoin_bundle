@@ -18,27 +18,18 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { GenerationTrackerProvider } from "@/components/GenerationTrackerProvider";
 
 /**
- * Applies the palette before first paint. Without this, the page would flash
- * the shipped default and then jump to whatever the user picked last
- * (ADR-0013 / docs/tasks/0002) once React hydrates and ThemePicker's own
- * effect runs. `beforeInteractive` is Next's supported way to run a script
- * this early — a hand-written `<head>` isn't, under the app router's metadata
- * API.
- *
- * The shipped default is `phosphor` (Obsidian) — a deliberate developer-taste
- * override of ADR-0012's Notebook default; the script writes it explicitly
- * when nothing is stored, so the CSS cascade never has to treat "no attribute"
- * as a second meaning of the default. Keep `DEFAULT_PALETTE` in ThemePicker
- * and `themeColor` below in sync.
+ * Applies the persisted palette before first paint. Without this, the page
+ * would flash the default `notebook` palette and then jump to whatever the
+ * user picked last (ADR-0013 / docs/tasks/0002) once React hydrates and
+ * ThemePicker's own effect runs. `beforeInteractive` is Next's supported way
+ * to run a script this early — a hand-written `<head>` isn't, under the app
+ * router's metadata API.
  */
-const DEFAULT_PALETTE = "phosphor";
-const DEFAULT_FONT = "grotesk";
-
 const APPLY_PALETTE_SCRIPT = `
 (function () {
   try {
-    var palette = localStorage.getItem("spoin-palette") || "${DEFAULT_PALETTE}";
-    document.body.setAttribute("data-palette", palette);
+    var palette = localStorage.getItem("spoin-palette");
+    if (palette) document.body.setAttribute("data-palette", palette);
     if (palette === "custom") {
       var colors = JSON.parse(localStorage.getItem("spoin-custom-colors") || "null");
       if (colors) {
@@ -53,14 +44,12 @@ const APPLY_PALETTE_SCRIPT = `
 `;
 
 /** Same shape as APPLY_PALETTE_SCRIPT, for the font choice (ADR-0023, wired
- *  up by ADR-0037). Shipped default is `grotesk` (Space Grotesk) — the
- *  developer-taste override of ADR-0037's Literata default; written
- *  explicitly, same reasoning as the palette. */
+ *  up by ADR-0037). */
 const APPLY_FONT_SCRIPT = `
 (function () {
   try {
-    var font = localStorage.getItem("spoin-font") || "${DEFAULT_FONT}";
-    document.body.setAttribute("data-font", font);
+    var font = localStorage.getItem("spoin-font");
+    if (font) document.body.setAttribute("data-font", font);
   } catch (e) {}
 })();
 `;
@@ -220,10 +209,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Matches the Obsidian (`phosphor`) palette's `--bg` — the shipped default
-  // (see ADR-0012's developer-choice note; keep in sync with DEFAULT_PALETTE
-  // above and ThemePicker).
-  themeColor: "#0b0b0c",
+  // Matches the Notebook palette's paper color (see ADR-0012) — the shipped
+  // default until the palette picker (docs/tasks/0002) exists.
+  themeColor: "#EDF0EA",
   // Lets the feed paint under the notch / home indicator; the fixed mobile
   // bars use env(safe-area-inset-*) to stay clear of them (ADR-0064).
   viewportFit: "cover",

@@ -60,10 +60,9 @@
   /* ADR-0023/0037: five selectable faces, switched by [data-font] on body
      (below) — --font-sans itself always resolves to whichever one is active
      plus a system fallback, so nothing downstream needs to know a picker
-     exists. This `:root` value is Literata (ADR-0023's textbook-not-dashboard
-     reasoning); the *shipped default* is now Space Grotesk via
-     `[data-font="grotesk"]`, which layout.tsx sets before paint — a
-     developer-taste override, see ADR-0037's note. */
+     exists. Literata is the default (no [data-font] set), matching
+     Notebook being the default palette (ADR-0023's reasoning: the product
+     reads closer to a textbook than a dashboard). */
   --font-sans: var(--font-literata), ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 
@@ -241,10 +240,9 @@
 }
 
 /* -- font selection (ADR-0023, wired up by ADR-0037) --------------------
-   `literata` has no rule of its own — it's :root's value above, so
-   `data-font="literata"` still resolves to it. The shipped default is
-   `grotesk` (below), set on <body> before paint. --font-mono is never
-   touched here: ADR-0021's ASCII scenes depend on it staying fixed. */
+   `literata` has no rule of its own — it's :root's default above, same
+   pattern as `notebook` needing no [data-palette] block. --font-mono is
+   never touched here: ADR-0021's ASCII scenes depend on it staying fixed. */
 [data-font="inter"] {
   --font-sans: var(--font-inter), ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 }
@@ -2118,6 +2116,23 @@ body.custom-cursor-active textarea {
 
 .theme-pill[data-active="true"] {
   border-color: var(--accent);
+}
+
+/* "Developer's pick" marker — a small accent dot in the corner (ADR-0012's
+   note). Not a state, just a recommendation hint; `::after` is the tooltip,
+   so this rides `::before`. */
+.theme-pill[data-devchoice]::before,
+.font-pill[data-devchoice]::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg-2);
 }
 
 .theme-pill-swatch-custom {

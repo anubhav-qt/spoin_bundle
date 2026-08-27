@@ -183,11 +183,10 @@ ADR-0014 for why that last slot isn't the relationship graph ADR-0013 originally
 The palette/typography/card decisions here are unchanged; only the outer shell around the
 thread changed.
 
-**Default palette override (2026-08-27, developer's choice):** the shipped default is now
-**Obsidian** (`phosphor`), not Notebook. All five palettes still ship and the picker is
-unchanged; only the boot default moved. `app/layout.tsx`'s pre-hydration script writes
-`data-palette="phosphor"` when nothing is stored, and `ThemePicker`'s `DEFAULT_PALETTE`
-and the `viewport.themeColor` (`#0b0b0c`) match. This is a taste call by the project
-owner, not a re-run of the palette comparison above; revert by pointing those three spots
-back at `notebook` / `#EDF0EA`. The companion font default is in
+**Developer's pick marker (2026-08-27):** the theme picker shows a small accent dot on
+**Obsidian** (`phosphor`) and the font picker on **Space Grotesk** (`grotesk`) -- a
+`data-devchoice` attribute + `::before` corner dot, tooltip "… · developer's pick". It is
+cosmetic only: the shipped default is still Notebook / Literata (`DEFAULT_PALETTE` /
+`DEFAULT_FONT` unchanged), nothing is pre-selected, and this is not a re-run of the
+palette comparison above -- just a signposted recommendation. Font side:
 [ADR-0037](0037-site-wide-font-picker.md).

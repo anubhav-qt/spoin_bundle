@@ -103,13 +103,10 @@ against real content before committing is the actual value being asked for here.
   behavior, consider bringing both pickers to the same interaction model rather than
   leaving them permanently divergent.
 
-## Default font override (2026-08-27, developer's choice)
+## Developer's pick marker (2026-08-27)
 
-The shipped default is now **Space Grotesk** (`grotesk`), not Literata — a taste call by
-the project owner, paired with the Obsidian palette default
-([ADR-0012](0012-feed-visual-design.md)). Unlike Literata (which is the bare `:root`
-`--font-sans`), `grotesk` has its own `[data-font="grotesk"]` block, so the attribute is
-now **always set** — `applyFont` no longer clears it to mean "default", and
-`app/layout.tsx`'s pre-hydration script writes `data-font="grotesk"` when nothing is
-stored. The five faces and the Keep/Revert flow are unchanged. Revert by pointing
-`DEFAULT_FONT` and the script back at `literata`.
+The five-face row shows a small accent dot on **Space Grotesk** (`grotesk`) — same
+`data-devchoice` + `::before` treatment as the Obsidian marker in the theme picker
+([ADR-0012](0012-feed-visual-design.md)). Cosmetic only: `DEFAULT_FONT` stays `literata`,
+`applyFont` is unchanged, nothing is pre-selected. It's a signposted recommendation, not a
+default.

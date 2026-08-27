@@ -42,6 +42,9 @@ built and responsive across the full breakpoint ladder
   and Font pickers (a labelled dropdown in the docked rail, expanded swatches in the
   sheet), focus mode, the topic filter with per-topic progress on each chip, "View all
   topics" discovery, the per-topic progress box, and inline Discover.
+- **Defaults stay Notebook + Literata** (ADR-0012 / ADR-0037). The Theme and Font pickers
+  carry a small accent-dot **"developer's pick"** marker on **Obsidian** and **Space
+  Grotesk** — a signposted recommendation only; nothing is pre-selected.
 - Auth: email/password, Google OAuth, guest sessions
   ([ADR-0033](../../docs/adr/0033-jwt-auth-and-guest-identity.md)); onboarding (topic pick
   + theme pick).

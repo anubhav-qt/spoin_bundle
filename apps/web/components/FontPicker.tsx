@@ -14,12 +14,10 @@ import { CustomFontModal } from "./CustomFontModal";
 import { PickerDropdown } from "./PickerDropdown";
 
 const STORAGE_KEY = "spoin-font";
-// Developer-taste default (ADR-0037's note): the app boots Space Grotesk, not
-// Literata. Unlike the old Literata default this is NOT the bare `:root`
-// value — it has its own `[data-font="grotesk"]` block — so the attribute is
-// always set (here and by `app/layout.tsx`'s pre-hydration script), never
-// cleared to mean "default".
-const DEFAULT_FONT = "grotesk";
+const DEFAULT_FONT = "literata";
+// Not the default (that stays Literata, ADR-0037) — just a marked
+// recommendation in the picker. See ADR-0037's "developer's pick" note.
+const DEV_CHOICE = "grotesk";
 
 const FONTS = [
   { key: "literata", name: "Literata" },
@@ -30,10 +28,11 @@ const FONTS = [
 ] as const;
 
 export function applyFont(key: string) {
-  // Always an explicit attribute — `literata` has no `[data-font]` rule of its
-  // own (it's the `:root` value), so setting `data-font="literata"` still
-  // resolves to Literata; every other face needs the attribute.
-  document.body.dataset.font = key;
+  if (key === DEFAULT_FONT) {
+    document.body.removeAttribute("data-font");
+  } else {
+    document.body.dataset.font = key;
+  }
 }
 
 export function persistFont(key: string) {
@@ -97,9 +96,10 @@ export function FontPicker({ variant = "row" }: Props) {
             type="button"
             className="font-pill"
             data-active={active === key}
-            data-tooltip={name}
+            data-devchoice={key === DEV_CHOICE || undefined}
+            data-tooltip={key === DEV_CHOICE ? `${name} · developer's pick` : name}
             aria-pressed={active === key}
-            aria-label={name}
+            aria-label={key === DEV_CHOICE ? `${name} (developer's pick)` : name}
             style={{ fontFamily: `var(--font-${key})` }}
             onClick={() => preview(key)}
           >

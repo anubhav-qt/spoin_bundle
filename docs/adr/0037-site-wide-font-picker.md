@@ -102,3 +102,14 @@ against real content before committing is the actual value being asked for here.
 - If the Keep/Revert pattern proves confusing next to `ThemePicker`'s plain apply-and-save
   behavior, consider bringing both pickers to the same interaction model rather than
   leaving them permanently divergent.
+
+## Default font override (2026-08-27, developer's choice)
+
+The shipped default is now **Space Grotesk** (`grotesk`), not Literata — a taste call by
+the project owner, paired with the Obsidian palette default
+([ADR-0012](0012-feed-visual-design.md)). Unlike Literata (which is the bare `:root`
+`--font-sans`), `grotesk` has its own `[data-font="grotesk"]` block, so the attribute is
+now **always set** — `applyFont` no longer clears it to mean "default", and
+`app/layout.tsx`'s pre-hydration script writes `data-font="grotesk"` when nothing is
+stored. The five faces and the Keep/Revert flow are unchanged. Revert by pointing
+`DEFAULT_FONT` and the script back at `literata`.

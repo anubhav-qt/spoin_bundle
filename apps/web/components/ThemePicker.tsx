@@ -17,7 +17,11 @@ import { CustomThemeModal } from "./CustomThemeModal";
 import { PickerDropdown } from "./PickerDropdown";
 
 const STORAGE_KEY = "spoin-palette";
-const DEFAULT_PALETTE = "notebook";
+// Developer-taste default (ADR-0012's note): the app boots Obsidian, not
+// Notebook. `app/layout.tsx`'s pre-hydration script writes this same value
+// when nothing is stored, so `document.body.dataset.palette` is always set by
+// the time this component's effect runs.
+const DEFAULT_PALETTE = "phosphor";
 
 const PALETTES = [
   { key: "notebook", name: "Notebook" },
@@ -143,7 +147,7 @@ export function ThemePicker({ variant = "pills", onChoose }: Props) {
 
   if (variant === "dropdown") {
     return (
-      <PickerDropdown label="Theme" value={PALETTE_NAME[active] ?? "Notebook"}>
+      <PickerDropdown label="Theme" value={PALETTE_NAME[active] ?? "Obsidian"}>
         {pills}
       </PickerDropdown>
     );

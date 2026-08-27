@@ -182,3 +182,12 @@ thread, right rail with the theme switcher, topic filter, and a progress-stats p
 ADR-0014 for why that last slot isn't the relationship graph ADR-0013 originally shipped).
 The palette/typography/card decisions here are unchanged; only the outer shell around the
 thread changed.
+
+**Default palette override (2026-08-27, developer's choice):** the shipped default is now
+**Obsidian** (`phosphor`), not Notebook. All five palettes still ship and the picker is
+unchanged; only the boot default moved. `app/layout.tsx`'s pre-hydration script writes
+`data-palette="phosphor"` when nothing is stored, and `ThemePicker`'s `DEFAULT_PALETTE`
+and the `viewport.themeColor` (`#0b0b0c`) match. This is a taste call by the project
+owner, not a re-run of the palette comparison above; revert by pointing those three spots
+back at `notebook` / `#EDF0EA`. The companion font default is in
+[ADR-0037](0037-site-wide-font-picker.md).

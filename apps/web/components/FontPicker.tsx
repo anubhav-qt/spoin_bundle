@@ -14,7 +14,12 @@ import { CustomFontModal } from "./CustomFontModal";
 import { PickerDropdown } from "./PickerDropdown";
 
 const STORAGE_KEY = "spoin-font";
-const DEFAULT_FONT = "literata";
+// Developer-taste default (ADR-0037's note): the app boots Space Grotesk, not
+// Literata. Unlike the old Literata default this is NOT the bare `:root`
+// value — it has its own `[data-font="grotesk"]` block — so the attribute is
+// always set (here and by `app/layout.tsx`'s pre-hydration script), never
+// cleared to mean "default".
+const DEFAULT_FONT = "grotesk";
 
 const FONTS = [
   { key: "literata", name: "Literata" },
@@ -25,11 +30,10 @@ const FONTS = [
 ] as const;
 
 export function applyFont(key: string) {
-  if (key === DEFAULT_FONT) {
-    document.body.removeAttribute("data-font");
-  } else {
-    document.body.dataset.font = key;
-  }
+  // Always an explicit attribute — `literata` has no `[data-font]` rule of its
+  // own (it's the `:root` value), so setting `data-font="literata"` still
+  // resolves to Literata; every other face needs the attribute.
+  document.body.dataset.font = key;
 }
 
 export function persistFont(key: string) {

@@ -2,9 +2,16 @@
 
 Pure DB bookkeeping — no real Gemini key needed, no network. Uses the real
 `session` fixture (Postgres, skipped if unavailable) since `QuotaLedger` rows and
-`day`-scoped uniqueness are the whole point of what's under test. RPM is
-in-memory only, so those tests don't touch the database at all — they rely on
-calls happening well within one 60s window, never on real sleeping.
+`day`-scoped uniqueness are the whole point of what's under test.
+
+RPM lives in the database too since ADR-0058 (`QuotaRequest`), and model
+availability since ADR-0065 (`ModelUnavailable`) — so those tests hit the same
+fixture session as the ledger ones. They still never sleep: every case drives
+`now` forward by hand rather than waiting out a real 60s window.
+
+The `_with_session` variants exist for exactly this — the fixture session IS the
+isolation boundary, and a method that opened its own would see none of the rows
+the test just wrote.
 """
 
 from __future__ import annotations
@@ -16,7 +23,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.domain.models.quiz import QuotaLedger, QuotaRequest
-from spoin.generation.quota import LadderRung, QuotaExhaustedError, QuotaGovernor, parse_ladder
+from spoin.generation.quota import (
+    AllModelsUnavailableError,
+    DailyQuotaExhaustedError,
+    LadderRung,
+    QuotaExhaustedError,
+    QuotaGovernor,
+    parse_ladder,
+)
 
 
 def _ladder(*rungs: tuple[str, int, int]) -> list[LadderRung]:
@@ -43,19 +57,24 @@ async def _spent(session: AsyncSession, backend: str, on: datetime) -> int:
     return ledger.requests_spent
 
 
-async def test_stays_on_first_key_and_model_while_under_target(session: AsyncSession) -> None:
+async def test_spreads_across_keys_least_spent_first(session: AsyncSession) -> None:
+    """Within one rung, the emptiest key wins (ADR-0065) -- NOT the lowest index.
+
+    This used to assert the opposite (`[(0, "model-a")] * 4`, "stays on the first
+    key while under target"). First-fit from key 0 read as harmless when the
+    ledger was the only thing being tested, and was measured in production as a
+    33-key pool behaving like a 9-key one: key 0 won every grant the moment it
+    came off cooldown, reaching 380/500 on a model where keys 10-32 sat at 15."""
+
     governor = QuotaGovernor(key_count=3, ladder=_ladder(("model-a", 5, 100)))
     now = datetime.now(UTC)
 
     results = [await governor.acquire_with_session(session, now=now) for _ in range(4)]
 
-    assert results == [(0, "model-a")] * 4
-    ledger = await session.scalar(
-        select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
-    )
-    assert ledger is not None
-    assert ledger.requests_spent == 4
-    assert ledger.exhausted_at is None
+    # Round the grid once, then back to the (now jointly-emptiest) key 0.
+    assert results == [(0, "model-a"), (1, "model-a"), (2, "model-a"), (0, "model-a")]
+    spend = {key: await _spent(session, f"gemini:{key}:model-a", now) for key in range(3)}
+    assert spend == {0: 2, 1: 1, 2: 1}
 
 
 async def test_drains_every_key_before_falling_to_the_next_model(session: AsyncSession) -> None:
@@ -64,11 +83,13 @@ async def test_drains_every_key_before_falling_to_the_next_model(session: AsyncS
 
     results = [await governor.acquire_with_session(session, now=now) for _ in range(5)]
 
-    # Both keys exhaust model-a (2 each) before model-b is ever touched.
+    # Both keys exhaust model-a (2 each) before model-b is ever touched. The
+    # rung-before-rung property is ADR-0028's and is untouched by ADR-0065's
+    # least-spent ordering -- only the order WITHIN the rung interleaves now.
     assert results == [
         (0, "model-a"),
-        (0, "model-a"),
         (1, "model-a"),
+        (0, "model-a"),
         (1, "model-a"),
         (0, "model-b"),
     ]
@@ -123,15 +144,90 @@ async def test_excluded_model_is_skipped_until_included_again(session: AsyncSess
     )
     now = datetime.now(UTC)
 
-    governor.exclude_model("model-a")
+    await governor.exclude_model_with_session(
+        session, "model-a", now=now, expires_in_s=1200.0, reason="504 DEADLINE_EXCEEDED"
+    )
     first = await governor.acquire_with_session(session, now=now)
     second = await governor.acquire_with_session(session, now=now)
     assert first == (0, "model-b")
-    assert second == (0, "model-b")
+    # Least-spent-first (ADR-0065) sends the second call to the other key, not
+    # back to key 0 -- the exclusion is per-MODEL, and both keys are equally
+    # available on the model that remains.
+    assert second == (1, "model-b")
 
-    governor.include_model("model-a")
+    await governor.include_model_with_session(session, "model-a")
     third = await governor.acquire_with_session(session, now=now)
     assert third == (0, "model-a")
+
+
+async def test_model_exclusion_stops_being_believed_once_it_expires(
+    session: AsyncSession,
+) -> None:
+    """An exclusion outlives the process that wrote it (that is the point of
+    persisting it, ADR-0065) but must not outlive it forever: the probe that
+    would have cleared the row dies with its process, and a short-lived worker
+    pass exiting mid-probe is the normal case, not the exceptional one."""
+
+    governor = QuotaGovernor(key_count=1, ladder=_ladder(("model-a", 20, 100)))
+    now = datetime.now(UTC)
+
+    await governor.exclude_model_with_session(
+        session, "model-a", now=now, expires_in_s=600.0, reason="504 DEADLINE_EXCEEDED"
+    )
+    with pytest.raises(AllModelsUnavailableError):
+        await governor.acquire_with_session(session, now=now)
+
+    # Past the horizon the row is simply no longer believed -- no probe, no
+    # restart, no manual clear required.
+    later = now + timedelta(seconds=601)
+    assert await governor.acquire_with_session(session, now=later) == (0, "model-a")
+
+
+async def test_every_rung_unavailable_is_not_reported_as_quota_exhaustion(
+    session: AsyncSession,
+) -> None:
+    """The distinction ADR-0065 exists for. A ladder that is entirely excluded
+    never consulted the ledger at all, so calling it "exhausted" asserts a fact
+    about the day's quota that was never checked -- which is exactly how a 504
+    storm got written up as daily quota death with ~90% of the grid untouched."""
+
+    governor = QuotaGovernor(
+        key_count=2, ladder=_ladder(("model-a", 20, 100), ("model-b", 20, 100))
+    )
+    now = datetime.now(UTC)
+
+    for model in ("model-a", "model-b"):
+        await governor.exclude_model_with_session(
+            session, model, now=now, expires_in_s=1200.0, reason="503 UNAVAILABLE"
+        )
+
+    with pytest.raises(AllModelsUnavailableError) as excinfo:
+        await governor.acquire_with_session(session, now=now)
+
+    # Names the models and says plainly that this is not a quota verdict.
+    assert "model-a" in str(excinfo.value)
+    assert "model-b" in str(excinfo.value)
+    assert "not quota" in str(excinfo.value)
+    # ...and the ledger really is untouched, which is the substantive claim.
+    assert (
+        await session.scalar(select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a"))
+        is None
+    )
+
+
+async def test_daily_exhaustion_still_raises_the_daily_error(session: AsyncSession) -> None:
+    """The other side of the same split: genuinely spent cells must keep
+    surfacing as `DailyQuotaExhaustedError`, so the worker's requeue-until-reset
+    path is not weakened by ADR-0065's new subclasses."""
+
+    governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 1, 100)))
+    now = datetime.now(UTC)
+
+    assert await governor.acquire_with_session(session, now=now) == (0, "model-a")
+    assert await governor.acquire_with_session(session, now=now) == (1, "model-a")
+
+    with pytest.raises(DailyQuotaExhaustedError):
+        await governor.acquire_with_session(session, now=now)
 
 
 async def test_record_probe_attempt_spends_ledger_like_a_real_acquire(
@@ -155,14 +251,16 @@ async def test_record_probe_attempt_spends_ledger_like_a_real_acquire(
 
     # A subsequent real acquire() picks up from the ledger the probe already
     # spent against, not from zero -- "already filled data for today's quota
-    # from before" is kept, never reset.
+    # from before" is kept, never reset. Since ADR-0065 that spend is also what
+    # steers the next grant AWAY from key 0: two probe attempts made it the
+    # fullest cell, so the emptiest key wins instead.
     result = await governor.acquire_with_session(session, now=now)
-    assert result == (0, "model-a")
+    assert result == (1, "model-a")
     ledger = await session.scalar(
         select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
     )
     assert ledger is not None
-    assert ledger.requests_spent == 3
+    assert ledger.requests_spent == 2
 
 
 async def test_record_probe_attempt_rejects_unknown_model(session: AsyncSession) -> None:
@@ -218,18 +316,24 @@ def test_governor_rejects_empty_ladder() -> None:
         QuotaGovernor(key_count=1, ladder=[])
 
 
-async def test_rate_limited_cell_cools_down_without_spending_the_ledger(
+async def test_rate_limited_cell_cools_down_and_refunds_the_grant(
     session: AsyncSession,
 ) -> None:
-    """The ADR-0058 fix: a per-minute 429 parks a cell but must NOT touch its
-    daily ledger. Folding the two together is what made a burst of throttling
-    read back as "every key exhausted for today" on keys with quota to spare."""
+    """ADR-0058 parked the cell without inflating the ledger; ADR-0065 goes the
+    rest of the way and gives the grant BACK.
+
+    `acquire()` bills RPD when it grants a cell, but the provider does not count
+    a request it refused -- so a throttled call left the day a request poorer for
+    nothing. Measured live before this changed: 727 throttles in 16 minutes, all
+    of them permanent RPD loss on a ladder whose whole daily budget is 20 per
+    cell."""
 
     governor = QuotaGovernor(key_count=2, ladder=_ladder(("model-a", 20, 100)))
     now = datetime.now(UTC)
 
-    spent_before = await governor.acquire_with_session(session, now=now)
-    assert spent_before == (0, "model-a")
+    granted = await governor.acquire_with_session(session, now=now)
+    assert granted == (0, "model-a")
+    assert await _spent(session, "gemini:0:model-a", now) == 1
 
     await governor.mark_rate_limited_with_session(
         session, 0, "model-a", now=now, retry_after_s=13.0
@@ -239,11 +343,13 @@ async def test_rate_limited_cell_cools_down_without_spending_the_ledger(
         select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
     )
     assert ledger is not None
-    # The one real acquire above, and nothing else -- not reset to 0, not
-    # inflated to the RPD ceiling.
-    assert ledger.requests_spent == 1
+    # Refunded: the grant was billed, the call was refused, the day keeps it.
+    assert ledger.requests_spent == 0
     assert ledger.exhausted_at is None
     assert ledger.cooldown_until == now + timedelta(seconds=13)
+    # The refund is RPD only -- the request DID leave, so it still weighs on the
+    # per-minute window it was actually sent in.
+    assert len(await _window_rows(session, "gemini:0:model-a")) == 1
 
     # Cooling, so the next acquire routes around it rather than raising.
     assert await governor.acquire_with_session(session, now=now) == (1, "model-a")
@@ -260,9 +366,7 @@ async def test_repeated_rate_limiting_never_exhausts_a_cell(session: AsyncSessio
     key out of rotation for the rest of the day."""
 
     # RPD comfortably above the loop count: the point is that THROTTLING never
-    # exhausts a cell, so the real daily ceiling must stay out of the way. (The
-    # 50 genuine acquires below still count against it -- that monotonic spend
-    # is exactly what bounds the retry loop in `_invoke_with_retry`.)
+    # exhausts a cell, so the real daily ceiling must stay out of the way.
     governor = QuotaGovernor(key_count=1, ladder=_ladder(("model-a", 200, 100)))
     start = datetime.now(UTC)
 
@@ -283,9 +387,12 @@ async def test_repeated_rate_limiting_never_exhausts_a_cell(session: AsyncSessio
         select(QuotaLedger).where(QuotaLedger.backend == "gemini:0:model-a")
     )
     assert ledger is not None
-    # Purely the 50 real acquires. Under the old cap this cell would have been
-    # written up to its RPD ceiling and marked exhausted long before here.
-    assert ledger.requests_spent == 50
+    # Each iteration refunds the previous acquire's grant before spending a new
+    # one, so the cell lands at exactly one -- the last acquire, still
+    # outstanding. Under the old 10-strike cap this cell would have been written
+    # up to its RPD ceiling and marked exhausted long before here; under
+    # ADR-0058 it would have climbed to 50 on calls the provider never served.
+    assert ledger.requests_spent == 1
     assert ledger.exhausted_at is None
 
 

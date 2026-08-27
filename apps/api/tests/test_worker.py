@@ -21,7 +21,11 @@ from spoin.core.config import Settings
 from spoin.domain.models import Card, GenerationJob, Topic
 from spoin.embeddings import HashEmbedder
 from spoin.generation.fake import FakeContentGenerator
-from spoin.generation.quota import QuotaExhaustedError
+from spoin.generation.quota import (
+    AllModelsUnavailableError,
+    DailyQuotaExhaustedError,
+    QuotaExhaustedError,
+)
 from spoin.worker import __main__ as worker_module
 
 _TEST_DATABASE_URL = os.environ.get(
@@ -46,15 +50,24 @@ class _FlakyGenerator(FakeContentGenerator):
 
 class _QuotaExhaustedGenerator(FakeContentGenerator):
     """Simulates the whole key x model grid (ADR-0028) being spent for the
-    day — the case the worker is supposed to requeue rather than fail."""
+    day — the case the worker is supposed to requeue rather than fail.
 
-    def __init__(self, exhausted_topic_name: str) -> None:
+    Raises the DAILY subclass specifically (ADR-0065): the base class is never
+    raised in real code, and which subclass arrives is what the worker records
+    as the pause reason."""
+
+    def __init__(
+        self,
+        exhausted_topic_name: str,
+        error: type[QuotaExhaustedError] = DailyQuotaExhaustedError,
+    ) -> None:
         super().__init__()
         self._exhausted_topic_name = exhausted_topic_name
+        self._error = error
 
     async def generate_curriculum(self, topic_name, description, existing_subtopics=None):  # type: ignore[no-untyped-def]
         if topic_name == self._exhausted_topic_name:
-            raise QuotaExhaustedError("all keys exhausted for today (simulated)")
+            raise self._error("all keys exhausted for today (simulated)")
         return await super().generate_curriculum(topic_name, description, existing_subtopics)
 
 
@@ -176,7 +189,38 @@ async def test_quota_exhausted_requeues_the_job_instead_of_failing_it(
     assert job.status == "pending"
     assert job.attempts == 1
     assert job.last_error is not None
-    assert "quota exhausted" in job.last_error
+    assert "daily quota exhausted" in job.last_error
+
+
+async def test_a_provider_outage_is_not_recorded_as_quota_exhaustion(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """ADR-0065. Both conditions requeue identically, so the only thing that
+    tells them apart later is what got written down -- and a stalled queue whose
+    jobs all say "quota exhausted" sends the next reader looking at the ledger
+    for a cause that was never there."""
+
+    topic = Topic(slug="outage-topic", canonical_name="Outage Topic")
+    session.add(topic)
+    await session.flush()
+    job = GenerationJob(topic_id=topic.id, status="pending")
+    session.add(job)
+    await session.commit()
+
+    monkeypatch.setattr(
+        worker_module,
+        "get_content_generator",
+        lambda: _QuotaExhaustedGenerator("Outage Topic", AllModelsUnavailableError),
+    )
+
+    assert await worker_module.run_once() == 1
+
+    await session.refresh(job)
+    # Same requeue, different recorded cause.
+    assert job.status == "pending"
+    assert job.last_error is not None
+    assert "provider outage" in job.last_error
+    assert "quota exhausted" not in job.last_error
 
 
 async def test_run_once_returns_zero_when_nothing_pending(session: AsyncSession) -> None:

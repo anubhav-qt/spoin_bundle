@@ -90,6 +90,12 @@ services:
       # Mounted so `make lint` / `make types` see the working tree rather than
       # whatever was baked into the image at build time.
       - ./apps/api/tests:/app/tests
+      # Same staleness trap, and a worse one because it fails QUIETLY: without
+      # this, `alembic heads` run here answers from the revisions baked in at
+      # the last build, so a migration added since reads as absent and an old
+      # revision reads as head. Confirmed the hard way -- a new migration was
+      # parented onto a stale head and created a second one.
+      - ./apps/api/alembic:/app/alembic
       # And so do their *settings*. src/ and tests/ were mounted but
       # pyproject.toml was not, so ruff and mypy read the config baked in at
       # the last `docker compose build` -- editing a per-file-ignore or a

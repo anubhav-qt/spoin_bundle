@@ -30,7 +30,7 @@ from spoin.domain.models import Card, Subtopic, Topic
 from spoin.embeddings import get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.pipeline import run_generation_pipeline
-from spoin.generation.quota import QuotaExhaustedError
+from spoin.generation.quota import DailyQuotaExhaustedError, QuotaExhaustedError
 
 logger = logging.getLogger("spoin.scan_and_generate")
 
@@ -199,16 +199,34 @@ async def process_incomplete_topics(
                 }
             )
         except QuotaExhaustedError as exc:
+            # "Pausing for tomorrow" is only true of the daily subclass
+            # (ADR-0065). A throttle or a provider outage clears in minutes, and
+            # a scan report that says otherwise is why a 504 storm got written up
+            # as the day's budget being gone.
+            resumes = (
+                "Pausing for tomorrow."
+                if isinstance(exc, DailyQuotaExhaustedError)
+                else "Transient -- retryable well before tomorrow."
+            )
             logger.warning(
-                "Daily quota reached while processing topic %s: %s. Pausing for tomorrow.",
+                "Generation stopped on topic %s: %s. %s",
                 candidate["name"],
                 exc,
+                resumes,
             )
             reports.append(
                 {
                     "topic": candidate["name"],
                     "topic_id": str(topic_id),
-                    "status": "quota_exhausted",
+                    # The status a report reader (and the run summaries built
+                    # from it) keys off -- so it must not claim exhaustion for
+                    # a condition that never consulted the ledger.
+                    "status": (
+                        "quota_exhausted"
+                        if isinstance(exc, DailyQuotaExhaustedError)
+                        else "generation_paused"
+                    ),
+                    "pause_reason": type(exc).__name__,
                     "error": str(exc),
                 }
             )

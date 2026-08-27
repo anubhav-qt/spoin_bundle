@@ -8,6 +8,16 @@ other model. `QuotaGovernor` walks that grid: for a call, try the strongest
 model in the ladder across every configured key; only fall to the next model
 once every key is exhausted for the current one.
 
+**Within a rung, keys are tried least-spent first** (ADR-0065), not in index
+order. First-fit from key 0 is what made a 33-key pool behave like a 9-key one:
+the lowest free key wins every grant, so it climbs toward its ceiling while the
+rest of the grid sits at whatever a single early burst left them at.
+
+**The configured `rpm` is a starting belief, not a fact** (ADR-0065). Each cell
+carries a learned effective rpm that halves on a per-minute 429 and grows back
+on success, so the governor converges on the provider's real ceiling instead of
+arguing with it 429 at a time.
+
 **Both RPD and RPM are persisted** — `QuotaLedger` (day, backend,
 requests_spent, cooldown_until) for the day, `QuotaRequest` (backend, sent_at)
 for the trailing minute, both keyed on `f"gemini:{key_index}:{model}"`.
@@ -52,7 +62,7 @@ from sqlalchemy import delete, func, insert, literal, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.db import session_scope
-from spoin.domain.models.quiz import QuotaLedger, QuotaRequest
+from spoin.domain.models.quiz import ModelUnavailable, QuotaLedger, QuotaRequest
 
 logger = logging.getLogger("spoin.generation.quota")
 
@@ -70,6 +80,11 @@ _DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS = _RPM_WINDOW_SECONDS
 #: `prune_request_window`'s phantom refund -- it is what makes "still
 #: unconfirmed" mean "never sent" rather than "sent, slowly".
 _REQUEST_RETENTION_SECONDS = _RPM_WINDOW_SECONDS * 5
+#: The slowest a cell's learned rpm can get (ADR-0065). One request per minute
+#: is the last pace that is still a pace -- below it the cell isn't throttled,
+#: it's switched off, and a cell we have stopped sending to can never produce
+#: the evidence that would let us speed it back up.
+_EFFECTIVE_RPM_FLOOR = 1.0
 
 
 def _backend(key_index: int, model: str) -> str:
@@ -81,14 +96,48 @@ def _backend(key_index: int, model: str) -> str:
 
 
 class QuotaExhaustedError(RuntimeError):
-    """Every key is exhausted for every model in the ladder, for today.
+    """`acquire()` could not grant a cell and will not be able to soon.
 
     ADR-0003 §6: this is a real, expected outcome to degrade gracefully from —
     not a try/except accident. The worker (`apps/worker/__main__.py`) catches
     this specifically and requeues the job as `pending` rather than `failed`,
     since `run_generation_pipeline` is idempotent (ADR-0026) and safely
     resumes once quota resets.
+
+    **Never raised directly — always one of the three subclasses below**
+    (ADR-0065). This class used to BE the outcome, with one message asserting
+    "all N keys x M models exhausted" regardless of which of three unrelated
+    conditions actually stopped the run. That is the same failure/rejection
+    conflation CLAUDE.md warns about, one level down: a provider outage and a
+    genuinely spent daily budget are different facts about the world, they call
+    for different responses, and folding them together made a 504 storm get
+    reported as quota death while ~90% of the grid sat untouched. Callers that
+    genuinely don't care (the worker's requeue path) still catch this base.
     """
+
+
+class DailyQuotaExhaustedError(QuotaExhaustedError):
+    """Every `(key, model)` cell has spent its RPD. The real thing: nothing
+    more can be sent today, and the only cure is the daily reset."""
+
+
+class AllCellsThrottledError(QuotaExhaustedError):
+    """Every cell with daily quota left is in a per-minute cooldown, and has
+    been for long enough that waiting is no longer distinguishable from being
+    stuck (see `_invoke_with_retry`'s throttle streak).
+
+    Transient by definition -- daily budget remains. A caller that treats this
+    like `DailyQuotaExhaustedError` and stands down until midnight is throwing
+    away quota it still has."""
+
+
+class AllModelsUnavailableError(QuotaExhaustedError):
+    """Every rung in the ladder is excluded as unavailable (a 503 overload or a
+    504 stall), so there is no model left to route to.
+
+    Says nothing about quota -- the ledger may be nearly untouched. This is a
+    provider outage surfacing as a local dead end, and it resolves when the
+    provider does, not when the day rolls over."""
 
 
 @dataclass(frozen=True)
@@ -155,13 +204,29 @@ class QuotaGovernor:
     _cell_locks: dict[tuple[int, str], asyncio.Lock] = field(
         default_factory=dict, init=False, repr=False
     )
-    #: Models currently believed unavailable after a client-side timeout
-    #: (`langchain_impl.py`'s `DeadlineExceeded` handler) -- excluded from
-    #: `acquire()` entirely while a background probe (`_probe_model`) checks
-    #: whether they've come back. In-memory only, same posture as the
-    #: cooldown/RPM state above: this is a live-availability signal, not a
-    #: persisted fact, and doesn't need to survive a restart.
-    _excluded_models: set[str] = field(default_factory=set, init=False, repr=False)
+    #: (key_index, model) -> the rpm this cell is currently allowed, which is
+    #: NOT `rung.rpm` once the provider has disagreed with us (ADR-0065).
+    #: Absent means "never throttled, use the configured ceiling".
+    #:
+    #: `rung.rpm` is a number a human read off a docs page; it is a claim about
+    #: the provider's limit, and a 77%-rejection run is that claim being wrong
+    #: out loud. AIMD replaces the claim with a measurement: halve on a
+    #: per-minute 429, add one back per success, floor at 1. It converges on
+    #: whatever the real ceiling is without anyone having to know why the
+    #: configured one was wrong -- shared project across keys, an undocumented
+    #: burst limit, a limit the provider changed on Tuesday.
+    #:
+    #: In-memory, unlike the window itself (ADR-0058 put that in the database
+    #: because two processes each permitting the full ceiling is precisely the
+    #: bug). Accepted difference: this value changes on nearly every call, and
+    #: it re-converges within a minute of traffic, so persisting it would buy a
+    #: write per call to save at most a minute of relearning per process. If
+    #: two processes ever diverge badly enough to matter, the shared window is
+    #: still the thing that actually enforces the ceiling -- this only decides
+    #: how eagerly each one walks toward it.
+    _effective_rpm: dict[tuple[int, str], float] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         if self.key_count < 1:
@@ -193,12 +258,23 @@ class QuotaGovernor:
         """A PER-MINUTE 429 (`GenerateRequestsPerMinutePerProjectPerModel`) --
         this cell has daily quota left and is simply being throttled right now.
 
-        Deliberately does NOT touch `requests_spent` (ADR-0058). That column is
-        the day's real consumption; writing to it here is what made a burst of
-        per-minute throttling read back as "every key exhausted for today"
-        while the real daily quota sat untouched. All this does is park the
-        cell until `retry_after_s` has passed, which `_acquire_locked` already
-        knows how to wait out via its `candidate_wait_times` queue.
+        Three things happen, and they are three different time horizons:
+
+        1. **The cell is parked** until `retry_after_s` has passed, which
+           `_acquire_locked` waits out via its `candidate_wait_times` queue.
+        2. **The day's charge is REFUNDED** (ADR-0065). `acquire()` bills RPD
+           when it grants a cell, but the provider does not count a request it
+           refused -- so a throttled call left the day's ledger a request poorer
+           for nothing. Measured live before this changed: 727 throttles inside
+           16 minutes, every one of them a permanent RPD unit spent on zero
+           output, on a thinking ladder whose entire daily budget is 20 per
+           cell. ADR-0058 knowingly accepted that over-count because ledger
+           erosion was the only thing terminating the throttle-retry loop; that
+           loop now terminates on a measured throttle streak instead
+           (`_invoke_with_retry`), so the erosion has nothing left to buy.
+        3. **The cell's effective rpm is halved** -- the provider just told us
+           our ceiling is wrong, and this is the only direct evidence of the
+           real one we will ever get. See `_effective_rpm`.
 
         Persisted rather than in-memory so that a throttle ONE process discovers
         is not something every other process has to rediscover the hard way, by
@@ -236,14 +312,107 @@ class QuotaGovernor:
     ) -> None:
         ledger = await self._ledger_row(session, _day_start(now), key_index, model)
         ledger.cooldown_until = now + timedelta(seconds=delay)
+        # Floored at 0 rather than allowed to go negative: a refund with no
+        # matching grant (a retry on a cell granted before a restart, a test
+        # calling this directly) is a bookkeeping edge, not a reason to invent
+        # daily budget that was never spent.
+        if ledger.requests_spent > 0:
+            ledger.requests_spent -= 1
+            # A cell that had hit its ceiling and is now one below it is
+            # genuinely usable again -- leaving `exhausted_at` set would keep
+            # `mark_exhausted`'s retirement in force over a charge we just
+            # agreed was never consumed.
+            if ledger.exhausted_at is not None and ledger.requests_spent < self._rpd_for(model):
+                ledger.exhausted_at = None
+        self._shrink_effective_rpm(key_index, model)
         await session.flush()
         logger.info(
             "quota: key %d model %s hit a per-minute rate limit -- cooling down %.1fs "
-            "(daily ledger untouched)",
+            "(day's charge refunded, now %d spent)",
             key_index,
             model,
             delay,
+            ledger.requests_spent,
         )
+
+    def _rpd_for(self, model: str) -> int:
+        rung = next((r for r in self.ladder if r.model == model), None)
+        return rung.rpd if rung is not None else 0
+
+    def _shrink_effective_rpm(self, key_index: int, model: str) -> None:
+        """Multiplicative decrease (the MD of AIMD): the provider refused a call
+        this cell's window said there was room for, so the window is too wide.
+        Halving rather than stepping down by one because we do not know how far
+        wrong we are -- overshooting downward costs a little latency, while
+        creeping down one at a time keeps paying the same 429 all the way."""
+
+        rung = next((r for r in self.ladder if r.model == model), None)
+        if rung is None:
+            return
+        cell = (key_index, model)
+        current = self._effective_rpm.get(cell, float(rung.rpm))
+        shrunk = max(_EFFECTIVE_RPM_FLOOR, current / 2.0)
+        if shrunk == current:
+            return
+        self._effective_rpm[cell] = shrunk
+        logger.info(
+            "quota: key %d model %s throttled -- effective rpm %.1f -> %.1f (configured %d)",
+            key_index,
+            model,
+            current,
+            shrunk,
+            rung.rpm,
+        )
+
+    def note_call_succeeded(self, key_index: int, model: str) -> None:
+        """Additive increase (the AI of AIMD): a call got through, so the cell
+        can carry a little more than we last believed. One per success, capped
+        at the configured `rung.rpm` -- the measurement only ever explains why
+        the documented ceiling is too HIGH, never grounds for exceeding it.
+
+        A no-op for a cell that has never been throttled: there is nothing to
+        grow back, and the configured ceiling already applies."""
+
+        cell = (key_index, model)
+        current = self._effective_rpm.get(cell)
+        if current is None:
+            return
+        rung = next((r for r in self.ladder if r.model == model), None)
+        if rung is None:
+            return
+        grown = min(float(rung.rpm), current + 1.0)
+        if grown == current:
+            return
+        self._effective_rpm[cell] = grown
+        logger.debug(
+            "quota: key %d model %s recovered -- effective rpm %.1f -> %.1f",
+            key_index,
+            model,
+            current,
+            grown,
+        )
+
+    def effective_rpm(self, key_index: int, model: str) -> int:
+        """The rpm this cell is currently allowed -- the configured ceiling
+        until the provider has said otherwise. Integer because the window
+        counts whole requests; a cell shrunk below 1 would be shut out entirely
+        rather than throttled, hence `_shrink_effective_rpm`'s floor."""
+
+        rung = next((r for r in self.ladder if r.model == model), None)
+        if rung is None:
+            return 0
+        return int(self._effective_rpm.get((key_index, model), float(rung.rpm)))
+
+    def is_at_rpm_floor(self, key_index: int, model: str) -> bool:
+        """Whether this cell has already been paced down as far as AIMD goes.
+
+        The distinction `_invoke_with_retry` needs to read a 429 correctly: a
+        throttle on a cell we had not yet slowed down is evidence our PACING was
+        wrong, and the fix is to slow down. A throttle on a cell already at one
+        request per minute is evidence about the PROVIDER -- there is no slower
+        we can go, so retrying is no longer a plan."""
+
+        return self._effective_rpm.get((key_index, model), float("inf")) <= _EFFECTIVE_RPM_FLOOR
 
     async def mark_exhausted(self, key_index: int, model: str, *, now: datetime) -> None:
         """This cell is spent for the rest of TODAY -- a per-day 429, an auth
@@ -308,19 +477,44 @@ class QuotaGovernor:
             day = _day_start(now)
             candidate_wait_times: list[float] = []
             has_unexhausted_cell = False
+            unavailable = await self._unavailable_models(session, now=now)
+            skipped_rungs: list[str] = []
 
             for rung in self.ladder:
                 if rung.model in exclude_models:
                     logger.debug("quota: model %s excluded for this call, skipping", rung.model)
+                    skipped_rungs.append(rung.model)
                     continue
-                if rung.model in self._excluded_models:
+                if rung.model in unavailable:
                     logger.debug(
                         "quota: model %s excluded pending a recovery probe, skipping", rung.model
                     )
+                    skipped_rungs.append(rung.model)
                     continue
-                for key_index in range(self.key_count):
-                    ledger = await self._ledger_row(session, day, key_index, rung.model)
-                    if ledger.requests_spent >= rung.rpd:
+                # LEAST-SPENT FIRST, not key 0 first (ADR-0065). A plain
+                # `range(key_count)` returns the lowest-numbered key that
+                # happens to be free, so key 0 absorbs every call the moment it
+                # comes off cooldown and the scan never has a reason to walk
+                # past it. Measured live: key 0 at 380/500 on a model where
+                # keys 10-32 sat at 15/500 all afternoon, having been granted
+                # once each during one early burst and never revisited.
+                #
+                # Ordering by spend instead makes the skew self-correcting
+                # rather than self-reinforcing, and it balances across
+                # PROCESSES too -- the API and the worker read the same ledger,
+                # so neither has to know the other exists to stop colliding
+                # with it. `key_index` breaks ties so the choice stays
+                # deterministic for a given ledger state.
+                spent = await self._rung_spend(session, day, rung.model)
+                for key_index in sorted(range(self.key_count), key=lambda k: (spent.get(k, 0), k)):
+                    # Rows are read, never created, on the way past: a cell only
+                    # gets a ledger row once it is actually GRANTED. That keeps
+                    # "a row exists" meaning "this cell was used" rather than
+                    # "this cell was looked at" -- the property that made it
+                    # possible to prove, from the ledger alone, that the scan
+                    # above never reached key 10.
+                    ledger = await self._existing_ledger_row(session, day, key_index, rung.model)
+                    if ledger is not None and ledger.requests_spent >= rung.rpd:
                         logger.debug(
                             "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
                             key_index,
@@ -333,7 +527,11 @@ class QuotaGovernor:
 
                     has_unexhausted_cell = True
 
-                    if ledger.cooldown_until is not None and now < ledger.cooldown_until:
+                    if (
+                        ledger is not None
+                        and ledger.cooldown_until is not None
+                        and now < ledger.cooldown_until
+                    ):
                         wait_cd = (ledger.cooldown_until - now).total_seconds()
                         candidate_wait_times.append(wait_cd)
                         logger.debug(
@@ -361,10 +559,12 @@ class QuotaGovernor:
                             "quota: key %d model %s at RPM ceiling (%d/min), trying next",
                             key_index,
                             rung.model,
-                            rung.rpm,
+                            self.effective_rpm(key_index, rung.model),
                         )
                         continue
 
+                    if ledger is None:
+                        ledger = await self._ledger_row(session, day, key_index, rung.model)
                     ledger.requests_spent += 1
                     if ledger.requests_spent >= rung.rpd:
                         ledger.exhausted_at = now
@@ -386,15 +586,40 @@ class QuotaGovernor:
                     return key_index, rung.model
 
             if not has_unexhausted_cell:
-                logger.warning(
-                    "quota: ALL %d key(s) x %d model(s) exhausted for %s",
-                    self.key_count,
-                    len(self.ladder),
-                    day.date(),
+                # Two genuinely different endings, told apart by whether any
+                # rung was ever CHECKED (ADR-0065). Every rung skipped as
+                # unavailable means no model was even asked about its quota --
+                # reporting that as "everything is exhausted" is how a 504
+                # storm got written up as daily quota death with 90% of the
+                # grid untouched.
+                if len(skipped_rungs) == len(self.ladder):
+                    logger.warning(
+                        "quota: every model in the ladder is excluded as unavailable (%s) -- "
+                        "no rung was checked for quota at all",
+                        ", ".join(skipped_rungs),
+                    )
+                    raise AllModelsUnavailableError(
+                        f"All {len(self.ladder)} model(s) unavailable "
+                        f"({', '.join(skipped_rungs)}) -- provider outage, not quota; "
+                        f"the day's ledger was never consulted"
+                    )
+                checked = len(self.ladder) - len(skipped_rungs)
+                excluded_note = (
+                    f" ({len(skipped_rungs)} further model(s) skipped as unavailable: "
+                    f"{', '.join(skipped_rungs)})"
+                    if skipped_rungs
+                    else ""
                 )
-                raise QuotaExhaustedError(
-                    f"All {self.key_count} key(s) x {len(self.ladder)} model(s) "
-                    f"exhausted for {day.date()}"
+                logger.warning(
+                    "quota: all %d key(s) exhausted across %d checked model(s) for %s%s",
+                    self.key_count,
+                    checked,
+                    day.date(),
+                    excluded_note,
+                )
+                raise DailyQuotaExhaustedError(
+                    f"All {self.key_count} key(s) exhausted across {checked} checked "
+                    f"model(s) for {day.date()}{excluded_note}"
                 )
 
             # All candidate keys have daily quota remaining but are temporarily rate-limited
@@ -418,20 +643,89 @@ class QuotaGovernor:
             # process happened to be doing meanwhile.
             now = now + timedelta(seconds=sleep_duration)
 
-    def exclude_model(self, model: str) -> None:
+    async def exclude_model(
+        self, model: str, *, now: datetime, expires_in_s: float, reason: str
+    ) -> None:
         """Stop routing real traffic to `model` -- called the moment a call
         times out (see langchain_impl.py's `DeadlineExceeded` handler), before
         the background probe even starts, so nothing else pays that same
-        timeout while recovery is being checked."""
-        self._excluded_models.add(model)
+        timeout while recovery is being checked.
 
-    def include_model(self, model: str) -> None:
+        Persisted since ADR-0065, for the reason ADR-0058 persisted the RPM
+        window: this used to be an in-memory set per `QuotaGovernor`, so the
+        API process, the worker process, and the two pools within each of them
+        all held separate views. A 504 outage on a model both ladders list was
+        therefore rediscovered up to four times over, each rediscovery costing
+        a full request timeout.
+
+        `expires_in_s` should be the caller's probe budget -- see
+        `ModelUnavailable.expires_at` for why an exclusion has to be able to
+        outlive the process that wrote it without outliving it forever."""
+
+        async with session_scope() as session:
+            await self.exclude_model_with_session(
+                session, model, now=now, expires_in_s=expires_in_s, reason=reason
+            )
+
+    async def exclude_model_with_session(
+        self,
+        session: AsyncSession,
+        model: str,
+        *,
+        now: datetime,
+        expires_in_s: float,
+        reason: str,
+    ) -> None:
+        """Same as `exclude_model`, reusing a caller-supplied session — for
+        tests, same reasoning as `acquire_with_session`."""
+
+        row = await session.get(ModelUnavailable, model)
+        expires_at = now + timedelta(seconds=expires_in_s)
+        if row is None:
+            session.add(
+                ModelUnavailable(
+                    model=model,
+                    excluded_at=now,
+                    expires_at=expires_at,
+                    reason=reason[:256],
+                )
+            )
+        else:
+            # Re-exclusion pushes the horizon out rather than leaving the
+            # original one standing: the model failing again NOW is fresh
+            # evidence, and an expiry anchored to the first failure would let a
+            # still-dead model quietly come back into rotation mid-outage.
+            row.excluded_at = now
+            row.expires_at = expires_at
+            row.reason = reason[:256]
+        await session.flush()
+
+    async def include_model(self, model: str) -> None:
         """Reverses `exclude_model` -- called by the probe either on success
         (model responded again) or once it gives up (every key it tried is
         separately marked exhausted via `mark_exhausted`, so the ledger itself
         keeps those cells out of rotation for the rest of today; releasing the
         flag here only matters for any key the probe didn't get to)."""
-        self._excluded_models.discard(model)
+
+        async with session_scope() as session:
+            await self.include_model_with_session(session, model)
+
+    async def include_model_with_session(self, session: AsyncSession, model: str) -> None:
+        """Same as `include_model`, reusing a caller-supplied session."""
+
+        await session.execute(delete(ModelUnavailable).where(ModelUnavailable.model == model))
+        await session.flush()
+
+    async def _unavailable_models(self, session: AsyncSession, *, now: datetime) -> set[str]:
+        """Models currently parked out of rotation. An expired row is ignored
+        rather than deleted here: the read path shouldn't take a write lock,
+        and a stale row is harmless once it stops being believed. `acquire()`'s
+        own prune sweep is where it goes."""
+
+        rows = await session.scalars(
+            select(ModelUnavailable.model).where(ModelUnavailable.expires_at > now)
+        )
+        return set(rows.all())
 
     async def record_probe_attempt(self, key_index: int, model: str, *, now: datetime) -> None:
         """One background-probe call against `(key_index, model)` -- counts
@@ -543,8 +837,12 @@ class QuotaGovernor:
         insert, and the provider gets 6 -- exactly the cross-process gap this
         table exists to close. `INSERT ... SELECT ... WHERE (count) < rpm` is
         decided inside the database, so only one of them can win.
+
+        The ceiling compared against is this cell's LEARNED rpm, not the
+        configured one (ADR-0065) -- see `_effective_rpm`.
         """
 
+        ceiling = self.effective_rpm(key_index, rung.model)
         backend = _backend(key_index, rung.model)
         cutoff = now - timedelta(seconds=_RPM_WINDOW_SECONDS)
         in_window = (
@@ -562,7 +860,7 @@ class QuotaGovernor:
                     literal(backend),
                     literal(now),
                     literal(False),
-                ).where(in_window < rung.rpm),
+                ).where(in_window < ceiling),
             )
             .returning(QuotaRequest.id)
         )
@@ -604,16 +902,19 @@ class QuotaGovernor:
         construction error, the process exiting mid-fan-out). Nothing else ever
         reconciles those, so they accumulate as permanent day-long loss.
 
-        **Only never-sent grants are refunded, never rejected sends.** A request
-        that reached the provider and came back 429 is confirmed, and stays
-        billed even though the provider did not count it against its own daily
-        total. That over-count is deliberate and load-bearing, not an oversight:
-        `_invoke_with_retry`'s per-minute branch retries WITHOUT burning a cell,
-        so the only thing that terminates it is the ledger climbing toward the
-        cap. Refunding a throttled call would make that loop retry, refund, and
-        retry forever -- and ADR-0060 widened the path into it by routing
-        unidentifiable 429s there too. See ADR-0058's "Harder" note, which
-        accepted this over-count knowingly.
+        **This prune refunds never-sent grants; throttled sends are refunded
+        elsewhere** (`mark_rate_limited`, ADR-0065) and for a different reason:
+        a phantom is a grant that never became a request, a throttle is a
+        request the provider refused to count. Both are RPD the day never
+        actually spent, but only one of them is discoverable by aging a row
+        out, so they are two mechanisms rather than one.
+
+        This used to be the ONLY refund, deliberately: ADR-0058 accepted the
+        throttle over-count because ledger erosion was the sole terminator for
+        `_invoke_with_retry`'s per-minute branch, which retries without burning
+        a cell (and ADR-0060 widened the path into it by routing unidentifiable
+        429s there too). That loop now stops on a measured throttle streak, so
+        the erosion buys nothing and costs real quota -- see ADR-0065.
 
         **A cell already marked exhausted is left alone**, so bookkeeping can
         never resurrect one that `mark_exhausted` deliberately retired for the
@@ -627,6 +928,13 @@ class QuotaGovernor:
                 .returning(QuotaRequest.backend, QuotaRequest.sent_at, QuotaRequest.confirmed)
             )
         ).all()
+
+        # Exclusions whose probe never came back to clear them (ADR-0065).
+        # Same disposable posture as the rows above: once an exclusion stops
+        # being believed it has no history value, and leaving it would make
+        # `SELECT * FROM model_unavailable` read as an outage that ended hours
+        # ago.
+        await session.execute(delete(ModelUnavailable).where(ModelUnavailable.expires_at <= now))
 
         # Keyed on the row's OWN day, not today's: retention outlives midnight,
         # so a run spanning it would otherwise refund yesterday's phantom
@@ -662,6 +970,34 @@ class QuotaGovernor:
         if phantoms:
             await session.flush()
         return len(dropped)
+
+    async def _rung_spend(self, session: AsyncSession, day: datetime, model: str) -> dict[int, int]:
+        """`key_index -> requests_spent` for one model, in ONE query instead of
+        `key_count` row reads. A key with no row has never been granted this
+        cell today, so it is absent -- and absent sorts as 0, which is both
+        true and exactly the ordering we want: an untouched key is the emptiest
+        key there is."""
+
+        backends = {_backend(k, model): k for k in range(self.key_count)}
+        rows = await session.execute(
+            select(QuotaLedger.backend, QuotaLedger.requests_spent).where(
+                QuotaLedger.day == day, QuotaLedger.backend.in_(backends)
+            )
+        )
+        return {backends[backend]: spent for backend, spent in rows.all()}
+
+    async def _existing_ledger_row(
+        self, session: AsyncSession, day: datetime, key_index: int, model: str
+    ) -> QuotaLedger | None:
+        """The cell's row if it has one, without creating it. See
+        `_acquire_locked`'s scan for why creation is deferred to the grant."""
+
+        row: QuotaLedger | None = await session.scalar(
+            select(QuotaLedger).where(
+                QuotaLedger.day == day, QuotaLedger.backend == _backend(key_index, model)
+            )
+        )
+        return row
 
     async def _ledger_row(
         self, session: AsyncSession, day: datetime, key_index: int, model: str

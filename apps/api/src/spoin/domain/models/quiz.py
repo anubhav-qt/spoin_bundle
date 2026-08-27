@@ -320,3 +320,41 @@ class QuotaRequest(Base, UUIDPrimaryKey):
         #: "anything older than that" -- one composite index serves both.
         Index("ix_quota_request_backend_sent_at", "backend", "sent_at"),
     )
+
+
+class ModelUnavailable(Base, Timestamps):
+    """A model the provider has stopped answering on, parked out of rotation
+    while a recovery probe checks whether it has come back (ADR-0065).
+
+    Keyed on the MODEL alone, not on a `(key, model)` cell and not on a pool: a
+    503 overload or a 504 stall is a property of the model at the provider, so
+    one process discovering it should keep every other process -- and both
+    ladders that happen to list it -- from walking into the same wall. That is
+    the same reasoning that moved the RPM window into the database (ADR-0058);
+    this row is the availability counterpart to `QuotaLedger.cooldown_until`.
+
+    Unlike `quota_request`, rows here are few and long-lived enough to be worth
+    reading on every `acquire()`; unlike `quota_ledger`, they are not a day's
+    accounting and carry no history -- `include_model` deletes the row outright
+    the moment a probe gets an answer.
+    """
+
+    __tablename__ = "model_unavailable"
+
+    model: Mapped[str] = mapped_column(String(64), primary_key=True)
+    #: When this model was last observed unavailable. Rewritten on every
+    #: re-exclusion, so it reads as "still failing as of", not "first failed at".
+    excluded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    #: When this exclusion stops being believed, absent a probe clearing it
+    #: first. Derived from the probe's own budget, NOT an independent tuning
+    #: knob: the probe that owns this row is given a fixed window to reach a
+    #: verdict, so an exclusion outliving that window is evidence the prober
+    #: died (a short-lived worker pass exiting mid-probe -- see
+    #: `_probe_model`'s docstring), not evidence the model is still down.
+    #: Without it, one crashed process could park a model for every other
+    #: process indefinitely.
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    #: The provider error that caused the exclusion, verbatim-ish. Read by
+    #: humans out of a terminal, and by `AllModelsUnavailableError` when it has
+    #: to explain that a run stopped on an outage rather than on quota.
+    reason: Mapped[str] = mapped_column(String(256), nullable=False)

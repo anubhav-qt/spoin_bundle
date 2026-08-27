@@ -29,8 +29,12 @@ from spoin.generation.base import (
     SubtopicTierDraft,
 )
 from spoin.generation.langchain_impl import (
+    _ASCII_MAX_WIDTH,
+    _PROBE_BUDGET_SECONDS,
     GeminiContentGenerator,
     _classify_rate_limit,
+    _WireAsciiRedrawBatch,
+    _WireAsciiScene,
     _WireCard,
     _WireCardBatch,
     _WireCorrection,
@@ -40,7 +44,11 @@ from spoin.generation.langchain_impl import (
     _WireVerification,
     _WireVerificationBatch,
 )
-from spoin.generation.quota import QuotaExhaustedError
+from spoin.generation.quota import (
+    AllCellsThrottledError,
+    DailyQuotaExhaustedError,
+    QuotaExhaustedError,
+)
 
 _THINKING_MODEL = "gemini-thinking-test"
 _GENERATOR_MODEL = "gemini-generator-test"
@@ -162,6 +170,14 @@ def _generator(**settings_overrides: object) -> GeminiContentGenerator:
     # against a real session).
     generator._thinking.note_request_sent = AsyncMock()  # type: ignore[method-assign]
     generator._generator.note_request_sent = AsyncMock()  # type: ignore[method-assign]
+    # Same again for model availability, which ADR-0065 moved into the database
+    # for the same cross-process reason. Unstubbed these open a session against
+    # the APP's database (they don't go through the `session` fixture), which is
+    # both outside what this file tests and a write this suite must never make.
+    generator._thinking.exclude_model = AsyncMock()  # type: ignore[method-assign]
+    generator._generator.exclude_model = AsyncMock()  # type: ignore[method-assign]
+    generator._thinking.include_model = AsyncMock()  # type: ignore[method-assign]
+    generator._generator.include_model = AsyncMock()  # type: ignore[method-assign]
     return generator
 
 
@@ -427,15 +443,26 @@ async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
 async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
     """`max_attempts` counts cells BURNED, not calls made. A 2x2 grid gets 4
     cell-attempts; throttling must not consume them, or a brief rate limit
-    surfaces as a hard failure while every key still has daily quota."""
+    surfaces as a hard failure while every key still has daily quota.
+
+    The throttles here all land on cells still ABOVE their rpm floor, which is
+    the ordinary case: AIMD's answer to them is to slow down and carry on, and
+    this test is the guard that it does carry on. See
+    `test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop` for the
+    other half -- what happens once slowing down has run out of room."""
 
     generator = _generator()
-    # Far more throttled calls than the 2 keys x 1 model grid has cells.
+    # More throttled calls than the 2 keys x 1 model grid has cells, but each
+    # cell still has pace left to give up (rpm 5 -> 2 -> 1), so none of these
+    # counts as evidence the provider is refusing us outright.
     generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
         side_effect=[(i % 2, _THINKING_MODEL) for i in range(12)]
     )
     generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
     generator._thinking.mark_rate_limited = AsyncMock()  # type: ignore[method-assign]
+    # Stubbing mark_rate_limited above means the real AIMD shrink never runs,
+    # so every cell stays at its configured rpm -- exactly the "still has pace
+    # to give up" condition this test is about.
 
     draft = CurriculumDraft(
         subtopics=[
@@ -457,6 +484,77 @@ async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
     assert result is draft
     assert generator._thinking.mark_rate_limited.await_count == 9
     generator._thinking.mark_exhausted.assert_not_awaited()
+
+
+async def test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop() -> None:
+    """ADR-0065's replacement terminator. Refunding throttled grants removed the
+    quota erosion that used to end this loop, so it now ends on evidence: every
+    cell in the grid 429ing while already paced down to one request per minute.
+
+    The error must be `AllCellsThrottledError`, NOT `DailyQuotaExhaustedError` --
+    daily budget is intact, and a caller that stands down until midnight over
+    this is discarding quota it still has."""
+
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(i % 2, _THINKING_MODEL) for i in range(40)]
+    )
+    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    # Both cells start already floored, so every throttle below is provider
+    # evidence rather than a pacing correction.
+    for key_index in (0, 1):
+        generator._thinking._effective_rpm[(key_index, _THINKING_MODEL)] = 1.0
+
+    runnable = AsyncMock()
+    runnable.ainvoke = AsyncMock(side_effect=_rpm_429())
+    with (
+        patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
+        patch.object(generator._thinking, "mark_rate_limited", AsyncMock()),
+        pytest.raises(AllCellsThrottledError) as excinfo,
+    ):
+        await generator.generate_curriculum("Topic", "desc")
+
+    assert not isinstance(excinfo.value, DailyQuotaExhaustedError)
+    assert "not exhaustion" in str(excinfo.value)
+    # Throttling still never spends a cell for the day, floored or not.
+    generator._thinking.mark_exhausted.assert_not_awaited()
+
+
+async def test_a_success_resets_the_floored_throttle_streak() -> None:
+    """The streak is about a run of failures with nothing getting through. One
+    call succeeding means the grid is serving us, however slowly -- so a later
+    throttle starts counting from scratch rather than inheriting a tally from
+    before the thing that disproved it."""
+
+    generator = _generator()
+    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(i % 2, _THINKING_MODEL) for i in range(40)]
+    )
+    for key_index in (0, 1):
+        generator._thinking._effective_rpm[(key_index, _THINKING_MODEL)] = 1.0
+
+    draft = CurriculumDraft(
+        subtopics=[
+            SubtopicGroupDraft(
+                title="G",
+                tiers=[
+                    SubtopicTierDraft(
+                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
+                    )
+                ],
+            )
+        ]
+    )
+    runnable = AsyncMock()
+    # One short of the 2-cell grid's bound, then a success, then one more --
+    # which would trip the bound only if the streak had survived the success.
+    runnable.ainvoke = AsyncMock(side_effect=[_rpm_429(), draft, _rpm_429(), draft])
+    with (
+        patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
+        patch.object(generator._thinking, "mark_rate_limited", AsyncMock()),
+    ):
+        assert await generator.generate_curriculum("Topic", "desc") is draft
+        assert await generator.generate_curriculum("Topic", "desc") is draft
 
 
 async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same_cell() -> None:
@@ -506,7 +604,6 @@ async def test_invoke_with_retry_starts_a_recovery_probe_on_timeout() -> None:
     generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
         side_effect=[(0, _THINKING_MODEL), (0, "gemini-fallback-model")]
     )
-    generator._thinking.exclude_model = Mock()  # type: ignore[method-assign]
     probe_started = asyncio.Event()
 
     async def _fake_probe(pool: object, model: str) -> None:
@@ -533,7 +630,13 @@ async def test_invoke_with_retry_starts_a_recovery_probe_on_timeout() -> None:
         await asyncio.wait_for(probe_started.wait(), timeout=1)
 
     assert result is draft
-    generator._thinking.exclude_model.assert_called_once_with(_THINKING_MODEL)
+    generator._thinking.exclude_model.assert_awaited_once()
+    excluded = generator._thinking.exclude_model.await_args
+    assert excluded.args[0] == _THINKING_MODEL
+    # The exclusion is given exactly the probe's own budget to be cleared in
+    # (ADR-0065) -- not an independently chosen lifetime.
+    assert excluded.kwargs["expires_in_s"] == _PROBE_BUDGET_SECONDS
+    assert "504" in excluded.kwargs["reason"]
     assert len(generator._active_probes) == 1
 
 
@@ -546,7 +649,6 @@ async def test_probe_model_stops_at_first_key_that_responds() -> None:
     generator = _generator(gemini_api_keys="key-a,key-b,key-c")
     pool = generator._thinking
     pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
-    pool.include_model = Mock()  # type: ignore[method-assign]
     pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
 
     fail_client = AsyncMock()
@@ -563,7 +665,7 @@ async def test_probe_model_stops_at_first_key_that_responds() -> None:
 
     assert generator._client.call_args_list == [call(0, _THINKING_MODEL), call(1, _THINKING_MODEL)]
     assert pool.record_probe_attempt.await_count == 2
-    pool.include_model.assert_called_once_with(_THINKING_MODEL)
+    pool.include_model.assert_awaited_once_with(_THINKING_MODEL)
     pool.mark_exhausted.assert_not_awaited()
 
 
@@ -575,7 +677,6 @@ async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires()
     generator = _generator(gemini_api_keys="key-a,key-b")
     pool = generator._thinking
     pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
-    pool.include_model = Mock()  # type: ignore[method-assign]
     pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
     # Also keeps the real implementation from consuming one of the scripted
     # `time.monotonic` values below: patching that name via this module patches
@@ -603,7 +704,7 @@ async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires()
     assert pool.note_request_sent.await_count == 2
     tried = {c.args for c in pool.mark_exhausted.await_args_list}
     assert tried == {(0, _THINKING_MODEL), (1, _THINKING_MODEL)}
-    pool.include_model.assert_called_once_with(_THINKING_MODEL)
+    pool.include_model.assert_awaited_once_with(_THINKING_MODEL)
 
 
 async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() -> None:
@@ -1211,4 +1312,156 @@ async def test_quota_exhausted_error_is_reraised_across_methods() -> None:
             difficulty=Difficulty.BEGINNER,
             existing_stems=[],
             is_backfill=False,
+        )
+
+
+# --- ADR-0066: over-budget ASCII art is redrawn, then rejected with its card ---
+
+_VALID_ART = "  o\n /|\\\n / \\"
+_OVERSIZED_ART = "  \\o/  " + "x" * _ASCII_MAX_WIDTH + "\n / \\"
+
+
+def _schema_dispatch(mapping: dict[object, object]) -> Mock:
+    """A `with_structured_output` stand-in that hands back a different scripted
+    runnable per requested schema, so one `generate_cards` call can script both
+    the card batch and the ASCII redraw batch. `.call_args_list` records which
+    schema each `_invoke_with_retry` asked for."""
+
+    def _make(schema: object) -> AsyncMock:
+        return _mock_structured(mapping[schema])
+
+    return Mock(side_effect=_make)
+
+
+async def _generate_one_ascii_card(
+    generator: GeminiContentGenerator,
+    card_wire: _WireCardBatch,
+    redraw_wire: _WireAsciiRedrawBatch,
+) -> tuple[object, Mock]:
+    dispatch = _schema_dispatch({_WireCardBatch: card_wire, _WireAsciiRedrawBatch: redraw_wire})
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", dispatch):
+        result = await generator.generate_cards(
+            topic_name="Databases",
+            subtopic_title="Indexing",
+            subtopic_description="B-trees vs Hash indexes",
+            difficulty=Difficulty.INTERMEDIATE,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
+            rejection_feedback=[],
+            card_type="ascii",
+        )
+    return result, dispatch
+
+
+def _redraw_call_count(dispatch: Mock) -> int:
+    return sum(1 for c in dispatch.call_args_list if c.args[0] is _WireAsciiRedrawBatch)
+
+
+def _wire_card_with_art(label: str, art: str) -> _WireCardBatch:
+    return _WireCardBatch(
+        cards=[
+            _WireCard(
+                title="T",
+                canonical_title="CT",
+                summary="S",
+                body="B",
+                ascii_label=label,
+                ascii_art=art,
+                ascii_alt="alt",
+            )
+        ]
+    )
+
+
+async def test_generate_cards_ascii_within_budget_is_not_sent_for_redraw() -> None:
+    generator = _generator()
+    result, dispatch = await _generate_one_ascii_card(
+        generator, _wire_card_with_art("scene", _VALID_ART), _WireAsciiRedrawBatch()
+    )
+
+    assert len(result.items) == 1
+    assert result.items[0].visual_slots == {"art": _VALID_ART, "alt": "alt"}
+    assert _redraw_call_count(dispatch) == 0
+
+
+async def test_generate_cards_oversized_ascii_is_redrawn_not_dropped() -> None:
+    generator = _generator()
+    redraw_wire = _WireAsciiRedrawBatch(
+        scenes=[
+            _WireAsciiScene(
+                index=0, ascii_label="scene", ascii_art=_VALID_ART, ascii_alt="fixed alt"
+            )
+        ]
+    )
+    result, dispatch = await _generate_one_ascii_card(
+        generator, _wire_card_with_art("scene", _OVERSIZED_ART), redraw_wire
+    )
+
+    assert len(result.items) == 1
+    assert result.items[0].visual_id == "scene"
+    assert result.items[0].visual_slots == {"art": _VALID_ART, "alt": "fixed alt"}
+    assert result.failures == []
+    assert _redraw_call_count(dispatch) == 1
+
+
+async def test_generate_cards_ascii_still_oversized_after_redraws_rejects_whole_card() -> None:
+    generator = _generator()  # ascii_redraw_attempts defaults to 2
+    redraw_wire = _WireAsciiRedrawBatch(
+        scenes=[
+            _WireAsciiScene(index=0, ascii_label="wide", ascii_art=_OVERSIZED_ART, ascii_alt="alt")
+        ]
+    )
+    result, dispatch = await _generate_one_ascii_card(
+        generator, _wire_card_with_art("wide", _OVERSIZED_ART), redraw_wire
+    )
+
+    assert result.items == []
+    assert len(result.failures) == 1
+    assert "card rejected" in result.failures[0]
+    assert "wide" in result.failures[0]
+    # Two redraw attempts (the config default) before giving up.
+    assert _redraw_call_count(dispatch) == 2
+
+
+async def test_generate_cards_ascii_redraw_disabled_rejects_without_a_redraw_call() -> None:
+    generator = _generator(ascii_redraw_attempts=0)
+    result, dispatch = await _generate_one_ascii_card(
+        generator, _wire_card_with_art("wide", _OVERSIZED_ART), _WireAsciiRedrawBatch()
+    )
+
+    assert result.items == []
+    assert "card rejected" in result.failures[0]
+    assert _redraw_call_count(dispatch) == 0
+
+
+async def test_generate_cards_ascii_redraw_quota_exhaustion_propagates() -> None:
+    generator = _generator()
+    generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[(0, _GENERATOR_MODEL), QuotaExhaustedError("exhausted mid-redraw")]
+    )
+    dispatch = _schema_dispatch(
+        {
+            _WireCardBatch: _wire_card_with_art("wide", _OVERSIZED_ART),
+            _WireAsciiRedrawBatch: _WireAsciiRedrawBatch(),
+        }
+    )
+    with (
+        patch.object(ChatGoogleGenerativeAI, "with_structured_output", dispatch),
+        pytest.raises(QuotaExhaustedError),
+    ):
+        await generator.generate_cards(
+            topic_name="T",
+            subtopic_title="S",
+            subtopic_description="D",
+            difficulty=Difficulty.BEGINNER,
+            count=1,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
+            rejection_feedback=[],
+            card_type="ascii",
         )

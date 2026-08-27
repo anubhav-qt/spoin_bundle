@@ -36,9 +36,24 @@ from spoin.embeddings import Embedder, get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline import run_generation_pipeline
-from spoin.generation.quota import QuotaExhaustedError
+from spoin.generation.quota import (
+    AllCellsThrottledError,
+    AllModelsUnavailableError,
+    DailyQuotaExhaustedError,
+    QuotaExhaustedError,
+)
 
 logger = logging.getLogger("spoin.worker")
+
+#: How a paused job describes WHY it paused (ADR-0065). Three different facts
+#: about the world that all requeue the same way -- kept distinguishable in the
+#: log and in `GenerationJob.last_error` so the next person reading a stalled
+#: queue can tell an outage from an exhausted budget without re-deriving it.
+_QUOTA_PAUSE_CAUSE: dict[type[QuotaExhaustedError], str] = {
+    DailyQuotaExhaustedError: "daily quota exhausted (resumes after reset)",
+    AllCellsThrottledError: "throttled on every cell (daily quota remains)",
+    AllModelsUnavailableError: "every model unavailable -- provider outage, not quota",
+}
 
 
 async def _run_job(
@@ -68,18 +83,26 @@ async def _run_job(
         accepted = topics[0].get("accepted", 0) if topics else 0
         logger.info("job %s completed (topic=%s, cards_accepted=%s)", job_id, topic_id, accepted)
     except QuotaExhaustedError as exc:
-        # ADR-0028: not a bug, an expected daily ceiling. Requeue rather than
-        # fail -- run_generation_pipeline is idempotent (ADR-0026), so the next
-        # cron pass (after tomorrow's quota resets) just picks up wherever this
-        # one stopped, instead of the topic being stuck "failed" forever next
-        # to jobs that failed for a real reason.
-        logger.info("job %s paused: quota exhausted (topic=%s): %s", job_id, topic_id, exc)
+        # ADR-0028: not a bug, an expected ceiling. Requeue rather than fail --
+        # run_generation_pipeline is idempotent (ADR-0026), so the next cron
+        # pass just picks up wherever this one stopped, instead of the topic
+        # being stuck "failed" forever next to jobs that failed for a real
+        # reason.
+        #
+        # WHEN that next pass can usefully run differs by subclass (ADR-0065),
+        # and the requeue is identical either way -- so the distinction is
+        # recorded rather than acted on. It is the difference between "come back
+        # after midnight" and "come back in a few minutes", and writing the
+        # wrong one into `last_error` is how a run that stopped on a provider
+        # outage gets read, hours later, as having exhausted the day's budget.
+        cause = _QUOTA_PAUSE_CAUSE.get(type(exc), "quota unavailable")
+        logger.info("job %s paused: %s (topic=%s): %s", job_id, cause, topic_id, exc)
         async with session_scope() as session:
             job = await session.get(GenerationJob, job_id)
             if job is not None:
                 job.status = "pending"
                 job.attempts += 1
-                job.last_error = f"quota exhausted, requeued: {exc}"[:2000]
+                job.last_error = f"{cause}, requeued: {exc}"[:2000]
     except Exception as exc:
         logger.exception("job %s failed (topic=%s)", job_id, topic_id)
         async with session_scope() as session:

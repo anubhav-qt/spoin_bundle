@@ -99,7 +99,13 @@ from spoin.generation.base import (
     TopicNameQuery,
     TopicNameVerdict,
 )
-from spoin.generation.quota import QuotaExhaustedError, QuotaGovernor, parse_ladder
+from spoin.generation.quota import (
+    AllCellsThrottledError,
+    DailyQuotaExhaustedError,
+    QuotaExhaustedError,
+    QuotaGovernor,
+    parse_ladder,
+)
 
 logger = logging.getLogger("spoin.generation.langchain_impl")
 
@@ -265,6 +271,20 @@ class _WireCard(_LenientWireModel):
 
 class _WireCardBatch(BaseModel):
     cards: list[_WireCard] = Field(default_factory=list)
+
+
+class _WireAsciiScene(_LenientWireModel):
+    #: One redrawn ASCII scene coming back from the ADR-0066 redraw call.
+    #: `index` matches the number the over-budget scene was given in the
+    #: redraw prompt -- that is how a redraw is attached back to its card.
+    index: int = -1
+    ascii_label: str = ""
+    ascii_art: str = ""
+    ascii_alt: str = ""
+
+
+class _WireAsciiRedrawBatch(BaseModel):
+    scenes: list[_WireAsciiScene] = Field(default_factory=list)
 
 
 class _WireCardPlan(_LenientWireModel):
@@ -479,30 +499,75 @@ def _format_builds_on(builds_on: list[str]) -> str:
     return f"\nBuilds on (lower-difficulty cards already written for this subtopic):\n{bodies}\n"
 
 
-#: Testing branch (non-ascii-library-generation-testing) — same width budget
-#: ADR-0021's scene library enforced at catalog-load time (a phone renders
-#: roughly 38-42 monospace columns), now checked against the model's own
-#: freehand output instead of hand-authored scenes.
+#: Free-form generator-drawn ASCII art (ADR-0042) carries the same width budget
+#: ADR-0021's scene library enforced at catalog-load time — a phone renders
+#: roughly 38-42 monospace columns and art that wraps is destroyed, not
+#: degraded. The constraint is still enforced outside the model; what changed
+#: (ADR-0066) is the response to a violation: the drawing is handed back to be
+#: redrawn within budget, and only a card whose art is STILL over budget after
+#: `ascii_redraw_attempts` tries is rejected — no more silent drop-the-visual.
 _ASCII_MAX_WIDTH = 40
 
 
-def _ascii_visual_fields(wire_card: _WireCard) -> tuple[str | None, dict[str, str] | None]:
-    """Mirrors ADR-0021's deterministic rule 1: the model is trusted for taste
-    (whether to draw, what to draw), never for the width constraint — a line
-    over budget drops the visual and keeps the card, it never rejects the
-    card or truncates/wraps the art."""
+def _ascii_over_budget_lines(art: str) -> list[tuple[int, int]]:
+    """`(line number, width)` for every line of `art` wider than the budget,
+    1-indexed. Empty list means the art fits. Used both to decide whether a
+    redraw is needed and to tell the model exactly which lines to tighten."""
 
-    if not wire_card.ascii_art.strip():
-        return None, None
-    if any(len(line) > _ASCII_MAX_WIDTH for line in wire_card.ascii_art.split("\n")):
-        logger.info(
-            "generate_cards: dropping ascii art %r -- a line exceeds the %d-column budget",
-            wire_card.ascii_label or "(unlabeled)",
-            _ASCII_MAX_WIDTH,
+    return [
+        (n, len(line))
+        for n, line in enumerate(art.split("\n"), start=1)
+        if len(line) > _ASCII_MAX_WIDTH
+    ]
+
+
+def _finalize_ascii_fields(label: str, art: str, alt: str) -> tuple[str, dict[str, str]]:
+    """Assemble the `visual_id` / `visual_slots` pair from art already known to
+    be non-empty and within budget (originally or after a redraw)."""
+
+    return (label.strip() or "untitled-scene")[:64], {"art": art, "alt": alt}
+
+
+def _ascii_redraw_prompt(
+    pending: dict[int, tuple[str, str, str]], *, escalated: bool
+) -> list[tuple[str, str]]:
+    """Build the batched redraw call (ADR-0066) for every scene still over
+    budget. `escalated` is set on the second and later attempts, when a prior
+    redraw of these same scenes came back too wide anyway."""
+
+    blocks: list[str] = []
+    for index, (label, art, _alt) in pending.items():
+        violations = (
+            ", ".join(
+                f"line {n} is {width} cols ({width - _ASCII_MAX_WIDTH} over)"
+                for n, width in _ascii_over_budget_lines(art)
+            )
+            or "one or more lines exceed the limit"
         )
-        return None, None
-    label = (wire_card.ascii_label.strip() or "untitled-scene")[:64]
-    return label, {"art": wire_card.ascii_art, "alt": wire_card.ascii_alt}
+        blocks.append(
+            f"Scene index {index} (label: {label or 'unlabeled'})\n"
+            f"Lines over {_ASCII_MAX_WIDTH} columns: {violations}\n"
+            f"Current drawing:\n```\n{art}\n```"
+        )
+    escalation_block = (
+        "A previous redraw of these scenes STILL came back over "
+        f"{_ASCII_MAX_WIDTH} columns. Be more aggressive now — drop a caption, "
+        "stack the panels vertically, or simplify the drawing rather than "
+        "exceed the limit even once.\n\n"
+        if escalated
+        else ""
+    )
+    return [
+        ("system", prompts.CARDS_ASCII_REDRAW_SYSTEM),
+        (
+            "human",
+            prompts.CARDS_ASCII_REDRAW_USER.format(
+                escalation_block=escalation_block,
+                count=len(pending),
+                scenes_block="\n\n".join(blocks),
+            ),
+        ),
+    ]
 
 
 def _format_free_text_grade_query(query: FreeTextGradeQuery) -> str:
@@ -559,6 +624,7 @@ class GeminiContentGenerator(ContentGenerator):
             )
         self._keys = keys
         self._request_timeout_s = settings.gemini_request_timeout_seconds
+        self._ascii_redraw_attempts = settings.ascii_redraw_attempts
         self._thinking = QuotaGovernor(
             key_count=len(keys), ladder=parse_ladder(settings.gemini_thinking_ladder)
         )
@@ -658,15 +724,32 @@ class GeminiContentGenerator(ContentGenerator):
         **`max_attempts` counts cells BURNED, not calls made** (ADR-0058). A
         per-minute 429 doesn't use a cell up -- it parks it for a few seconds --
         so counting it here would let a brief throttle burn the whole grid's
-        attempt budget and surface as a hard failure. Those retries are instead
-        bounded by real quota: every `acquire()` increments a ledger that now
-        only ever counts UP, so a cell that keeps throttling still walks toward
-        its own RPD ceiling and drops out of rotation on its own. Once every
-        cell has, `acquire()` raises `QuotaExhaustedError` -- a real terminal
-        condition rather than an invented retry cap."""
+        attempt budget and surface as a hard failure.
+
+        **Throttle retries are bounded by evidence, not by erosion** (ADR-0065).
+        They used to be bounded by quota erosion: each retry's `acquire()`
+        billed a cell's RPD and never gave it back, so a throttle storm walked
+        the whole grid toward its ceiling and terminated by exhausting it. That
+        worked, and cost a full day's budget to do it.
+
+        The charge is refunded now, so the loop needs a real stopping condition
+        instead. It counts only throttles arriving on a cell ALREADY at its rpm
+        floor, because those are the only ones that say anything about the
+        provider: a 429 on a cell we had not yet slowed down means our pacing
+        was too fast, and AIMD's response is to slow down and try again -- that
+        is the mechanism working, not failing. A 429 on a cell already down to
+        one request per minute has no such answer; there is no slower to go.
+        `grid_size` of those in a row, with no success in between, means every
+        cell in the grid refused us at the slowest pace we have. Any success
+        resets the count."""
 
         max_attempts = pool.key_count * len(pool.ladder)
+        # Not a tuning knob: one full sweep of the grid, all of it floored and
+        # all of it still refusing, is the smallest streak that distinguishes
+        # "this cell is busy" from "nothing here will serve us right now".
+        grid_size = max_attempts
         cells_burned = 0
+        floored_throttles = 0
         last_server_error: ServerError | None = None
         # A 503 overload -- and a 504 timeout, see the ServerError handler
         # below -- is treated as per-MODEL, not per-key (every key hits the
@@ -720,14 +803,31 @@ class GeminiContentGenerator(ContentGenerator):
                     limit = _classify_rate_limit(real_error)
                     if not limit.is_daily:
                         # Throttled, not spent. Park the cell for as long as the
-                        # provider asked and try another -- crucially WITHOUT
-                        # touching the ledger or burning a cell (ADR-0058).
+                        # provider asked, refund the day's charge and narrow the
+                        # cell's learned rpm (all three inside mark_rate_limited,
+                        # ADR-0058 + ADR-0065), then try another -- without
+                        # burning a cell.
+                        # Read BEFORE mark_rate_limited, which is what shrinks
+                        # it: the question is whether this call went out at a
+                        # pace we had already bottomed out, not what we are
+                        # about to reduce it to.
+                        was_floored = pool.is_at_rpm_floor(key_index, model)
                         await pool.mark_rate_limited(
                             key_index,
                             model,
                             now=datetime.now(UTC),
                             retry_after_s=limit.retry_after_s,
                         )
+                        if was_floored:
+                            floored_throttles += 1
+                            if floored_throttles >= grid_size:
+                                raise AllCellsThrottledError(
+                                    f"{floored_throttles} consecutive per-minute 429s at the "
+                                    f"one-request-per-minute floor with no success -- every "
+                                    f"cell in the {pool.key_count}x{len(pool.ladder)} grid is "
+                                    f"refusing us at the slowest pace we have. Daily quota "
+                                    f"remains; this is throttling, not exhaustion."
+                                ) from exc
                         continue
                     logger.warning(
                         "quota: key=%d model=%s got a per-day 429 from the provider despite "
@@ -774,13 +874,27 @@ class GeminiContentGenerator(ContentGenerator):
                     max_attempts,
                     exc,
                 )
-                pool.exclude_model(model)
+                await pool.exclude_model(
+                    model,
+                    now=datetime.now(UTC),
+                    # The probe about to start is what will clear this row; the
+                    # exclusion should therefore outlive exactly as long as that
+                    # probe is entitled to take, and no longer (ADR-0065).
+                    expires_in_s=_PROBE_BUDGET_SECONDS,
+                    reason=str(exc),
+                )
                 self._start_recovery_probe(pool, model)
                 unavailable_models.add(model)
                 last_server_error = exc
                 cells_burned += 1
                 continue
             assert isinstance(result, schema)
+            # A call got through: the cell can carry a little more than we last
+            # believed (AIMD's additive increase), and the throttle streak that
+            # would otherwise end this loop is genuinely broken, not merely
+            # paused (ADR-0065).
+            pool.note_call_succeeded(key_index, model)
+            floored_throttles = 0
             return result
         if last_server_error is not None:
             # Every cell in the grid stayed UNAVAILABLE -- NOT a quota exhaustion
@@ -794,9 +908,10 @@ class GeminiContentGenerator(ContentGenerator):
         # have no intention of making, and -- now that a per-minute 429 leaves a
         # cell alive but cooling -- could block on `acquire()`'s self-pacing sleep
         # instead of returning the failure the caller is waiting on.
-        raise QuotaExhaustedError(
+        raise DailyQuotaExhaustedError(
             f"All {pool.key_count} key(s) x {len(pool.ladder)} model(s) exhausted "
-            f"for {datetime.now(UTC).date()}"
+            f"for {datetime.now(UTC).date()} -- every cell was marked exhausted by a "
+            f"per-day 429 or an auth failure during this call"
         )
 
     def _start_recovery_probe(self, pool: QuotaGovernor, model: str) -> None:
@@ -861,7 +976,7 @@ class GeminiContentGenerator(ContentGenerator):
                 key_index,
                 model,
             )
-            pool.include_model(model)
+            await pool.include_model(model)
             return
 
         logger.warning(
@@ -877,7 +992,7 @@ class GeminiContentGenerator(ContentGenerator):
         # today on its own; releasing the manual flag only matters for a key
         # this probe never got to (e.g. a key pool larger than fit in the
         # budget), which real traffic is then free to discover for itself.
-        pool.include_model(model)
+        await pool.include_model(model)
 
     # --------------------------------------------------------------- curriculum --
 
@@ -1036,6 +1151,87 @@ class GeminiContentGenerator(ContentGenerator):
                 failures.append(f"malformed card plan: {exc}")
         return BatchResult(items=items, failures=failures)
 
+    async def _resolve_ascii_art(
+        self, wire_cards: list[_WireCard]
+    ) -> tuple[dict[int, tuple[str, str, str]], set[int]]:
+        """ADR-0066: hand every over-budget ASCII drawing back to the generator
+        to redraw within the 40-column budget instead of silently dropping it.
+
+        Returns ``(resolved, rejected)``:
+
+        - ``resolved[i]`` is the final ``(label, art, alt)`` for card ``i``'s
+          scene — unchanged if it already fit, redrawn if it didn't.
+        - ``rejected`` is the set of card indices whose art was STILL over
+          budget after ``ascii_redraw_attempts`` tries; the caller rejects
+          those cards whole rather than shipping them without art.
+
+        A card that drew no scene is in neither set. Each redraw attempt is one
+        batched call (ADR-0005) covering every scene still over budget."""
+
+        resolved: dict[int, tuple[str, str, str]] = {}
+        pending: dict[int, tuple[str, str, str]] = {}
+        for i, wc in enumerate(wire_cards):
+            if not wc.ascii_art.strip():
+                continue
+            slot = (wc.ascii_label, wc.ascii_art, wc.ascii_alt)
+            if _ascii_over_budget_lines(wc.ascii_art):
+                pending[i] = slot
+            else:
+                resolved[i] = slot
+
+        for attempt in range(self._ascii_redraw_attempts):
+            if not pending:
+                break
+            logger.info(
+                "generate_cards: ascii redraw attempt %d/%d for %d over-budget scene(s)",
+                attempt + 1,
+                self._ascii_redraw_attempts,
+                len(pending),
+            )
+            prompt = _ascii_redraw_prompt(pending, escalated=attempt > 0)
+            try:
+                redraw = await self._invoke_with_retry(
+                    self._generator, _WireAsciiRedrawBatch, prompt
+                )
+            except QuotaExhaustedError:
+                raise
+            except Exception as exc:
+                logger.info(
+                    "generate_cards: ascii redraw call failed (%s) -- %d scene(s) "
+                    "will be rejected with their card",
+                    exc,
+                    len(pending),
+                )
+                break
+            by_index = {scene.index: scene for scene in redraw.scenes}
+            next_pending: dict[int, tuple[str, str, str]] = {}
+            for i, (label, art, alt) in pending.items():
+                scene = by_index.get(i)
+                if scene is None:
+                    # The model dropped this one from its response -- keep the
+                    # current art for the next round's feedback.
+                    next_pending[i] = (label, art, alt)
+                    continue
+                latest = (scene.ascii_label or label, scene.ascii_art, scene.ascii_alt or alt)
+                if not scene.ascii_art.strip() or _ascii_over_budget_lines(scene.ascii_art):
+                    # Still too wide (or returned empty, meaning "can't fit it").
+                    # Feed the latest attempt back in with fresh violation
+                    # numbers; fall back to the prior art if it gave us nothing.
+                    next_pending[i] = latest if scene.ascii_art.strip() else (label, art, alt)
+                    continue
+                resolved[i] = latest
+            pending = next_pending
+
+        if pending:
+            logger.info(
+                "generate_cards: %d ascii scene(s) still over the %d-column budget after "
+                "%d redraw attempt(s) -- rejecting those cards (ADR-0066)",
+                len(pending),
+                _ASCII_MAX_WIDTH,
+                self._ascii_redraw_attempts,
+            )
+        return resolved, set(pending)
+
     async def generate_cards(
         self,
         *,
@@ -1102,9 +1298,22 @@ class GeminiContentGenerator(ContentGenerator):
 
         items: list[CardDraft] = []
         failures: list[str] = []
-        for wire_card in wire_result.cards:
+        # ADR-0066: redraw any over-budget ASCII art before assembling cards.
+        # Called outside the try/except above on purpose — a QuotaExhaustedError
+        # from a redraw call must propagate, same as the main generate call.
+        resolved_art, rejected_for_art = await self._resolve_ascii_art(wire_result.cards)
+        for i, wire_card in enumerate(wire_result.cards):
+            if i in rejected_for_art:
+                failures.append(
+                    f"ascii art {wire_card.ascii_label or '(unlabeled)'!r} still exceeded "
+                    f"{_ASCII_MAX_WIDTH} cols after redraw -- card rejected (ADR-0066)"
+                )
+                continue
             try:
-                visual_id, visual_slots = _ascii_visual_fields(wire_card)
+                if i in resolved_art:
+                    visual_id, visual_slots = _finalize_ascii_fields(*resolved_art[i])
+                else:
+                    visual_id, visual_slots = None, None
                 items.append(
                     CardDraft(
                         title=wire_card.title,

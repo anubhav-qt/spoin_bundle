@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from "react";
 import { CustomFontModal } from "./CustomFontModal";
+import { PickerDropdown } from "./PickerDropdown";
 
 const STORAGE_KEY = "spoin-font";
 const DEFAULT_FONT = "literata";
@@ -39,7 +40,16 @@ function persistedFont(): string {
   return localStorage.getItem(STORAGE_KEY) ?? DEFAULT_FONT;
 }
 
-export function FontPicker() {
+const FONT_NAME: Record<string, string> = Object.fromEntries(FONTS.map((f) => [f.key, f.name]));
+
+interface Props {
+  /** "row" (default): the always-open `Aa` swatch row (right-rail sheet /
+   *  mobile Browse). "dropdown": the same row inside a labelled
+   *  `PickerDropdown` for the desktop rail's four-up utility row. */
+  variant?: "row" | "dropdown";
+}
+
+export function FontPicker({ variant = "row" }: Props) {
   const [active, setActive] = useState(DEFAULT_FONT);
   // The persisted value being previewed away from — null while there is no
   // pending preview (the row shows no Keep/Revert). Set the moment a
@@ -74,7 +84,7 @@ export function FontPicker() {
 
   const isPreset = FONTS.some((f) => f.key === active);
 
-  return (
+  const body = (
     <div className="font-picker">
       <div className="font-picker-row" role="group" aria-label="Font">
         {FONTS.map(({ key, name }) => (
@@ -129,4 +139,14 @@ export function FontPicker() {
       ) : null}
     </div>
   );
+
+  if (variant === "dropdown") {
+    return (
+      <PickerDropdown label="Font" value={FONT_NAME[active] ?? "Custom"} align="right">
+        {body}
+      </PickerDropdown>
+    );
+  }
+
+  return body;
 }

@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { MotionConfig } from "framer-motion";
 
-import { api, type Difficulty, type Topic } from "@/lib/api";
+import { api, type DailyGoal, type Difficulty, type Topic } from "@/lib/api";
 import { engagement } from "@/lib/engagement";
 import { getReducedMotion, subscribeReducedMotion } from "@/lib/motionPreference";
 import { invalidate } from "@/lib/refresh";
@@ -24,6 +24,8 @@ import { Feed } from "./Feed";
 import { FocusToggle } from "./FocusToggle";
 import { GuestNotice } from "./GuestNotice";
 import { LikedView } from "./LikedView";
+import { MobileNav } from "./MobileNav";
+import { MobileTopBar } from "./MobileTopBar";
 import { NotesView } from "./NotesView";
 import { ProfileView } from "./ProfileView";
 import { RightRail } from "./RightRail";
@@ -66,6 +68,27 @@ export function AppShell() {
   // worth preserving across the toggle, so this is plain UI state — not
   // persisted, not lifted any further than it needs to be.
   const [focusMode, setFocusMode] = useState(false);
+  // The phone-width Browse sheet (RightRail's contents). Plain UI state — not
+  // persisted, opened from MobileTopBar's Browse button.
+  const [browseOpen, setBrowseOpen] = useState(false);
+  // Daily-goal ring (ADR-0062). Seeded with the DB default so the ring is
+  // present and interactive from first paint rather than popping in once the
+  // fetch resolves; refreshed on mount and whenever a card is marked seen.
+  const [dailyGoal, setDailyGoal] = useState<DailyGoal>({ cards_read: 0, goal: 10 });
+
+  const refreshDailyGoal = useCallback(() => {
+    // `-getTimezoneOffset()` = local-minus-UTC (ADR-0062).
+    void api
+      .today(-new Date().getTimezoneOffset())
+      .then(setDailyGoal)
+      .catch(() => {
+        /* the ring keeps its last value; nothing gates on it */
+      });
+  }, []);
+
+  useEffect(() => {
+    refreshDailyGoal();
+  }, [refreshDailyGoal]);
   // Bumped on every dev-reset (Sidebar's wordmark easter egg) and used as a
   // `key` on Feed/RightRail below — the simplest correct way to guarantee
   // every bit of client-side state derived from the old server state (feed
@@ -127,11 +150,14 @@ export function AppShell() {
       setReadCardIds((current) => {
         if (current.has(cardId)) return current;
         const next = new Set(current).add(cardId);
-        void engagement.whenIdle().then(() => refreshProgress(topicId));
+        void engagement.whenIdle().then(() => {
+          refreshProgress(topicId);
+          refreshDailyGoal();
+        });
         return next;
       });
     },
-    [refreshProgress],
+    [refreshProgress, refreshDailyGoal],
   );
 
   // Both rails swap for entirely different DOM (rail <-> empty spacer, and
@@ -233,6 +259,22 @@ export function AppShell() {
     return subscribeReducedMotion(() => setReducedMotionState(getReducedMotion()));
   }, []);
 
+  // Shared by the docked rail and the phone-width Browse sheet — the sheet is
+  // a second RightRail instance, not a copy of its markup.
+  const rightRailProps = {
+    topics,
+    progress,
+    selected,
+    onToggle: toggleTopic,
+    onFollowed,
+    onEnterFocus: () => setFocusModeAnimated(true),
+    onProgressChanged: refreshProgress,
+    onTopicColorChanged,
+    onUnfollowed,
+    onTopicRemoved: removeTopicLocally,
+    dailyGoal,
+  };
+
   return (
     /* "user" also honours prefers-reduced-motion on its own, so the OS setting
        keeps working when this switch is off. */
@@ -240,6 +282,29 @@ export function AppShell() {
       <CustomCursor />
       <GuestNotice />
       <UndoToast />
+      {/* Phone-width chrome (<=680px for the bar, <=900px for the tab bar) —
+          CSS-hidden on wider viewports where the rails do the job, and
+          unmounted entirely in focus mode (same as the rails always have
+          been), so the exit-focus button has nothing to dodge but the notch. */}
+      {focusMode ? null : (
+        <>
+          <MobileTopBar
+            onReset={() => void onReset()}
+            onRefresh={onRefresh}
+            onOpenBrowse={() => setBrowseOpen(true)}
+            dailyGoal={dailyGoal}
+          />
+          <MobileNav view={view} onNavigate={setView} />
+          {browseOpen ? (
+            <RightRail
+              {...rightRailProps}
+              variant="sheet"
+              onClose={() => setBrowseOpen(false)}
+              onNavigate={setView}
+            />
+          ) : null}
+        </>
+      )}
       <div className="app-grid" data-focused={focusMode}>
         {/* Both rails keep reserving their grid track even when hidden — an
             empty spacer, not a removed column — so toggling focus mode never
@@ -293,19 +358,7 @@ export function AppShell() {
             <FocusToggle focused onToggle={() => setFocusModeAnimated(false)} />
           </>
         ) : (
-          <RightRail
-            key={resetCount}
-            topics={topics}
-            progress={progress}
-            selected={selected}
-            onToggle={toggleTopic}
-            onFollowed={onFollowed}
-            onEnterFocus={() => setFocusModeAnimated(true)}
-            onProgressChanged={refreshProgress}
-            onTopicColorChanged={onTopicColorChanged}
-            onUnfollowed={onUnfollowed}
-            onTopicRemoved={removeTopicLocally}
-          />
+          <RightRail key={resetCount} {...rightRailProps} />
         )}
       </div>
     </MotionConfig>

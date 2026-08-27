@@ -129,6 +129,29 @@ export function HomeIcon(_: IconProps) {
   );
 }
 
+/** Revisit — a clock wound backwards. Same 24/1.5 spec as the rest. */
+export function HistoryIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 2.64-6.36" />
+      <path d="M3 4.5V9h4.5" />
+      <path d="M12 8.5V12l2.6 1.8" />
+    </svg>
+  );
+}
+
+/** Opens the mobile "Browse" sheet — filters and settings live behind it. */
+export function SlidersIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h8M17 7h3M4 12h3M12 12h8M4 17h11M19 17h1" />
+      <circle cx="14.5" cy="7" r="2" />
+      <circle cx="9" cy="12" r="2" />
+      <circle cx="16.5" cy="17" r="2" />
+    </svg>
+  );
+}
+
 export function CompassIcon(_: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

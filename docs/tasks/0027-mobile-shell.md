@@ -1,7 +1,11 @@
 # Task 0027: A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet
 
 **Owner:** mayanks0ni
-**Status:** Done -- 2026-08-26, see [ADR-0063](../adr/0063-mobile-shell.md)
+**Status:** Reverted, then superseded -- the ADR-0063 implementation was rolled back to
+the `3bc9c30` baseline with the rest of an in-flight UI branch. The mobile shell was
+redesigned and re-landed under [ADR-0064](../adr/0064-mobile-shell-tab-bar.md) (edge-to-edge
+tab bar instead of a floating pill); the right rail's own restyle is
+[task 0028](0028-responsive-right-rail-and-controls.md).
 
 ## Goal
 

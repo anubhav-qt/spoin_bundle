@@ -1,9 +1,18 @@
 # ADR-0063: A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet
 
-- **Status:** Accepted (amends [ADR-0013](0013-topic-relationship-graph.md)'s three-column
-  shell as restructured by [ADR-0015](0015-topic-progress-and-discovery.md))
+- **Status:** Superseded by [ADR-0064](0064-mobile-shell-tab-bar.md)
 - **Date:** 2026-08-26
 - **Deciders:** mayanks0ni
+
+> **Superseded by [ADR-0064](0064-mobile-shell-tab-bar.md) (2026-08-27).** This ADR's
+> implementation was reverted to the `3bc9c30` baseline along with the rest of an in-flight
+> UI branch, and the mobile view was then redesigned from scratch. ADR-0064 keeps this
+> ADR's core principle (no parallel component tree, CSS re-places the rails) and re-lands
+> its fixed-element / `viewportFit` hygiene, but replaces the **floating four-item pill**
+> (Home/Topics/Profile/Settings + `MobileProfileNav`) with an **edge-to-edge five-item tab
+> bar** (Liked/Revisit/Home/Notes/Profile) and keeps the appearance controls in the mobile
+> Browse sheet rather than routing them to `SettingsView`. Everything below is retained for
+> the reasoning it records; the shipped shell is ADR-0064's.
 
 ## Context
 

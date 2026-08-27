@@ -212,6 +212,9 @@ export const viewport: Viewport = {
   // Matches the Notebook palette's paper color (see ADR-0012) — the shipped
   // default until the palette picker (docs/tasks/0002) exists.
   themeColor: "#EDF0EA",
+  // Lets the feed paint under the notch / home indicator; the fixed mobile
+  // bars use env(safe-area-inset-*) to stay clear of them (ADR-0064).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

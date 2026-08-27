@@ -5,6 +5,8 @@ from __future__ import annotations
 from spoin.generation.prompts.cards import (
     ASCII_INSTRUCTIONS,
     CARD_FIELDS_BLOCK,
+    CARDS_ASCII_REDRAW_SYSTEM,
+    CARDS_ASCII_REDRAW_USER,
     CARDS_ASCII_SYSTEM,
     CARDS_CODE_SYSTEM,
     CARDS_COMMON_HEADER,
@@ -43,6 +45,8 @@ from spoin.generation.prompts.topics import (
 
 __all__ = [
     "ASCII_INSTRUCTIONS",
+    "CARDS_ASCII_REDRAW_SYSTEM",
+    "CARDS_ASCII_REDRAW_USER",
     "CARDS_ASCII_SYSTEM",
     "CARDS_CODE_SYSTEM",
     "CARDS_COMMON_HEADER",

@@ -44,6 +44,10 @@ produces `title`/`summary`/`body`, instead of selecting from a catalog:
   freehand output) is enforced server-side in `_ascii_visual_fields()` -- a line over
   budget drops the visual and keeps the card, exactly ADR-0021's degrade-to-"no art"
   posture, never a rejected card or truncated/wrapped art.
+  **Superseded for the width-violation path by [ADR-0066](0066-redraw-over-budget-ascii-art.md):**
+  an over-budget drawing is now redrawn within budget and, only if that fails, the card is
+  rejected whole -- the silent drop-the-visual is gone. The 40-column cap itself is
+  unchanged.
 - Art is instructed to be used sparingly ("most cards should have none"), and the prompt
   carries the same "weight classes in wrestling" example ADR-0021's Context used to set
   the bar for charm.

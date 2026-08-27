@@ -31,7 +31,8 @@ Rules:
     Aim for at least 1-2 diagram cards in almost every subtopic tier.
   * "ascii": HIGH PRIORITY across all topics. 1-2 panel silly, funny stickman visual \
     gags and humorous physical analogies that make concepts stick. Aim for at least \
-    1-2 ascii stickman cards in every subtopic tier.
+    2-3 ascii stickman cards in every subtopic tier — lean generous, these are the \
+    cards learners screenshot and remember.
   * "comparison": HIGH PRIORITY for common misconceptions, myths vs facts, pitfalls, \
     and "wrong way vs right way" contrasts.
   * "prose": For foundational mental models, conceptual principles, and deep intuition. \

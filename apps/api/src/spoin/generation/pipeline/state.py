@@ -308,7 +308,13 @@ class _GateItem:
 #: UPDATE on real production content to record something the absence already
 #: says (CLAUDE.md's database rule). Query v1 as
 #: `gen_meta->>'prompt_version' IS NULL`.
-CARD_PROMPT_VERSION = 2
+#:
+#: v2 -> v3 (ADR-0066): over-budget ASCII art is now redrawn and, failing that,
+#: rejected with its card, instead of silently dropped; the card prompt asks
+#: for art more freely and the curriculum quota for `ascii` cards went up. v3
+#: corpora carry a materially higher share of art-bearing cards and should not
+#: be pooled with v2 when judging quality.
+CARD_PROMPT_VERSION = 3
 
 
 def _rejected_card(

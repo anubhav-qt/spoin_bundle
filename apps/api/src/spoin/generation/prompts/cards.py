@@ -71,11 +71,12 @@ Already covered in this subtopic — plan around these, never re-plan one of the
 {avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
 
 ASCII_INSTRUCTIONS = r"""\
-Sometimes — not every card, only when a concept genuinely lends itself to it —
-you may ALSO draw a small ASCII scene that shows the idea rather than just
+Whenever a concept has a physical, spatial, or visual gag that would make it
+stick, ALSO draw a small ASCII scene that shows the idea rather than just
 describing it: a weird stickman gag, one or two panels, something silly but
 informative — it should actually dramatize the concept, not just decorate the
-card.
+card. Reach for one often; skip it only when nothing about the idea genuinely
+lends itself to a picture.
 
 Canonical Examples of Stickman ASCII Scenes (under 40 columns wide):
 
@@ -126,6 +127,40 @@ If you draw one, set:
 Leave all three empty (ascii_label, ascii_art, ascii_alt) for any card where
 no scene genuinely fits.
 """
+
+#: ADR-0066. A drawing that broke the 40-column budget is handed back here to
+#: be re-fitted, rather than dropped from its card. The model is re-fitting an
+#: existing scene, not inventing one — same gag, same characters, narrower.
+CARDS_ASCII_REDRAW_SYSTEM = r"""\
+You are fixing ASCII art that broke a HARD width limit. Each scene below was
+drawn for a learning card but has at least one line wider than 40 monospace
+columns — on a phone (roughly 38-42 columns) that art wraps and is destroyed,
+not merely degraded.
+
+Redraw each scene so EVERY line is at most 40 characters wide, keeping the
+same gag, the same characters, the same idea. You are re-fitting a drawing,
+not inventing a new one. Tighten the spacing between panels, shorten a
+caption, stack the panels vertically instead of side by side — whatever it
+takes to get under 40 columns without losing what made the scene land.
+
+Count the characters in every line before you commit to it. If a scene truly
+cannot work within 40 columns, return it with an EMPTY ascii_art rather than
+shipping one still too wide or mangled to fit — an empty result is understood
+and handled, an over-width one is not.
+
+For each scene return:
+- index: the exact number the scene was given in the input. This is how the
+  redraw is matched back to its card, so it MUST match.
+- ascii_label: keep the original slug unless it no longer fits the redrawn scene.
+- ascii_art: the redrawn art, newline-separated, every line <= 40 characters.
+- ascii_alt: one plain sentence describing the scene for a screen reader.
+"""
+
+CARDS_ASCII_REDRAW_USER = """\
+{escalation_block}Redraw the following {count} ASCII scene(s) so every line fits \
+within 40 columns. Return one entry per scene, keyed by its index.
+
+{scenes_block}"""
 
 CARD_FIELDS_BLOCK = """\
 Each card needs:

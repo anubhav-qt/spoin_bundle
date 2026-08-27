@@ -182,6 +182,16 @@ class Settings(BaseSettings):
     #: only stop condition is the redraft loop's own per-tier stuck guard.
     #: See that loop's docstring for the full reasoning (docs/tasks/0023).
     first_pass_completion_fraction: float = 0.9
+    #: How many times `generate_cards` will hand a too-wide ASCII drawing back
+    #: to the generator to redraw within the 40-column budget before giving up
+    #: on it (ADR-0066). Each attempt is ONE batched call covering every
+    #: over-budget drawing in the batch (ADR-0005), the second attempt carrying
+    #: escalated feedback. Art still over budget after the last attempt rejects
+    #: the whole card -- the per-tier redraft loop then refills the deficit.
+    #: 0 disables redrawing entirely (straight to reject), matching the old
+    #: drop-the-visual posture only in that it stops here -- it rejects the card
+    #: rather than shipping it without art.
+    ascii_redraw_attempts: int = 2
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

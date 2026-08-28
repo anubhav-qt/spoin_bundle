@@ -76,3 +76,25 @@ async def test_top_candidates_ranking_is_a_real_ordering_not_arbitrary() -> None
 
 async def test_top_candidates_zero_k_returns_empty() -> None:
     assert await top_candidates("anything", k=0) == []
+
+
+def test_library_titles_by_source() -> None:
+    from spoin.content.ascii_library import get_library_titles_by_source
+
+    by_source = get_library_titles_by_source()
+    assert "gags" in by_source
+    assert "info" in by_source
+    assert len(by_source["gags"]) > 800
+    assert len(by_source["info"]) > 1400
+
+
+def test_format_library_catalog_for_planner() -> None:
+    from spoin.content.ascii_library import format_library_catalog_for_planner
+
+    catalog = format_library_catalog_for_planner()
+    assert "GAGS & COMEDIC CHARACTER REACTIONS" in catalog
+    assert "INFORMATIVE VISUALIZATIONS" in catalog
+    assert "70%" in catalog
+    assert "30%" in catalog
+
+

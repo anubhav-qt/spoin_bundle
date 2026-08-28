@@ -64,6 +64,7 @@ class AsciiLibraryEntry:
     category: str
     subcategory: str
     art: str
+    source: str = "gags"
 
 
 @lru_cache
@@ -81,6 +82,7 @@ def load_library() -> tuple[AsciiLibraryEntry, ...]:
         if not target.is_file():
             continue
         text = target.read_text(encoding="utf-8")
+        source = "gags" if "gags" in filename else "info"
         for match in _ENTRY_RE.finditer(text):
             entries.append(
                 AsciiLibraryEntry(
@@ -89,9 +91,42 @@ def load_library() -> tuple[AsciiLibraryEntry, ...]:
                     category=match.group("category").strip(),
                     subcategory=match.group("subcategory").strip(),
                     art=match.group("art").rstrip("\n"),
+                    source=source,
                 )
             )
     return tuple(entries)
+
+
+@lru_cache
+def get_library_titles_by_source() -> dict[str, list[str]]:
+    """Returns all library artwork titles grouped by source ('gags' vs 'info')."""
+    library = load_library()
+    gags: list[str] = []
+    info: list[str] = []
+    for e in library:
+        if e.source == "gags":
+            gags.append(e.title)
+        else:
+            info.append(e.title)
+    return {"gags": gags, "info": info}
+
+
+@lru_cache
+def format_library_catalog_for_planner() -> str:
+    """Formats the full catalog of curated reference library concepts for the card planner."""
+    by_source = get_library_titles_by_source()
+    gags = by_source.get("gags", [])
+    info = by_source.get("info", [])
+    gags_block = "\n".join(f"- {t}" for t in gags)
+    info_block = "\n".join(f"- {t}" for t in info)
+    return (
+        "\nAVAILABLE CURATED ASCII ART LIBRARY (USE TO GROUND YOUR ASCII CARD PLANS):\n"
+        f"--- GAGS & COMEDIC CHARACTER REACTIONS ({len(gags)} available — AT LEAST 70% OF PLANNED ASCII CARDS MUST BE FROM THIS CATEGORY) ---\n"
+        f"{gags_block}\n\n"
+        f"--- INFORMATIVE VISUALIZATIONS & REAL-WORLD OBJECTS ({len(info)} available — AT MOST 30% OF PLANNED ASCII CARDS) ---\n"
+        f"{info_block}\n"
+    )
+
 
 
 #: Populated once per process by `_library_index`, guarded by `_index_lock` so

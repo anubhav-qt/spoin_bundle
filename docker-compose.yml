@@ -47,7 +47,8 @@ services:
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
+      SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
+
     depends_on:
       db:
         condition: service_healthy
@@ -62,7 +63,8 @@ services:
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
+      SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
+
       SPOIN_ENV: local
       SPOIN_CORS_ORIGINS: http://localhost:3000
       SPOIN_JWT_SECRET_KEY: dev-secret-not-for-prod
@@ -77,7 +79,7 @@ services:
       # the request, before any GenerationJob exists for the worker to pick up.
       SPOIN_GENERATOR: ${SPOIN_GENERATOR:-fake}
       SPOIN_GEMINI_API_KEYS: ${SPOIN_GEMINI_API_KEYS:-}
-      SPOIN_GEMINI_THINKING_LADDER: ${SPOIN_GEMINI_THINKING_LADDER:-gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5}
+      SPOIN_GEMINI_THINKING_LADDER: ${SPOIN_GEMINI_THINKING_LADDER:-gemini-3.6-flash:20:5,gemini-3.7-flash:20:5,gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5}
       SPOIN_GEMINI_GENERATOR_LADDER: ${SPOIN_GEMINI_GENERATOR_LADDER:-gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15}
       SPOIN_MAX_CONCURRENT_GENERATION_CALLS: ${SPOIN_MAX_CONCURRENT_GENERATION_CALLS:-5}
     ports:
@@ -172,7 +174,8 @@ services:
     build:
       context: ./apps/api
     environment:
-      SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
+      SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
+
       # See the `api` service's identical two lines above for why this reads
       # from `.env` via `${...}` instead of a literal -- same reasoning here.
       SPOIN_GENERATOR: ${SPOIN_GENERATOR:-fake}

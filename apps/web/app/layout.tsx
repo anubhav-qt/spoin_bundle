@@ -215,6 +215,9 @@ export const viewport: Viewport = {
   // Lets the feed paint under the notch / home indicator; the fixed mobile
   // bars use env(safe-area-inset-*) to stay clear of them (ADR-0064).
   viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

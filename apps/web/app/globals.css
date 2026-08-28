@@ -961,6 +961,12 @@ body {
   color: var(--good);
 }
 
+@media (max-width: 768px) {
+  .card[data-expanded="true"] .card-read {
+    display: none;
+  }
+}
+
 /* Only rendered while expanded — pushed to the far right of the head row by
    `margin-left: auto` on an otherwise flex-start row. The one way to close an
    expanded card from inside it, now that tapping the body no longer does. */
@@ -5873,7 +5879,7 @@ body.custom-cursor-active textarea {
   background: var(--bg);
   color: var(--fg);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.4;
 }
 

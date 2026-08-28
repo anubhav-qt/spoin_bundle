@@ -314,7 +314,15 @@ class _GateItem:
 #: for art more freely and the curriculum quota for `ascii` cards went up. v3
 #: corpora carry a materially higher share of art-bearing cards and should not
 #: be pooled with v2 when judging quality.
-CARD_PROMPT_VERSION = 3
+#:
+#: v3 -> v4 (ADR-0067 + ADR-0068): mermaid replaces hand-drawn ASCII diagrams;
+#: ASCII scenes are strictly pictorial; a curated ~2,487-entry reference
+#: library is wired in via embedding retrieval for every planned ascii card;
+#: three generation-time defects (fence wrapper, duplicate scene in body,
+#: structurally-invalid mermaid) are now enforced deterministically server-side.
+#: v4 content should not be pooled with v3 when judging quality.
+CARD_PROMPT_VERSION = 4
+
 
 
 def _clean_null_bytes(val: Any) -> Any:

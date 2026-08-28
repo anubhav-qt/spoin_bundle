@@ -35,6 +35,10 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0025](0025-quota-governor-as-a-library.md) | Extract the quota governor into a standalone library -- deferred past spoin v1 | unassigned |
 | [0026](0026-few-shot-examples-from-manual-review.md) | Add worked good/bad examples to the card prompts, from hand review of v2 cards (ADR-0059) | unassigned |
 | [0028](0028-responsive-right-rail-and-controls.md) | The right rail's own restructure from the responsive redesign (ADR-0064's deferred half) | unassigned -- items 1-2 shipped on `responsive-mobile-shell`; density pass + Popular/For You toggle left |
+| [0029](0029-mermaid-shape-budget-and-curated-ascii-library.md) | Deterministic mermaid shape budget (node count/label length) | unassigned -- curated-library retrieval half shipped, see doc |
+| [0030](0030-manual-review-curated-ascii-library.md) | Manually review all 2,532 curated ASCII library entries for art clarity and title accuracy before retrieval leans on them | Anubhav |
+| [0031](0031-planner-visibility-into-ascii-library-breakdown.md) | Give the card planner a category/example breakdown of the curated ASCII library, so `asset_direction` is written with a sense of what's actually available | unassigned -- blocked on 0030 |
+| [0032](0032-batch-topic-requests.md) | Let a user request several custom topics in one submission (a `+` to add rows, each with an optional description), sent to the server as one batched call instead of one at a time | unassigned |
 
 Tasks 0016-0021 are one sequence, gated on 0016. Read
 [ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and

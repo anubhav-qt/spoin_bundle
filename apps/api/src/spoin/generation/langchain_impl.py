@@ -68,6 +68,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -78,6 +79,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
+from spoin.content.ascii_library import AsciiLibraryEntry, top_candidates
 from spoin.core.config import Settings
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
@@ -411,15 +413,51 @@ def _format_type_quotas(type_quotas: dict[str, int]) -> str:
     return "\n".join(f"- {ct}: about {n}" for ct, n in wanted.items())
 
 
-def _format_plans(plans: list[CardPlan]) -> str:
+#: Task 0029: how many curated-library candidates an ascii-typed plan entry
+#: gets shown. High enough that a genuinely good match is very likely in the
+#: set; low enough that ten cards' worth of candidates doesn't dwarf the
+#: rest of the prompt (each candidate carries its own small art block).
+_ASCII_CANDIDATE_COUNT = 10
+
+
+def _format_ascii_candidates(candidates: list[AsciiLibraryEntry]) -> str:
+    if not candidates:
+        return ""
+    blocks = [f'  ["{c.title}"]\n  ```\n{c.art}\n  ```' for c in candidates]
+    return (
+        "\n  Curated reference pieces that may fit this scene (from a hand-verified "
+        f"library, all ≤{_ASCII_MAX_WIDTH} columns) -- ADAPT one if it genuinely suits "
+        "the idea (retitle it, add a label or a speech callout, trim what doesn't "
+        "apply), or draw an original scene if none of these fit better. These are "
+        "candidates, not a requirement to pick one:\n" + "\n".join(blocks)
+    )
+
+
+async def _format_plans(plans: list[CardPlan]) -> str:
     """ADR-0059: this writer call's slice of the tier's briefs. Returns "" when
     unplanned (the hero call, or a planning failure) so `CARDS_USER` renders
-    exactly as it did before the planning stage existed."""
+    exactly as it did before the planning stage existed.
+
+    Task 0029: an `ascii`-typed plan's `asset_direction` is also used as a
+    retrieval query against the curated library (`content/ascii_library.py`),
+    and the top matches are appended to that plan's own block -- never pooled
+    across the whole batch, since each card's scene is a different query."""
 
     if not plans:
         return ""
+
+    # Only ascii-typed plans with a real asset_direction are worth a retrieval
+    # call -- everything else gets `[]` without paying for one.
+    lookups = {
+        n: top_candidates(plan.asset_direction, k=_ASCII_CANDIDATE_COUNT)
+        for n, plan in enumerate(plans)
+        if plan.card_type == CardType.ASCII.value and plan.asset_direction
+    }
+    resolved = dict(zip(lookups.keys(), await asyncio.gather(*lookups.values()), strict=True))
+    ascii_candidates = [resolved.get(n, []) for n in range(len(plans))]
+
     blocks = []
-    for n, plan in enumerate(plans, start=1):
+    for n, (plan, candidates) in enumerate(zip(plans, ascii_candidates, strict=True), start=1):
         lines = [
             f"--- card {n} ---",
             f"concept: {plan.canonical_title}",
@@ -431,6 +469,9 @@ def _format_plans(plans: list[CardPlan]) -> str:
             lines.append(
                 f"angle (what makes it different from the others): {plan.content_direction}"
             )
+        candidates_block = _format_ascii_candidates(candidates)
+        if candidates_block:
+            lines.append(candidates_block)
         blocks.append("\n".join(lines))
     return (
         "\nThe briefs for the cards to write, one card each, in this order:\n"
@@ -521,11 +562,136 @@ def _ascii_over_budget_lines(art: str) -> list[tuple[int, int]]:
     ]
 
 
+#: `visual_slots.art` is meant to hold raw ASCII, but the model intermittently
+#: leaves the ```lang fence it drew the scene inside around it -- left alone,
+#: those backticks rendered as literal text at the top of the card (the
+#: original report behind this fix: a card's lead visual showing a stray
+#: ` ```text ` line). Stripped here, deterministically, rather than relied on
+#: from the prompt alone -- CLAUDE.md's "trusted for taste, never for
+#: constraints": the prompt already asks for no fence, this is the check.
+_ASCII_FENCE_WRAPPER = re.compile(r"^```[a-zA-Z0-9_-]*\n(.*?)\n?```$", re.DOTALL)
+
+
+def _strip_ascii_fence_wrapper(art: str) -> str:
+    stripped = art.strip("\n")
+    match = _ASCII_FENCE_WRAPPER.match(stripped.strip())
+    return match.group(1) if match is not None else stripped
+
+
+#: Loose identity for "is this the same scene" -- whitespace differences
+#: between `visual_slots.art` and a copy of it inside `body` are common (they
+#: come from two different generation slots), so exact string equality misses
+#: most real duplicates. Same normalization as the frontend's
+#: `looseFenceKey` in Card.tsx -- the two must agree on what "the same
+#: scene" means.
+def _loose_scene_key(text: str) -> str:
+    return re.sub(r"\s+", "", text)
+
+
+#: A fenced block, keeping enough to both classify it (content/archetype.py's
+#: own logic, duplicated in spirit here since importing it would need the
+#: language tag reasoning it already encodes) and remove it verbatim from
+#: `body`.
+_FENCE_BLOCK = re.compile(r"```[a-zA-Z0-9_-]*\n.*?```\n?", re.DOTALL)
+
+#: Same shape as `_FENCE_BLOCK`, but captures the language tag and inner
+#: content separately -- used to find a specific fence (e.g. ```mermaid)
+#: rather than to remove one wholesale.
+_FENCE = re.compile(r"```([a-zA-Z0-9_-]*)\n(.*?)```", re.DOTALL)
+
+
+def _strip_duplicate_scene_from_body(body: str, art: str) -> str:
+    """Removes the FIRST fenced block in `body` whose content loosely matches
+    `art` -- the prompt (ASCII_INSTRUCTIONS) tells the model not to redraw its
+    own scene into `body`, but a card is not trusted to have honored that on
+    its own. A body with no matching fence is returned unchanged."""
+
+    art_key = _loose_scene_key(art)
+    if not art_key:
+        return body
+
+    for match in _FENCE_BLOCK.finditer(body):
+        fenced = match.group(0)
+        inner = fenced.split("\n", 1)[1].rsplit("```", 1)[0]
+        if _loose_scene_key(inner) != art_key:
+            continue
+        # Remove exactly this one match and collapse the blank run it leaves
+        # behind -- every other fence in `body` (a genuinely different code
+        # or diagram block) is left untouched.
+        result = body[: match.start()] + body[match.end() :]
+        return re.sub(r"\n{3,}", "\n\n", result).strip()
+
+    return body
+
+
 def _finalize_ascii_fields(label: str, art: str, alt: str) -> tuple[str, dict[str, str]]:
     """Assemble the `visual_id` / `visual_slots` pair from art already known to
     be non-empty and within budget (originally or after a redraw)."""
 
     return (label.strip() or "untitled-scene")[:64], {"art": art, "alt": alt}
+
+
+#: ADR-0067: diagram cards write ```mermaid, and the prompt is trusted for
+#: WHAT the diagram shows, never for whether the syntax is valid mermaid --
+#: same "trusted for taste, never for constraints" line as the ASCII width
+#: budget above. This is deliberately a light structural check, not a real
+#: parser: it exists to catch the failure modes an LLM actually produces (an
+#: empty fence, a diagram-type keyword typo'd or omitted, no edges at all,
+#: unbalanced brackets from a truncated generation) without maintaining a
+#: mermaid grammar in Python. The client (`MermaidBlock.tsx`) runs the real
+#: parser at render time and falls back to showing the source verbatim on
+#: failure -- this check exists to keep an obviously-broken diagram from
+#: reaching that fallback silently on every single viewer, not to guarantee
+#: perfect syntax.
+_MERMAID_DIAGRAM_TYPES = (
+    "flowchart",
+    "graph",
+    "sequencediagram",
+    "statediagram",
+    "statediagram-v2",
+    "classdiagram",
+    "erdiagram",
+    "gantt",
+    "pie",
+    "timeline",
+    "journey",
+    "mindmap",
+    "quadrantchart",
+)
+
+#: A relationship of some kind: an arrow (flowchart/graph), a `->`/`->>`/`-->>`
+#: message (sequenceDiagram), or a `-->`/`:` transition (stateDiagram). Loose
+#: on purpose -- this only needs to rule out a diagram with declared nodes and
+#: nothing connecting them, not validate the exact arrow grammar per type.
+_MERMAID_EDGE_RE = re.compile(r"-{1,3}>|->>|--x|--o|:::|\.\.>|:")
+
+
+def _mermaid_structural_issue(source: str) -> str | None:
+    """Returns a short reason string if `source` fails the light structural
+    check, or `None` if it passes. Deliberately permissive -- a false
+    rejection costs a whole card; a false pass costs nothing beyond what the
+    client's own fallback already covers."""
+
+    lines = [line for line in source.split("\n") if line.strip()]
+    if not lines:
+        return "empty mermaid block"
+
+    first = lines[0].strip().lower()
+    # `flowchart TD` / `graph LR` / etc. carry a direction after the type; every
+    # other diagram type is the bare keyword, optionally with a title after it.
+    first_word = first.split()[0] if first.split() else ""
+    if first_word not in _MERMAID_DIAGRAM_TYPES:
+        return f"first line {lines[0].strip()!r} does not name a known mermaid diagram type"
+
+    if first_word in ("flowchart", "graph") and not _MERMAID_EDGE_RE.search(source):
+        return "flowchart/graph has no edges connecting its nodes"
+
+    opens = source.count("[") + source.count("(") + source.count("{")
+    closes = source.count("]") + source.count(")") + source.count("}")
+    if opens != closes:
+        return f"unbalanced brackets ({opens} opening vs {closes} closing)"
+
+    return None
 
 
 def _ascii_redraw_prompt(
@@ -1173,8 +1339,14 @@ class GeminiContentGenerator(ContentGenerator):
         for i, wc in enumerate(wire_cards):
             if not wc.ascii_art.strip():
                 continue
-            slot = (wc.ascii_label, wc.ascii_art, wc.ascii_alt)
-            if _ascii_over_budget_lines(wc.ascii_art):
+            # Strip a stray ```lang fence wrapper before the width check, not
+            # after -- the fence's own backtick line is short enough to never
+            # trip the budget itself, so a wrapped scene could otherwise sail
+            # through here and ship with literal backticks at the top of the
+            # card (see `_strip_ascii_fence_wrapper`'s docstring).
+            art = _strip_ascii_fence_wrapper(wc.ascii_art)
+            slot = (wc.ascii_label, art, wc.ascii_alt)
+            if _ascii_over_budget_lines(art):
                 pending[i] = slot
             else:
                 resolved[i] = slot
@@ -1212,12 +1384,13 @@ class GeminiContentGenerator(ContentGenerator):
                     # current art for the next round's feedback.
                     next_pending[i] = (label, art, alt)
                     continue
-                latest = (scene.ascii_label or label, scene.ascii_art, scene.ascii_alt or alt)
-                if not scene.ascii_art.strip() or _ascii_over_budget_lines(scene.ascii_art):
+                redrawn_art = _strip_ascii_fence_wrapper(scene.ascii_art)
+                latest = (scene.ascii_label or label, redrawn_art, scene.ascii_alt or alt)
+                if not redrawn_art.strip() or _ascii_over_budget_lines(redrawn_art):
                     # Still too wide (or returned empty, meaning "can't fit it").
                     # Feed the latest attempt back in with fresh violation
                     # numbers; fall back to the prior art if it gave us nothing.
-                    next_pending[i] = latest if scene.ascii_art.strip() else (label, art, alt)
+                    next_pending[i] = latest if redrawn_art.strip() else (label, art, alt)
                     continue
                 resolved[i] = latest
             pending = next_pending
@@ -1280,7 +1453,7 @@ class GeminiContentGenerator(ContentGenerator):
                     subtopic_description=subtopic_description,
                     difficulty=difficulty.value,
                     count=count,
-                    plans_block=_format_plans(plans or []),
+                    plans_block=await _format_plans(plans or []),
                     difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
                     existing_titles_block=_format_existing_titles(existing_titles),
                     avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
@@ -1309,9 +1482,35 @@ class GeminiContentGenerator(ContentGenerator):
                     f"{_ASCII_MAX_WIDTH} cols after redraw -- card rejected (ADR-0066)"
                 )
                 continue
+            body = wire_card.body
+
+            # Any ```mermaid fence in the body is a genuine content defect if
+            # it fails the structural check, not a call failure -- the model
+            # returned something, it's just not usable (CLAUDE.md's rejected-
+            # vs-failed distinction). Checked before art resolution so a bad
+            # diagram never gets as far as `CardDraft`.
+            mermaid_issue: str | None = None
+            for lang, content in _FENCE.findall(body):
+                if lang.strip().lower() != "mermaid":
+                    continue
+                issue = _mermaid_structural_issue(content)
+                if issue is not None:
+                    mermaid_issue = issue
+                    break
+            if mermaid_issue is not None:
+                failures.append(f"malformed mermaid diagram: {mermaid_issue}")
+                continue
+
             try:
                 if i in resolved_art:
-                    visual_id, visual_slots = _finalize_ascii_fields(*resolved_art[i])
+                    label, art, alt = resolved_art[i]
+                    # The prompt tells the model not to redraw its own scene a
+                    # second time into `body` (ASCII_INSTRUCTIONS), but a card
+                    # is not trusted to have honored that on its own -- strip a
+                    # duplicate copy deterministically rather than shipping the
+                    # same picture twice.
+                    body = _strip_duplicate_scene_from_body(body, art)
+                    visual_id, visual_slots = _finalize_ascii_fields(label, art, alt)
                 else:
                     visual_id, visual_slots = None, None
                 items.append(
@@ -1322,7 +1521,7 @@ class GeminiContentGenerator(ContentGenerator):
                         # independent judge, not this call, is what validates it).
                         canonical_title=wire_card.canonical_title or wire_card.title,
                         summary=wire_card.summary,
-                        body=wire_card.body,
+                        body=body,
                         difficulty=difficulty,
                         visual_id=visual_id,
                         visual_slots=visual_slots,

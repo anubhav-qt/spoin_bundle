@@ -73,11 +73,47 @@ monospace box exactly as it did; only a ```mermaid fence takes the new path. The
 cards already in `spoin_db` are untouched and nothing is re-generated. The corpus will
 carry both shapes indefinitely, which is correct — an old card is not wrong, it is old.
 
-**Mermaid is generated content and is not trusted.** It renders with
-`securityLevel: "strict"` (no click handlers, no inline HTML in labels), and a diagram
-that fails to parse falls back to showing its source in the monospace box rather than
-rendering blank. A malformed diagram degrades to exactly what an ASCII diagram would
-have been.
+**Mermaid is generated content and is not trusted, on both sides of the wire.**
+Client-side it renders with `securityLevel: "strict"` (no click handlers, no inline
+HTML in labels), and a diagram that fails to parse falls back to showing its source in
+the monospace box rather than rendering blank. Server-side, `langchain_impl.py`'s
+`_mermaid_structural_issue` runs a light structural check on every ```mermaid fence
+before the card is ever written — a known diagram-type keyword on the first line, at
+least one edge for a flowchart/graph, balanced brackets — and rejects the whole card
+(counted as a rejection, not a call failure, per CLAUDE.md) when it fails. It is
+deliberately not a real parser: it exists to catch what an LLM actually produces
+(an empty fence, a typo'd diagram type, declared nodes with nothing connecting them,
+brackets truncated mid-generation), not to guarantee perfect syntax — the client's own
+fallback is still the last line of defense for whatever slips past it.
+
+**Two more generation-time defects get the same "enforced outside the model"
+treatment**, both server-side in `langchain_impl.py`, both found by generation
+actually running rather than anticipated up front:
+
+- `_strip_ascii_fence_wrapper` strips a stray ` ```lang ` fence the model sometimes
+  leaves wrapped around `visual_slots.art` — left alone, those backticks rendered as
+  literal text at the top of the card. Applied before the width-budget check, not
+  after, so a wrapped scene can't sail through by virtue of its own fence line being
+  short.
+- `_strip_duplicate_scene_from_body` removes a card's `body` copy of its own lead
+  visual when it loosely matches `visual_slots.art` — the prompt tells the model not
+  to redraw the same scene twice (ASCII_INSTRUCTIONS), but that instruction is not
+  trusted on its own, so the duplicate is stripped deterministically by content match
+  (whitespace-insensitive, same normalization as the frontend's `looseFenceKey`)
+  rather than relied on to simply not happen.
+
+`content/archetype.py`'s `_DIAGRAM_LANG_TAGS` also needed `mermaid` added explicitly —
+without it, a ```mermaid fence whose body has no `-->` (a `sequenceDiagram`'s `->>`, a
+bare `timeline`) fell into the generic "real language tag, therefore code" branch and
+was classified `code` instead of `diagram`. That misclassification wasn't cosmetic: it
+fed the pipeline's per-tier quota accounting (`pipeline/state.py`'s
+`_card_matches_type`) and the feed's archetype-diversity spread
+(`feed/ranking.py`'s `_primary_archetype`), and — client-side — it could make
+`Card.tsx`'s `resolveHero` look for a code fence on a combo-tagged card that had no
+code, dropping the lead visual entirely. `Card.tsx` now also falls back to ANY fence
+in the body when the kind-specific search comes up empty, so a future server/client
+classification disagreement degrades to "shows the fence that's actually there"
+rather than "shows nothing."
 
 **Theming follows the palette.** Mermaid's theme variables are filled from the live
 CSS tokens at render time rather than hardcoded, so a diagram tracks the five shipped

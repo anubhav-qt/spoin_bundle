@@ -1011,13 +1011,16 @@ function resolveHero(
         ? "diagram"
         : null;
 
-  // With an `art` slot present, ANY fence in the body is the fuller twin of
-  // it worth preferring — the archetype tags describe the card's teaching
-  // shape, and a scene drawn into both slots does not always earn the tag
-  // that would find it by kind alone.
+  // Two reasons this falls through to ANY fence rather than stopping at
+  // `kind`: an `art` slot present means the body fence is likely the fuller
+  // twin of the same scene, worth preferring even off-kind; and a server/
+  // client classification disagreement (`card.archetype` says "diagram" but
+  // this component's own `isDiagramFence` reads the same fence differently)
+  // must never mean the card loses its visual outright — it should show
+  // WHATEVER fence body actually has, not fall back to a bare summary line.
   const fence =
     (kind !== null ? firstFenceOfKind(body, kind) : null) ??
-    (art !== null ? firstFence(body) : null);
+    (art !== null || kind !== null ? firstFence(body) : null);
 
   if (fence !== null) {
     const skipKey = fenceKey(fence.content);

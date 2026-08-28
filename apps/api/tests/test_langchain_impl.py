@@ -23,6 +23,7 @@ from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
 from spoin.generation.base import (
     CardCorrectionQuery,
+    CardPlan,
     CardVerificationQuery,
     CurriculumDraft,
     SubtopicGroupDraft,
@@ -1250,6 +1251,65 @@ async def test_generate_cards_prompt_selection_by_card_type(
     assert len(result.items) == 1
     system_prompt = str(captured_prompt[0])
     assert expected_phrase in system_prompt
+
+
+async def test_generate_cards_with_ascii_plan_shows_retrieved_candidates() -> None:
+    """Task 0029: an ascii-typed plan's `asset_direction` is used as a retrieval
+    query against the curated library, and the matches are shown in the SAME
+    card's brief in the user prompt -- not pooled across the batch, and not
+    shown for a plan of a different type."""
+
+    generator = _generator()
+    wire = _WireCardBatch(
+        cards=[
+            _WireCard(title="T1", canonical_title="CT1", summary="S1", body="B1"),
+            _WireCard(title="T2", canonical_title="CT2", summary="S2", body="B2"),
+        ]
+    )
+    captured_prompt: list[object] = []
+
+    async def _capture(prompt: object) -> _WireCardBatch:
+        captured_prompt.append(prompt)
+        return wire
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _capture
+    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
+        result = await generator.generate_cards(
+            topic_name="Gym",
+            subtopic_title="Progressive Overload",
+            subtopic_description="Adding load over time",
+            difficulty=Difficulty.BEGINNER,
+            count=2,
+            existing_titles=[],
+            builds_on=[],
+            difficulty_examples={},
+            avoid_bodies=[],
+            rejection_feedback=[],
+            plans=[
+                CardPlan(
+                    canonical_title="Progressive Overload",
+                    card_type="ascii",
+                    asset_direction="a boxer in a fighting stance getting stronger",
+                    content_direction="the gag angle",
+                ),
+                CardPlan(
+                    canonical_title="Rest Days Matter",
+                    card_type="prose",
+                    asset_direction="",
+                    content_direction="the mental-model angle",
+                ),
+            ],
+        )
+
+    assert len(result.items) == 2
+    user_prompt = str(captured_prompt[0])
+    # The ascii-typed card's brief carries retrieved candidates...
+    assert "Curated reference pieces" in user_prompt
+    assert "card 1" in user_prompt
+    # ...and they appear once per query, not blanket-appended to the whole
+    # batch's prompt regardless of which card asked for them.
+    assert user_prompt.count("Curated reference pieces") == 1
 
 
 async def test_quota_exhausted_error_is_reraised_across_methods() -> None:

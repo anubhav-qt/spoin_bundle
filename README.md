@@ -79,7 +79,7 @@ it costs:
 
 | Decision | Shape |
 |---|---|
-| [ADR-0042](docs/adr/0042-freeform-ascii-and-real-hero-mechanism.md): ASCII scenes | Cards can carry a stickman scene, **drawn by the generator directly** (superseding [ADR-0021](docs/adr/0021-ascii-scene-library.md)'s never-authored hand-drawn catalog). A 40-column width budget is enforced server-side, not prompted -- an over-budget line drops the visual and keeps the card. |
+| [ADR-0042](docs/adr/0042-freeform-ascii-and-real-hero-mechanism.md): ASCII scenes | Cards can carry an ASCII scene, **drawn by the generator directly** (superseding [ADR-0021](docs/adr/0021-ascii-scene-library.md)'s never-authored hand-drawn catalog). A 40-column width budget is enforced server-side, not prompted -- an over-budget line drops the visual and keeps the card. [ADR-0067](docs/adr/0067-mermaid-diagrams-and-form-free-ascii.md) removes the stickman requirement: a scene may take any form. |
 | [ADR-0022](docs/adr/0022-dual-titles.md): two titles | `title` is playful and shown on the feed face; `canonical_title` is literal and is what quizzes, progress lists, search, and the generation prompt read. Make the title playful without this and ADR-0007's duplicate prevention silently stops working. **Built**: schema and generation prompt (not live-verified, see [generation-pipeline.md](docs/architecture/generation-pipeline.md)). |
 | [ADR-0023](docs/adr/0023-reader-font-selection.md): five reader fonts | Same mechanism as the five palettes. `--font-mono` is deliberately **not** part of the choice: ASCII scenes are only real if the characters are fixed-width. **Built** ([ADR-0037](docs/adr/0037-site-wide-font-picker.md)). |
 

@@ -1,0 +1,728 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: TOYS
+# Total artworks in category fitting <=40 cols: 40
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 512999c4ffb07bd4 | TITLE: Paper dolls | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 32x5 ===
+```
+       _    _    _    _    _
+    __( )__( )__( )__( )__( )__
+   '--. .--. .--. .--. .--. .--'
+     / _ \/ _ \/ _ \/ _ \/ _ \
+jgs  (/ \)(/ \)(/ \)(/ \)(/ \)
+```
+
+=== ID: cf8b4c657eb1c3e9 | TITLE: Marionette | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 14x6 ===
+```
+       ___+___
+       :  :  :
+       :  o  :
+       :_/|\/
+          /\
+ejm96    / /
+```
+
+=== ID: 57ce6d488f3639f0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 16x8 ===
+```
+         &&&
+        (+.+)
+      ___\=/___
+     (|_ ~~~ _|)
+        |___|
+        / _ \
+       /_/ \_\
+ejm97 /_)   (_\
+```
+
+=== ID: e012f6856582c840 | TITLE: Untitled | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 16x9 ===
+```
+       &&&&&&&
+      &&(+.+)&&
+      ___\=/___
+     (|_ ~~~ _|)
+        )___(
+      /'     `\
+     ~~~~~~~~~~~
+     `~//~~~\\~'
+ejm97 /_)   (_\
+```
+
+=== ID: a9d948c007682106 | TITLE: Raggedy Ann | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 29x14 ===
+```
+       ,,,,,,,,,,,,,,,
+    ,(((((((((())))))))),
+  ,((((((((((()))))))))))),
+ ,(((((((((\\\|///))))))))),
+,((((((((((///|\\\)))))))))),
+((((((((//////^\\\\\\))))))))
+((((((' .-""-   -""-. '))))))
+(((((  `\.-.     .-./`  )))))
+((((( -=(0) )   (0) )=- )))))
+'((((   /'-'     '-'\   ))))'
+ ((((\   _,   A  ,_    /))))
+ '((((\    \     /    /))))'
+   '((('.   `-o-'   .')))'
+jgs      '-.,___,.-'
+```
+
+=== ID: f44e48106d9e0d6b | TITLE: Hand Doll | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 25x17 ===
+```
+       __     __
+      (( \---/ ))
+       )__   __(
+      / ()___() \
+      \  /(_)\  /
+       \ \_|_/ /
+ _______>     <_______
+//\      |>o<|      /\\
+\\/___           ___\//
+      |         |
+      |         |
+      |         |
+      |         |
+      `--....---'
+        \     \
+         \     `.     hjw
+          \      `.
+```
+
+=== ID: 4aa4e750a799a818 | TITLE: Untitled | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: other | SIZE: 25x15 ===
+```
+              _,;;.,_
+     ,-;;,_  ;,',,,'''@
+  ,;;``  `'\\|//``-:;,.
+@`         ;^^^;      `'@
+           :@ @:
+           \ u /
+  ,=,------)^^^(------,=,
+  '-'-----/=====\-----'-'
+          \_____/
+      '`\ /_____\
+      `\ \\_____/_
+        \//_____\/|
+        |        ||
+        |  ldb   |'
+        :________:`
+```
+
+=== ID: b97ddb547f76897a | TITLE: Untitled | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: other | SIZE: 31x18 ===
+```
+          ..   ..
+     __   ; `.'  :
+    |  +. :  ;   :   __
+  .-+\   `:  ;   ,,-'  :
+  `.  `.  `\ ;  :'   ,'
+ ,-+`+. `. \.;.:  _,' `-.
+ `.__  "-.::||::.:'___-+'
+ -"  `--..::::::_____.IIHb
+`-:______.:; `::,,...,;:HB\
+ .+         \ ::,,...,;:HB \
+'-.______.:+ \`+.,...,;:P'  \
+.-'\   \
+`-.______.:+   \______________\
+.-::::::::,     BBBBBBBBBBBBBBB
+::,,...,;:HB    BBB         BBB
+::,,...,;:HB    BBB SLiNkEY BBB
+::,,...,;:HB\   BBB         BBB
+::,,...,;:HB \  BBBBBBBBBBBBBBB
+```
+
+=== ID: f35d30b67ac23123 | TITLE: Jack in the Box | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: other | SIZE: 25x26 ===
+```
+      0_
+       \`.     ___
+        \ \   / __>0
+    /\  /  |/' /
+   /  \/   `  ,`'--.
+  / /(___________)_ \
+  |/ //.-.   .-.\\ \ \
+  0 // :@ ___ @: \\ \/
+    ( o ^(___)^ o ) 0
+     \ \_______/ /
+ /\   '._______.'--.
+ \ /|  |<_____>    |
+  \ \__|<_____>____/|__
+   \____<_____>_______/
+       |<_____>    |
+       |<_____>    |
+       :<_____>____:
+      / <_____>   /|
+     /  <_____>  / |
+    /___________/  |
+    |           | _|__
+    |           | ---||_
+    |   |L\/|/  |  | [__]
+    |  \|||\|\  |  /
+jgs |           | /
+    |___________|/
+```
+
+=== ID: 3629814ffafda20e | TITLE: Balloons | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: balloons | SIZE: 24x11 ===
+```
+    .-'"'-.
+   / #     \
+  : #       :  .-'"'-.
+   \       /  / #     \
+    \     /  : #       :
+jgs  `'q'`    \       /
+       (       \     /
+        )       `'p'`
+       (          )
+        )        (
+                  )
+```
+
+=== ID: 4ce1e6cbdf0a42ce | TITLE: Party hat and balloons | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: balloons | SIZE: 35x14 ===
+```
+           ^ _...._      ^
+           .'      '.  _...._
+      ^   /          \'      '.
+          |X        /          \
+        -. \        |X         |  ^
+      .-. |'.-.   .' \        /
+         \;/  `/\`    '.    .'
+         / \   (        `/\`
+        /   \   \    ^    `)
+    ^  /     \   )        (     ^
+      /'-...-'\ (          \
+     /-.__ __.-\            )
+jgs '._   `   _.'  ^       /
+       `"""""`
+```
+
+=== ID: 4c4447d9e81f0bf4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 34x4 ===
+```
+     ()=()   ()-()   ()=()   ()-()
+     ('Y')   (':')   (^;^)   ('&')
+     q . p   d . b   C   C   c . c
+jgs  ()_()   ()_()   ()_()   ()=()
+```
+
+=== ID: cfcbfe2673de574b | TITLE: Untitled | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 7x5 ===
+```
+  ___
+{~._.~}
+ ( Y )
+()~*~()
+(_)-(_)
+```
+
+=== ID: 7f8a42a6fcdfe19c | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 18x5 ===
+```
+ ,~~.,''"'`'.~~.
+: {` .- _ -. '} ;
+ `:   O(_)O   ;'
+  ';  ._|_,  ;`
+   '`-.\_/,.'` hjw
+```
+
+=== ID: dde278a55e9cff0e | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 13x5 ===
+```
+  (".___.")
+  _ { + } _
+()__|>o<|__()
+   (  .  )
+ (_)     (_)
+```
+
+=== ID: ac0df14fc74e4c1f | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 9x6 ===
+```
+ {"`-'"}
+  (o o)
+,--`Y'--.
+``:   ;''
+  / _ \
+ ()' `()
+```
+
+=== ID: 01061556721ca2dc | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 9x6 ===
+```
+ {"`-'"}
+  (o o)
+,--`Y'--.
+`-:,-.;-'
+  /`_'\
+ (_/ \_)
+```
+
+=== ID: 5b89fdd1e6607ecf | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 16x6 ===
+```
+  _   _
+ (o\-(o\
+ (      \
+ a  a    ;
+ (O _   /_
+,'\-j_.'  `. hjw
+```
+
+=== ID: b661ef8f78a6e1b1 | TITLE: Untitled | ARTIST: R. Elizabeth A | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 14x7 ===
+```
+   /\___/\
+   | o o |
+  __\_^_/__
+ (__/   \__)
+  _|  .  |_
+ (__\___/__)
+R. Elizabeth A
+```
+
+=== ID: 20bc2c06725ee715 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 9x7 ===
+```
+ {"`-'"}
+  (o o)
+  ,`Y'.
+ / ,-. \
+(_)| |(_)
+  /`_'\
+ (_) (_)
+```
+
+=== ID: 4073c535ca7c581f | TITLE: Small teddy bear | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 13x7 ===
+```
+    (`-"-`)
+     /'Y'\
+   __\_^_/__
+  ()_ >o< _()
+     ) : (
+jgs / /-\ \
+   ()/   \()
+```
+
+=== ID: 138005d025b74f96 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 17x10 ===
+```
+     ___
+  (o|_+_|o)
+   ( . . )
+  _( (Y) )_
+ / /,---.\ \
+/ / | + | \ \
+\_)-"   "-(_/
+  |_______|
+  _)  |  (_
+ (___,'.___)  hjw
+```
+
+=== ID: 4db778157e542073 | TITLE: Untitled | ARTIST: Rick Cox | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 20x10 ===
+```
+   ( )_____( )
+    / O   O \
+   |   (@)   |
+   \    ~    /  Rick
+    \ <}*{> /   Cox
+ ___/  ___  \___
+()___ /   \ ___()
+    ( \___/ )
+   /_ /   \ _\
+  (__)     (__)
+```
+
+=== ID: c64f92c14fb7a06c | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 21x13 ===
+```
+ (\     (\
+ ("\  _ ("\ _
+((/ \(o\---/o)
+((/  \( . . )  /|
+((/  _( (T) )-/-l_
+ (/ (  \__ (_/_(__)
+  \/ \    `-|   |
+  (   `---.__)--+--|>
+   \    \  \ \  |
+    )    )  ) \_|
+   (    (  ( hjw
+    \    )  )`97
+     `--^`--^
+```
+
+=== ID: d5203c4284f6b922 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 22x14 ===
+```
+      ,-._____,-.
+     (_c       c_)
+      /  e-o-e  \
+     (  (._|_,)  )
+      >._`---'_,<
+    ,'/  `---'  \`.
+  ,' /           \ `.
+ (  (             )  )
+  `-'\           /`-'
+     |`-._____.-'|
+     |     Y     |
+     /     |     \
+hjw (      |      )
+     `-----^-----'
+```
+
+=== ID: efd6eebc01a3de28 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 18x14 ===
+```
+          _  ,-.
+         (,-/)  )
+         /      \
+      o-' 9      ;
+      \         /
+       `-.     (
+       ,'/  ,--.;
+,-. _,','  /   ||
+|  (  / _,'    /|
+>-. `( (    _,' |
+|  \_.--`~~' `.  )
+|             ;-'
+`.__,.      ,'
+      `----'  hjw
+```
+
+=== ID: 926c474485e02760 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 36x20 ===
+```
+          ___   .--.
+    .--.-"   "-' .- |
+   / .-,`          .'
+   \   `           \
+    '.            ! \
+      |     !  .--.  |
+      \        '--'  /.____
+     /`-.     \__,'.'      `\
+  __/   \`-.____.-' `\      /
+  | `---`'-'._/-`     \----'    _
+  |,-'`  /             |    _.-' `\
+ .'     /              |--'`     / |
+/      /\              `         | |
+|   .\/  \      .--. __          \ |
+ '-'      '._       /  `\         /
+    jgs      `\    '     |------'`
+               \  |      |
+                \        /
+                 '._  _.'
+                    ``
+```
+
+=== ID: cbbac3329e6f58c9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 27x24 ===
+```
+     __             __
+    /_ \_.--"""--._/ _\
+    \ )   _     _   ( /
+     |   (o)___(o)   |
+     |      \_/      |
+     \       |       /
+      \     <Y>     /
+       \_    _    _/
+      ___)==( )==(___
+    /'      //\      `\
+   /       // \\       \
+  /   |   |/   \|   |   \
+ /,_ /|             |\ _,\
+((_// |             | \\_))
+ `-'  |             |  `-'
+      |             |
+      |             |
+      |      _      |
+     /      / \      \
+jgs /      /   \      \
+   /      /     \      \
+ _/      /       \      \_
+( _____ /         \ _____ )
+ '-----'           `-----'
+```
+
+=== ID: c5e8e1d7342241b8 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: toys | SUBCATEGORY: pez | SIZE: 11x25 ===
+```
+   .-O-O-.
+  ((((())))
+  ()-   -()
+  `(  -  )'
+akg )   (
+  /\-----/\
+  \|-----|/
+   |     |
+   |  _  |
+   | |_) |
+   | |   |
+   |     |
+   |     |
+   |  _  |
+   | |_  |
+   | |_  |
+   |     |
+   |     |
+   | __  |
+   |  /  |
+   | /_  |
+   |     |
+   |     |
+Pru|_____|
+  '-------'
+```
+
+=== ID: 92db942d6e023a08 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: toys | SUBCATEGORY: pez | SIZE: 19x26 ===
+```
+             __
+            ,~~`.
+      __   /~  o|
+ \\__/_   />~ ? _\
+/_\ /    </ `   /
+            /   \
+          /\-----/\
+          \|-----|/
+           |     |
+           |  _  |
+           | |_) |
+           | |   |
+           |     |
+           |     |
+           |  _  |
+           | |_  |
+           | |_  |
+           |     |
+           |     |
+           | __  |
+           |  /  |
+           | /_  |
+           |     |
+           |     |
+        Pru|_____|
+          '-------'
+```
+
+=== ID: 925cfc55d6400855 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: toys | SUBCATEGORY: pez | SIZE: 13x31 ===
+```
+    .o@o.
+    |. .|
+    :'.':
+     \-/
+  .-'' ''-.
+ / (*) (*) \
+/ /\     /\ \
+\ \_| o |_/ /
+ \_/\___/\_/
+   | \_/ |
+   |  |  |
+  /\-----/\
+  \|-----|/
+   |     |
+   |  _  |
+   | |_) |
+   | |   |
+   |     |
+   |     |
+   |  _  |
+   | |_  |
+   | |_  |
+   |     |
+   |     |
+   | __  |
+   |  /  |
+   | /_  |
+   |     |
+   |     |
+Pru|_____|
+  '-------'
+```
+
+=== ID: f258ab1a6c959ea9 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: toys | SUBCATEGORY: pez | SIZE: 21x31 ===
+```
+          o
+       o^/|\^o
+   o\*`'.\|/.'`*/o
+    \\\\\\|//////
+     {><><@><><}
+    }}} _   _ {{{
+  }}}}  6   6  {{{
+ {{{{{    ^    }}}}
+{{{{{{\  -=-  /}}}}}}
+{{{{{{{;.___.;}}}}}}}
+ {{{{{{{)   (}}}}}}''
+      /\====/\
+      \|----|/
+       |    |
+       |  _ |
+       | |_)|
+       | |  |
+       |    |
+       |    |
+       |  _ |
+       | |_ |
+       | |_ |
+       |    |
+       |    |
+       | __ |
+       |  / |
+       | /_ |
+       |    |
+       |    |
+    Pru|____|
+      `------'
+```
+
+=== ID: d4c4be5455d63a8b | TITLE: Untitled | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: pez | SIZE: 20x34 ===
+```
+ (
+(_)
+###       .
+(#c    __\|/__
+ #\     wWWWw
+ \ \-. (/. .\)
+ /\ /`\/\   /\
+ |\/   \_) (_|
+ `\.' ; ; `' ;`\
+   `\;  ;    .  ;/\
+     `\;    ;  ;|  \
+      ;   .'  ' ;  /
+      |_.'   ;  | /)
+      (_    ''._;/`
+       /\-----/\
+       \|-----|/
+        |     |
+        |  _  |
+        | |_) |
+        | |   |
+        |     |
+        |     |
+        |  _  |
+        | |_  |
+        | |_  |
+        |     |
+        |     |
+        | __  |
+        |  /  |
+        | /_  |
+        |     |
+        |     |
+        |_____|
+       `-------'
+```
+
+=== ID: 7b8bef8939f86698 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 21x8 ===
+```
+  , Beanie Babies .
+ ('.   ,.---.,   .')
+  \ `-'       `-' /
+ __\;   O   O   `/__
+(__/     ___     \__)
+   (    /, ,\    )
+    \   \___/   /
+ dwb `~~~~~~~~~'
+```
+
+=== ID: 2c4be6070f1a155e | TITLE: Seaweed, the otter | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 28x10 ===
+```
+  .-"""-.
+ /      o\
+|    o   0).-.
+|       .-;(_/     .-.
+ \     /  /)).---._|  `\   ,
+  '.  '  /((       `'-./ _/|
+    \  .'  )        .-.;`  /
+     '.             |  `\-'
+       '._        -'    /
+ jgs      ``""--`------`
+```
+
+=== ID: 5bfe48de4ae3c20c | TITLE: Ty logo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 28x12 ===
+```
+         _...._   _...._
+       .'      '.'__/\__'.
+      /   .-.     '.  .'  \
+     ;   _|  |_    /.'.\   ;
+     |  (_    _).-. .-.    |
+     |    |  |  |  U  |    |
+      ;   |  |  \     |   ;
+       \  \  '-')'-.  /  /
+        \  '...'_.' .'  /
+         '.    (__.'  .'
+     jgs   '.       .'
+             `'-.-'`
+```
+
+=== ID: f7ce0b89a1c37ee4 | TITLE: Bongo, the monkey | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 21x16 ===
+```
+         _..._
+       .'     '.
+      /'-.---.-'\
+      |/`     `\|
+     ( \  0 0  / )
+      |/   V   \|
+       \ '-:-' /
+      .'`-----'`.
+    /`           `\
+   /  /         \  \
+  /._/|         |\_.\
+  |  )\._     _./(  |
+  \_)_/_   Y   _\_(_/
+    / ` ) / \ / ` \
+    \   \/   \|   /
+jgs  '._/     \_.'
+```
+
+=== ID: 7a0685cecf9b2508 | TITLE: Pinchers, the lobster | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 33x17 ===
+```
+           ."".-._.-."".
+          |   \  |  /   |
+           \   \.T./   /
+            '-./   \.-'
+              /     \
+             ;       ;
+             |       |
+             |       |
+            /         \
+            |    .    |
+         __.|    :    |.__
+     .-'`   |    :    |   `'-.
+   /`     ."\  0 : 0  /".     `\
+  |     _/   './ : \.'   \_     |
+  |    /      /`"""`\      \    |
+   \   \   .-'       '._   /   /
+jgs '-._\                 /_.-'
+```
+
+=== ID: 0de3e985e3889460 | TITLE: Hippity | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 30x19 ===
+```
+          _   ____  _.-"-._
+        .' `;'    ':.      '-.
+       /  ./     .'`\`-...-'`
+      /  /|D_  .O    |
+     /  / |=\/`=     |
+    |_.'  |  |       |
+           \  \   _ /_
+           /`---'}_()_{
+          /`'---' //\\\
+         /;      (/\ \)\
+        / |         \   \
+       /  |         |   |
+      /  / .     _ /   /
+      \_|   '. .'  '-'|
+        \    .-|     /
+jgs  _.-'   /  |    /
+    (      /  / .--;
+     '-.__/   |    /
+              \__.
+```
+
+=== ID: 78e2471d6eff94f3 | TITLE: Inch | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: beanie-babies | SIZE: 23x29 ===
+```
+        |    |
+        |    o
+        |   /|  .--o
+        |   ||_/_
+        | .'\    `'.
+        |/   \      `\
+        ||       O    |
+        |;            /
+        | \   '-,___.'
+       _|  \      \
+    .-' |   ;      \
+  .'    |   |       ;
+ /      |   |       |
+|       |   |       ;
+|       L_  |      /
+|         `'-.  _.'
+\             `'._
+ \                '.
+  '.                \
+    `'._             ;
+        T-._         |
+       ,|   |-,      ;
+     .' |   |       /
+    /   |   |     .'
+   /    |   |.--'`
+  |   .-|   |
+  |  /  |   |
+  \ /   |   |
+   ` jgs|   |
+```
+

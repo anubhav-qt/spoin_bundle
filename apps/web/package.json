@@ -14,6 +14,7 @@
     "framer-motion": "^11.15.0",
     "html-to-image": "^1.11.13",
     "katex": "^0.18.4",
+    "mermaid": "^11.17.2",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

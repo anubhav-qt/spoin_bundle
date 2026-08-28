@@ -1,0 +1,1700 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: COMPUTERS
+# Total artworks in category fitting <=40 cols: 106
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: aeda0e50cf50b186 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 15x4 ===
+```
+      _
+     |-|  __
+jgs  |=| [Ll]
+     "^" ====`o
+```
+
+=== ID: 7e8fed287f2176de | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 15x4 ===
+```
+             _
+       __   |-|
+jgs   [Ll]  |=|
+      ====`o"^"
+```
+
+=== ID: 2edbbb0462ea44eb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 13x5 ===
+```
+      ____
+     ||""||
+     ||__||
+jgs  [ -=.]`)
+     ====== 0
+```
+
+=== ID: 7d3983f96545baf5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 13x6 ===
+```
+   .----.
+   |C>_ |
+ __|____|__
+|  ______--|
+`-/.::::.\-'a
+ `--------'
+```
+
+=== ID: cdb7054d517c2858 | TITLE: Untitled | ARTIST: Kevin Kreamer | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 14x6 ===
+```
+.--.
+|__| .-------.
+|=.| |.-----.|
+|--| || KCK ||
+|  | |'-----'|
+|__|~')_____('
+```
+
+=== ID: a8c764d9b7608ea9 | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 27x7 ===
+```
+               __
+    ..=====.. |==|
+    ||     || |= |
+ _  ||     || |^*| _
+|=| o=,===,=o |__||=|
+|_|  _______)~`)  |_|
+    [=======]  ()       ldb
+```
+
+=== ID: d8c619f43b0b80ce | TITLE: Sick computer | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 21x8 ===
+```
+         _______
+        |.-----.|
+        ||x . x||
+        ||_.-._||
+        `--)-(--`
+       __[=== o]___
+      |:::::::::::|\
+jgs   `-=========-`()
+```
+
+=== ID: 5284e2f8d8526812 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 24x10 ===
+```
+                  .----.
+      .---------. | == |
+      |.-"""""-.| |----|
+      ||       || | == |
+      ||       || |----|
+      |'-.....-'| |::::|
+      `"")---(""` |___.|
+     /:::::::::::\" _  "
+    /:::=======:::\`\`\
+jgs `"""""""""""""`  '-'
+```
+
+=== ID: 3d20731707f4c71a | TITLE: Untitled | ARTIST: Jeremy J. Olson | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 15x10 ===
+```
+   _____
+  | ___ |
+  ||   ||  J.O.
+  ||___||
+  |   _ |
+  |_____|
+ /_/_|_\_\----.
+/_/__|__\_\   )
+             (
+             []
+```
+
+=== ID: 37bc7fd33d1e26f6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 24x11 ===
+```
+ ______________
+||            ||
+||            ||
+||            ||
+||            ||
+||____________||
+|______________|
+ \\############\\
+  \\############\\
+   \      ____    \
+    \_____\___\____\CA15
+```
+
+=== ID: d93c89b6c50e40d4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 23x12 ===
+```
+       ___________
+      |.---------.|
+      ||         ||
+      ||         ||
+      ||         ||
+      |'---------'|
+       `)__ ____('
+       [=== -- o ]--.
+     __'---------'__ \
+jgs [::::::::::: :::] )
+     `""'"""""'""""`/T\
+                    \_/
+```
+
+=== ID: 250bd85761c35ad7 | TITLE: Untitled | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 29x13 ===
+```
+   ._________________.
+   |.---------------.|
+   ||               ||
+   ||   -._ .-.     ||
+   ||   -._| | |    ||
+   ||   -._|"|"|    ||
+   ||   -._|.-.|    ||
+   ||_______________||
+   /.-.-.-.-.-.-.-.-.\
+  /.-.-.-.-.-.-.-.-.-.\
+ /.-.-.-.-.-.-.-.-.-.-.\
+/______/__________\___o_\ DrS
+\_______________________/
+```
+
+=== ID: 3f48d10c283c85d8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 22x13 ===
+```
+   +--------------+
+   |.------------.|
+   ||            ||
+   ||            ||
+   ||            ||
+   ||            ||
+   |+------------+|
+   +-..--------..-+
+   .--------------.
+  / /============\ \
+ / /==============\ \
+/____________________\
+\____________________/
+```
+
+=== ID: cdd1b8129ebbddd4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 33x14 ===
+```
+ ___________
+||         ||            _______
+||ASCII ART||           | _____ |
+||         ||           ||_____||
+||_________||           |  ___  |
+|  + + + +  |           | |___| |
+    _|_|_   \           |       |
+   (_____)   \          |       |
+              \    ___  |       |
+       ______  \__/   \_|       |
+      |   _  |      _/  |       |
+      |  ( ) |     /    |_______|
+      |___|__|    /         CA15
+           \_____/
+```
+
+=== ID: 464e15f1cc01f4da | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 34x15 ===
+```
+ ___________________
+ | _______________ |
+ | |XXXXXXXXXXXXX| |
+ | |XXXXXXXXXXXXX| |
+ | |XXXXXXXXXXXXX| |
+ | |XXXXXXXXXXXXX| |
+ | |XXXXXXXXXXXXX| |
+ |_________________|
+     _[_______]_
+ ___[___________]___
+|         [_____] []|__
+|         [_____] []|  \__
+L___________________J     \ \___\/
+ ___________________      /\
+/###################\    (__)
+```
+
+=== ID: ee1f8ea4ba93b555 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 36x18 ===
+```
+                          _______
+                         | ___  o|
+                         |[_-_]_ |
+      ______________     |[_____]|
+     |.------------.|    |[_____]|
+     ||            ||    |[====o]|
+     ||            ||    |[_.--_]|
+     ||            ||    |[_____]|
+     ||            ||    |      :|
+     ||____________||    |      :|
+ .==.|""  ......    |.==.|      :|
+ |::| '-.________.-' |::||      :|
+ |''|  (__________)-.|''||______:|
+ `""`_.............._\""`______
+    /:::::::::::'':::\`;'-.-.  `\
+   /::=========.:.-::"\ \ \--\   \
+   \`""""""""""""""""`/  \ \__)   \
+jgs `""""""""""""""""`    '========'
+```
+
+=== ID: 54ec6d297fc4956e | TITLE: ObASCII | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 24x10 ===
+```
+   .===========.
+   |   |       |
+   |  /|\      |
+   | /a|d\     |
+   |___________|
+   |_________-_|_,-.
+  [_____________]   )
+  .,,,,,,,,,, ,,.  (_
+ /,,,,,,,,,,, ,,,\ (>`\
+(______.-``-._____) \__)
+```
+
+=== ID: 779d5593f664ce73 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: computers | SIZE: 27x30 ===
+```
+  ,=====================.
+  |G GATEWAY2000 /P5-90/|
+  |.-------------------.|
+  ||[ _ o     . .  _ ]_||
+  |`-------------------'|
+  ||                   ||
+  |`-------------------'|
+  ||                   ||
+  |`-------------------'|
+  ||                   ||
+  |`-----------------_-'|
+  ||[=========]| o  (@) |
+  |`---------=='/u\ --- |
+  |------_--------------|
+  | (/) (_)           []|
+  |---==--==----------==|
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||||||||
+  |||||||||||||||||dxm|||
+  |||||||||||||||||||||||
+  |=====================|
+ .'                     `.
+"""""""""""""""""""""""""""
+```
+
+=== ID: 88a3db92ccc49681 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 9x4 ===
+```
+ ___
+|[_]|
+|+ ;| hjw
+`---'
+```
+
+=== ID: a55ea76ded5ff12f | TITLE: Sony Playstation | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 30x6 ===
+```
+   ________________
+  |   |,"    `.|   | SgH
+  |   /  SONY  \   |
+  |O _\   />   /_  |   ___ _
+  |_(_)'.____.'(_)_|  (")__(")
+  [___|[=]__[=]|___]  //    \\
+```
+
+=== ID: cd41845bf90fec05 | TITLE: GameBoy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 12x6 ===
+```
+      _____
+     |.---.|
+     ||___||
+     |+  .'|
+     | _ _ |
+jgs  |_____/
+```
+
+=== ID: 7e857cdde7715500 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 10x6 ===
+```
+ ____
+|,--.|
+||__||
+|+  o| hjw
+|,'o |
+`----'
+```
+
+=== ID: d1f2019c443c8ef3 | TITLE: GameBoy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 13x9 ===
+```
+     _______
+    |.-----.|
+    ||     ||
+    ||_____/|
+    | .     |
+    |-|-  oo|
+    |  _ _  |
+jgs |       /
+    `""""""`
+```
+
+=== ID: f5d620d5f721c24e | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 15x10 ===
+```
+ _._______
+| _______ |
+||,-----.||
+|||     |||
+|||_____|||
+|`-------'| hjw
+| +     O | `97
+|      O  |
+| / /  ##,"
+ `------"
+```
+
+=== ID: 8ca6413125c7b197 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 31x12 ===
+```
+ _____________________________
+/        _____________        \
+| == .  |             |     o |
+|   _   |             |    B  |
+|  / \  |             | A   O |
+| | O | |             |  O    |
+|  \_/  |             |       |
+|       |             | . . . |
+|  :::  |             | . . . |
+|  :::  |_____________| . . . |
+|           S N K             |
+\_____________________________/
+```
+
+=== ID: a6666f091aaa10c4 | TITLE: GameBoy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 19x15 ===
+```
+     _____________
+    | _"_________ |
+    ||.---------.||
+    |||         |||
+    |||         |||
+    |||         |||
+    ||'---------'/|
+    | """"""""""` |
+    | ||  ^^^  () |
+    |[  ]    ()   |
+    | ||          |
+    |     _ _     |
+    |          :::|
+jgs |         .::'/
+    '""""""""""""`
+```
+
+=== ID: c324b3918a0004e1 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 25x19 ===
+```
+ _n_________________
+|_|_______________|_|
+|  ,-------------.  |
+| |  .---------.  | |
+| |  |         |  | |
+| |  |         |  | |
+| |  |         |  | |
+| |  |         |  | |
+| |  `---------'  | |
+| `---------------' |
+|   _ GAME BOY      |
+| _| |_         ,-. |
+||_ O _|   ,-. "._,"|
+|  |_|    "._,"   A | hjw
+|    _  _    B      | `97
+|   // //           |
+|  // //    \\\\\\  |
+|  `  `      \\\\\\ ,
+|________...______,"
+```
+
+=== ID: 0fea684f94d9a639 | TITLE: GameBoy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: game-consoles | SIZE: 31x26 ===
+```
+    __________________________
+   |OFFo oON                  |
+   | .----------------------. |
+   | |  .----------------.  | |
+   | |  |                |  | |
+   | |))|                |  | |
+   | |  |                |  | |
+   | |  |                |  | |
+   | |  |                |  | |
+   | |  |                |  | |
+   | |  |                |  | |
+   | |  '----------------'  | |
+   | |__GAME BOY____________/ |
+   |          ________        |
+   |    .    (Nintendo)       |
+   |  _| |_   """"""""   .-.  |
+   |-[_   _]-       .-. (   ) |
+   |   |_|         (   ) '-'  |
+   |    '           '-'   A   |
+   |                 B        |
+   |          ___   ___       |
+   |         (___) (___)  ,., |
+   |        select start ;:;: |
+   |                    ,;:;' /
+jgs|                   ,:;:'.'
+   '-----------------------`
+```
+
+=== ID: 2e9a20f59f4995a5 | TITLE: Atari Controller | ARTIST: Daniel Wesely (Phydeaux) | CATEGORY: computers | SUBCATEGORY: atari | SIZE: 21x6 ===
+```
+     []  ,----.___
+   __||_/___      '.
+  / O||    /|       )
+ /   ""   / /   =._/
+/________/ /
+|________|/   dew
+```
+
+=== ID: 672dd0e0d9ba6752 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: atari | SIZE: 39x15 ===
+```
+              $$ $$$$$ $$
+              $$ $$$$$ $$
+             .$$ $$$$$ $$.
+             :$$ $$$$$ $$:
+             $$$ $$$$$ $$$
+             $$$ $$$$$ $$$
+            ,$$$ $$$$$ $$$.
+           ,$$$$ $$$$$ $$$$.
+          ,$$$$; $$$$$ :$$$$.
+         ,$$$$$  $$$$$  $$$$$.
+       ,$$$$$$'  $$$$$  `$$$$$$.
+     ,$$$$$$$'   $$$$$   `$$$$$$$.
+  ,s$$$$$$$'     $$$$$     `$$$$$$$s.
+$$$$$$$$$'       $$$$$       `$$$$$$$$$
+$$$$$Y'          $$$$$          `Y$$$$$
+```
+
+=== ID: ae9fedba132505e1 | TITLE: Millenium bug | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: bug | SIZE: 28x8 ===
+```
+               _ _       \ \
+    .-"""""-. / \_> /\    |/
+   /         \.'`  `',.--//
+ -(    Y2K    I      I  @@\
+   \         /'.____.'\___|
+    '-.....-' __/ | \   (`)
+jgs          /   /  /
+                 \  \
+```
+
+=== ID: 5df2d54bb0f962fb | TITLE: Y2K bug | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: bug | SIZE: 27x14 ===
+```
+        .--.       .--.
+    _  `    \     /    `  _
+     `\.===. \.^./ .===./`
+            \/`"`\/
+         ,  | y2k |  ,
+        / `\|;-.-'|/` \
+       /    |::\  |    \
+    .-' ,-'`|:::; |`'-, '-.
+        |   |::::\|   |
+        |   |::::;|   |
+        |   \:::://   |
+        |    `.://'   |
+jgs    .'             `.
+    _,'                 `,_
+```
+
+=== ID: 88d38432debb53c4 | TITLE: Little Linux penguin | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: linux | SIZE: 16x8 ===
+```
+       .---.
+      /     \
+      \.@-@./
+      /`\_/`\
+     //  _  \\
+    | \     )|_
+   /`\_`>  <_/ \
+jgs\__/'---'\__/
+```
+
+=== ID: c5241549b22774f4 | TITLE: Untitled | ARTIST: Harry Mason (Hajoma) | CATEGORY: computers | SUBCATEGORY: linux | SIZE: 23x16 ===
+```
+         _nnnn_
+        dGGGGMMb
+       @p~qp~~qMb
+       M|@||@) M|
+       @,----.JM|
+      JS^\__/  qKL
+     dZP        qKRb
+    dZP          qKKb
+   fZP            SMMb
+   HZM            MMMM
+   FqM            MMMM
+ __| ".        |\dS"qML
+ |    `.       | `' \Zq
+_)      \.___.,|     .'
+\____   )MMMMMP|   .'
+     `-'       `--' hjm
+```
+
+=== ID: 5e6e97e0bd18eee0 | TITLE: Untitled | ARTIST: Harry Mason (Hajoma) | CATEGORY: computers | SUBCATEGORY: linux | SIZE: 37x16 ===
+```
+         _nnnn_
+        dGGGGMMb     ,"""""""""""""".
+       @p~qp~~qMb    | Linux Rules! |
+       M|@||@) M|   _;..............'
+       @,----.JM| -'
+      JS^\__/  qKL
+     dZP        qKRb
+    dZP          qKKb
+   fZP            SMMb
+   HZM            MMMM
+   FqM            MMMM
+ __| ".        |\dS"qML
+ |    `.       | `' \Zq
+_)      \.___.,|     .'
+\____   )MMMMMM|   .'
+     `-'       `--' hjm
+```
+
+=== ID: ea1ab399bf03d655 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: computers | SUBCATEGORY: linux | SIZE: 30x18 ===
+```
+            .-"""-.
+           '       \
+          |,.  ,-.  |
+          |()L( ()| |
+          |,'  `".| |
+          |.___.',| `
+         .j `--"' `  `.
+        / '        '   \
+       / /          `   `.
+      / /            `    .
+     / /              l   |
+    . ,               |   |
+    ,"`.             .|   |
+ _.'   ``.          | `..-'l
+|       `.`,        |      `.
+|         `.    __.j         )
+|__        |--""___|      ,-'
+   `"--...,+""""   `._,.-' mh
+```
+
+=== ID: 88d8c3f401dac18c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 21x8 ===
+```
+      _.-'''''-._
+    .'  _     _  '.
+   /   (_)   (_)   \
+  |  ,           ,  |
+  |  \`.       .`/  |
+   \  '.`'""'"`.'  /
+    '.  `'---'`  .'
+jgs   '-._____.-'
+```
+
+=== ID: 82142283db439db2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 21x8 ===
+```
+      _.-'''''-._
+    .'  _     _  '.
+   /   (o)   (o)   \
+  |                 |
+  |  \           /  |
+   \  '.       .'  /
+    '.  `'---'`  .'
+jgs   '-._____.-'
+```
+
+=== ID: 8e409c3612b981b2 | TITLE: Smiley from 'The Hitchiker' | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 28x9 ===
+```
+  , ; ,   .-'"""'-.   , ; ,
+  \\|/  .'         '.  \|//
+   \-;-/   ()   ()   \-;-/
+   // ;               ; \\
+  //__; :.         .; ;__\\
+ `-----\'.'-.....-'.'/-----'
+        '.'.-.-,_.'.'
+jgs       '(  (..-'
+            '-'
+```
+
+=== ID: dcd228070ae7c747 | TITLE: Goofy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 26x9 ===
+```
+     .-""""""-.
+   .'          '.
+  /   O      O   \
+ :                :
+ |                |  goofy
+ : ',          ,' :
+  \  '-.____.-'  /
+   '.     U    .'
+jgs  '-......-'
+```
+
+=== ID: ce5f2dbf0a781d60 | TITLE: Happy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 27x9 ===
+```
+     .-""""""-.
+   .'          '.
+  /   O      O   \
+ :                :
+ |                |   happy
+ : ',          ,' :
+  \  '-......-'  /
+   '.          .'
+jgs  '-......-'
+```
+
+=== ID: e71fb9221c7776e6 | TITLE: Sad | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 25x9 ===
+```
+     .-""""""-.
+   .'          '.
+  /   O      O   \
+ :           `    :
+ |                |   sad
+ :    .------.    :
+  \  '        '  /
+   '.          .'
+jgs  '-......-'
+```
+
+=== ID: 83d9f7714e9f186d | TITLE: Winking | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 28x9 ===
+```
+     .-""""""-.
+   .'          '.
+  /   O    -=-   \
+ :                :
+ |                |  winking
+ : ',          ,' :
+  \  '-......-'  /
+   '.          .'
+jgs  '-......-'
+```
+
+=== ID: ed6487ddf798c7ed | TITLE: Angry | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 26x9 ===
+```
+     .-""""""-.
+   .'  \\  //  '.
+  /   O      O   \
+ :                :
+ |                |  angry
+ :       __       :
+  \  .-"`  `"-.  /
+   '.          .'
+jgs  '-......-'
+```
+
+=== ID: 945cb584be47be73 | TITLE: Girl smiley | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 32x9 ===
+```
+     .-""""""-.
+   .(((      ))).
+  /  (O)    (O)  \
+ :                :
+ | @            @ |  girl smiley
+ :    _.-..-._    :
+  \    '-..-'    /
+   '.          .'
+jgs  '-......-'
+```
+
+=== ID: 3f04c7c1e067c68f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 19x9 ===
+```
+     .oOOOOOOo.
+   oO'        'Oo
+  O'  O      O  'O
+ O                O
+ O                O
+ O  Oo,      ,oO  O
+  O. 'OOOOOOOO' .O
+   Yb.        .dP
+jgs  'YOOOOOOP'
+```
+
+=== ID: 2545fe9201567983 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 22x14 ===
+```
+      .ssSSSSss.
+    .ER'      `AM.
+  .ST'          `CS.
+ .E'  .S.    .S.  `S.
+.L'   SSS    SSS   `S.
+S'    `S'    `S'    `S
+S                    S
+S                    S
+S.  s.          .s   S
+`S. `"s.      .s"'  S'
+ `S.  `"ss..ss"'  .S'
+  `SS.    ~~    .SS'
+    `SS.      .SS'
+      `SSssssSS'
+```
+
+=== ID: 95ea99185001b060 | TITLE: Smiley face santa | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: smileys | SIZE: 25x14 ===
+```
+      .-""""""""""-.
+     /              `\
+    / .--.---.-.-.--.-;.
+   ; { ' . '  .  '  .  '}
+   | {__'_,__.__'__.__'_}
+   |  /    _      _    \
+   | ;    / \    / \    ;
+   | |    |0|    |0|    |
+   \ |    \_/    \_/    |
+ .-'\;  \            /  ;
+|.  ' \  '.        .'  /
+\  ` / '.  '-.__.-'  .'
+ '--'    '-._    _.-'
+  jgs        ''''
+```
+
+=== ID: b3f5c150cf1a2af4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 8x4 ===
+```
+ ______
+| |__| |
+|  ()  |
+|______|
+```
+
+=== ID: e160c69f55c3068d | TITLE: Untitled | ARTIST: Randy Ransom | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 21x4 ===
+```
+ _____
+|==   |
+|  o. |
+|__O__|  Randy Ransom
+```
+
+=== ID: 461705a2c8119455 | TITLE: Floppy Disk | ARTIST: Sarah Day | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 10x6 ===
+```
+ ________
+| |____| |
+|   __   |
+|  (__)  |
+|        |
+|________|
+```
+
+=== ID: 39896b648cf868f4 | TITLE: 3 1/2 inch disk | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 27x6 ===
+```
+               ___________
+SAVE          |           |
+THE           |           |
+DISK!         |    (O)    |
+              |    !|!    |
+              |____!_!____|
+```
+
+=== ID: 977dd1eab0b45ec1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 11x7 ===
+```
+ _________
+|^|     | |
+| |_____| |
+|  _____  |
+| |     | |
+| |_____| |
+|_|_____|_|
+```
+
+=== ID: 8ebdfd4acd32682a | TITLE: Untitled | ARTIST: Martin Atkins | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 14x8 ===
+```
+ _.........._
+| |mga     | |
+| |        | |
+| |        | |
+| |________| |
+|   ______   |
+|  |    | |  |
+|__|____|_|__|
+```
+
+=== ID: cfa7fec7c8a7d22c | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 16x9 ===
+```
+ ______________
+|[]            |
+|  __________  |
+|  | Radio  |  |
+|  | Shack  |  |
+|  |________|  |
+|   ________   |
+|   [ [ ]  ]   |
+\___[_[_]__]___|
+```
+
+=== ID: 92da261af6319ff0 | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 21x10 ===
+```
+ _________________
+|# :           : #|
+|  :           :  |
+|  :           :  |
+|  :           :  |
+|  :___________:  |
+|     _________   |
+|    | __      |  |
+|    ||  |     |  |
+\____||__|_____|__|lc
+```
+
+=== ID: 145f281eaac3a02b | TITLE: Untitled | ARTIST: Edward Farrow | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 17x10 ===
+```
+.-.-----------.-.
+| |-----------|#|
+| |-----------| |
+| |-----------| |
+| |--------etf| |
+| "-----------' |
+|  .-----.-..   |
+|  |     | || |||
+|  |     | || \/|
+"--^-----^-^^---'
+```
+
+=== ID: a2719ffd94949801 | TITLE: Untitled | ARTIST: Robert Craggs | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 19x11 ===
+```
+ _________________
+| | ___________ |o|
+| | ___________ | |
+| | ___________ | |
+| | ___________ | |
+| |_____________| |
+|     _______     |
+|    |       |   ||
+| DD |       |   V|
+|____|_______|____|
+      Robert Craggs
+```
+
+=== ID: 03dba817e552d5bf | TITLE: Untitled | ARTIST: Bob Allison (Scarecrow) | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 23x12 ===
+```
+ ___,___,_______,____
+|  :::|///./||'||    \
+|  :::|//.//|| || H)  |
+|  :::|/.///|!!!|     |
+|   _______________   |
+|  |:::::::::::::::|  |
+|  |_______________|  |
+|  |_______________|  |
+|  |_______________|  |
+|  |_______________|  |
+||_|     boba      ||_|
+|__|_______________|__|
+```
+
+=== ID: a5b14e0367b64925 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 27x13 ===
+```
+BBBBBBBBBBBBBBBBBBBBBBBBBBB
+BMB---------------------B B
+BBB---------------------BBB
+BBB---------------------BBB
+BBB---------------------BBB
+BBB---------------------BBB
+BBB---------------------BBB
+BBBBBBBBBBBBBBBBBBBBBBBBBBB
+BBBBB++++++++++++++++BBBBBB
+BBBBB++BBBBB+++++++++BBBBBB
+BBBBB++BBBBB+++++++++BBBBBB
+BBBBB++BBBBB+++++++++BBBBBB
+BBBBB++++++++++++++++BBBBBB
+```
+
+=== ID: df004b57f2264734 | TITLE: Untitled | ARTIST: Philip Powell | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 25x13 ===
+```
+    ____________________
+   |  |              |  |
+   |[]|              |[]|
+   |  |              |  |
+   |  |              |  |
+   |  |              |  |
+   |  |______________|  |
+   |                    |
+   |     ____________   |
+   |    | __      |  |  |
+   |    ||  |     |  |  |
+   |    ||__|     |  |  |
+pjp|____|_________|__|__|
+```
+
+=== ID: 9b64dd09279d0220 | TITLE: Floppy Disk | ARTIST: Martin Atkins | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 26x14 ===
+```
+ ____________________
+| |""""""""""""""""| |
+|.|________________|H|
+| |________________| |
+| |________________| |
+| |________________| |
+| |________________| |
+| |________________| |
+|                    |
+|    ____________    |
+|   |   |  _     |   |
+|   |   | | |    |   |
+|   |   | |_|    | V | mga
+|___|___|________|___|
+```
+
+=== ID: 324546af3173c962 | TITLE: ZIP Disk | ARTIST: Martin Atkins | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 28x14 ===
+```
+ .-|:"""":""""""'''"""":|-.
+:  |'----'-------------'|  :
+:  |                    |  :
+:  |                    |  :
+:  |               mga  |  :
+:  | .----------------. |  :
+:  |[ zip:          [i]]|  :
+:  |[------------------]|  :
+:  |[                  ]|  :
+:  |[                  ]|  :
+:  |[.....        PC100]|  :
+:  |[::::::..    iomega]|  :
+:  |""""""""""""""""""""|  :
+'--'--------------------'--'
+```
+
+=== ID: 54d74d29ecda2295 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 34x17 ===
+```
+     ___________________________
+    |[]                        []|
+    |[]                        []|
+    |                            |
+    |            . .             |
+    |          `    _`           |
+    |         `  ()|_|`          |
+    |         `       `          |
+    |          ` . . `           |
+    |      ________________      |
+    |     |          ____  |     |
+    |     |         |    | |     |
+    |     |         |    | |     |
+    |     |         |    | |     |
+    |()   |         |_  _| |   ()|
+    |)    |           --   |    (|
+das |_____|[]______________|\___/
+```
+
+=== ID: c33b4502411931f2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 27x18 ===
+```
+,'";-------------------;"`.
+;[]; ................. ;[];
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  `.                 ,'  ;
+;    """""""""""""""""    ;
+;    ,-------------.---.  ;
+;    ;  ;"";       ;   ;  ;
+;    ;  ;  ;       ;   ;  ;
+;    ;  ;  ;       ;   ;  ;
+;//||;  ;  ;       ;   ;||;
+;\\||;  ;__;       ;   ;\/;
+ `. _;          _  ;  _;  ;
+   " """"""""""" """"" """
+```
+
+=== ID: ecfff759201df070 | TITLE: Untitled | ARTIST: David Palmer | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 37x19 ===
+```
+.---------------------------------.
+|  .---------------------------.  |
+|[]|                           |[]|
+|  |                           |  |
+|  |                           |  |
+|  |                           |  |
+|  |                           |  |
+|  |                           |  |
+|  |                           |  |
+|  |                           |  |
+|  |                           |  |
+|  `---------------------------'  |
+|      __________________ _____   |
+|     |   ___            |     |  |
+|     |  |   |           |     |  |
+|     |  |   |           |     |  |
+|     |  |   |           |     |  |
+|     |  |___|           |     |  |
+\_____|__________________|_____|__|dp
+```
+
+=== ID: ff8dba2df394a321 | TITLE: Untitled | ARTIST: Philip Kaulfuss | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 32x19 ===
+```
+,'";-------------------;"`.
+;[]; ................. ;[];
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  ; ................. ;  ;
+;  `.                 ,'  ;
+;    """""""""""""""""    ;
+;    ,-------------.---.  ;
+;    ;  ;"";       ;   ;  ;
+;    ;  ;  ;       ;   ;  ;
+;    ;  ;  ;       ;   ;  ;
+;//||;  ;  ;       ;   ;||;
+;\\||;  ;__;       ;   ;\/;
+ `. _;          _  ;  _;  ;
+   " """"""""""" """"" """
+         -=> Philip Kaulfuss <=-
+```
+
+=== ID: 5dcf30ac8ab99be9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: floppies | SIZE: 30x20 ===
+```
+ ___________________________.
+|;;|                     |;;||
+|[]|---------------------|[]||
+|;;|                     |;;||
+|;;|                     |;;||
+|;;|                     |;;||
+|;;|                     |;;||
+|;;|                     |;;||
+|;;|                     |;;||
+|;;|_____________________|;;||
+|;;;;;;;;;;;;;;;;;;;;;;;;;;;||
+|;;;;;;_______________ ;;;;;||
+|;;;;;|  ___          |;;;;;||
+|;;;;;| |;;;|         |;;;;;||
+|;;;;;| |;;;|         |;;;;;||
+|;;;;;| |;;;|         |;;;;;||
+|;;;;;| |;;;|         |;;;;;||
+|;;;;;| |___|         |;;;;;||
+\_____|_______________|_____||
+ ~~~~~^^^^^^^^^^^^^^^^^~~~~~~
+```
+
+=== ID: a3f5401a057d5bd7 | TITLE: Untitled | ARTIST: Jens Reissenweber (Reißenweber) | CATEGORY: computers | SUBCATEGORY: joysticks | SIZE: 25x7 ===
+```
+            __
+           (  )
+            ||
+            ||
+        ___|""|__.._
+       /____________\
+jrei   \____________/~~~.
+```
+
+=== ID: 4983990c902256a3 | TITLE: Untitled | ARTIST: Jens Reissenweber (Reißenweber) | CATEGORY: computers | SUBCATEGORY: joysticks | SIZE: 28x7 ===
+```
+                           _
+            ,---.          U
+           ;     \         ;
+       .==\"/==.  `-.___.-'
+      ((+) .  .:)
+      |`.-(o)-.'|
+jrei  \/  \_/  \/
+```
+
+=== ID: c4209da62ce4b137 | TITLE: Untitled | ARTIST: m1a9366b | CATEGORY: computers | SUBCATEGORY: joysticks | SIZE: 19x13 ===
+```
+       _         ||
+      |-|   m1a  ||
+  ____| |____    ||
+ /   _| |_   \   //
+|  / ,| |. \  |_//
+| ( ( '-' ) ) |-'
+|  \ `'"'' /  |
+|   `-----'   ;
+|\___________/|
+|             ;
+ \___________/
+
+ competition pro
+```
+
+=== ID: f8989be69f754088 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: joysticks | SIZE: 27x17 ===
+```
+           __________
+      ____/,    _____)
+      \  //    /   /
+      _\/_     \  (
+     /    \  ___\_|_
+____/    \_\/       \
+      (\___/\\       \
+       |     \_______/
+       |     //      \
+   /   |     \_______/
+___\   |   _//     \
+    \__|  //\______/
+       |__\______/  ____
+    _____|____|____|____|
+   /Trb       __________o\
+  /          /            \
+  \_________/_____________/
+```
+
+=== ID: 42db9271c4cf795c | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: computers | SUBCATEGORY: joysticks | SIZE: 23x21 ===
+```
+          ___
+        ,"---".
+        :     ;
+         `-.-'
+          | |
+          | |
+          | |
+       _.-\_/-._
+    _ / |     | \ _
+   / /   `---'   \ \
+  /  `-----------'  \
+ /,-""-.       ,-""-.\
+( i-..-i       i-..-i )
+|`|    |-------|    |'|
+\ `-..-'  ,=.  `-..-'/
+ `--------|=|-------'
+          | |
+          \ \
+           ) ) hjw
+          / /
+         ( (
+```
+
+=== ID: afdfab7c353c0f60 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 16x7 ===
+```
+          .:'
+      __ :'__
+   .'`__`-'__``.
+  :__________.-'
+  :_________:
+   :_________`-;
+jgs `.__.-.__.'
+```
+
+=== ID: 7f69b47ba23db6a1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 36x17 ===
+```
+    .__________________________.
+    | .___________________. |==|
+    | | ................. | |  |
+    | | ::::Apple ][::::: | |  |
+    | | ::::::::::::::::: | |  |
+    | | ::::::::::::::::: | |  |
+    | | ::::::::::::::::: | |  |
+    | | ::::::::::::::::: | |  |
+    | | ::::::::::::::::: | | ,|
+    | !___________________! |(c|
+    !_______________________!__!
+   /                            \
+  /  [][][][][][][][][][][][][]  \
+ /  [][][][][][][][][][][][][][]  \
+(  [][][][][____________][][][][]  )
+ \ ------------------------------ /
+  \______________________________/
+```
+
+=== ID: a7802fef501374de | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 34x17 ===
+```
+   _____________________
+  /                 `   \
+  |  .-----------.  |   |-----.
+  |  |           |  |   |-=---|
+  |  | Apple //c |  |   |-----|
+  |  |           |  |   |-----|
+  |  |           |  |   |-----|
+  |  `-----------'  |   |-----'/\
+   \________________/___'     /  \
+      /                      / / /
+     / //               //  / / /
+    /                      / / /
+   / _/_/_/_/_/_/_/_/_/_/ /   /
+  / _/_/_/_/_/_/_/_/_/_/ /   /
+ / _/_/_/_______/_/_/_/ / __/
+/______________________/ /
+\______________________\/
+```
+
+=== ID: e16c2b38f352a4a4 | TITLE: Macintosh | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 25x18 ===
+```
+         ______________
+        /             /|
+       /             / |
+      /____________ /  |
+     | ___________ |   |
+     ||           ||   |
+     ||           ||   |
+     ||           ||   |
+     ||___________||   |
+     |   _______   |  /
+    /|  (_______)  | /
+   ( |_____________|/
+    \
+.=======================.
+| ::::::::::::::::  ::: |
+| ::::::::::::::[]  ::: |
+|   -----------     ::: |
+`-----------------------'
+```
+
+=== ID: 837c7dbf6f60a378 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 36x21 ===
+```
+    .__________________________.
+    | .___________________. |==|
+    | |     Apple ][      | |  |
+    | |                   | |  |
+    | |                   | |  |
+    | |                   | |  |
+    | |                   | |  |
+    | |                   | |  |
+    | | ]                 | | ,|
+    | !___________________! |(c|
+    !_______________________!__!
+    |    ___ -=      ___ -= | ,|
+    | ---[_]---   ---[_]--- |(c|
+
+    !_______________________!__!
+   /                            \
+  /  [][][][][][][][][][][][][]  \
+ /  [][][][][][][][][][][][][][]  \
+(  [][][][][____________][][][][]  )
+ \ ------------------------------ /
+  \______________________________/
+```
+
+=== ID: bc30f26894557727 | TITLE: Untitled | ARTIST: Dan Greuel | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 34x22 ===
+```
+  ___________________
+:' ,__________,  ':  `.
+| '            `  |    `.
+| |  Hello     |  |      `.
+| |            |  |        \
+| |  (Again!)  |  |         ]
+| |            |  |~~~~~~.  )
+| `,__________,'  |\__O\_| ,'
+|    _______      |     \.`
+|<> [___=___](@)<>|    .'\
+':________________/__.'   )
+   (____________)        /
+                        /
+              _________/
+  ___________/______
+ /''''=========='(@)\___
+ |[][][][][][][][][]|   \ _______
+ |[][][][][][][][][]|    \__     \
+ |[][][][][][][][][]|    |  \..  |
+ \------------------/    | ( # ) |
+         dan greuel      |  '''  |
+                1999     \_______/
+```
+
+=== ID: cadb5019109a7cb6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: apple | SIZE: 38x25 ===
+```
+                        .8
+                      .888
+                    .8888'
+                   .8888'
+                   888'
+                   8'
+      .88888888888. .88888888888.
+   .8888888888888888888888888888888.
+ .8888888888888888888888888888888888.
+.&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@:
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@:
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.
+`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.
+ `00000000000000000000000000000000000'
+  `000000000000000000000000000000000'
+   `0000000000000000000000000000000'
+     `###########################'
+jgs    `#######################'
+         `#########''########'
+           `""""""'  `"""""'
+```
+
+=== ID: 93fbb41d284ee6e2 | TITLE: Mouse | ARTIST: Sarah Day | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 14x6 ===
+```
+ ____((______
+|    _\\     |
+|   |_|_|    |
+|   |   |    |
+|   |___|    |
+|____________|
+```
+
+=== ID: 4b75106e42a35749 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 10x6 ===
+```
+     ,.
+ __.'_
+|__|__|
+|     |
+|-___-|
+'.___.'mrf
+```
+
+=== ID: ffbbd79eefd6fdbe | TITLE: Mac | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 6x6 ===
+```
+   /
+ __|_
+|____|
+|    |
+|    |
+\____/
+```
+
+=== ID: f8db5c197dda22f3 | TITLE: iMac | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 7x6 ===
+```
+  \
+   |
+  _|_
+ /___\
+|     |
+ \___/
+```
+
+=== ID: af681d64d8d41116 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 7x7 ===
+```
+   ,..'
+   i
++-+-+-+
+l l l l
++-+-+-+
+l     l
+`\___/'
+```
+
+=== ID: fdb37f7d6389e309 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 13x7 ===
+```
+   ,-------,
+  /       / |
+ /______ /  /
+|___/___/  /
+|__..___|.'
+  //mrf
+.'/
+```
+
+=== ID: a8357802b15f8c40 | TITLE: Wireless mouse | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 9x8 ===
+```
+ ______
+/ |0|0|\
+|___|___|
+|       |
+|       |
+|       |
+|       |
+\______/
+```
+
+=== ID: 17945c74fd158c3b | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 10x8 ===
+```
+  _______
+ |   |   |
+ |___|___|
+ |       |
+ )       |
+/        |
+|        |
+|________|
+```
+
+=== ID: f4e1b75037325a3a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 19x15 ===
+```
+    ,d88b
+ ,8P'    `8,
+ 8'       _.8._
+8       .'  |  '.
+       /    |    \
+      |    [_]    |
+      |     |     |
+      |-----'-----|
+      |           |
+      |           |
+      |;         .|
+      ;\         /;
+       \\       //
+   jgs  \'._ _.'/
+         '-...-'
+```
+
+=== ID: 5029570e5839ef77 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 31x18 ===
+```
+                   __  __
+                 ,',.\/,.`.
+                 \(_,''._)/
+                 ._(.||.)_,
+                 (,>(__)<.)
+                 '`-.==,-'`
+                     )(_
+            _____ _.'   `-.
+       _.-''    ,','|    \.\
+    ,-'         `-.`:  .  :\\_
+   /,::::, ,::::, ,>))._ ,' `'`
+  //::::/ /::::/ /    )'/.
+ //::::/ /::::/ /   ,',|`.\
+/______________/   /,'||'|))
+\ _ _ __ _ _ _ \,':(_ |('((__
+ \___(,.)SSt____\,|_)))_))`--`
+     /,'
+    //
+```
+
+=== ID: 5b969be871351ec1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 20x20 ===
+```
+           ||
+           ||
+           ||
+           ||
+.-----------.------.
+|           |      |
+|           |      |
+|           |      |
+|-----------'------|
+| Microsoft        |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+`                  '
+ `.              ,'
+   \_          _/
+     '-,____,-'
+```
+
+=== ID: b6234955cc82c519 | TITLE: Untitled | ARTIST: Shaun Mead | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 25x20 ===
+```
+        \ \
+         \ \  ___,.,
+  _,..--=";"*^^     5
+ *         {         %
+ {          }         }
+  }          }        %
+  %          { ___,,.-"%
+   %_,..--==""^        %
+   L                   &
+   V  Microsloth        L
+   [                    J
+   J                    J
+   ;                    L
+  #                     %
+  P                     $
+  P                     L
+  P                    K
+   L                  J
+    L                P
+sdm  "=e,_________,s"
+```
+
+=== ID: 2f0210510b654261 | TITLE: Untitled | ARTIST: Ilmari Karonen | CATEGORY: computers | SUBCATEGORY: mouse | SIZE: 15x22 ===
+```
+      \
+       `.
+         :
+        ,'
+       f
+      .#.
+     .=#=.
+.-------------.
+|.  __   __  .|
+|: |  | |  | ;|
+| :|  |-|  |: |
+| ||  | |  || |
+| |`--' `--'| |
+| |         | |
+| |         | |
+| |         | i
+| |         | t
+| |         | z
+| :---------: |
+|:           :|
+|'           `|
+`-------------'
+```
+
+=== ID: 8f039d07ecff8bc2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: sun-microsystems | SIZE: 16x11 ===
+```
+     ______
+    /_____/\
+   /_____\\ \
+  /_____\ \\ /
+ /_____/ \/ / /
+/_____/ /   \//\
+\_____\//\   / /
+ \_____/ / /\ /
+  \_____/ \\ \
+   \_____\ \\
+    \_____\/
+```
+
+=== ID: 43a4522cc94736a1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: sun-microsystems | SIZE: 15x14 ===
+```
+       /\
+       \ \
+      \ \ \
+     \ \ \
+   /  \ \  /
+  / /  \/ / /
+ / / /\  / / /\
+ \/ / /  \/ / /
+   / / /\  / /
+    /  \ \  /
+      \ \ \
+     \ \ \
+      \ \
+       \/
+```
+
+=== ID: 33b71b725e34579b | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: sun-microsystems | SIZE: 16x16 ===
+```
+       /\
+      /  \
+     /\ \ \
+    /\ \ \ \
+   /\ \ \ \/\
+  / /\ \ \/ /\
+ / / /\  / / /\
+/ / /  \/ / /  \
+\  / / /\  / / /
+ \/ / /  \/ / /
+  \/ /\ \ \/ /
+   \/\ \ \ \/
+    \ \ \ \/
+     \ \ \/
+      \  /
+       \/
+```
+
+=== ID: 0294c726e920e3c0 | TITLE: Windows logo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: other | SIZE: 22x5 ===
+```
+             _.-;;-._
+      '-..-'|   ||   |
+      '-..-'|_.-;;-._|
+      '-..-'|   ||   |
+jgs   '-..-'|_.-''-._|
+```
+
+=== ID: 7ea9b26431935092 | TITLE: Windows logo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: computers | SUBCATEGORY: other | SIZE: 23x9 ===
+```
+    .----------------.
+   |          _       |
+   |      _.-'|'-._   |
+   | .__.|    |    |  |
+   |     |_.-'|'-._|  |
+   | '--'|    |    |  |
+   | '--'|_.-'`'-._|  |
+jgs| '--'          `  |
+    '----------------'
+```
+
+=== ID: 53cf822d87e26f82 | TITLE: Untitled | ARTIST: Christian Garbs | CATEGORY: computers | SUBCATEGORY: other | SIZE: 14x9 ===
+```
+b.
+88b
+888b.
+88888b
+888888b.
+8888P"
+P" `8.
+    `8.   cgmm
+     `8
+```
+
+=== ID: bbd24e28d7801962 | TITLE: Untitled | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: other | SIZE: 35x19 ===
+```
+             @      @
+     / \     { _____}      / \
+   /  |  \___/*******\___/  |  \
+  (   I  /   ~   '   ~   \  I   )
+   \  |  |   0       0   |  |  /
+     \   |       A       |   /
+       \__    _______    __/
+          \_____________/
+    _-------*         *-------_
+   /  /---      VAX       ---\  \
+ /  /     (    System   )     \  \
+{  (     (    Gremlin!   )     )  }
+ \  \    |               |    /  /
+   \  \  |               |  /  /
+    **** |               | ****
+   //|\\  \_____________/  //|\\
+   *         '*** ***'         *
+  ***.       .*** ***.       .***
+  '*************' '*************'
+```
+
+=== ID: 3a4e8bf5186611e2 | TITLE: Untitled | ARTIST: Andreas Heitzer | CATEGORY: computers | SUBCATEGORY: other | SIZE: 35x28 ===
+```
+,--------------------------===---.
+| PalmVx                          |
+| ,----------------------------.  |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |                             | |
+| |.............................| |
+| |  _  :          '      :  _  | |
+| | |_| :                 : |_| | |
+| |  _  :_               _:  _  | |
+| | |_| :.)        .    (.: |_| | |
+| '-----....._________.....-----' |
+|     _    _     O     _    _     |
+|    |_|  |_|    |    |_|  |_|    |
+"------......____O____......------"
+                            heia
+```
+
+=== ID: 88a278f2e19e8e54 | TITLE: SysAdmin | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: other | SIZE: 12x34 ===
+```
+   _\\/|(/_
+   >_   _ /
+   (_)-(_)
+    ) o (
+    \ = /
+     |W|
+     | |
+   __| |__
+  / \ u / \
+ |   `-'   |
+ |__|   |__|
+  |||ADM|||
+  |||   |||
+  |||   |||
+  |||   |||
+  |||   |||
+  |||   |||
+ /  |___/  \
+ ||(|   \)||
+  \\| | |//
+    | | |
+    | | |
+    | | |
+    | | |
+    | | |
+    ( ( |
+    | | |
+    | | |
+    | | |
+    | | |
+    | | |
+ ___[_[_]
+/ /      \
+\_\______/
+```
+
+=== ID: 223ef340b2d7b4ce | TITLE: Amiga A1500 | ARTIST: Edward Farrow | CATEGORY: computers | SUBCATEGORY: amiga | SIZE: 16x8 ===
+```
+  .---------.
+  |.-------.|
+  ||>run#  ||
+  ||       ||
+  |"-------'|etf
+.-^---------^-.
+| ---~   AMiGA|
+"-------------'
+```
+
+=== ID: 796be9aa603b8918 | TITLE: Gard | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: fonts | SIZE: 34x5 ===
+```
+ ..|'''.|                      '||
+.|'     '   ....   ... ..    .. ||
+||    .... '' .||   ||' '' .'  '||
+'|.    ||  .|' ||   ||     |.   ||
+ ''|...'|  '|..'|' .||.    '|..'||
+```
+
+=== ID: efd8d7e85d400fb3 | TITLE: Nice | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: fonts | SIZE: 34x6 ===
+```
+        _
+       / )
+      ( / /|   _              _
+       X /-+- / )  /\    /\  / \
+      / X  |  \/  /  \  /  \(___)
+_____/ (_) \__/\_/    \/     \____
+```
+
+=== ID: 9fb8dfd699449419 | TITLE: Olfo | ARTIST: unknown | CATEGORY: computers | SUBCATEGORY: fonts | SIZE: 26x7 ===
+```
+    ____
+   / __ \ /\          ___
+  / / / // /____     / __\
+ / / / // // __ \  _/ /
+/ /_/ // // /_/ / /  _/
+\____//_/ \_____\ / /
+                 /_/
+```
+

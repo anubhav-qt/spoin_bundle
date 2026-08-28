@@ -1,0 +1,37 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: ASCII-BORDERS
+# Total artworks in category fitting <=40 cols: 2
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 4a609c8506b5325d | TITLE: Untitled | ARTIST: unknown | CATEGORY: ascii-borders | SUBCATEGORY: gallery/classic | SIZE: 27x7 ===
+```
+  (¯`·.¸¸.·´¯`·.¸¸.·´¯)
+  ( \                 / )
+ ( \ )               ( / )
+( ) (                 ) ( )
+ ( / )               ( \ )
+  ( /                 \ )
+   (_.·´¯`·.¸¸.·´¯`·.¸_)
+```
+
+=== ID: 9ce80b772c7c9d07 | TITLE: Vertical scroll | ARTIST: Lorna Dean (Dixie-Chick) | CATEGORY: ascii-borders | SUBCATEGORY: gallery/classic | SIZE: 38x18 ===
+```
+   ______________________________
+ / \                             \.
+|   |                            |.
+ \_ |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |   _________________________|___
+    |  /                            /.
+    \_/dc__________________________/.
+```
+

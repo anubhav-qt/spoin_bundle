@@ -1,0 +1,2568 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: WEAPONS
+# Total artworks in category fitting <=40 cols: 138
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 942e4d84e91e90dc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: soldiers | SIZE: 18x20 ===
+```
+       .---.
+      /_____\
+      ( '.' )
+       \_-_/_
+    .-"`'V'//-.
+   / ,   |// , \
+  / /|Ll //Ll|\ \
+ / / |__//   | \_\
+ \ \/---|[]==| / /
+  \/\__/ |   \/\/
+   |/_   | Ll_\|
+     |`^"""^`|
+     |   |   |
+     |   |   |
+     |   |   |
+     |   |   |
+     L___l___J
+      |_ | _|
+jgs  (___|___)
+      ^^^ ^^^
+```
+
+=== ID: 60110fdd1044bebb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: soldiers | SIZE: 18x20 ===
+```
+       .---.
+  ___ /_____\
+ /\.-`( '.' )
+/ /    \_-_/_
+\ `-.-"`'V'//-.
+ `.__,   |// , \
+     |Ll //Ll|\ \
+     |__//   | \_\
+    /---|[]==| / /
+    \__/ |   \/\/
+    /_   | Ll_\|
+     |`^"""^`|
+     |   |   |
+     |   |   |
+     |   |   |
+     |   |   |
+     L___l___J
+ jgs  |_ | _|
+     (___|___)
+      ^^^ ^^^
+```
+
+=== ID: 8ce979a19276180b | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: bows-and-arrows | SIZE: 29x1 ===
+```
+>>>>>----------------------->
+```
+
+=== ID: 051efe76311715da | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: bows-and-arrows | SIZE: 33x2 ===
+```
+>>>>>>>_____________________\`-._
+>>>>>>>                     /.-'
+```
+
+=== ID: 85cedaf771024e58 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: bows-and-arrows | SIZE: 39x2 ===
+```
+       _.-"/______________________/////
+jgs    `'-.\~~~~~~~~~~~~~~~~~~~~~~\\\\\
+```
+
+=== ID: 4451cb403d5fb2d9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: bows-and-arrows | SIZE: 39x3 ===
+```
+    _
+.-'` |___________________________//////
+`'-._|                           \\\\\\
+```
+
+=== ID: a8c57c72a4d3b53a | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: weapons | SUBCATEGORY: bows-and-arrows | SIZE: 24x7 ===
+```
+   (
+    \
+     )
+##-------->        b'ger
+     )
+    /
+   (
+```
+
+=== ID: b4331367facaf84e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: bows-and-arrows | SIZE: 30x19 ===
+```
+          4$$-.      *Archery*
+           4   ".
+           4    ^.
+           4     $
+           4     'b
+           4      "b.
+           4        $
+           4        $r
+           4        $F
+-$b========4========$b====*P=-
+           4       *$$F
+           4        $$"
+           4       .$F
+           4       dP
+           4      F
+           4     @
+           4    .
+           J.
+          '$$     Gilo94'
+```
+
+=== ID: 434e7bc8faea590e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 6x1 ===
+```
+-|----
+```
+
+=== ID: 092b2a9c43b367f7 | TITLE: Chuckles | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 12x1 ===
+```
+====K-------
+```
+
+=== ID: 1316aed44ec922de | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 18x1 ===
+```
+====)-------------
+```
+
+=== ID: f4e00d2ca3b6c8b2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 33x1 ===
+```
+[O\\\\\[========================-
+```
+
+=== ID: 6b98aaf4a85b8242 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 33x1 ===
+```
+[==|::::::::::::::::::::::::::::/
+```
+
+=== ID: 9aa97d18e3371bc2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 36x2 ===
+```
+[X]xxxxxx[[/\/\/\/\ANGST/\/\/\/\/\ >
+knm
+```
+
+=== ID: 4feef2736ed09a14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 36x2 ===
+```
+[O]xxxxxx[[/\/\/\/\KAAOS/\/\/\/\/\ >
+knm
+```
+
+=== ID: 2e8c693919b640a0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 26x3 ===
+```
+      /| ________________
+O|===|* >________________>
+      \|
+```
+
+=== ID: a4dae8ab7c597744 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 14x3 ===
+```
+   '
+=={==========-
+   `
+```
+
+=== ID: dcdd89a5aff1c645 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 20x3 ===
+```
+     #
+O%%%%#============--
+     #
+```
+
+=== ID: f617716b5a4e7997 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 26x3 ===
+```
+    /
+O===[====================-
+    \
+```
+
+=== ID: 2a651137068bdb44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 29x3 ===
+```
+        /
+*//////{<>==================-
+        \
+```
+
+=== ID: ace2a4bc6b70ba21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 28x3 ===
+```
+       ./~
+(=#####{>==================-
+       `\_
+```
+
+=== ID: 132e56200176f1de | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 31x3 ===
+```
+          ./~
+(=@@@@@@@=[}=================--
+          `\_
+```
+
+=== ID: dea3de6c76dce3bf | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 37x3 ===
+```
+     []
+o////||::===========================-
+     []
+```
+
+=== ID: 3b2c2e5f899bd9e8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 40x3 ===
+```
+            //
+()=========>>=========================--
+            \\
+```
+
+=== ID: 9d270b11c1322d72 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 25x3 ===
+```
+                  |
+--==/////////////[}}====*
+                  |
+```
+
+=== ID: 61f1087e54d9dcc8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 28x3 ===
+```
+         /________________,
+<=======| _________________>
+         \
+```
+
+=== ID: 277f5dd375a9d54b | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 23x4 ===
+```
+       |______________
+[======|______________>
+       |
+       '
+```
+
+=== ID: 0260e0ed4a8540af | TITLE: Rapiers | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 40x5 ===
+```
+       O ,_
+ II    |/  `
+O//////])==============================-
+ \    /|
+  `--~ O
+```
+
+=== ID: 9a1ae54b2bbdbf43 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 37x5 ===
+```
+       |
+       /~\
+Oxxxxx|  (|=========================-
+ \____/\_/
+       |
+```
+
+=== ID: 42ec34ec32888e3a | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 37x5 ===
+```
+          -
+          |
+O=========|>>>>>>>>>>>>>>>>>>>>>>>>>>
+          |
+          -
+```
+
+=== ID: 152da04fd8e68d2e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 29x5 ===
+```
+       O
+       |
+0{XXXX}+====================>
+       |
+       O
+```
+
+=== ID: 020efca71c9bedfb | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 33x5 ===
+```
+     ==
+     ||_________________________
+OOOOO||_________________________>
+     ||
+     ==
+```
+
+=== ID: 830d90291b70bbb0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 29x5 ===
+```
+        \
+ _      ||__________________
+(_|%|%|%|[__________________>
+        ||
+         \
+```
+
+=== ID: ee5e685e11950292 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 36x5 ===
+```
+             |>
+            //_____________________
+<((((((((((|_/_/____//________/____/
+            \\
+             |>
+```
+
+=== ID: d66887985b06710b | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 39x5 ===
+```
+          />
+         /<
+O[\\\\\\(O):::<=======================-
+         \<
+          \>
+```
+
+=== ID: 7b38e046bc6a7d6c | TITLE: Broadswords | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 40x6 ===
+```
+         //
+        ||
+|\[][][]||-----------------------------\
+|/[][][]||-----------------------------/
+        ||
+         \\
+```
+
+=== ID: 2eb9034e130a25a7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 30x6 ===
+```
+          &&&
+          &
+* ######## & ----------------\
+* ######## & ----------------/
+          &
+          &&&
+```
+
+=== ID: acf51f7972e39f86 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 3x6 ===
+```
+ ^
+ |
+ |
+ |
+o+o
+ 0
+```
+
+=== ID: e74db7aa0d652829 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 3x6 ===
+```
+ ^
+ |
+ |
+ |
+(=)
+ 0
+```
+
+=== ID: d1fd0d5476c9175b | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 29x9 ===
+```
+           _____   _____
+          /     \ /     \
+     ,   |       '       |
+     I __L________       L__
+O====IE__________/     ./___>
+     I      \.       ./
+     `        \.   ./
+                \ /
+                 '
+```
+
+=== ID: eea848dc419e61a4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 3x9 ===
+```
+ |
+ |
+ |
+ |
+ |
+ |
+o=o
+ I
+ *
+```
+
+=== ID: 60072021e2df160f | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 8x9 ===
+```
+   /\
+  \II/
+(88II88)
+  /II\
+   II
+   II
+   II
+   II
+   \/
+```
+
+=== ID: 46607bdc9af399ea | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 7x11 ===
+```
+   .
+  / \
+  | |
+  | |
+  |.|
+  |.|
+  |:|
+  |:|
+`--8--'
+   8
+   O
+```
+
+=== ID: dd90faab09363fd9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 15x12 ===
+```
+   ^
+  |.|
+  |||
+  |||
+  |||
+  |||
+  |||
+__|||_
+`----.`
+  ||  ))
+  |'-',
+   '-'Starshine
+```
+
+=== ID: ef4bf47d4ffd8bae | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 6x12 ===
+```
+  __
+  ||
+ _||_
+( || )
+  ||
+  ||
+  ||
+  ||
+  ||
+  ||
+  ||
+  \/
+```
+
+=== ID: 4c0e2f63cd382bb6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 9x12 ===
+```
+    /|
+   |\|
+   |||
+   |||
+   |||
+   |||
+   |||
+   |||
+~-[{o}]-~
+   |/|
+   |/|
+   `0'
+```
+
+=== ID: adaa8e6e15aeabca | TITLE: Untitled | ARTIST: Genoveva Galarza | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 11x13 ===
+```
+  ()
+__)(__
+'-<>-'
+  )(   __
+  ||  / \\
+  || (  ||)
+  || ]_(\,|
+  || ]-->/|
+  || (  ||)
+  ||  \_//
+  ||
+  ||  gnv
+  \/
+```
+
+=== ID: f19a994b088a2ae8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 7x13 ===
+```
+   O
+   D
+   I
+___E___
+  | |
+  | |
+  | |
+  | |
+  | |
+  | |
+  | |
+  \ /
+   '
+```
+
+=== ID: 83eaf412e0debdc7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 8x13 ===
+```
+   ()
+   )(
+o======o
+   ||
+   ||
+   ||
+   ||
+   ||
+   ||
+   ||
+   ||
+   ||
+   \/
+```
+
+=== ID: 821fd597f4a6927b | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 30x15 ===
+```
+ ,.
+ \%`.
+  `.%`.
+    `.%`.
+      `.%`.
+        `.%`.
+          `.%`.    __
+            `.%`.  \ \
+              `.%`./_/
+                `./ /.
+               __/\/:/;.
+               \__/  `:/;.
+                       `:/;.,
+                    Krogg`:/ ;
+                           `'
+```
+
+=== ID: 901deba5c77e8aa8 | TITLE: Sword of power | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 12x15 ===
+```
+     /\
+    // \
+    || |
+    || |
+    || |
+    || |
+    || |
+    || |
+ __ || | __
+/___||_|___\
+     ww
+     MM
+    _MM_
+   (&<>&)
+    ~~~~
+```
+
+=== ID: 81875e2dd867b799 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 28x15 ===
+```
+   |\                     /)
+ /\_\\__               (_//
+|   `>\-`     _._       //`)
+ \ /` \\  _.-`:::`-._  //
+  `    \|`    :::    `|/
+        |     :::     |
+        |.....:::.....|
+        |:::::::::::::|
+        |     :::     |
+        \     :::     /
+         \    :::    /
+          `-. ::: .-'
+           //`:::`\\
+          //   '   \\
+         |/         \\
+```
+
+=== ID: d8cf6de1aa51af6c | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 11x16 ===
+```
+     o
+     X
+     X
+|===[O]===|
+    |||
+    |||
+    |||
+    |||
+    |||
+    |||
+    |||
+    |||
+    |||
+    |^|
+    \ /
+     `
+```
+
+=== ID: e75f3b1ff2caf58e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 11x16 ===
+```
+    /^\
+   |\ /|
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+    |||
+    |||
+    |||
+..  |||  ..
+`\\=====//'
+    (=)
+    (=)
+    (=)
+    \U/
+```
+
+=== ID: 9ae5c57322986f1e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 21x16 ===
+```
+     ___________
+._____l_______l_____.
+||_____/  |  \_____||
+      /   |   \
+     /    |    \
+    /     |     \
+   /      |      \
+  /       |       \
+ /        |        \
+|         |         |
+ \        |        /
+   \      |      /
+     \    |    /
+       \  |  /
+         \|/
+          `
+```
+
+=== ID: bb09e0abf93ad87c | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 24x17 ===
+```
+/\                    /\
+\ \                  / /
+ \ \                / /
+  \.\              /./
+   \.\            /./
+    \.\          /./
+     \\\        ///
+      \.\      /./
+       \.\    /./
+        \.\__/./
+       _/)))(((\_
+       \|)\##/(|/
+       _|)/##\(|_
+       \|)))(((|/
+        /o/  \o\
+       /o/    \o\
+      /_/      \_\
+```
+
+=== ID: 6b06d2774a624a5a | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 18x18 ===
+```
+                _
+               /\)
+              /\/
+             /\/
+           _/L/
+          (/\_)
+          /%/
+         /%/
+        /%/
+       /%/
+      /%/
+     /%/
+    /%/
+   /%/
+  /%/
+ /%/ Krogg
+/,'
+"
+```
+
+=== ID: b8934feb0900a634 | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 21x19 ===
+```
+     .
+    J:L    (""")
+    |:|     III
+    |:|     III
+    |:|     III
+    |:|   __III__
+    |:| /:-.___,-:\
+    |:| \]  |:|  [/
+    |:|     |:|
+    |:|     |:|
+    |:|     |:|
+/]  |:|  [\ |:|
+\:-'"""`-:/ |:|
+  ""III""   |:|
+    III     |:|
+    III     |:|
+    III     |:|
+   (___)    J:F Krogg
+             "
+```
+
+=== ID: 28f3d77d47313f68 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 13x22 ===
+```
+     .-.
+    (0.0)
+  '=.|m|.='
+  .='/@\`=.
+     @8@
+ _   8@8   _
+(@__/@8@\__@)
+ `-=:8@8:=-'
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     |:|
+     \:/
+      ^
+```
+
+=== ID: 8cf0947281d6659e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 11x22 ===
+```
+   |^^^|
+    }_{
+    }_{
+/|_/---\_|\
+I _|\_/|_ I
+\| |   | |/
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   |   |
+   \   /
+    \ /
+     Y
+```
+
+=== ID: 06b9a103c4290c24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 23x23 ===
+```
+        _
+       (_)
+       |=|
+       |=|
+   /|__|_|__|\
+  (    ( )    )
+   \|\/\"/\/|/
+     |  Y  |
+     |  |  |
+     |  |  |
+    _|  |  |
+ __/ |  |  |\
+/  \ |  |  |  \
+   __|  |  |   |
+/\/  |  |  |   |\
+ <   +\ |  |\ />  \
+  >   + \  | LJ    |
+        + \|+  \  < \
+  (O)      +    |    )
+   |             \  /\
+ ( | )   (o)      \/  )
+_\\|//__( | )______)_/
+        \\|//
+```
+
+=== ID: 7239a1f3a3359c31 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 36x25 ===
+```
+                           .-.
+                          {{@}}
+          <>               8@8
+        .::::.             888
+    @\\/W\/\/W\//@         8@8
+     \\/^\/\/^\//     _    )8(    _
+      \_O_<>_O_/     (@)__/8@8\__(@)
+ ____________________ `~"-=):(=-"~`
+|<><><>  |  |  <><><>|     |.|
+|<>      |  |      <>|     |S|
+|<>      |  |      <>|     |'|
+|<>   .--------.   <>|     |.|
+|     |   ()   |     |     |P|
+|_____| (O\/O) |_____|     |'|
+|     \   /\   /     |     |.|
+|------\  \/  /------|     |U|
+|       '.__.'       |     |'|
+|        |  |        |     |.|
+:        |  |        :     |N|
+ \<>     |  |     <>/      |'|
+  \<>    |  |    <>/       |.|
+   \<>   |  |   <>/        |K|
+    `\<> |  | <>/'         |'|
+jgs   `-.|  |.-`           \ /
+         '--'               ^
+```
+
+=== ID: b06105666bbe113d | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 13x25 ===
+```
+     /\
+    //\\
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+    ||||
+ _  ||||  _
+/(  ||||  )\
+\\\_[\/]_///
+ \\_<()>_//
+  \/[\\]\/
+    [//]
+    [\\]
+    [//]
+    [\\]
+    [//]
+    (__)Krogg
+```
+
+=== ID: 0478d62b7c24fdf7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 15x25 ===
+```
+      .-.
+     {{@}}
+      8@8
+      888
+      8@8
+ _    )8(    _
+(@)__/8@8\__(@)
+ `~"-=):(=-"~`
+      |.|
+      |S|
+      |'|
+      |.|
+      |P|
+      |'|
+      |.|
+      |U|
+      |'|
+      |.|
+      |N|
+      |'|
+      |.|
+      |K|
+      |'|
+      \ /
+       ^
+```
+
+=== ID: 971d48aee7736605 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 36x25 ===
+```
+                           .-.
+                          {{#}}
+          {}               8@8
+        .::::.             888
+    @\\/W\/\/W\//@         8@8
+     \\/^\/\/^\//     _    )8(    _
+      \_O_{}_O_/     (@)__/8@8\__(@)
+ ____________________ `~"-=):(=-"~`
+|<><><>  |  |  <><><>|     |.|
+|<>      |  |      <>|     |S|
+|<>      |  |      <>|     |'|
+|<>   .--------.   <>|     |.|
+|     |   ()   |     |     |P|
+|_____| (O\/O) |_____|     |'|
+|     \   /\   /     |     |.|
+|------\  \/  /------|     |U|
+|       '.__.'       |     |'|
+|        |  |        |     |.|
+:        |  |        :     |N|
+ \       |  |       /      |'|
+  \<>    |  |    <>/       |.|
+   \<>   |  |   <>/        |K|
+    `\<> |  | <>/'         |'|
+jgs   `-.|__|.-`           \ /
+                            ^
+```
+
+=== ID: 8a55b895e6ca0d62 | TITLE: Untitled | ARTIST: Jan Weseler | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 28x26 ===
+```
+      .m.
+      (;)
+      (;)
+      (;)
+   .  (;)  .
+   |\_(;)_/|
+<JW~:_###_:~==>
+   |/ )|( \|
+     ( o )
+      )8(
+     ( o )
+      )8(
+     ;|S|;
+     ||S||
+     ||S||
+     ||S|<
+     ||S||
+     ||S||
+     ||S||
+     ||S||
+     >|S||
+     ||S||
+     ||S||
+     \\ //       Jan Weseler
+      \V/
+       V
+```
+
+=== ID: 7d7ebfe87582b429 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 22x26 ===
+```
+          /\
+         /  \
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        |    |
+        | /\ |
+:\______|/  \|______/:
+ \__________________/
+        | /\ |
+        ||  ||
+        ||  ||
+        ||  ||
+        ||  ||
+        ||  ||
+        ||  ||
+        | \/ |
+        \____/
+        (____)
+```
+
+=== ID: f3ba9fd67a7159c4 | TITLE: Untitled | ARTIST: Jan Weseler | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 30x28 ===
+```
+      .m.
+      (;)
+      (;)
+      (;)
+   .  (;)  .
+   )\_(;)_/(
+<JW~:_###_:~==>
+  / / )|( \ \
+  |/ ( o ) \|
+      )8(
+     ( o\\
+      )8 \\
+     //o|\))
+    //|8|\(
+   ((/ o||
+    )/|8||
+      |o||/\
+     /|8||/\\
+     ||o\/ ||
+     |/\   ||
+   /\  ) . ||
+  (/\\//||\/|
+  (| \/ ||\/
+   \\   ||
+    \\  ||         Jan Weseler
+     \\ //
+      \V/
+       V
+```
+
+=== ID: 9a47252acc91b29a | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 11x28 ===
+```
+     _
+    (_)
+    |_|
+    |_|
+    |_|
+    |_|
+    |_|
+o=========o
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    | |
+    \ /
+```
+
+=== ID: b0cd1582690b097a | TITLE: Untitled | ARTIST: David Dahlberg | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 11x29 ===
+```
+    .-.
+    |/|
+    |/|
+    |/|
+    |/|
+ ___|_|___
+ )  ___  (
+/__/ | \__\
+   ) | (
+dd ) | (
+   ) | (
+   ) | (
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   | | |
+   ( | )
+    \ /
+     '
+```
+
+=== ID: d035b98d70ead923 | TITLE: Untitled | ARTIST: Ejejl Goldrush | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 39x30 ===
+```
+           ,
+          / \
+         {   }
+         p   !
+         ; : ;
+         | : |
+         | : |
+         l ; l
+         l ; l
+         I ; I
+         I ; I
+         I ; I
+         I ; I
+         d | b
+         H | H
+         H | H
+         H I H
+ ,;,     H I H     ,;,
+;H@H;    ;_H_;,   ;H@H;
+`\Y/d_,;|4H@HK|;,_b\Y/'
+ '\;MMMMM$@@@$MMMMM;/'
+   "~~~*;!8@8!;*~~~"
+         ;888;
+         ;888;
+         ;888;
+         ;888;
+         d8@8b
+         O8@8O
+         T808T
+          `~` 		     EJejl@goldrush.com
+```
+
+=== ID: 804a108f1187104e | TITLE: Untitled | ARTIST: Henry Segerman | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 18x30 ===
+```
+        )
+          (
+        '    }
+      (    '
+     '      (
+      )  |    )
+    '   /|\    `
+   )   / | \  ` )
+  {    | | |  {
+ }     | | |  .
+  '    | | |    )
+ (    /| | |\    .
+  .  / | | | \  (
+}    \ \ | / /  .
+ (    \ `-' /    }
+ '    / ,-. \    '
+  }  / / | \ \  }
+ '   \ | | | /   }
+  (   \| | |/  (
+    )  | | |  )
+    .  | | |  '
+       J | L
+ /|    J_|_L    |\
+ \ \___/ o \___/ /
+  \_____ _ _____/
+        |-|
+        |-|
+        |-|
+   hs  ,'-'.
+       '---'
+```
+
+=== ID: 49923ea67b3a5ea1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 19x31 ===
+```
+         .
+        / \
+       /   \
+      /  |  \
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+      |  |  |
+ ____/|  |  |\____
+/____/\___/\____/ )
+(_______________)/
+      |/////|
+      |/////|
+      |/////|
+      |/////|
+      |/////|
+      |/////|
+      |/////|
+     (_______)
+```
+
+=== ID: 10d84a180afcbd80 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 24x36 ===
+```
+           /\
+          //\\
+         //  \\
+        //    \\
+        |\    /|
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+        | |  | |
+ __     | |  | |     __
+/  \____| |  | |____/  \
+)   ___/  )  (  \___   (
+\__/  \__/    \__/  \__/
+         \____/
+          )  (
+         / /\ \
+         ) )( (
+         | || |
+         | || |
+         | || |
+         | || |
+         | )( |
+         ) \/ (
+         \____/
+         (____)
+```
+
+=== ID: 3a4f55b718e8802d | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 40x40 ===
+```
+                  /¯¯\
+                  \__/
+                   ||
+                   ||
+                  |  |
+                  |  |
+                  |  |
+                  |  |
+                  |  |
+                  |  |
+              .--.----.--.
+            .-----\__/-----.
+    ___---¯¯////¯¯|\/|¯¯\\\\¯¯---___
+ /¯¯ __O_--////   |  |   \\\\--_O__ ¯¯\
+| O?¯      ¯¯¯    |  |    ¯¯¯      ¯?O |
+|  '    _.-.      |  |      .-._    '  |
+|O|    ?..?      ./  \.      ?..?    |O|
+| |     '?. .-.  | /\ |  .-. .?'     | |
+| ---__  ¯?__?  /|\¯¯/|\  ?__?¯  __--- |
+|O     \         ||\/ |         /     O|
+|       \  /¯?_  ||   |  _?¯\  /       |
+|       / /    - ||   | -    \ \       |
+|O   __/  | __   ||   |   __ |  \__   O|
+| ---     |/  -_/||   |\_-  \|     --- |
+|O|            \ ||   | /            |O|
+\ '              ||   |        ^~DLF ' /
+ \O\    _-¯?.    ||   |    .?¯-_    /O/
+  \ \  /  /¯¯¯?  ||   |  ?¯¯¯\  \  / /
+   \O\/   |      ||   |      |   \/O/
+    \     |      ||   |      |     /
+     '.O  |_     ||   |     _|  O.'
+        '._O'.__/||   |\__.'O_.'
+           '._ O ||   | O _.'
+              '._||   |_.'
+                 ||   |
+                 ||   |
+                 | \/ |
+                 |  | |
+                  \ |/
+                   \/
+```
+
+=== ID: b4c5c4fb94e1ab75 | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 31x41 ===
+```
+               /\
+              //\\
+             //__\\
+            //____\\
+            \\____//
+             \\__//
+             [|__|]
+             [|__|]
+             [|__|]
+             [|__|]
+             [|__|]
+             [|__|]
+             [|__|]
+  /)         [|__|]        (\
+ //\_________[|__|]________/\\
+ ))__________||__||_________((
+<_/         [  \/  ] Krogg97\_>
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            || || ||
+            \\ || //
+             \\||//
+              \\//
+          ____-\/-____
+              -__-
+             /    \
+```
+
+=== ID: cc65abc5ccf1bd7e | TITLE: Untitled | ARTIST: David Dahlberg | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 14x47 ===
+```
+      __
+     |//|
+     |//|
+     |//|
+     |//|
+     |//|
+     |//|
+     |//|
+  ___|//|___
+ /<>______<>\
+// / |/\| \ \\
+//"  //\\  "\\
+    //  \\
+   |/)dd(\|
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     )  (
+     (  )
+      \/
+```
+
+=== ID: 45a111ec868a6b52 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 36x48 ===
+```
+                 /\
+                /  \
+               / /\ \
+              / /  \ \
+             / /    \ \
+            /_/      \_\
+            \    '`    /
+             )   ||   (
+             |   ||   |
+             |   ||   |
+             |   ||   |
+             |   ||   |
+             |   ||   |
+             |   ||   |
+             |   ||   |
+             |   ||   |
+             |   ||   |
+ /           |   ||   |           \
+/(           |   ||   |           )\
+|`\_         |   ||   |         _/'|
+|`. `-._     |   ||   |     _,-' ,'|
+(   ` . `-._ |  _--_  | _,-' , '   )
+ `.._   ` . `-./.__.\.-' , '   _,-'
+     `-._   ` | /  \ | '   _,-'
+         `-._/ |_()_| \_,-'
+      ___.-'   ______   `-,
+     '-----.  |______|   /
+            \  ______   /
+            |  \>  </  /
+             \________/
+             _]______[_
+             |        |
+             |________|
+              ]______[
+             |        |
+             |________|
+             _]______[_
+             |        |
+             |________|
+             _]______[_
+             |        |
+             |________|
+               ]____[
+             .'      `.
+             | <   >  |>
+            <|   <   >|
+              `.____.'
+                V   V
+```
+
+=== ID: 4d4900fe81432fc0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 32x51 ===
+```
+               /\
+              /  \
+             / /\ \
+            / /  \ \
+           / /    \ \
+          /_/      \_\
+          \ \      / /
+           ) \    / (
+           | /\  /\ |
+           |/  )(  \|
+           |\_/  \_/|
+           |/ \__/ \|
+           |\_/  \_/|
+           |/ \__/ \|
+           |\_/  \_/|
+           |/ \__/ \|
+           |\_/  \_/|
+           |/ \__/ \|
+           |\_/  \_/|
+           |/ \__/ \|
+           |\_/  \_/|
+|\         |/ \__/ \|         /|
+| \        |\_/  \_/|        / |
+|  \       |/ \/\/ \|       /  |
+|  (       |\ /  \ /|       )  |
+'.  \      | /    \ |      /  .'
+  \  `-._  |/      \|  _.-'  /
+   \     `-'        `-'     /
+    \                      /
+     `-._              _.-'
+         `-.________.-'
+           |\\\E////|
+           |\\D///L\|
+           |\A///L\\|
+           |M///E\\\|
+           |///H\\\\|
+           |//\\\\N/|
+           |/N\\\I//|
+           |I\\\\///|
+           |\\\E///M|
+           |\\D///\\|
+           |\A///L\\|
+           |M///L\\\|
+           |///E\\\D|
+           |//H\\\A/|
+           )========(
+          /\/\/\/\/\/\
+          ))))))((((((
+          \/\/\/\/\/\/
+           \/\/\/\/\/
+            ========
+```
+
+=== ID: bd0809c18441ae0f | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: swords | SIZE: 34x52 ===
+```
+                /\
+               /..\
+              / .. \
+             /  ..  \
+            /   ..   \
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+            |   ::   |
+.           |   /\   |           .
+|\          |  /  \  |          /|
+| `-._      | /    \ |      _.-' |
+\     `-._  |/      \|  _.-'     /
+ \        `-'        `-'        /
+  `-._                      _.-'
+      `-._              _.-'
+          `-.________.-'
+            |\\\V///A|
+            |\\V///A\|
+            |\V///A\\|
+            |V///A\\\|
+            |///A\\\V|
+            |//A\\\V/|
+            |/A\\\V//|
+            |A\\\V///|
+            |\\\V///A|
+            |\\V///A\|
+            |\V///A\\|
+            |V///A\\\|
+            |///A\\\V|
+            |//A\\\V/|
+            |/A\\\V//|
+            |_.----._|
+         _.-'_.----._`-._
+        / .-' .----. `-. \
+        \_`-._`----'_.-'_/
+          `-._`----'_.-'
+              `----'
+```
+
+=== ID: 5c4325f03acdc16d | TITLE: Man with a Pistol | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: other | SIZE: 33x9 ===
+```
+     ----.
+    "   _}
+    "@   >
+    |\   7
+    / `-- _         ,-------,****
+ ~    >o<  \---------o{___}-
+/  |  \  /  ________/8'
+|  |       /         "
+|  /      |
+```
+
+=== ID: 27e6de6b32965dbb | TITLE: Mace | ARTIST: Veronica Karlsson | CATEGORY: weapons | SUBCATEGORY: other | SIZE: 33x20 ===
+```
+        |\
+        | \        /|
+        |  \____  / |
+       /|__/AMMA\/  |
+     /AMMMMMMMMMMM\_|
+ ___/AMMMMMMMMMMMMMMA
+ \   |MVKMMM/ .\MMMMM\
+  \__/MMMMMM\  /MMMMMM---
+  |MMMMMMMMMMMMMMMMMM|  /
+  |MMMM/. \MM.--MMMMMM\/
+  /\MMM\  /MM\  |MMMMMM   ___
+ /  |MMMMMMMMM\ |MMMMMM--/   \-.
+/___/MMMMMMMMMM\|M.--M/___/_|   \
+     \VMM/\MMMMMMM\  |      /\ \/
+      \V/  \MMMMMMM\ |     /_  /
+        |  /MMMV'   \|    |/ _/
+        | /              _/  /
+        |/              /| \'
+VK                     /_  /
+                       /  /
+```
+
+=== ID: aa0fe965fc517e0b | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 32x4 ===
+```
+ ___________________    . , ; .
+(___________________|~~~~~X.;' .
+                      ' `" ' `
+            TNT
+```
+
+=== ID: ceb2276c8ab64132 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 15x6 ===
+```
+  /\     |\**/|
+ /  \    \ == /
+ |  |     |  |
+ |  |     |  |
+/ == \    \  /
+|/**\|     \/
+```
+
+=== ID: d6a060aedeb9cd94 | TITLE: Untitled | ARTIST: Harry Mason (Hajoma) | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 14x6 ===
+```
+        ,--.!,
+     __/   -*-
+   ,d08b.  '|`
+   0088MM
+   `9MMP'
+hjm
+```
+
+=== ID: 54b24d9f6d71e995 | TITLE: Nuclear explosion | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 33x8 ===
+```
+          _ ._  _ , _ ._
+        (_ ' ( `  )_  .__)
+      ( (  (    )   `)  ) _)
+     (__ (_   (_ . _) _) ,__)
+         `~~`\ ' . /`~~`
+              ;   ;
+              /   \
+_____________/_ __ \_____________
+```
+
+=== ID: 339664348541e773 | TITLE: Mushroom cloud | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 27x11 ===
+```
+     _.-^^---....,,--
+ _--                  --_
+<                        >)
+|                         |
+ \._                   _./
+    ```--. . , ; .--'''
+          | |   |
+       .-=||  | |=-.
+       `-=#$%&%$#=-'
+          | ;  :|
+ _____.,-#%&$@%#&#~,._____
+```
+
+=== ID: 36c0391591037cc6 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 27x14 ===
+```
+   ____
+  '-..-'               .-.
+ ___||___           .-/ /-.
+/_______/|         / / / /
+|       ||        / / / /
+|   o   |/       / / / /
+'---`(--' Pru   />>=<</
+      ')       / / / /
+      (       / / / /
+       ')    / / / /
+       (    /_/_/_/
+       ,   '.'.'.'
+        )   /
+         ` '
+```
+
+=== ID: a1765651eeca031c | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 31x23 ===
+```
+             . . .
+              \|/
+            `--+--'
+              /|\
+             ' | '
+               |
+               |
+           ,--'#`--.
+           |#######|
+        _.-'#######`-._
+     ,-'###############`-.
+   ,'#####################`,
+  /#########################\
+ |###########################|
+|#############################|
+|#############################|
+|#############################|
+|#############################|
+ |###########################|
+  \#########################/
+   `.#####################,'
+     `._###############_,'
+        `--..#####..--'
+```
+
+=== ID: 9a45d533aefcae74 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 28x32 ===
+```
+                 .
+                 .
+                 .       :
+                 :      .
+        :..   :  : :  .
+           ..  ; :: .
+              ... .. :..
+             ::: :...
+         ::.:.:...;; .....
+      :..     .;.. :;     ..
+            . :. .  ;.
+             .: ;;: ;.
+            :; .BRRRV;
+               YB BMMMBR
+              ;BVIMMMMMt
+        .=YRBBBMMMMMMMB
+      =RMMMMMMMMMMMMMM;
+    ;BMMR=VMMMMMMMMMMMV.
+   tMMR::VMMMMMMMMMMMMMB:
+  tMMt ;BMMMMMMMMMMMMMMMB.
+ ;MMY ;MMMMMMMMMMMMMMMMMMV
+ XMB .BMMMMMMMMMMMMMMMMMMM:
+ BMI +MMMMMMMMMMMMMMMMMMMMi
+.MM= XMMMMMMMMMMMMMMMMMMMMY
+ BMt YMMMMMMMMMMMMMMMMMMMMi
+ VMB +MMMMMMMMMMMMMMMMMMMM:
+ ;MM+ BMMMMMMMMMMMMMMMMMMR
+  tMBVBMMMMMMMMMMMMMMMMMB.
+   tMMMMMMMMMMMMMMMMMMMB:
+    ;BMMMMMMMMMMMMMMMMY
+      +BMMMMMMMMMMMBY:
+        :+YRBBBRVt;
+```
+
+=== ID: 1e407cfe0676e416 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 13x54 ===
+```
+      )
+     (
+    .-`-.
+    :   :
+    :TNT:
+    :___:
+
+    \|/
+   - o -
+    /-`-.
+    :   :
+    :TNT:
+    :___:
+
+    .---.
+    : | :
+    :-o-:
+    :_|_:
+
+    .---.
+    (\|/)
+    --0--
+    (/|\)
+
+   '.\|/.'
+   (\   /)
+   - -O- -
+   (/   \)
+   ,'/|\'.
+
+'.  \ | /  ,'
+  `. `.' ,'
+ ( .`.|,' .)
+ - ~ -0- ~ -
+ (
+
+','|'.` )
+  .' .'. '.
+,'  / | \  '.
+    \ '  "
+ ` . `.' ,'
+ . `` ,'. "
+   ~ (   ~ -
+'
+
+. ','|` ` .
+  .'  "  '
+,   ' , '  `
+
+   (  ) (
+    ) ( )
+    (  )
+     ) /
+    ,---.
+```
+
+=== ID: 36b8b6c292043d6b | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 16x1 ===
+```
+[]++++||=======>
+```
+
+=== ID: dff61e45eb9e3782 | TITLE: Knife | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 17x1 ===
+```
+)xxxxx[;;;;;;;;;>
+```
+
+=== ID: 42531e2bd380f0c8 | TITLE: Ninja sword | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 27x1 ===
+```
+0)xxxxx[=======------------
+```
+
+=== ID: d75300502c44610a | TITLE: Ninja sword | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 27x1 ===
+```
+0)xxxxx[=======------------
+```
+
+=== ID: 4dfc167a12d9d9fc | TITLE: Untitled | ARTIST: BluePard | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 25x3 ===
+```
+ ___________ ____________
+|           )._______.-'
+`----------'  BP
+```
+
+=== ID: 7dc2a925a6b09b5b | TITLE: Pocket Knife | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 40x10 ===
+```
+                                    .:^
+             ^                     /   :
+'`.        /;/                    /    /
+\  \      /;/                    /    /
+ \\ \    /;/                    /  ///
+  \\ \  /;/                    /  ///
+   \  \/_/____________________/    /
+    `/                         \  /
+HZ  {  o      <B S A>        o  }'
+     \_________________________/
+```
+
+=== ID: d5c9c92cf16b1a2c | TITLE: Knife and fork | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 9x10 ===
+```
+       _
+      / )
+|||| / /
+||||/ /
+\__(_/
+ ||//
+ ||/
+ ||
+(||   hjw
+ ""
+```
+
+=== ID: a3f31fafe8e56496 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 16x18 ===
+```
+       /\
+      //\\
+     //  \\
+ ^   \\  //   ^
+/ \   )  (   / \
+) (   )  (   ) (
+\  \_/ /\ \_/  /
+ \__  _)(_  __/
+    \ \  / /
+     ) \/ (
+     | /\ |
+     | )( |
+     | )( |
+     | \/ |
+     )____(
+    /      \
+    \______/
+Hawkeye
+```
+
+=== ID: 60bcd1947e383300 | TITLE: A dripping knife | ARTIST: Kevin Kreamer | CATEGORY: weapons | SUBCATEGORY: knives | SIZE: 37x27 ===
+```
+       .---.
+       |---|
+       |---|
+       |---|
+   .---^ - ^---.
+   :___________:
+      |  |//|
+      |  |//|
+      |  |//|
+      |  |//|
+      |  |//|
+      |  |//|
+      |  |.-|
+      |.-'**|
+       \***/
+        \*/
+         V
+
+        '
+         ^'
+        (_)
+
+
+
+    -.   ^   .-
+______\'.|.'/________
+kevin kreamer - kreamer@centraltx.net
+```
+
+=== ID: 07ddde135c49245f | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 3x3 ===
+```
+(>|
+  |
+  !
+```
+
+=== ID: df8b3c1606ab10ea | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 17x3 ===
+```
+             +-+
+=============| |
+            `:_;'
+```
+
+=== ID: 6083bb7dfee833ff | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 23x4 ===
+```
+(Y) (X) (=) (>+<) /`-'\
+ |   |   |    |   \,T./
+ |   |   |    |     |
+                    |
+```
+
+=== ID: d9db7f1f5b7b934e | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 5x6 ===
+```
+ _,-,
+T_  |
+||`-'
+||
+||
+~~
+```
+
+=== ID: 247c1c75e0e0e917 | TITLE: Untitled | ARTIST: Philip Powell | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 22x6 ===
+```
+ /(
+( -||]\
+ \(|| ||
+   ||=||     /))
+   || ||\\/ |//
+   || ||//\\ \_((  PjP
+```
+
+=== ID: 3016c679e8b35a11 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 30x7 ===
+```
+ _________________.---.______
+(_(______________(_o o_(____()
+        mrf  .___.'. .'.___.
+             \ o    Y    o /
+              \ \__   __/ /
+               '.__'-'__.'
+                   '''
+```
+
+=== ID: 66ce28384f636c0b | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 24x10 ===
+```
+       ___
+      /___\
+     (|0 0|)
+   __/{\U/}\_ ___/vvv
+  / \  {~}   / _|_P|
+  | /\  ~   /_/   ||
+  |_| (____)      ||
+  \_]/______\  /\_||_/\
+     _\_||_/_ |] _||_ [|
+snd (_,_||_,_) \/ [] \/
+```
+
+=== ID: ff7d2ec69ccded2a | TITLE: Untitled | ARTIST: Harry Mason (Hajoma) | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 12x11 ===
+```
+  ,  /\  .
+ //`-||-'\\
+(| -=||=- |)
+ \\,-||-.//
+  `  ||  '
+     ||
+     ||
+     ||
+     ||
+     ||
+hjm  ()
+```
+
+=== ID: bbeb73281753492c | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 16x11 ===
+```
+           __
+        ,. |_'.
+       / / /:\ \
+     _/_/_/::: |
+    /o_'/o>::/ /
+    / /'/:::/ /
+   / /_/::.'_/
+  / / \__.-'
+ / /
+/ /
+ /
+```
+
+=== ID: b391f0c24194cf36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 21x12 ===
+```
+          A
+         /!\
+        / ! \
+ /\     )___(
+(  `.____(_)_________
+|           __..--""
+(       _.-|
+ \    ,' | |
+  \  /   | |
+   \(    | |
+    `    | |
+         | |
+```
+
+=== ID: 58ee8bbe671f7684 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 28x12 ===
+```
+               /\_[]_/\
+              |] _||_ [|
+       ___     \/ || \/
+      /___\       ||
+     (|0 0|)      ||
+   __/{\U/}\_ ___/vvv
+  / \  {~}   / _|_P|
+  | /\  ~   /_/   []
+  |_| (____)
+  \_]/______\        -edias-
+     _\_||_/_
+snd (_,_||_,_)
+```
+
+=== ID: 156335f54118288b | TITLE: Untitled | ARTIST: Jola Backiel | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 17x13 ===
+```
+        .
+       *|*
+   _/>  #  <\_
+ /~  ;_/|\_;  ~\
+(       #       )
+ \_  ;~\|/~;  _/
+   ~\>  #  </~
+        #
+        #
+        #
+        #
+       /,\
+       \`/ -jb-
+```
+
+=== ID: b454d7c2484e5fa3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 16x15 ===
+```
+  ,:\      /:.
+ //  \_()_/  \\
+||   |    |   ||
+||   |    |   ||
+||   |____|   ||
+ \\  / || \  //
+  `:/  ||  \;'
+       ||
+       ||
+       XX
+       XX
+       XX
+       XX
+       OO
+       `'
+```
+
+=== ID: da33bbdced9b58c6 | TITLE: Untitled | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 37x21 ===
+```
+                   /^\
+          _.-`:   /   \   :'-._
+        ,`    :  |     |  :    '.
+      ,`       \,|     |,/       '.
+     /           `-...-`           \
+    :              .'.              :
+    |             . ' .             |
+    |             ' . '             |
+    :              '.'              :
+     \           ,-"""-,           /
+      `.       /'|     |'\       ,'
+        `._   ;  |     |  ;   _,'
+           `-.:  |     |  :,-'
+                 |     |
+                 |     |
+barbarian        |     |
+battle           |     |
+axe-head         |     |
+14mar99
+
+cjr
+```
+
+=== ID: 31152cdad4136cd8 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: weapons | SUBCATEGORY: axes | SIZE: 31x43 ===
+```
+              __   _
+            .$SSssS$b.
+          .$SSd$$^SSS$b
+         ,Sd$PSP   `TS$;
+         SdSS^.=, =. bSS
+        ;$SS$;'-  -':$SS;
+       :$SSd$i   ,  :$S$S
+       $$SS$PS. == .$$S$S
+      :$$SdSSSS`--'$$$$$;
+      $^^SSS^' \  d$$$$bj-.
+     /    )""--. '.^^"" :  \
+    /    j               ;  ;
+   ,    /|.             .;  :
+   ;   / :              .j-.;
+   | .' : \      ,     / ;  |
+   `';  ;  `--.._j..--'  :  |
+     |  :                ;  :
+     |   \      __      /   :
+     :   ;:----'  `----:|   ;
+     ; `: ;            |:   ;
+    :.--;/             ; ;_ :
+    |.--j"-.          : :_ `i
+    |  dM.  "-.__   _.: | `-:
+    : dMMMm.--,  """   ;;   ;
+     YM\ `-.  :      .M:   :
+     MP'`-. `-:    .MPT|   ;
+  _.-'     `-./`-.MMP  ;  :
+ ;\          dMm. `^.,-'--;
+ : `.       :MMMMM-.  )   :
+  \  `-.    |MMMMM  `y_.--'.
+  :M.   "-._;MMMMM   "MMm+. `-.
+  dMMMm.___.':MMM;    :MMM `-.'
+  MMMMMP'    :MMM;     MMM
+ :MMMMM       MMM      :M:
+ dMMMMM       MM;       MM;
+ MMMMM;       MM;       :MM
+:MMMMM        MM    ;    M:
+dMMMMM        MM    M    MM;
+MMMMMM        :;    M;   :MM
+MMMMMM;            :MM    M:
+MMMMMMM            :MM;   MM;
+TMMMMMM;           MMMM.  :MM
+:MMMMMMMm  bug   _:MMMMMm. M:
+```
+
+=== ID: 76fd08fca5b868bb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 14x9 ===
+```
+  |`-._/\_.-`|
+  |    ||    |
+  |___o()o___|
+  |__((<>))__|
+  \   o\/o   /
+   \   ||   /
+    \  ||  /
+jgs  '.||.'
+       ``
+```
+
+=== ID: 9db3ba8c427fda6a | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 13x10 ===
+```
+    _..._
+.-'_.---._'-.
+||####|(__)||
+((####|(**)))
+ '\###|_''/'
+  \\()|##//
+   \\ |#//
+    .\_/.
+     L.J
+      "
+```
+
+=== ID: e59dae589b989ff3 | TITLE: I-Am-The-Evil-Guy-Who-Wil-Destroy-The-World-Now | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 18x11 ===
+```
+  |\ _..--.._ /|
+  |############|
+   )##########(
+._/##.'//\\'.##\_.
+ .__)#((()))#(__.
+  \##'.\\//.'##/
+   \####\/####/
+   /,.######.,\
+  (  \##__##/  )
+      "(\/)"
+        )(
+```
+
+=== ID: 7cb7099d0c1a1e18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 18x14 ===
+```
+\_              _/
+] --__________-- [
+|       ||       |
+\       ||       /
+ [      ||      ]
+ |______||______|
+ |------..------|
+ ]      ||      [
+  \     ||     /
+   [    ||    ]
+   \    ||    /
+    [   ||   ]
+     \__||__/
+        --
+```
+
+=== ID: 9f4d15e0e7ebc00b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 28x15 ===
+```
+   |\                     /)
+ /\_\\__               (_//
+|   `>\-`     _._       //`)
+ \ /` \\  _.-`:::`-._  //
+  `    \|`    :::    `|/
+        |     :::     |
+        |.....:::.....|
+        |:::::::::::::|
+        |     :::     |
+        \     :::     /
+         \    :::    /
+          `-. ::: .-'
+   jgs     //`:::`\\
+          //   '   \\
+         |/         \\
+```
+
+=== ID: e6f8679560bff49d | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 19x16 ===
+```
+\_________________/
+|       | |       |
+|       | |       |
+|       | |       |
+|_______| |_______|
+|_______   _______|
+|       | |       |
+|       | |       |
+ \      | |      /
+  \     | |     /
+   \    | |    /
+    \   | |   /
+     \  | |  /
+      \ | | /
+       \| |/
+        \_/
+```
+
+=== ID: 234bc5ef07cc2432 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 34x21 ===
+```
+           _ -  / -  _
+         -      /       -
+       -        /         -
+     -          /           -
+    _           /            _
+    _           /             _
+  ( / / / / / / 0/ / / / / / / )
+  0 _           /            _ 0
+  #  _          /           _  #
+  #   _         /          _   #
+  #     _       /        _     #
+  0        -  _ / _   -        0
+ /I\            0             /I\
+//I\\           #            //I\\
+//I\\           #            //I\\
+//I\\           0            //I\\
+ /I\           /I\            /I\
+  v           //I\\            v
+              //I\\
+              //I\\
+               /I\
+```
+
+=== ID: f8044d735956fb59 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 27x23 ===
+```
+ _________________________
+|<><><>     |  |    <><><>|
+|<>         |  |        <>|
+|           |  |          |
+|  (______ <\-/> ______)  |
+|  /_.-=-.\| " |/.-=-._\  |
+|   /_    \(o_o)/    _\   |
+|    /_  /\/ ^ \/\  _\    |
+|      \/ | / \ | \/      |
+|_______ /((( )))\ _______|
+|      __\ \___/ /__      |
+|--- (((---'   '---))) ---|
+|           |  |          |
+|           |  |          |
+:           |  |          :
+ \<>        |  |       <>/
+  \<>       |  |      <>/
+   \<>      |  |     <>/
+    `\<>    |  |   <>/'
+      `\<>  |  |  <>/'
+        `\<>|  |<>/'
+          `-.  .-`
+            '--'
+```
+
+=== ID: 971d48aee7736605 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 36x25 ===
+```
+                           .-.
+                          {{#}}
+          {}               8@8
+        .::::.             888
+    @\\/W\/\/W\//@         8@8
+     \\/^\/\/^\//     _    )8(    _
+      \_O_{}_O_/     (@)__/8@8\__(@)
+ ____________________ `~"-=):(=-"~`
+|<><><>  |  |  <><><>|     |.|
+|<>      |  |      <>|     |S|
+|<>      |  |      <>|     |'|
+|<>   .--------.   <>|     |.|
+|     |   ()   |     |     |P|
+|_____| (O\/O) |_____|     |'|
+|     \   /\   /     |     |.|
+|------\  \/  /------|     |U|
+|       '.__.'       |     |'|
+|        |  |        |     |.|
+:        |  |        :     |N|
+ \       |  |       /      |'|
+  \<>    |  |    <>/       |.|
+   \<>   |  |   <>/        |K|
+    `\<> |  | <>/'         |'|
+jgs   `-.|__|.-`           \ /
+                            ^
+```
+
+=== ID: 997ceb6e9873add0 | TITLE: Baltimore Police Shield | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 36x28 ===
+```
+        ,---__,------__---.
+      ,'////<: =     ]\\\\\`.
+     ///__---^~~"""~~^---__\\\
+    //,' D E T E C T I V E `.\\
+   /  \   __---^~~~^---__   /  \
+  /,.  \,'   /.-----.\   `./  ,.\
+ //  `.     MMM ,^. MMM     ,'  \\
+//.--. ~~^^---^~   ~^---^^~~ .--.\\
+/  '> \  __--'^^~~~^^`--__  / <'   \
+\   / _-^  o   L   I   c  ^-_ \   /
+ \  ,'  P  __--^^^^^--__  E  `.  /
+  \ \   ,-^             ^-.   / /
+  i  \,' ,^-__-^~/\^-__-^. `./  i
+  |     /|#`|`.| ||**\ */-\     |
+  !     '>#| `|`.||--/* \*<'    !
+  /     /|#|_|#_|||________\    \
+ /      \   *   *||.| |#| |/     \
+i        \**\ */-[]|`.|#| /       i
+|         \-/* \/~~\`|`.|/        |
+|   /`.    `. ./_[]_\.`,'   ,'\   |
+!  /   `-.   ^|______|^  ,-'   \  !
+ \ `.     ~~^--_____--^~~     ,' /
+  \  `-_     BALTIMORE     _-'  /
+   `.   ^~--._________.--~^   ,'
+     ^-_                   _-^
+        ^~--__ 1 6 4 __--~^
+              `.   ,'
+                `-'
+```
+
+=== ID: 3a4f55b718e8802d | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: shields | SIZE: 40x40 ===
+```
+                  /¯¯\
+                  \__/
+                   ||
+                   ||
+                  |  |
+                  |  |
+                  |  |
+                  |  |
+                  |  |
+                  |  |
+              .--.----.--.
+            .-----\__/-----.
+    ___---¯¯////¯¯|\/|¯¯\\\\¯¯---___
+ /¯¯ __O_--////   |  |   \\\\--_O__ ¯¯\
+| O?¯      ¯¯¯    |  |    ¯¯¯      ¯?O |
+|  '    _.-.      |  |      .-._    '  |
+|O|    ?..?      ./  \.      ?..?    |O|
+| |     '?. .-.  | /\ |  .-. .?'     | |
+| ---__  ¯?__?  /|\¯¯/|\  ?__?¯  __--- |
+|O     \         ||\/ |         /     O|
+|       \  /¯?_  ||   |  _?¯\  /       |
+|       / /    - ||   | -    \ \       |
+|O   __/  | __   ||   |   __ |  \__   O|
+| ---     |/  -_/||   |\_-  \|     --- |
+|O|            \ ||   | /            |O|
+\ '              ||   |        ^~DLF ' /
+ \O\    _-¯?.    ||   |    .?¯-_    /O/
+  \ \  /  /¯¯¯?  ||   |  ?¯¯¯\  \  / /
+   \O\/   |      ||   |      |   \/O/
+    \     |      ||   |      |     /
+     '.O  |_     ||   |     _|  O.'
+        '._O'.__/||   |\__.'O_.'
+           '._ O ||   | O _.'
+              '._||   |_.'
+                 ||   |
+                 ||   |
+                 | \/ |
+                 |  | |
+                  \ |/
+                   \/
+```
+
+=== ID: 459fa16298a4b27c | TITLE: Gun | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: weapons | SUBCATEGORY: guns | SIZE: 15x4 ===
+```
+      __,_____
+hjw  / __.==--"
+    /#(-'
+    `-'
+```
+
+=== ID: 388d691460b6f4ce | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: guns | SIZE: 20x17 ===
+```
+         ^
+         | |
+       @#####@
+     (###   ###)-.
+   .(###     ###) \
+  /  (###   ###)   )
+ (=-  .@#####@|_--"
+ /\    \_|l|_/ (\
+(=-\     |l|    /
+ \  \.___|l|___/
+ /\      |_|   /
+(=-\._________/\
+ \             /
+   \._________/
+     #  ----  #
+     #   __   #
+     \########/
+```
+
+=== ID: 4cd0a1ea3d85cd94 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 11x5 ===
+```
+| |
+|-|__
+|\| /
+|0|/|
+|~|   :F_P:
+```
+
+=== ID: fe630503a6f28fa6 | TITLE: Untitled | ARTIST: Jola Backiel | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 12x6 ===
+```
+ _______
+ ||  .'|
+ ||,`  |
+ |     |
+ |_____|
+_|_( )_|_ jb
+```
+
+=== ID: 2b5f53844fbff8c3 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 18x9 ===
+```
+   +---+
+zed| o |
+   |\__|
+   |   |
+   |---|
+   |-0-|
+   +---+
+
+re-diddle by b'ger
+```
+
+=== ID: 1795b7cd4e0c99b6 | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 38x11 ===
+```
+        ______
+       |\____/|,      _
+       |      | \    {\\,
+       |      |  `,__.'\`
+    ___|______|____""', :__.
+  /    | (__) |       / `,  `.
+ /     !______|       L\J'    `.
+:_______________________________i.
+|                                |
+|                                |
+!________________________________! fsc
+```
+
+=== ID: 3721622b3654198e | TITLE: Untitled | ARTIST: Russell Marks | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 40x16 ===
+```
+   _______
+  |.--+--.|
+  ||  |  ||
+  ||--`--||
+  ||    ,||
+  ||  ,' ||
+  ||,'   ||
+  ||     ||
+  ||_____||__
+  | ___.  |  `.
+  |(o o)) |  ,(
+  |`.-,'  |-'_ )
+  |______ |\' -'  rjm aka  Russell Marks
+ _\     /_) )
+'"`\___//_)'
+       ''^
+```
+
+=== ID: 93ade102e33e885a | TITLE: Untitled | ARTIST: Przemek Borys | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 24x17 ===
+```
+||HHHHHHHHHHHH||
+||HHHHHHHHHHHH||
+||      8     ||
+||      8     ||
+||     8      ||
+|| ;   8o     ||'
+|| ; ;  8     || ; '
+|| ; ; o8;  ' ||   '
+||_____8______|| ,'  ' '
+||     __     ||   ' '
+||----(())----||' ' , '
+||_____,-,____|| ' '
+||   ,$  <'   ||
+||---`$$s'----||
+||  ________  ||
+||--|_ __ _|--||
+||pb \____/   ||
+```
+
+=== ID: cbd48ab620daf241 | TITLE: Untitled | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 30x24 ===
+```
+   ____________
+  |____________|_
+   ||--------|| | _________
+   ||- _     || |(HA ha ha!)
+   ||    - _ || | ---------
+   ||       -|| |     //
+   ||        || O\    __
+   ||        ||  \\  (..)
+   ||        ||   \\_|  |_
+   ||        ||    \  \/  )
+   ||        ||     :    :|
+   ||        ||     :    :|
+   ||        ||     :====:O
+   ||        ||     (    )
+   ||__@@@@__||     | `' |
+   || @|..|@ ||     | || |
+   ||O@`=='@O||     | || |
+   ||_@\/\/@_||     |_||_|
+ ----------------   '_'`_`
+/________________\----------\
+|   GUILLOTINE   |-----------|
+|  OF CASTLE DE SADE         |
+|____________________________|
+Just trying to get a head!!!
+```
+
+=== ID: 8fe56b0c839c8f0a | TITLE: Untitled | ARTIST: Ojosh!ro | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 18x28 ===
+```
+     ____________
+     |__________|
+     ||        ||
+     ||""""""""||
+     ||"-_n.   ||
+     ||   "*N, ||
+     ||      "-||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||        ||
+     ||--------||
+     ||   __   ||
+     ||--(__)--||
+     ||        ||
+  """""""""""""""7
+                 |
+                 |
+Ojo
+```
+
+=== ID: a03ba0b91dfb89a6 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 33x35 ===
+```
+    __.--.____________.--.__
+   (       _.------._       ).
+    '._.--'    ||    '--._.'  )
+     | |================| || (
+     | ||               | ||  )
+     | ||              _| || (
+     | ||          _.-' | ||  )
+     | ||      _.-'     | || (
+     | ||  _.-'         | ||  )
+     | |.-'             | || (
+     | ||               | ||  )
+     | ||               | || (
+     | ||               | ||  )
+     | ||               | || (
+     | ||               | ||  )
+     | ||               | || (
+     | .---.            | ||  )
+     | |   |            | || (
+     | |   |            | ||  )
+     | |  .'            | || (
+     | | '              | ||  )
+     | |  '.            | || (
+     | |   |            | ||  )
+     | |O__|  .))).     | || (
+     | ||    ( O O )    | ||
+     | ||===._ (_) _.===| ||
+     | ||     '-.-'     | ||
+     | || not one of my | ||
+     | ||  better days  | ||
+     | ||    ______     | ||
+ LGB | ||   /      \    | ||
+   __| ||  (\______/)   | ||_____
+  /__| ||___) |''| (____| ||____/
+ /___|_|/  (________)   |_|/___/
+/_____________________________/
+```
+
+=== ID: a0dae1faa49f2644 | TITLE: Untitled | ARTIST: Ojosh!ro | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 21x38 ===
+```
+.___________________.
+|`._______________,'|
+| |               | |
+| |_______________| |
+| ||             || |
+| ||_   _        || |
+| || ""--._._    || |
+| ||       `-.   || |
+| ||          `. || |
+| ||            \|| |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||             || |
+| ||_____________|| |
+| |/     ,--.    \| |
+| |-(_)-(    )-(_)| |
+| |      `--'     | |
+|===================|
+|                   |
+
+Ojo
+```
+

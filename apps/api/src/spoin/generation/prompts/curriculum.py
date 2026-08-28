@@ -29,9 +29,11 @@ Rules:
     system design architecture, request flows, state machines, timelines, biological \
     cycles/cascades, economic feedback loops, chemical processes, organizational trees. \
     Aim for at least 1-2 diagram cards in almost every subtopic tier.
-  * "ascii": HIGH PRIORITY across all topics. 1-2 panel silly, funny stickman visual \
-    gags and humorous physical analogies that make concepts stick. Aim for at least \
-    2-3 ascii stickman cards in every subtopic tier — lean generous, these are the \
+  * "ascii": HIGH PRIORITY across all topics. Silly, funny visual gags and \
+    humorous physical analogies that make concepts stick — characters, \
+    checklists, before/after pairs, timelines, tiny charts, whatever form the joke \
+    wants. Aim for at least 2-3 ascii cards in every subtopic tier, and vary their \
+    FORM across the tier rather than repeating one. Lean generous: these are the \
     cards learners screenshot and remember.
   * "comparison": HIGH PRIORITY for common misconceptions, myths vs facts, pitfalls, \
     and "wrong way vs right way" contrasts.

@@ -1,0 +1,2136 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: MYTHOLOGY
+# Total artworks in category fitting <=40 cols: 113
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 2e37911694582c76 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 20x5 ===
+```
+  ,  {\_       _
+  }><_('>   \_{Ss
+  `    `     _(/\SS
+           _/_/ / SS
+jgs        \{
+```
+
+=== ID: db5471923bf66a11 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 24x6 ===
+```
+          ,sSSs
+        ,SSSS_/ ,_
+        sS/`))\//
+       sS//|_(_/      _,
+       SS\\\  `""-.-'` /
+jgs  sSS` ` `-==-'`'-._\
+```
+
+=== ID: 8a06d735b9f31254 | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 24x6 ===
+```
+  ,;:;,        /^\   /^\
+ ((@ @))       \\\\.////
+ ))\=/((        \\\|///
+.((/"\))         \\|//
+//)W)(W(``''--.._/`'/
+`m(\,_))__________.' ldb
+```
+
+=== ID: d61dcd040c2ad310 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 22x6 ===
+```
+       \}}/  '
+~       ()  '   _/}  ,
+   ~   /oo\    <')_><{
+        /\      `    `
+        \/    ~
+jgs     /\          ~
+```
+
+=== ID: 299b1916203c7e4d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 22x6 ===
+```
+            sSSs,
+         _, \_SSSS,
+          \\/((`\Ss
+    ._     \/)_|\\Ss
+    \ `-.-""'  ///SS
+jgs /_.-'`-==-' ' 'SSs
+```
+
+=== ID: 9bca3b065c67478e | TITLE: Untitled | ARTIST: llizard | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 31x7 ===
+```
+      ,-,-
+      ))) \
+     ((((,__
+   _/ ) (/  \~ ~~~~ ~~ ~~~~
+_-'  (____/`.`.-')~ ~~~~~~~~~~
+ejm          ) ^' ~  ~~ ~~~ ~ ~
+            /.'  ~  ~ ~~ ~~~ ~
+```
+
+=== ID: 64f4d9d0328c6009 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 37x9 ===
+```
+                           .-""-.
+                          (___/\ \
+        ,                 (|^ ^ ) )
+       /(                _)_\=_/  (
+ ,..__/ `\          ____(_/_ ` \   )
+  `\    _/        _/---._/(_)_  `\ (
+jgs '--\ `-.__..-'    /.    (_), |  )
+        `._        ___\_____.'_| |__/
+           `~----"`   `-.........'
+```
+
+=== ID: 834814b4c027d9f3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 15x9 ===
+```
+        sSSs
+     _, \_SSSS
+      \\/((`\Ss
+       \/)_|\\S
+        /::|//S
+        |:/ `SS
+      __|/
+     /:::\
+jgs  `'`:/
+```
+
+=== ID: d89fda433eb3905b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 10x9 ===
+```
+  ,sSSs
+,SSSS_/ ,_
+sS/`))\//
+S//|_(\/
+S\\|::\
+SS` \:|
+     \|__
+     /:::\
+jgs  \:`'`
+```
+
+=== ID: fd9df083a398ffbd | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 19x9 ===
+```
+              /:.:,
+   O          \::/
+ o            /|`
+ _ '  sSSs   /:|
+  \\__\_SSSs/::|
+   `--((S\SSSs/
+       SS\\SSSs
+      sSS//SSs
+jgs      `Ss'
+```
+
+=== ID: aed62b6fc2845659 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 17x9 ===
+```
+,:.:\
+ \::/
+  `|\           o
+   |:\   sSSs ' _
+   |::\sSSS_/__//
+    \sSSS/S))--`
+    sSSS//SS
+jgs  sSS\\SSs
+       sS'Ss
+```
+
+=== ID: 692d49d488d1d7cc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 39x13 ===
+```
+                 .--.
+                {=.  `}
+                {\_{   }
+               {  )\_  }
+               { (( \\  }
+              { //)_(\\ }
+             .=///   \/=~=,
+-  ~  -  ~ /` -`/   /'     `\-  ` _ ~
+_  - _~ _ /    /  /`         \ ~ -   _
+      `  `~- ~| (` -_ ~ -~ -`-~ - ~ _
+`  ~ _ -  ~  - \ \ ~   ~ -  ~  _ ~ -
+ _     ~  -  ~/   `\ ~   _ ` -    ` ~ -
+   jgs   `    `"`""`
+```
+
+=== ID: 0a9c468f7b295746 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 18x13 ===
+```
+           __w
+         ,%%%%
+        .%%%_/  ,_
+        %%/(___//
+       ,%%||))-'
+      ,%%%)\(
+      %%'&&\\
+     ,%% &&&&&
+       %  &&&&
+          ,&&'
+        ,&&&
+jgs   ,&&'&&,
+     ,&'   `&.
+```
+
+=== ID: b9bbc9f84cc1ba7b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 18x13 ===
+```
+           __w
+         ,%%%%
+        .%%%_/  ,_
+        %%/(___//
+       ,%%||))-'
+      ,%%%)\(
+      %%'&&\\
+     ,%% &&&&&
+       %  &&&&
+          ,&&'
+        ,&&&
+jgs   ,&&'&&,
+     ,&'   `&.
+```
+
+=== ID: 4281fd4f37a99519 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 36x13 ===
+```
+                          _.._
+                     ___.'    '.
+                    (  (____/`\ \
+ ,     ,`\           \(' |')' )  )
+/ \   /`  |           /  _\= _/  (
+|' `-'  ^ /   ___.-. (_.'  )  \   )
+ \: ^    /  ,;   |/-'(  \     `\  (
+  '-.:.^<  /:   ^/    `--`_     ;  )
+      `|:\ |  ^ / .     (` \,-| |_(
+       |.:/:.   `\__.---'`-'  '_|
+        \':' ^   /-'         / ,'
+    jgs  `.^:. ^/           ( \
+           `'--`            '\/
+```
+
+=== ID: a80cc7ac4344872f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 25x15 ===
+```
+               .
+              .    /
+       ((())    . /--, /
+      (((()))    <')  =<
+      ))6.6((     \__/ \
+     ((( v )))   //\
+      ))) (((\  //
+     /(() ()))\//
+    //))) (((`\/
+   //(((^^^)))  |\    /|
+  //  ))^^^((    \\\///
+ //   ((`\^^)\    \\//jgs
+~`     )) `\^^^`\_/^/
+       (    `\^^^~^/
+              `~~~`
+```
+
+=== ID: ebaba1aa741c3132 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 17x15 ===
+```
+             ()
+          O
+       .-.  o
+      {/^\}
+     { \_/ }  __
+     {.-"-.}_//-'
+  ___/(\-/)--`
+ `---` )^(
+      /`"`\
+      \   /
+       \ /
+       / \
+       \ /
+jgs   /` `\
+      `"`"`
+```
+
+=== ID: e569f25f75997e7c | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 15x18 ===
+```
+()
+||,/))),
+||)/e e\)
+(((\ O /((
+ \)_)'(_))
+  (|)^(|)\\
+   ) . (  \\
+  ((\ /))  \\_,
+   \\|//    ~~
+   ((|))    o
+    \|/      o
+    |||
+   //'\\    O
+  ((   ))
+   )   (  mn
+   o
+  o    o
+   o
+```
+
+=== ID: 2f6372f1998e9615 | TITLE: Mermaid on rock | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 38x18 ===
+```
+              .---.
+             (_,/\ \
+            (`^ ^(  )
+            ) \=  ) (
+       |\_  (.-' '--.)
+        \(  /(_)-(_) \
+         \\/ /\   /`\ \
+          \_/ / . \  //
+             /'---'\`/_
+           _/ ^   ^ ;--;
+       .--`| ^  ^ /`    `),
+      /`  . \  ^ /`  ) .   ').
+ ~^~`/  (    \^ / (       '  \^-~`-~
+-  ^ ~^-    . )/   .    )  '-.;~^-~^~-
+   ~^~- jgs  / `\ - .  ~^~ ,-.`~~^~^~^
+ ~- `^_~-~^-| \^ \~_~^ -~^~- ~^`~^ ^~
+  ~_~^- .-./__/\__`\-. ~^_-~^- ~^-
+     ^~ `-^~=~-`=~-~=-'    ~
+```
+
+=== ID: ea8887719dfd22c2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 15x19 ===
+```
+      .---.
+     / /"\ \
+     )/a a\(
+    ( ( - ) )
+     ) ) (  (
+    (__)  \  )
+   /,(@)~(@\__)
+   \\ \   / //
+    \\/\'/\//
+    (/^.^.^\)
+     |^.^.^|
+     |^.^.^|
+     \^.^.^/
+      \^.^/
+       )^(
+      /^.^\
+     /.^,^.\
+jgs,/-,-|-,-\,
+   ^~^~^`^~^~^
+```
+
+=== ID: 5a0d5865c23a1ffe | TITLE: Untitled | ARTIST: Clover Fernchild | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 26x20 ===
+```
+                 .
+             ;-'.,
+      ;   ;'.;'-'  ;
+        `;;;;  ' ');
+           ;;' -'/;;;
+        ;;;; ;| |;;'__
+  \\\,   / |_/__/____ \
+   \ \  / (__,.__)   \ \
+    \ \/ / )     (    \ \
+     `--' ;-. .  ;.   '\\\
+          \  `.,' )
+          `.     ;
+cf         ;     )
+          /    .'
+         ;   ,;
+          , .'
+        ,' , `.
+      ,'  / \  `.
+      `. ;   ; ,'
+        `'   .'
+```
+
+=== ID: 526f1918ecbc16a8 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 26x21 ===
+```
+    o       sSSSSSSs
+~      o   SS,,SSSSSs   ~
+   \       S<   ?SSSS
+  / \ o    S >  SSSSS
+>= ('>     _SS)(SSSSS
+ '\ /     ( SS  SSSSS
+   / \||, )(SS ( SSS\
+       \\/ /S    SS\ \   ~
+        \./  ). (S / /
+            / \/ \//'
+    ~      /^  ^ '|\`
+          /^  ^  ^|
+         /   ^  ^ /  ~
+         |^    ^/'
+          \^ ^ /
+~         `\ ^/' ~
+            )(
+           /  \
+    jgs   / ^  \         ~
+        _/ ^/`.^`._,
+       `-.-'   `-.-'
+```
+
+=== ID: 4e4f255d0bd7805a | TITLE: Small Unicorn | ARTIST: Donovan Baker | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 15x4 ===
+```
+      _ __,~~~/
+,~~`( )_( )-\|
+    |/|  `--.
+    ! !  !
+```
+
+=== ID: c65b80adc49fbbbc | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 28x8 ===
+```
+ _______\)%%%%%%%%._
+`''''-'-;   % % % % %'-._
+        :b) \            '-.
+        : :__)'    .'    .'
+        :.::/  '.'   .'
+        o_i/   :    ;
+               :   .'
+                ''`
+```
+
+=== ID: 2af0b45d0e201abf | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 22x12 ===
+```
+                    /
+               ,.. /
+             ,'   ';
+  ,,.__    _,' /';  .
+ :','  ~~~~    '. '~
+:' (   )         )::,
+'. '. .=----=..-~  .;'
+ '  ;'  ::   ':.  '"
+   (:   ':    ;)
+    \\   '"  ./
+     '"      '"
+               DR J
+```
+
+=== ID: f741dcd1ff47ec4a | TITLE: Untitled | ARTIST: Marie Bird | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 32x16 ===
+```
+               |))    |))
+ .             |  )) /   ))
+ \\   ^ ^      |    /      ))
+  \\(((  )))   |   /        ))
+   / G    )))  |  /        ))
+  |o  _)   ))) | /       )))
+   --' |     ))`/      )))
+    ___|              )))
+   / __\             ))))`()))
+  /\@   /             `(())))
+  \/   /  /`_______/\   \  ))))
+       | |          \ \  |  )))
+       | |           | | |   )))
+       |_@           |_|_@    ))
+      /_/           /_/_/
+Valkyrie
+```
+
+=== ID: 627363361eda1a20 | TITLE: Unicorn | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 33x21 ===
+```
+                              /
+                   __       //
+                   -\= \=\ //
+                 --=_\=---//=--
+               -_==/  \/ //\/--
+                ==/   /O   O\==--
+   _ _ _ _     /_/    \  ]  /--
+  /\ ( (- \    /       ] ] ]==-
+ (\ _\_\_\-\__/     \  (,_,)--
+(\_/                 \     \-
+\/      /       (   ( \  ] /)
+/      (         \   \_ \./ )
+(       \         \      )  \
+(       /\_ _ _ _ /---/ /\_  \
+ \     / \     / ____/ /   \  \
+  (   /   )   / /  /__ )   (  )
+  (  )   / __/ '---`       / /
+  \  /   \ \             _/ /
+  ] ]     )_\_         /__\/
+  /_\     ]___\
+ (___)
+```
+
+=== ID: da852d3b9eff3c8a | TITLE: Untitled | ARTIST: R.B.Cleary | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 26x21 ===
+```
+         .
+        /'
+       //
+   .  //
+   |\//7
+  /' " \
+ .   . .
+ | (    \     '._
+ |  '._  '    '. '
+ /    \'-'_---. ) )
+.              :.'
+|               \
+| .    .   .     .
+' .    |  |      |
+ \^   /_-':     /
+ / | |    '\  .'
+/ /| |     \\  |
+\ \( )     // /
+ \ | |    // /
+  L! !   // / Monoceros'95
+   [_]  L[_|  R.B.Cleary
+```
+
+=== ID: 4ac4be583e483ed5 | TITLE: Untitled | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 38x23 ===
+```
+              \
+               \
+                \\
+                 \\
+                  >\/7
+              _.-(6'  \
+             (=___._/` \
+                  )  \ |
+                 /   / |
+                /    > /
+               j    < _\
+           _.-' :      ``.
+           \ r=._\        `.
+          <`\\_  \         .`-.
+           \ r-7  `-. ._  ' .  `\
+            \`,      `-.`7  7)   )
+             \/         \|  \'  / `-._
+                        ||    .'
+cjr                      \\  (
+10mar02                   >\  >
+                      ,.-' >.'
+                     <.'_.''
+                       <'
+```
+
+=== ID: 48fb729669bc989c | TITLE: Untitled | ARTIST: Dustin Slater | CATEGORY: mythology | SUBCATEGORY: grim-reapers | SIZE: 23x17 ===
+```
+             ___
+            /   \\
+       /\\ | . . \\
+     ////\\|     ||
+   ////   \\ ___//\
+  ///      \\      \
+ ///       |\\      |
+//         | \\  \   \
+/          |  \\  \   \
+           |   \\ /   /
+           |    \/   /
+           |     \\/|
+           |      \\|
+           |       \\
+           |        |
+           |_________\
+     from Dustin Slater
+```
+
+=== ID: efcffe8389cd8bd9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: grim-reapers | SIZE: 23x15 ===
+```
+                 /\
+                 ||
+   ____ (((+))) _||_
+  /.--.\  .-.  /.||.\
+ /.,   \\(0.0)// || \\
+/;`";/\ \\|m|//  ||  ;\
+|:   \ \__`:`____||__:|
+|:    \__ \T/ (@~)(~@)|
+|:    _/|     |\_\/  :|
+|:   /  |     |  \   :|
+|'  /   |     |   \  '|
+ \_/    |     |    \_/
+        |     |
+        |_____|
+    jgs |_____|
+```
+
+=== ID: 189a76353e2b07a6 | TITLE: -=[ reapers ]=-  10/98 | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: grim-reapers | SIZE: 25x34 ===
+```
+                   ,____
+                   |---.\
+           ___     |    `
+          / .-\  ./=)
+         |  |"|_/\/|
+         ;  |-;| /_|
+        / \_| |/ \ |
+       /      \/\( |
+       |   /  |` ) |
+       /   \ _/    |
+      /--._/  \    |
+      `/|)    |    /
+        /     |   |
+      .'      |   |
+jgs  /         \  |
+    (_.-.__.__./  /
+
+
+ ____,
+/.---|
+`    |     ___
+    (=\.  /-. \
+     |\/\_|"|  |
+     |_\ |;-|  ;
+     | / \| |_/ \
+     | )/\/      \
+     | ( '|  \   |
+     |    \_ /   \
+     |    /  \_.--\
+     \    |    (|\`
+      |   |     \
+      |   |      '.
+      |  /         \
+jgs   \  \.__.__.-._)
+```
+
+=== ID: 376f09ee4a3a0cfa | TITLE: Untitled | ARTIST: llizard | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 21x10 ===
+```
+              ,~,
+             (((}
+             -''-.
+            (\  /\)
+      ~______\) | `\
+   ~~~(         |  ')
+      | )____(  |
+     /|/     ` /|
+     \ \      / |
+ejm  |\|\   /| |\
+```
+
+=== ID: a8fce6f77fc0e4f9 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 18x10 ===
+```
+  <=======]}======
+    --.   /|
+   _\"/_.'/
+ .'._._,.'
+ :/ \{}/
+(L  /--',----._
+    |          \\
+   : /-\ .'-'\ / |
+snd \\, ||    \|
+     \/ ||    ||
+```
+
+=== ID: 5975f1153c59c551 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 29x14 ===
+```
+                __
+               / _\ #
+               \c /  #
+               / \___ #
+               \`----`#==>
+               |  \  #
+    ,%.-"""---'`--'\#_
+   %%/             |__`\
+  .%'\     |   \   /  //
+  ,%' >   .'----\ |  [/
+     < <<`       ||
+      `\\\       ||
+        )\\      )\
+^^^jgs^^"""^^^^^^""^^^^^^^^^^
+```
+
+=== ID: 27cdfcac40f1bcdd | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 29x14 ===
+```
+                 _,._
+                ,%%%%
+               .%%%_/
+               %%/(
+               %%||))
+             ,%%%)\(
+    ,%.-"""--%%%-`\\
+   %%/       ,%    |
+  .%'\     |   \   /\
+  ,%' >   .'----\ |\ \
+     < <<`       || //
+      `\\\       ||[/
+        )\\      )\
+^^^jgs^^"""^^^^^^""^^^^^^^^^^
+```
+
+=== ID: 5490849c3924cf2b | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 40x18 ===
+```
+      /
+     /\     ___
+    /  \   \\\\\              __________
+   |    \ /O )))        _--~~~ ________/
+   |     \ |=  /     _-~__--~~~ _____/
+   |_____ \_|_|___ /  ____---~~~~__/
+<--E---<<</E______)  ______---~~_/
+   |~~~~~~/|    | |  _______--_/
+   |     / |    |  \  ____--_/  ____
+   |    / /      ---)      /--.==\\\\
+    \  / |          ~~~--~/   )  ))))
+     \/   |                    |  ((((
+      \ _-~\|  /     _____\   /   )))
+       ( ---| /--~~~~  \ \v\ (    (((
+       ||   ||          \ > \ >    ((
+       ||_  (|          //  ||      ))
+        \_| ||         //   ||
+           /_|        /_|  /_|
+```
+
+=== ID: 3cfaa70d7f3bf62b | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 30x19 ===
+```
+            _
+       (/ ((( \
+        '/' (  )
+        \=   )/__
+        __\ \#__ \
+       (   ~     \)
+       |(. ( . /\ \    ____
+       \ )    / / /   /__  \
+        /    (_/ ),----. )  )
+       (       \\\       \ (
+       /                 |  )
+       |  '          _   | /
+       | \__|  /___,/    /(
+        \ | | / (  (   _/
+        ('| ( )  \_ \_ >
+         \\ |/      | )/
+          \)\\      )//
+          /,/,     /(<,
+b'ger  ,,/_/_).   / )_),,, ,,_
+```
+
+=== ID: fa0914d37c077e12 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: mythology | SUBCATEGORY: centaurs | SIZE: 37x24 ===
+```
+         =*===
+       $$- - $$$
+       $ <    D$$
+       $ -   $$$
+ ,     $$$$  |
+///; ,---' _ |----.
+ \ )(           /  )
+ | \/ \.   '  _.|  \              $
+ |  \ /(   /    /\_ \          $$$$$
+  \ /  (       / /  )         $$$ $$$
+       (  ,   /_/ ,`_,-----.,$$  $$$
+       |   <----|  \---##     \   $$
+       /         \\\           |    $
+      '   '                    |
+      |                 \      /
+      /  \_|    /______,/     /
+     /   / |   /    |   |    /
+    (   /--|  /.     \  (\  (_
+     `----,( ( _\     \ / / ,/
+           | /        /,_/,/
+          _|/        / / (
+         / (        ^-/, |
+        /, |          ^-    b'ger
+        ^-
+```
+
+=== ID: de9ec110885fbddf | TITLE: Untitled | ARTIST: BluePard | CATEGORY: mythology | SUBCATEGORY: gryphon | SIZE: 21x8 ===
+```
+   ____       ____
+  /    )     (    \
+ /    (  ^_^  )    \
+|  {   \('v')/   }  |
+|   {   /   \   }   |
+|_)(   /\   /\   )(_|
+|)  (_ | \|/  |_)  (|
+'     "--^^^^--" BP '
+```
+
+=== ID: 1439a2d47a4340e2 | TITLE: Untitled | ARTIST: John van der Zwaag / VanderZwaag / Vanderz | CATEGORY: mythology | SUBCATEGORY: gryphon | SIZE: 32x14 ===
+```
+                        ______
+             ______,---'__,---'
+         _,-'---_---__,---'
+  /_    (,  ---____',
+ /  ',,   `, ,-'
+;/)   ,',,_/,'
+| /\   ,.'//\
+`-` \ ,,'    `.
+     `',   ,-- `.
+     '/ / |      `,         _
+     //'',.\_    .\\      ,{==>-
+  __//   __;_`-  \ `;.__,;'
+((,--,) (((,------;  `--' jv
+```  '   ```
+```
+
+=== ID: 0af5287cc6a700df | TITLE: gryphon in flight | ARTIST: BluePard | CATEGORY: mythology | SUBCATEGORY: gryphon | SIZE: 26x16 ===
+```
+                 /i
+                //,
+               ///i
+             ,/ ).'i
+              |   )-i
+              |   )i
+              '   )i
+             /    |-
+        _.-./-.  /z_
+         `-. >._\ _ );i.
+          / `-'/`k-'`u)-'`
+         /    )-
+  ,.----'   ) '
+  /      )1`
+ ///v`-v\v
+/v  BP
+```
+
+=== ID: 165970ee68d87bf0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: gryphon | SIZE: 38x20 ===
+```
+                           _
+                          _)\.-.
+         .-.__,___,_.-=-. )\`  a`\_
+     .-.__\__,__,__.-=-. `/  \     `\
+     {~,-~-,-~.-~,-,;;;;\ |   '--;`)/
+      \-,~_-~_-,~-,(_(_(;\/   ,;/
+       ",-.~_,-~,-~,)_)_)'.  ;;(
+         `~-,_-~,-~(_(_(_(_\  `;\
+   ,          `"~~--,)_)_)_)\_   \
+   |\              (_(_/_(_,   \  ;
+   \ '-.       _.--'  /_/_/_)   | |
+    '--.\    .'          /_/    | |
+        ))  /       \      |   /.'
+       //  /,        | __.'|  ||
+      //   ||        /`    (  ||
+     ||    ||      .'       \ \\
+     ||    ||    .'_         \ \\
+      \\   //   / _ `\        \ \\__
+jgs    \'-'/(   _  `\,;        \ '--:,
+        `"`  `"` `-,,;         `"`",,;
+```
+
+=== ID: 264d8ab214894c2e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: gryphon | SIZE: 27x28 ===
+```
+    .-')          _
+   (`_^ (    .----`/
+    ` )  \_/`   __/     __,
+    __{   |`  __/      /_/
+   / _{    \__/ '--.  //
+   \_> \_\  >__/    \((
+        _/ /` _\_   |))
+  jgs  /__(  /______/`
+
+
+     .-')          _
+   (`_^ (    .----`/
+    ` )  \_/`   __/     __,
+      {   |`  __/      /_/
+      {    \__/ '--.  //
+       \_\  >__/    \((
+      _/_/ /` _\_   |))
+ jgs /_/__(  /______/`
+
+
+       _          (`-.
+       \`----.    ) ^_`)
+,__     \__   `\_/  ( `
+ \_\      \__  `|   }
+   \\  .--' \__/    }
+    ))/   \__,<  /_/
+    ((|  _/_/ `\ \_\_
+ jgs `\_____\\  )__\_\
+```
+
+=== ID: 6130aa06bc858348 | TITLE: Tiny Fairy | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 10x5 ===
+```
+  |}.'}
+\()/%(
+ _>\_{
+  /|
+  \\   hjw
+```
+
+=== ID: ef6ed9f31fafad7b | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 16x7 ===
+```
+.'.         .'.
+|  \       /  |
+'.  \  |  /  .'
+  '. \\|// .'
+    '-- --'
+    .'/|\'.^~DLF
+   '..'|'..'
+```
+
+=== ID: 7de7618fc6d44b58 | TITLE: Untitled | ARTIST: llizard | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 15x9 ===
+```
+   (\{\
+   { { \ ,~,
+  { {   \)))  *
+   { {  (((  /
+    {/{/; ,\/
+       (( '
+        \` \
+        (/  \
+ejm     `)  `\
+```
+
+=== ID: d50e10a184b45642 | TITLE: A fairy princess | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 22x12 ===
+```
+   _   vvvvvvvvv   _
+  ( `-._\...../_.-' )
+   \   ((('_')))   /
+    )   ))) (((   (
+   (   ((( v )))   )
+    )`--' )X( `-._(
+   /   _./   \._   \
+  /  .' /     \ `.  \
+ (__/  /       \  \__)
+      /         \
+jgs  /           \
+    WwWwWwWwWwWwWwW
+```
+
+=== ID: 0b202516388e225f | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 20x14 ===
+```
+    ,@@@@
+__ _ ),\\(\   _,::;
+.)\)\\_(((\),:::::;
+ `\`._,)))))::::::`,
+   `.__/(((:::::::'
+      \  (`:::::::.
+       ) .. `:::::;
+      /   ))  `::'
+      |  //
+      | //
+      \ \\
+       `.\\
+         \((
+          ` ` hjw
+```
+
+=== ID: a6d0b00b58cde24e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 33x14 ===
+```
+                       _()/^)
+   (^\()_               _)\<
+    >/(_     _.-.-.       \\)_
+   (/\\     (_\_|_/_)      \  `
+     /|    (__>(@)<__)     `
+     ``     (_/^|^\_)
+              '-'-'#,  _/\
+                   `# / _/
+               |\_ ,#|/_/
+               \ \|#'
+                `-#' /|
+               /\_# | /_
+               \_.|#,__/
+^^jgs^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: c30fe67530c2aee1 | TITLE: Untitled | ARTIST: Ojosh!ro | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 39x15 ===
+```
+ __       __          .--.
+(  ""--__(  ""-_    ,' .-.\        *
+ "-_ __  ""--__ "-_(  (^_^))      /
+    (  """--___""--__" )-'(      /
+     "-__      ""---/ ,(., )__o-/,
+         """----___(.'.   /--"--'
+                   ("-_"/(    /
+                    \   \ \
+                     `.  \ |
+                       \  \/
+                       ||  \
+                     ,-'/`. \
+                     ) /   ) \  Ojo '98
+                     |/    `-.\
+                              `\
+```
+
+=== ID: 9ebeaa0ffb955598 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 22x19 ===
+```
+   //.---.    .-'.
+( (-/==^==.  /    ) ))
+  /|))è é()./   .'
+ ('-((\_/( ))..' /
+  \ '-;_.-. ) ))
+   '-(_ _)_\ ) )).'
+    / ) (/_ ) \
+(( ( /\_/\,/|  ) ))
+    /  .  '.'.'
+   (  .\  . '.___.
+    \_| \  '.___/
+     \'._;.___)
+      \_|-.\ |mrf
+       '--,-\'.
+          |/ \ )
+        ._/   \|_
+               \ )
+                \|
+               ._)
+```
+
+=== ID: 23e01f798a40cccd | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 26x19 ===
+```
+   /\  ,
+  {Oo\{o\    .=.
+  {o: \:.\  /   \
+ {O:'  \:.-'_.-\_)____
+  {o:.  /`~('-./-----.\
+   }o: // /|         `/\
+  {O:'// /-'         /\/\
+  }o-/( <___    \'/ /\/\/\
+ /o./  ;--._)====* -\/\/\/
+ `"`\  \        /.\  `""`
+     \  \
+      \  \
+jgs   /`\ )
+      |/| |
+    _//  \|
+   | /   ||
+   |/   / |
+        `\|
+          '
+```
+
+=== ID: 379b2db6ff2afada | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 33x22 ===
+```
+                   ,_  .--.
+             , ,   _)\/    ;--.
+     . ' .    \_\-'   |  .'    \
+    -= * =-   (.-,   /  /       |
+     ' .\'    ).  ))/ .'   _/\ /
+         \_   \_  /( /     \ /(
+         /_\ .--'   `-.    //  \
+         ||\/        , '._//    |
+         ||/ /`(_ (_,;`-._/     /
+         \_.'   )   /`\       .'
+              .' .  |  ;.   /`
+             /      |\(  `.(
+            |   |/  | `    `
+            |   |  /
+            |   |.'
+         __/'  /
+     _ .'  _.-`
+  _.` `.-;`/
+ /_.-'` / /
+       | /
+jgs   ( /
+     /_/
+```
+
+=== ID: 4e19ff27f2278bb2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 32x22 ===
+```
+      .--.   _,
+  .--;    \ /(_
+ /    '.   |   '-._    . ' .
+|       \  \    ,-.)  -= * =-
+ \ /\_   '. \((` .(    '/. '
+  )\ /     \ )\  _/   _/
+ /  \\    .-'   '--. /_\
+|    \\_.' ,        \/||
+\     \_.-';,_) _)'\ \||
+ '.       /`\   (   '._/
+   `\   .;  |  . '.
+jgs  ).'  )/|      \
+     `    ` |  \|   |
+             \  |   |
+              '.|   |
+                 \  '\__
+                  `-._  '. _
+                     \`;-.` `._
+                      \ \ `'-._\
+                       \ |
+                        \ )
+                         \_\
+```
+
+=== ID: 777383771106fe4d | TITLE: Fairy Queen | ARTIST: H P Barmario (Morfina) | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 25x22 ===
+```
+            .-.-.
+    . .    / %%% \
+  '     ' / %%%%\ \
+'  \.'./ ( &%%%%%) )
+. -(( ))- '.),ò )%/\
+ .  /\\_ . /\-_/*%%.\
+   .  | /  \°.| %%.°/
+     _|/\ /\_\__/_/\\
+    (( )\\. '::::'. )\
+  .'.\  \\\. .\/. .'\/
+  |\| './)'\'.__.'/\_)
+  |_|_______)_  _(  |-\
+  (^ ^_^_^_^__\/_^\ |  \
+  |\^/ ^ ^ ^ ^ ^ ^ \(__))
+  |/)^ .' ( ^\^_^_.'_/|
+  |/^ ^| ^ \ ^\ ____/ /
+  /^ ^ |^ ^ \ ^'.___\|\
+ (^_^_^| ^ ^ \-^'
+  | |  \^_^_^/
+  |\|_.:_\ '.\
+.-'-'----'--\:|--- - --
+|            \|
+```
+
+=== ID: 04acb98551784dbc | TITLE: Elf | ARTIST: H P Barmario (Morfina) | CATEGORY: mythology | SUBCATEGORY: fantasy | SIZE: 21x18 ===
+```
+           .-----.
+ \ ' /   _/    )/
+- ( ) -('---''--)
+ / . \((()\^_^/)()
+  \\_\ (()_)-((()()
+   '- \ )/\._./(()
+     '/\/( X   ) \
+     (___)|___/ ) \
+          |.#_|(___)
+         /\    \ ( (_
+         \/\/\/\) \\
+         | / \ |
+         |(   \|
+        _|_)__|_\_
+        )...()...(
+         | (   \ |
+      .-'__,)  (  \
+  mrf           '\_-,
+```
+
+=== ID: 0056bba8c33a2da6 | TITLE: Cyclops | ARTIST: lgbeard | CATEGORY: mythology | SUBCATEGORY: fantasy | SIZE: 31x20 ===
+```
+           _......._
+       .-'.'.'.'.'.'.`-.
+     .'.'.'.'.'.'.'.'.'.`.
+    /.'.'               '.\
+    |.'    _.--...--._     |
+    \    `._.-.....-._.'   /
+    |     _..- .-. -.._   |
+ .-.'    `.   ((@))  .'   '.-.
+( ^ \      `--.   .-'     / ^ )
+ \  /         .   .       \  /
+ /          .'     '.  .-    \
+( _.\    \ (_`-._.-'_)    /._\)
+ `-' \   ' .--.          / `-'
+     |  / /|_| `-._.'\   |
+     |   |       |_| |   /-.._
+ _..-\   `.--.______.'  |
+      \       .....     |
+       `.  .'      `.  /
+         \           .'
+  LGB     `-..___..-`
+```
+
+=== ID: b5d3848bf3d3a802 | TITLE: Minatour | ARTIST: Shanaka Dias | CATEGORY: mythology | SUBCATEGORY: fantasy | SIZE: 28x21 ===
+```
+     .      .
+     |\____/|
+    (\|----|/)
+     \ 0  0 /
+      |    |
+   ___/\../\____
+  /     --       \
+ /  \         /   \
+|    \___/___/(   |
+\   /|  }{   | \  )
+ \  ||__}{__|  |  |
+  \  |;;;;;;;\  \ / \_______
+   \ /;;;;;;;;| [,,[|======'
+     |;;;;;;/ |     /
+     ||;;|\   |
+     ||;;/|   /
+     \_|:||__|
+      \ ;||  /
+      |= || =|
+      |= /\ =|
+      /_/  \_\
+```
+
+=== ID: aad1d5fe51c24e6a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: monsters | SIZE: 27x16 ===
+```
+        .-"""".
+       /       \
+   __ /   .-.  .\
+  /  `\  /   \/  \
+  |  _ \/   .==.==.
+  | (   \  /____\__\
+   \ \      (_()(_()
+    \ \            '---._
+     \                   \_
+  /\ |`       (__)________/
+ /  \|     /\___/
+|    \     \||VV
+|     \     \|"""",
+|      \     ______)
+\       \  /`
+jgs      \(
+```
+
+=== ID: f1e2984cc97eec6a | TITLE: -=[ vampire teeth ]=-  10/98 | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: monsters | SIZE: 21x10 ===
+```
+        __   __
+     .-'  "."  '-.
+   .'   ___,___   '.
+  ;__.-; | | | ;-.__;
+  | \  | | | | |  / |
+   \ \/`"`"`"`"`\/ /
+    \_.-,-,-,-,-._/
+     \`-:_|_|_:-'/
+jgs   '.       .'
+        `'---'`
+```
+
+=== ID: 19c4ac317d4d0e69 | TITLE: Troll | ARTIST: Veronica Karlsson | CATEGORY: mythology | SUBCATEGORY: monsters | SIZE: 34x18 ===
+```
+      -. -. `.  / .-' _.'  _
+     .--`. `. `| / __.-- _' `
+    '.-.  \  \ |  /   _.' `_
+    .-. \  `  || |  .' _.-' `.
+  .' _ \ '  -    -'  - ` _.-.
+   .' `. %%%%%   | %%%%% _.-.`-
+ .' .-. ><(@)> ) ( <(@)>< .-.`.
+   (("`(   -   | |   -   )'"))
+  / \\#)\    (.(_).)    /(#//\
+ ' / ) ((  /   | |   \  )) (`.`.
+ .'  (.) \ .md88o88bm. / (.) \)
+   / /| / \ `Y88888Y' / \ | \ \
+ .' / O  / `.   -   .' \  O \ \\
+  / /(O)/ /| `.___.' | \\(O) \
+   / / / / |  |   |  |\  \  \ \
+   / / // /|  |   |  |  \  \ \  VK
+ _.--/--/'( ) ) ( ) ) )`\-\-\-._
+( ( ( ) ( ) ) ( ) ) ( ) ) ) ( ) )
+```
+
+=== ID: f2c4ac156b4c8c3d | TITLE: Untitled | ARTIST: Clover Fernchild, Veronica Karlsson | CATEGORY: mythology | SUBCATEGORY: monsters | SIZE: 40x39 ===
+```
+         ,     .
+        /(     )\               A
+   .--.( `.___.' ).--.         /_\
+   `._ `%_&%#%$_ ' _.'     /| <___> |\
+      `|(@\*%%/@)|'       / (  |L|  ) \
+       |  |%%#|  |       J d8bo|=|od8b L
+        \ \$#%/ /        | 8888|=|8888 |
+        |\|%%#|/|        J Y8P"|=|"Y8P F
+        | (.".)%|         \ (  |L|  ) /
+    ___.'  `-'  `.___      \|  |L|  |/
+  .'#*#`-       -'$#*`.       / )|
+ /#%^#%*_ *%^%_  #  %$%\    .J (__)
+ #&  . %%%#% ###%*.   *%\.-'&# (__)
+ %*  J %.%#_|_#$.\J* \ %'#%*^  (__)
+ *#% J %$%%#|#$#$ J\%   *   .--|(_)
+ |%  J\ `%%#|#%%' / `.   _.'   |L|
+ |#$%||` %%%$### '|   `-'      |L|
+ (#%%||` #$#$%%% '|            |L|
+ | ##||  $%%.%$%  |            |L|
+ |$%^||   $%#$%   |  VK/cf     |L|
+ |&^ ||  #%#$%#%  |            |L|
+ |#$*|| #$%$$#%%$ |\           |L|
+ ||||||  %%(@)$#  |\\          |L|
+ `|||||  #$$|%#%  | L|         |L|
+      |  #$%|$%%  | ||l        |L|
+      |  ##$H$%%  | |\\        |L|
+      |  #%%H%##  | |\\|       |L|
+      |  ##% $%#  | Y|||       |L|
+      J $$#* *%#% L  |E/
+      (__ $F J$ __)  F/
+      J#%$ | |%%#%L
+      |$$%#& & %%#|
+      J##$ J % %%$F
+       %$# * * %#&
+       %#$ | |%#$%
+       *#$%| | #$*
+      /$#' ) ( `%%\
+     /#$# /   \ %$%\
+    ooooO'     `Ooooo
+```
+
+=== ID: 9c7cb4565bbb176b | TITLE: Untitled | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: mythology | SUBCATEGORY: skeletons | SIZE: 13x14 ===
+```
+      .-.
+     (o.o)
+      |=|
+     __|__
+   //.=|=.\\
+  // .=|=. \\
+  \\ .=|=. //
+   \\(_=_)//
+    (:| |:)
+     || ||
+     () ()
+     || ||
+     || ||
+l42 ==' '==
+```
+
+=== ID: 87e385443717614d | TITLE: Skull | ARTIST: Veronica Karlsson | CATEGORY: mythology | SUBCATEGORY: skeletons | SIZE: 32x20 ===
+```
+         .AMMMMMMMMMMA.
+       .AV. :::.:.:.::MA.
+      A' :..        : .:`A
+     A'..              . `A.
+    A' :.    :::::::::  : :`A
+    M  .    :::.:.:.:::  . .M
+    M  :   ::.:.....::.:   .M
+    V : :.::.:........:.:  :V
+   A  A:    ..:...:...:.   A A
+  .V  MA:.....:M.::.::. .:AM.M
+ A'  .VMMMMMMMMM:.:AMMMMMMMV: A
+:M .  .`VMMMMMMV.:A `VMMMMV .:M:
+ V.:.  ..`VMMMV.:AM..`VMV' .: V
+  V.  .:. .....:AMMA. . .:. .V
+   VMM...: ...:.MMMM.: .: MMV
+       `VM: . ..M.:M..:::M'
+         `M::. .:.... .::M
+          M:.  :. .... ..M
+ VK       V:  M:. M. :M .V
+          `V.:M.. M. :M.V'
+```
+
+=== ID: 2f32ee024b813131 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: skeletons | SIZE: 37x44 ===
+```
+               _.---._
+             .'       `.
+             :)       (:
+             \ (@) (@) /
+              \   A   /
+               )     (
+               \"""""/
+                `._.'
+                 .=.
+         .---._.-.=.-._.---.
+        / ':-(_.-: :-._)-:` \
+       / /' (__.-: :-.__) `\ \
+      / /  (___.-` '-.___)  \ \
+     / /   (___.-'^`-.___)   \ \
+    / /    (___.-'=`-.___)    \ \
+   / /     (____.'=`.____)     \ \
+  / /       (___.'=`.___)       \ \
+ (_.;       `---'.=.`---'       ;._)
+ ;||        __  _.=._  __        ||;
+ ;||       (  `.-.=.-.'  )       ||;
+ ;||       \    `.=.'    /       ||;
+ ;||        \    .=.    /        ||;
+ ;||       .-`.`-._.-'.'-.       ||;
+.:::\      ( ,): O O :(, )      /:::.
+|||| `     / /'`--'--'`\ \     ' ||||
+''''      / /           \ \      ''''
+         / /             \ \
+        / /               \ \
+       / /                 \ \
+      / /                   \ \
+     / /                     \ \
+    /.'                       `.\
+   (_)'                       `(_)
+    \\.                       .//
+     \\.                     .//
+      \\.                   .//
+       \\.                 .//
+        \\.               .//
+         \\.             .//
+    jgs   \\.           .//
+          ///)         (\\\
+        ,///'           `\\\,
+       ///'               `\\\
+      ""'                   '""
+```
+
+=== ID: 12d62f98f27a6b21 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 16x5 ===
+```
+      .
+ .>   )\;`a__
+(  _ _)/ /-." ~~
+ `( )_ )/
+  <_  <_ sb/dwb
+```
+
+=== ID: ca1eef6a6a4ac7d5 | TITLE: Dragon | ARTIST: Charles Caffrey | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 22x7 ===
+```
+         \ _^ /   ,^,
+         \>@@</   ((
+Art by    (..)    );)
+ Charles   vv\^^^^ /
+  Caffrey /==  ))) )
+         ( ==/ )=< \
+        {{{)=(}}}(_}}}
+```
+
+=== ID: a29e758aabebe15b | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 36x8 ===
+```
+Luv Dragons  _)               (_
+            _) \ /\%/\ /\_/\ / (_
+           _)  \\(0 0) (0 0)//  (_
+Art by     )_ -- \(oo) (oo)/ -- _(
+ VampLadee  )_ / /\\__,__//\ \ _(
+             )_ /   --;--   \ _(
+         *.    ( (  )) ((  ) )    .*
+           '...(____)z z(____)...'
+```
+
+=== ID: 9e65db4400fdf604 | TITLE: Untitled | ARTIST: Roland Waylor | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 32x10 ===
+```
+                    /     \
+                   ((     ))
+               ===  \\_v_//  ===
+ Art by          ====)_^_(====
+Roland Waylor    ===/ O O \===
+                 = | /_ _\ | =
+                =   \/_ _\/   =
+                     \_ _/
+                     (o_o)
+                      VwV
+```
+
+=== ID: 60dd623ced892fc4 | TITLE: Dragon | ARTIST: Gunnar Z. | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 32x11 ===
+```
+                __        _
+              _/  \    _(\(o
+             /     \  /  _  ^^^o
+            /   !   \/  ! '!!!v'
+           !  !  \ _' ( \____
+           ! . \ _!\   \===^\)
+Art by      \ \_!  / __!
+ Gunnar Z.   \!   /    \
+       (\_      _/   _\ )
+        \ ^^--^^ __-^ /(__
+         ^^----^^    "^--v'
+```
+
+=== ID: 4088048994bf9a28 | TITLE: Dragon | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 26x11 ===
+```
+                \||/
+                |  @___oo
+      /\  /\   / (__,,,,|
+     ) /^\) ^\/ _)
+     )   /^\/   _)
+     )   _ /  / _)
+ /\  )/\/ ||  | )_)
+<  >      |(,,) )__)
+ ||      /    \)___)\
+ | \____(      )___) )___
+  \______(_______;;; __;;;
+```
+
+=== ID: d7b509deb781ce3f | TITLE: Dragon | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 26x11 ===
+```
+          ,  ,
+          \\ \\
+          ) \\ \\    _p_
+          )^\))\))  /  *\
+           \_|| || / /^`-'
+  __       -\ \\--/ /
+<'  \\___/   ___. )'
+     `====\ )___/\\
+          //     `"
+          \\    /  \
+          `"
+```
+
+=== ID: f9a5107954eff86b | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 21x11 ===
+```
+         /\_/\
+     /\  |6 6|  /\
+    /  \ \<">/ /  \
+   / ,__`~)-(~___, \
+  /.',-'`/_/`'-,  '.\
+   ,'    \_\    ',
+  :       \|\     ;
+   ',     /|/    ,'
+ldb  '-,__\W\_,-))
+               ((
+                )
+```
+
+=== ID: 9cf3beff46f64ce5 | TITLE: Dragon | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 35x12 ===
+```
+        ,     \    /      ,
+       / \    )\__/(     / \
+      /   \  (_\  /_)   /   \
+ ____/_____\__\@  @/___/_____\____
+|             |\../|              |
+|              \VV/               |
+|        ----------------         |
+|_________________________________|
+ |    /\ /      \\       \ /\    |
+ |  /   V        ))       V   \  |
+ |/     `       //        '     \|
+ `              V                '
+```
+
+=== ID: 5166c9c0190ec632 | TITLE: Untitled | ARTIST: Ben | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 28x13 ===
+```
+             __.-/|
+             \`o_O'
+              =( )=  +-----+
+                U|   | BEN |
+      /\  /\   / |   +-----+
+     ) /^\) ^\/ _)\     |
+     )   /^\/   _) \    |
+     )   _ /  / _)  \___|_
+ /\  )/\/ ||  | )_)\___,|))
+<  >      |(,,) )__)    |
+ ||      /    \)___)\
+ | \____(      )___) )____
+  \______(_______;;;)__;;;)
+```
+
+=== ID: 8e33de1a80392fc5 | TITLE: Baby Dragon | ARTIST: Shanaka Dias | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 19x13 ===
+```
+       .----.
+     .'  \__ '.
+    |   __|  _ :
+    V\/(0I0\/ |/
+       \ : /  '
+       (oYo)
+       /` `\__
+     _|  _ Vuu: ,
+    |uV\/ \| \_/|
+    :      /\   :
+snd  \   -'    /
+      '-.___.-'  <>
+     =        <;
+```
+
+=== ID: 4988ffe9e2be8899 | TITLE: Dragon Riders of Pern | ARTIST: Lisa Lai | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 35x15 ===
+```
+                   ,  ,
+                   \\ \\
+                   ) \\ \\    _p_
+                   )^\))\))  /  *\
+                    \_|| || / /^`-'
+           __       -\ \\--/ /
+         <'  \\___/   ___. )'
+              `====\ )___/\\
+                   //     `"
+                   \\    /  \
+                   `" +========+
+                      |Dragon  |
+Art by                |Riders  |
+   Lisa Lai           |of Pern |
+                      """"""""""
+```
+
+=== ID: 376a59d7692b8079 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 39x15 ===
+```
+ <>=======()
+(/\___   /|\\          ()==========<>_
+      \_/ | \\        //|\   ______/ \)
+        \_|  \\      // | \_/
+          \|\/|\_   //  /\/
+           (oo)\ \_//  /
+          //_/\_\/ /  |
+         @@/  |=\  \  |
+              \_=\_ \ |
+                \==\ \|\_ snd
+             __(\===\(  )\
+            (((~) __(_/   |
+                 (((~) \  /
+                 ______/ /
+                 '------'
+```
+
+=== ID: 92d4cfa940962edb | TITLE: Untitled | ARTIST: Lisa Lai | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 35x15 ===
+```
+                   ,  ,
+                   \\ \\
+                   ) \\ \\    _p_
+                   )^\))\))  /  *\
+                    \_|| || / /^`-'
+           __       -\ \\--/ /
+         <'  \\___/   ___. )'
+              `====\ )___/\\
+                   //     `"
+                   \\    /  \
+                   `" +========+
+                      |Dragon  |
+Art by                |Riders  |
+   Lisa Lai           |of Pern |
+                      """"""""""
+```
+
+=== ID: c4a5475ba0277bac | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 33x18 ===
+```
+                 /           /
+                /' .,,,,  ./
+               /';'     ,/
+              / /   ,,//,`'`
+             ( ,, '_,  ,,,' ``
+             |    /@  ,,, ;" `
+            /    .   ,''/' `,``
+           /   .     ./, `,, ` ;
+        ,./  .   ,-,',` ,,/''\,'
+       |   /; ./,,'`,,'' |   |
+       |     /   ','    /    |
+        \___/'   '     |     |
+          `,,'  |      /     `\
+Art by         /      |        ~\
+ Ooyamaneko   '       (
+             :
+            ; .         \--
+          :   \         ;
+```
+
+=== ID: ee838dbfaec771c3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 35x20 ===
+```
+       \(______     ______)/
+       /`.----.\   /.----.`\
+      } /      :} {:      \ {
+     / {        } {        } \
+     } }      ) } { (      { {
+    / {      /|\}!{/|\      } \
+    } }     ( (."^".) )     { {
+   / {       (d\   /b)       } \
+   } }       |\~   ~/|       { {
+  / /        | )   ( |        \ \
+ { {        _)(,   ,)(_        } }
+  } }      //  `";"`  \\      { {
+ / /      //     (     \\      \ \
+{ {      {(     -=)     )}      } }
+ \ \     /)    -=(=-     (\    / /
+  `\\  /'/    /-=|\-\    \`\  //'
+    `\{  |   ( -===- )   |  }/'
+      `  _\   \-===-/   /_  '
+  jgs   (_(_(_)'-=-'(_)_)_)
+        `"`"`"       "`"`"`
+```
+
+=== ID: 931f09b77f63a22d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: phoenix | SIZE: 18x6 ===
+```
+      _,     ,_
+    .'/  ,_   \'.
+   |  \__( >__/  |
+   \             /
+    '-..__ __..-'
+jgs      /_\
+```
+
+=== ID: d617dc8524c96d93 | TITLE: Untitled | ARTIST: Nathan Roberts | CATEGORY: mythology | SUBCATEGORY: phoenix | SIZE: 20x6 ===
+```
+   _,="( _  )"=,_
+_,'    \_>\_/    ',_
+.7,     {  }     ,\.
+ '/:,  .m  m.  ,:\'
+   ')",(/  \),"('
+      '{'!!'}'
+```
+
+=== ID: dda55c0c3eff5e0b | TITLE: Untitled | ARTIST: BluePard | CATEGORY: mythology | SUBCATEGORY: phoenix | SIZE: 40x10 ===
+```
+ .\\            //.
+. \ \          / /.
+.\  ,\     /` /,.-
+ -.   \  /'/ /  .
+ ` -   `-'  \  -
+   '.       /.\`
+      -    .-
+      :`//.'
+      .`.'
+      .' BP          Variation - phoenix
+```
+
+=== ID: ba67ab3f717231db | TITLE: Untitled | ARTIST: Alyssa | CATEGORY: mythology | SUBCATEGORY: phoenix | SIZE: 17x11 ===
+```
+   __________
+  <_______ /
+   <______/  /(_
+    <____<  ( __\
+     <____\  \ \
+     <_____\\_) )
+    /          /
+   / /_|  )___/
+  / |  / /
+ /  |   \\__
+~~~~    (~~~)
+```
+
+=== ID: b6299de662eb98a9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: phoenix | SIZE: 29x11 ===
+```
+      __             __
+   .-'.'     .-.     '.'-.
+ .'.((      ( ^ `>     )).'.
+/`'- \'._____\ (_____.'/ -'`\
+|-''`.'------' '------'.`''-|
+|.-'`.'.'.`/ | | \`.'.'.`'-.|
+ \ .' . /  | | | |  \ . '. /
+  '._. :  _|_| |_|_  : ._.'
+     ````` /T"Y"T\ `````
+          / | | | \
+   jgs   `'`'`'`'`'`
+```
+
+=== ID: d30eaa3de0599661 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: mythology | SUBCATEGORY: phoenix | SIZE: 39x14 ===
+```
+  _/|       |\_
+ /  |       |  \
+|    \     /    |
+|  \ /     \ /  |
+| \  |     |  / |
+| \ _\_/^\_/_ / |
+|    --\//--    |
+ \_  \     /  _/
+   \__  |  __/
+      \ _ /
+     _/   \_   Christian Koehler
+    / _/|\_ \  Diddle: Deelkar (DLK)
+     /  |  \   Diddle: Faux_Pseud :F_P:
+      / v \
+```
+
+=== ID: b070bb29746cd035 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 10x5 ===
+```
+ .-.
+(o o) boo!
+| O \
+ \   \
+  `~~~'
+```
+
+=== ID: 8bfca50cd189c3ed | TITLE: ~ a ghost ~  9/96 | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 32x13 ===
+```
+     .-.
+   .'   `.
+   :g g   :
+   : o    `.
+  :         ``.
+ :             `.
+:  :         .   `.
+:   :          ` . `.
+ `.. :            `. ``;
+    `:;             `:'
+       :              `.
+ jgs    `.              `.     .
+          `'`'`'`---..,___`;.-'
+```
+
+=== ID: bae086503985ac17 | TITLE: -=[ ghost ]=-  10/97 | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 27x21 ===
+```
+      ###, ,##, ,##,
+       #  # #  # #  #
+       ###  #  # #  #
+       #  # #  # #  #
+       ###' '##' '##'
+            .--,
+           /  (
+          /    \
+         /      \
+        /  0  0  \
+((()   |    ()    |   ()))
+\  ()  (  .____.  )  ()  /
+ |` \_/ \  `""`  / \_/ `|
+ |       `.'--'.`       |
+  \        `""`        /
+   \                  /
+    `.              .'    ,
+jgs  |`             |  _.'|
+     |              `-'  /
+     \                 .'
+      `.____________.-'
+```
+
+=== ID: edfd50fd46e7865b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 37x25 ===
+```
+          ,
+        .--')
+       /    /
+      |    /
+   /`.\   (_.'\
+   \          /
+    '--. .---'
+jgs   ( " )
+       '-'
+                ,
+                 \`-,      ,     =-
+             .-._/   \_____)\
+            ("              / =-
+             '-;   ,_____.-'       =-
+  jgs         /__.'
+
+
+       .-.
+      ( " )
+   /\_.' '._/\
+   |         |
+    \       /
+     \    /`
+   (__)  /
+jgs`.__.'
+```
+
+=== ID: 51566162a9a531ae | TITLE: -=[ ghosts ]=-  2/97 | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 15x35 ===
+```
+        ___
+      _/ ..\
+     ( \  0/__
+      \    \__)
+      /     \
+jgs  /      _\
+    `"""""``
+        ___
+      _/ oo\
+     ( \  -/__
+      \    \__)
+      /     \
+jgs  /      _\
+    `"""""``
+        ___
+      _/ @@\
+     ( \  O/__
+      \    \__)
+      /     \
+jgs  /      _\
+    `"""""``
+        ___
+      _/ 66\
+     ( \  ^/__
+      \    \__)
+      /     \
+jgs  /      _\
+    `"""""``
+        ___
+      _/  "\
+     ( \  ~/__
+      \    \__)
+      /     \
+jgs  /      _\
+    `"""""``
+```
+
+=== ID: ce543b3c65a34686 | TITLE: -=[ Casper, the Friendly Ghost ]=-  10/97 | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 22x44 ===
+```
+     .-----.
+   .' -   - '.
+  /  .-. .-.  \
+  |  | | | |  |
+   \ \o/ \o/ /
+  _/    ^    \_
+ | \  '---'  / |
+ / /`--. .--`\ \
+/ /'---` `---'\ \
+'.__.       .__.'
+    `|     |`
+     |     \
+     \      '--.
+      '.        `\
+        `'---.   |
+   jgs     ,__) /
+            `..'
+
+
+        .-""""-.
+       / -   -  \
+      |  .-. .- |
+      |  \o| |o (
+      \     ^    \
+       '.  )--'  /
+  jgs    '-...-'`
+
+
+        .-""""-.
+       / -   -  \
+      |  .-. .- |
+      |  \o| |o (
+      \     ^    \
+      |'.  )--'  /|
+     / / '-. .-'`\ \
+    / /'---` `---'\ \
+    '.__.       .__.'
+        `|     |`
+         |     \
+         \      '--.
+          '.        `\
+            `'---.   |
+   jgs         ,__) /
+                `..'
+```
+
+=== ID: 37750587761a5e76 | TITLE: Little devil | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 27x4 ===
+```
+             ,,
+           W ()      , `)
+           |-><       )  ,
+jgs        | )(\_v   (, ` )
+```
+
+=== ID: f4ff9994556ecc15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 17x6 ===
+```
+      ,  ,  , , ,
+     <(__)> | | |
+     | \/ | \_|_/
+     \^  ^/   |
+     /\--/\  /|
+jgs /  \/  \/ |
+```
+
+=== ID: 1bcef7344a81ff76 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 26x6 ===
+```
+             (_)L|J
+      )      (") |     (
+      ,(. A `/ \-|   (,`)
+     )' (' \/\ / |  ) (.
+jgs (' ),).  _W_ | (,)' )
+   ^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: ce81f944ef293bf4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 16x9 ===
+```
+    |\     ____
+    | \.-./ .-'
+     \ _  _(
+     | .)(./
+     |   \(
+     |     \   |
+     |  \vvv   |
+     |  |__    |
+jgs /      `-. |
+```
+
+=== ID: e33ac749c06e8612 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 24x9 ===
+```
+   ,    ,    /\   /\
+  /( /\ )\  _\ \_/ /_
+  |\_||_/| < \_   _/ >
+  \______/  \|0   0|/
+    _\/_   _(_  ^  _)_
+   ( () ) /`\|V"""V|/`\
+     {}   \  \_____/  /
+     ()   /\   )=(   /\
+jgs  {}  /  \_/\=/\_/  \
+```
+
+=== ID: bdd1a490105e4518 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 25x10 ===
+```
+         ,   ,
+        /(   )\
+        \ \_/ /   , /\ ,
+        /_   _\  /| || |\
+       | \> </ | |\_||_/|
+       (_  ^  _)  \____/
+     /`\|IIIII|/`\ _\/_
+     \  \_____/  /  ()
+     /\   )=(   /\  ()
+jgs /  `-.\=/.-'  \ ()
+```
+
+=== ID: 0059b86b0fbcdd3d | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 18x10 ===
+```
+     (\-"```"-/)
+     //^\   /^\\
+    ;/ ~_\ /_~ \;
+    |  / \Y/ \  |
+   (,  \0/ \0/  ,)
+    |   /   \   |
+    | (_\._./_) |
+     \ \v-.-v/ /
+jgs   \ `===' /
+       `-----`
+```
+
+=== ID: 6cdf3738cf03eaff | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 17x11 ===
+```
+              v
+        (__)v | v
+        /\/\\_|_/
+       _\__/  |
+      /  \/`\<`)
+      \ (  |\_/
+      /)))-(  |
+     / /^ ^ \ |
+    /  )^/\^( |
+jgs )_//`__>> |
+      #   #`  |
+```
+
+=== ID: b27deca8bd120e9c | TITLE: The Devil | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 27x12 ===
+```
+~       . ...... .        ~
+ ~   .               .   ~
+  ~.    __       __    .~
+ .     @@@       @@@     .
+.            /            .
+.           /             .
+.          /              .
+ .     *  ----     *     .
+  .     *         *     .
+    .     *******     .
+       .           .
+            ...
+```
+
+=== ID: 0672ff4f19d95306 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 19x12 ===
+```
+     (\-"````"-/)
+     //^\    /^\\
+    ;/ ~_\  /_~ \;
+    |  / \\// \  |
+   (,  \0/  \0/  ,)
+    |   /    \   |
+    | (_\.__./_) |
+     \ \v-..-v/ /
+jgs   \ `====' /
+       `\\\///'
+        '\\//'
+          \/
+```
+
+=== ID: 21d7bee6f1acf1bf | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 20x13 ===
+```
+          .    .
+          |\   |\
+       _..;|;__;|;
+     ,'   ';` \';`-.
+     7;-..     :   )
+.--._)|   `;==,|,=='
+ `\`@; \_ `<`G," G).
+   `\/-;,(  )  .>. )
+       < ,-;'-.__.;'
+        `\_ `-,__,'
+   kg      `-..,;,>
+              `;;;;
+               `  `
+```
+
+=== ID: 7c5699804de7847a | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 40x15 ===
+```
+   , ,, ,
+   | || |    ,/  _____  \.
+   \_||_/    ||_/     \_||
+     ||       \_| . . |_/
+     ||         |  L  |
+    ,||         |`==='|
+    |>|      ___`>  -<'___
+    |>|\    /             \
+    \>| \  /  ,    .    .  |
+     ||  \/  /| .  |  . |  |
+     ||\  ` / | ___|___ |  |     (
+  (( || `--'  | _______ |  |     ))  (
+(  )\|| (  )\ | - --- - | -| (  ( \  ))
+(\/  || ))/ ( | -- - -- |  | )) )  \((
+ ( ()||((( ())|         |  |( (( () )hjm
+```
+
+=== ID: 860acc60b047cb14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 23x16 ===
+```
+     ,
+     |\     ____
+     \ \.-./ .-' T
+      \ _  _( /| | |\
+    ) | .)(./ |  |  |
+      |   \(   \_|_/
+  (   |     \    |
+ )    |  \VvV    | (
+      |  |\,,\   |
+    ) |  | ^^^   |    )
+   (  |  |__     |   (
+ )   /      `-. _|    )
+(   /          /  `\
+   /          ///_ |
+  /jgs       (((-|'
+              ```|
+```
+
+=== ID: 3fc1764ed67631c5 | TITLE: Untitled | ARTIST: Andrew Turnbull | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 36x18 ===
+```
+      `  `
+
+      \    \
+       \\___\\___ /\
+      /____      \   \
+     / /\  \   /\ \   |
+    | |_@|_ \ // \ \ /
+   //\       ||_ | |/
+  / /  \__|     /  /
+ |__-     /   \/ /
+   /___/     / /
+   \       /  |
+    |    /    \___
+    |  /           \
+   ///|     ________\
+  ///  \___/
+ //                -Andrew Turnbull-
+/
+```
+
+=== ID: 75ecbbc850fc1a57 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 28x21 ===
+```
+        _.---**""**-.
+._   .-'           /|`.
+ \`.'             / |  `.
+  V              (  ;    \
+  L       _.-  -. `'      \
+ / `-. _.'       \         ;
+:            __   ;    _   |
+:`-.___.+-*"': `  ;  .' `. |
+|`-/     `--*'   /  /  /`.\|
+: :              \    :`.| ;
+| |   .           ;/ .' ' /
+: :  / `             :__.'
+ \`._.-'       /     |
+  : )         :      ;
+  :----.._    |     /
+ : .-.    `.       /
+  \     `._       /
+  /`-            /
+ :             .'
+  \ )       .-'
+   `-----*"'     [bug]
+```
+
+=== ID: bc3f9ab1dca3fbaa | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 26x21 ===
+```
+                        *
+                     *
+          (\___/)     (
+          \ (- -)     )\ *
+          c\   >'    ( #
+            )-_/      '
+     _______| |__    ,|//
+    # ___ `  ~   )  ( /
+    \,|  | . ' .) \ /#
+   _( /  )   , / \ / |
+    //  ;;,,;,;   \,/
+     _,#;,;;,;,
+    /,i;;;,,;#,;
+   ((  %;;,;,;;,;
+    ))  ;#;,;%;;,,
+  _//    ;,;; ,#;,
+ /_)     #,;  //
+        //    \|_
+        \|_    |#\
+         |#\    -"
+b'ger     -"
+```
+
+=== ID: 07c7f82522fc1af1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 27x21 ===
+```
+ *                       *
+    *                 *
+   )       (\___/)     (
+* /(       \ (. .)     )\ *
+  # )      c\   >'    ( #
+   '         )-_/      '
+ \\|,    ____| |__    ,|//
+   \ )  (  `  ~   )  ( /
+    #\ / /| . ' .) \ /#
+    | \ / )   , / \ / |
+     \,/ ;;,,;,;   \,/
+      _,#;,;;,;,
+     /,i;;;,,;#,;
+    //  %;;,;,;;,;
+   ((    ;#;,;%;;,,
+  _//     ;,;; ,#;,
+ /_)      #,;    ))
+         //      \|_
+         \|_      |#\
+          |#\      -"
+ b'ger     -"
+```
+
+=== ID: ffac26e740780d46 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 28x21 ===
+```
+        _.---**""**-.
+._   .-'           /|`.
+ \`.'             / |  `.
+  V              (  ;    \
+  L       _.-  -. `'      \
+ / `-. _.'       \         ;
+:            __   ;    _   |
+:`-.___.+-*"': `  ;  .' `. |
+|`-/     `--*'   /  /  /`.\|
+: :              \    :`.| ;
+| |   .           ;/ .' ' /
+: :  / `             :__.'
+ \`._.-'       /     |
+  : )         :      ;
+  :----.._    |     /
+ : .-.    `.       /
+  \     `._       /
+  /`-            /
+ :             .'
+  \ )       .-'
+   `-----*"'     [bug]
+```
+
+=== ID: 898448aafb10cb50 | TITLE: Untitled | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 32x24 ===
+```
+                            *
+                            _
+                           /,\_
+         Do you?__         |___)
+                 /          ,
+              (\___/)   * (
+              \ (. .)      \ *
+              c\   >'      #
+                )`_/      '
+         _______| |__    ,|//
+        # ___ `  ~   )  ( /
+        \,|  | . ' .) \ /#
+       _( /  )   , / \ / |
+        // ,#;,,;,;   \,/
+__,,    ,#;,;;,;;
+\__(    i;;;,,;;
+   \\,;;,%;;,;#
+    %,;;:,%;,;%
+           ;,;;
+           #,;
+          //
+          \|_
+  b'ger    |#\
+            -"
+```
+

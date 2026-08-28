@@ -1,0 +1,2435 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: ART-AND-DESIGN
+# Total artworks in category fitting <=40 cols: 126
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: ad64e6158798e325 | TITLE: Untitled | ARTIST: Jan-Erik Finnberg | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 12x4 ===
+```
+    ______
+   /__/\__\
+  (`-/__\-')
+Wny\/,'`.\/
+```
+
+=== ID: a955f214d9a2909d | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 18x6 ===
+```
+      /`\
+.----/---\----.
+ `'./     \.'`
+   /`'.'.'`\
+  /,-`   `-,\
+  `         `  ldb
+```
+
+=== ID: 2cfb88d68e6050fb | TITLE: Untitled | ARTIST: Gerfried Fuchs | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 10x6 ===
+```
+    /\
+.--/--\--,
+ \/    \/
+ /\    /\
+'--\--/--`
+    \/ alf
+```
+
+=== ID: 8752e34f345a51af | TITLE: Untitled | ARTIST: Genoveva Galarza | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 23x9 ===
+```
+         ______
+     .-'`  /\  `'-.
+   .'_____/__\_____`.
+  / `._  /    \  _.` \
+ |     `/      \'     |
+ |     / `-..-' \     |
+  \   /  .-'`-.  \   /
+gnv`./.-'      `-.\.'
+     `-..______..-'
+```
+
+=== ID: cd24569d4ee3c15f | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 30x17 ===
+```
+            ______
+       .d$$$******$$$$c.
+    .d$P"            "$$c
+   $$$$$.           .$$$*$.
+ .$$ 4$L*$$.     .$$Pd$  '$b
+ $F   *$. "$$e.e$$" 4$F   ^$b
+d$     $$   z$$$e   $$     '$.
+$P     `$L$$P` `"$$d$"      $$
+$$     e$$F       4$$b.     $$
+$b  .$$" $$      .$$ "4$b.  $$
+$$e$P"    $b     d$`    "$$c$F
+'$P$$$$$$$$$$$$$$$$$$$$$$$$$$
+ "$c.      4$.  $$       .$$
+  ^$$.      $$ d$"      d$P
+    "$$c.   `$b$F    .d$P"
+      `4$$$c.$$$..e$$P"
+          `^^^^^^^`
+```
+
+=== ID: f1e4120822b20c3c | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 37x20 ===
+```
+             ..---n---..
+        .--""'   / \   '""--.
+      ."        |   |        ".
+    ."          |   |          ".
+   /           /     \           \
+  /           |       |           \
+ .------------+-------+------------.
+.'`--.       /         \       .--' .
+:     ".    |           |    ."     ;
+|       "-. |           | .-"       |
+|          )-.         .-(          |
+"         |   ".     ."   |         "
+ \       /      "-.-"      \       /
+ ".     |      .-' '-.      |     ."
+  \     |    ."       ".    |     /
+   \   /  .-"           "-.  \   /
+    ".|.-"                 "-.|."
+      ".                     ."
+        "--..           ..--"
+            '""-------""'
+```
+
+=== ID: 796c1b03cc604649 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 40x22 ===
+```
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMds+:--------:+sdNMMMMMMMMMMM
+MMMMMMMMms:-+sdNMMMMMMMMNdy+--omMMMMMMMM
+MMMMMMh:` /mMMMMMMMMMMMMMMMMm+ `-yMMMMMM
+MMMMd--hN``--sNMMMMMMMMMMNy:..`md:.hMMMM
+MMM+`yMMMy hd+./hMMMMMMh/.+dd sMMMh`/MMM
+MM:.mMMMMM:.NMMh/.+dd+./hMMM--MMMMMm--NM
+M+`mMMMMMMN`+MMMMm-  .dMMMMo mMMMMMMN.:M
+d yMMMMMMMMy dNy:.omNs--sNm oMMMMMMMMh h
+/`MMMMMMMMMM.`.+dMMMMMMm+.``NMMMMMMMMM-:
+.:MMMMMMMd+./`oMMMMMMMMMMs /.+dMMMMMMM/`
+.:MMMMmo.:yNMs dMMMMMMMMm`oMNy:.omMMMM/`
+/`MNy:.omMMMMM--MMMMMMMM:.MMMMMNs--sNM.:
+d -` :++++++++: /++++++/ :++++++++:  : h
+M+ yddddddddddd+ yddddy /dddddddddddy`/M
+MM/.mMMMMMMMMMMM.-MMMM/.NMMMMMMMMMMm.:NM
+MMMo`sMMMMMMMMMMd sMMy hMMMMMMMMMMy`+MMM
+MMMMd--hMMMMMMMMM+`mN`/MMMMMMMMMh--hMMMM
+MMMMMMh:.omMMMMMMN.:/`NMMMMMMms.:hMMMMMM
+MMMMMMMMNs:./shmMMh  yMMNds/.:smMMMMMMMM
+MMMMMMMMMMMMdy+/---``---:+sdMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+```
+
+=== ID: d30c8eced8e1adbe | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 27x22 ===
+```
+          ..,+,..
+       .+'       `+.
+     .'             `.
+    .                 .
+   . `.             .' .
+  .  ` `.         .' '  .
+      `  `.     .'  '
+ '     `   `. .'   '     `
+,      `   .+`+.   '      .
+'       `.'     `.,       :
+`     .+`.       .`.      '
+`   .'   `       '  `.    '
+` .'     `       '    `.. '
+``````````````'''''''''''''
+ `        `     '        '
+ `         `   '         '
+  `        `   '        '
+   `       `   '       '
+    `       ` '       '
+     `.     `.'     .'
+       `+.   '   .+'
+          `~"+"~'
+```
+
+=== ID: 618c6677eace913a | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 32x32 ===
+```
+           `#@@@@@@:
+         @@@,     `#@@.`
+       @@.           `@@
+     .@;               .@:
+    `@+@` `            @@@+
+   .@  @@'           ,@'. @'
+   @   @ '@         @# @   @.
+  @`   +. `@       @,  @    @
+ :@     @   @#   '#   ;,    +@
+ @      @    ,@ @+    @      @
+`@      #.    `@`     @      '#
+@        @   +@ #@   :;       @
+@        @  @'   .@  @        @
+@        #`@     ` @'#        @`
+@         @         #@        ':
+@       @.@         @`@.      :'
+#   ` ;#  @`        @  @#     :+
+@    @+`   @       ,;   :@    ;;
+@  `@      @       @      @:  @.
+@ #@       @       @       #@ @
+@@@@@@@@@@@@@@@@@@,'@@@@ @@@@@@@
+,#                @          :#
+ @          @     @          @
+ ;+         `+   `'         ,@
+  @          @   @          @
+   @         @   @         @:
+   ,@        ,+ `'        #@
+    ,@        @ @        @#
+     .@``     @ @       @+
+       @@     ,'+     #@`
+        `@@:   @   ,@@:
+           :@@@@@@@+
+```
+
+=== ID: 6386bbb917c86c65 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: pentacles | SIZE: 25x86 ===
+```
+ten lines:
+
+            /\
+           /  \
+ _________/____\_________
+ '-.     /      \     ,-'
+    '-, /        \ ,-'
+       /-.      ,-\
+      /   '-,.-'   \
+     /    ,-''-.    \
+    /  ,-'      '-.  \
+   /,-'            '-.\
+
+Nine lines:
+
+           /\
+          /  \
+_________/____\_________
+`-._    /      \    _,-'
+    `-./        \.-'
+      / `-.  ,-' \
+     /  _,-'`-._  \
+    /,-'        `-.\
+   /'              `\
+
+
+eight lines:
+
+         /\
+ _______/__\_______
+ `-.   /    \   ,-'
+    `-/      \-'
+     / `-.,-' \
+    /  ,-''-.  \
+   /,-'      `-.\
+   '            `
+
+seven lines:
+
+       /\
+ _____/__\_____
+ `-. /    \ ,-'
+    /-.  .-\
+   /  ,`'.  \
+  /,-'    '-.\
+  '          `
+
+six lines:
+
+      /\
+ =---/--\---=
+  `-/    \-'
+   / `,.' \
+  /,-'  '-.\
+  '        `
+
+five lines:
+
+     /\
+ ___/__\___
+ `-/.  ,\-'
+  /,-''-,\
+ /'      `\
+
+four lines:
+
+    /\
+-.-/--\-,-
+  /-.,-\
+ /,-''-.\
+
+
+three lines:
+
+   /\
+=:/--\:=
+ /,'',\
+
+two lines:
+
+__/\__
+ /;:\
+
+one line:
+
+*
+```
+
+=== ID: 5aa830b77f9165ab | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: origamis | SIZE: 34x15 ===
+```
+        _____                   /|
+        |   \      ____        / |
+  __    |    \    /\   |      /  ;
+ /\  \  |     \  /  \  |     /  ;
+/,'\  \ |      \/  : \ |    /   ;
+~  ;   \|      /   :  \|   /   ;
+   |    \     /   :'  |   /    ;
+   |     \   /    :   |  /    ;
+   |      \ /    :'   | /     ;
+   |       /     :    |/     ;
+   |      /     :'    |      ;
+    \    /      :     |     ;
+     \  /      :'     |     ;
+      \       :'      |    ;
+       \______:_______|___;
+```
+
+=== ID: 25bd07f5d0293712 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: fractals | SIZE: 25x7 ===
+```
+          ,
+         _o_
+    ._ ,'   `o'
+----(_)      :       ^aNT
+    '  `.   .o
+         ~o~  `
+          '
+```
+
+=== ID: 6acbf7b4b8e1a3d9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: fractals | SIZE: 18x12 ===
+```
+      __/\__
+      \    /
+__/\__/    \__/\__
+\                /
+/_              _\
+  \            /
+__/            \__
+\                /
+/_  __      __  _\
+  \/  \    /  \/
+      /_  _\
+        \/
+```
+
+=== ID: a62b3f6ad010a29d | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: fractals | SIZE: 38x20 ===
+```
+                           ..
+                          .:+:-.
+                        ..::*=:..
+                     ....::####:...
+                  ...-=::--*##=-::::=.
+                ....::##############=.
+          ........::#@#############@:.
+        ..:%::=::::-#################%
+      ....::*#####=##################+
+  ......:==%#########################.
+:::#:===+##########################-:.
+   .....:--%#########################:
+       ...::*#####-##################+
+         .:=::-::::=#################@
+          .........:#+#############+:.
+                ....::############%@+.
+                   ..:-:::-###=:::..:.
+                     ....::###%:...
+                        ...:-=:..
+                          .:%::.
+```
+
+=== ID: 9ae782b0aa3117d4 | TITLE: Male and female symbols | ARTIST: Max Strandberg | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 8x4 ===
+```
+  _  Max
+ _/`  _
+(_)  (_)
+      +
+```
+
+=== ID: db0a774958a10df6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 18x6 ===
+```
+        .---.---.
+       /   / \   \
+       \   \ /   /
+        '-.-'-.-'
+         _|_ _|_
+jgs       |   |
+```
+
+=== ID: b0d23dfdbef73fa1 | TITLE: Female symbol | ARTIST: Veronica Karlsson | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 12x7 ===
+```
+          _.
+         .'|
+   .---.'
+  /     \
+ |       |
+  \     /
+VK `---'
+```
+
+=== ID: 3c1f8b3721f29baf | TITLE: Male-male symbols | ARTIST: Veronica Karlsson | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 18x7 ===
+```
+          _.    _.
+         .'|   .'|
+   .---.',---.'
+  /     \     \
+ |     | |     |
+  \     \     /
+VK `---' `---'
+```
+
+=== ID: 6d47fc32c00673a8 | TITLE: Male symbol | ARTIST: Veronica Karlsson | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 10x8 ===
+```
+   .---.
+  /     \
+ |       |
+  \     /
+   `---'
+     |
+   --+--
+VK   |
+```
+
+=== ID: cae422f91d0a8db2 | TITLE: Female-female symbols | ARTIST: Veronica Karlsson | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 16x8 ===
+```
+   .---. ,---.
+  /     \     \
+ |     | |     |
+  \     \     /
+   `---' `---'
+     |     |
+   --+-- --+--
+VK   |     |
+```
+
+=== ID: d346eba77e49cc71 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 22x8 ===
+```
+                    _
+                    /|
+          .---.---./
+         /   / \   \
+         \   \ /   /
+          '-.-'---'
+           _|_
+jgs         |
+```
+
+=== ID: 35de018f669dfaf6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 23x9 ===
+```
+       ,88888,,88888,
+     ,88'   '888'  '88,
+     88'    88 88   '88
+     88,    88 88   ,88
+     '88,   ,888,  ,88'
+       '88888''88888'
+          8      8
+         888    888
+jgs       8      8
+```
+
+=== ID: c3569308afc2ab2c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 16x9 ===
+```
+       ,88888,
+     ,88'   '88,
+     88'     '88
+     88,      88
+     '88,   ,88'
+       '88888'
+          8
+         888
+jgs       8
+```
+
+=== ID: dae2b14114e1c405 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 17x9 ===
+```
+            88888
+             ,888
+            88' 8
+      ,888888
+    ,88'   '88,
+    88'     '88
+    88,      88
+    '88,   ,88'
+jgs   '88888'
+```
+
+=== ID: 8b5de75ed64288ab | TITLE: Male-female symbols | ARTIST: Veronica Karlsson | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 18x10 ===
+```
+                _.
+               .'|
+   .---. ,---.'
+  /     \     \
+ |     | |     |
+  \     \     /
+   `---' `---'
+     |
+   --+--
+VK   |
+```
+
+=== ID: 52d9fbb4f836db18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 24x11 ===
+```
+                .o88o.
+              .88"  "88.
+              88'    `88
+      _       88.    .88
+    /' `\     `88o  o88'
+    \._./       `"88"'
+o     |           88
++   --+--         88
+      |       8888888888
+                  88
+                  88
+```
+
+=== ID: 65e39667a8c83034 | TITLE: Gender signs | ARTIST: Teng Yee Chiew | CATEGORY: art-and-design | SUBCATEGORY: gender-symbols | SIZE: 18x24 ===
+```
+  ,:d88b:.
+ d8P~''~Y8b
+:8P      Y8:
+[8|      |8]
+:8b      d8;
+ Y8b.__,d8P
+  `~Y88P"^
+     88
+     88
+ [88888888]
+     88
+     88
+     YP
+           _______
+           8888888
+             ,d888
+           ,d8P~88
+  ,:d88b;,88P'  88
+ d8P~''~Y8b~
+:8P      Y8:
+[8|      |8]
+:8b      d8;
+ Y8b.__,d8P
+  `~Y88P"^
+```
+
+=== ID: df13d2fd0807a00b | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: other | SIZE: 28x23 ===
+```
+........
+:      :
+: :'': :
+: :..: :...
+:    : :
+''''': :'''
+     : :
+...  : :
+: :  : :
+: :  : :
+: :  : :
+: :  : :
+: :  : :  .
+: :  : :  :'.
+: :..: :..:.:..
+:    : :       '.
+''''': :'':':'''''
+.....:.:..:.:........
+:                    '.
+: :'':':'':':'''''''''''
+: :..: :  : :...............
+:      :  :                :
+''''''''  ''''''''''''''''''
+```
+
+=== ID: c6dc49088225e780 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: art-and-design | SUBCATEGORY: other | SIZE: 40x31 ===
+```
+                   _
+                  / /\
+                 / /  \
+                / / /\ \
+               / / /\ \ \
+              / / /  \ \ \
+             / / /    \ \ \
+            / / /      \ \ \
+           / / /        \ \ \
+          / / /          \ \ \
+         / / /   _   _    \ \ \
+        / / /\  /\ \/ /\  /\ \ \
+      .`.`.`\ \ \ \/ / / / /`.`.`.
+    .`.`.` \ \ \ \/ / / / / / `.`.`.
+  .`.`.`    \ \ \/ / /\/ / /    `.`.`.
+.`.`.`       \ \ \/ /\/ / /       `.`.`.
+`.`.`.        \_\  /\  /_/        .`.`.`
+  `.`.`.      / /  \/  \ \      .`.`.`
+    `.`.`.   / / /\ \/\ \ \   .`.`.`
+      `.`.`./ / /\ \ \/\ \ \.`.`.`
+        \ \ \/ / /\ \ \ \ \/ / /
+         \ \ \/ /_/\ \ \ \/ / /
+          \ \ \ \_\/\_\/ / / /
+           \ \ \        / / /
+            \ \ \      / / /
+             \ \ \    / / /
+              \ \ \  / / /
+               \ \ \/ / /
+                \ \ \/ /
+                 \ \  /
+                  \_\/LGB
+```
+
+=== ID: b13e9ae573adbd3e | TITLE: Labyrinth | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: mazes | SIZE: 37x12 ===
+```
+___________________________________
+| _____ |   | ___ | ___ ___ | |   | |
+| |   | |_| |__ | |_| __|____ | | | |
+| | | |_________|__ |______ |___|_| |
+| |_|   | _______ |______ |   | ____|
+| ___ | |____ | |______ | |_| |____ |
+|___|_|____ | |   ___ | |________ | |
+|   ________| | |__ | |______ | | | |
+| | | ________| | __|____ | | | __| |
+|_| |__ |   | __|__ | ____| | |_| __|
+|   ____| | |____ | |__ |   |__ |__ |
+| |_______|_______|___|___|___|_____|
+```
+
+=== ID: 301369c0b6350a08 | TITLE: Maze | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: mazes | SIZE: 19x13 ===
+```
+.--.--.--.  .--.--.
+|     |        |  |
+:  :--:  :  :  :  :
+|  |     |  |     |
+:  :  :  :--:--:--:
+|  |  |           |
+:  :  :--:--:--:  :
+|  |        |  |  |
+:  :--:--:  :  :  :
+|     |     |  |  |
+:--:  :  :--:  :  :
+|        |        |
+:  :--:--:--:--:--:
+```
+
+=== ID: 58db5e9e6fd1ec61 | TITLE: Maze | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: mazes | SIZE: 16x15 ===
+```
+.--.--.--.--.  .
+|     |        |
+:  :--:  :  :--:
+|        |  |  |
+:--:--:--:  :  :
+|           |  |
+:  :  :--:  :  :
+|  |     |     |
+:  :--:--:--:  :
+|  |        |  |
+:  :  :--:  :  :
+|     |     |  |
+:  :--:  :--:  :
+|     |  |     |
+:--:--:  :--:--:
+```
+
+=== ID: 47e905fe940924d5 | TITLE: Labyrinth | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: mazes | SIZE: 21x20 ===
+```
+     .----------.
+\   (  ||    ||  )  /
+ \   ~-||====||-~  /
+  \    ||    ||   /
+  |    ||====||  /
+  |__  ||    ||  |
+  | |\ ||====||__|
+  | | \      /|  |
+  | |  \    / |  |
+  | |   \__|  |  |
+  | |   |__|  |  |
+  | |   /  |  |  |
+  | |  /    \ |  |
+  | | /      \|  |
+  |_|/        |__|
+  |              |
+  |              |
+  /              \
+ /                \
+/                  \
+```
+
+=== ID: 5a97bc649de4d5b4 | TITLE: Labyrinth | ARTIST: Ojosh!ro | CATEGORY: art-and-design | SUBCATEGORY: mazes | SIZE: 33x25 ===
+```
+\                           /
+ \                         /
+  \                       /
+   ]                     [    ,'|
+   ]                     [   /  |
+   ]___               ___[ ,'   |
+   ]  ]\             /[  [ |:   |
+   ]  ] \           / [  [ |:   |
+   ]  ]  ]         [  [  [ |:   |
+   ]  ]  ]__     __[  [  [ |:   |
+   ]  ]  ] ]\ _ /[ [  [  [ |:   |
+   ]  ]  ] ] (#) [ [  [  [ :===='
+   ]  ]  ]_].nHn.[_[  [  [
+   ]  ]  ]  HHHHH. [  [  [
+   ]  ] /   `HH("N  \ [  [
+   ]__]/     HHH  "  \[__[
+   ]         NNN         [
+   ]         N/"         [
+   ]         N H         [
+  /          N            \
+ /           q,            \
+/                           \
+
+
+  O!o
+```
+
+=== ID: 6b73a41934bc5de9 | TITLE: Terahedron | ARTIST: Kevin Kreamer | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 11x5 ===
+```
+       ^
+      /|\
+     / | \
+    /  |  \
+KCK '-.|.-'
+```
+
+=== ID: 4442d0dc91812f6d | TITLE: Terahedron | ARTIST: Kevin Kreamer | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 11x6 ===
+```
+       A
+      /I\
+     //I\\
+    ///I\\\
+KCK '//I\\'
+      'I'
+```
+
+=== ID: 81ab4d954de85b0c | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 13x7 ===
+```
+    .-^-.
+   /     \
+  /       \
+ /         \
+|           |
+\           /
+ `-._____.-'
+```
+
+=== ID: 1591ca6448a6dab8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 12x7 ===
+```
+     /\
+   .'  `.
+ .'      `.
+<          >
+ `.      .'
+   `.  .'
+     \/
+```
+
+=== ID: c02ea28990c72a65 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 17x7 ===
+```
+      .-^-.
+   ."       ".
+."             ".
+\               /
+ \             /
+  \           /
+   \_________/
+```
+
+=== ID: 34bdb4ae5f30608e | TITLE: Terahedron | ARTIST: Kevin Kreamer | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 14x7 ===
+```
+        A
+       *I=
+      **I==
+     ***I===
+    ****I====
+KCK''_**I==_''
+      - I -
+```
+
+=== ID: b5aa1aa026a8885f | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 18x11 ===
+```
+ ._____A_____,
+ |`          :\
+ | `         : B
+ |  `        :  \
+ C   +-----A-----+
+ |   :       :   :
+ |__ : _A____:   :
+ `   :        \  :
+  `  :         B :
+   ` :          \:
+    `:_____A_____>
+```
+
+=== ID: be4e65919b776830 | TITLE: Dodecahedron | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 25x12 ===
+```
+      _----------_,
+    ,"__         _-:,
+   /    ""--_--""...:\
+  /         |.........\
+ /          |..........\
+/,         _'_........./:
+! -,    _-"   "-_... ,;;:
+\   -_-"         "-_/;;;;
+ \   \             /;;;;'
+  \   \           /;;;;
+   '.  \         /;;;'
+     "-_\_______/;;'
+```
+
+=== ID: d0572a9bf3db54dc | TITLE: Icosahedron | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 23x12 ===
+```
+        _-_.
+     _-',^. `-_.
+ ._-' ,'   `.   `-_
+!`-_._________`-':::
+!   /\        /\::::
+;  /  \      /..\:::
+! /    \    /....\::
+!/      \  /......\:
+;--.___. \/_.__.--;;
+ '-_    `:!;;;;;;;'
+    `-_, :!;;;''
+        `-!'         mn
+```
+
+=== ID: a8b8453baf115b2a | TITLE: Dodecahedrons | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 32x12 ===
+```
+             .----------,,
+           ,"__:::::::: _-:,
+          /....""--_--""...:\
+         /.........|.........\
+        /... 12 ...|.... 4 ...\
+       /.........._'_........./|
+       | -,... _-"..."-_... ,..|
+       \ 1.-_-"........."-_/.6.|
+        \...\..... 8 .... /.../'
+         \...\.........../.../
+          '. .\........ /../'
+            "-_\_______/_/'
+```
+
+=== ID: cfead39b0b5d9a41 | TITLE: Geometric Eye | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 26x12 ===
+```
+            /\
+           /  \
+      .---<    >---.
+      |   _\  /_   |
+    _,',_|  \/  |_,',_
+_.-'     '-./\.-'     '-._
+ '-._   _.-'\/'-._   _.-'
+     `,` |__/\__| `,`
+      |    /  \    |
+      '---<    >---'
+           \  /
+            \/
+```
+
+=== ID: e9f9c7a42f74d19b | TITLE: Hyper-Cube | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 24x15 ===
+```
+                  (
+ AAAAAaaaaaaaa!
+              (   ()   )
+    ) ________    //  )
+ ()  |\       \  //
+( \\__ \ ______\//
+   \__) |       |
+     |  |       |
+      \ |       |
+       \|_______|
+       //    \\
+      ((     ||
+       \\    ||
+     ( ()    ||
+      (      () ) )
+```
+
+=== ID: a872036f19cc30e8 | TITLE: Terahedron | ARTIST: Kevin Kreamer | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 24x16 ===
+```
+             ^
+            /A\
+           //I\\
+          ///I\\\
+         ////I\\\\
+        /////I\\\\\
+       //////I\\\\\\
+      ///////I\\\\\\\
+     ////////I\\\\\\\\
+    /////////I\\\\\\\\\
+   //////////I\\\\\\\\\\
+    '////////I\\\\\\\\'
+KCK   '//////I\\\\\\'
+        '////I\\\\'
+          '//I\\'
+            'I'
+```
+
+=== ID: 5b6eab6da5f2dcfb | TITLE: 2-Dimensional Representation Of A 3-Dimensional Cross-Section Of A 4-Dimensional Cube | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 29x16 ===
+```
+     +___________+
+    /:\         ,:\
+   / : \       , : \
+  /  :  \     ,  :  \
+ /   :   +-----------+
++....:../:...+   :  /|
+|\   +./.:...`...+ / |
+| \ ,`/  :   :` ,`/  |
+|  \ /`. :   : ` /`  |
+| , +-----------+  ` |
+|,  |   `+...:,.|...`+
++...|...,'...+  |   /
+ \  |  ,     `  |  /
+  \ | ,       ` | /
+   \|,         `|/   mn, 7/97
+    +___________+
+```
+
+=== ID: 9aba75de5ff12131 | TITLE: Terahedron | ARTIST: Kevin Kreamer | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 24x19 ===
+```
+            /A\
+           /*I=\
+          /**I==\
+         /*^*I===\
+        /*^**I====\
+       /*^***I=^^==\
+      /*^^^^^I^==^==\
+     /*^^****I^======\
+    /*^*^****I^=======\
+   /*^**^****I^========\
+    \***^****I^=======/
+     \**^****I=^==^==/
+KCK   \*^****I==^^==/
+       \^****I=====/
+        \****I====/
+         \***I===/
+          \**I==/
+           \*I=/
+             V
+```
+
+=== ID: a839761dcc5bcabe | TITLE: Hexagonal | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: geometries | SIZE: 27x73 ===
+```
+  Size 1 :
+     _
+  ,-<_>-.
+  >-<_>-<
+  `-<_>-'
+
+
+  Size 2 :
+      __
+   __/  \__
+  /  \__/  \
+  \__/  \__/
+  /  \__/  \
+  \__/  \__/
+     \__/
+
+
+  Size 3 :
+        ___
+       /   \
+   ,--<     >--.
+  /    \___/    \
+  \    /   \    /
+   >--<     >--<
+  /    \___/    \
+  \    /   \    /
+   `--<     >--'
+       \___/
+        ___
+       /   \
+   ,--(     )--.
+  /    \___/    \
+  \    /   \    /
+   )--(     )--(
+  /    \___/    \
+  \    /   \    /
+   `--(     )--'
+       \___/
+
+
+  Size 4 :
+          ____
+         /    \
+    ____/      \____
+   /    \      /    \
+  /      \____/      \
+  \      /    \      /
+   \____/      \____/
+   /    \      /    \
+  /      \____/      \
+  \      /    \      /
+   \____/      \____/
+        \      /
+         \____/
+
+
+  Size 5 :
+            _____
+           /     \
+          /       \
+    ,----<         >----.
+   /      \       /      \
+  /        \_____/        \
+  \        /     \        /
+   \      /       \      /
+    >----<         >----<
+   /      \       /      \
+  /        \_____/        \
+  \        /     \        /
+   \      /       \      /
+    `----<         >----'
+          \       /
+           \_____/
+```
+
+=== ID: d75b2f3fe100ec32 | TITLE: Three Graces - Antonio Canova | ARTIST: H P Barmario (Morfina) | CATEGORY: art-and-design | SUBCATEGORY: sculptures | SIZE: 36x20 ===
+```
+            .$$$$$.          .
+  |/()))))  $)'\$==. %%%%%%\%%\
+ / ((((==)  ') - $$$'===%%%%\'.|
+ |((((( <(   \-_/$$  )" _)%% )/|
+ | ())))_/._\._) //_.\_  %% ( /
+ | \_) /.--._\___/__.-.\ (.' /
+  \_ (   __._'_..'.__.   ) .'
+    \     )  (_.(_)/(     /
+     \\  /    \   /  \  //
+      )  \     ). \  /  (
+     / '  \   /    \|  ' \
+    (  |   | / \/   |   )_)
+     :-'-- /|  /   /|  /  \
+     _\|  / | / .-' | / '. \
+   _/  | /  \| (    ( \   '.\
+  ( ).'/ |   |  )   |  |   | \
+  /.' (_ /   | / )   \'|   |._)
+ °oO  | /    | \/     \|    \ |
+      |(     \  )   mrf)\    )_\
+_____(__'-.___)/____..'__)___'._'.__
+```
+
+=== ID: 861e53d0a11d5c98 | TITLE: Venus de Milo | ARTIST: H P Barmario (Morfina) | CATEGORY: art-and-design | SUBCATEGORY: sculptures | SIZE: 16x24 ===
+```
+    %%%
+   =====
+  &%&%%%&
+  %& < <%
+   &\__/
+    \ |____
+   .', ,  ()
+  / -.  _)|
+ |_(_.    |
+ '-'\  )  |
+ mrf )    |
+    /  .  ).
+   /    _. |
+ /'---':.-'|
+(__.' /    /
+ \   ( /  /
+  \ /  _  |
+   \  |  '|
+   | . \  |
+   |(     |
+   |  \ \ |
+    \  )\ |
+   __)/ / \
+--"--(_.Ooo'----
+```
+
+=== ID: edf04aa476fc9f2b | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: mona-lisa | SIZE: 27x17 ===
+```
+          ____
+        o8%8888,
+      o88%8888888.
+     8'-    -:8888b
+    8'         8888
+   d8.-=. ,==-.:888b
+   >8 `~` :`~' d8888
+   88         ,88888
+   88b. `-~  ':88888
+   888b ~==~ .:88888
+   88888o--:':::8888
+   `88888| :::' 8888b
+   8888^^'       8888b
+  d888           ,%888b.
+ d88%            %%%8--'-.
+/88:.__ ,       _%-' ---  -
+    '''::===..-'   =  --.
+```
+
+=== ID: c54265b7b9e0f99b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: mona-lisa | SIZE: 26x21 ===
+```
+ ________________________
+|.----------------------.|
+||                      ||
+||                      ||
+||     .-"````"-.       ||
+||    /  _.._    `\     ||
+||   / /`    `-.   ; . .||
+||   | |__  __  \   |   ||
+||.-.| | e`/e`  |   |   ||
+||   | |  |     |   |'--||
+||   | |  '-    |   |   ||
+||   |  \ --'  /|   |   ||
+||   |   `;---'\|   |   ||
+||   |    |     |   |   ||
+||   |  .-'     |   |   ||
+||'--|/`        |   |--.||
+||   ;    .     ;  _.\  ||
+||    `-.;_    /.-'     ||
+||         ````         ||
+||jgs___________________||
+'------------------------'
+```
+
+=== ID: 9a308d3d385ac808 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: mona-lisa | SIZE: 26x21 ===
+```
+ ________________________
+|.----------------------.|
+||                      ||
+||       ______         ||
+||     .;;;;;;;;.       ||
+||    /;;;;;;;;;;;\     ||
+||   /;/`    `-;;;;; . .||
+||   |;|__  __  \;;;|   ||
+||.-.|;| e`/e`  |;;;|   ||
+||   |;|  |     |;;;|'--||
+||   |;|  '-    |;;;|   ||
+||   |;;\ --'  /|;;;|   ||
+||   |;;;;;---'\|;;;|   ||
+||   |;;;;|     |;;;|   ||
+||   |;;.-'     |;;;|   ||
+||'--|/`        |;;;|--.||
+||;;;;    .     ;;;;.\;;||
+||;;;;;-.;_    /.-;;;;;;||
+||;;;;;;;;;;;;;;;;;;;;;;||
+||jgs;;;;;;;;;;;;;;;;;;;||
+'------------------------'
+```
+
+=== ID: 9ce80b772c7c9d07 | TITLE: Vertical scroll | ARTIST: Lorna Dean (Dixie-Chick) | CATEGORY: art-and-design | SUBCATEGORY: scrolls | SIZE: 38x18 ===
+```
+   ______________________________
+ / \                             \.
+|   |                            |.
+ \_ |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |   _________________________|___
+    |  /                            /.
+    \_/dc__________________________/.
+```
+
+=== ID: 13600446efcfa54a | TITLE: Untitled | ARTIST: llizard | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 12x3 ===
+```
+       .^.
+     ,-.|,-.
+ejm     v
+```
+
+=== ID: ebe8f61e25ac7e47 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 15x4 ===
+```
+     /\
+ ,-.(  ),-.
+',-.\)(/,-.'
+  `-'\/`-'  SSt
+```
+
+=== ID: 3eb66c9dd14e76be | TITLE: Untitled | ARTIST: llizard | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 13x4 ===
+```
+        /\
+      _(  )_
+     (,`==' )
+ejm    '\/`
+```
+
+=== ID: 6d4a93ec3095c54f | TITLE: Untitled | ARTIST: llizard | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 13x4 ===
+```
+        /\
+      _(  )_
+     ( `==' )
+ejm    '\/`
+```
+
+=== ID: 0fcf5505fff11652 | TITLE: Untitled | ARTIST: llizard | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 15x5 ===
+```
+          ^
+       _(   )_
+      ( `\ /' )
+        _)^(_
+ejm       V
+```
+
+=== ID: 453de5a1447a4a04 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 14x6 ===
+```
+        /\
+      _(  )_
+    (`_\\//_`)
+     `={==}=`
+     .->/\<-.
+jgs  `"`\/`
+```
+
+=== ID: a919d5986d99b375 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 17x7 ===
+```
+          /\
+         (  )
+      .--.\/.--.
+     (/`\_\/_/`\)
+     '  {____}  '
+jgs    ,_//\\_,
+        '-\/-'
+```
+
+=== ID: 99ac23397f8300f8 | TITLE: Untitled | ARTIST: Arturo Pascalin | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 29x16 ===
+```
+         ..-'"'"'-..
+      .''     .     ''.
+    ,'       / \       ',
+   /        / | \        \
+  '        :  |  :        '
+ '    ,"". \  |  / ,"".    '
+:    ( *  \ : | : /  * )    :
+|     \ ,. \ \|/ / ,. /     |
+:      '  '======='  '      :
+ ;       ..',/|\.'..       ;
+  .     '-.": | :".-'     .
+   \         \ /         /
+    ',        '        ,'
+      '.             .'
+        '-..-apc-..-'
+           -'   '-
+```
+
+=== ID: 5665f8e95feb4cd2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 27x19 ===
+```
+            ,'.
+          .'   '.
+      _.-'       '-._
+    .'               '.
+   /                   \
+  |                     |
+   \                   /
+    '-._           _.-'
+   _..._'.       .'_..._
+ .'     '.\     /.'     '.
+/   __    \\   //    __   \
+|  /  `.   \| |/   .'  \  |
+ \ \    \   Y Y   /    / /
+  `-'  ==+=+;=;+=+==  '-`
+         // / \ \\
+     ('-'/ /   \ \'-')
+      '-' (     ) '-'
+  jgs      '. .'
+             '
+```
+
+=== ID: ec9b17d3e5cdf071 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: fleur-de-lis | SIZE: 26x19 ===
+```
+             8
+           .d8b.
+       _.d8888888b._
+     .88888888888888b.
+    d88888888888888888b
+    8888888888888888888
+    Y88888888888888888P
+     'Y8888888888888P'
+   _..._ 'Y88888P' _..._
+ .d88888b. Y888P .d88888b.
+d888888888b 888 d88888888b
+888P  `Y8888888888P'  Y888
+ b8b    Y88888888P    d8Y
+  `"'  #############  '"`
+         dP d8b Yb
+     Ob=dP d888b Yb=dO
+      `"` O88888O `"`
+   jgs     'Y8P'
+             '
+```
+
+=== ID: 239cb808afd460dc | TITLE: Celtic cross | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 20x14 ===
+```
+         _..._
+       .-|>X<|-.
+     _//`|oxo|`\\_
+    /xo=._\X/_.=ox\
+    |<>X<>(_)<>X<>|
+    \xo.='/X\'=.ox/
+      \\_/oxo\_//
+       ';<>X<>;'
+        |=====|
+        |<>X<>|
+        |oxoxo|
+        |<>X<>|
+       _|oxoxo|_
+jgs.--' `"""""` '--.
+```
+
+=== ID: 77141f543a1cba45 | TITLE: Celtic knots | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 12x16 ===
+```
+   /\  /\
+  /  \/  \
+ / /\ \/\ \
+ \ \/\ \/ /
+  \/ /\/ /
+  / /\/ /\
+ / /\  /\ \
+/ /  \/  \ \
+\ \  /\  / /
+ \ \/  \/ /
+  \/ /\/ /
+  / /\/ /\
+ / /\ \/\ \
+ \ \/\ \/ /
+  \  /\  /
+   \/  \/
+```
+
+=== ID: c636ef36687e067e | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 16x16 ===
+```
+    /\    /\
+   /  \  /  \
+  / /\ \/ /\ \
+ / /  \ \/  \ \
+/ /   /\ \   \ \
+\ \  / /\ \  / /
+ \ \/ /  \ \/ /
+  \/ /    \/ /
+  / /\    / /\
+ / /\ \  / /\ \
+/ /  \ \/ /  \ \
+\ \   \ \/   / /
+ \ \  /\ \  / /
+  \ \/ /\ \/ /
+   \  /  \  /
+    \/    \/
+```
+
+=== ID: bcd89412094699ad | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 18x16 ===
+```
+ .--..--..--..--.
+/ .. \.. \.. \.. \
+\ \/\ \/\ \/\ \/ /
+ \/ /\/ /\/ /\/ /
+ / /\/ /\/ /\/ /\
+/ /\ \/\ \/\ \/\ \
+\ \/\ \/\ \/\ \/ /
+ \/ /\/ /\/ /\/ /
+ / /\/ /\/ /\/ /\
+/ /\ \/\ \/\ \/\ \
+\ \/\ \/\ \/\ \/ /
+ \/ /\/ /\/ /\/ /
+ / /\/ /\/ /\/ /\
+/ /\ \/\ \/\ \/\ \
+\ `'\ `'\ `'\ `' /
+ `--'`--'`--'`--'
+```
+
+=== ID: ecf0f28b7473a911 | TITLE: Celtic knot | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 16x22 ===
+```
+    /\
+   /  \
+  / /\ \
+  \ \/ /
+   \  /
+    \/
+
+   /\  /\  /\
+  /  \/  \/  \
+ / /\/ /\/ /\ \
+/ / / /\/ /\ \ \
+\ \ \/ /\/ / / /
+ \ \/ /\/ /\/ /
+  \  /\  /\  /
+   \/  \/  \/
+
+   /\/\
+  / /  \
+ / / /\ \
+ \ \/ / /
+  \  / /
+   \/\/
+```
+
+=== ID: 9a36007f0c4156d3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 22x22 ===
+```
+         /\/\
+        /  \ \
+       / /\ \ \
+       \/ /\/ /
+       / /\/ /\
+      / /\ \/\ \
+     / / /\ \ \ \
+  /\/ / / /\ \ \ \/\
+ /  \/ / /  \ \ \ \ \
+/ /\ \/ /    \ \/\ \ \
+\/ /\/ /      \/ /\/ /
+/ /\/ /\      / /\/ /\
+\ \ \/\ \    / /\ \/ /
+ \ \ \ \ \  / / /\  /
+  \/\ \ \ \/ / / /\/
+     \ \ \ \/ / /
+      \ \/\ \/ /
+       \/ /\/ /
+       / /\/ /\
+       \ \ \/ /
+        \ \  /
+         \/\/
+```
+
+=== ID: 9e8d174b4a302ef8 | TITLE: Celtic knot | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 6x24 ===
+```
+  /\
+ /  \
+/ /\ \
+\ \/ /
+ \ \/
+ /\ \
+ \ \/
+ /\ \
+ \ \/
+ /\ \
+/ /\ \
+\ \ \/
+/\ \ \
+\ \/ /
+ \ \/
+ /\ \
+ \ \/
+ /\ \
+ \ \/
+ /\ \
+/ /\ \
+\ \/ /
+ \  /
+  \/
+```
+
+=== ID: f7b6a8d129954753 | TITLE: Celtic crosses | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 33x26 ===
+```
+            .-------.
+            |(~\o/~)|
+          _.||\/X\/||._
+       ,-"  || \ / ||  "-,
+     ,'  () ||o X o|| ()  ',
+    / ()  ,-|| / \ ||-,  () \
+   : o  ,'  ||/\X/\||  ',  o ;
+.----------._)~   ~(_.----------.
+|\/)~~(\/\   (~\ /~)   /\/)~~(\/|
+|(X () X) >o  >-X-<  o< (X () X)|
+|/\)__(/\/  _(_/|\_)_  \/\)__(/\|
+'----------' )     ( '----------'
+   ; o  ',  ||\/~\/||  ,'  o ;
+    \ ()  '-|| \o/ ||-'  () /
+     ',  () |(~\ /~)| ()  ,'
+       '-._ ||\/X\/|| _.-'
+           '|| \ / ||'
+            ||  X  ||
+            ||\(/\/||
+            ||=)O(=||
+            ||/\/)\||
+            ||  X  ||
+            || / \ ||
+            ||/\X/\||
+      jgs   |(_/o\_)|
+            '._____.'
+```
+
+=== ID: cf12c188c7926f55 | TITLE: Celtic crosses | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 33x26 ===
+```
+            .-------.
+            |(~\o/~)|
+          _.||\/X\/||._
+       ,-"  || \ / ||  "-,
+     ,'  () ||o X o|| ()  ',
+    / ()  ,-|| / \ ||-,  () \
+   : o  ,'  ||/\X/\||  ',  o ;
+.----------._).-.-.(_.----------.
+|\/)~~(\/\ o (     ) o /\/)~~(\/|
+|(X () X)  .-.\ : /.-.  (X () X)|
+|/\)__(/\/(   .`:`.   )\/\)__(/\|
+'----------(   /|\   )----------'
+   ; o  ',  |"` | `"|  ,'  o ;
+    \ ()  '-|  /o\  |-'  () /
+     ',  () |(~\ /~)| ()  ,'
+       '-._ ||\/X\/|| _.-'
+           '|| \ / ||'
+            ||  X  ||
+            ||\(/\/||
+            ||=)O(=||
+            ||/\/)\||
+            ||  X  ||
+            || / \ ||
+            ||/\X/\||
+      jgs   |(_/o\_)|
+            '._____.'
+```
+
+=== ID: de4dda7fdde9dfc4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 16x30 ===
+```
+    /\    /\
+   /  \  /  \
+  / /\ \/ /\ \
+ / /  \/ /  \ \
+/ / /\ \/\/\ \ \
+\ \ \/\/\ \/ / /
+ \ \/ / /\/ / /
+  \ \/\/\ \/\/
+  /\/\ \/\/\ \
+ / / /\  / /\ \
+/ / /\ \/ /\ \ \
+\ \/  \  /  \ \/
+/\ \   \/   /\ \
+\ \/        \ \/
+/\ \        /\ \
+\ \/        \ \/
+/\ \        /\ \
+\ \/   /\   \ \/
+/\ \  /  \  /\ \
+\ \ \/ /\ \/ / /
+ \ \/ /  \/ / /
+  \ \/\/\ \/\/
+  /\/\ \/\/\ \
+ / / /\/ / /\ \
+/ / /\ \/\/\ \ \
+\ \ \/\/\ \/ / /
+ \ \  / /\  / /
+  \ \/ /\ \/ /
+   \  /  \  /
+    \/    \/
+```
+
+=== ID: 2a39aa86a24f649e | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: celtic | SIZE: 22x48 ===
+```
+        /\  /\
+       /  \/  \
+       \ \ \/ /
+        \/\/ /
+        / /\/\
+       / /\ \ \
+      / / /\ \ \
+     / / /  \ \ \
+     \ \ \  / / /
+      \ \ \/ / /
+       \ \ \/ /
+        \/\/ /
+        / /\/\
+       / /\ \ \
+      / / /\ \ \
+     / / /  \ \ \
+    / / /    \ \ \
+   / / / /\/\ \ \ \
+  / / / /  \ \ \ \ \
+ / / / / /\ \ \ \ \ \
+ \ \ \ \/ /\/ / / / /
+  \ \ \/ /\/ /\/ / /
+   \ \ \/\ \/\ \/ /
+    \/\ \/\ \/\/ /
+  /\/ /\/ /\/ / /\/\
+ /  \/\ \/\/ /\/\ \ \
+/ /\ \/\ \ \/\ \/\ \ \
+\/ /\/ /\/\/ /\/ /\/ /
+/ /\/ /\/ /\/\/ /\/ /\
+\ \ \/\ \/\ \ \/\ \/ /
+ \ \ \/\/ /\/\ \/\  /
+  \/\/ / /\/ /\/ /\/
+    / /\/\ \/\ \/\
+   / /\ \/\ \/\ \ \
+  / / /\/ /\/ /\ \ \
+ / / / / /\/ /\ \ \ \
+ \ \ \ \ \ \/ / / / /
+  \ \ \ \ \  / / / /
+   \ \ \ \/\/ / / /
+    \ \ \    / / /
+     \ \ \  / / /
+      \ \ \/ / /
+       \ \ \/ /
+        \/\/ /
+        / /\/\
+       / /\ \ \
+       \  /\  /
+        \/  \/
+```
+
+=== ID: 57b88e2161ffafba | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 22x5 ===
+```
+   __
+  /\ \   Moebius Strip
+ / /\ \
+/ /__\ \
+\/____\/    mn
+```
+
+=== ID: 62247fa62a49c675 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 29x6 ===
+```
+    _____________________
+   /  __________________()
+  /  /|_________________
+ /  /_/________________()
+/______________________
+|_____________________()   mn
+```
+
+=== ID: 1b20fa3fbc68249d | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 29x6 ===
+```
+ ____________________
+/___________________()
+| ___________________
+| | |_______________()
+| |/_________________
+|___________________()     mn
+```
+
+=== ID: 49b95d69403337c6 | TITLE: Cube | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 9x7 ===
+```
+   _____
+  /|   /|
+ /_|__/ |
+|  |  | |
+|  |__|_|
+| /   | /
+|/____|/
+```
+
+=== ID: 2cd05645f9539a75 | TITLE: Untitled | ARTIST: Andy Johnson | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 27x7 ===
+```
+ _________
+|  _____  |\
+| |\ ___| | \
+| | |   | | |
+| | |___| | |
+\ | |____\| |
+ \|_________|  Andy Johnson
+```
+
+=== ID: 0e86c0dcd5d85a85 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 24x8 ===
+```
+      __        __
+     /\ \      /\ \
+    /  \ \    /  \ \
+   / /\ \ \  / /\ \ \
+  / / /\ \ \/ / /\ \ \
+ / / /__\_\/ / /__\_\ \
+/ / /______\/ /________\
+\/_____________________/
+```
+
+=== ID: 52dc7f58bea83364 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 15x8 ===
+```
+._____. ._____.
+| ._. | | ._. |
+| !_| |_|_|_! |
+!___| |_______!
+.___|_|_| |___.
+| ._____| |_. |
+| !_! | | !_! |
+!_____! !_____!
+```
+
+=== ID: 75bd2882d2f88059 | TITLE: Untitled | ARTIST: Armando Frazăo (Seal do Mar) | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 14x8 ===
+```
+ .--..--.
+/ .. \.. \
+\ \/\ \/ /
+ \/ /\/ /
+ / /\/ /\
+/ /\ \/) \
+\ `'\ `' /
+ `--'`--' seal
+```
+
+=== ID: 26ecfdc3428836b7 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 16x9 ===
+```
+    ________
+   /_______/\
+   \ \    / /
+ ___\ \__/_/___
+/____\ \______/\
+\ \   \/ /   / /
+ \ \  / /\  / /
+  \ \/ /\ \/ /
+   \_\/  \_\/
+```
+
+=== ID: 528a79120b0d4c64 | TITLE: Untitled | ARTIST: Paul Wisehart | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 11x10 ===
+```
+ _   _   _
+(_) (_) (_)
+| | | | | |
+|p| | | | |
+|k| | | | |
+|w| | | | |
+| | | | | |
+| | |_| | |
+\ | |__\| |
+ \|_______|
+```
+
+=== ID: 290a076473d3a0f7 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 18x10 ===
+```
+   __        __
+  /\ \      / /\
+ / /\ \    / /\ \
+/ /__\ \__/_/__\ \
+\/____\ \_______\/
+        \/ /
+       / /\
+      / /\ \
+     / /__\ \
+     \_____\/
+```
+
+=== ID: d53d9dd935e6f1ab | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 18x11 ===
+```
+          _______
+         /       /
+___     /   ____/
+\   \  /   /\
+ \   \/___/  \
+  \       \   \
+   \_______\   \
+           /   /
+          /   /
+          \  /
+           \/
+```
+
+=== ID: ad32debc673ecf39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 22x12 ===
+```
+     ____________
+    /___________/\
+   _\ \________/_/_
+  /__\ \__________/\
+ _\ \_\_\____/ /_/_/_
+/\_\ \______/ /______\
+\ \ \ \ \ \/ / / / / /
+ \ \ \ \ \ \/ / / / /
+  \ \ \ \/\ \/ / / /
+   \ \ \/ /\/ / / /
+    \ \/ /\/ /\/ /
+     \/_/\_\/\/_/
+```
+
+=== ID: e20c94d22c2d7d45 | TITLE: Untitled | ARTIST: Mic Barendsz | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 22x12 ===
+```
+              .
+           .-` :-
+        .-` .-` :
+     .-` .-` .: :
+  .-` .-` .-: : :
+-:  -: .-`  : : :
+: `-. `-.   : : :
+'-.  `-. '-.: : :
+   `-.  `-. : : :
+      `-.  `- : :
+         `-.  : :
+            `-:-`  mic
+```
+
+=== ID: e2024fbf960bca44 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 24x13 ===
+```
+          ____
+         /.../\
+        /.../--\
+       /.../----\
+      /.../------\
+     /.../---/\---\
+    /.../---/\\\---\
+   /.../---/\\\\\---\
+  /.../===/__\\\\\---\
+ /............\\\\\---\
+/..............\\\\\---\
+\\\\\\\\\\\\\\\\\\\\\--/
+ \\\\\\\\\\\\\\\\\\\\\/
+```
+
+=== ID: 842f8a44329313f7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 24x13 ===
+```
+      ____________
+     /\  ________ \
+    /  \ \______/\ \
+   / /\ \ \  / /\ \ \
+  / / /\ \ \/ / /\ \ \
+ / / /__\_\/ / /__\_\ \
+/ /_/_______/ /________\
+\ \ \______ \ \______  /
+ \ \ \  / /\ \ \  / / /
+  \ \ \/ / /\ \ \/ / /
+   \ \/ / /__\_\/ / /
+    \  / /______\/ /
+     \/___________/
+```
+
+=== ID: e0556ad6971639d4 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 24x13 ===
+```
+      ____________
+     /___________/\
+     \ \        / /
+     _\ \______/_/_
+    /__\ \________/\
+ ___\ \_\_\__/ /_/_/___
+/\___\ \____/ /_______/\
+\ \   \ \ \ \/ / /   / /
+ \ \   \ \/\ \/ /   / /
+  \ \   \/ /\/ /   / /
+   \ \  / /\/ /\  / /
+    \ \/ /\_\/\ \/ /
+     \/_/      \_\/
+```
+
+=== ID: b92fa8f7e9b6987c | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 24x13 ===
+```
+      ____________
+     /\  ________ \
+    /  \ \______/\ \
+   / /\ \ \  / /\ \ \
+  / / /\ \ \/ / /\ \ \
+ / / /__\_\/ / /__\_\ \
+/ /_/_______/ /________\
+\ \ \______ \ \______  /
+ \ \ \  / /\ \ \  / / /
+  \ \ \/ / /\ \ \/ / /
+   \ \/ / /__\_\/ / /
+    \  / /______\/ /
+VK   \/___________/
+```
+
+=== ID: 07b97364717b6a93 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 26x14 ===
+```
+           ____
+          /   /\
+         /___/  \
+        /   /\  /\
+       /   /  \/  \
+      /   /   /\   \
+     /   /   /  \   \
+    /   /   /\   \   \
+   /   /   /  \   \   \
+  /___/___/____\   \   \
+ /   /          \   \  /\
+/___/____________\___\/  \
+\   \             \   \  /
+ \___\_____________\___\/
+```
+
+=== ID: b6e2d30ed763be81 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 40x14 ===
+```
+           ____
+          /\   \        Moebius Triangle
+         /  \   \
+        /    \   \
+       /      \   \
+      /   /\   \   \
+     /   /  \   \   \
+    /   /    \   \   \
+   /   /    / \   \   \
+  /   /    /   \   \   \
+ /   /    /---------'   \
+/   /    /_______________\
+\  /                     /
+ \/_____________________/   mn
+```
+
+=== ID: 08ebef74bd807cd5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 34x15 ===
+```
+          ________
+         /\       \
+        /  \       \
+       /    \       \
+      /      \_______\
+      \      /       /
+    ___\    /   ____/___
+   /\   \  /   /\       \
+  /  \   \/___/  \       \
+ /    \       \   \       \
+/      \_______\   \_______\
+\      /       /   /       /
+ \    /       /   /       /
+  \  /       /\  /       /
+   \/_______/  \/_______/ 'logico'
+```
+
+=== ID: 04c80a3c6145fdc2 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 28x15 ===
+```
+       ______________
+      /_____________/\
+      \ \          / /
+    ___\ \________/_/___
+   /____\ \____________/\
+   \ \   \ \    / /   / /
+ ___\ \___\_\__/ /___/_/___
+/\___\ \______/ /_________/\
+\ \   \ \   \ \/   / /   / /
+ \ \   \ \  /\ \  / /   / /
+  \ \   \ \/ /\ \/ /   / /
+   \ \   \/ /  \/ /   / /
+    \ \  / /\  / /\  / /
+     \ \/ /\ \/ /\ \/ /
+      \_\/  \_\/  \_\/
+```
+
+=== ID: 6db3017ac916d8c0 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 26x15 ===
+```
+  ________________
+ /_______________/\
+ \ \            / /
+  \ \    ______/_/_______
+   \ \  /\______________/\
+ ___\ \_\_\__/ /_      / /
+/\___\ \____/ /__\    / /
+\ \   \ \ \ \/ / /   / /
+ \ \   \ \/\ \/ /   / /
+  \ \   \/_/\/ /   / /
+   \ \      / /\  / /
+    \ \    / /\ \/ /
+     \ \  / /  \_\/
+      \ \/ /
+       \/_/
+```
+
+=== ID: b144140419fdc8d4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 27x15 ===
+```
+        ___________
+       |           |
+       |    ___    |
+       |   |   |   |
+ ______|   |___|___|______
+|      |   |              |
+|   ___|   |_______ ___   |
+|  |   |   |   |   |   |  |
+|  |___|___|___|   |___|  |
+|              |   |      |
+|______________|   |______|
+       |   |   |   |
+       |   |___|   |
+       |           |
+       |___________|
+```
+
+=== ID: b6a90f70caf38bbe | TITLE: Untitled | ARTIST: Paul Wisehart | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 16x16 ===
+```
+ __    __    __
+(__)  (__)  (__)
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |p |
+|  |  |  |  |k |
+|  |  |__|  |w |
+|  |  |   \ |  |
+\  |  |____\|  |
+ \ |           |
+  \|___________|
+```
+
+=== ID: 70c93e270c8fc939 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 30x16 ===
+```
+    ________      ________
+   /_______/\    /_______/\
+   \ \    / /    \ \    / /
+ ___\ \__/_/______\ \__/_/___
+/____\ \___________\ \______/\
+\ \   \/ /          \/ /   / /
+ \ \  / /\          / /\  / /
+  \ \/ /\ \        / /\ \/ /
+   \_\/  \ \      / /  \_\/
+          \ \    / /
+        ___\ \__/_/___
+       /____\ \______/\
+       \ \   \/ /   / /
+        \ \  / /\  / /
+         \ \/ /\ \/ /
+          \_\/  \_\/
+```
+
+=== ID: edc5c9ce72514f6b | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 32x16 ===
+```
+ ._____. ._____. ._____. ._____.
+ | ._. | | ._. | | ._. | | ._. |
+ | !_| |_|_|_! | | !_| |_|_|_! |
+ !___| |_______! !___| |_______!
+ .___|_|_| |_________|_|_| |___.
+ | ._____| |_____________| |_. |
+ | !_! | | |         | | ! !_! |
+ !_____! | |         | | !_____!
+ ._____. | |         | | ._____.
+ | ._. | | |         | | | ._. |
+ | !_| |_|_|_________| |_|_|_! |
+ !___| |_____________| |_______!
+ .___|_|_| |___. .___|_|_| |___.
+ | ._____| |_. | | ._____| |_. |
+ | !_! | | !_! | | !_! | | !_! |
+ !_____! !_____! !_____! !_____!
+```
+
+=== ID: 34fe87279e9c33d4 | TITLE: Sierpinsky Gasket | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 38x16 ===
+```
+               /\
+              /__\
+             /\  /\
+            /__\/__\
+           /\      /\
+          /__\    /__\
+         /\  /\  /\  /\
+        /__\/__\/__\/__\
+       /\              /\
+      /__\            /__\
+     /\  /\          /\  /\
+    /__\/__\        /__\/__\
+   /\      /\      /\      /\
+  /__\    /__\    /__\    /__\
+ /\  /\  /\  /\  /\  /\  /\  /\
+/__\/__\/__\/__\/__\/__\/__\/__\    mn
+```
+
+=== ID: 10117d122afec09d | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 15x16 ===
+```
+      ,-"~"-.
+     /  ._.  \
+    :  /   \  :
+    !  !    : !
+    ;  !    ; ;
+   /    \  / /
+  /      \/ /
+ /       /`/
+/       / /\
+|     .`-'  |
+|    .'.'   |
+|    : :    |
+|  ..: :..  |
+|.' .' `. '.|
+`\ '     ` /'
+  `--___--'  mn
+```
+
+=== ID: 6d23a74c07b83f84 | TITLE: Climber | ARTIST: Felix Lee | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 38x17 ===
+```
+    |' _     |' _     |' _     |' _
+-.' < < `-.' < ( `-.' < ( `-.' < ( `-.
+" ) /-'  " ) /-'  " ) /-'  " ) /-'  "
+-'.'    .-'.'    .-'.'    .-'.'    .-'
+'   . `..'   . `..'   . `..'     `..'
+ Y    >._ Y    >._ Y    >._ Y    >._ Y
+`|     _ `|     _ `|     _ `|     _ `|
+ > `.-' ) > `.-' ) > `.-' ) > `.-' ) >
+-\ ( "  `-\ ( "  `-\ ( "  `-\ ( "  `-\
+  `.`-.    `.`-.    `.`-.    `.`-.
+    `..' .   `..' .   `..' .   `..' .
+    Y _.<    Y _.<    Y _.<    Y _.<
+    |' _     |' _     |' _     |' _
+-.' < ( `-.' < ( `-.' < ( `-.' < ( `-.
+" ) /-'  " ) /-'  " ) /-'  " ) /-'  "
+-'.'    .-'.'    .-'.'    .-'.'    .-'
+'   . `..'   . `..'   . `..'   . (FL)
+```
+
+=== ID: 18df1ff3153fc065 | TITLE: Obasciililthingy | ARTIST: Krogg Zothommog | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 39x17 ===
+```
+                       ,
+,,            '\      /+
+ \',         +  \    / '
+  \ ',       '   \  / +
+   \  ',    +     \/  '
+    \   ',  '     /  +
+     \    '+     /   '
+      \    '    /   +\
+       \  +    /    ' \
+        \ '   /    +   \
+         +   /     '    \
+         '  /     +',    \
+        +  /\     '  ',   \
+        ' /  \   +     ',  \
+       + /    \  '       ', \
+       '/      \+          ',\
+       '                     ''  Krogg?
+```
+
+=== ID: 5bad4c09b58bdddc | TITLE: Untitled | ARTIST: Ben Norwood | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 19x17 ===
+```
+   _____________
+  /            /|
+ /____________/ |
+|            | /
+|   _________|/_
+|  |  |        /|
+|  |  |_______/ |
+|  | /       | /
+|  |/________|/_
+|              /|
+|  ___________/ |
+|  |  |      | /
+|  |  |______|/_
+|  | /         /|
+|  |/________ / |
+|            | /
+|____________|/mbfh
+```
+
+=== ID: fe45163fcbb020c7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 35x18 ===
+```
+  _______________________________
+ /\                              \
+/++\    __________________________\
+\+++\   \ ************************/
+ \+++\   \___________________ ***/
+  \+++\   \             /+++/***/
+   \+++\   \           /+++/***/
+    \+++\   \         /+++/***/
+     \+++\   \       /+++/***/
+      \+++\   \     /+++/***/
+       \+++\   \   /+++/***/
+        \+++\   \ /+++/***/
+         \+++\   /+++/***/
+          \+++\ /+++/***/
+           \+++++++/***/
+            \+++++/***/
+             \+++/***/
+              \+/___/
+```
+
+=== ID: 7b6953c18b85dae5 | TITLE: Untitled | ARTIST: Jiri Matejicek | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 30x18 ===
+```
+         __
+        / /\
+       / /  \
+      / /    \__________
+     / /      \        /\
+    /_/        \      / /
+ ___\ \      ___\____/_/_
+/____\ \    /___________/\
+\     \ \   \           \ \
+ \     \ \   \____       \ \
+  \     \ \  /   /\       \ \
+   \   / \_\/   / /        \ \
+    \ /        / /__________\/
+     /        / /     /
+    /        / /     /
+   /________/ /\    /
+   \________\/\ \  /
+               \_\/jiri
+```
+
+=== ID: efe93c877b393738 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 36x18 ===
+```
+                    _______________
+                   /       /      /|
+                 /       /      /  |
+               /       /      /    |
+             /       /      /      |
+           /       /      /       /
+         /       /      /       /
+       /       /      /       /
+     /       /      /       /
+   /       /      /       /
+ /_______/      /       /
+|        |    /       /
+|        |  /       /
+|        |/       /
+|--------|      /
+|        |    /
+|        |  /
+|________|/                    PH
+```
+
+=== ID: 08ed16464da8eeb4 | TITLE: Untitled | ARTIST: P.J. LaBrocca | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 11x18 ===
+```
+   _______
+ /|       |
+| |  pjl  |
+| |  __   |
+| | |_ /| |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+| | | | | |
+|_| |_| |_|
+(_) (_) (_)
+```
+
+=== ID: 3dd155c4976a6a2b | TITLE: Untitled | ARTIST: Mic Barendsz | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 35x18 ===
+```
+        ________________________
+       / ____________________  /|
+      / /|__________________/ / |
+     / / | |               / / .|
+    / / /| |              / / /||
+   / / / | |             / / / ||
+  / / /| | |            / / /| ||
+ / /_/_| | |___________/ / /_| ||
+/______| | /__________/_/ /__| ||
+|  ____|_|/___________| | |____||
+| | |  / / /          | | | / / /
+| | | / / /           | | |/ / /
+| | |/ / /            | | | / /
+| | | / /             | | |/ /
+| | |/ /              | | / /
+| | |_/_______________| |  /
+| |/__________________| | /
+|_______________________|/  JEZ_mic
+```
+
+=== ID: 6ff5fcd93ce7613a | TITLE: Untitled | ARTIST: Mike Rosulek | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 36x20 ===
+```
+       _______________________
+      |,_,_,_,_,_,_,_,_,_,_,_/|
+      \( (_(_(_(_(_(_(_( ( (/ /
+     ( \|_____________/|) )/ /|
+      )   | |        //) )/ / |
+     ( )  | |       //) )/_/|_|____
+      (   | |      //)_)_,_,_,_,_,/|
+     ) (  | |     //(_(_(_(_( ( (/ /
+      )   | |    |_________/|) )/ /|
+     ( )  |_|     | |     //) )/ / |
+ _____(___________|_|____//) )/ /| |
+|____)_(_,_,_,_,_,_,_,_,|/) )/ / | |
+ \  _)_)_)_)_)_)_)_)_)_)_)_)/ /  | |
+  \|________________________|/   | |
+    | |           |_|    | |     |_|
+    | |                  | |
+    | |                  | |
+    | |                  | |   -MJR
+    | |                  | |
+    |_|                  |_|
+```
+
+=== ID: c1c01b51b7695543 | TITLE: Untitled | ARTIST: P.J. LaBrocca | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 29x20 ===
+```
+            _______________
+           /               /|
+          /               / |
+         /               /  |
+        /               /   /
+       /               /   /
+      /_______________/   /
+     /|               |  /
+    / |               | /
+   /  |____       ____|/
+  /  /    /|     |    /
+ /  /    / |     |   /
+|  /    /  |     |  /
+| /    /   | pjl | /
+|/___ /    |_____|/
+     |    /      /
+     |   /      /
+     |  /      /
+     | /      /
+     |/______/
+```
+
+=== ID: 96d019d5bbf48556 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 27x20 ===
+```
+      ____________________
+     /    _____________   |
+    / /| |            /   |
+   / / | |           / /| |
+  / /  | |          / / | |
+ / /   | |         / /  | |
+/ /____| |________/ /   | |
+|  ____| |_______  /    | |
+| |    | |       | |    | |
+| |    | |       | |    | |
+| |    | |       | |    | |
+| |    | |       | |    | |
+| |    | |_______| |____| |
+| |   / _________| |_____ |
+| |  / /         | |    / /
+| | / /          | |   / /
+| |/ /           | |  / /
+| / /            | | / /
+|  /_____________| |/ /
+|____________________/jT
+```
+
+=== ID: ea5e17515ef863a3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 39x21 ===
+```
+                 ______
+                /     /\
+               /     /##\
+              /     /####\
+             /     /######\
+            /     /########\
+           /     /##########\
+          /     /#####/\#####\
+         /     /#####/++\#####\
+        /     /#####/++++\#####\
+       /     /#####/\+++++\#####\
+      /     /#####/  \+++++\#####\
+     /     /#####/    \+++++\#####\
+    /     /#####/      \+++++\#####\
+   /     /#####/        \+++++\#####\
+  /     /#####/__________\+++++\#####\
+ /                        \+++++\#####\
+/__________________________\+++++\####/
+\+++++++++++++++++++++++++++++++++\##/
+ \+++++++++++++++++++++++++++++++++\/
+  ``````````````````````````````````
+```
+
+=== ID: 0921ea1535b1cdd3 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 38x22 ===
+```
+               ______________________
+              /_____________________/\
+       _______\ \________          / /
+      /________\ \_______\        / /
+ _____\ \_______\_\____/ /_______/_/_
+/______\ \____________/ /___________/\
+\ \     \ \       \ \/ /       / / / /
+ \ \     \ \       \ \/       / / / /
+  \ \     \ \      /\ \      / / / /
+   \ \    _\_\____/ /\_\____/ /_/_/_
+    \ \  /\______/ /_______/ /_____/\
+     \ \ \ \ \ \/ /    \ \/ / / / / /
+      \ \ \ \ \ \/      \ \/ / / / /
+       \ \ \ \/\ \      /\ \/ / / /
+        \ \ \/ /\ \    / /\_\/ / /
+         \ \/ /\ \ \  / /     / /
+          \_\/\ \ \ \/ /     / /
+               \ \ \/ /     / /
+                \ \/ /\    / /
+                 \_\/\ \  / /
+                      \ \/ /
+                       \_\/
+```
+
+=== ID: 181908b7cf46a7d9 | TITLE: Untitled | ARTIST: P.J. LaBrocca | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 26x22 ===
+```
+                  _
+                 (_) _
+                / / (_) _
+               / / / / (_)
+              / / / / / /
+             / / / / / /
+            / / / / / /
+           / / / / / /
+          / / / / / /
+         / / / / / /
+        / / / / / /
+       / / / / / /
+      / / / / / /
+     / /_/ / / /
+    /  \ \/ / /
+   /    \/ / /
+   \      / /
+   /     / /
+  / /\  / /
+ / / /\/_/
+/ / /pjl
+\/_/
+```
+
+=== ID: bf2631254833c687 | TITLE: Untitled | ARTIST: Neil Smith | CATEGORY: art-and-design | SUBCATEGORY: escher | SIZE: 34x23 ===
+```
+                __
+               / /\
+              / / /\
+             / / /\ \
+            / / /\ \ \
+ __________/_/_/__\ \ \__________
+/\ \_______________\ \ \_________\
+\ \ \_______________\ \ \________/
+ \ \ \  / / /        \ \ \  / / /
+  \ \ \/ / /          \ \ \/ / /
+   \ \/ / /            \ \/ / /
+    \/ / /              \/ / /
+    / / /\              / / /\
+   / / /\ \            / / /\ \
+  / / /\ \ \          / / /\ \ \
+ /_/_/__\ \ \________/_/_/__\ \ \
+/________\ \ \_______________\ \ \
+\_________\ \ \_______________\_\/
+           \ \ \  / / /
+            \ \ \/ / /
+             \ \/ / /
+              \/ / /
+               \/_/  Neil Smith
+```
+
+=== ID: 4a609c8506b5325d | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: borders | SIZE: 27x7 ===
+```
+  (¯`·.¸¸.·´¯`·.¸¸.·´¯)
+  ( \                 / )
+ ( \ )               ( / )
+( ) (                 ) ( )
+ ( / )               ( \ )
+  ( /                 \ )
+   (_.·´¯`·.¸¸.·´¯`·.¸_)
+```
+
+=== ID: 9ce80b772c7c9d07 | TITLE: Vertical scroll | ARTIST: Lorna Dean (Dixie-Chick) | CATEGORY: art-and-design | SUBCATEGORY: borders | SIZE: 38x18 ===
+```
+   ______________________________
+ / \                             \.
+|   |                            |.
+ \_ |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |                            |.
+    |   _________________________|___
+    |  /                            /.
+    \_/dc__________________________/.
+```
+
+=== ID: 32ba4d003ae7e4dc | TITLE: Untitled | ARTIST: Przemyslaw Skoczkowski | CATEGORY: art-and-design | SUBCATEGORY: patterns | SIZE: 32x9 ===
+```
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/
+/|/ \|\ /|/ \|\ /|/ \|\ /|/ (PS)
+```
+
+=== ID: e71fd4a30855876a | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: patterns | SIZE: 30x10 ===
+```
+.----------------------------.
+|\\//\\//\\//\\//\\//\\//\\//|
+|//\\//\\//\\//\\//\\//\\//\\|
+|\\//\\//\\//\\//\\//\\//\\//|
+|//\\//\\//\\//\\//\\//\\//\\|
+|\\//\\//\\//\\//\\//\\//\\//|
+|//\\//\\//\\//\\//\\//\\//\\|
+|\\//\\//\\//\\//\\//\\//\\//|
+|//\\//\\//\\//\\//\\//\\//\\|
+'----------------------------'
+```
+
+=== ID: af072557affb4abe | TITLE: Untitled | ARTIST: unknown | CATEGORY: art-and-design | SUBCATEGORY: patterns | SIZE: 30x13 ===
+```
+.----------------------------.
+|\  /\  /\  /\  /\  /\  /\  /|
+| )(  )(  )(  )(  )(  )(  )( |
+|(  )(  )(  )(  )(  )(  )(  )|
+| )(  )(  )(  )(  )(  )(  )( |
+|(  )(  )(  )(  )(  )(  )(  )|
+| )(  )(  )(  )(  )(  )(  )( |
+|(  )(  )(  )(  )(  )(  )(  )|
+| )(  )(  )(  )(  )(  )(  )( |
+|(  )(  )(  )(  )(  )(  )(  )|
+| )(  )(  )(  )(  )(  )(  )( |
+|/  \/  \/  \/  \/  \/  \/  \|
+'----------------------------'
+```
+

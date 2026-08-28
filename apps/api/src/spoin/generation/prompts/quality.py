@@ -17,7 +17,8 @@ phrasing might appear inside the card's own text):
 
 IMPORTANT — PRESERVE SPECIALIZED ARCHETYPES:
 Do NOT flatten visual or structured cards into plain prose. If a card contains \
-an ASCII stickman comic, a specialized diagram (```text or ```diagram), a code \
+an ASCII scene, a diagram (a ```mermaid graph, or a legacy ```text/```diagram \
+block on an older card), a code \
 block, or a ❌ Myth vs ✅ Fact comparison, PRESERVE and POLISH that archetype \
 rather than converting it into generic text paragraphs.
 

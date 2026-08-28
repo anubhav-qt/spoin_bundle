@@ -1,0 +1,1106 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: CLOTHING-AND-ACCESSORIES
+# Total artworks in category fitting <=40 cols: 95
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 005c99e0db3d7e64 | TITLE: Pullover | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 10x6 ===
+```
+  __  __
+ )HH\/HH(
+|XXXXXXXX|
+|HHHHHHHH|
+|XXXXXXXX|
+ ||||||||
+```
+
+=== ID: 84fb1d1475921448 | TITLE: Bermudas | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 11x6 ===
+```
+  ===E===
+ /_] | [_\
+|         |
+|    |    |
+|____|____|
+|____!____|
+```
+
+=== ID: 042bf1228264535c | TITLE: Blouse | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 15x6 ===
+```
+  .--=   =--.
+ /    \./    \
+(__|   :   |__)
+   |   :   |
+   |   :   |
+   |___:___|
+```
+
+=== ID: dd45dae23ccf67ae | TITLE: Pyjamas | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 9x6 ===
+```
+  _   _
+ /)`:'(\
+//| : |\\
+  |-'-|
+  | | |
+  |_|_|
+```
+
+=== ID: 19c6cb9a04f6c698 | TITLE: Handbag | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 9x6 ===
+```
+   ___
+  /   \
+ |__%__|
+ / : : \
+(       )
+ `-----'
+```
+
+=== ID: 1bee8352a6ea852a | TITLE: Ear-muffs | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 25x9 ===
+```
+               .####.
+             .#'    `#.
+             #        #
+             #        #
+            .#.      .#.
+           /###\    /OOO\
+           #####    OOOOO
+      VK   \###/    \OOO/
+            `-'      `-'
+```
+
+=== ID: b4075cf4ed8ecf15 | TITLE: Scarf | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 32x10 ===
+```
+                _.-.
+         _.----'    `.
+        /             `.
+       /                `-._
+VK   .'     __.----.        `-._
+  .-'      /        `-._       =
+ //       /             `-.    =
+  //    .'                 `--.=
+   // .'
+    //
+```
+
+=== ID: 6174ad8c5bf80391 | TITLE: Lipstick | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 20x11 ===
+```
+      _
+     | \
+     |  |
+     |  |
+     |  |
+    |~~~~|
+    |SSSS|
+    |    |  _______
+    |    | /     / \
+jgs |SSSS| \_____\_/
+    '----'
+```
+
+=== ID: 8ad60b4150a30bbb | TITLE: Cross-stitching | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: other | SIZE: 30x16 ===
+```
+    .-_---...._____
+ .-((_.>      _____::::::-----
+/   '--\--"""'
+\       |
+ '--.   /
+  _  \ (
+ (   /  '.
+  '-'     \
+           |
+  jgs     /
+  .-----'`
+ (
+  '-.
+     \
+      |
+    _.'
+```
+
+=== ID: c43243bdb3bc2059 | TITLE: Shirt (with short sleeves) | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 13x6 ===
+```
+   ___ ___
+ /| |/|\| |\
+/_| ´ |.` |_\
+  |   |.  |
+  |   |.  |
+  |___|.__|
+```
+
+=== ID: bce6ce95faf9a6a6 | TITLE: T-shirt | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 13x6 ===
+```
+   __   __
+ /|  `-´  |\
+/_|  o.o  |_\
+  | o`o´o |
+  |  o^o  |
+  |_______|
+```
+
+=== ID: ed706be1b7aa2835 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 11x6 ===
+```
+  __   __
+ /  `-'  \
+/_| R   |_\
+  |  E  |
+  |   M |
+  |_____|
+```
+
+=== ID: c57346f6f51ebf8b | TITLE: Long sleeves | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 15x6 ===
+```
+    __   __
+   /  `-'  \
+  / | R   | \
+ / /|  E  |\ \
+/_/ |   M | \_\
+    |_____|
+```
+
+=== ID: 560415bd120ad668 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 9x6 ===
+```
+  _   _
+ ) `-' (
+|sponsor|
+|_______|
+|_/ , \_|
+|___|___|
+```
+
+=== ID: 4d44fdf1f538ae9a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 19x9 ===
+```
+          ,..,
+       .-//||\\-.
+      / ,      , \
+     /  ;      ;  \
+     './|      |\.'
+        |      |
+        |      |
+jgs     ||||||||
+        `"===="`
+```
+
+=== ID: adfea5327b60208b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 21x11 ===
+```
+     __.-.__.-.__
+   .'\ '-.__.-' /'.
+  /  |    ,_    |  \
+ /   |  _/| \_  |   \
+ '-._/ \.-""-./ \_.-'
+     | ( ^ \^ ) |
+     |  \ == /  |
+     |  /'--'\  |
+jgs  |          |
+     '._      _.'
+        `""""`
+```
+
+=== ID: a2e6fe315a9b7b6b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: shirts | SIZE: 38x19 ===
+```
+              ._      _.
+             /  `""""`  \
+        .-""`'-..____..-'`""-.
+      /`\                    /`\
+    /`   |                  |   `\
+   /`    |    Sayings on    |    `\
+  /      |                  |      \
+ /       /     Women's      \       \
+/        |                  |        \
+'-._____.|    T-shirts:     |._____.-'
+         |                  |
+         |                  |
+         |                  |
+         \                  |
+         /                  |
+         |                  \
+         |                  |
+     jgs '._              _.'
+            `""--------""`
+```
+
+=== ID: fdb40e08df3aae40 | TITLE: Shoes | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 19x4 ===
+```
+    ,___ ,__
+     )  `\  `\
+    (   _ '-._'-._
+jgs  )_( \____)___)
+```
+
+=== ID: d6d06c8a322d61dc | TITLE: Shoes | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 21x5 ===
+```
+      ____ ___
+      )  =\  =\
+     /    =\  =\
+     \      `-._`-._
+jgs   )__(`\____)___)
+```
+
+=== ID: d35bd08744abf816 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 22x5 ===
+```
+            ___
+      ___ /`"""`8-.__
+    /`"""`8-.__._    )
+    \   ._     ) """""
+jgs """"  """"""
+```
+
+=== ID: 491597c416c03fa8 | TITLE: Boots | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 13x6 ===
+```
+     ._......
+     |X/.*| |
+     |X/+ | |
+     |X/* | |
+____/     ; ;
+\_____/|_/_/
+```
+
+=== ID: 26b11ae135be9cac | TITLE: Shoes | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 14x6 ===
+```
+       ___ _
+      |x  | |
+      /x  | |
+     /x  __)_)
+ __./x /| / /
+(_____/ |/|/
+```
+
+=== ID: 32fbcac263b7bef6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 19x6 ===
+```
+               __
+             .'--'\
+         _.-'_  __/
+        (_.'--'\|_|
+      _.-`   __/
+jgs  (_____.'|_|
+```
+
+=== ID: a374beda9fc7bb68 | TITLE: Cowboy boots | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 26x6 ===
+```
+         ,|_|,   ,|_|,
+         |===|   |===|
+         |   |   |   |
+         /  &|   |&  \
+jgs  .-'`  , )* *( ,  `'-.
+     `"""""`"`   `"`"""""`
+```
+
+=== ID: 795920259c86017d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 31x7 ===
+```
+     .---..__      ,
+    |'-._    ``'--/ `\._
+    /'-._`'--.._.'   |  '--._
+    |    `''--...___/__....--`\
+    \                         /
+    |`'-----------..........-'|
+jgs \_____.---.______________/
+```
+
+=== ID: 95eb44821999a9e2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 21x7 ===
+```
+      ,---.
+     / \   '.
+    |   '.--'\
+    \     \   '._
+    | |`'. \     '-.
+    | |   \ '-------\
+jgs )_(    '._______/
+```
+
+=== ID: fe2bcc34997c30a8 | TITLE: Cowboy boots | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 18x7 ===
+```
+       |: |  |
+      ,|:_|__|
+      |===|==|
+      |   |  |
+      |&  \  \
+jgs  *( ,  `'-.'-.
+      `"`"""""`""`
+```
+
+=== ID: 6bc21f6d9384d368 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 27x9 ===
+```
+        ________
+VK   __(_____  <|
+    (____ / <| <|
+    (___ /  <| L`-------.
+    (__ /   L`--------.  \
+    /  `.    ^^^^^ |   \  |
+   |     \---------'    |/
+   |______|____________/]
+   [_____|`-.__________]
+```
+
+=== ID: d2a41baabd05da52 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 32x9 ===
+```
+                  _    _
+                 (_\__/(,_
+                 | \ `_////-._
+     _    _      L_/__ "=> __/`\
+    (_\__/(,_    |=====;__/___./
+    | \ `_////-._'-'-'-""""""`
+    J_/___"=> __/`\
+jgs |=====;__/___./
+    '-'-'-"""""""`
+```
+
+=== ID: 8c1e9a5675fa8680 | TITLE: Boots | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: footwear | SIZE: 22x9 ===
+```
+           ___
+      ___(|'. `\
+    (|'. `\  ; |
+     |  : |  ; |
+     |  ; |.'  |
+     |.'  |-.  '.
+     /`-.  '.:_  `'-.
+jgs  \   :_  `'-.----'
+     `"""` `-----'
+```
+
+=== ID: 21ec9e12e841546b | TITLE: Bikini and swimming suit | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: bikinis | SIZE: 18x6 ===
+```
+ /   \      |   |
+(_\./_)    ( \./ )
+            \ : /
+ =-.-=      /   \
+ \   /      \   /
+  \_/        \_/
+```
+
+=== ID: 4d2415f47c777665 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: bikinis | SIZE: 14x16 ===
+```
+     .---.
+    (_,/\ \
+   (`a a(  )
+   ) \=  ) (
+  (.--' '--.)
+  / (_\_/_) \
+ | / \   / \ |
+  \\ / . \ //
+   \/\___/\/
+   |  \_/  |
+    \  /  /
+     \/  /
+      ( (
+      |\ \
+jgs   | \ \
+     /_Y/_Y
+```
+
+=== ID: ae0f39782abbbcc6 | TITLE: Untitled | ARTIST: Christian Garbs | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 14x4 ===
+```
+  +
+qoOop
+(===)     cgmm
+"""""
+```
+
+=== ID: cc9425735fc52875 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 14x4 ===
+```
+       _.+._
+     (^\/^\/^)
+      \@*@*@/
+jgs   {_____}
+```
+
+=== ID: cfb55f837d92150e | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 14x5 ===
+```
+      <>
+    .::::.
+@\\/W\/\/W\//@
+ \\/^\/\/^\//
+  \_O_<>_O_/
+```
+
+=== ID: 7507263ea37d7915 | TITLE: Untitled | ARTIST: Geraldine Jones | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 37x6 ===
+```
+        *
+   <*> <*> <*>
+ <*><*><*><*><*>
+"\"\"\"\|/"/"/"/"       Queen's Crown
+  "\"\"\|/"/"/"            gfj/99
+    <*><*><*>
+```
+
+=== ID: 3054715146ba05dc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 18x7 ===
+```
+          o
+       o^/|\^o
+    o_^|\/*\/|^_o
+   o\*`'.\|/.'`*/o
+    \\\\\\|//////
+jgs  {><><@><><}
+     `"""""""""`
+```
+
+=== ID: f3e80ecf98400f47 | TITLE: Untitled | ARTIST: Geraldine Jones | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 34x7 ===
+```
+     *
+   *-|-*
+   ..*..
+ *"*****"*
+" """"""" "         Religous Crown
+\*********/            gfj/99
+(((((0)))))
+```
+
+=== ID: f0e6ad7014a30c5a | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: clothing-and-accessories | SUBCATEGORY: crowns | SIZE: 27x14 ===
+```
+         o  o   o  o
+         |\/ \^/ \/|
+         |,-------.|
+       ,-.(|)   (|),-.
+       \_*._ ' '_.* _/
+        /`-.`--' .-'\
+   ,--./    `---'    \,--.
+   \   |(  )     (  )|   /
+hjw \  | ||       || |  /
+`97  \ | /|\     /|\ | /
+     /  \-._     _,-/  \
+    //| \\  `---'  // |\\
+   /,-.,-.\       /,-.,-.\
+  o   o   o      o   o    o
+```
+
+=== ID: 1a9e7922ed1dbbd9 | TITLE: Untitled | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: skirts | SIZE: 9x6 ===
+```
+  =+===
+ / |.  \
+|  |.   |
+|  |.   |
+|  |.   |
+|_/_\___|
+```
+
+=== ID: f38957116b6e779c | TITLE: Mittens | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: handwears | SIZE: 21x6 ===
+```
+  ___           ___
+ /HHH\         /HHH\
+|XXXXX| _     |XXXXX|
+|HHHHH|/H) (H\|HHHHH|
+\XXXXX/X/   \XXXXXXX/
+ ||||||'     `||||||
+```
+
+=== ID: d4dd55928ee2b459 | TITLE: Gloves | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: handwears | SIZE: 17x6 ===
+```
+  _           _
+,|||.       ,|||.
+|||||       |||||
+|||||/)   (\|||||
+\,,, /     \ ,,,/
+|___|       |___|
+```
+
+=== ID: 045a151bcea9d2a9 | TITLE: Untitled | ARTIST: llizard | CATEGORY: clothing-and-accessories | SUBCATEGORY: handwears | SIZE: 20x7 ===
+```
+  ))))(
+ /     \
+|       \    )((((
+|    |\_)   /     \
+ \___/     / ^     \
+          (_/ |    |
+   ejm        \___/
+```
+
+=== ID: 1bc62a09660e9a72 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: handwears | SIZE: 22x9 ===
+```
+        _______
+    ___/_____ _)____
+ .-'-'   ____)______)
+|    .-'    ______)__)
+|    ---    _______))
+|    `-.   _______))
+ `---.___________)
+
+VK
+```
+
+=== ID: de44d5cf83bebac0 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: handwears | SIZE: 22x9 ===
+```
+        _______
+    ___/_____ _)____
+ .-'-'   ____)____  \
+|                 \  )
+|                  )/
+|                 //
+ `---.___________/
+
+VK
+```
+
+=== ID: 3fbf82be189e2209 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: handwears | SIZE: 33x16 ===
+```
+        .-""-.           .-""-.
+       /      \         /      \
+      |       |         |       |
+      |       |         |       |
+      |       | _     _ |       |
+      ;       /`/     \`\       ;
+      |        /       \        |
+       \      /         \      /
+jgs     |    |           |    |
+        HHHHHH           HHHHHH
+        ((                   ))
+         ))    ____       __//
+        //    /.--.\    ((--'
+       ((____//    ))    ))
+        '----'    ((____//
+                   '----'
+```
+
+=== ID: 49ca20f330daa5ff | TITLE: Chef’s hat | ARTIST: Jerry Ozaniec | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 25x5 ===
+```
+ ______
+( Cook )
+ |    |
+ |    |   -Jerry Ozaniec-
+ |____|
+```
+
+=== ID: f806e5f755308cbf | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 22x5 ===
+```
+     ,~"""~.
+  ,-/       \-.
+.' '`._____.'` `.  hjw
+`-._         _,-'
+    `--...--'
+```
+
+=== ID: 6a5545d39ed52d9d | TITLE: Hat (with a feather) | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 14x6 ===
+```
+           (/;
+          (/;
+   .--..-(/;
+   |    (/;
+ __|====/=|__
+(____________)
+```
+
+=== ID: b4cd0ab68a5c4df0 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 26x6 ===
+```
+         _____
+      .-'     `-.
+     /           \
+    |-.           |
+    |  \          |
+VK  [__|__________|_______
+```
+
+=== ID: 5c350ba42b144523 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 22x6 ===
+```
+       .--------.
+      /          `.
+     |         .-. \
+     |         |  `.|
+VK   |_________|   /|\
+    (___________)  |||
+```
+
+=== ID: a21c9b5d8ae7ce19 | TITLE: Untitled | ARTIST: Tom Youderian | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 40x6 ===
+```
+      .~~~~`\~~\
+     ;       ~~ \
+     |           ;
+ ,--------,______|---.
+/          \-----`    \    Tom Youderian
+`.__________`-_______-'
+```
+
+=== ID: 6135b1fba2530126 | TITLE: Untitled | ARTIST: Bob Allison (Scarecrow) | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 34x8 ===
+```
+            .
+           /:\
+          /;:.\
+         //;:. \     -Bob Allison-
+        ///;:.. \
+  __--"////;:... \"--__
+--__   "--_____--"   __--
+    """--_______--"""
+```
+
+=== ID: 5f0211c9773c7660 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 23x8 ===
+```
+          ___
+         /\  \
+        /  \/ \
+   ___  \   O /  ___
+  /    \ \   / /    \
+ /   __ -    -  __   \
+/___/ |_________| \___\
+O                     O
+```
+
+=== ID: bfaa1fefecf5919e | TITLE: Untitled | ARTIST: Chris Jackson | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 32x9 ===
+```
+    __________
+    |        |
+    |________|
+    |        |
+    |--------|   -Chris Jackson-
+    |        |
+----|--------|----
+|                |
+------------------
+```
+
+=== ID: a1b8ad04c1769ea0 | TITLE: Untitled | ARTIST: Dan Strychalski | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 28x10 ===
+```
+         _.--._
+    _.-.'      `.-._
+  .' ./`--...--' \  `.
+  `.'.`--.._..--'   .'
+  ( (-..__    __..-'
+   ) )    ````
+  / /
+.'.'         Dan Strychalski
+`.`.
+ '^'
+```
+
+=== ID: f835936568979088 | TITLE: Untitled | ARTIST: Dan Strychalski | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 38x10 ===
+```
+                    _.--._
+               _.-.'      `.-._
+             .' ./`--...--' \  `.
+    .-.      `.'.`--.._..--'   .'
+_..'.-.`-._.'( (-..__    __..-'
+ >.'   `-...' ) )    ````
+ '           / /
+        .._.'.'        Dan Strychalski
+         >.-'
+         '
+```
+
+=== ID: 89ccc343f7d73193 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 35x11 ===
+```
+        __,--~--._
+     ,-;;;;   `;;;`\
+    /;;;;;      ;;;;`\
+  /;;;;;;     ___;;_; \
+ /;;;;;;      \_ |;|;; |
+(;;;;;;       __||_|;;;|   -Revell-
+ `\_,;;             ;_,`\
+    `\___,-----'~~~~~    `\
+       \                   )
+        `\.__             /'
+             `~~~~------~~
+```
+
+=== ID: 90d68ad102c49897 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 38x11 ===
+```
+                             .-'''''-.
+                             |'-----'|
+                             |-.....-|
+                             |       |
+                             |       |
+            _,._             |       |
+       __.o`   o`"-.         |       |
+    .-O o `"-.o   O )_,._    |       |
+   ( o   O  o )--.-"`O   o"-.`'-----'`
+jgs '--------'  (   o  O    o)
+       /////     `----------`
+```
+
+=== ID: 77322b6f83c91800 | TITLE: Untitled | ARTIST: Chris Hoffman | CATEGORY: clothing-and-accessories | SUBCATEGORY: hats | SIZE: 33x17 ===
+```
+                 _
+               /   \,
+             /       \,
+           /    ./ \.  \,
+         ./   ./     \.  \,
+ ___    _/  ./         \.  \.
+ ~-_~\ /  ./             \  \,
+    Y,`\,/                `Y `Y
+      \  \              _-~`   `\
+       ~-_~\        _-``    ___,;
+         -- Y    _-`   _-~~~
+           ~~Y,/`    /~
+            ~~ \,  /`
+              \  \`
+                -_`Y
+                  \,|
+-Chris Hoffman-
+```
+
+=== ID: 6d4aa89e535d0cdf | TITLE: Untitled | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: dresses | SIZE: 36x6 ===
+```
+ /| |\         |   |         |   |
+( \./ )       ( \ / )       (.\ /.)
+ \ : /         \\*//         \   /
+ ) : (         ))*((         ) . (
+/  :  \       ///|\\\       /  v  \
+|__:__|      ////|\\\\     /.......\
+```
+
+=== ID: f14f0da4439780fa | TITLE: Nightie | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: nightwears | SIZE: 21x14 ===
+```
+       /         \
+      /|         |\
+     | '.       .' |
+     |   '-._.-'   |
+     \     / \     /
+      ;---'   '---;
+       \         /
+        )       (
+      /`         `\
+     /             \
+jgs |               |
+    ('-._       _.-')
+    `-._ '-._.-' _.-'
+        '-./ \.-'
+```
+
+=== ID: 3ad6a94b2ba68f21 | TITLE: Untitled | ARTIST: Dan Lowe | CATEGORY: clothing-and-accessories | SUBCATEGORY: glasses | SIZE: 11x4 ===
+```
+/\     /\
+  \ _____\
+   (_)-(_)
+   Dan Lowe
+```
+
+=== ID: c6c72de7e1f6c07f | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: glasses | SIZE: 37x4 ===
+```
+        ________     ________
+  . - ~|        |-^-|        |~ - .
+{      |        |   |        |      }
+        `.____.'     `.____.'
+```
+
+=== ID: 0fb503157400436f | TITLE: Untitled | ARTIST: Przemek Borys | CATEGORY: clothing-and-accessories | SUBCATEGORY: glasses | SIZE: 27x6 ===
+```
+        _,--,            _
+   __,-'____| ___      /' |
+ /'   `\,--,/'   `\  /'   |
+(       )  (       )'
+ \_   _/'  `\_   _/   pb
+   """        """
+```
+
+=== ID: 462025a24216a3c8 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: clothing-and-accessories | SUBCATEGORY: glasses | SIZE: 26x8 ===
+```
+    __         __
+   /.-'       `-.\
+  //             \\
+ /j_______________j\
+/o.-==-. .-. .-==-.o\
+||      )) ((      ||
+ \\____//   \\____//   hjw
+  `-==-'     `-==-'
+```
+
+=== ID: 61fe4b0295cf191b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: glasses | SIZE: 27x9 ===
+```
+    _               _
+  .'_`\           .' `\
+ (_( \ \         (_( \ \
+      \ \             \ \
+jgs    \ \ ____________\ \
+        \.'====. = .===='.\
+        ((      ) (      ))
+         \\____//^\\____//
+          '----'   '----'
+```
+
+=== ID: bed89d987737a36a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: glasses | SIZE: 21x10 ===
+```
+             __
+           .'  `'.
+          /  _    |
+          #_/.\==/.\
+         (, \_/ \\_/
+          |    -' |
+          \   '=  /
+          /`-.__.'
+       .-'`-.___|__
+jgs   /    \       `.
+```
+
+=== ID: 51190856b2300090 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 5x2 ===
+```
+.-^-.
+  j
+```
+
+=== ID: 6d8daf389c5de8c7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 7x2 ===
+```
+ .-^-.
+'"'j`"`
+```
+
+=== ID: 20ede5b14cc9c6fc | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 7x3 ===
+```
+ .-^-.
+'"'|`"`
+   j
+```
+
+=== ID: f51a215e77215458 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 9x3 ===
+```
+  .-^-.
+ /_/_\_\
+' ' J ` `
+```
+
+=== ID: 3cfe42b92ba83650 | TITLE: Untitled | ARTIST: Felix Lee | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 38x4 ===
+```
+    ______......-------''''''';     =,
+-==(______------=======:::::::;======"
+          ``````-------.......;
+    -Felix Lee-
+```
+
+=== ID: 7103830446b93c14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 9x4 ===
+```
+  .-^-.
+ /_/_\_\
+' ' | ` `
+    j
+```
+
+=== ID: b668cea8e3c4bb64 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 9x4 ===
+```
+  .-'-.
+,".,-.,".
+    |
+    J
+```
+
+=== ID: fe8c1ce77f00a935 | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 9x4 ===
+```
+.-""""-.
+'""||""`
+  ,||
+  `-' crw
+```
+
+=== ID: 64095abfe3647289 | TITLE: Untitled | ARTIST: Daniel C. Au | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 27x6 ===
+```
+   ____|____
+ /'  U ^    `\
+|/\/\/\/\/\/\/|
+       |
+       |     -Daniel C. Au-
+       J
+```
+
+=== ID: c8d688f079897f56 | TITLE: Untitled | ARTIST: llizard | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 16x7 ===
+```
+          .
+         _|_
+      .-'   '-.
+     /         \
+     ^^^^^|^^^^^
+          |
+ejm97     \_/
+```
+
+=== ID: 953891a670336ccd | TITLE: Untitled | ARTIST: unknown | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 14x7 ===
+```
+     _.._
+ .-""    ""-.
+:---.-__-.---;
+      ||
+      ||
+    ,.||
+     `-' crw
+```
+
+=== ID: bbd329b8ec2622d7 | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 17x9 ===
+```
+      ,.!.,
+   .'`     `'.
+ .'           '.
+:.'`'..'`'..'`'.:
+ `    ` |  `    `
+        |
+        |
+        |
+        O lc
+```
+
+=== ID: 973b5ac07df2da16 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 21x11 ===
+```
+  {{}
+ {( )}  .-^-.
+   H   /_/_\_\
+ .' `.' ' | ` `
+/( ) )\___j
+\ ) (
+ ( v )
+  \|/
+  (|)
+  '|`
+___|______________ VK
+```
+
+=== ID: eec1cf9759d73c95 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 23x12 ===
+```
+        __.|.__
+    .-"'..':`..`"-.
+  .' .' .  :  . `. `.
+ / .   .   :   .   . \
+/_ _._ _.._:_.._ _._ _\
+  '   '    |    '   '
+           |
+           |
+           |
+           |
+           |
+         `=' mh
+```
+
+=== ID: 76ba2c134cae1d3b | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 23x12 ===
+```
+        __.|.__
+    .n887.d8`qb`"-.
+  .d88' .888  q8b. `.
+ d8P'  .8888   .88b. \
+d88_._ d8888_.._9888 _\
+  '   '    |    '   '
+           |
+           |
+           |
+           |
+           |
+         `=' mh
+```
+
+=== ID: 1112ad1a162b90f1 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 16x14 ===
+```
+         .-^-.
+        /_/_\_\
+       ' ' | ` `
+           j
+    |||||  w
+   ||. .|| |
+  |||\=/|||/
+  |.-- --./
+  /(.) (.)
+  \ ) . (
+  '(  v  )
+    \ | /
+    ( | )
+VK  '- -`
+```
+
+=== ID: 86499b4e60a63bff | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: clothing-and-accessories | SUBCATEGORY: umbrellas | SIZE: 32x16 ===
+```
+            ___()___
+       _.-'' ,-'`-. ``-._
+    ,-'    ,'      `.    `-.
+  ,'     ,'          `.     `.
+ /      /              \      \
+/_     /                \     _\
+  ``-./_..---'''|``---.._\,-''
+                |
+                |
+                |
+                |
+                |
+                |
+                |
+             ,  |
+             `..' SSt
+```
+
+=== ID: 46656b08e79bdaa0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: bra | SIZE: 21x2 ===
+```
+          )\_ _/(
+jgs   --=(__/^\__)==-
+```
+
+=== ID: e1a7ceff2fc71b7a | TITLE: Untitled | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: overalls | SIZE: 9x6 ===
+```
+  _   _
+ /)`Y´(\
+//|   |\\
+  | . |
+  | | |
+  |_|_|
+```
+
+=== ID: c7139acb647045b5 | TITLE: Untitled | ARTIST: Colin Douthwaite | CATEGORY: clothing-and-accessories | SUBCATEGORY: overalls | SIZE: 7x8 ===
+```
+ _   _
+||   ||
+||___||
+| o o |
+|     |
+|  A  |
+|__|__|
+cfbd
+```
+
+=== ID: 036c60c3b5a0fda6 | TITLE: Untitled | ARTIST: Felix Lee | CATEGORY: clothing-and-accessories | SUBCATEGORY: underwear | SIZE: 26x4 ===
+```
+,==========,
+|   |  |   |
+`-./    \.-'   -Felix Lee-
+   `.__.'
+```
+
+=== ID: 3b934d566ee4762c | TITLE: Underpants | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: underwear | SIZE: 18x5 ===
+```
+  .--------------.
+   \-.        .-/
+    \ \      / /
+jgs  \ \    / /
+      `-'--'-`
+```
+
+=== ID: 9b9cfbec6694cd4e | TITLE: Underwear | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: underwear | SIZE: 20x5 ===
+```
+      .,.,.,.,.,.,.
+     [_           _]
+     | '-.     .-' |
+      \   \   /   /
+jgs    '.__\_/__.'
+```
+
+=== ID: 53d27074a6119dd8 | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: clothing-and-accessories | SUBCATEGORY: underwear | SIZE: 19x6 ===
+```
+###################
+( """%()()()()%"" )
+ \   %)()()()%   /
+  \   %)()()%   /
+   \   %)()%   /
+    `.__%_%__,'
+```
+
+=== ID: 6cf683253f39a609 | TITLE: Underwear | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: underwear | SIZE: 21x6 ===
+```
+     _______________
+    |===============|
+    |     /```\     |
+    |    /    /\    |
+    '--._\   | /_.--'
+jgs      `\__\/`
+```
+
+=== ID: bca969707d3183a0 | TITLE: Trousers (or jeans) | ARTIST: Riitta Rasimus | CATEGORY: clothing-and-accessories | SUBCATEGORY: pants | SIZE: 7x6 ===
+```
+,==c==.
+|_/|\_|
+| ´|` |
+|  |  |
+|  |  |
+|__|__|
+```
+
+=== ID: 7423430583de1e6e | TITLE: Trousers | ARTIST: Joan G. Stark (Spunk) | CATEGORY: clothing-and-accessories | SUBCATEGORY: pants | SIZE: 19x16 ===
+```
+     _____________
+    [_I_I[L]=_I_I_]
+    /     | :     \
+    |    /|  \    |
+    |   | '-  |   |
+     \  | /^\ |  /
+     |  | | | |  |
+     |  | | | |  |
+     |  | | | |  |
+     \  | | | |  /
+     / -|-| |-|- \
+     |  | | | |  |
+     |  | | | |  |
+     |  | | | |  |
+     |__|_| |_|__|
+jgs  [____] [____]
+```
+

@@ -1,0 +1,44 @@
+ASCII ART ARCHIVE REFERENCE LIBRARY SUMMARY
+==================================================
+
+Source: https://www.asciiart.eu
+Max Column Width Constraint: <= 40 characters
+Total Valid Artworks Stored: 3,505
+Total Categories: 32
+
+Category Breakdown:
+--------------------------------------------------
+  animals                       :   563 cards
+  one-line                      :   488 cards
+  people                        :   180 cards
+  miscellaneous                 :   152 cards
+  sports-and-outdoors           :   138 cards
+  weapons                       :   138 cards
+  cartoons                      :   127 cards
+  art-and-design                :   126 cards
+  electronics                   :   124 cards
+  plants                        :   118 cards
+  mythology                     :   113 cards
+  buildings-and-places          :   111 cards
+  computers                     :   106 cards
+  holiday-and-events            :    99 cards
+  clothing-and-accessories      :    95 cards
+  ascii-dividers                :    89 cards
+  religion                      :    89 cards
+  television                    :    88 cards
+  vehicles                      :    72 cards
+  space                         :    67 cards
+  books                         :    65 cards
+  comics                        :    57 cards
+  food-and-drinks               :    53 cards
+  music                         :    51 cards
+  nature                        :    46 cards
+  movies                        :    40 cards
+  toys                          :    40 cards
+  logos                         :    37 cards
+  video-games                   :    18 cards
+  artists                       :    10 cards
+  ascii-patterns                :     3 cards
+  ascii-borders                 :     2 cards
+--------------------------------------------------
+  TOTAL                         :  3505 cards

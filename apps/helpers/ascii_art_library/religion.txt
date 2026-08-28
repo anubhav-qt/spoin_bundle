@@ -1,0 +1,1650 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: RELIGION
+# Total artworks in category fitting <=40 cols: 89
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 9cce146421bb356b | TITLE: Saint Nicholas or St. Patrick | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: saints | SIZE: 25x26 ===
+```
+                  .--.
+                 /.''.\
+                 ||   \_)
+          /^\    '.'--,
+        .'_|_'.    `()
+       <   |   >    ||
+        \_____/     ||
+        {/a a\}     ||
+       {/-.^.-\}   (_|
+      .'{  `  }'-._/|;\
+     /  {     }  /; || |
+    /`'-{     }-';  || |
+   ; `'=|{   }|=' _/|| |
+   |   \| |~| |  |/ || |
+   |\   \ | | |  ;  || |
+   | \   ||=| |=<\  || |
+   | /\_/\| | |  \`-||_/
+   '-| `;'| | |  |  ||
+jgs  |  | | | |  |  ||
+     |  |+| |+|  |  ||
+     |  """ """  |  ||
+     |_ _ _ _ _ _|  ||
+     |,;,;,;,;,;,|  ||
+     `|||||||||||`  ||
+      |||||||||||   ||
+      `"""""""""`   ""
+```
+
+=== ID: b8592a8047eb646d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: saints | SIZE: 24x27 ===
+```
+                  .---.
+                 /.'"'.\
+                 \\   ||
+         /^\    ,_),-','
+       .'_|_'.     ()`
+      <   |   >    ||
+       \_____/     ||
+       {/a a\}     ||
+      {/-.^.-\}   (_|
+     .'{  `  }'-._/|;\
+    /  {     }  /; || |
+   /`'-{     }-';  || |
+  ; `'=|{   }|=' _/|| |
+  |   \| |~| |  |/ || |
+  |\   \ | | |  ;  || |
+  | \   ||=| |=<\  || |
+  | /\_/\| | |  \`-||_/
+  '-| `;'| | |  |  ||
+jgs |  |+| |+|  |  ||
+    |  | | | |  |  ||
+    |  """ """  |  ||
+    |           |  ||
+    |_ _ _ _ _ _|  ||
+    |,;,;,;,;,;,|  ||
+    `|||||||||||`  ||
+     |||||||||||   ||
+     `"""""""""`   ""
+```
+
+=== ID: 01bb1b7ff4706095 | TITLE: Yin-Yang | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 9x5 ===
+```
+ ,-,-.
+/ (_o \
+\ o ) /
+ `-'-'
+      hjw
+```
+
+=== ID: 05030ca2a67c70e8 | TITLE: Untitled | ARTIST: Michael Naylor | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 16x7 ===
+```
+  _-==---_
+ -===  _  -
+-==== ( )  -
+-=====     -
+-==( )=    -
+ -=====  _-
+   -==---     mn
+```
+
+=== ID: 2b011c2c9ae3bf26 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 19x9 ===
+```
+     _.ooo-._   sgj
+   .OOOP   _ '.
+  dOOOO   (_)  \
+ OOOOOb         |
+ OOOOOOb.       |
+ OOOOOOOOb      |
+  YOO(_)OOO    /
+   'OOOOOY  _.'
+jgs  '""""''
+```
+
+=== ID: f3fd8ae0b94ea19d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 19x9 ===
+```
+     _.----._   sgj
+   .'   /  _ '.
+  /    |  (_)  \
+ |     \        |
+ |      '.      |
+ |    _   `\    |
+  \  (_)   |   /
+   '._    / _.'
+jgs   '----'
+```
+
+=== ID: 4ec09b0085e17f22 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 27x13 ===
+```
+      _,,ddF"""Ybb,,_
+    ,d@#@#@#@g,   `"Yb,
+  ,d#@#V``V@#@#b      "b,
+ d@#@#I    I@#@8        "b
+d@#@#@#A..A@#@#P         `b
+8#@#@#@#@#@#@8"           8
+8@#@#@#@#@#@J             8
+8#@#@#@#@#P               8
+Y@#@#@#@#P    ,db,       ,P
+ Y@#@#@#@)    @DWB      aP
+  "Y#@#@#b    `69'    aP"
+    "Y@#@#g,,     _,dP"
+      `""YBBgggddP""'
+```
+
+=== ID: fbef6df00576010d | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 29x13 ===
+```
+       _..oo8"""Y8b.._
+     .88888888o.    "Yb.
+   .d888P""Y8888b      "b.
+  o88888    88888)       "b
+ d888888b..d8888P         'b
+ 88888888888888"           8
+(88DWB8888888P             8)
+ 8888888888P               8
+ Y88888888P     ee        .P
+  Y888888(     8888      oP
+   "Y88888b     ""     oP"
+     "Y8888o._     _.oP"
+       `""Y888boodP""'
+```
+
+=== ID: e137ffc84fda452c | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: religion | SUBCATEGORY: yin-and-yang | SIZE: 38x22 ===
+```
+               __....__
+           .gd$$$$$$$$$$bp.
+        .-"^^^T$$$$$$$$$$$$$p.
+      .'       "^T$$$$$$$$$$$$b.
+    .'            `T$$$$$$$$$$$$b.
+   /     .d$$b.     T$$$$$$$$$$$$$b
+  /     d$$$$$$b     $$$$$$$$$$$$$$b
+ :     :$$$$$$$$;    :$$$$$$$$$$$$$$;
+ ;      T$$$$$$P     :$$$$$$$$$$$$$$$
+:        "^$$^"      $$$$$$$$$$$$$$$$;
+;                   d$$$$$$$$$$$$$$$$$
+|                 .d$$$$$$$$$$$$$$$$$$
+;                d$$$$$$$$$$$$$$$$$$$$
+:               :$$$$$$P^""^T$$$$$$$$;
+ ;              $$$$$$P      T$$$$$$$
+ :              $$$$$$        $$$$$$;
+  \             :$$$$$b      d$$$$$P
+   \             T$$$$$bp..gd$$$$$P
+    `.            `T$$$$$$$$$$$$P'
+      `.            "^$$$$$$$$P'
+        "-.            "^^T$P'
+   bug     "--...____...--"
+```
+
+=== ID: a37934b04e13ece7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 34x7 ===
+```
+     .========.        .========.
+    // I .'..' \      // VI.'.,".\
+    || II .'..'|      || VII..'..|
+    || III .'."|      || VIII,'.'|
+    || IV ,','.|      || IX.'".'.|
+    || V '..'.'|      || X .'..',|
+jgs .\_________/      .\_________/
+```
+
+=== ID: db58882b0d831d6f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 11x7 ===
+```
+     .-.
+   __| |__
+  [__   __]
+     | |
+     | |
+jgs  | |
+     '-'
+```
+
+=== ID: 36e9a4edb6ca3a93 | TITLE: Bible | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 19x7 ===
+```
+          _______
+         /       /_
+        /  -/-  / /
+       /   /   / /
+      /_______/ /
+jgs  ((______| /
+      `"""""""`
+```
+
+=== ID: 1d0d46eabea1b23f | TITLE: Church | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 17x7 ===
+```
+ *      +
+        A
+     __/_\__  *
+    /\-'o'-/\
+   _||:<_>:||_
+  /\_/=====\_/\
+__|:_:_[I]_:_:|__
+```
+
+=== ID: 216d062c27dcec1c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 14x9 ===
+```
+      |V|
+   .::| |::.
+  ::__| |__::
+ >____   ____<
+  ::  | |  ::
+   '::| |::'
+      | |
+      | |
+jgs   |A|
+```
+
+=== ID: f8977d5ed396941a | TITLE: Praying hands | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 15x10 ===
+```
+       _.-._
+     /| | | |_
+     || | | | |
+     || | | | |
+    _||     ` |
+   \\`\       ;
+    \\        |
+     \\      /
+jgs  | |    |
+     | |    |
+```
+
+=== ID: b71fe6a6b7011465 | TITLE: Praying hands | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 18x10 ===
+```
+          _.-/`)
+         // / / )
+      .=// / / / )
+     //`/ / / / /
+    // /     ` /
+   ||         /
+    \\       /
+     ))    .'
+jgs //    /
+         /
+```
+
+=== ID: 7fc73644627810c0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 14x13 ===
+```
+         ,   ,
+        /////|
+       ///// |
+      /////  |
+     |~~~| | |
+     |===| |/|
+     | B |/| |
+     | I | | |
+     | B | | |
+     | L |  /
+     | E | /
+     |===|/
+jgs  '---'
+```
+
+=== ID: ac61a5460621fa50 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 22x13 ===
+```
+         .:.:.:.
+        / .***. \
+       | / ,,, \ |
+       | \/6.6\/ |
+       | (  _  ) |
+      /  /`"""`\  \
+    .:.:( (/|\) ):.:.
+     ':'/':_A_:'\':'
+       /         \
+      /           \
+jgs  /             \
+    .:.:.:.:.:.:.:.:.
+   ':':':':':':':':':'
+```
+
+=== ID: 356b9d722edaee3c | TITLE: Crucified Jesus | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 20x13 ===
+```
+ _      xxxx      _
+/_;-.__ / _\  _.-;_\
+   `-._`'`_/'`.-'
+       `\   /`
+        |  /
+       /-.(
+       \_._\
+        \ \`;
+         > |/
+        / //
+        |//
+ jgs    \(\
+         ``
+```
+
+=== ID: 0dcc0e20ca8669b2 | TITLE: Crosses at Calvary | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 27x13 ===
+```
+               |
+           \       /
+             .---.
+        '-.  |   |  .-'
+          ___|   |___
+     -=  [           ]  =-
+         `---.   .---'
+      __||__ |   | __||__
+      '-..-' |   | '-..-'
+        ||   |   |   ||
+        ||_.-|   |-,_||
+      .-"`   `"`'`   `"-.
+jgs .'                   '.
+```
+
+=== ID: 674862dcb2fbc240 | TITLE: praying | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 21x14 ===
+```
+            .---.
+           /-====)
+           | / '(
+          / /  _/
+          | |-(    _
+          / |  \  //|
+         /  \   \/\/
+        |    |\   /
+        `-;./ ;-'
+          |    \
+          |     \
+        _/       |
+jgs .--/         /
+    `''---`-----`
+```
+
+=== ID: dc3ed59f4f9728ed | TITLE: Virgin Mary | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 16x22 ===
+```
+       * * *
+     *       *
+    *  ,;;;,  *
+     */;;-;;\*
+     /;/   \;\
+    /);|)-(|;;\
+   ;;;/ `"` \;(;
+   |(|\_/|\_/|;|
+   |;|_|/^\|_|;|
+   |;;\=:=:=/;)|
+   |:;| : : |;:|
+   |);\ : : /;;|
+   ;;;| _:_ |;(;
+   \;;\  |  /;;/
+    |(;\   /;;|
+     \;;| |;;/
+      |;| |;|
+     .'`-.-''.
+jgs /   .-.  (\
+   |   Q   \__)|
+   '-.__   __.-'
+        ```
+```
+
+=== ID: 1da5f928665ec910 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 34x24 ===
+```
+             .======.
+             | INRI |
+             |      |
+             |      |
+    .========'      '========.
+    |   _      xxxx      _   |
+    |  /_;-.__ / _\  _.-;_\  |
+    |     `-._`'`_/'`.-'     |
+    '========.`\   /`========'
+             | |  / |
+             |/-.(  |
+             |\_._\ |
+             | \ \`;|
+             |  > |/|
+             | / // |
+             | |//  |
+             | \(\  |
+             |  ``  |
+             |      |
+             |      |
+             |      |
+             |      |
+ \\jgs _  _\\| \//  |//_   _ \// _
+^ `^`^ ^`` `^ ^` ``^^`  `^^` `^ `^
+```
+
+=== ID: aacaaf613ea1d8f0 | TITLE: The Virgin Mary | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 21x29 ===
+```
+        .***.
+       <.:::.>
+       /:::::\
+       |/_ _\|
+       || / ||
+       ||\'/||
+      /:|~=~|:\
+     /::|  :|::\
+    /:::|:  |:::\
+   ,::::| : |::::,
+   ;::::|: :|::::;
+  ,:::::|~~~|:::::,
+  ;:::::\ : /:::::;
+ /:=:::::|:|:::::=:\
+//- |\:::/ \:::/| -\\
+|^|||: `-' ::`-'|||^|
+|; ' : : :   : : ' ;|
+||: ::  : :: : :: :||
+|| : :: :: :: : : :||
+||::   :  :  :: : :||
+| \ ::  :: : : :: / |
+ \/: :  :    :  : \/
+  \ :  :: ::  :  _/
+   \  :  :  :: :\/
+    `\ :: :  : /`
+  jgs \ : :: :/
+     .-"(___)"-.
+    /"=,   ,=, '\
+   |    "="  {}  |
+```
+
+=== ID: 3dca494744a04cda | TITLE: Grail | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: christianity | SIZE: 33x32 ===
+```
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ : : : : : : : : : : : : : : : @
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ |                             |
+ |  \|/        %%%        \|/  |
+ |  -t-     %%%%%%%%%     -t-  |
+ |  /|\     \  %%%  /     /|\  |
+ |         \ / %%% \ /         |
+ \        - |  %%%  | -        /
+  \       - |  %%%  | -       /
+   \       / \     / \       /
+    \        / --- \        /
+     \         ! !         /
+      \ __ ___ __ ___ ___ /
+      ( ___ ___ __ _ ___  )
+       (88888888888888888)
+        --\ --------- /--
+          ((((((o))))))
+           \         /
+            | | | | |
+            | | | | |
+            | | | | |
+            | | | | |
+            | | | | |
+            | | | | |
+            | | | | |
+            | | | | |
+          _(IIIIIIIII)_
+       __/_____________\__
+  ____/___________________\____
+ /_____________________________\
+(_______________________________)
+```
+
+=== ID: 28b94eece5d66fad | TITLE: Torah scroll | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: judaism | SIZE: 33x7 ===
+```
+                         ___
+        __              /.-.\
+       /  )_____________\\  Y
+      /_ /=== == === === =\ _\_
+     ( /)=== == === === == Y   \
+      `-------------------(  o  )
+hjw                        \___/
+```
+
+=== ID: 4318a725b808af23 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: judaism | SIZE: 17x10 ===
+```
+       /\
+      //\\
+ ____//__\\____
+ \.-//----\\-,/
+  \v/      \v/
+  /\\      //\
+ //_\\____//_\\
+'----\\--//----`
+      \\//
+       \/     hjw
+```
+
+=== ID: 84af7e5a7c5c3aeb | TITLE: Bar Mitzvah | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: judaism | SIZE: 34x15 ===
+```
+          ___,,
+        / /\\\\\
+        \|'    |
+         c   6_6
+       .-;\___/.
+     .'  |\/=\/:`.
+    /    |     |  \
+   |     |     |   |
+   |    _/     |   |   ___
+   j_ _/  `-._  \  |  /.-.\
+  /  )`-..___/-._\_j__\\  Y
+ /_ /== === =///\== === \ _\_
+( /)== === === === === ==Y   \
+ `----------------------(  o  )
+                         \___/ hjw
+```
+
+=== ID: b60ef2366ef676cb | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: judaism | SIZE: 33x20 ===
+```
+              .....
+         .d$$$$*$$$$$$bc
+      .d$P"    d$$    "*$$.
+     d$"      4$"$$      "$$.
+   4$P        $F ^$F       "$c
+  z$%        d$   3$        ^$L
+ 4$$$$$$$$$$$$$$$$$$$$$$$$$$$$$F
+ $$$F"""""""$F""""""$F"""""C$$*$
+.$%"$$e    d$       3$   z$$"  $F
+4$    *$$.4$"        $$d$P"    $$
+4$      ^*$$.       .d$F       $$
+4$       d$"$$c   z$$"3$       $F
+ $L     4$"  ^*$$$P"   $$     4$"
+ 3$     $F   .d$P$$e   ^$F    $P
+  $$   d$  .$$"    "$$c 3$   d$
+   *$.4$"z$$"        ^*$$$$ $$
+    "$$$$P"             "$$$P
+      *$b.             .d$P"
+        "$$$ec.....ze$$$"
+            "**$$$**""
+```
+
+=== ID: cf5a12bb98add2d9 | TITLE: Hannukka | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: judaism | SIZE: 38x20 ===
+```
+                  __
+ __  __  __  __  \__/  __  __  __  __
+\__/\__/\__/\__/  )(  \__/\__/\__/\__/
+ )(  )(  )(  )(   )(   )(  )(  )(  )(
+ )(  )(  )(   \\__)(__//   )(  )(  )(
+ )(   \\  \\   `--)(--'   //  //   )(
+  \\   \\  \\_____)(_____//  //   //
+   \\   \\  `-----)(-----'  //   //
+    \\   \\_______)(_______//   //
+     \\   `-------)(-------'   //
+      \\__________)(__________//
+       `----------)(.---------'
+                  )(
+                 _/\_
+                 >()<
+                  \/
+                  )(
+                 (())
+            ___.-"^^"-.___
+           '==============`    hjw
+```
+
+=== ID: 60968e95f237e787 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: religion | SUBCATEGORY: other | SIZE: 18x10 ===
+```
+  _____  _  _____
+ (___  \( )/  ___)
+   (___/")|\___)
+      ( | | )
+       \!' /
+       / .'\
+       \|/ /
+        /.<
+VK     (| |)
+        `-'
+```
+
+=== ID: 998dd9e4ed7831c8 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: religion | SUBCATEGORY: other | SIZE: 19x12 ===
+```
+   _____  _  _____
+  (___  \( )/  ___)
+    (___ | | ___)
+       /"| ("\
+      ( (| |) )
+       `.!' .'
+        / .'\
+        \|/ /
+         /.<
+VK      (| |)
+         | '
+         `-'
+```
+
+=== ID: 06244dfab1bdbe7d | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: other | SIZE: 17x12 ===
+```
+    _     _
+   /.\   ( )
+  / T \   \\
+  \,-./    \
+  ( oo)  /\{}
+   \_=/ /  \ \
+  //  \/ ,'   \
+ ||    |'      \
+ ||    |        \
+ m|    |
+  |____|
+    `-`-
+```
+
+=== ID: 058e6149a7b77f76 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: religion | SUBCATEGORY: other | SIZE: 21x15 ===
+```
+     _____  _  _____
+    (___  \( )/  ___)
+      (___ | | ___)
+       /")`| |'("\
+      | |  | |  | |
+       \ \_| |_/ /
+        `._!' _.'
+          / .'\
+         | / | |
+          \|/ /
+           /.<
+          (| |)
+ VK        | '
+           | |
+           `-'
+```
+
+=== ID: da44f9978352d6b5 | TITLE: Priest | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 22x14 ===
+```
+          .---.
+         / __ /\
+        | /  `\ |
+        \| . . |/
+        (   _\  )
+         |  -  |
+         \  .  /
+         |'---'|
+        /'. _ .'\
+     .-`-._|_|_.-`-.
+jgs /`    \   /     `\
+           `|'
+           -|-
+            |
+```
+
+=== ID: d01ce0e40fb3ef5e | TITLE: Pope | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 13x15 ===
+```
+          /
+     /\   |
+    /  \  |/
+   |    | |>
+   \____/ |
+   ( .. ) |
+   /\__/\ |
+  /\ qp /\|
+ /  |  |  |
+/|  |db| /\`\
+| \ |  | \|_|
+\  \|qp|  |
+ \__/  |  |
+ |/||db|  |
+ |  |  |  |
+```
+
+=== ID: ba8883402be9a44f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 38x19 ===
+```
+                 ___
+                /___\
+               |/. .\|
+               (   > )
+                \ - /
+                _)_(_
+              .'     '.
+             /.-.___.-.\
+             [_________]
+              |       |
+              |   ,   |
+              |  -|-  |
+              |   |   |
+              |       |
+              |       |
+              |       |
+             .---------.
+         __,-'---------'-,__
+__jgs___|___________________|_________
+```
+
+=== ID: 0d833d84edc5be94 | TITLE: Rabbi | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 20x20 ===
+```
+              .--.
+             /_`-.|
+            <    )/
+             L_.'/
+            _;-"``\
+     _,__.-'||     ;
+,_  \__| || ||     |
+|_`"-._ \|| ||     |
+ |`"-._| || ||     |
+ |    |  || ||     |
+ |    |  || ||    ;'
+ |    |  || ||_,-'|
+ |    |  |{o};|   |
+ |    |  `))` |   |
+ |    |   ((  |   |
+ |    |    )  |   |
+ j    |   (   |   |
+ g    |    `  |   |
+ s    |      _|___|
+ |____|     (___._|
+```
+
+=== ID: 645c1579e62594e3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 16x20 ===
+```
+         ___
+        /___\
+       |/. .\|
+       (   > )
+        \ < /
+         )_(
+       .;_u_;.
+      /       \
+     ; / _|_ \ ;
+     | |  |  | |
+     | \  '  / |
+     | /\   /\ |
+     |/\/   \/\|
+     `|       |`
+      |       |
+      `;""""";`
+       |     |
+jgs    |_____|
+        / | \
+       (_/ \_)
+```
+
+=== ID: 2f1e6eeb6a3efb76 | TITLE: Untitled | ARTIST: Zotiel R. Bell | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 29x20 ===
+```
+            ,-----.
+           #,-. ,-.#
+          () a   e ()
+          (   (_)   )
+          #\_  -  _/#
+        ,'   `"""`    `.
+      ,'      \X/      `.
+     /         X     ____\
+    /          v   ,`  v  `,
+   /    /         ( <==+==> )
+   `-._/|__________\   ^   /
+  (\\)  |______@____\  ^  /
+    \\  |     ( )    \ ^ /
+     )  |             \^/
+    (   |             |v
+   <(^)>|             |
+     v  |             |
+        |             |
+ZOT     |_.--.__ .--._|
+          `==='  `==='
+```
+
+=== ID: ab63195bb514b7b3 | TITLE: Minister | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 26x22 ===
+```
+           .---.
+         /` ___|`\
+         |_/    \|
+         (  -/-  )
+          \_ - _/
+         .-'|_|'-.
+        /         \
+       /     O     \
+      / _____!_____ \
+     /.-------------.\
+     \|     ,;,     |/
+      |     ;;;     |
+      |  ;;;;;;;;;  |
+      |   `';;;'`   |
+      |     ;;;     |
+      |     ;;;     |
+      |     :::     |
+      |     ';'     |
+      |             |
+     _| _  __   __ _|_
+jgs_/ _  __  ___  __ _\_
+ _/ __  ___  _ ___ __ _ \_
+```
+
+=== ID: fb8e5e84f890490b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 24x27 ===
+```
+                  .---.
+                 /.'"'.\
+                 \\   ||
+         /^\    ,_),-','
+       .'_|_'.     ()`
+      <   |   >    ||
+       \_____/     ||
+       {/a a\}     ||
+      {/-.^.-\}   (_|
+     .'{  `  }'-._/|;\
+    /  {     }  /; || |
+   /`'-{     }-';  || |
+  ; `'=|{   }|=' _/|| |
+  |   \| |~| |  |/ || |
+  |\   \ | | |  ;  || |
+  | \   ||=| |=<\  || |
+  | /\_/\| | |  \`-||_/
+  '-| `;'| | |  |  ||
+jgs |  |+| |+|  |  ||
+    |  | | | |  |  ||
+    |  """ """  |  ||
+    |           |  ||
+    |_ _ _ _ _ _|  ||
+    |,;,;,;,;,;,|  ||
+    `|||||||||||`  ||
+     |||||||||||   ||
+     `"""""""""`   ""
+```
+
+=== ID: 4f900f2e3e8dd30f | TITLE: Tiny angels | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 17x3 ===
+```
+     _        _
+   (\o/)    {\o/}
+jgs /_\      /_\
+```
+
+=== ID: 61de3e7def8a1de7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 14x5 ===
+```
+         ==
+      <^\()/^>
+       \/  \/
+jgs     /  \
+        `''`
+```
+
+=== ID: 8ba8ee6ea5730ba4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 14x6 ===
+```
+____ <==> ____
+\___\(**)/___/
+ \___|  |___/
+     L  J
+     |__|
+      vv
+```
+
+=== ID: bf7a549a43f43554 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 13x7 ===
+```
+   -=-
+(\  _  /)
+( \( )/ )
+(       )
+ `>   <'
+ /     \  hjw
+ `-._.-'
+```
+
+=== ID: 255aba9aac65e1f2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 12x7 ===
+```
+      ===
+   (`\(")/`)
+    > /~\ <
+    (// \\)
+     `| |`
+jgs   |_|
+      ' '
+```
+
+=== ID: b4a02896371f9caf | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 12x8 ===
+```
+   -=-
+(\  _  /)
+(`\(")/')
+(`/<v>\')
+ \\/^\//
+  /   \  hjw
+ /     \
+ `-._.-'
+```
+
+=== ID: 2328631004d1cd80 | TITLE: Untitled | ARTIST: Marilyn Cox | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 17x8 ===
+```
+   ____
+(\  __  /)
+( \(__)/ )
+ ( /<>\ )
+  (\/\/)  Marilyn
+   /  \     Cox
+  (    )
+   ~~~~
+```
+
+=== ID: 03185719b2a037c0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 13x8 ===
+```
+      _  ===
+     ( `\( )
+      `> /~\*
+      (_/ /\I
+        \ \
+jgs     / /
+        \/
+        `
+```
+
+=== ID: feee42d22136b6a1 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 13x8 ===
+```
+  {\  ***  /}
+  {{\  _  /}}
+  {{{\(_)/}}}
+  {{{(_j_)}}}
+   {{{/ \}}}
+    {/   \}
+jgs /     \
+   (_______)
+```
+
+=== ID: b2fee3501d50bbe6 | TITLE: angel on a cloud | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 21x9 ===
+```
+        _ === _
+       / \(_)/ \
+       | /   \ |
+       | \\ // |
+       \_/   \_/
+   .--" /     \ `"-.
+  (   ( '.___.'   ,')
+   (__,-.       )--'
+jgs   '.____)--'
+```
+
+=== ID: 88444109f980f8d8 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 16x9 ===
+```
+      __ -=- __
+     /-.\//\/.-\
+     |  \\_//  |
+     |  / Y \  |
+     | //)=(\\ |
+     |/` | | `\|
+     | _/| |\_ |
+     |/  | |  \|
+jgs      |_|
+```
+
+=== ID: a6e4d97761560564 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 23x10 ===
+```
+     __/)     (\__
+  ,-'~~(   _   )~~`-.
+ /      \/'_`\/      \
+|       /_(_)_\       |
+|     _(/(\_/)\)_     |
+|    / // \ / \\ \    |
+ \  | ``  / \ ''  |  /
+  \  )   /   \   (  /
+   )/   /     \   \(
+   '    `-`-'-'    `
+```
+
+=== ID: 9b864aeaeabcbe0c | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 20x10 ===
+```
+       ===
+  (`\,;+++;,/`)
+ (- (((^.^))) -)
+(-   ))\-/((   -)
+(-   (() ())   -)
+ \   `/`@`\`   /
+  \  /     \  /
+   \/       \/
+   /         \
+  /_/_/_|_\_\_\  ldb
+```
+
+=== ID: bb7bf6f70fa0c498 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 17x11 ===
+```
+       -==-
+   {\  ssss  /}
+  {  \sS""Ss/  }
+ {   SS\__/SS   }
+  {   /`\/`\   }
+   {_| (  ) |_}
+      \/)(\/
+      |    |
+      |    |
+jgs  /      \
+     `""""""`
+```
+
+=== ID: 3d54b41fe5949113 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 18x14 ===
+```
+      ******
+        __
+      /`__`\
+  .=.| ('') |.=.
+ /.-.\ _)(_ /.-.\
+|:    / ~~ \    :|
+\ :  | (__) |  : /
+ | :  \_/\_/  : |
+ |:  /|    |\  :|
+ \_/` |    | `\_/
+      |    |
+      |    |
+ jgs  |~~~~|
+      '----'
+```
+
+=== ID: 29e3cbdf29db2d81 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 16x14 ===
+```
+       <***>
+    _  //^\\  _
+   / \/('_')\/ \
+   |  \/`-'\/  |
+   |  /  ,  \  |
+   | ( -.!.- ) |
+   |  './_\.'  |
+   |   |   |   |
+   |   |   |   |
+   |  /|   |\  |
+   |/' |   | `\|
+   '  /     \  '
+jgs  /       \
+     `"""""""`
+```
+
+=== ID: 35171c355551b3fb | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 15x12 ===
+```
+       O
+       _
+---\ _|.|_ /---
+ ---|  |  |---
+    |_/ \_|
+     |   |
+     |   |
+     |___|
+      | |
+      / \
+
+DELUXE (Doug)
+```
+
+=== ID: a3a69f7e102352da | TITLE: Untitled | ARTIST: Ojosh!ro | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 31x18 ===
+```
+             .---.
+            / ,-- \
+    .--.   ( (^_^) )   .--.
+  ,'    \  (.-`-'(_)  /    `.
+ /       `-/ \ `.  \-'       \
+: (_,' .  / (.\_ ") \  . `._) :
+|   `-'(_,\ \     / /._)`-'   |
+|       .  `.\,O,'.'  .   :   |
+|   . : !   /\_  /\   ! . !   |
+| ! |-'-|  : ""T"" :  |-'-| | |
+| |-'   `-'|   H   |`-'   `-| |
+`-'        |   H .:|        `-'
+           | . H !||
+           | : H :!|
+           | ! H !||
+           | | H |||
+           | | H |||  Ojo 98
+           /_,'V.L|.\
+```
+
+=== ID: 28a935caa543f13d | TITLE: Angel w/candle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 19x18 ===
+```
+  .-. <*****> .-.
+ / _ \.-----./ _ \
+| /:\(((((()))/ \ |
+||' :(( '_' )): `||
+||:   \`---'/   :||
+||  :/'  )  `\:  ||
+||: /   (,)   \  ||
+|| / ,__[_]__, \:||
+||:\___)_=_(___/ ||
+|| : ||     ||:  ||
+||  / |     | \  ||
+||:|  |     |  |:||
+| /   |     |   \ |
+|/    |     |    \|
+      |     |
+ jgs  |     |
+      |~~~~~|
+   ^^^^^^^^^^^^^^
+```
+
+=== ID: 058e94c7de3683e9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 17x18 ===
+```
+   ,='"`````"'=,
+  ;    .-=-.    ;
+  ',  /=====\  ,'
+    "=|/"""\|="
+       \^ ^/
+      / '-' \
+     /   _   \
+    /   /|\   \
+   | \_/ | \_/ |
+   |   |/ \|   |
+    \__|   |__/
+     |       |
+     |       |
+     |       |
+     |       |
+     |       |
+jgs  |'.'.'.'|
+     '.'.'.'.'
+```
+
+=== ID: 1faaa8bcb81baa13 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 31x19 ===
+```
+              _______
+             `*******'
+               .---.
+              ( --- )
+             ( /m m\ )
+           ___(  =  )___
+         .'----`\ /'----`.
+        //' .-'': ;``-. `\\
+       //  /     Y     \  \\
+      //  /     (|)     \  \\
+     //  :   .-' | `-.   ;  \\
+    //    `.__.-'^`-.__.'    \\
+    ^. .^.^/           \^.^. .^
+      ^   /             \   ^
+         /               \
+jgs   _.'                 `._
+     '._                   _.'
+        `--..___   ___..--'
+                ```
+```
+
+=== ID: d59eec3828257c38 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 35x19 ===
+```
+    .--,.-,
+   /.-',\:.\  .===.    ,;;,;;,
+  /;    \\:.\/    _)  ;;;;;;;;;
+  |'     \\:(  _,`'>   ';;;;;'
+  |;      \\(_/ ._=      ';'
+  |;       ;/ /`|\
+  /,      _/  |-' `\
+ /;    __//(  \_,;;,;;,
+|;  __/  /  \  /);;;;;;)
+| _/|/  /    \/`';;;;;'    ,;;,;;,
+|/     /      (   ';'     ;;;;;;;;;
+      (    .-, \           ';;;;;'
+       )  /`\ ) \            ';'
+      '._/|/| |.'
+  jgs   _//  \|
+       | /   ||
+       |/   / |
+            `\|
+              '
+```
+
+=== ID: a8d75d8cdc781ec0 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 29x21 ===
+```
+            ,-.-.
+           / ,-. \
+      ,-. ( |a a| ) ,-.
+     :   `( : o ; )'   :
+ ____|____(_.>-<._)____|____
+(_|        /     \        |_)
+ ||       : `.|,' :       ||
+ '|___..--|_\_|_/_|-...___|'
+    ;     | /SSt\ |     :
+   /  ;  ;| ,'|`. |:  :  \
+  /  /| /|;._____.:|\ |\  \
+ / ,' `' /  ;| |:  \ `' `. \
+ `'     /  / | | \  \     `'
+       /  /  ; :  \  \
+      /  /  /| |\  \  \
+     /  /  / | | \  \  \
+    /  /  /  ; :  \  \  \
+   /  /  /  /| |\  \  \  \
+  (  /  /  / | | \  \  \  )
+   `(_ /  /  ; :  \  \ _)'
+      `'.(_./___\._).`'
+```
+
+=== ID: 0b98e0c9c1ca6496 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 39x21 ===
+```
+                   _
+                 *"_"*
+        _..._    /`_`\    _..._
+      .'     '. | / \ | .'     '.
+,    /         ')\^_^/('         \    ,
+\`--'  .--.    (_.> <._)    .--.  '--`/
+ '.__.'    '._/   \_/   \_.'    '.__.'
+             /     _     \
+             \  \_/|\_/  /
+              \  //^\\  /
+               \/`   `\/
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+           jgs  |     |
+                \_.__./
+```
+
+=== ID: 188d425562f1b134 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 27x21 ===
+```
+         {\
+        {\ \
+       { ~\ \   _______
+      {*   \ \ <:<:<:>:>
+     { ~ *  \ \(((//^^\
+    {*     ~ \((((/ e e
+    {  * ~  * |))))c u )
+    {*    *   ////'_/~`
+     {~ *    (((( `.`\
+     `{.~   ~ )))`\ \))_.-.
+       `{  ~ *(() `\_.-'``
+         `{.__.* `-*.
+            .*   ~  *.
+          .*.  *   ~ *.
+         .*    .    . *.
+        .*  ~     *    *.
+       .*      *     ~  *.
+jgs  .*    ~      .     *.
+   .*   *   .  ~   *  ~ *.
+..*  ~     *     ~     *.
+ ~~* ~~* ~~* ~~* ~~* ~~*
+```
+
+=== ID: bfc50b5ecfc2eeb0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 25x21 ===
+```
+           <*****>
+     ."^".  ,;;;,  ."^".
+    {.'^'.\//a a\\/.'^'.}
+    {{    ((  L  ))    }}
+    {{      \ = /      }}
+    {{   .-'\`-`/'-.   }}
+    {{  /    \_/    \  }}
+    {{ /             \ }}
+    {{/   /|     |\   \}}
+    {|   | |     | |   |}
+    {\___| >===;=< |___/}
+    {{(_/  |   : |  \_)}}
+    {{   _/|   : |\_   }}
+    {{ _/  |   : |  \_ }}
+jgs {{/    |   : |    \}}
+    `-`    |   : |    `-`
+           |   : |
+           |   : |
+           |   : |
+           |___:_|
+           (_/ \_)
+```
+
+=== ID: a87f73cbb94a49b0 | TITLE: A male angel | ARTIST: Joris Bellenger | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 36x22 ===
+```
+                  ----o-
+ _____________   %%% , ,%_________
+(___________,,)  %c    >) ,________)
+   (_________,,)  )   =  ,______)
+        (_____,,)/ _/__,,____)
+           / \   \__/ /\
+          /\ |        \/\
+         /__\|'   ,   /  \,
+        < -  '====o==,  /_\
+       /    /`       |\ __ \
+      /__,_/    |  _/, \____\
+      //   |     \/  \    \\
+    _( \   \      \  \   _/ \
+     //|    \     \  \    |/|
+            < `  _\ -)
+           /    |_/ |
+          |    / |_/
+         / _,  ' /|
+         \/ \_,--.,
+         '(    )'
+        / |    | \
+        |,/    \,/     b'ger
+```
+
+=== ID: d080347e4b98ca9c | TITLE: Angels with sword & shield | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 31x23 ===
+```
+(\
+ \\
+  \\
+   \\           <*****>
+    \\    .=^=.  .""".  .=^=.
+     \\  //```\\(/a a\)//```\\
+      \\{{      (  L  )      }}
+       \\{ _  __ \ = /       }}
+        \\/@.---,/'-'\,---.  }}
+        /(&\ |`-._/\_.-'|  \ }}
+       (@ \&\|    ||    |\  \}}
+        {{ \ |___o()o___| >  )}
+        {{  `|__((<>))__|` .'}}
+        {{   \   o\/o   /``  }}
+        {{  ,'\   ||   /\',  }}
+        {{.'   \  ||  / |  '.}}
+               /'.||.'  /
+              /   //   /
+             (   /(   /
+     jgs     /  /  \  \
+            /  /    \  \
+        ___/ _/    __\ _\
+       (______)   (______)
+```
+
+=== ID: 58d9ccf24a6a9252 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 25x24 ===
+```
+  .-"".   _____   .""-.
+ //.==.\ (*****) /.==.\\
+;//:::'||,;;;;;,||.:::\\;
+||::::.\((((/\)))/.::::||
+||:::.  )))a a(((  .:::||
+||:::. (((  ^  ))) ':::||
+||::.   )))-^-(((  .:::||
+||::'  (((\\_//)))  .::||
+||::. /    \_/    \ '::||
+||:: /             \ ::||
+||::/   |       |   \::||
+||:/    ;       ;    \:||
+||/      }===o={      \||
+|`-,_   ;    (  ;   _,-'|
+||(_/'._|     ) |_.'\_)||
+||::.  ||    (  ||  .::||
+||::. / |     ) | \ '::||
+||:' |  |       |  | .:||
+||::/   |       |   \::||
+;|:|    |       |    |:|;
+ \/     |       |     \/
+    jgs |       |
+        |:.:.:.:|
+        :':':':':
+```
+
+=== ID: 0a3aefc6bcc0eee7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 39x25 ===
+```
+               _......._
+              :_       _:
+  ,---.,_       '''''''       _,.---,
+ {_=_-=._'-.   .-"""""-.   .-'_.-=_=_}
+{-=_-    `'.\ /         \ /.'`    =_-=}
+{-_=        \\| (_((_(( |//        =_-}
+ {-_=-       \( (*   *) )/       =-_=}
+  {_-=_=-     ) )  ^  ( (     -=_=-_}
+    {_=_-=-   (_\ '-' /_)   -=-_=_}
+      {_-_=_     `) (`      -_=_}
+        {_-=   .-`\ /`-.  -=_}
+          {_= /    ^    \ =_}
+           '-/ _.=. .=._ \-'
+         jgs \/_)  `  (_\/
+              |\       /|
+              | '.   .' |
+              |   '.'   |
+              |         |
+              |         |
+              |         |
+              |         |
+              |         |
+              |         |
+              |         |
+              '-'-'-'-'-'
+```
+
+=== ID: 7cd601a8aa3b1d23 | TITLE: Angels with sword & shield | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 31x25 ===
+```
+(\
+ \\
+  \\
+   \\           <*****>
+    \\    .=^=.  .""".  .=^=.
+     \\  //```\\(/a a\)//```\\
+      \\{{      (  L  )      }}
+       \\{ _  __ \ = /       }}
+        \\/@.---,/'-'\,---.  }}
+        /(&\ |`-._/\_.-'|  \ }}
+       (@ \&\|    ||    |\  \}}
+        {{ \ |___o()o___| >  )}
+        {{  `|__((<>))__|` .'}}
+        {{   \   o\/o   /``  }}
+        {{  ,'\   ||   / ',  }}
+        {{.'   \  ||  /|   '.}}
+               |'.||.' |
+               |    :  |
+               |    :  |
+               |    :  |
+               |    :  |
+               |    :  |
+               |    :  |
+               |____:__|
+                (_/ \_)
+```
+
+=== ID: d628b4abb6d9249e | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 35x26 ===
+```
+                )
+              /  )
+             /  / )
+        -   /  / /
+           '  / / -
+          / _/ / /
+    _    / _/_, /          ,
+  + $$$ / _/_/_/          \       |
+/- + $$/ _/_/_/      /
+\`_ $$/'_/_/    .    ______   _
+   \ (  / ___,_____ _ _____,
+   |  `(|/_,_,__ ________/
+   |.   |''_,_______)
+    \   (_
+     \  / |-._
+      \.' /|/ \_._
+      /_/   _/    /-'__
+        \     \'       \.___
+         '.   /,     |_/_   |._
+           \ / )   '.     '_/, )
+            (_(     -\_   /  \ \
+               \__      |-'   |/
+                 \._  /_/_
+                    \_/\' )
+                        \ |
+                        |/   b'ger
+```
+
+=== ID: eeed41c9ba8ce05c | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: religion | SUBCATEGORY: buddhism | SIZE: 7x4 ===
+```
+   _
+  (")
+ (-"-)
+(_`/._)
+```
+
+=== ID: f9077b6f1118f9bb | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: religion | SUBCATEGORY: buddhism | SIZE: 7x4 ===
+```
+   _
+  (")
+ (/ \)
+(_`/._)
+```
+
+=== ID: 67b2131891d1dd12 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: religion | SUBCATEGORY: buddhism | SIZE: 37x11 ===
+```
+__7__          %%%,%%%%%%%
+\_._/           ,'%% \\-*%%%%%%%
+( ^ )     ;%%%%%*%   _%%%%
+ `='|\.    ,%%%       \(_.*%%%%.
+   /  |    % *%%, ,%%%%*(    '
+ (/   |  %^     ,*%%% )\|,%%*%,_
+ |__, |       *%    \/ #).-*%%*
+  |   |           _.) ,/ *%,
+  |   |   _________/)#(_____________
+  /___|  |_____________________b'ger|
+  ===
+```
+
+=== ID: 5a03a0bf2d53006b | TITLE: Buddha under a tree | ARTIST: Koshy George | CATEGORY: religion | SUBCATEGORY: buddhism | SIZE: 19x11 ===
+```
+        -=-
+      -=-=-   -=-=-
+cc-=-= \/-=-=-=-=-
+   -=\ |/    |/
+    =\V    \/
+       \  /
+      , ||
+    `()'||
+   ((..))
+  (\)  (/)
+   ~~\'~~
+```
+
+=== ID: 933991813a9efd94 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: buddhism | SIZE: 16x26 ===
+```
+1       _=_
+2     q(-_-)p
+3     '_) (_`
+4     /__/  \
+5   _(<_   / )_
+6  (__\_\_|_/__)
+
+1       _=_
+2     q(-_-)p
+3     ,<___/\
+4    (<_`. _/)
+5   (_\_\_|_/_)
+
+1     q(-_-)p
+2     ,<___/\
+3    (<_`.__/)
+4   (_\_\_\_/_)
+
+1     q(-_-)p
+2    ,(<__/ \
+3   (_\_\_\_/)
+
+1     q(--)p
+2    ,(<_,/),
+
+1       &
+```
+
+=== ID: 818bbdc84b5fcf49 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: crosses-and-crucifixes | SIZE: 7x6 ===
+```
+ __
+/_/\/\
+\_\  /
+/_/  \
+\_\/\ \
+   \_\/
+```
+
+=== ID: 0a23c6003cd5b145 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: crosses-and-crucifixes | SIZE: 10x7 ===
+```
+      _
+     |w|
+   __|O|__
+   \+-|-+/
+    ~<<|~
+     |+|
+jgs   \|
+```
+
+=== ID: 67efe3361f4b8a50 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: crosses-and-crucifixes | SIZE: 30x11 ===
+```
+                .---.
+           '-.  |   |  .-'
+             ___|   |___
+        -=  [           ]  =-
+            `---.   .---'
+         __||__ |   | __||__
+         '-..-' |   | '-..-'
+           ||   |   |   ||
+           ||_.-|   |-,_||
+         .-"`   `"`'`   `"-.
+jgs    .'                   '.
+```
+
+=== ID: e4eea80a4bef5834 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: crosses-and-crucifixes | SIZE: 18x13 ===
+```
+      _.--._
+      \ ** /
+       (<>)
+.      )  (      .
+)\_.._/ /\ \_.._/(
+(*_<>_ <NO> _<>_*)
+)/ '' \ \/ / '' \(
+'      )  (      '
+       (  )
+       )  (
+       (<>)
+      / ** \
+     /.-..-.\
+```
+
+=== ID: 901e0745d3696587 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: hinduism | SIZE: 19x10 ===
+```
+       _
+      | |
+      | |
+    O | | O
+ _____| |_____
+|_____   _____|
+      | |
+    O | | O
+      | |
+      |_|       dlb
+```
+
+=== ID: db34791108a06f7b | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: hinduism | SIZE: 12x10 ===
+```
+    __
+ __----__
+{   p p  }
+{____||__}__
+  /  || \/ /
+ / /  - |_/
+ \_\    |
+  |= = =|
+  '-----'
+  |_) |_)
+```
+
+=== ID: 22524219b4f76618 | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: hinduism | SIZE: 19x10 ===
+```
+          .--.
+        {c.  .o}
+      _    \ !_c) _
+       \` , `--' /
+        \/ \  /\/
+           | (
+          /   )
+         /  |/
+         \) \)
+ejm     --  _-
+```
+
+=== ID: 25e8615da3a0ec5a | TITLE: Ganesha | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: hinduism | SIZE: 29x17 ===
+```
+             _.!._
+            /O*@*O\
+           <\@(_)@/>
+  ,;,   .--;`     `;--.   ,
+  O@O_ /   |d     b|   \ _hnn
+  | `/ \   |       |   / \` |
+  &&&&  :##;\     /;##;  &&&&
+  |  \ / `##/|   |##'  \ /  |
+  \   %%%%`</|   |#'`%%%%   /
+   '._|_ \   |   |'  / _|_.'
+     _/  /   \   \   \  \
+    /!`)(     '.  '-._&&&&
+   ( =}/##,    o'--.. _`\/
+    \=/::`##########'\==/
+     /:::::/()`Y`()\:::::\
+jgs  \::::( () | () )::::/
+      `"""`-`'-'-'`-'"""`
+```
+
+=== ID: 0c7f18578072cf8b | TITLE: Untitled | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: hinduism | SIZE: 27x17 ===
+```
+             \
+             //
+             \\
+            / /
+            \ \
+            | |
+          O | | O   _
+    _   ____| |____/_\_.-._
+_  /_\_/____   ____/ \_/
+ '-' \_/    | |
+          O | | O
+            | |       dlb
+            \ \
+            / /
+            \\
+            //
+             \
+```
+
+=== ID: 7c7bcf04a87f66a1 | TITLE: Hindu Ohm symbol | ARTIST: unknown | CATEGORY: religion | SUBCATEGORY: hinduism | SIZE: 36x24 ===
+```
+      ....
+   ,od88888bo.
+ ,d88888888888b
+,dP""'   `"Y888b       ,.
+d'         `"Y88b     .d8b. ,
+'            `Y88[  , `Y8P' db
+              `88b  Ybo,`',d88)
+               ]88[ `Y888888P"
+              ,888)  `Y8888P'
+             ,d888[    `""'
+          .od8888P          ...
+     ..od88888888bo,      .d888b
+          `""Y888888bo. .d888888b
+.             `Y88b"Y88888P"' `Y8b
+:.             `Y88[ `"""'     `88[
+|b              |88b            Y8b.
+`8[             :888[ ,         :88)
+ Yb             :888) `b.       d8P'
+ `8b.          ,d888[  `Ybo.  .d88[
+  Y8b.        .dWARP'   `Y8888888P
+  `Y88bo.  .od8888P'      "YWARP'
+   `"Y8888888888P"'         `"'
+      `"Y8888P""'
+         `""'      warp.tmt.1997
+```
+

@@ -1,0 +1,2293 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: ELECTRONICS
+# Total artworks in category fitting <=40 cols: 124
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 154589b4bdc785b5 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 21x7 ===
+```
+.'`~~~~~~~~~~~`'.
+(  .'11 12 1'.  )
+|  :10 \    2:  |
+|  :9   @-> 3:  |
+|  :8       4;  |
+'. '..7 6 5..' .'
+ ~-------------~  ldb
+```
+
+=== ID: 8dd31ff7f2aeaca7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 11x7 ===
+```
+  _______
+ /  12   \
+|    |    |
+|9   |   3|
+|     \   |
+|         |
+ \___6___/
+```
+
+=== ID: 523cb5679dfe3a4c | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 21x7 ===
+```
+.'`~~~~~~~~~~~`'.
+(  .'11 12 1'.  )
+|  :10 \|   2:  |
+|  :9   @   3:  |
+|  :8       4;  |
+'. '..7 6 5..' .'
+ ~-------------~  ldb
+```
+
+=== ID: 8261c55233635ef6 | TITLE: Alarm clock | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 17x10 ===
+```
+       .-.-.
+  ((  (__I__)  ))
+    .'_....._'.
+   / / .12 . \ \
+  | | '  |  ' | |
+  | | 9  /  3 | |
+   \ \ '.6.' / /
+    '.`-...-'.'
+jgs  /'-- --'\
+    `"""""""""`
+```
+
+=== ID: a5fba21587046c4e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 23x13 ===
+```
+-=[ stopwatch ]=-  8/99
+         .--.
+    .-._;.--.;_.-.
+   (_.'_..--.._'._)
+    /.' . 60 . '.\
+   // .      / . \\
+  |; .      /   . |;
+  ||45    ()    15||
+  |; .          . |;
+   \\ .        . //
+    \'._' 30 '_.'/
+jgs  '-._'--'_.-'
+         `""`
+```
+
+=== ID: e1929916d5eb95e7 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 21x14 ===
+```
+        _____
+     _.'_____`._
+   .'.-'  12 `-.`.
+  /,' 11      1 `.\
+ // 10      /   2 \\
+;;         /       ::
+|| 9  ----O      3 ||
+::                 ;;
+ \\ 8           4 //
+  \`. 7       5 ,'/
+   '.`-.__6__.-'.'
+    ((-._____.-))
+    _))       ((_
+   '--'SSt    '--'
+```
+
+=== ID: 8e959fccba5d549d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 26x18 ===
+```
+-=[ cuckoo clock ]=-  2/00
+          _
+        ,/_\,
+      ,/_/ \_\,
+     /_/ ___ \_\
+    /_/ |(V)| \_\
+      |  .-.  |
+      | / / \ |
+      | \ \ / |
+      |  '-'  |
+      '--,-,--'
+  jgs    | |
+         | |
+         | |
+         /\|
+         \/|
+          /\
+          \/
+```
+
+=== ID: 797f1ef1ba8048ac | TITLE: Untitled | ARTIST: llizard | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 37x19 ===
+```
+      (\                     /)
+      (v\                   /v)
+     (vvv\                 /vvv)
+    (vvvvv\               /vvvvv)
+   (vvvvvvv\             /vvvvvvv)
+  (vvvvvvvvv\   _---_   /vvvvvvvvv)
+ (vvvvvvvvvvv\/  XII  \/vvvvvvvvvvv)
+(vvvvvvvvvvvv/      /  \vvvvvvvvvvvv)
+(vvvvvvvvvvv/      /    \vvvvvvvvvvv)
+(vvvvvvvvvv|IX   @   III |vvvvvvvvvv)
+ (vvvvvvvvvv\      \    /vvvvvvvvvv)
+  (vvvvvvvvvv\         /vvvvvvvvvv)
+    (vvvvvvvvv\  VI   /vvvvvvvvv)
+       (vvvvvvvv-___-vvvvvvvv)
+         (vvvvvv/   \vvvvvv)
+         (vvvvv/     \vvvvv)
+          (vvv/       \vvv)
+ejm97      (v/         \v)
+           (/           \)
+```
+
+=== ID: dd18b5e463e10449 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 12x19 ===
+```
+  oOoOoOoOo
+0oOoOoOo0/|
+| .---. | |
+|{  0  }| |
+|{ \ . }| |
+|{9 x 3}| |
+|{     }| |
+|{  6  }| |
+| `---' | o
+|_______|/
+ \ ____//
+  `----'
+     \\
+      \\
+       \\
+        \\
+        /'\
+       :F_P:
+        \_/
+```
+
+=== ID: d645feaeb5d2951b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 15x19 ===
+```
+       _..._
+      |_____|
+      |_____|
+      |_____|
+      |_____|
+      |_____|
+     / _____ \
+     ||  '  ||
+     ||  |  ||
+     ||- | -||)
+     ||   \ ||
+     ||__.__||
+jgs  \_______/
+      |_____|
+      |_____|
+      |_____|
+      |_____|
+      |_   _|
+        ```
+```
+
+=== ID: d8c9e7e3a23868f4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 29x22 ===
+```
+       ,--.-----.--.
+       |--|-----|--|
+       |--|     |--|
+       |  |-----|  |
+     __|--|     |--|__
+    /  |  |-----|  |  \
+   /   \__|-----|__/   \
+  /   ______---______   \/\
+ /   /  11  1 2 / 1  \   \/
+{   /10    ROLEX     2\   }
+|  {     ,_.    /  ,_. }  |-,
+|  |9  {   }  O--{- } 3|  | |
+|  {   `-'  /    `-'   }  |-'
+{   \8   7 /     5   4/   }
+ \   `------_6_------'   /\
+  \     __|-----|__     /\/
+   \   /  |-----|  \   /
+    \  |--|     |--|  /
+     --|  |-----|  |--
+       |--|     |--|
+       |--|-----|--|
+       `--'-----`--'
+```
+
+=== ID: b89f1511af9c1ae6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 29x22 ===
+```
+       ,--.-----.--.
+       |--|-----|--|
+       |--|     |--|
+       |  |-----|  |
+     __|--|     |--|__
+    /  |  |-----|  |  \
+   /   \__|-----|__/   \
+  /   ______---______   \/\
+ /   /               \   \/
+{   /    _     _   _  \   }
+|  {    | | . | | | |  }  |-,
+|  |    |_| . |_| |_|  |  | |
+|  {                   }  |-'
+{   \                 /   }
+ \   `------___------'   /\
+  \     __|-----|__     /\/
+   \   /  |-----|  \   /
+    \  |--|     |--|  /
+     --|  |-----|  |--
+       |--|     |--|
+       |--|-----|--|
+       `--'-----`--'
+```
+
+=== ID: 612f9c78a437c979 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 29x22 ===
+```
+       ,--.-----.--.
+       |--|-----|--|
+       |--|     |--|
+       |  |-----|  |
+     __|--|     |--|__
+    /  |  |-----|  |  \
+   /   \__|-----|__/   \
+  /   ______---______   \/\
+ /   /  11  1 2 / 1  \   \/
+{   /10    ROLEX     2\   }
+|  {   ,_.    /  ,_.   }  |-,
+|  |9 {   }  O--{-  } 3|  | |
+|  {   `-'  /    `-'   }  |-'
+{   \8   7 /     5   4/   }
+ \   `------_6_------'   /\
+  \     __|-----|__     /\/
+   \   /  |-----|  \   /
+    \  |--|     |--|  /
+     --|  |-----|  |--
+       |--|     |--|
+       |--|-----|--|
+       `--'-----`--'
+```
+
+=== ID: 09b7aca1283a77c0 | TITLE: Untitled | ARTIST: Martin Atkins | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 11x27 ===
+```
+   ___
+  |---|
+  |_|_|
+  |   |
+  |   |
+  |   |
+  |   |
+  |   |
+  |___|
+ /_____\
+ |11:10|
+ |_____|
+ |.....|
+ |.....|
+ \ ___ /
+  |   |
+  |   |
+  |   |
+  | . |
+  | . |
+  | . | mga
+  | . |
+  | . |
+  | . |
+  | . |
+  | . |
+  |___|
+```
+
+=== ID: 2ea738a34ad2108f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 32x36 ===
+```
+ -=[ grandfather clock ]=-  2/01
+
+             O
+            (_)
+          _ )_( _
+        /`_) H (_`\
+      .' (  { }  ) '.
+    _/ /` '-'='-' `\ \_
+   [_.'   _,...,_   '._]
+    |   .:"`````":.   |
+    |__//_________\\__|
+     | .-----------. |
+     | |  .-"""-.  | |
+     | | /    /  \ | |
+     | ||-   <   -|| |
+     | | \    \  / | |
+     | |[`'-...-'`]| |
+     | | ;-.___.-; | |
+     | | |  |||  | | |
+     | | |  |||  | | |
+     | | |  |||  | | |
+     | | |  |||  | | |
+     | | |  |||  | | |
+     | | | _|||_ | | |
+     | | | >===< | | |
+     | | | |___| | | |
+     | | |  |||  | | |
+     | | |  ;-;  | | |
+     | | | (   ) | | |
+     | | |  '-'  | | |
+     | | '-------' | |
+jgs _| '-----------' |_
+   [= === === ==== == =]
+   [__--__--___--__--__]
+  /__-___-___-___-___-__\
+ `"""""""""""""""""""""""`
+```
+
+=== ID: b89be1d7b4856a66 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 19x41 ===
+```
+-=[ watch ]=-  7/00
+        ___
+       /___\
+      |/   \|
+      ||_|_||
+      [_____]
+      |:___:|
+      [_____]
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:___:|
+      (=___=)
+     /.'12 '.\
+    //       \\
+   ||   \     ||
+   ||9   .   3||)
+   ||   /     ||
+    \\       //
+     \'._6_.'/
+      (=___=)
+  jgs |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |:   :|
+      |: o :|
+      |: o :|
+      |: o :|
+      |: o :|
+      ;'   ';
+       \' '/
+        \./
+```
+
+=== ID: be797f0901346846 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: clocks | SIZE: 24x62 ===
+```
+     ______A______
+    |  ___||___  |
+    | |   ||   | |
+    | |   ||   | |
+    | |   ||   | |
+    | |___||___| |
+    | ||  ||  || |
+    |__|      |__|
+       |      |
+       |      |
+       |      |
+       |      |
+       |      |
+      |        |
+      |        |
+     _|________|_
+    |____________|
+      |        |
+      |        |
+      |        |
+     |          |
+     |          |
+     |          |
+     |          |
+    _|__________|_
+  _/______________\_
+ /  ______________  \
+|  |  _     _  _  |  |
+|  | |_| o | | _| |  |\
+|  |  _| o |_| _| |  | |
+|  |______________|  |/
+|                __  |
+|  _   _   _    |  | |\
+| |_| |_| |_|   |__| |/
+\____________________/
+   \______________/
+     |          |
+     |          |
+     |          |
+     |          |
+     |          |
+      |        |
+      |   ()   |
+      |        |
+      |        |
+      |        |
+      |   ()   |
+      |        |
+      |        |
+       |      |
+       |  ()  |
+       |      |
+       |      |
+       |      |
+       |  ()  |
+       |      |
+       |      |
+       |      |
+       |  ()  |
+       |      |
+       |      |
+       \______/
+```
+
+=== ID: a285a59f30cf9365 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 3x2 ===
+```
+(v)
+ =
+```
+
+=== ID: 4be1d2ccdc76fbd5 | TITLE: Small light bulb | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 11x4 ===
+```
+     :
+ '.  _  .'
+-=  (~)  =-
+ .'  #  '.
+```
+
+=== ID: 203ad6554a26870a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 13x9 ===
+```
+      __
+   ."`  `".
+  /   /\   \
+ |    \/    |
+  \   ()   /
+   '.____.'
+    {_.="}
+jgs {_.="}
+    `-..-`
+```
+
+=== ID: 4279701069a5a7f6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 19x10 ===
+```
+         |
+ \     _____     /
+     /       \
+    (         )
+-   ( ))))))) )   -
+     \ \   / /
+      \|___|/
+  /    |___|    \
+       |___| prs
+       |___|
+```
+
+=== ID: 4e7bd9f9fe0c5dcb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 14x10 ===
+```
+     _____
+   .'     `.
+  /         \
+ |           |
+ '.  +^^^+  .'
+   `. \./ .'
+     |_|_|
+     (___)
+jgs  (___)
+     `---'
+```
+
+=== ID: ed6b970c76a3e66f | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 11x10 ===
+```
+  ..---..
+ /       \
+|         |
+:         ;
+ \  \~/  /
+  `, Y ,'
+   |_|_|
+   |===|
+   |===|
+    \_/
+```
+
+=== ID: 87a69a588ba02e17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 19x13 ===
+```
+  .--.       .--.
+ /    \     /    \
+J      L   J      L
+J     ..---..     F
+ \   /       \   /
+  `-|         |-'
+    :         ;
+     \  \ /  /
+      `,   ,'
+       |___|
+       |===|
+       |===|
+        \_/
+```
+
+=== ID: 40c5498b6b5dc877 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 19x14 ===
+```
+    _.-"```"-._
+  .'           '.
+ /      .-.      \
+;       | |       ;
+|       | |       |
+;       \_/       ;
+ \      (_)      /
+  '.           .'
+    `;_______;`
+     |_..--"`)
+     (_..--'`|
+     |_..--'`)
+ jgs (_..--'`|
+      `-...-`
+```
+
+=== ID: a139f88f845b002f | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 24x16 ===
+```
+          ____
+     ---        ---
+  ---              ---
+ --        _         --
+--         |>         --
+--         |<         --
+ --        |>        --
+  --       |<       --
+   --      |>      --
+    --     ||-    --
+     --    ||    --
+      --   ||   --
+      |__________|
+      <__________>
+      <__________>
+           \/
+```
+
+=== ID: ec962ef5afd5dafb | TITLE: Untitled | ARTIST: Bob Allison (Scarecrow) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 34x19 ===
+```
+            ..........
+       .......::::::.......
+    .......:::======:::.......
+  .......::===========::........
+ ......::===####@@####===::......
+......::===####@@@@####===::......
+.....::===####@@@@@@####===::.....
+.....::===#####@@@@#####===::.....
+ .....::===#####@@#####===::.....
+  .....::====########====::.....
+   .....::=====####=====::.....
+     ....::============::....
+       ...::==========::...
+         ..::========::..
+           |__________|
+           <__________>
+           <__________>
+           <__________>
+                \/boba
+```
+
+=== ID: de6f1f6684ae6bf0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 19x20 ===
+```
+        ___
+    .-"`   `"-.
+  .'           '.
+ /               \
+/  #              \
+| #               |
+|                 |
+;     .-~~~-.     ;
+ ;     )   (     ;
+  \   (     )   /
+   \   \   /   /
+    \   ) (   /
+     |  | |  |
+     |__|_|__|
+     {=======}
+     }======={
+     {=======}
+     }======={
+  jgs{=======}
+      `""u""`
+```
+
+=== ID: a86df79562e0316b | TITLE: Woman in light bulb | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 19x20 ===
+```
+        ___
+    .-"`   `"-.
+  .'    .-.    '.
+ /     (/^\)     \
+/  #   (\ /)      \
+| #    .-'-.      |
+|     /(_I_)\     |
+;     \\) (//     ;
+ ;     / Y \     ;
+  \    \ | /    /
+   \    \|/    /
+    \   /|\   /
+     |  \|/  |
+     |__/Y\__|
+     {=======}
+     }======={
+     {=======}
+     }======={
+  jgs{=======}
+      `""u""`
+```
+
+=== ID: 188d58e438e820b5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: light-bulbs | SIZE: 29x21 ===
+```
+        ___,-----.___
+    ,--'             `--.
+   /                     \
+  /                       \
+ |                         |
+|                           |
+|        |~~~~~~~~~|        |
+|        \         /        |
+ |        \       /        |
+  \        \     /        /
+   \        |   |        /
+    \       |   |       /
+     \      |   |      /
+      \     |   |     /
+       \____|___| ___/
+       )___,-----'___(
+       )___,-----'___(
+       )___,-----'___(
+       )___,-----'___(
+       \_____________/
+            \___/
+```
+
+=== ID: 975c480fdcc2f1fa | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: stereos | SIZE: 20x7 ===
+```
+ /~~~\________/~~~\
+(  o  )      (  o  )
+ \___/  ++++  \___/
+  | \          / |
+  |   \o____o/   |
+  |%%   #### oooo|
+  |______________|
+```
+
+=== ID: 66c02a0bd260337e | TITLE: Turntable | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: stereos | SIZE: 34x8 ===
+```
+             ____           __
+             \===\=========|__|=[]
+  <========^==='======>    _||_
+ _/_|_|_|_|_|_|_|_|_|_\_^__||||_
+|                              |
+|                              |
++---/||\----------------/||\---+
+   ^^^^^^              ^^^^^^
+```
+
+=== ID: b2854b891d269310 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 14x3 ===
+```
+<o         \_/
+ |\___,    ( ]
+ |~| |~|   |~|
+```
+
+=== ID: 089281c8a4c5ceb4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 17x6 ===
+```
+ _______________
+| /~~~~~~~~\ ||||
+||          |...|
+||          |   |
+| \________/  O |
+ ~~~~~~~~~~~~~~~
+```
+
+=== ID: 8fd832944f2f82f1 | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 21x8 ===
+```
+     '-.
+        '-. _____
+ .-._      |     '.
+:  ..      |      :
+'-._+      |    .-'
+ /  \     .'i--i
+/    \ .-'_/____\___
+    .-'  :       fsc:
+```
+
+=== ID: acf35fac62f58892 | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 13x8 ===
+```
+ ___________
+|  .----.  o|
+| |      | o|
+| |      | o|
+|__`----`___|
+ `         `
+
+lc
+```
+
+=== ID: 4b9afc81688e8046 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 21x8 ===
+```
+ _______________
+|,----------.  |\
+||           |=| |
+||          || | |
+||       . _o| | | __
+|`-----------' |/ /~/
+ ~~~~~~~~~~~~~~~ / /
+                 ~~
+```
+
+=== ID: f5e106b6bee098ce | TITLE: A radio mast and a 50s style TV | ARTIST: James Fox | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 29x8 ===
+```
+    \ | /         _________
+    - * -        |+-------+|
+     /|\        (||       ||)
+    /\|/\       |||_______|||
+   /  |  \      || o  o  o ||
+  /\/\|/\/\     ||  .-"-.  ||
+ /    |    \    ||_(     )_||
+-     -     -
+```
+
+=== ID: 284dccc5b0c79ba6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 25x9 ===
+```
+     _______________
+    |,----------.  |\
+    ||           |=| |
+    ||          || | |
+    ||       . _o| | | __
+    |`-----------' |/ /~/
+     ~~~~~~~~~~~~~~~ / /
+                     ~~
+Ojoshiro
+```
+
+=== ID: dc17b1a489f68c23 | TITLE: Untitled | ARTIST: Jens Reissenweber (Reißenweber) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 40x10 ===
+```
+   _,-.
+,-'  _|
+|_,-O__`-._
+|`-._\`.__ `_.
+|`-._`-.\,-'_|  _,-'.
+     `-.|.-' | |`.-'|_
+        |      |_|,-'_`.
+              |-._,-'  |
+              | |    _,'
+              '-|_,-'               jrei
+```
+
+=== ID: f31f30a3e7799817 | TITLE: Television with remote control | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 25x10 ===
+```
+      ______________
+     |.------------.|
+     ||  88::%%##  ||
+     ||  88::%%##  ||
+     ||  88::%%##  ||
+ __  ||  88::%%##  ||
+|==| ||____________||
+|88| |[##] oo O [##]|
+|88| |==sharp=======|
+`--' """""""""""""""" hjw
+```
+
+=== ID: f05f0f18ca949807 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 25x11 ===
+```
+    ,-----.
+    |     |
+    ".___."
+ ______|_____
+|,----------.|
+||          ||
+||   ????   ||
+||          ||
+|`----------'|     ,--|=
+|o .... [###]|\_,--'  hjw
+|____________|        `97
+```
+
+=== ID: 5f06a3cae8c48454 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 27x11 ===
+```
+             \  /
+              \/
+    .===============.
+    | .-----------. |
+    | |           | |
+    | |    HSC    | |
+    | |           | |   __
+    | '-----------'o|  |o.|
+    |===============|  |::|
+jgs |###############|  |::|
+    '==============='  '--'
+```
+
+=== ID: 7bc0c314b248c77b | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 24x11 ===
+```
+  ________________
+ /______________ /|
+|  ___________  | |
+| |           | | |
+| |           | | |
+| |           | | |
+| |           | | |
+| |           | | |
+| |___________| | |  ___
+|_______________|/  /  /
+                   /__/
+```
+
+=== ID: c8780253f23717dd | TITLE: Untitled | ARTIST: llizard | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 27x12 ===
+```
+        ________
+       /_______/|
+      | -----  ||   ,
+      | |   |**||  |[|
+      | |___|()||__|]|_,__
+     /[________]|  |[|( )/|
+    /___________________/ |
+    |__________  ______ | |
+    |          ||______|| |
+    |        ] ||______|| |
+    |          ||______|| |
+ejm |__________|________|/
+```
+
+=== ID: f3a0b681d7d65740 | TITLE: Untitled | ARTIST: Daniel C Au | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 19x12 ===
+```
+          /\ o
+   o     /_ /~~/
+    \      /\/
+     \    /
+      \  /
+,-----------------,
+| ,-----------,   |
+| |           | O |
+| |           | O |
+| |           |...|
+| |___________|I#I|
+|_____________dcau|
+```
+
+=== ID: 6b8f408ba395eb55 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 24x13 ===
+```
+o              o
+ \            /
+   \        /
+     \    /
+ ______\/_______   _____
+|  _________    |  | --|
+| |  ^  ^   | ()|  |---|
+| |  o  o   | ()|  |---|
+| |   ||    |   |  |---|
+| | -    -  | _ |  |-  |
+| | |____|  ||_||  |   |
+| |_________|   |  |   |
+|_______________|  |___|
+```
+
+=== ID: cd683b851406beaa | TITLE: Untitled | ARTIST: Daniel C Au | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 21x14 ===
+```
+     O         O
+      \\     //
+       \\   //
+        \\ //
+       /~~~~~\
+,-------------------,
+| ,---------------, |
+| |               | |
+| |               | |
+| |               | |
+| |               | |
+| |_______________| |
+|___________________|
+|_______________dcau|
+```
+
+=== ID: 777325d2e329c67d | TITLE: TV remote | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 16x15 ===
+```
+        .--.
+    .-========-.
+    | === [__] |
+    | [__][__] |
+    | o   ==== |
+    | LILILILI |
+    | LILILILI |
+    | LILILILI |
+    | LILILILI |
+    |  __  __  |
+    | [__][__] |
+    | [__][][] |
+    | [__] ==  |
+jgs |      OOO |
+    '-========-'
+```
+
+=== ID: 1b0d8a5f7eceb091 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 24x16 ===
+```
+               o
+          o    |
+           \   |
+            \  |
+             \.|-.
+             (\|  )
+    .==================.
+    | .--------------. |
+    | |--.__.--.__.--| |
+    | |--.__.--.__.--| |
+    | |--.__.--.__.--| |
+    | |--.__.--.__.--| |
+    | |--.__.--.__.--| |
+    | '--------------'o|
+jgs | LI LI """""""   o|
+    '=================='
+```
+
+=== ID: 99441495aeb1f3b9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 30x16 ===
+```
+                    o
+           o       /
+            \     /
+             \   /
+              \ /
++--------------v-------------+
+|  __________________      @ |
+| /                  \       |
+| |             ,--, |  (\)  |
+| |       _ ___/ /\| |       |
+| |   ,;`( )__, )  ~ |  (-)  |
+| |  // o//   '--;   |       |
+| \  ' o \     |     / :|||: |
+|  -ooo--------------  :|||: |
++----------------------------+
+   []                    []
+```
+
+=== ID: 63371c96cec16c7d | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 30x16 ===
+```
+                    o
+           o       /
+            \     /
+             \   /
+              \ /
++--------------v-------------+
+|  __________________      @ |
+| /          ,  ooo  \       |
+| |  ---=====|#O#### |  (\)  |
+| |          `  \ )  |       |
+| |   ,;`,      | |  |  (-)  |
+| |  // o ',    | |  |       |
+| \  ' o \ /,   | |  / :|||: |
+|  -ooo--------------  :|||: |
++----------------------------+
+   []                    []
+```
+
+=== ID: 9f1b3190fb6e9384 | TITLE: Untitled | ARTIST: Marion Koslowski | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 39x16 ===
+```
+     -._
+         '--._
+    .---.     '-..
+    )''  `'-      `._
+    )c  -'\\         `.
+  ,.|\_=/              -._       _.
+.' /   (                  ' ,----'|---.
+| |  \  )\                  |`-.|     |
+|  \ '_.__`---,.____.       |   |     |
+| `.= ..,_'\..\..L__//      |   |     |
+|         .'._   `--'       |   |     |
+\        .'-._\_            '`.,|     |
+ `       |    -.`.  _,..,--- `'.-----.'
+  \_____,|`-.   \ \.            | | kOs
+  | |./| |./ \  ,-.'            | |
+  './  './   '...-'            |_._|
+```
+
+=== ID: bcc349f693ce141a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 24x20 ===
+```
+               o
+          o    |
+           \   |
+            \  |
+             \.|-.
+             (\|  )
+    .==================.
+    | .--------------. |
+    | |::.::.::.::.::| |
+    | |'::'::'::'::':| |
+    | |::.::.::.::.::| |
+    | |:'::'::'::'::'| |
+    | |::.::.::.::.::| |
+    | '--------------'o|
+    | LI LI """""""   o|
+    |==================|
+jgs |  .------------.  |
+    | /              \ |
+    |/                \|
+    "                  "
+```
+
+=== ID: c44530c69ebd5885 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 28x21 ===
+```
+   o                   o
+    \               __/
+     \___          /
+         \__    __/
+            \  /
+ ____________\/____________
+/   ____________________   \
+|  /__/  \__   \__/  \__\  |
+| |    __   \__    __   \| |
+| |\__/  \__   \__/  \__ | |
+| |    __   \__    __   \| |
+| |\__/  \__   \__/  \__ | |
+| |    __   \__    __   \| |
+| |\__/  \__   \__/  \__ | |
+| |    __   \__    __   \| |
+| |\__/  \__   \__/  \__ | |
+|  \________\___________/  |
+|                 _   _    |
+|  prs           (|) (/)   |
+\_________________________/
+    "--"           "--"
+```
+
+=== ID: 7e3eb0dbad3c994d | TITLE: Untitled | ARTIST: Ethan Hayes-Chute | CATEGORY: electronics | SUBCATEGORY: televisions | SIZE: 34x21 ===
+```
+         o               ||   \===
+          \              ||^^^^^^^
+           \      /\     ||   ^^^
+            \    /  o    |'-------
+             \__/        '--------
+     _______ /  \_________
+    | __________________  |
+    ||"'`':`.,~"`;"`;#'~|_|
+    ||";";.,`~;`'+.:',!`|O|
+    ||.;',`'`.,`':.`~,;'|O|
+    ||':'""`~`"'`'`::'`'|o|    '
+    ||.:',~;~'`;'`.,:'`;|_|  ' @
+    ||-'`:'`.`;.:""";/;`| |  @ |
+    ||'`'`~';?;`:`.,`.:'| |  | |
+    |'------------------' | '---'
+----'---------------------'--\_/--
+
+      A STATIC-INFLICTED TV
+   w/ FLOWERS AND A BOAT PICTURE
+
+Ethan Hayes-Chute
+```
+
+=== ID: 24a464449d4210d8 | TITLE: Untitled | ARTIST: Sara Wallen (Very Small Monster) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 17x4 ===
+```
+ _____
+(.---.)-._.-.
+ /:::\ _.---'
+'-----'       sjw
+```
+
+=== ID: 140d70a2848ca158 | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 13x5 ===
+```
+  ________
+ (_]----[_)
+.~ |.''.|
+~. |'..'|
+ `~`----` ldb
+```
+
+=== ID: a77bf310b2f1a2ca | TITLE: Untitled | ARTIST: Sara Wallen (Very Small Monster) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 10x5 ===
+```
+*
+|_
+(O)
+|#|
+'-'    sjw
+```
+
+=== ID: 0951a869f5cc74fa | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 20x6 ===
+```
+       _______
+     /` _____ `\;,
+    /__(^===^)__\';,
+      /  :::  \   ,;
+     |   :::   | ,;'
+jgs  '._______.'`
+```
+
+=== ID: a1cb68065643ab5a | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 11x7 ===
+```
+ __i
+|---|
+|[_]|
+|:::|
+|:::|
+`\   \
+  \_=_\ jsm
+```
+
+=== ID: 3dd4c72b855b5570 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 19x7 ===
+```
+   ,==.-------.
+  (    ) ====  \
+  ||  | [][][] |
+,8||  | [][][] |
+8 ||  | [][][] |
+8 (    ) O O O /
+'88`=='-------' hjw
+```
+
+=== ID: 07c7f5b769443a00 | TITLE: Untitled | ARTIST: llizard | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 28x7 ===
+```
+        ____________
+      /   ,,____,,   \:.
+      |__| [][][] |__|:  :
+        /  [][][]  \   :  :
+ejm98  /   [][][]   \   :  :
+      /    [][][]    \   ..
+=====|________________|
+```
+
+=== ID: 889416e9bcc09b11 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 25x10 ===
+```
+     ,'"".
+     )  ,|
+    /  /,'-.
+   /  //  /.`.
+ ,'  //  /  `.`.
+(    )--.`.   //|
+|`--'|   `.`.// |
+ `--'      `./  /
+   |         | /
+   |_________|/  -shimrod
+```
+
+=== ID: 44aa60f2c1674fc3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 24x10 ===
+```
+  .----------------.
+ /    _H______H_    \@,
+ \____/        \____/ @,
+    /            \    `@
+    |  LI LI LI  |    ,@
+    |  LI LI LI  |   ,@'
+    |  LI LI LI  |  ,@'
+    |  LI LI LI  |@@'
+jgs \            /'
+     `----------'
+```
+
+=== ID: ab8c87320d0c49ef | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 18x12 ===
+```
+        __
+      /` _`\
+     |  (_()| .-.
+      \_  _/_/   \
+        ||=[_]   |
+        || | |   |
+        ||/   \  |
+        ||`---'  /
+    .--'||-.___.'
+  /`  .-||-.
+  '-/`.____.`\
+jgs '.______.'
+```
+
+=== ID: b67e7549547d6794 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 23x14 ===
+```
+   _______________
+   /               \
+  |   .---------.   |@
+  '---' .-----. '---'@
+    .' /6 5_4 3\ '.  @
+    | |7 /...\ 2| |  @
+    | |8 \___/ 1| |  @
+    |  \_9_0_)\/  |  @@
+ /==|_____________|@@@@
+ H-------------------@@
+ H   )  ||   ||  (   @@
+ H  /   ||   ||   \   @
+ H |----''---''----|
+=/ |_______________|
+```
+
+=== ID: 1327b9d13d9bee8d | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 10x15 ===
+```
+        ||
+  ______||
+ / ____ o|
+| / ;; \ |
+| ______ |
+||______||
+||  D2  ||
+||______||
+|'\[--]/'|
+|  ¨''¨  |
+|  ''''  |
+|        |
+|        |
+|        |
+|________|
+```
+
+=== ID: 3ea23b0b4d0a2ac7 | TITLE: Stick telephone | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 15x15 ===
+```
+        .-.
+       /  ,`\_
+      |  /-'/ \
+      |  \-.\_/
+       \  ` /
+        ;-;`
+     .-.| |
+    {|=|| |
+     / \| |`;,
+    '---; |  `;
+        | |  ,;
+        | | ;'
+      .-' '-;,
+jgs  [   (__)];
+     `"""""""`
+```
+
+=== ID: c9a573304fe3fcbb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 39x16 ===
+```
+                                  .
+     .              .   .'.     \   /
+   \   /      .'. .' '.'   '  -=  o  =-
+ -=  o  =-  .'   '              / | \
+   / | \                          |
+     |                            |
+     |                            |
+     |                      .=====|
+     |=====.                |.---.|
+     |.---.|                ||=o=||
+     ||=o=||                ||   ||
+     ||   ||                ||   ||
+     ||   ||                ||___||
+     ||___||                |[:::]|
+jgs  |[:::]|                '-----'
+     '-----'
+```
+
+=== ID: fb240c4c45ee0372 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 32x17 ===
+```
+          _...----..._
+       ,-'    ,-.     `-.
+     ,' ,-.  ( 4 )   ,-. `.
+   ,'  ( 5 )  `-'   ( 3 )  `.
+  / ,-. `-',-''  ``-.`-' ,-. \
+ / ( 6 ) ,'          `. ( 2 ) \
+:   `-' /    FEUER     \ `-'   :
+| ,-.  :    ________    :  ,-. |
+|( 7 ) |   |________|   | ( 1 )|
+| `-'  :                ;  `-' |
+:   ,-. \    NOTRUF    /       ;
+ \ ( 8 ) `.          ,'(`.    /
+  \ `-' ,-.`-..__..-'   \ `-./
+   `.  ( 9 )   ,-.       \  ,'
+     `. `-'   ( 0 )      ,'`
+       `-._    `-'   _.-'
+           ```----''' SSt
+```
+
+=== ID: 154c32aad5cb032e | TITLE: Payphone | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 28x21 ===
+```
+     _________________
+    /            __   \
+    |           (__)  |
+    |                 |
+    | .-----.   .--.  |
+    | |     |  /    \ |
+    | '-----'  \    / |
+    |           |  |  |
+    | LI LI LI  |  |  |
+    | LI LI LI  |  |  |Oo
+    | LI LI LI  |  |  |`Oo
+    | LI LI LI  |  |  |  Oo
+    |           |  |  |   Oo
+    | .------. /    \ |   oO
+    | |      | \    / |   Oo
+    | '------'  '-oO  |   oO
+    |          .---Oo |   Oo
+    |          ||  ||`Oo  oO
+    |          |'--'| | OoO
+    |          '----' |
+jgs \_________________/
+```
+
+=== ID: 9101368ad551a34a | TITLE: Untitled | ARTIST: Jan-Erik Finnberg | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 15x26 ===
+```
+           ,-.
+           | |
+           | |
+  ,-"""""""-.|
+ /  __:::__()\
+J ."_______". L
+JJ,"       ".LL
+|J|         |L|
+|||         |||
+L||         ||J
+LJ|Wny      |LJ
+LJ._________,LJ
+L ___     ___ J
+| \__)---(__/ |
+J----(===)----L
+ L\ "-___-" /J
+ | "-------" |
+ |           |
+ |           |
+ |           |
+ |           |
+ |           |
+ |           |
+ |           |
+ |    ...    |
+ "-----------"
+```
+
+=== ID: fea63a66a3ca1d4f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 36x28 ===
+```
+               __ _
+             .: .' '.
+            /: /     \_
+           ;: ;  ,-'/`:\
+           |: | |  |() :|
+           ;: ;  '-.\_:/
+            \: \     /`
+             ':_'._.'
+                ||
+               /__\
+    .---.     {====}
+  .'   _,"-,__|::  |
+ /    ((O)=;--.::  |
+;      `|: |  |::  |
+|       |: |  |::  |
+|       |: |  |::  |
+|       |: |  |::  |
+|       |: |  |::  |
+|       |: |  |::  |
+|      /:'__\ |::  |
+|     [______]|::  |
+|      `----` |::  |__
+|         _.--|::  |  ''--._
+;       .'  __{====}__      '.
+ \    .'_.-'._ `""` _.'-._    '.
+  '--'/`      `''''`      `\    '.__
+ jgs  '._                _.'
+         `""--......--""`
+```
+
+=== ID: 9efeb52dd9b071ac | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 29x30 ===
+```
+            _.._
+     __.--"" __ ""--.__
+   .'//   .-"  "-.   \\`,
+  : :'  .'.  :;  ,`.  `; ;
+ /; ;  /  T. $$ ,P  \  : :
+/: :  ;    T.:;,P    :  ; ;
+)| | :      `  '      ; | |
+`j | :.--------------.: | |
+ ; ; |                | : :
+ ; ; |                | : :
+ | | |                | | |
+ | | |                | | |
+ : : |                | ; ;
+ : : :________________: ; ;
+  ; ;__    _...._    __: :
+  | ;  "-./ ,--, \,-"  : |
+  | '._   \ ;  : /   _.' |
+  :  __`-. `."",' .-'__  ;
+   ;`.__> `.J__L.' <__.':
+   ;.--._   .--.   _.--,:
+   |`.__.' `.__.' `.__.'|
+   |.--._   .--.   _.--,|
+   |`.__.' `.__.' `.__.'|
+   |.--._   .--.   _.--,|
+   ;`.__.' `.__.' `.__.':
+  : .--._   .--.   _.--, ;
+  ; `.__.' `.__.' `.__.' :
+  ;                      :
+  '--..__          __..--'
+         """"""""""       bug
+```
+
+=== ID: 7762b6c4ab55777e | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 17x31 ===
+```
+   _
+  | |
+  |_|
+  /_\    \ | /
+.-"""------.----.
+|          U    |
+|               |
+| ====o======== |
+| ============= |
+|               |
+|_______________|
+| ________GF337 |
+||   Welcome   ||
+||             ||
+||_____________||
+|__.---"""---.__|
+|---------------|
+|[Yes][(|)][ No]|
+| ___  ___  ___ |
+|[<-'][CLR][.->]|
+| ___  ___  ___ |
+|[1__][2__][3__]|
+| ___  ___  ___ |
+|[4__][5__][6__]|
+| ___  ___  ___ |
+|[7__][8__][9__]|
+| ___  ___  ___ |
+|[*__][0__][#__]|
+`--------------'
+{__|""|_______'-
+`---------------'
+```
+
+=== ID: e7b25e1e2ee51c27 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 27x31 ===
+```
+            _.._
+     __.--"" __ ""--.__
+   .'//   .-"  "-.   \\`,
+  : :'  .'.  :;  ,`.  `; ;
+ /; ;  /  T. $$ ,P  \  : :
+/: :  ;    T.:;,P    :  ; ;
+)| | :      `  '      ; | |
+`j | :.--------------.: | |
+ ; ; |                | : :
+ ; ; |                | : :
+ | | |                | | |
+ | | |                | | |
+ : : |                | ; ;
+ : : :________________: ; ;
+  ; ;__    _...._    __: :
+  | ;  "-./ ,--, \,-"  : |
+  | '._   \ ;  : /   _.' |
+  :  __`-. `."",' .-'__  ;
+   ;`.__> `.J__L.' <__.':
+   ;.--._   .--.   _.--,:
+   |`.__.' `.__.' `.__.'|
+   |.--._   .--.   _.--,|
+   |`.__.' `.__.' `.__.'|
+   |.--._   .--.   _.--,|
+   ;`.__.' `.__.' `.__.':
+  : .--._   .--.   _.--, ;
+  ; `.__.' `.__.' `.__.' :
+  ;                      :
+  '--..__          __..--'
+         """"""""""
+    bug
+```
+
+=== ID: 7180d6da000b3c2b | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 27x34 ===
+```
+                .sss.
+                $P'`T.
+                $;  :;
+                $;  :$
+        __......$b__d$
+   .sd$$$P^^^^^^^TBuG$s.
+  .$P'      ___     _`T$.
+  $P        """    (_) T$
+ s$   _..---***---.._   $s
+ $$ .'    ALCATEL    `. $$
+.$$.  .-------------.  .$$.
+:$$: :               ; ;$$;
+$$;| |               | |:$$
+$$'| |               | |'$$
+$$ | |               | | $$
+$$ | |               | | $$
+$$ | :               ; | $$
+$$.;  `-------------'  :.$$
+$$; . (C)   .-.       . :$$
+:$$  `-.   / _ \   .-'  $$;
+'$$  .-.`.: (_) ;.'.-.  $$'
+ $$ :   ; `.___.' :   ; $$
+ $$  `-'           `-'  $$
+ $$.( 1 )  ( 2 )  ( 3 ).$$
+ $$;                   :$$
+ :$$ ( 4 ).( 5 ).( 6 ) $$;
+ '$$                   $$'
+  $$ ( 7 ) ( 8 ) ( 9 ) $$
+  $$                   $$
+  $$ ( * ) ( 0 ) ( # ) $$
+  $$.                 .$$
+  $$; o               :$P
+   T$b.             .d$P
+    `^T$$$$$$$$$$$$$P^'
+```
+
+=== ID: 49b63ef1d0cf8d6b | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 21x36 ===
+```
+                  _
+                 |#|
+                 |#|
+                 |#|
+   ______________|#|
+//######_____######\\
+||#####'  ^  '#####||
+||#################||
+||#################||
+||#################||
+||######BOSCH######||
+||#################||
+||#|gmw          |#||
+||.|             |.||
+| ||             || |
+| ||_____________|| |
+| |.#####509e####.| |
+|  |___##/-\##___|  |
+|  |\ o\| ^ |/o /|  |
+|   |\O|| , || /|   |
+|   \#\|#\_/#|/#/   |
+|    "---------"    |
+|  ___   ___   ___  |
+| (___) (___) (___) |
+|      O     O      |
+|  ___   ___   ___  |
+| (___) (___) (___) |
+|                   |
+|  ___   ___   ___  |
+| (___) (___) (___) |
+|      O     O      |
+|  ___   ___   ___  |
+| (___) (___) (___) |
+|                   |
+\         o         /
+ \_________________/
+```
+
+=== ID: 2b7425d72938417d | TITLE: Cordless telephone | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 21x39 ===
+```
+                .-.
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+     _.--"""""""--;_
+    //             \\
+    ||   .-"""-.   ||
+    ||  /  ...  \  ||
+    || |  :::::  | ||
+    ||  \  '''  /  ||
+    ||   '-...-'   ||
+    |/.-----------.\|
+    ||.-"""""""""-.||
+    |||___________|||
+    ||[__][___][__]||
+    ||=== ===== ===||
+    |\  ===   ===  /|
+    | `'""""""""""` |
+    |[TALK] === === |
+    |.---..---..---.|
+    ||_1_||_2_||_3_||
+    |.---..---..---.|
+    ||_4_||_5_||_6_||
+    |.---..---..---.|
+    ||_7_||_8_||_9_||
+    |.---..---..---.|
+    ||_*_||_0_||_#_||
+    |____ _____ ____|
+    |==== ===== ====|
+    |====  ___  ====|
+    |   .'`   `'.   |
+jgs |  /  .:::.  \  |
+    \ '  {CASIO}  ' /
+     `--.........--'
+```
+
+=== ID: 0c2dc663df564037 | TITLE: Untitled | ARTIST: David Palmer | CATEGORY: electronics | SUBCATEGORY: phones | SIZE: 30x44 ===
+```
+                          .--.
+                          |  |
+                          |  |
+                          |  |
+                          |  |
+         _.-----------._  |  |
+      .-'      __       `-.  |
+    .'       .'  `.        `.|
+   ;         :    :          ;
+   |         `.__.'          |
+   |   ___                   |
+   |  (_M_) M O T O R A L A  |
+   | .---------------------. |
+   | |                     | |
+   | |                     | |
+   | |                     | |
+   | |                     | |
+   | |                     | |
+   | |                     | |
+   | |                     | |
+   | `---------------------' |
+   |                         |
+   |                __       |
+   |  ________  .-~~__~~-.   |
+   | |___C___/ /  .'  `.  \  |
+   |  ______  ;   : OK :   ; |
+   | |__A___| |  _`.__.'_  | |
+   |  _______ ; \< |  | >/ ; |
+   | [_=<D)__\ \ \_|  |_/ /  |
+   |            `-..__..-'   |
+   |  _____   _____   _____  |
+   | [ 1   ] [ 2abc] [ 3def] |
+   |  _____   _____   _____  |
+   | [ 4ghi] [ 5jkl] [ 6mno] |
+   |  _____   _____   _____  |
+   | [7pqrs] [ 8tuv] [9wxyz] |
+   |  _____   _____   _____  |
+   | [_*___] [_0_+_] [__#__] |
+   |    _     _....---...._  |
+   |   (O)   (_    [_]C520_) |
+   |           ''''---''''   |
+   ;    o                    ;
+    `-._                 _.-'
+dp      `"""""""""""""""'
+```
+
+=== ID: 9d166a9c925bd08e | TITLE: Untitled | ARTIST: Argiris A. Kranidiotis | CATEGORY: electronics | SUBCATEGORY: other | SIZE: 35x8 ===
+```
+     ____________________________
+    /                           /\
+   /   Argiris A. Kranidiotis _/ /\
+  /                          / \/
+ /                           /\
+/___________________________/ /
+\___________________________\/
+ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
+```
+
+=== ID: e79825cb9132ffdb | TITLE: Hair dryer | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: other | SIZE: 40x15 ===
+```
+    _....._
+  .'       '.-------------,   ~~_  ~ - ~
+ /   ====   '            /    ~. - ~~ ~
+|   ======   ;__________/   ~-  _~  ~
+|   ======   |
+ \   ====   /
+  '.      .'
+    \   (`
+     \ __\
+      \\_\\
+      /   |
+ jgs  |   \
+      '-,,-'
+        ||
+       //
+```
+
+=== ID: 26e586d5db023498 | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 15x8 ===
+```
+      \_/
+     (* *)
+    __)#(__
+   ( )...( )(_)
+   || |_| ||//
+>==() | | ()/
+    _(___)_
+   [-]   [-]MJP
+```
+
+=== ID: 251cb1e6e32f323a | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 17x9 ===
+```
+     ,     ,
+    (\____/)
+     (_oo_)
+       (O)
+     __||__    \)
+  []/______\[] /
+  / \______/ \/
+ /    /__\
+(\   /____\
+```
+
+=== ID: 6be02c804d06dfc1 | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 17x9 ===
+```
+    \_\
+   (_**)
+  __) #_
+ ( )...()
+ || | |I|
+ || | |()__/
+ /\(___)
+_-"""""""-_""-_
+-,,,,,,,,- ,,-MJP
+```
+
+=== ID: 4f0415c06acebd57 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 22x9 ===
+```
+         __
+ _(\    |@@|
+(__/\__ \--/ __
+   \___|----|  |   __
+       \ }{ /\ )_ / _\
+       /\__/\ \__O (__
+      (--/\--)    \__/
+      _)(  )(_
+     `---''---`
+```
+
+=== ID: 63826013fbd015d4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 20x9 ===
+```
+       __
+   _  |@@|
+  / \ \--/ __
+  ) O|----|  |   __
+ / / \ }{ /\ )_ / _\
+ )/  /\__/\ \__O (__
+|/  (--/\--)    \__/
+/   _)(  )(_
+   `---''---`
+```
+
+=== ID: 8e9378d228786089 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 15x10 ===
+```
+       _
+      [ ]
+     (   )
+      |>|
+   __/===\__
+  //| o=o |\\
+<]  | o=o |  [>
+    \=====/
+   / / | \ \
+  <_________>
+```
+
+=== ID: 6c7ebfe931f4604f | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 21x12 ===
+```
+   __,_,
+  [_|_/
+   //
+ _//    __
+(_|)   |@@|
+ \ \__ \--/ __
+  \o__|----|  |   __
+      \ }{ /\ )_ / _\
+      /\__/\ \__O (__
+     (--/\--)    \__/
+     _)(  )(_
+    `---''---`
+```
+
+=== ID: aba05047e26eec94 | TITLE: Untitled | ARTIST: Mark Moir | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 35x14 ===
+```
+       _______
+     _/       \_
+    / |       | \
+   /  |__   __|  \
+  |__/((o| |o))\__|
+  |      | |      |
+  |\     |_|     /|
+  | \           / |
+   \| /  ___  \ |/
+    \ | / _ \ | /
+     \_________/
+      _|_____|_
+ ____|_________|____
+/                   \  -- Mark Moir
+```
+
+=== ID: 84553688d829031f | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: blender | SIZE: 16x7 ===
+```
+    ___
+ , | l |
+(( | l | ))
+   | l | '
+    \_/
+   /...\--.   _
+   =====  `--(_=
+```
+
+=== ID: 406d9aa817d02048 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: blender | SIZE: 18x8 ===
+```
+   __...---...__
+  [K:E:N:W:O:O:D]
+  \      OO     /
+   \    (~~)   /
+    \  (    ) /
+     \  ^^^^ / _
+ _____:-----:_/_\
+|________________|
+```
+
+=== ID: d3c1efdb2faec189 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: electronics | SUBCATEGORY: blender | SIZE: 22x12 ===
+```
+   _____.-._____
+  '-------------'
+  |    (o)(0)   |
+  |  o.(.--).o  |
+  \  O` ) : `o  /
+   | o.( _).O  |
+    \O' `- 'o /
+     |  >|<  |
+     \_______/
+  .'==========='.
+ / o o o o o o o \ LGB
+'-----------------'
+```
+
+=== ID: 6a56f4d13c1f0b30 | TITLE: Frog in a blender | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: blender | SIZE: 28x19 ===
+```
+           ___
+   _______|___|______
+__|__________________|
+\  ]________________[ `---.
+ `.                   ___  L
+  |   _              |   L |
+  | .'_`--.___   __  |   | |
+  |( 'o`   - .`.'_ ) |   F F
+  | `-._      `_`./_ |  / /
+  J   '/\\    ( .'/ )F.' /
+   L ,__//`---'`-'_/J  .'
+   J  /-'        '/ F.'
+    L            ' J'
+    J `.`-. .-'.'  F
+     L  `.-'.-'   J
+     |__(__(___)__|
+     F            J
+    J              L
+    |______________|
+```
+
+=== ID: 7363104aafa0adde | TITLE: Electric plug | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: electronics | SIZE: 25x5 ===
+```
+                  _
+             .---/ '____
+   _________'   | .-.---'
+jgs---------.   | |_|___
+             '---\_.----'
+```
+
+=== ID: 5b9e0ce4d02a0dc9 | TITLE: Electric plug | ARTIST: Veronica Karlsson | CATEGORY: electronics | SUBCATEGORY: electronics | SIZE: 18x6 ===
+```
+      ____
+ ____|    \
+(____|     `._____
+ ____|       _|___
+(____|     .'
+     |____/
+```
+
+=== ID: e20e28358cfa2af6 | TITLE: Light switch | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: electronics | SIZE: 16x12 ===
+```
+    .----------.
+    |   ~ON~   |
+    |   ____   |
+    |  |.--.|  |
+    |  ||  ||  |
+    |  ||__||  |
+    |  ||\ \|  |
+    |  |\ \_\  |
+    |  |_\[_]  |
+    |          |
+jgs |  ~OFF~   |
+    '----------'
+```
+
+=== ID: 594290a25910cd6f | TITLE: Radio | ARTIST: Matthew Thomas | CATEGORY: electronics | SUBCATEGORY: audio-equipment | SIZE: 20x6 ===
+```
+       _________
+     _|_________|_
+    /             \
+MT | ###       ### |
+   | ###       ### |
+    \_____________/
+```
+
+=== ID: e3f15f7cdfe8e16c | TITLE: Radio playing music | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: audio-equipment | SIZE: 28x12 ===
+```
+                !
+                |
+                |    |~/
+                |   _|~
+  .============.|  (_|   |~/
+.-;____________;|.      _|~
+| [_________I__] |     (_|
+|  """"" (_) (_) |
+| .=====..=====. |
+| |:::::||:::::| |
+| '=====''=====' |  jgs
+'----------------'
+```
+
+=== ID: f20e1b1d87c0fb63 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: electronics | SUBCATEGORY: calculators | SIZE: 17x10 ===
+```
+ __________
+| ________ |
+||12345678||
+|""""""""""|
+|[M|#|C][-]|
+|[7|8|9][+]|
+|[4|5|6][x]|
+|[1|2|3][%]|
+|[.|O|:][=]|
+"----------"  hjw
+```
+
+=== ID: 07153e5553c889ff | TITLE: Regular Calculator | ARTIST: Jeremy J. Olson | CATEGORY: electronics | SUBCATEGORY: calculators | SIZE: 23x14 ===
+```
+ _____________________
+|  _________________  |
+| | JO           0. | |
+| |_________________| |
+|  ___ ___ ___   ___  |
+| | 7 | 8 | 9 | | + | |
+| |___|___|___| |___| |
+| | 4 | 5 | 6 | | - | |
+| |___|___|___| |___| |
+| | 1 | 2 | 3 | | x | |
+| |___|___|___| |___| |
+| | . | 0 | = | | / | |
+| |___|___|___| |___| |
+|_____________________|
+```
+
+=== ID: 3bf52b621c1d6730 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: calculators | SIZE: 23x14 ===
+```
+ _____________________
+/ ,-----------------. \
+| |    1.05459 e -34| |
+| `-----------------' |
+| [@ ] On/Off  ###### |
+|              ###### |
+| [7] [8] [9] [C] [AC]|
+|                     |
+| [4] [5] [6] [X] [%] |
+|                     |
+| [1] [2] [3] [+] [-] |
+|                     |
+| [0] [.]  [EXP]  [=] |
+\_____________________/
+```
+
+=== ID: bcb56e8a6d2d7247 | TITLE: Scientific Calculator | ARTIST: Jeremy J. Olson | CATEGORY: electronics | SUBCATEGORY: calculators | SIZE: 23x21 ===
+```
+ _____________________
+|  _________________  |
+| | JO  3.141592654 | |
+| |_________________| |
+|  __ __ __ __ __ __  |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+|  ___ ___ ___   ___  |
+| | 7 | 8 | 9 | | + | |
+| |___|___|___| |___| |
+| | 4 | 5 | 6 | | - | |
+| |___|___|___| |___| |
+| | 1 | 2 | 3 | | x | |
+| |___|___|___| |___| |
+| | . | 0 | = | | / | |
+| |___|___|___| |___| |
+|_____________________|
+```
+
+=== ID: eaa79919c00f4773 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: calculators | SIZE: 31x22 ===
+```
+.-----------------------------.
+| # Texax Instruments   TI-82 |
+| .-------------------------. |
+| |            ./           | |
+| |            +            | |
+| |. . . . . ./. . . . . . .| |
+| |          / .            | |
+| | X=5.2   /  .   Y=0      | |
+| '-------------------------' |
+| [Y=][WIN][ZOOM][TRACE][GRH] |
+|                  _ [ ^ ] _  |
+| [2nd][MODE][DEL]|_|     |_| |
+| [ALP][XTO][STAT]   [ V ]    |
+| [MATH][MAT][PGM][VARS][CLR] |
+| [x-1] [SIN] [COS] [TAN] [^] |
+|  [x2][ , ][ ( ][ ) ][ / ]   |
+| [LOG][ 7 ][ 8 ][ 9 ] [ X ]  |
+| [LN ][ 4 ][ 5 ][ 6 ] [ - ]  |
+| [STO>][ 1 ][ 2 ][ 3 ][ + ]  |
+| [ON][ 0 ][ . ][ (-) ][ENTR] |
+| ----                        |
+'-----------------------------'
+```
+
+=== ID: 892ff7d579e9734b | TITLE: Graphing Calculator | ARTIST: Jeremy J. Olson | CATEGORY: electronics | SUBCATEGORY: calculators | SIZE: 23x25 ===
+```
+ _____________________
+|  _________________  |
+| |              /  | |
+| |       /\    /   | |
+| |  /\  /  \  /    | |
+| | /  \/    \/     | |
+| |/             JO | |
+| |_________________| |
+|  __ __ __ __ __ __  |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+| |__|__|__|__|__|__| |
+|  ___ ___ ___   ___  |
+| | 7 | 8 | 9 | | + | |
+| |___|___|___| |___| |
+| | 4 | 5 | 6 | | - | |
+| |___|___|___| |___| |
+| | 1 | 2 | 3 | | x | |
+| |___|___|___| |___| |
+| | . | 0 | = | | / | |
+| |___|___|___| |___| |
+|_____________________|
+```
+
+=== ID: f5e5c95602fa89e3 | TITLE: Tiny Camera | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 3x1 ===
+```
+[o]
+```
+
+=== ID: c2e88709f4757283 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 7x4 ===
+```
+   _
+ _|#|_
+| (O) |
+ -----
+```
+
+=== ID: 6520037e51b4c557 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 22x4 ===
+```
+              o OO=|
+              |-YY
+_____________/\_/|____
+:F_P:
+```
+
+=== ID: 614dfed99705ae8b | TITLE: Untitled | ARTIST: llizard | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 21x5 ===
+```
+         ___
+       [|   |=|{)__
+        |___| \/   )
+         /|\      /|
+ejm97   / | \     | \
+```
+
+=== ID: 5500624453a78fb3 | TITLE: Viewfinder Camera | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 10x5 ===
+```
+  _______
+ |__/-\[]|
+ |  (_)  |
+ |_______|
+    /|\
+```
+
+=== ID: 34f95170aa7eef94 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 15x5 ===
+```
+         _
+     _n_|_|_,_
+    |===.-.===|
+    |  ((_))  |
+jgs '==='-'==='
+```
+
+=== ID: 64ae76bb1c71734c | TITLE: Untitled | ARTIST: llizard | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 33x6 ===
+```
+            __
+        __ /_/\___
+       /__/[]\/__/|o-_
+      |    _     ||   -_
+      |  ((_))   ||     -_
+ejm96 |__________|/       ===oooo
+```
+
+=== ID: 5b0cd2b6c2b472f3 | TITLE: Untitled | ARTIST: Martin Schulze | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 25x6 ===
+```
+   ___             //////
+  (__|_______--/| /   ///
+  __/  +--+| |-\| (>   )/
+ |_|ooo+--+|_|    /_    /
+   `-------'       |_, //
+-Martin Schulze-   |___/
+```
+
+=== ID: b2f39454638e51a4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 27x7 ===
+```
+      .-------------------.
+     /--"--.------.------/|
+     |Kodak|__Ll__| [==] ||
+     |     | .--. | """" ||
+     |     |( () )|      ||
+jgs  |     | `--' |      |/
+     `-----'------'------'
+```
+
+=== ID: 0dacc9b6d61657a1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 9x8 ===
+```
+  \ | /
+ '  _  '
+-  |_|  -
+ ' | | '
+ _,_|___
+|   _ []|
+|  (O)  |
+|_______|
+```
+
+=== ID: 7b8e26d12cff6fe8 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 26x10 ===
+```
+        .---.
+        |[X]|
+ _.==._.""""".___n__
+d __ ___.-''-. _____b
+|[__]  /."""".\ _   |
+|     // /""\ \\_)  |
+|     \\ \__/ //    |
+|pentax\`.__.'/     |
+\=======`-..-'======/
+ `-----------------'   hjw
+```
+
+=== ID: 496f97c7c788e21c | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 27x12 ===
+```
+  ___________________
+)=|                 |     /
+  |  Falwell Films  |====||
+  |                 |====||
+  |                 |+    \
+  -------------------
+         (--)
+        *    *
+       *      *
+      *        *
+     *          *
+    *            *
+```
+
+=== ID: 674bb0cc2e69e181 | TITLE: Untitled | ARTIST: William Cody Sain | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 38x12 ===
+```
+                       _______
+   ___________________/       |______
+  ;; o__o       .....               ;;
+ ;;  ;__;       '''''       o o o  ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;
+;     ,,,         ,,,    _  ,,,,   ; ;
+;    ;;;;;       ;;;;;  ;_; ;;;;   ;;;
+;     '''   ,.,   '''       ````   ;;;
+;         ;` . `;                  ;;;
+;         ; `.` ;       wcs        ; ;
+;          `'''`                   ; ;
+;__________________________________;'`
+```
+
+=== ID: ecc454b2eb40e44d | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 28x14 ===
+```
+        o#######o
+      o###########o
+     o#############o
+    #################
+    ######  \########o
+   '#;^ _^,/---\#####!
+   ,` /^_ .-~^~-.__\#
+  /    ^\/,,@@@,, ;|
+ |      \!!@@@@@!! ^,
+#.    .\; '9@@@P'   ^,
+###./^ ----,_^^      /@-._
+              ^--._,o@@@@@@
+                 ^;@@@@@@@@@
+                   ^-;@@@@
+```
+
+=== ID: 331f3ec1ae78d2f4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 35x15 ===
+```
+   .________________-----_________
+  /  _             /   /         /|
+ /  ._.`          /   /    .   ./ |
+/________________/___/____|0000\  |
+|   /|\         |UUUU|    |0000|  |
+|  . | ,         `''`          | p|
+|  | | |         .---.   o     |  |
+|  | | |       .` .o, `.       |  |
+|  | | |       -  OOO  -       |  |
+|  | | |       '  'o`  '       | /|
+|  | | |       /'....-'\       |/A
+|--' | '------|---------|------|A/
+ ___\|/_______|_________|______ /
+
+@TEC
+```
+
+=== ID: f585f40498c0c100 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 25x19 ===
+```
+    _    _
+   ).\  (o)
+     \`,/~/\___
+     ,/        \,
+ .-./ |   ...    \._   /|
+| o |_|   |__}    ._III |
+ '-'  |         ,/     \|
+       `-------'
+          ||
+          ||
+          ||
+          ||
+         //\\
+        //||\\
+       // || \\
+      //  ||  \\
+     //   ||   \\
+    //    ||    \\   jgs
+ ====    ====   ====
+```
+
+=== ID: 4c513d93449212f6 | TITLE: Untitled | ARTIST: Bob R | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 30x19 ===
+```
+     ___ ____   ________
+   ,"_ ,`==='`.'__....__`--.
+ ,',' |      ,o@@@@@@@@@@o. \
+, /___|     d@/@@@@@@@@@@@@b \
+||   "|    d@/@@@@@@@@@@@@@@b|
+|| ()||   ,@/@@@@@@@@@@@@@@@@:
+|| , ||   @@@@@@@@@@@@@@@@@@@@
+||(|)||   '@@@@@@@@@@@@@@@@//D
+|| ' ||    '@@@@@@@@@@@@@@/@P
+|| , ||     `@@@@@@@@@@@@/@'|
+||(|)|| CCD   `@@@@@@@@@@'  |
+|| ' | '----------'"""""_,  |
+|| , |`.    S O N Y   |     |
+:|(|)| |              |     |
+`|  '| ::............::     ,
+ |\__| ::::::::::::::::----"
+ :     '::::::::::::::'
+  \                 ;   Bob_R
+   `---------------"
+```
+
+=== ID: d3bc0106bb373bd9 | TITLE: Untitled | ARTIST: Elissa Potier | CATEGORY: electronics | SUBCATEGORY: cameras | SIZE: 37x32 ===
+```
+            ___
+           / _ \
+          | / \ |
+          | \_/ |
+           \___/ ___
+           _|_|_/[_]\__==_
+          [---------------]
+          | O   /---\     |
+          |    |     |    |
+          |     \___/     |
+          [---------------]
+                [___]
+                 | |\\
+                 | | \\
+                 [ ]  \\_
+                /|_|\  ( \
+               //| |\\  \ \
+              // | | \\  \ \
+             //  |_|  \\  \_\
+            //   | |   \\
+           //\   | |   /\\
+          //  \  | |  /  \\
+         //    \ | | /    \\
+        //      \|_|/      \\
+       //        [_]        \\
+      //          H          \\
+     //           H           \\
+    //            H            \\
+   //             H             \\
+  //              H              \\
+ //                               \\
+//                                 \\
+```
+

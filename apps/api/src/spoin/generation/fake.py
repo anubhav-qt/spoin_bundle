@@ -211,7 +211,7 @@ class FakeContentGenerator(ContentGenerator):
             visual_slots = None
 
             if card_type in (CardType.ASCII, "ascii") or want_hero:
-                visual_id = f"fake-stickman-scene-{idx}"
+                visual_id = f"fake-ascii-scene-{idx}"
                 visual_slots = {
                     "art": f'  o   "Check this #{idx}!"\n /|\\\n / \\',
                     "alt": f"Stick figure explaining scenario {idx}",

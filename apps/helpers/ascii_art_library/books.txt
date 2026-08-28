@@ -1,0 +1,1450 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: BOOKS
+# Total artworks in category fitting <=40 cols: 65
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 42d941855d40ef4f | TITLE: Untitled | ARTIST: Jussi Roine | CATEGORY: books | SUBCATEGORY: books | SIZE: 23x6 ===
+```
+    _______
+   /      /,
+  /      //
+ /______//
+(______(/
+            Jussi Roine
+```
+
+=== ID: 9bf427c87d74a160 | TITLE: Person reading a book | ARTIST: Stanislaw Ciszewski | CATEGORY: books | SUBCATEGORY: books | SIZE: 31x6 ===
+```
+ ooooO   .=====i=====.   Ooooo
+|    /   |     |     |   \    |
+|   |   <|     |     |>   |   |
+|   |\~-.|_____|_____|.-~/|   |
+|   \ \   ~-.(___).-~   / /   |
+ \__/-/_________________\-\__/
+```
+
+=== ID: 44b41b44e6b23f31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: books | SIZE: 26x8 ===
+```
+(\
+\'\
+ \'\     __________
+ / '|   ()_________)
+ \ '/    \ ~~~~~~~~ \
+   \       \ ~~~~~~   \
+   ==).      \__________\
+  (__)       ()__________)
+```
+
+=== ID: 552a286d4b6da311 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: books | SIZE: 27x8 ===
+```
+       __..._   _...__
+  _..-"      `Y`      "-._
+  \ Once upon |           /
+  \\  a time..|          //
+  \\\         |         ///
+   \\\ _..---.|.---.._ ///
+jgs \\`_..---.Y.---.._`//
+     '`               `'
+```
+
+=== ID: 523d39568d05b5da | TITLE: Untitled | ARTIST: David Issel | CATEGORY: books | SUBCATEGORY: books | SIZE: 34x8 ===
+```
+      _ _
+ .-. | | |
+ |M|_|A|N|
+ |A|a|.|.|<\
+ |T|r| | | \\
+ |H|t|M|Z|  \\      "Bookshelf" by
+ | |!| | |   \>     David S. Issel
+""""""""""""""""""
+```
+
+=== ID: 8d5b0e86c79a0afb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: books | SIZE: 11x10 ===
+```
+,         ,
+|\\\\ ////|
+| \\\V/// |
+|  |~~~|  |
+|  |===|  |
+|  |j  |  |
+|  | g |  |
+ \ |  s| /
+  \|===|/
+   '---'
+```
+
+=== ID: 5a8162616ac5be89 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: books | SIZE: 8x10 ===
+```
+   ,   ,
+  /////|
+ ///// |
+|~~~|  |
+|===|  |
+|j  |  |
+| g |  |
+|  s| /
+|===|/
+'---'
+```
+
+=== ID: 73d29273b315596f | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: books | SUBCATEGORY: books | SIZE: 25x11 ===
+```
+        _.-"\
+    _.-"     \
+ ,-"          \
+( \            \
+ \ \            \
+  \ \            \
+   \ \         _.-;
+    \ \    _.-"   :
+     \ \,-"    _.-"
+      \(   _.-"  -shimrod
+       `--"
+```
+
+=== ID: da306629afd8567d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: books | SIZE: 15x11 ===
+```
+   /|~|\
+  / |=| \
+ /  | |  \
+|   | |   |
+|   | |   |
+|   | |   |
+|   |=|   |
+|  //A\\  |
+| /// \\\ | jgs
+|///   \\\|
+`         `
+```
+
+=== ID: 1d88bc6c880b2b8d | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: books | SUBCATEGORY: books | SIZE: 40x12 ===
+```
+                 .--.   _
+             .---|__| .((\=.
+          .--|===|--|/    ,(,
+          |  |===|  |\      y
+          |%%|   |  | `.__,'
+          |%%|   |  | /  \\\
+          |  |   |  |/|  | \`----.
+          |  |   |  ||\  \  |___.'_
+         _|  |   |__||,\  \-+-._.' )_
+        / |  |===|--|\  \  \      /  \
+hjw    /  `--^---'--' `--`-'---^-'    \
+      '================================`
+```
+
+=== ID: f31a3a98c66164d8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: books | SIZE: 21x13 ===
+```
+                  /\
+                 /  )
+                (__/
+        ____     //
+  _--~~~    ~~~-//
+ /   ()   ()   // )
+|           _-//-~
+| ()       (_//
+|            ~~---_
+ \  ()       ()    )
+  ~--__  ()    __-~
+       ~//~~~~~
+       //
+```
+
+=== ID: e2674480576895fe | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: books | SIZE: 37x15 ===
+```
+        _________   _________
+   ____/      452\ /     453 \____
+ /| ------------- |  ------------ |\
+||| ------------- | ------------- |||
+||| ------------- | ------------- |||
+||| ------- ----- | ------------- |||
+||| ------------- | ------------- |||
+||| ------------- | ------------- |||
+|||  ------------ | ----------    |||
+||| ------------- |  ------------ |||
+||| ------------- | ------------- |||
+||| ------------- | ------ -----  |||
+||| ------------  | ------------- |||
+|||_____________  |  _____________|||
+L/_____/--------\\_//W-------\_____\J
+```
+
+=== ID: 6df733d051988181 | TITLE: Gollum | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 34x15 ===
+```
+           ___
+         .';:;'.
+        /_' _' /\   __
+        ;a/ e= J/-'"  '.
+        \ ~_   (  -'  ( ;_ ,.
+         L~"'_.    -.  \ ./  )
+         ,'-' '-._  _;  )'   (
+       .' .'   _.'")  \  \(  |
+      /  (  .-'   __\{`', \  |
+     / .'  /  _.-'   "  ; /  |
+    / /    '-._'-,     / / \ (
+ __/ (_    ,;' .-'    / /  /_'-._
+`"-'` ~`  ccc.'   __.','     \j\L\
+                 .='/|\7
+     snd           ' `
+```
+
+=== ID: 19d8059bbf55d34f | TITLE: Ent | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 23x17 ===
+```
+     _ .-'
+     _`\`
+ `._/` ;_.  \,
+    `. /  _ /`
+      ;_ _,;
+    _/ , , /_,
+    `"\ _  |'
+    _=}  ` ;/
+   .'    `. `-._
+,_/ ,| '    {  `.
+ ] ',/  ; , ;\ , \_
+ `._L`\  `  \ `.` :`
+  `"` | / ; [   J./_
+     /   .   `. ` `"
+    { ;' |\`._ \
+    | `  ; J  ` \
+   /_\_/__}{_\_/_)  fsc
+```
+
+=== ID: 1ffdc5502d28e822 | TITLE: Untitled | ARTIST: C. Jacobsen | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 21x18 ===
+```
+            ,
+         ,-`;
+  ,      ; ;      ,
+ ,  `'"""   """'`  ,
+, ,-'````, ,````'-, ,
+``    ,'`` ``',    ``
+     ' ,`; ;`, '
+     `,`,; ;,',`
+     ,'` ,  ,`
+-, '`,-'`; ;',`, ,
+`,,'`    ; ;  `,`,`
+         ; ;    `
+         ;  '-
+         ; '`
+         ` `
+        , '
+   ,'`:, '
+    , - `      KTJ
+```
+
+=== ID: 85d768b06b220963 | TITLE: Gollum | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 36x21 ===
+```
+                      _..
+                    .'   `",
+                   ;        \
+            .---._; ^,       ;
+         .-'      ;{ :  .-. ._;
+    .--""          \*'   o/ o/
+   /   ,  /         :    _`";
+  ;     \;          `.   `"+'
+  |      }    /    _.'T"--"\
+  :     /   .'.--""-,_ \    ;
+   \   /   /_         `,\   ;
+    : /   /  `-.,_      \`.  :
+    |;   {     .' `-     ; `, \
+    : \  `;   {  `-,__..-'   \ `}+=,
+     : \  ;    `.   `,        `-,\"
+     ! |\ `;     \}?\|}
+  .-'  | \ ;
+.'}/ i.'  \ `,        fsc
+``''-'    /   \
+         /J|/{/
+           `'
+```
+
+=== ID: 0e5e3ae87964623c | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 37x26 ===
+```
+                       ,---.
+                       /    |
+                      /     |
+  Gandalf            /      |
+                    /       |
+               ___,'        |
+             <  -'          :
+              `-.__..--'``-,_\_
+                 |o/ <o>` :,.)_`>
+                 :/ `     ||/)
+                 (_.).__,-` |\
+                 /( `.``   `| :
+                 \'`-.)  `  ; ;
+                 | `       /-<
+                 |     `  /   `.
+ ,-_-..____     /|  `    :__..-'\
+/,'-.__\\  ``-./ :`      ;       \
+`\ `\  `\\  \ :  (   `  /  ,   `. \
+  \` \   \\   |  | `   :  :     .\ \
+   \ `\_  ))  :  ;     |  |      ): :
+  (`-.-'\ ||  |\ \   ` ;  ;       | |
+   \-_   `;;._   ( `  /  /_       | |
+    `-.-.// ,'`-._\__/_,'         ; |
+       \:: :     /     `     ,   /  |
+        || |    (        ,' /   /   |
+        ||                ,'   / SSt|
+```
+
+=== ID: 02d550e58f97a9e3 | TITLE: Gimli | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 31x28 ===
+```
+             _.-;-._
+            ;_.JL___;
+            F"-/\_-7L
+            | a/ e | \
+           ,L,c;,.='/;,
+        _,-;;S:;:S;;:' '--._
+       ;. \;;s:::s;;: .'   /\
+      /  \  ;::::;;  /    /  \
+     / ,  k ;S';;'S.'    j __,l
+  ,---/| /  /S   /S '.   |'   ;
+ ,Ljjj |/|.' s .' s   \  L    |
+ LL,_ ]( \    /    '.  '.||   ;
+ ||\ > /  ;-.'_.-.___\.-'(|=="(
+ JJ," /   |_  [   ]     _]|   /
+  LL\/   ,' '--'-'-----'  \  (
+  ||     ;      |          |  >
+  JJ     |      |\         |,/
+   LL    |      ||       ' |
+   ||    |      ||       . |
+   JJ    /_     ||       ;_|
+    LL   L "==='|i======='_|
+    ||    i----' '-------';
+    JJ    ';-----.------,-'
+     LL     L_.__J,'---;'
+     ||      |   ,|    (
+     JJ     .'=  (|  ,_|
+      LL   /    .'L_    \
+snd   ||   '---'    '.___>
+```
+
+=== ID: 6dfbc1c8527cf6e1 | TITLE: Untitled | ARTIST: Jonathon R. Oglesbee | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 36x28 ===
+```
+                       /\
+        _/\           /  \
+    _  /   \         /    \/\
+   / \/   _ \     /\/\  _  _/\
+  /   \_ / \/\_/\/_/  \/ \/   \
+ /\/\   \_   /   \/            \
+/    \___/\ /     \             \
+           \       \             \
+           .-"---.  \             \
+__..---.. /       \  \             \
+         /\___.-'./\''--..____..--''
+`-.      \/ O) (O \/ ''--.._
+    __    |  (_)  |         _.-'-._
+   / /  __/\\___//\__ ..--''-._
+   | (_/\ \/`---'\/ /\         `-._
+_.-\ \/  \  \   /  /  \.-'-._
+   /\|   /  -| |-  \   \     `-._
+  | ||  /\  -| |-  /\   \        `-.
+   \/|_/ |  -|_\-  |/   /
+   \ \   /  /B_B\  \\  /
+   / (   \_/  _  \_/ \/
+.__\ \   /    |    \_/
+   ) /''-| __ | __ |
+   |(    \    |    /---...___
+   /|    /____|____\         '-._
+   ||     |   ||   |
+   \\     ///\\//\\\
+jro \|   oOO(_)(_)OOo
+```
+
+=== ID: 37fb3dc018174d91 | TITLE: Hobbit | ARTIST: Niels Rasmus Hansen | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 31x31 ===
+```
+              _,,,,_
+           .(((()()()(
+           ())()()))())
+          ((,.""-,(()())
+          \ @ ) @  )/)()
+          .'-. -   (C))
+          (  (_. ` .))
+          \ .___.   .'
+         __`.____.' \_____
+       /(  " /))_\.-'  (  `\
+      / ( _  o/(o "  _ \   `.
+     (  /. . o)/o       (    \
+    /   ( . o/(o .  "  .)\    )
+   (   )( _ o)\o  _   . )(    )
+   (   (.' o)/o    `.   )/   /
+    \ ( . "o((o .  . ` _/   )
+     (/)____o)/o______(c`-.)
+      |)_|__[H]___|___(//)'
+      (   )  : \  )    `''
+      (_)  (  )    \ (_ )
+      (      .   (      )
+     (  ( )   (\  /  )  )
+      (    (   (       )
+      (  ( ) ./ \ ( .( )
+       (     )  (     )
+       |"^"")    ("^"")
+       |    /    \    |
+ pils  ),,,,)    |,,,,/
+       /,,,,(    ),,,,(
+    .-',,,,,)    /,,,,\
+   ((((_).-'    (_)())))
+```
+
+=== ID: b3e9539113a03768 | TITLE: Frodo | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 31x32 ===
+```
+                       \ : /
+                    '-: __ :-'
+                    -:  )(_ :--
+                    -' |r-_i'-
+            ,sSSSSs,   (2-,7
+            sS';:'`Ss   )-j
+           ;K e (e s7  /  (
+            S, ''  SJ (  ;/
+            sL_~~_;(S_)  _7
+|,          'J)_.-' />'-' `Z
+j J         /-;-A'-'|'--'-j\
+ L L        )  |/   :    /  \
+  \ \       | | |    '._.'|  L
+   \ \      | | |       | \  J
+    \ \    _/ | |       |  ',|
+     \ L.,' | | |       |   |/
+    _;-r-<_.| \=\    __.;  _/
+      {_}"  L-'  '--'   / /|
+            |   ,      |  \|
+            |   |      |   ")
+            L   ;|     |   /|
+           /|    ;     |  / |
+          | |    ;     |  ) |
+         |  |    ;|    | /  |
+         | ;|    ||    | |  |
+         L-'|____||    )/   |
+             % %/ '-,- /    /
+     snd     |% |   \%/_    |
+          ___%  (   )% |'-; |
+        C;.---..'   >%,(   "'
+                   /%% /
+                  Cccc'
+```
+
+=== ID: eabcae912187597d | TITLE: Arwen | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 35x34 ===
+```
+          .;;;,.,
+         ;sXs=SV2;
+        ;;Y; _ ^_;
+        :LS  a (a(
+       ;;;;   .. ;
+       ;';)'. ==/;
+     _.-';   '-';-;_
+    /\\  ;;    ;; //'.
+   | ,\\_;_____; '/,  \
+   | | ';;--- ;;-' |   \
+   F |  ;     ;    |\   \
+  J  .\';    ;     | ;--t
+  |__/ )      ;   / .'';|
+  j  '-,__   __.---;    (
+   )  ( =r'-| ' .  \  '; )
+   | : "-s=-|   '  |   ; |
+   | : ; \  |   |  |     |
+    L; :  L |      ;     |
+   J ;    | |   :  ;     |
+   | ;    J |   :   ;    |
+   L.'     L|       (    |
+  J ;  :   ||  '    ;    |
+  | ;      ||  :    ;    |
+  |,/  ;   ||       ;    \
+  |(   :   ||   __.'     |
+  | >  |   ||,-'         |
+  |/   ;   |Z_,          |
+  (,  _L---J   '.        |
+   '-'|       |  '--._   |
+      |       :     ; '-r
+      |   ;   |     |; ||-._____
+snd __/ | ;   '|    |; ;(-'.--' ';
+  ,'_'/;  ',   ; \ ( _L_.'-._'---,;
+ '-----L___;--.,__;-' --''-.'---'
+```
+
+=== ID: 4a08ac97eed4498a | TITLE: Saruman's Tower at Orthanc, Isengard | ARTIST: Graeme Porter | CATEGORY: books | SUBCATEGORY: lord-of-the-rings | SIZE: 22x49 ===
+```
+    .       ..       .
+    |\      ||      /|
+    | \     ||     / |
+    |  \    ||    /  |
+    |  :\___JL___/   |
+    |  :|##XLJ: :|   |
+    '\ :|###||: X|  /'
+      \:|###||:X#| /
+       |==========|
+        |###XXX;;|
+        |##XX:: :|
+        |##Xn:: :|
+        |##XU:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: n|
+        |##XX:: U|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##Xn:: :|
+        |##XU:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: n|
+        |##XX:: U|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##Xn:: :|
+        |##XU:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: n|
+        |##XX:: U|
+        |##XX:: :|
+        |##XX:: :|
+        |##XX:: :|
+        |##,_,: :|
+        |./ T \.:|
+        || o|o |:|
+        ||  |  |:|
+      .============.
+     .==============.
+    .================.
+Graeme Porter
+```
+
+=== ID: 1c645d929b95906b | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: dr-seuss | SIZE: 17x18 ===
+```
+        _____
+       /ZZZZZ)
+       |____/
+       |ZZZZ|
+       \_____\
+       |ZZZZZ|___
+     .'(\ @ @)_.
+       /;   " )-
+       \; `--'
+         \,'/
+      ___|;|___
+     >xXX>O<XXx<
+       /;;XX \
+      |;  XX;|
+      |;   X  |
+      |;;__/|\|
+snd   ';(__ k_)
+       ;;; \|/
+```
+
+=== ID: 9ac5ba31f2620592 | TITLE: Cat in the Hat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: dr-seuss | SIZE: 34x34 ===
+```
+                 _.---,_
+               .'       `'.
+                \    __..-'\
+                 }-"`       \
+                /__,,..---.._|
+                \            |
+                |---..__     |
+               /        ``"-./
+             .'---...__      |
+           .'          ``"-./
+      ,--./...,,,__        /
+      '--.'__    __```.-. /._
+        / `  `  '  `=/.-.|-._)
+        | .-.  .-.  "\\  /
+        || O| | O|  ""=='_\
+      .-' '-'o '-'    ""=\`
+`''--/-              ""=-,\--._
+.---|-            ( ""=-. \`
+    \             /`)"=."=|'-.
+     '.       _.-' '  "=|\|
+       (`----`    '="=|/
+        `-.       "=/`
+           '.     =/
+             \   =|
+  .-.        |` "=|
+ (   ~._     | "==|        _.-~`\
+  \     ~.   |'"="|    _.-~      )
+   ;      ~-.|.-._|_.-~         /
+  /        _-(  /-.__          (
+ '._..--~~`/`/-'\-._ `~~-       ;
+     jgs  /"=|  |" =\~-...___.-~
+         /=" /  | "==\
+        / = (_  \  "==\
+       ;="=   `\_)  =="\
+```
+
+=== ID: 07b6700c5fb39e04 | TITLE: Sherlock holmes | ARTIST: Harry Mason (Hajoma) | CATEGORY: books | SUBCATEGORY: other | SIZE: 12x9 ===
+```
+   ,_
+ ,'  `\,_
+ |_,-'_)
+ /##c '\  (
+' |'  -{.  )
+  /\__-' \[]
+ /`-_`\
+ '     \
+hjm
+```
+
+=== ID: 671a643c6b531715 | TITLE: Eeyore | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 12x4 ===
+```
+ ,~~--~~-.
++      | |\
+|| |~ |`,/-\
+*\_) \_) `-'
+```
+
+=== ID: 1e18fd4a2976fed6 | TITLE: Piglet | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 12x10 ===
+```
+        _
+      _<_/_
+   __/    _>
+  '\  '  |
+    \___/
+    /+++\
+ o=|..|..|
+   | o/..|
+0==|+++++|
+ 0======/
+```
+
+=== ID: a69b3add0c9673fc | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 11x13 ===
+```
+   _
+ _( )_
+(     (o___
+ |      _ 7
+  \    (")
+  /     \ \
+ |    \ __/
+ |        |
+ (       /
+  \     /
+   )   /(_
+   |  (___)
+    \___)
+```
+
+=== ID: af41b676969c1977 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 19x14 ===
+```
+    _
+ __( )_
+(      (o____
+ |          |
+ |      (__/
+   \     /   ___
+   /     \  \___/
+ /    ^    /     \
+|   |  |__|_HUNNY |
+|    \______)____/
+ \         /
+   \     /_
+    |  ( __)
+    (____)
+```
+
+=== ID: f7914bbb849fa012 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 35x16 ===
+```
+                    .--,
+     .-.    __,,,__/    |
+    /   \-'`        `-./_
+    |    |               `)
+     \   `             `\ ;
+    /       ,        ,    |
+    |      /         : O /_
+    |          O  .--;__   '.
+    |                (  )`.  |
+    \                 `-` /  |
+     \          ,_  _.-./`  /
+      \          \``-.(    /
+      |           `---'   /--.
+    ,--\___..__        _.'   /--.
+jgs \          `-._  _`/    '    '.
+    .' ` ' .       ``    '        .
+```
+
+=== ID: 65bf0f16c2236176 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 17x17 ===
+```
+  _    _
+ (_`,_' )
+  )    `\
+ /    ', |
+ |       `,
+  \,_  `-/
+  ,&&&&&V
+ ,&&&&&&&&:
+,&&&&&&&&&&;
+|  |&&&&&&&|
+|  |       :\
+|  |       ; \
+`--'   `, /`-'
+  /`.    \
+ /   /\  _\  -swm
+ \   \ \/  \
+  \__'  \__/
+```
+
+=== ID: 6b2c3d551322f0b2 | TITLE: Eeyore | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 34x17 ===
+```
+   /`"'-,__
+   \/\)`   `'-.
+  // \ .--.\   '.
+ //|-.  \_o `-.  \---._
+ || \_o\  _.-.\`'-'    `-.
+ || |\.-'`    |           `.
+ || | \  \    |             `\
+ \| /  \ ,\' /                \
+  `'    `---'                  ;
+         `))          .-'      |
+      .-.// .-.     .'        ,;=D
+     /  // /   \  .'          ||
+    |..-' |     '-'          //
+    ((    \         .===. _,//
+     '`'--`'---''',--\_/-;-'`
+jgs                `~/^\`
+                    '==='
+```
+
+=== ID: 2041aa0fab3746bc | TITLE: Untitled | ARTIST: Tom R. Earlywine | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 35x17 ===
+```
+     .'''.
+    '     '
+    '.   .'
+      '.'
+       '
+       '
+       '
+     /")\
+    / /\ \
+   / ()""()       pooh with balloon
+   |=( . .)
+   |  '(o)|
+   /______|
+   |      |
+ _ / ____ \ _
+( ) /    \ ( )
+|_|/ tre  \|_|
+```
+
+=== ID: 266ccf2ceae21f3a | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 21x17 ===
+```
+               _
+           .--'-/]
+       O---\     '.
+        \__       :
+         .'       :_
+       ..'._.-----'/
+      (  '.   .'''.:
+   ____'_  '' \   ::
+  [    U ]'.   \.' :
+ _/      \__'''  __\
+(_)Honey |  '---'  '.
+  '.____.'          :
+        :     .''.  :
+         ''..:   :.'
+          :  :   :
+         .' .'.  :
+   snd  '..'.....:
+```
+
+=== ID: c918194169c7a504 | TITLE: Tigger | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 23x18 ===
+```
+            __
+        _ ."--". _
+       (_:/ oo \:_)
+   /\,   _(`()`)_   ,/\
+   \ `~~~,(`""`),~~~` /
+    `'---|/`""`\|---'`
+         ||    ||
+     _   ||    ||   _
+    //)  ||    ||  (\\
+   (/ '-.\\    //.-' \)
+    `"=.,__`""`__,.-"`
+           }=-{
+           {==}
+           }-={
+           {==}
+           }-={
+jgs        {==}
+            ~~
+```
+
+=== ID: 9813ff71ae13b794 | TITLE: Untitled | ARTIST: Jola Backiel | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 26x19 ===
+```
+            .-_
+    ."'.  //,  )
+    "   \,'``'`,
+    `.   \  . '# )
+      `"'(   ,_,. _
+       _..'. `"/   `)-.
+   .``)_    `-` _-` `-`
+   `-'  /`-    \_ ,
+ .".  ,'        ,'  .".
+'  ;  /``'-.-`'";.  :  '
+:  : ;  `      ,  \ '  ;
+ \  '    `-._.     `,  /
+  `_.,-,`'-,,,,,-'`-,_`
+        :    ,"         jb
+        `.   ,
+         .   :
+         ;  ;
+       ,' _`
+      (_,'
+```
+
+=== ID: 889d03abde85f19f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 30x20 ===
+```
+            |\  _,
+            \_|/ |
+           .'  `\/
+         _o o`   |
+        ()`      ;
+     __  `--'    /
+     \_`\  `.___/
+       \ \ /=====\
+        \ |=====/`\
+         `|=====| |
+          |=====| |
+          |=====\_\
+          \======/
+          /`--/^`\
+     jgs  \  |\  |
+         (___(___)
+,===, ,, ,==, ,,   ,===,,====,
+||__))||// __ ||   ||__   ||
+||    ||\\  ||||   ||     ||
+''    '' '===''===''==='  ''
+```
+
+=== ID: 5b2f37fc0fd1c120 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 22x20 ===
+```
+            _     _
+           /\\.--/\\
+           \_ _  \//\
+         __/o o`     |
+        (/           |
+         \__,        /
+        __\-'       /
+   .-'``\ /`"-=.-="`)
+ /`  _.-.'          \
+ \_."   ,`-._ /    /_\
+       /     /-.._/ |
+      |     /    /  |
+     ,|    '.__.'   |
+ _  /  \     .-"".  /
+/ \/   /`-._|     |`
+\  \  /     \     |
+ \   /       \    |
+  '-'         `.  |
+           .-"`   \
+jgs        \__,.-'`
+```
+
+=== ID: dc6d03e3134394f1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 34x21 ===
+```
+        __  _-==-=_,-.
+        /--`' \_@-@.--<
+        `--'\ \   <___/.
+             \ \\   " /
+              >=\\_/`<
+  ____       /= |  \_|/
+_'    `\   _/=== \___/
+`___/ //\./=/~\====\
+    \   // /   | ===:
+     |  ._/_,__|_ ==:        __
+      \/    \\ \\`--|       / \\
+       |    _     \\:      /==:-\
+       `.__' `-____/       |--|==:
+          \    \ ===\      :==:`-'
+          _>    \ ===\    /==/
+         /==\   |  ===\__/--/
+        <=== \  /  ====\ \\/
+        _`--  \/  === \/--'
+       |       \ ==== |
+        -`------/`--' /
+                \___-'
+```
+
+=== ID: 52428badea17624b | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 34x21 ===
+```
+         __  _-==-=_,-.
+        /--`' \_@-@.--<
+        `--'\ \   <___/.
+            \ \\   " /
+              >=\\_/`<
+  ____       /= |  \_\\
+_'    `\   _/=== \__/\\\
+`___/ //\./=/~\====\  \ \
+    \   // /   | ===:  \_)
+     |  ._/_,__|_ ==:        __
+      \/    \\ \\`--|       / \\
+       |    _     \\:      /==:-\
+       `.__' `-____/       |--|==:
+          \    \ ===\      :==:`-'
+          _>    \ ===\    /==/
+         /==\   |  ===\__/--/
+        <=== \  /  ====\ \\/
+        _`--  \/  === \/--'
+       |       \ ==== |
+        -`------/`--' /
+                \___-'
+```
+
+=== ID: 7c471b1b5f249eaf | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 19x21 ===
+```
+     ,-.,-.
+   ,|  /-./_
+  (        (___
+  |      'o   \)
+  ;           /
+  |        ,_/
+ ((        \)
+  )`---.__ /(
+ /  , .   `' \
+/  |   |      `.
+)  |   |   __,'|
+`-->___<--'    |
+ | |   |       ;
+ ; |   (      /
+ \ `.   )   ,j  hjw
+  ;' `-' )-' |
+  |     /   /
+  |    /|  (_
+  ;   (_(    )
+  (     )`--'
+   `---'
+```
+
+=== ID: 06e8865f81c99669 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 28x24 ===
+```
+                   __
+              ,_  :  \
+              ; L_;   ;.
+              `.' `   ` \
+             ,'          ;
+             ; ",        |
+           .-' *         |
+          $    _         ;_
+           \   ;      _.-' )
+            `+*     .'   -')
+     [bug]   .`._.-'      /
+            ,(      .-   :
+         _.: ; -'.'     `,
+   /\--*"   \/  .'     ;  ;
+  /  \      /-.-'"*.  /    \
+ ;__.-*"\.--*"      ;:_..-+'
+ \\     :       _.-'       ;
+  \\    *.___.-'           :
+ .-\\      \               |
+: ;.-.      \-*""*.        ;
+: : ; ; _.-*"      ;      /
+ Y: : '"           ,___.-'
+   Y'  __...___.-*"
+    `"'
+```
+
+=== ID: d8a9e3ce928c7d39 | TITLE: Untitled | ARTIST: Kurt Scaletta | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 29x25 ===
+```
+                       /\
+                     /////\
+                   ///<< o  \
+                   \\\o>>   /
+                     \/   /
+                       \/
+                       /
+                      /
+                     /
+                    /
+   _               /
+ _( )_  __        /
+(     (o  \      /
+  |       /     /
+   \    (    _ /
+  /======\ /\ =)
+ ( *  * */ *_\
+ |*  * * * /
+ | *  \*_ /
+ /*  *  * |
+ ==========
+  \     /
+   )   /
+ / |  (
+ \ |___ )   Kurt Scaletta
+```
+
+=== ID: b0afe83dbf4b5e6e | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 34x26 ===
+```
+             ,  .p'
+     _    _.db.dP_
+      Tp.d$$$$$$$$$b.
+      :T$$$$$$$$$$b.
+  .-gd$$$$$$$$$$$^^Tb
+   .T$$$$$$^^$$$P"s. `
+-.d$$$$$$P    `T  "`;.
+d$$$$$P^' ,db   `.  :/Ts.
+$$$P'     ;P .--. `-.`--'`-._
+$$P (/  / :  ; /db.  `-.   .-`-.
+$P  /  :     :: T$P    .`-:    ,\
+P  /   |      `._.'  .'    `.  " ;
+  /    :            /        \   :
+ :     :           /     _.   \  :
+ ;     :          :     `"     ; ;
+:      |`--.      ;            :/
+;      ;    `. ; /             /
+      :       ::/            .'
+      |       | \  ,--.___.-'
+      ;       |  `--"'
+     :        |
+     |        :  bug
+     ;         ;
+    /          |
+   /           :
+  '            '
+```
+
+=== ID: 41760eef6faf13cb | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 37x36 ===
+```
+         _
+      ,g$Pdb.        ,:;
+     d$Pd$$P       .+:::
+ ,  :Pd$$$P       ,:::::
+ $.d*'`**'        ;::::;
+ $P               :::::
+ $ [bug]        _.+-**--.  ___
+ $         _.-*"__  ._  ,+:::::+.
+ $       ,'    :::;   ` ::::::::::+.
+ $_      :    ::::: "*  `^:::::::^"
+(.-+.    |   `.`^:;       : """
+(`-  \   :     `-.__;     ;     .---,
+ $-.  \   ;         '    /    .' .__:
+ $  \  \  |            .'   .'  .'
+     .  \ |          .'   .'  .'
+         \:         :   .'   /
+      `   :`-.___.-' l-'    /
+       \  ;-._   _.-:     .'
+        \:    """   :    /
+         ;-._      _.`-+'
+         |   ""**""     ;
+         |-._      _.-*':
+         ;   ""**""     |
+         :-._      _.-*'|
+          ;  ""**""     :
+          :-. _    _.-*';
+           \.' `.""    /
+     .--.  /     ; _..'
+    :    \/  /`--'-+'
+     \      /    :  \
+      `.   /      \  `.
+        `-'        `.  \
+                     ;  :
+                   .'   ;
+                  :    /
+                   `--'
+```
+
+=== ID: ec5257afed7e21b8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 39x50 ===
+```
+    _          ,d8b_
+  ,aP88b,     P"   "8.
+ ,8"    "bb88db,    lb
+ dl      "    "b,   .B'
+ "b.            "b ,9'
+   "b             "b
+   .J)             "b.
+  .d                "8a.
+  8               ,d' "9
+ d8               "   "b
+ 88                 d  B
+ 88                MP  P
+ 88                    'ba+
+  "8                     YP
+   "8            d       P
+ ba_b,        "b."b,   .d'
+  L;;PMMMbaa_   "d88ad8'
+   L.n;;;;;"YMba.""8.
+   ,V;;;;;;;;;;"Man,8b.
+   gd;;;;;;;;;;;;;"Mb;Mb.
+  gd;;;;;;;;;;;;;;;;;;"Mb,
+ d8b;;;;;;;;b;;;;;;;;;;;"b,
+ 7P"8ba;;;;;B;;;;;;;;;;;;"Na
+ 8"   "8b;;a";;;;;;;;;;;;;lB.
+ B     "8b,d;;paaaaaaqaL;;;"B
+,B       P" """'     ""Y8bmdMb
+dP      dP                 "ba,
+8       B'                   "ba
+8,      B                     "ba_
+"b      B                       b8_
+ B     78                       8^"8,
+ P     d"                       "8  "8,
+ 6.   aP                         B,  6J
+(8   .d, ,      ,                Bg. B'
+ "8bP"8.P        "ba.           .P 8P
+      'W8          "8ba.        B"
+        8.            l8      .8"
+        "b.            8a     B'
+       d8'b.            B.  XP'
+     d"   "ba.           P XP
+   .8       "ba_        ad8ba
+   l8         'Bb,    aP"_  "8.
+   '8      .adP""9a .d" d    lb
+    l     .ad"    "ad" f"    lP
+     8    '  "b    88 l'    ;l"
+      8a      'l   ll l     lB
+       8b     lb   "8.'l.   "P
+        '9     P'   lb.'    8"
+          '98P       8ba _aP"
+                       '""'
+```
+
+=== ID: 7899758b1159ccd0 | TITLE: Cheshire Cat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: alice-in-wonderland | SIZE: 31x12 ===
+```
+           .'\   /`.
+         .'.-.`-'.-.`.
+    ..._:   .-. .-.   :_...
+  .'    '-.(o ) (o ).-'    `.
+ :  _    _ _`~(_)~`_ _    _  :
+:  /:   ' .-=_   _=-. `   ;\  :
+:   :|-.._  '     `  _..-|:   :
+ :   `:| |`:-:-.-:-:'| |:'   :
+  `.   `.| | | | | | |.'   .'
+    `.   `-:_| | |_:-'   .'
+ jgs  `-._   ````    _.-'
+          ``-------''
+```
+
+=== ID: 0a165372e697d773 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: books | SUBCATEGORY: alice-in-wonderland | SIZE: 37x23 ===
+```
+                    _.---.---._
+ Alice            ,'     |     `.
+(01-Feb-02)     ,'       |       `.
+               /         :         \
+              .        ,' `.        .
+              :    _,-'     `-._    :
+              |  ,'___       ___`.  |
+              | : ' __`-   -'__ ` : |
+              | | ,',.`.   ,',.`. | |
+              | | `.`'_,' `._`',' | |
+              | |                 | |
+              | :        )        ; |
+              |  \      (_       /  |
+              |   \             /   |
+              |    \   ,-.-.   /    |
+              |    :`.  `-'  ,':    |
+              |    |,|`.___,'|.|    |
+              |    | :       ; |    |
+              |    |  \     /  |    |
+              |    |   `---'   |    |
+              :    |           |    ;
+               `.  | SSt       |  ,'
+                 `-'           `-'
+```
+
+=== ID: 88816dd61b45cb9a | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: books | SUBCATEGORY: alice-in-wonderland | SIZE: 31x29 ===
+```
+              ___
+            ,'/|\`.
+           :,',^.`.:
+           |,'_ _`.|
+           |:`*)*';|
+           ;|\ _ /|:
+        ,-(||.)-(.||)-.
+       |'  \|(\ /)|/  `|
+       `:. (  `|'  ) .;'
+        | : \ ,^. / : |
+       ,'`'\-`.._/_/; |
+       `:=..-...______;_
+       \`\ \'`. .-'\`: /
+       ;' \ \/|  \_,\ `:
+      /  / \ \;   \  \ .\
+     / //  _) `.'--`-----,
+    /  /  `-'-.)____...-' \
+   / ,(    ;    |  .    ) \\
+  //   `-./     |   \.-'    \
+ /   /     ``---'-''  \  .   \
+(   ,   ,     |     \  `  `   )
+ `./      ,   ' .   .     \_.'
+    `-._ /    . |    \ _.''
+        ``-.._|___..-''
+             |.'//
+             |'::
+             |=||
+            ,'.|`._
+           '--^'^--` SSt
+```
+
+=== ID: 7dbb6d1b6a470dd4 | TITLE: Untitled | ARTIST: Genoveva Galarza | CATEGORY: books | SUBCATEGORY: harry-potter | SIZE: 31x15 ===
+```
+          _
+      /b_,dM\__,_
+    _/MMMMMMMMMMMm,
+   _YMMMMMMMMMMMM(
+  `MMMMMM/   /   \   _   ,
+   MMM|  __  / __/  ( |_|
+   YMM/_/# \__/# \    | |_)arry
+   (.   \__/  \__/     ___
+     )       _,  |    '_|_)
+_____/\     _   /       | otter
+    \  `._____,'
+     `..___(__
+              ``-.
+                  \
+              gnv  )
+```
+
+=== ID: 8cb98480aa700443 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: harry-potter | SIZE: 24x15 ===
+```
+         ,/////\\,
+       ,///////\\\\\
+     ,//////   > \\\\
+     ////  __ `   _\\
+     //__//  \--//  \
+     /'--\\_O/  \\_O/
+     \_         \   |
+       \      ,__>  /
+       |\   ,____  /
+       | \   \__| /
+       |  '._____/
+       |      |
+     /``"--._ \/`\
+jgs /        \|  /`--.
+  /```""--..__;.'     `\
+```
+
+=== ID: 23ba7962d1777951 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: harry-potter | SIZE: 39x17 ===
+```
+            _            _.,----,
+ __  _.-._ / '-.        -  ,._  \)
+|  `-)_   '-.   \       / < _ )/" }
+/__    '-.   \   '-, ___(c-(6)=(6)
+ , `'.    `._ '.  _,'   >\    "  )
+ :;;,,'-._   '---' (  ( "/`. -='/
+;:;;:;;,  '..__    ,`-.`)'- '--'
+;';:;;;;;'-._ /'._|   Y/   _/' \
+      '''"._ F    |  _/ _.'._   `\
+             L    \   \/     '._  \
+      .-,-,_ |     `.  `'---,  \_ _|
+      //    'L    /  \,   ("--',=`)7
+     | `._       : _,  \  /'`-._L,_'-._
+     '--' '-.\__/ _L   .`'         './/
+                 [ (  /
+                  ) `{
+       snd        \__)
+```
+
+=== ID: df9b67c53f2381fa | TITLE: Dobby | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: harry-potter | SIZE: 14x17 ===
+```
+   _____
+  /     \
+/- (*) |*)\
+|/\.  _>/\|
+    \__/    |\
+   _| |_   \-/
+  /|\__|\  //
+ |/|   |\\//
+ |||   | ~'
+ ||| __|
+ /_\| ||
+ \_/| ||
+   |7 |7
+   || ||
+   || ||
+   /\ \ \  fog
+  ^^^^ ^^^
+```
+
+=== ID: 57aee3810cb1d1b3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: books | SUBCATEGORY: harry-potter | SIZE: 24x22 ===
+```
+        ______
+        /      \
+       |        |
+       |:/-\\--\.
+        ( )-( )/,
+         | ,  .
+        / \- /. \
+       | ||L  / \ \
+      / /  \/    | *
+     / /          \  \
+     | |      []   |\ |
+    /| |           ||  |
+    || |           ||  |
+    |  |           ||  |
+    /_ |__________|||  |
+   /_ \| ---------||   |
+   /_ / |         ||   |
+  /  | ||         | |
+  \//  ||         | |  |
+  /  | ||    T    | |  |
+ /   | ||    |     |
+/     fog
+```
+
+=== ID: e95bab364870b166 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 11x6 ===
+```
+       //
+      (oo\
+      / ._)
+     J _=\=
+     |   /
+3._.' |_|_
+```
+
+=== ID: 3f0bd01dbcb40004 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 11x6 ===
+```
+       /m'
+      (oo\
+      / ._)
+     J _=\=
+     |   /
+3._.' |_+_
+```
+
+=== ID: 0f0b2209608fc069 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 11x6 ===
+```
+       //
+      (oo\
+      / ._)
+    @J _=\=
+    /||||||
+3._.' |||||
+```
+
+=== ID: 0632bee27fb0bb6f | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 15x6 ===
+```
+       //
+      (oo\   /
+      / ._) /\
+     J _=\=/\/\
+     |   /   \/
+3._.' |_|_
+```
+
+=== ID: 9b96580bcfdb14c4 | TITLE: Snufkin | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 19x11 ===
+```
+          .-.
+       __/   (
+     , '-.____\
+      u=='/  \
+         /_/  \
+       .-''   |
+      (  ____/_____
+      _>_/.--------
+      \///
+       //
+snd   //
+```
+
+=== ID: d67306ee47762c32 | TITLE: Fillyjonk | ARTIST: Shanaka Dias | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 24x13 ===
+```
+            /()))
+           //( oo
+          (/|| _ \__
+         /||||/ '._-'
+        /  \ |\
+       /  \ \  \_____
+      |    \ \.___  /==,
+      |    ='.___/=.
+      |             )
+      '.______      |
+       (______( |  ||
+snd     |_|| _/ |  |_\
+            '---'--'
+```
+
+=== ID: c6344117e6043cdf | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 17x19 ===
+```
+         /\\
+         |||
+         |||
+         \\/
+       .//\\\.
+      ////\\\\\
+     | `_   _' |
+    || (o) (o) ||
+    `|   /_\   |'
+     |    _    |
+      `._____.'
+       /__A__\
+      /   o   \
+     |    o    |
+     |    o    |
+     |    o    |
+     |    o    |
+     |    o    |
+VK   |    o    |
+```
+
+=== ID: 81985ba0460ad587 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 33x20 ===
+```
+                 .   ,
+               .';_.';
+              .       `.
+                    _   \
+             .     (.) (.)--._
+            .       "   "     `.
+           .                   :
+                   ._         .'
+          .          `"-.___."
+                      `.
+         .              .
+         .   .  `.       .
+         .    `.  `.      .
+,,.      .      ` . `.    .
+\W;      .         "`     .
+ `.    .' .               '
+   `--'    ,    __,..-   '  .
+          .   .'     `.   `' ;
+          `.   `,      `.  .'
+            "._.'        `' mh/VK
+```
+
+=== ID: 9e1ac8d63e5aa399 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 40x21 ===
+```
+                 /|  /|
+                J(|_J(|
+               /     _ `_
+              J     '_ ' \
+              F     (.) (.)--._
+             /                 `.
+            J                   |
+            F       ._         .'
+           J          `-.____.'
+           F           \
+          J             \---
+          |              \_E
+         _|   .  `.       \
+ ,,,    ((|____`.  `.______L
+\VVV'   ((|  @@  `.  `.  @@|
+ \W|    ))J  @@  //```\\ @@|
+  `.    .' \ @@ 0<__o__>0@@|
+    `--'    )@@ |#######|@@|
+           / @@ |#######|@@|
+          (  @@ |#######|@@|
+           `.@@__@@__@@__@@|   TJ/mh/TVK
+```
+
+=== ID: 81e6e5c337368dc6 | TITLE: My | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: books | SUBCATEGORY: moomintroll | SIZE: 37x24 ===
+```
+              .-.
+             //|\\
+            ;||;|;;
+            ;|\|||;
+             `\||;/
+              _>;<,,,,_
+           .-',/|;`\,`.`-.
+         .',/_..----.\\`\,;\
+        //.-'___.'`.,___,,  ;
+       ;' /"(#) |  | (#)`\  ;
+       ;  `.___.'  `.___.' /   _ .-.
+        `.  ._ `-----' _  /,_,,)` / )
+        _,`-._`-------'_.'     \  _)
+ _(\.--':..   `"7---""\ `\ _..-'`-'
+(_  |:.  __,,, / |( \`.`) (
+ `--'--""   /:|_ ; \ \ /   \
+          .':.  `--'  `     `.
+         /:.   ,:.            \
+        ::  ,::'              .'
+        |:.               _.-'
+        `--....._____..--\,-.
+           ..-'   | |        )
+          (     _,/ `--'"---'     fsc
+           `---'
+```
+

@@ -1,0 +1,2536 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: MISCELLANEOUS
+# Total artworks in category fitting <=40 cols: 152
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 5465d419bd672af1 | TITLE: Hour glass on side | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: hourglass | SIZE: 4x1 ===
+```
+|><|
+```
+
+=== ID: c8c2873591e9a686 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: hourglass | SIZE: 6x5 ===
+```
++====+
+|(::)|
+| )( |
+|(..)|
++====+
+```
+
+=== ID: d1adefe036c1d102 | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: miscellaneous | SUBCATEGORY: hourglass | SIZE: 18x5 ===
+```
+.____.
+|(__)|
+| )( |  Hour Glass
+|(::)|
+-''''- ldb
+```
+
+=== ID: f527c79e74af0cf4 | TITLE: Untitled | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: miscellaneous | SUBCATEGORY: hourglass | SIZE: 17x11 ===
+```
+ _________
+(_      __)
+ .||~"~~b.
+ |||:.:::|
+ `||::::p'
+  ||b:d||
+  ||p:q||
+ .|| : `b.
+ ||| .   |
+ _||::::p_
+(_________)   DrS
+```
+
+=== ID: ef0eab4a1b0b5036 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: hourglass | SIZE: 15x15 ===
+```
++8-=-=-=-=-=-8+
+ | ,.-'"'-., |
+ |/         \|
+ |\:.     .:/|
+ | \:::::::/ |
+ |  \:::::/  |
+ |   \:::/   |
+ |    ):(    |
+ |   / . \   |
+ |  /  .  \  |
+ | /   .   \ |
+ |/   .:.   \|
+ |\.:::::::./|
+ | '--___--' |
++8-=-=-=-=-=-8+
+```
+
+=== ID: 91557dd7e8aa228b | TITLE: Untitled | ARTIST: Ilmari Karonen | CATEGORY: miscellaneous | SUBCATEGORY: hourglass | SIZE: 24x33 ===
+```
+ ______________________
+(0RGSDOFCJftli;:.:. .  )
+ T""""""""""""""""""""T
+ |.;....,..........;..|
+ |;;:: .  .    .      |
+ l;;;:. :   .     ..  ;
+ `;;:::.: .    .     .'
+  l;;:. ..  .     .: ;
+  `;;::.. .    .  ; .'
+   l;;:: .  .    /  ;
+    \;;:. .   .,'  /
+     `\;:.. ..'  .'
+       `\;:.. ..'
+         \;:. /
+          l; f
+          `;f'
+           ||
+           ;l.
+          ;: l
+         / ;  \
+       ,/  :   `.
+     ./' . :     `.
+    /' ,'  :       \
+   f  /  . :        i
+  ,' ;  .  :        `.
+  f ;  .   :      .  i
+ .'    :   :       . `.
+ f ,  .    ;       :  i
+ |    :  ,/`.       : |
+ |    ;,/;:. `.     . |
+ |___,/;;:. . .`._____|
+(QB0ZDOLC7itz!;:.:. .  )
+ """"""""""""""""""""""
+```
+
+=== ID: a9da289a68de1e5f | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: miscellaneous | SUBCATEGORY: cigarettes | SIZE: 29x4 ===
+```
+                   (  )/
+                    )(/
+ ________________  ( /)
+()__)____________)))))    hjw
+```
+
+=== ID: a0b8d988255d5158 | TITLE: Untitled | ARTIST: Stanislaw Ciszewski | CATEGORY: miscellaneous | SUBCATEGORY: cigarettes | SIZE: 23x6 ===
+```
+ __..-\\\\           _
+`\\\\\\\\\\         (_)
+ `\\\\\\ _.\      O
+  `\\\U\\   \   o
+   `\\  \\\\~  _
+     |   \\\\~~~
+```
+
+=== ID: ff65a01300ca037a | TITLE: Zippo | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: cigarettes | SIZE: 12x7 ===
+```
+___    A
+| |   {*}
+| |  __V__
+|_|o_|%%%|0_
+   |       |
+   |       |
+   |_______|
+```
+
+=== ID: 5f92f05d2f00dd96 | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 15x3 ===
+```
+ _       _
+(_'-----'_)
+(_.'""""._) fsc
+```
+
+=== ID: 9b2a9b2141fa1944 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 27x5 ===
+```
+    .-.               .-.
+    (   `-._________.-'   )
+     >=     _______     =<
+jgs (   ,-'`       `'-,   )
+     `-'               `-'
+```
+
+=== ID: 5096b22a8402f39a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 11x10 ===
+```
+     _ ,.
+    ( `  )
+     |  |
+     | "|_
+     | ,__)
+     |)-'
+     | \,
+     |  |
+jgs (_,  )
+       `"
+```
+
+=== ID: c1923f91b1fa1cb4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 27x12 ===
+```
+     .-. .-.       .-. .-.
+    (   Y   )     (   Y   )
+     `|   |`       `|   |`
+      | 00|_       _|00 |
+      |  ,__)     (__,  |
+      |,_|           L_,|
+      ||               ||
+      | \_,         ,_/ |
+      |   |         |   |
+      |   |         |   |
+    (`  A  `)     (`  A  `)
+jgs  '-' '-'       '-' '-'
+```
+
+=== ID: 7a86a244271cd74f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 15x15 ===
+```
+     .-.     _
+    (   `. .' )
+     `\  `  .'
+       |   |
+       |   |
+       | 66|_
+       |  ,__)
+       |(,_|
+       | |
+       | \_,
+       |   |
+       |   |
+     .'     \
+    (    ,   )
+jgs  '--' '-'
+```
+
+=== ID: 93916eb582041bf0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 14x15 ===
+```
+    _     .-.
+   ( `. .'   )
+    `. `   /'
+      |   |
+      |   |
+     _|66 |
+    (__,  |
+      L_,)|
+        | |
+      ,_/ |
+      |   |
+      |   |
+     /     '.
+    (   ,    )
+jgs  '-' '--'
+```
+
+=== ID: 898e5017cd0062a0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: signs | SIZE: 22x17 ===
+```
+ ____________________
+/                    \
+!                    !
+!                    !
+\____________________/
+         !  !
+         !  !
+         L_ !
+        / _)!
+       / /__L
+ _____/ (____)
+        (____)
+ _____  (____)
+      \_(____)
+         !  !
+         !  !
+         \__/
+```
+
+=== ID: dead5c2f07568829 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: signs | SIZE: 22x17 ===
+```
+ ____________________
+/                    \
+|     In case of     |
+|     Frustration    |
+\____________________/
+         !  !
+         !  !
+         L_ !
+        / _)!
+       / /__L
+ _____/ (____)
+        (____)
+ _____  (____)
+      \_(____)
+         !  !
+         !  !
+         \__/
+```
+
+=== ID: af8c18b5fc4178d3 | TITLE: Anchor | ARTIST: llizard | CATEGORY: miscellaneous | SUBCATEGORY: anchors | SIZE: 14x6 ===
+```
+          o
+         -+-
+          |
+          |
+       ^  |  ^
+ejm97   \_|_/
+```
+
+=== ID: d3a0622d9a59f8b2 | TITLE: Anchor | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: anchors | SIZE: 11x7 ===
+```
+     _
+    (_)
+  <--|-->
+ _   |   _
+`\__/ \__/`
+  `-. .-'
+     ' jgs
+```
+
+=== ID: 96e6da5e5856e698 | TITLE: Anchor | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: anchors | SIZE: 19x13 ===
+```
+        _-_
+       |(_)|
+        |||
+        |||
+        |||
+        |||
+        |||
+  ^     |^|     ^
+< ^ >   <+>   < ^ >
+ | |    |||    | |
+  \ \__/ | \__/ /
+    \,__.|.__,/
+        (_)
+```
+
+=== ID: 2eb26a8e809d26a8 | TITLE: Untitled | ARTIST: llizard | CATEGORY: miscellaneous | SUBCATEGORY: playing-cards | SIZE: 37x9 ===
+```
+          _____
+         |A .  | _____
+         | /.\ ||A ^  | _____
+         |(_._)|| / \ ||A _  | _____
+ejm98    |  |  || \ / || ( ) ||A_ _ |
+         |____V||  .  ||(_'_)||( v )|
+                |____V||  |  || \ / |
+                       |____V||  .  |
+                              |____V|
+```
+
+=== ID: 8c9860d8e2054f6d | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: miscellaneous | SUBCATEGORY: keys | SIZE: 35x6 ===
+```
+  ooo,    .---.
+ o`  o   /    |\________________
+o`   'oooo()  | ________   _   _)
+`oo   o` \    |/        | | | |
+  `ooo'   `---'         "-" |_|
+                                hjw
+```
+
+=== ID: 08ec0733f27a237d | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: money | SIZE: 36x9 ===
+```
+___________________________________
+|#######====================#######|
+|#(1)*UNITED STATES OF AMERICA*(1)#|
+|#**          /===\   ********  **#|
+|*# {G}      | (") |             #*|
+|#*  ******  | /v\ |    O N E    *#|
+|#(1)         \===/            (1)#|
+|##=========ONE DOLLAR===========##|
+------------------------------------
+```
+
+=== ID: 59801124e31b5417 | TITLE: Untitled | ARTIST: Benoit Rigaut | CATEGORY: miscellaneous | SUBCATEGORY: money | SIZE: 25x13 ===
+```
+           _.-------._
+        _-'_.------._ `-_
+      _- _-          `-_/
+     -  -
+ ___/  /______________
+/___  .______________/
+ ___| |_____________
+/___  .____________/
+    \  \
+     -_ -_             /|
+       -_ -._        _- |
+ Benoit  -._ `------'_./
+ Rigaut     `-------'
+```
+
+=== ID: 2c57368fa6b04b73 | TITLE: Untitled | ARTIST: Daniel C Au | CATEGORY: miscellaneous | SUBCATEGORY: money | SIZE: 29x14 ===
+```
+          __-----__
+     ..;;;--'~~~`--;;;..
+   /;-~IN GOD WE TRUST~-.\
+  //      ,;;;;;;;;      \\
+.//      ;;;;;    \       \\
+||       ;;;;(   /.|       ||
+||       ;;;;;;;   _\      ||
+||       ';;  ;;;;=        ||
+||LIBERTY | ''\;;;;;;      ||
+ \\     ,| '\  '|><| 1995 //
+  \\   |     |      \  A //
+   `;.,|.    |      '\.-'/
+     ~~;;;,._|___.,-;;;~'
+         ''=--<dcau>'
+```
+
+=== ID: dfab255ee7874d22 | TITLE: Quarter | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: money | SIZE: 29x14 ===
+```
+        _.-'~~`~~'-._
+     .'`  B   E   R  `'.
+    / I               T \
+  /`       .-'~"-.       `\
+ ; L      / `-    \      Y ;
+;        />  `.  -.|        ;
+|       /_     '-.__)       |
+|        |-  _.' \ |        |
+;        `~~;     \\        ;
+ ;  INGODWE /      \\)P    ;
+  \  TRUST '.___.-'`"     /
+   `\                   /`
+     '._   1 9 9 7   _.'
+ jgs    `'-..,,,..-'`
+```
+
+=== ID: fa3f3a5a27247ea6 | TITLE: Law Enforcement | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: handcuffs | SIZE: 27x5 ===
+```
+ _    .----.       .----.
+( )  //--\  \.---./  /--\\
+ T  ((    ) @)   (@ (    ))
+ |   \\__/  /'---'\  \__//
+ |E   '----'   dwb '----'
+```
+
+=== ID: be9715c0681e1a64 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: handcuffs | SIZE: 27x5 ===
+```
+ _    .----.       .----.
+( )  //--\  \.---./  /--\\
+ T  ((    ) @)   (@ (    ))
+ |   \\__/  /'---'\  \__//
+ |E   '----'   dwb '----'
+```
+
+=== ID: 8026d74a6eba1184 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: handcuffs | SIZE: 27x5 ===
+```
+ _    .----.       .----.
+( )  //--\  \.---./  /--\\
+ T  ((    ) @)   (@ (    ))
+ |   \\__/  /'---'\  \__//
+ |E   '----'   dwb '----'
+```
+
+=== ID: d5a26b5a80d98d75 | TITLE: Handcuff | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: handcuffs | SIZE: 33x7 ===
+```
+     OOOOOOOOOOOOOOOOOOOOOOO
+   _P_                     _9_
+  / @ \        _          / @ \
+ //---\\      ( )        //---\\
+((     ))      T        ((     ))
+ \\___//       |         \\___//
+  '---'        |E     dwb '---'
+```
+
+=== ID: 93d9dff44c36e707 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: handcuffs | SIZE: 33x7 ===
+```
+     OOOOOOOOOOOOOOOOOOOOOOO
+   _P_                     _9_
+  / @ \        _          / @ \
+ //---\\      ( )        //---\\
+((     ))      T        ((     ))
+ \\___//       |         \\___//
+  '---'        |E     dwb '---'
+```
+
+=== ID: 373a1e665aca147f | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: awards | SIZE: 11x7 ===
+```
+  _______
+ |       |
+(| SFAfS |)
+ |  #X   |
+  \     /
+   `---'
+   _|_|_
+```
+
+=== ID: c7557dcc754363bc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: awards | SIZE: 21x16 ===
+```
+     _______________
+    |@@@@|     |####|
+    |@@@@|     |####|
+    |@@@@|     |####|
+    \@@@@|     |####/
+     \@@@|     |###/
+      `@@|_____|##'
+           (O)
+        .-'''''-.
+      .'  * * *  `.
+     :  *       *  :
+    : ~ A S C I I ~ :
+    : ~ A W A R D ~ :
+     :  *       *  :
+jgs   `.  * * *  .'
+        `-.....-'
+```
+
+=== ID: eaa53875e3eac918 | TITLE: Feather | ARTIST: llizard | CATEGORY: miscellaneous | SUBCATEGORY: feathers | SIZE: 10x5 ===
+```
+    (`/\
+    `=\/\
+     `=\/\
+      `=\/
+ejm      \
+```
+
+=== ID: d4486115260cc1c3 | TITLE: Feather and Ink | ARTIST: llizard | CATEGORY: miscellaneous | SUBCATEGORY: feathers | SIZE: 14x8 ===
+```
+    (`/\
+    `=\/\
+     `=\/\
+      `=\/
+        _\___
+         ) (
+ejm    ( INK )
+        \___/
+```
+
+=== ID: d5a07bc12d95bf42 | TITLE: Bottle | ARTIST: Veronica Karlsson | CATEGORY: miscellaneous | SUBCATEGORY: bottles | SIZE: 5x7 ===
+```
+ mmm
+ )-(
+(   )
+|   |
+|   |
+|___|
+   vk
+```
+
+=== ID: 9ec4b7604b0a90b0 | TITLE: Bottles | ARTIST: Maija Haavisto | CATEGORY: miscellaneous | SUBCATEGORY: bottles | SIZE: 26x12 ===
+```
+   ,--,          ,--,
+   )""(          )""(
+  /    \        .%nn%.
+ /      \      /%%%%%%\
+.        .    .%%%%%%%%.
+|`-....-'|    |"*%%%%*"|
+|        |    |        |
+|        |    |        |
+|`-....-'|    |8n....n8|
+|        |    |%%%%%%%%|
+|        |    |%%%%%%%%|
+ `-....-' mh   "*%%%%*" mh
+```
+
+=== ID: ebe55211a401df5b | TITLE: Bottle | ARTIST: Sebastian Stoecker | CATEGORY: miscellaneous | SUBCATEGORY: bottles | SIZE: 13x13 ===
+```
+   _____
+  `.___,'
+   (___)
+   <   >
+    ) (
+   /`-.\
+  /     \
+ / _    _\
+:,' `-.' `:
+|         |
+:         ;
+ \       /
+  `.___.' SSt
+```
+
+=== ID: bac7fef39723eaa7 | TITLE: CD | ARTIST: Sarah Day | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 11x6 ===
+```
+    ___
+  .'   '.
+ /       \
+(   (0)   )
+ \       /
+  '.___.'
+```
+
+=== ID: a08d313773d5a75e | TITLE: Untitled | ARTIST: llizard | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 21x9 ===
+```
+         __________
+        /\____;;___\
+       | /         /
+       `. ())oo() .
+        |\(%()*^^()^\
+       %| |-%-------|
+      % \ | %  ))   |
+      %  \|%________|
+ejm97  %%%%
+```
+
+=== ID: 6547aef228ebf0e9 | TITLE: Microscope | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 14x10 ===
+```
+    __
+    ||
+   ====
+   |  |__
+   |  |-.\
+   |__|  \\
+    ||   ||
+  ======__|
+ ________||__
+/____________\
+```
+
+=== ID: 4d9ea3fa96e994dc | TITLE: Rubber duck | ARTIST: Maija Haavisto | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 35x13 ===
+```
+       ..---..
+     .'  _    `.
+ __..'  (o)    :
+`..__          ;
+     `.       /
+       ;      `..---...___
+     .'                   `~-. .-')
+    .                         ' _.'
+   :                           :
+   \                           '
+    +                         J
+     `._                   _.'
+        `~--....___...---~' mh
+```
+
+=== ID: b16a92fddbd35aae | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 29x14 ===
+```
+                 . '  .
+               ' .( '.) '
+       _     ('-.)' (`'.) '
+      |0|- -(. ')`( .-`) (-')
+   .--`+'--.  .  (' -,).(') .
+   |`-----'|   (' .) - ('. )
+   |       |    . (' `.  )
+   |  .-.  |       ` .  `
+   | (0.0) |
+   | >|=|< |
+   |  `"`  |
+   |       |
+jgs|       |
+   `-.___.-'
+```
+
+=== ID: cfe13b3ca06748d7 | TITLE: Untitled | ARTIST: Praseodymium 59 | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 25x14 ===
+```
+             _.____
+          _.'      '_.
+      _.-'       _.'  \
+    _'___     _.'      |
+  .'     '-.-'         L
+ /          \          |
+|     __     |         L
+|   .x$$x.   L         |
+|   |%$$$|   |         |
+|   |%%$$|   L         |
+|   '%%%?'   |         .\
+ \          /|      .-
+  '.__  __.' |   .-    Pr
+      ''      \.-      59
+```
+
+=== ID: 083db98c800e627a | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 17x18 ===
+```
+  ,/         \.
+ ((           ))
+  \`.       ,'/
+   )')     (`(
+ ,'`/       \,`.
+(`-(         )-')
+ \-'\,-'"`-./`-/
+  \-')     (`-/
+  /`'       `'\
+ (  _       _  )
+ | ( \     / ) |
+ |  `.\   /,'  |
+ |    `\ /'    |
+ (             )
+  \           /
+   \         /
+    `.     ,'
+hh    `-.-'
+```
+
+=== ID: c2e0856f16694e33 | TITLE: Medallion | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 30x18 ===
+```
+         _o8888888o_
+      .o888' ...  '888o.
+   .o88'  :::;(;:::  '88o.
+  ,88'  .::;.) );:::.  '88,
+ ,88'  :::;`(,' (,;:::  '88,
+,88'  :::;;). (, (';:::  '88,
+88'   :::;( ) ; ' );;::   '88
+88    '::;')_,_)_(`;::'    88
+88      '::[_____]::'      88
+88          \_ _/          88
+88           |#|_          88
+88,     __.-'(__ )        ,88
+'88,     '-. \___ )      ,88'
+ '88,     _.\_)__ )     ,88'
+  '88o,  _   (__ )    ,o88'
+    '88o, `'-\#/'   ,o88'
+      '888o,_   _,o888'
+         '8JGS88888'       jgs
+```
+
+=== ID: 4c9ca3464b4367c5 | TITLE: Toilet paper | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 26x17 ===
+```
+  .--'""""""""""`--.
+,'     .------.     `,
+:     (        )     :
+|\     `------'     /|
+| `--.__________,--' |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+`.         /        .'
+  `--._____\____,--'   dxm
+```
+
+=== ID: 190578fbd624047c | TITLE: Notepad | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 34x19 ===
+```
+           _ _ _ _ _ _ _ _ _ _ _
+          (-(-(-(-(-(-(-(-(-(-(-()
+          /¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ /||
+         /                    /_||
+        /                    /__||
+       //|  /               /___||
+      // | / ___/_ _  _    /____||
+     //  |/(_) (__(/_/_)_ /_____||
+    /( _ _ _ _ _ _ _ _ _ /______||
+   /  ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ /_______||
+  /                    /________||
+ /                    /_________||
+(____________________(__________||
+           |____________________||
+           |____________________||
+           |____________________||
+           |____________________||
+           |____________________||
+           |_______________JSS__|/
+```
+
+=== ID: b5c8cf8dbbe73af3 | TITLE: Toilet paper | ARTIST: Veronica Karlsson | CATEGORY: miscellaneous | SUBCATEGORY: other | SIZE: 34x20 ===
+```
+     .--.----------------.
+    /    \  \ \ \ \ \ \ \ \
+   /      \                \
+  /        \                \
+ /          |                |
+ |   d8b    |                |
+ |  d888b   || | | | | | | | |
+ |  88888   |  | | | | | | | |
+ |  Y888P   |                |
+ \   Y8P    |                |
+  \        //                /
+   \      //                /
+    \    /| | | | | | | | ||
+     `--'-|| | | | | | | | |
+           \                \
+            \                \
+             \                \
+              \                \
+ VK            \\ \ \ \ \ \ \ \ \
+                \................\
+```
+
+=== ID: 1cad22c67d57fb84 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: diamonds | SIZE: 16x6 ===
+```
+  .     '     ,
+    _________
+ _ /_|_____|_\ _
+   '. \   / .'
+     '.\ /.'
+       '.'
+```
+
+=== ID: 0c7226a1c46c28ca | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: miscellaneous | SUBCATEGORY: diamonds | SIZE: 17x8 ===
+```
+   .    '    ,
+     _______
+_  .`_|___|_`.  _
+    \ \   / /
+     \ ' ' /
+      \ " /
+       \./
+        V
+```
+
+=== ID: 8b337cca884c4570 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: diamonds | SIZE: 28x16 ===
+```
+              v
+       \             /
+
+          _________
+ `       /         \      '
+        /  \     /  \
+       /             \
+_     /   _ _ . _ _   \    _
+      \               /
+       \             /
+        \  /     \  /
+ '       \_________/      `
+
+
+       /             \
+              ^
+```
+
+=== ID: 20973a5d24d75b3c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 14x8 ===
+```
+     _______
+    |/      |
+    |      (_)
+    |      \|/
+    |       |
+    |      / \
+    |
+jgs_|___
+```
+
+=== ID: 156c184fa1f0039f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 20x14 ===
+```
+     ,%%%%%%%%,
+    %%o%%/%%%%%%
+   %%%%\%%%<%%%%%
+   %%>%%%/%%%%o%%
+   %%%%%o%%\%%//%
+   %\o%\%%/%o/%%'
+    '%%\ `%/%%%'
+      '%| |%|%'
+        | | (O
+        | | |\
+        | | >>
+        | |
+       /   \
+jgs^^^^^^^^^^^^^^^^^
+```
+
+=== ID: 51c96bd05104d9f4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 14x16 ===
+```
+       (/)
+       (/)
+        (/)
+       (/)
+        (/)
+       (/)
+       (/))
+      (/)(/)
+     (/)'`(/)
+    (/)    (/)
+    (/)    (/)
+    (/)    (/)
+    (/)    (/)
+     (/)  (/)
+      (/)(/)
+jgs    `""`
+```
+
+=== ID: ae4d34348ac911ef | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 9x17 ===
+```
+   |/|
+   | |
+   |/|
+   | |
+   |/|
+  (___)
+  (___)
+  (___)
+  (___)
+  (___)
+  // \\
+ //   \\
+||     ||
+||     ||
+||     ||
+ \\___//
+  -----
+```
+
+=== ID: b0f5307372805a5d | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 13x23 ===
+```
+     |\|
+     |\|
+     |\|
+     |\|
+     |\|
+     |\|
+     |_|
+    (___)
+    (___)
+    (___)
+    (___)
+    (___)
+    (___)
+  ,(/   \),
+ ('/     \')
+('/       \')
+|/|       |/|
+|/|       |/|
+|/|       |/|
+(-\       /-)
+ \-\     /-/
+  \-\___/-/
+   '-----'
+```
+
+=== ID: 4d1962082bc2e272 | TITLE: Untitled | ARTIST: Sarah Kearsley | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 29x23 ===
+```
+ ___________.._______
+| .__________))______|
+| | / /      ||
+| |/ /       ||
+| | /        ||.-''.
+| |/         |/  _  \
+| |          ||  `/,|
+| |          (\\`_.'
+| |         .-`--'.
+| |        /Y . . Y\
+| |       // |   | \\
+| |      //  | . |  \\
+| |     ')   |   |   (`
+| |          ||'||
+| |          || ||
+| |          || ||
+| |          || ||
+| |         / | | \
+""""""""""|_`-' `-' |"""|
+|"|"""""""\ \       '"|"|
+| |        \ \        | |
+: :         \ \       : :  sk
+. .          `'       . .
+```
+
+=== ID: ee29c50414f865f0 | TITLE: Untitled | ARTIST: Philipp Schwartz | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 17x26 ===
+```
+     |/|
+     |/|
+     |/|
+     |/|
+     |/|
+     |/|
+     |/| /¯)
+     |/|/\/
+     |/|\/
+    (¯¯¯)
+    (¯¯¯)
+    (¯¯¯)
+    (¯¯¯)
+    (¯¯¯)
+    /¯¯/\
+   / ,^./\
+  / /   \/\
+ / /     \/\
+( (       )/)
+| |       |/|
+| |       |/|
+| |       |/|
+( (       )/)
+ \ \     / /
+  \ `---' /
+   `-----'    PhS
+```
+
+=== ID: 786c9a52cdf84e48 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: noose | SIZE: 33x31 ===
+```
+   |_______________``\
+    [/]           [  ]
+    [\]           | ||
+    [/]           |  |
+    [\]           |  |
+    [/]           || |
+   [---]          |  |
+   [---]          |@ |
+   [---]          |  |
+  oOOOOOo         |  |
+ oOO___OOo        | @|
+oO/|||||\Oo       |  |
+OO/|||||\OOo      |  |
+*O\ x x /OO*      |  |
+/*|  c  |O*\      |  |
+   \_O_/    \     |  |
+    \#/     |     |  |
+ |       |  |     | ||
+ |       |  |_____| ||__
+_/_______\__|  \  ||||  \
+/         \_|\  _ | ||\  \
+|    V    |\  \//\  \  \  \
+|    |    | __//  \  \  \  \
+|    |    |\|//|\  \  \  \  \
+------------\--- \  \  \  \  \
+\  \  \  \  \  \  \  \  \  \  \
+_\__\__\__\__\__\__\__\__\__\__\
+__|__|__|__|__|__|__|__|__|__|__|
+|___| |___|
+|###/ \###|
+\##/   \##/
+```
+
+=== ID: 853c7f27d8514479 | TITLE: DNA sample | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 1x1 ===
+```
+~
+```
+
+=== ID: 483faa29553f0152 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 30x4 ===
+```
+-. .-.   .-. .-.   .-. .-.   .
+||\|||\ /|||\|||\ /|||\|||\ /|
+|/ \|||\|||/ \|||\|||/ \|||\||
+~   `-~ `-`   `-~ `-`   `-~ `-
+```
+
+=== ID: db5d461b47ef513c | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 30x4 ===
+```
+-. .-.   .-. .-.   .-. .-.   .
+  \   \ /   \   \ /   \   \ /
+ / \   \   / \   \   / \   \
+~   `-~ `-`   `-~ `-`   `-~ `-
+```
+
+=== ID: da6640c578a79262 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 3x5 ===
+```
+(=)
+ X
+(=)
+ X
+(=)
+```
+
+=== ID: e0c7398b0adeda5a | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 29x5 ===
+```
+O       o O       o O       o
+| O   o | | O   o | | O   o |
+| | O | | | | O | | | | O | |
+| o   O | | o   O | | o   O |
+o       O o       O o       O
+```
+
+=== ID: 8b60aac666670322 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 19x9 ===
+```
+|-----------------|
+ \---------------/
+  ~-_---------_-~
+     ~-_---_-~
+        ~-_
+     _-~---~-_
+  _-~---------~-_
+ /---------------\
+|-----------------|
+```
+
+=== ID: 9d114d3da37c16d4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 9x13 ===
+```
+(=(   )=)
+ `.\ /,'
+   `\.
+ ,'/ \`.
+(=(   )=)
+ `.\ /,'
+   ,/'
+ ,'/ \`.
+(=(   )=)
+ `.\ /,'
+   ,/'
+ ,'/ \`.
+(=(   )=)
+```
+
+=== ID: e6bbcd9e91952d7b | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 13x13 ===
+```
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+```
+
+=== ID: f83986772cf1a394 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 5x15 ===
+```
+O---o
+ O-o
+  O
+ o-O
+o---O
+O---o
+ O-o
+  O
+ o-O
+o---O
+O---o
+ O-o
+  O
+ o-O
+o---O
+```
+
+=== ID: f87a81cb86de95bb | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 9x17 ===
+```
+(=(   )=)
+ `.\ /,'
+   `\.
+ ,'/ \`.
+(=(   )=)
+ `.\ /,'
+   ,/'
+ ,'/ \`.
+(=(   )=)
+ `.\ /,'
+   `\.
+ ,'/ \`.
+(=(   )=)
+ `.\ /,'
+   ,/'
+ ,'/ \`.
+(=(   )=)
+```
+
+=== ID: bc5c751c88b2f720 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 13x17 ===
+```
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+ `-.`. ,',-'
+    _,-'"
+ ,-',' `.`-.
+(==(     )==)
+```
+
+=== ID: 42ce6c80d9cbce3e | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 9x21 ===
+```
+/=/   \=\
+|=|   |=|
+\=\   /=/
+ `.\ /,'
+   `\.
+ ,'/ \`.
+/=/   \=\
+|=|   |=|
+\=\   /=/
+ `.\ /,'
+   ,/'
+ ,'/ \`.
+/=/   \=\
+|=|   |=|
+\=\   /=/
+ `.\ /,'
+   ,/'
+ ,'/ \`.
+/=/   \=\
+|=|   |=|
+\=\   /=/
+```
+
+=== ID: ffbfd201abdb181f | TITLE: Double helix | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 5x25 ===
+```
+0===0
+ O=o
+  O
+ o=O
+0===0
+ O=o
+  O
+ o=O
+0===0
+ O=o
+  O
+ o=O
+0===0
+ O=o
+  O
+ o=O
+0===0
+ O=o
+  O
+ o=O
+0===0
+ O=o
+  O
+ o=O
+0===0
+```
+
+=== ID: d29564549fda859a | TITLE: DNA double helix | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dna | SIZE: 16x41 ===
+```
+6098)o%:::%o(860
+098)o%:::%o(8609
+ 6o%:%o(86098)
+  (86098)o
+6098)o%::%o9
+098)o%::::::%o9
+ 6o%::::::%o(860
+    6o%::%o(8609
+      o(86098)
+  (86098)o%:%o9
+6098)o%:::%o(860
+098)o%:::%o(8609
+ 6o%:%o(86098)
+  (86098)o
+6098)o%::%o9
+098)o%::::::%o9
+ 6o%::::::%o(860
+    6o%::%o(8609
+      o(86098)
+  (86098)o%:%o9
+6098)o%:::%o(860
+098)o%:::%o(8609
+ 6o%:%o(86098)
+  (86098)o
+6098)o%::%o9
+098)o%::::::%o9
+ 6o%::::::%o(860
+    6o%::%o(8609
+      o(86098)
+  (86098)o%:%o9
+6098)o%:::%o(860
+098)o%:::%o(8609
+ 6o%:%o(86098)
+  (86098)o
+6098)o%::%o9
+098)o%::::::%o9
+ 6o%::::::%o(860
+    6o%::%o(8609
+      o(86098)
+  (86098)o%:%o9
+6098)o%:::%o(860
+```
+
+=== ID: ad1a636647f3e22c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 18x11 ===
+```
+      _________
+    .`.        `.
+   /   \ .======.\
+   |   | |______||
+   |   |   _____ |
+   |   |  /    / |
+   |   | /____/  |
+   | _ |         |
+   |/ \|.-"```"-.|
+   `` |||      |||
+jgs   `"`      `"
+```
+
+=== ID: aa33a51042cafb44 | TITLE: Maibox | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 27x12 ===
+```
+           _
+          |E]
+        .-|=====-.
+        | | mail |
+     ___|________|
+            ||
+            ||
+            ||   www
+     ,;,    ||   )_(,;;;,
+     <_>  \ ||   \|/ \_/
+     \|/  \\||  \\|   |//
+_jgs_\|//_\\|///_\V/_\|//__
+```
+
+=== ID: c9c0972a59b7d2c4 | TITLE: Untitled | ARTIST: Jonathon R. Oglesbee | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 36x12 ===
+```
+                 )__________
+                .'.         `.
+                | | S.T.Peay |
+                |_|__________|
+                      |  |    __..--
+                    __|  |--""
+          __..---"""  |  |
+         |\           |  |
+         | \          |  |
+         \  \    \|/  |  |
+          \  \        |__\|/
+jro        \  \
+```
+
+=== ID: 7ccd0d010df2e895 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 22x12 ===
+```
+       ..--""|
+       |     |
+       | .---'
+ (\-.--| |---------.
+/ \) \ | |          \
+|:.  | | |           |
+|:.  | |o|           |
+|:.  | `"`           |
+|:.  |_ __  __ _  __ /
+`""""`""|=`|"""""""`
+        |=_|
+    jgs |= |
+```
+
+=== ID: ea54f66961cdfeeb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 24x12 ===
+```
+       ..--""|
+       |     |
+       | .---'
+ (\-.--| |-----------.
+/ \) \ | |            \
+|:.  | | |             |
+|:.  | |o| E - M A I L |
+|:.  | `"`             |
+|:.  |_  __   __ _  __ /
+`""""`""""|=`|"""""""`
+          |=_|
+    jgs   |= |
+```
+
+=== ID: 92f32269113d79eb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 20x14 ===
+```
+          __
+         | _]
+      .--||-----.
+      |  ||     |
+ _____|__||_____|
+           \ |
+            ||
+            ||
+            ||
+            ||
+            ||
+  jgs       ||
+            ||
+^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: 6a8812255ef3b700 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 20x14 ===
+```
+          __
+         | _]
+      .--||-----.
+      |  ||     |
+ _____|__||_____|
+           \ |
+ _______    ||
+|==   []|   ||
+|  ==== |   ||
+'-------'   ||
+            ||
+  jgs       ||
+            ||
+^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: 8e5e5ffa42e5cefc | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: miscellaneous | SUBCATEGORY: mailbox | SIZE: 26x23 ===
+```
+     ____
+    |    |
+    | .--'
+,.--| |-------------.
+|:\ | |   __       _ \
+|#| | |              |
+|#| |o|  THE SMITHS  |
+|#| '-'              |
+|#|                  |
+ \|__________________|
+   [_______________]
+          \ \   | |
+           \ \  | |
+           '/~\ | | .-.-.~
+          ~/.-.-. | '. .'
+   ,___.-.-.'. .'~| ~/!
+  ~/,  '. .'\ ! |_|_/,!
+ .-.-.   !   \! / .-.-.
+ '. .'   !   ,|/| '. .'
+   !      -_  |~| | !  _-
+   !         ~| lc| !-
+         ~""~ | ~""~
+          ~"~"~"~"~
+```
+
+=== ID: 63d922b597e24c95 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: buckets | SIZE: 21x10 ===
+```
+     ,.--'`````'--.,
+    (\'-.,_____,.-'/)
+     \\-.,_____,.-//
+     ;\\         //|
+     | \\  ___  // |
+     |  '-[___]-'  |
+     |             |
+     |             |
+     |             |
+jgs  `'-.,_____,.-''
+```
+
+=== ID: 5abbf8e02f76f739 | TITLE: Ready to Paint | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: buckets | SIZE: 28x11 ===
+```
+      ___
+  ,--[___]--,
+ /           \
+|,.--'```'--.,|    ,
+|'-.,_____,.-'|    ||
+|'-.,_____,.-'|    ||
+|             |   _||_
+|  P A I N T  |  ///\\\
+|             |  HHHHHH
+|'-.,_____,.-'|  ||||||
+`'-.,_____,.-''  ||||||  jgs
+```
+
+=== ID: bbee7a5cf82f78d0 | TITLE: Water bucket | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: buckets | SIZE: 25x12 ===
+```
+      ___________
+     /=//==//=/  \
+    |=||==||=|    |
+    |=||==||=|~-, |
+    |=||==||=|^.`;|
+jgs  \=\\==\\=\`=.:
+      `"""""""`^-,`.
+               `.~,'
+              ',~^:,
+              `.^;`.
+               ^-.~=;.
+                  `.^.:`.
+```
+
+=== ID: 4fed7b3fcc665fa9 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: miscellaneous | SUBCATEGORY: buckets | SIZE: 25x16 ===
+```
+       ___
+    .-'   `-.
+   /         \
+  /   _____   \
+ /.-'"     "`-.\
+d(             )b
+ |`-.._____..-'|
+ |             |
+ |             |
+ |             |
+ |             |
+ |             |
+ |             |
+ |             |
+ \             /
+  `-.._____..-'        VK
+```
+
+=== ID: b2fbae681fd9a282 | TITLE: Untitled | ARTIST: Jens Reissenweber (Reißenweber) | CATEGORY: miscellaneous | SUBCATEGORY: buckets | SIZE: 25x18 ===
+```
+          _______
+      _.-()______)-._
+    .'               '.
+   /                   \
+  :      _________      :
+  |.--'''         '''--.|
+  (                     )
+  :'--..._________...--':
+  :                     :
+   :                   :
+   :                   :
+    :                 :
+    :                 :
+     :               :
+     :               :
+      :             :
+jrei  :_           _:
+        '''-----'''
+```
+
+=== ID: 1032de6921cdde6b | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: brooms | SIZE: 5x8 ===
+```
+  |
+  |
+  |
+  |
+  |
+  |
+ /X\
+//X\\
+```
+
+=== ID: e46d44670d445af0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: brooms | SIZE: 30x14 ===
+```
+  ||
+  ||
+  ||
+  ||
+  ||
+  ||
+  ||     Here you go, sweep
+  ||     that up..............
+ /||\
+/||||\
+======         __|__
+||||||        / ~@~ \
+||||||       |-------|
+||||||       |_______|
+```
+
+=== ID: 26c12e34e93a25b4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: brooms | SIZE: 12x28 ===
+```
+      .-.
+      | |
+      |=|
+      |=|
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      | |
+      |=|
+jgs   |=|
+      |_|
+    .=/I\=.
+   ////V\\\\
+   |#######|
+   |||||||||
+   |||||||||
+   |||||||||
+   |||||||||
+   |||||||||
+```
+
+=== ID: 525e0f24dbf181f3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: magnifying-glass | SIZE: 17x5 ===
+```
+         .-""-.
+ _______/      \
+|_______        ;
+        \      /
+         '-..-'
+```
+
+=== ID: e731f2b5e481d5f7 | TITLE: Magnifying glass | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: magnifying-glass | SIZE: 24x7 ===
+```
+       ___
+     .:---:.         _
+    // #   \\_...--'' \
+   || #     |_         |
+    \\     // ```--.._/
+jgs  ':===:'
+       ```
+```
+
+=== ID: fc64f570a5d5896c | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: magnifying-glass | SIZE: 25x21 ===
+```
+            ______
+         .-'      `-.
+       .'            `.
+      /                \
+     ;                 ;`
+     |         H       |;
+     ;                 ;|
+     '\               / ;
+      \`.           .' /
+       `.`-._____.-' .'
+         / /`_____.-'
+        / / /
+       / / /
+      / / /
+     / / /
+    / / /
+   / / /
+  / / /
+ / / /
+/ / /
+\/_/
+```
+
+=== ID: 3dad59155b60d247 | TITLE: Untitled | ARTIST: Ojosh!ro | CATEGORY: miscellaneous | SUBCATEGORY: kleenex | SIZE: 18x7 ===
+```
+ .--""--.___.._
+(  <__>  )     `-.
+|`--..--'|      <|
+|       :|       /
+|       :|--""-./
+`.__  __;' o!O
+    ""
+```
+
+=== ID: 5cdd9e675562501a | TITLE: Untitled | ARTIST: Praseodymium 59 | CATEGORY: miscellaneous | SUBCATEGORY: kleenex | SIZE: 25x14 ===
+```
+             _.____
+          _.'      '_.
+      _.-'       _.'  \
+    _'___     _.'      |
+  .'     '-.-'         L
+ /          \          |
+|     __     |         L
+|   .x$$x.   L         |
+|   |%$$$|   |         |
+|   |%%$$|   L         |
+|   '%%%?'   |         .\
+ \          /|      .-
+  '.__  __.' |   .-    Pr
+      ''      \.-      59
+```
+
+=== ID: 9f8aee6bcd237356 | TITLE: Untitled | ARTIST: Praseodymium 59 | CATEGORY: miscellaneous | SUBCATEGORY: kleenex | SIZE: 26x16 ===
+```
+             _.____
+          _.'      '_.
+      _.-'       _.'  \
+    _'___     _.'      |
+  .'     '-.-'         L
+ /          \          |
+|     __     |         L
+|   .x$$x.   L         |
+|   |%$$$|   |         /
+|   |%%$$|   L      _.'
+|   '%%%?'   |   _.' |
+ \          / _.'    .\
+  '.__  __.:-'      .-  Pr
+   L  ''         .-     59
+    \       .-
+     `\.-
+```
+
+=== ID: c68851ca1bd2dc09 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: kleenex | SIZE: 26x17 ===
+```
+  .--'""""""""""`--.
+,'     .------.     `,
+:     (        )     :
+|\     `------'     /|
+| `--.__________,--' |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+|          /         |
+|          \         |
+`.         /        .'
+  `--._____\____,--'   dxm
+```
+
+=== ID: 70eaa6481e067347 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: miscellaneous | SUBCATEGORY: kleenex | SIZE: 34x21 ===
+```
+     .--.----------------.
+    /    \  \ \ \ \ \ \ \ \
+   /      \                \
+  /        \                \
+ /          |                |
+ |   d8b    |                |
+ |  d888b   || | | | | | | | |
+ |  88888   |  | | | | | | | |
+ |  Y888P   |                |
+ \   Y8P    |                |
+  \        //                /
+   \      //                /
+    \    /| | | | | | | | ||
+     `--'-|| | | | | | | | |
+           \                \
+            \                \
+             \                \
+              \                \
+               \\ \ \ \ \ \ \ \ \
+                \................\
+VK
+```
+
+=== ID: ac10a1d41cc5aa09 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: miscellaneous | SUBCATEGORY: kleenex | SIZE: 28x24 ===
+```
+              _
+     . -  ' '   '  ' -.
+  . '       _,._       ' .
+,'        ;'    ";        ',
+|'         ',_ ,-'        .|
+| '.          '         .  |
+|   ' ,             . '    |
+|   |   ' - . _ . -|       |
+|               '. |       |
+|   |             '.       |
+|                   '.     |
+|   |                .,    |
+|                    . ,   |
+|   |               .  '   |
+|                  .   '   |
+|   |            .    '    |
+!.              '    '    .'
+  '.|           '   ,   .
+    ' ,        '   ,. '
+        ' - . ,  .-
+             ,  .
+            , .    :F_P:
+           , .
+           ,'
+```
+
+=== ID: 015448fa2844888a | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: antennas | SIZE: 19x7 ===
+```
+--=---+---=--
+       \___
+ ---=---+-I-=---
+        |\
+  ---=----+----=---
+        |
+        ^
+```
+
+=== ID: 58b5f7e01d4b5a0b | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: miscellaneous | SUBCATEGORY: antennas | SIZE: 31x26 ===
+```
+    .-.
+   (;;;)
+    \_|
+      \ _.--l--._
+     . \    |     `.
+   .` `.\   |    .` `.
+ .`     `\  |  .`     `.
+/ __      \.|.`      __ \
+|   ''--._ \V  _.--''   |
+|        _ (") _        |
+| __..--'   ^   '--..__ | _
+\         .`|`.         /-.)
+ `.     .`  |  `.     .`
+   `. .`    |    `. .`
+     `._    |    _.`|
+         `--l--`  | |
+                  | |
+                  | |
+                  | |
+         o        | |     o
+          )    o  | |    (
+         \|/  (   | |   \|/
+             \|/  | | o  WWwwwW
+                o | |  )
+        WWwwWww ( | | \|/
+           LGB \|/WWwwWWwW
+```
+
+=== ID: 18d53a691c8b5a7f | TITLE: Untitled | ARTIST: Richard James | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 3x2 ===
+```
+ _
+|_|
+```
+
+=== ID: 9b7705e5868d0479 | TITLE: A box in a box | ARTIST: lgbeard | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 7x4 ===
+```
+ _____
+|  _  |
+| |_| |
+|_____|
+```
+
+=== ID: 49f4c546235e8d7f | TITLE: A dot in a box in a box | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 7x5 ===
+```
+.-----.
+| .-. |
+| |.| |
+| `-' |
+`-----'
+```
+
+=== ID: bd9edbb3752b0f6a | TITLE: Bad Art Day Box Outside The Box | ARTIST: Ryan Hoetge | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 13x5 ===
+```
+ _______
+|       |
+|       |
+|       |  _
+|_______| |_|
+```
+
+=== ID: 406b4580569f5e95 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 7x6 ===
+```
+ _____
+|_|_|_|
+|_|_|_|
+|_|_|_|
+|_|_|_|
+|_|_|_|
+```
+
+=== ID: bc22259299373503 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 27x11 ===
+```
+           +--------------+
+          /|             /|
+         / |            / |
+        *--+-----------*  |
+        |  |           |  |
+        |  |           |  |
+        |  |           |  |
+        |  +-----------+--+
+        | /            | /
+        |/             |/
+M.G.    *--------------*
+```
+
+=== ID: 6395d1b2fcd30685 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: boxes | SIZE: 39x23 ===
+```
+      ____________
+     /\  ________ \
+    /  \ \______/\ \
+   / /\ \ \  / /\ \ \
+  / / /\ \ \/ / /\ \ \
+ / / /__\ \ \/_/__\_\ \__________
+/ /_/____\ \__________  ________ \
+\ \ \____/ / ________/\ \______/\ \
+ \ \ \  / / /\ \  / /\ \ \  / /\ \ \
+  \ \ \/ / /\ \ \/ / /\ \ \/ / /\ \ \
+   \ \/ / /__\_\/ / /__\ \ \/_/__\_\ \
+    \  /_/______\/_/____\ \___________\
+    /  \ \______/\ \____/ / ________  /
+   / /\ \ \  / /\ \ \  / / /\ \  / / /
+  / / /\ \ \/ / /\ \ \/ / /\ \ \/ / /
+ / / /__\ \ \/_/__\_\/ / /__\_\/ / /
+/ /_/____\ \_________\/ /______\/ /
+\ \ \____/ / ________  __________/
+ \ \ \  / / /\ \  / / /
+  \ \ \/ / /\ \ \/ / /
+   \ \/ / /__\_\/ / /
+    \  / /______\/ /
+     \/___________/BvG
+```
+
+=== ID: 85f8fac1f1a55176 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 14x5 ===
+```
+       )
+      (_)
+      |`|
+      | |  _()
+jgs \_|_|_/
+```
+
+=== ID: 054b9d9303c9f72f | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 22x6 ===
+```
+           ___)__
+          | 1999 |
+   (')    |      |
+ ___)__   |      |
+| 1998 |  |      |
+'------'  '------' ldb
+```
+
+=== ID: 44fb4deb985d01c2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 5x7 ===
+```
+  (\
+  .'.
+  | |
+  | |
+  |_|
+
+kwc
+```
+
+=== ID: 8b06d9a84dfa378e | TITLE: Candle | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 11x7 ===
+```
+    ..
+ . .  . .
+. . /\ . .
+. . \/. .
+    ||
+ ___||__(~\
+ \______/
+```
+
+=== ID: bdd886a24c9442bf | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 10x9 ===
+```
+    (
+     )
+    ()
+   |--|
+   |  |
+ .-|  |-.
+:  |  |  :
+:  '--'  :
+ '-....-'
+```
+
+=== ID: 4a00b92acc8f213f | TITLE: Untitled | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 12x10 ===
+```
+   /\
+  (  )
+   ||
+  |  |
+  |  |
+  |  |
+  |  | ____
+  |  |/ /  )
+ _|__|_/__/
+(/cjr_\)
+```
+
+=== ID: 1e27f9b11a58b5e5 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 12x10 ===
+```
+       (
+       )\
+       {_}
+      .-;-.
+     |'-=-'|
+     |     |
+     |     |
+     |     |
+     |     |
+jgs  '.___.'
+```
+
+=== ID: 7a43ae01188d7c40 | TITLE: Untitled | ARTIST: Ojosh!ro | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 10x10 ===
+```
+   )
+  / (
+ ( 6 )
+ _`)'_
+(  |  )
+|`"-")|
+|   ( )
+|    (_)
+|     |
+|     |o!O
+```
+
+=== ID: 206f15162cbcc683 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 22x11 ===
+```
+           *
+           |
+ * * * *   |   * * * *
+  \ \ \ \__|__/ / / /
+    \ \ \__|__/ / /
+      \ \__|__/ /
+        \__|__/
+           |
+           |
+         __|__
+        |     |
+```
+
+=== ID: cb7ea1fbb2cbbbab | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 24x12 ===
+```
+            )
+           (_)
+          .-'-.
+          |   |
+          |   |
+          |   |
+          |   |
+        __|   |__   .-.
+     .-'  |   |  `-:   :
+    :     `---'     :-'
+jgs  `-._       _.-'
+         '""""""
+```
+
+=== ID: e3db694eaca37ee3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 27x14 ===
+```
+             .
+           .....
+       ..:::::::::..
+    ..:::::: # ::::::..
+  ..:::::: ====== :::::..
+ ..::::: ========== ::::..
+..::::: ==== |\ ==== ::::..
+.::::: ==== /%#| ==== :::..
+.::::: === |&@/ ==== :::::.
+..::::: ===_\|_==== :::::..
+ ..::::: /| .:. | :::::...
+  ..:::: || .:. | ::::...
+   ...:: (| .:. | ::....
+     .... | .:. | ....
+```
+
+=== ID: 2a3559410ca1e5b3 | TITLE: Untitled | ARTIST: Niki Fowler | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 29x14 ===
+```
+      |\
+      / \
+      \|/
+     .=|-._
+     |~'~~|)
+     |    |
+     |    |)
+     |    |
+ \// |    | \|/
+  \//|..  |\//           Niki
+_\\\\\\\__////////_
+'/////////\\\\\\\\\`
+        //\\
+         //\
+```
+
+=== ID: 77d8e70bc43cedc9 | TITLE: Untitled | ARTIST: Clinton James | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 19x15 ===
+```
+        /\
+       /  \
+       \/\/
+        ~|
+       !~~-!
+       |` ,!
+       |'` |
+       |   |
+       |   |
+       |   |
+       |   |
+       |   |
+_______|___|_______
+\                 /
+ \_______________/
+```
+
+=== ID: ffb6c389a613e8a3 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 22x18 ===
+```
+           :
+   .       :       .
+    ::.   :::   .::
+       ::  :   ::
+        :  )  :
+   :::::  (_)  :::::
+      .: .-;_ :.
+    .:   |   \  :.
+         |    )
+         |   |     __
+       . |   |   _) .(
+      _\/|   | _) .'_|
+       -\|   |) .'_(
+     ~>>8o<<-'8o-'  `
+      / /,\-(  )``.,
+      | \.'\/  ) :(
+      \   `'   `) (`
+hjw    `._____.'`./
+```
+
+=== ID: 4653d4a21aae7a41 | TITLE: Candle | ARTIST: Sebastian Stoecker | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 17x18 ===
+```
+     ,
+    ( \
+     ) \
+    ((\ )
+   |`-;-._
+   |`-.   )
+   |   \ (
+   |    \ )
+   |    |/
+   |    `|
+   |     |
+   |     |
+   |     |
+   |     |
+   |_____|
+ _(_______)_
+|           |
+|___________| SSt
+```
+
+=== ID: 7f6ce91ffbe5e97b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 15x20 ===
+```
+   ,,;;;;;,,
+ ,;;:::::::;;,
+,;;::' , ':::;,
+;;::  /(   ::;;
+;;:: |  \  ::;;
+';;::.\c/.::;;'
+ ';:::'-,:::;'
+   '';| |;''
+      '-,
+      | |
+      '-,
+      | |
+      '-,
+      | |
+      '-,
+      | |
+jgs  /`"`\
+  .-'.  _.'-.
+ `._  `    _.'
+    `"---"`
+```
+
+=== ID: ad81af823434f1d6 | TITLE: Untitled | ARTIST: Felix Lee | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 31x23 ===
+```
+_______________________________
+|                             |
+|    _,__\      |;'|_         |
+|    \_` @'     @'_./         |
+|     \.'   )\  ''            |
+|           (&)               |
+|           _|._              |
+|         Y\.-v'|             |
+|         f Y   |             |
+|         | "   |             |
+|         |     |             |
+|         b     |             |
+|         |     |             |
+|         |     |             |
+|         |     |             |
+|         |     |             |
+|         |     |             |
+|         |     |      ,;::;, |
+|   _..--f`-...-'|--..'/   )) |
+|   \ `-.!._____.!.-' (__,;'  |
+|    \               .---'    |
+|     ``-...___...-''         |
+|_______________________(FL)__|
+```
+
+=== ID: e09b4cfb4f771707 | TITLE: Untitled | ARTIST: Peter Bier | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 37x29 ===
+```
+    /\           /\           /\
+   //\\         //\\         //\\
+   \\//         \\//         \\//
+    ><           ><           ><
+ .._||_..      ._||..       ._||..
+ :/  !! :     |     \:     :/    :;
+ |:  :| |     |  ::  |     |  :: ;|
+ |:  :; |     |  :;  |     |  :: :|
+ |;   : |     | : :  |     |  :: :|
+ |      |     |      |     |     ,|
+ |_._.__|     |__.__.|     |._._._|
+|        |   |        |   |        |
+|        |   |        |   |        |
+ \_.. ._/     \_. .._/     \_.. ._/
+  |    |       |    |       |    |
+  |    |       |    |       |    |
+  |    \._____./    \._____./    |
+  \                              /
+    `-.______.  . ..   ._______.-'
+              \  ..   /
+               |     |
+               |     |
+               |     |
+               |     |
+               |     |
+               |... .|
+          ____/.. . ..\____
+     _. -'                  '-._
+    /___________________________\ pjb
+```
+
+=== ID: f40d37a193520ec7 | TITLE: Untitled | ARTIST: Stephane Abello | CATEGORY: miscellaneous | SUBCATEGORY: candles | SIZE: 26x36 ===
+```
+         __,---.__
+      ,-'         `-.
+    ,'               `.
+   /                   \
+  /         .           \
+ ;           )           :
+ |          ((           |
+ |          ) \          |
+ :         ( , )         ;
+  \       _ `|'__       /
+   \     ( """"_ )     /
+    `.    )/(/( \|   ,'
+      `- ()  )()|| -'
+          | ()  ||
+          |     ||
+          |     ()
+          |     |
+          |     |
+          |     |
+          |     |
+      ____|_____|____
+     (________    ___)
+        \___     _/
+        (_____  __)
+         \       /
+          )__   (
+         (____  _)
+           |   |
+           |   |
+           |   |
+           |   |
+           |   |
+           |   |
+           |   |
+         _/     \_
+Stef .--'_________`--.
+```
+
+=== ID: 3c71cba582d08308 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 14x8 ===
+```
+   ,   /\   ,
+  / '-'  '-' \
+  |  POLICE  |
+  |   .--.   |
+  |  ( 19 )  |
+  \   '--'   /
+   '--.  .--'
+jgs    \/
+```
+
+=== ID: 6427ff7494f0ab4d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 15x8 ===
+```
+   ,   /\   ,
+  / '-'  '-' \
+ |   POLICE   |
+ \    .--.    /
+  |  ( 19 )  |
+  \   '--'   /
+   '--.  .--'
+jgs    \/
+```
+
+=== ID: ef442862ef739ddb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 15x8 ===
+```
+   ,   /\   ,
+  / '-'  '-' \
+ |   POLICE   |
+ \    .--.    /
+  |  ( 19 )  |
+  \   '--'   /
+   '--.  .--'
+jgs    \/
+```
+
+=== ID: 0380d20c475e8691 | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 15x11 ===
+```
+   __     __
+  |  \   /  |
+  ||| \_/ |||
+  |||||||||||
+  |||||||||||
+  |||||||||||
+__|||||||||||__
+\ \--.|||.--/ /
+ \ \__\_/__/ /
+  \ TRIUMPH /
+   ---------
+```
+
+=== ID: 531af73f5279170d | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 35x18 ===
+```
+      _____________________
+     |       .--.--.       |
+     |  +   /|  |  |\   +  |
+     | +{+  ||.-o-.||  +}+ |
+     |  l   |/.-'-.\|   l  |
+     |--+-------+-------+--|
+     |  |.o. .o.|WwW WwW|  |
+     |  |`;`o`;`| wWwWw |  |
+     |  |  `;`  |   W   |  |
+     ;  |-------|-------|  ;
+      ; ; WwWWwW|.o..o. ; ;
+       \ \ W  W |`;``;`/ /
+        \ '. WwW|.o. .' /
+         '. `.w | `;` .'
+*          '. `.|.` .'            *
+ \N_O_U_S    '. | .'    P_R_Ê_T_S/
+         \     '+'     /
+           S_O_M_M_E_S
+```
+
+=== ID: c38d6a8bed242d42 | TITLE: Untitled | ARTIST: Christian Jensen (also C.J. and CJ) | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 36x21 ===
+```
+       _____________________
+      |       .--,--.       |
+      |  .   /|~~|~~|\   .  |
+      | :+:  ||.-o-.||  :+: |
+      |  |   |/.-'-.\|   |  |
+      |--,---------------.  |
+      |  |:O: :O:|WwW WwW|  |
+      |  | ' . ' |)_WwW_(|  |
+      |  |  :O:  |  )_(  |  |
+      :--+---'---|-------+--;
+       : :WwW WwW|:O: :O:; ;
+        \ \_( )_(| '   '/ /
+         \ `. WwW|:O: ,' /
+          `. `._(| ',' ,'
+           _`. `.|,' ,'     _ _ _/ _
+  \/)()(/_)   `. | ,'    /)/ (- /_)
+                `+'     /
+            _   _  _  _  _
+          _) ()//)//)(-_)
+
+-= CeeJay =-
+```
+
+=== ID: bd72ae19fb241561 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: miscellaneous | SUBCATEGORY: badges | SIZE: 31x29 ===
+```
+       _.-.___    _-._
+      /' ___(o `-.'    `\
+     /JJJ\__ /       LLLL\
+    ////////`\      /\\\\\\\
+   |/YYYYYYY  `-._.' YYYYYY\\
+  //////////         \\\\\\\\|
+  |/       __.---.__        \\
+ /  ___.--'         `--.___  \|
+|\/|     C U P I E R S     |\/|
+|\/| O C   _.----.__    O F|\/|
+|\/|___.--'_-=====-._--.___|\/|
+|\/|      /.-'oadi`-.\     |\/|
+|\/|     // +-[OT] Tr\\    |\/|
+|\/|    ||  | `Re: Tro||   |\/|
+|\/|    ||  +-[OT] [sl||   |\/|
+|\/|    ||  | `->     ||   |\/|
+|\/|     \\ |   `->  //    |\/|
+|\/|___   \`-.____.-'/  ___|\/|
+ \\| A `--.`-.____.-'--' R |//
+ | \__ L A `--._.--' N O __/ |
+  \ \ `--. N   C O N _.-' / /
+   \ \    `--.___.--'    / /
+    \ \    _________    / /
+     \ \  |  31173  |  / /
+      \ `\|_________|/' /
+       `\ \. :F_P: ./ /'
+         `-_`\___/'_-'
+           `-.   .-'
+              `V'
+```
+
+=== ID: bade71d2cced1cbb | TITLE: Balls and chains | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: chains | SIZE: 29x4 ===
+```
+ .d888b.
+ 8888888
+ 8888888>               ____
+ `Y888P' `=-=-=-=-=-=-<|____|
+```
+
+=== ID: dfcbdce83e58deeb | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: chains | SIZE: 31x5 ===
+```
+                          __
+                        /`  `\
+        ___            |      |
+       [___]>=-=-=-=-=' \____/
+jgs
+```
+
+=== ID: c9b3acd32a07821f | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: miscellaneous | SUBCATEGORY: chains | SIZE: 32x32 ===
+```
+ __|HM\
+/HH\.M|
+HMHH\.|
+\HMHH\|
+\\HMHH\
+HH\HMHH\
+HHH\HMHH\
+    \HMHH\-HHH\
+     \HMHH\.HHM\
+      \HMHH\.HMH\
+      |\HMHH\\HMH\
+      |H\HHH| \HMH\
+      |MH\H/   \HMH\
+      |MH\      \HMH\
+      \HMH\      \HMH\
+       \HMH\    __|HM|
+        \HMH\  /HH\.M|
+         \HMH\ |MHH\.|
+          \HMH\\HMHH\|
+           \HMH\\HMHH\
+            \HMHH\HMHH\
+             \HHHH\HMHH\
+                   \HMHH\-HHH\
+                    \HMHH\.HHM\
+                     \HMHH\.HMH\
+                     |\HMHH|\HMH
+                     |H\HMH/ \HM
+                     |MH\H/   \H
+                     |MH\      \
+                     \HMH\
+                      \HMH\
+                       \HMH\
+```
+
+=== ID: 1724996517c3c102 | TITLE: Fire Extinguisher | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: miscellaneous | SUBCATEGORY: fire-extinguishers | SIZE: 14x14 ===
+```
+      _
+     /_\
+    // ))
+   (( ((
+ .-/ \-\\
+ :'-.-':\\
+ : ABc : |\
+ :     : | \
+ : ALL : |  \
+ :Fires: |.-.\
+ :     : '._.'
+ '-._.-'
+
+MJP
+```
+
+=== ID: 147e286317b77955 | TITLE: Untitled | ARTIST: Marie Bird | CATEGORY: miscellaneous | SUBCATEGORY: dice | SIZE: 18x6 ===
+```
+  ____
+ /\' .\    _____
+/: \___\  / .  /\
+\' / . / /____/..\
+ \/___/  \'  '\  /
+          \'__'\/
+```
+
+=== ID: 5ec4f3e9d111652f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: dice | SIZE: 29x7 ===
+```
+       .-------.    ______
+      /   o   /|   /\     \
+     /_______/o|  /o \  o  \
+     | o     | | /   o\_____\
+     |   o   |o/ \o   /o    /
+     |     o |/   \ o/  o  /
+jgs  '-------'     \/____o/
+```
+
+=== ID: e2626074ff09aafd | TITLE: Untitled | ARTIST: unknown | CATEGORY: miscellaneous | SUBCATEGORY: dice | SIZE: 14x7 ===
+```
+    _______
+  /\       \
+ /()\   ()  \
+/    \_______\
+\    /()     /
+ \()/   ()  /
+  \/_____()/
+```
+
+=== ID: 7042a12186a00c4e | TITLE: Untitled | ARTIST: R. Shawn Butler | CATEGORY: miscellaneous | SUBCATEGORY: dice | SIZE: 20x8 ===
+```
+   _______
+  /\ o o o\
+ /o \ o o o\_______
+<    >------>   o /|
+ \ o/  o   /_____/o|
+  \/______/     |oo|
+        |   o   |o/
+        |_______|/
+```
+
+=== ID: 4824a7fbc9cdefee | TITLE: Untitled | ARTIST: Marie Bird | CATEGORY: miscellaneous | SUBCATEGORY: dice | SIZE: 25x8 ===
+```
+              _______.
+   ______    | .   . |\
+  /     /\   |   .   |.\
+ /  '  /  \  | .   . |.'|
+/_____/. . \ |_______|.'|
+\ . . \    /  \ ' .   \'|
+ \ . . \  /    \____'__\|
+  \_____\/
+```
+
+=== ID: 32f4f11fc4fac6d2 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: miscellaneous | SUBCATEGORY: dice | SIZE: 31x9 ===
+```
+               (( _______
+     _______     /\O    O\
+    /O     /\   /  \      \
+   /   O  /O \ / O  \O____O\ ))
+((/_____O/    \\    /O     /
+  \O    O\    / \  /   O  /
+   \O    O\ O/   \/_____O/
+    \O____O\/ )) mrf      ))
+  ((
+```
+
+=== ID: c3028156907e2d45 | TITLE: Untitled | ARTIST: Tony Cucchiara | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 6x7 ===
+```
+......
+:.  .:
+.'  '.
+|    |
+|    |
+`----'
+ AMC
+```
+
+=== ID: aced8ae46ad0b376 | TITLE: Poison | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 18x8 ===
+```
+        _________
+       [_________]
+        |  .-.  |
+        |,(o.o).|
+        | >|n|< |
+        |` `"` `|
+        |POISON!|
+jgs     `"""""""`
+```
+
+=== ID: c8f4c188b955018e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 25x11 ===
+```
+              _________
+             {_________}
+              )=======(
+             /         \
+            | _________ |
+            ||   _     ||
+            ||  |_)    ||
+            ||  | \/   ||
+      __    ||    /\   ||
+ __  (_|)   |'---------'|
+(_|)     jgs`-.........-'
+```
+
+=== ID: 06e215f3c7db4948 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 19x11 ===
+```
+     _____
+    [IIIII]
+     )"""(
+    /     \
+   /       \
+   |`-...-'|
+   |asprin |
+ _ |`-...-'j    _
+(\)`-.___.(I) _(/)
+  (I)  (/)(I)(\)
+     (I)        hjw
+```
+
+=== ID: eaf792a57fbde6ad | TITLE: Drugs | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 32x12 ===
+```
+  .-.    __
+ |   |  /\ \
+ |   |  \_\/      __        .-.
+ |___|        __ /\ \      /:::\
+ |:::|       / /\\_\/     /::::/
+ |:::|       \/_/        / `-:/
+ ':::'__   _____ _____  /    /
+     / /\ /     |:::::\ \   /
+     \/_/ \     |:::::/  `"`
+jgs     __ `"""""""""`
+       /\ \
+       \_\/
+```
+
+=== ID: adffe659e9dfee6a | TITLE: Untitled | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 36x13 ===
+```
+              _,.......____
+          _.-'      /  `-._`-.
+        ,'         /     / `. `.
+      ,'   ___    / _   /  __`. `.
+     /    /   \  / (_) /  / /  \  \
+    :    / /) / / __  /  / /    L  L
+    |   / __,' / / / /  / /     |  |
+    |  / /    / / / /  / /___   |  |
+    : /_/    / /_/ /  /_____/   F  F
+     \      /     /            /  /
+      `.   /     /           ,' ,'
+        `./     /         _,'_,'
+cjr       `-.__/______,.;:.-'
+```
+
+=== ID: c89495f23546dd0e | TITLE: Cough syrup | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 17x15 ===
+```
+    _____
+   [|||||]
+    |"""|
+    )   (
+  ,'_    `.
+ //#/      \
+/   ,---.   \
+|__//"""\\__|
+|--'_  _ `--|
+| _(_ (_)(_||
+|(  \/ |) | |
+|_) /  |\ |_|
+|-----------|
+|"""""""""""|
+`-._______.-' hjw
+```
+
+=== ID: 5889413d46e5753e | TITLE: Untitled | ARTIST: Colin Douthwaite | CATEGORY: miscellaneous | SUBCATEGORY: medical | SIZE: 31x17 ===
+```
+   I--------------I
+   I--------------I
+  .-'            '-.
+ / --.-.--,---,.--.,\
+/--.-.--,---,.--.,-- \
+|--------------------|
+|       ANTI         |
+|                    |
+|  VERBAL-DIARRHOEA  |
+|                    |
+|     MEDICINE       |
+|                    |
+| [ Pharmacy Only ]  |
+|____________________|
+|.,--.-.--,---,.--.-.|   -cfbd-
+|--.-.--,---,.--.,--.|
+'--------------------'
+```
+

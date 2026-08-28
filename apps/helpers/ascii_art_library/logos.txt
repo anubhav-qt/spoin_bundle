@@ -1,0 +1,689 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: LOGOS
+# Total artworks in category fitting <=40 cols: 37
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 0b59dacd45b4f068 | TITLE: Untitled | ARTIST: Tony Cucchiara | CATEGORY: logos | SUBCATEGORY: television | SIZE: 13x13 ===
+```
+ ____
+|  _ |
+| |  |
+| |_ |
+| |  |
+| |_ |
+|____|
+ ____
+|    |
+|____|
+     .-~~-.
+    (_^..^_)
+Lester||||AMC
+```
+
+=== ID: 568e2daea712d13a | TITLE: Untitled | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: television | SIZE: 32x21 ===
+```
+         .dWeL  udWbL
+         :$$$$$.x$$$$$:
+     ... 9$$$$$E"$$$$$E  ..
+    d$$$e`$$$$$F9$$$$$"o$$$N.
+   d$$$$$kR$$$$~4$$$$$z$$$$$&
+   $$$$$$$/$$<  '$$$$\$$$$$$R
+   ^*$$$$$$"$$$  $$$F$$$$$$*
+ .uu."R$$$$c$$E  $$$x$$$$P".uu.
+o$$$$$u?*$$$/$>  4$\$$$*)o$$$$$c
+$$$$$$$$oC#$b#   'F@$#)d$$$$$$$$
+*$$$$$$$$$NU#(    x#u$$$$$$$$$$P
+ "***$$$$$$$NU   .b$$$$$$$$***"
+ .      .. ......      .uuuu.
+ $o     $$ 9$$$$$$.  .@$$$$$E
+ $$N.   $$ 9$$""$$B x$$$#"""*
+ $$$$o  $$ 9$$  8$F $$$"
+ $$*$$$u$$ 9$$$$$$. $$E
+ $$>"$$$$$ 9$$""*$$ $$B
+ $$> `#$$$ 9$$   $$ $$$i.
+ $$>   "*$ 9$$WW$$$ '*$$$NW@E
+ **>     # ******#`   "*$$$$F
+```
+
+=== ID: 51040f2a0251a7ce | TITLE: Untitled | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: other | SIZE: 30x15 ===
+```
+          wvwVWVWvwv
+       vwvwVWVWVWVWvwvw
+    vwVWVW          VWVWvw
+   vwVW    /\    /\    VWvw
+  wVW      \ \  / /      VWv
+ wVW  /\    \ \/ /    /\  VWv
+wVW  /  \    \__/    /  \  VWv
+wVW  \_  \    __    /  _/  VWv
+wVW   \_  \  /  \  /  _/   VWv
+wVW    \_  \/    \/  _/    VWv
+ wVW    \_    /\    _/    VWv
+  wVWV   \_  /  \  _/   WVWv
+   vwVWV  \_/    \_/  WVWvw
+     vwVWV          WVWvw
+       vwVWVWVWVWVWVWvw
+```
+
+=== ID: a72d9c55c32ad5d7 | TITLE: Pepsi | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: other | SIZE: 26x18 ===
+```
+ ..--------------------..
+|``--------------------''|
+|                        |
+|      ,,,;;;;;;,,,      |
+|   ,;;;;;;;;;;;;;;;;,   |
+|  ;;;;;;;;;;;;;;;;;;;;  |
+| ;;;;;;;;;'''  _  '';;; |
+|   _'''_  _   (_'  |  ` |
+|  |_) |_  |_) ._)  |    |
+| .|   |_  |     .....   |
+| :::..     ...::::::::: |
+|  ::::::::::::::::::::  |
+|   '::::::::::::::::'   |
+|      '''::::::'''      |
+|                        |
+|                        |
+';----..............----;'
+  '--------------------'
+```
+
+=== ID: 1b6b4b909bb88763 | TITLE: Untitled | ARTIST: Daniel Wesely (Phydeaux) | CATEGORY: logos | SUBCATEGORY: jolly-roger | SIZE: 11x4 ===
+```
+ _________
+|   (")   |
+| '-.H.-' |
+| .-'^'-. |
+```
+
+=== ID: 0d0dd3f86f0be794 | TITLE: Untitled | ARTIST: David Dahlberg | CATEGORY: logos | SUBCATEGORY: jolly-roger | SIZE: 12x5 ===
+```
+  _________
+ |-_ .-. _-|
+ |  (*^*)  |
+ |_-"|H|"-_|
+dd
+```
+
+=== ID: dff446e42927ebd0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: jolly-roger | SIZE: 29x13 ===
+```
+    ___
+    \_/
+     |._
+     |'."-._.-""--.-"-.__.-'/
+     |  \       .-.        (
+     |   |     (@.@)        )
+     |   |   '=.|m|.='     /
+jgs  |  /    .='`"``=.    /
+     |.'                 (
+     |.-"-.__.-""-.__.-"-.)
+     |
+     |
+     |
+```
+
+=== ID: 62aca1efe15812f0 | TITLE: Untitled | ARTIST: llizard | CATEGORY: logos | SUBCATEGORY: jolly-roger | SIZE: 38x16 ===
+```
+                            __________
+                ___________)%%%%%%%%%/
+               /%%%%%%%%%%/%{}%%%%%%/
+              /{}%%%%%%%%/%%/%%%%%%/
+             /%%\% _---_/ \/%%%%%%/
+            /%%%%\/    /()|%%%%%%/
+           /%%%%%|()  /+ /%%%%%%/
+          /%%%%%%%\ +/HH%%\%%%%/
+         /%%%%%%%/%HH/_/%%%\%%/
+ejm97   /%%%%%%%/%%\/%%%%%%{}/
+       /%%%%%%{}%%%/%%%%%%%%/
+      /%%%%%%%%%%%/
+     /
+    /
+   /
+  /
+```
+
+=== ID: 18c5108ccf178fdc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: no-smoking | SIZE: 20x6 ===
+```
+      __    __    )
+      \\\  ///   (
+   _ __\\\///_____ )
+  [_[___>><<______#
+       ///\\\
+jgs   ///  \\\
+```
+
+=== ID: 4bd235e3ae15b96e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: no-smoking | SIZE: 24x11 ===
+```
+       _..----.._
+    _-'_..----.._'-_
+  .'.  \       ( `'.'.
+ / / `\ `\       )  \ \
+| |   _`\ `\____(    | |
+| |  [__]_\ `\__()   | |
+| |        `\ `\     | |
+ \ \         `\ `\  / /
+  '.'-._       `\ `'.'
+jgs `-._`'----'`_.-'
+        `"----"`
+```
+
+=== ID: a7e7f019de9e89ca | TITLE: Untitled | ARTIST: Brian T. Odom | CATEGORY: logos | SUBCATEGORY: pillsbury-doughboy | SIZE: 32x13 ===
+```
+   ,------.
+   `-____-'        ,-----------.
+    ,i--i.         |           |
+   / @  @ \       /  HEE HEE!  |
+  | -.__.- | ___-'             J
+   \.    ,/ """"""""""""""""""'
+   ,\""""/.
+ ,'  `--'  `.
+(_,i'    `i._)
+   |      |
+   |  ,.  |
+   | |  | |      -bodom-
+   `-'  `-'
+```
+
+=== ID: e6399337c8674a51 | TITLE: Recycle triangle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: recycle | SIZE: 21x10 ===
+```
+         .-"-.
+        / .-. \
+      .'\/   \ \
+    ,'   \    \ \
+     / /-'     \ \ .
+    / /        ,\ '|
+   / /         '-._|
+  / (_.'|_________) \
+  \__<  ____________/
+jgs   '.|
+```
+
+=== ID: 2d928ae2dffa722e | TITLE: Recycle triangle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: recycle | SIZE: 20x10 ===
+```
+         ____
+        / _\ \
+      .'\/  \ \
+    ,'   \   \ \
+     / /-'    \ \ .
+    / /       ,\ '|
+   / /        '-._|
+  / /_.'|________\_\
+  \/_<  ___________/
+jgs   '.|
+```
+
+=== ID: 06831e618896c624 | TITLE: Recycle logo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: recycle | SIZE: 23x11 ===
+```
+    _____\    _______
+   /      \  |      /\
+  /_______/  |_____/  \
+ |   \   /        /   /
+  \   \         \/   /
+   \  /          \__/_
+    \/ ____    /\
+      /  \    /  \
+     /\   \  /   /
+jgs    \   \/   /
+        \___\__/
+```
+
+=== ID: 16f1c99cbbb1c1ec | TITLE: Bio Hazard | ARTIST: Andrew Hood (Andy, Flookster) | CATEGORY: logos | SUBCATEGORY: biohazards | SIZE: 11x3 ===
+```
+  \"/
+.-.".-. AsH
+ '   `
+```
+
+=== ID: f4034d32290d1c11 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: biohazards | SIZE: 24x11 ===
+```
+          .  .
+          dOO  OOb
+         dOP'..'YOb
+         OOboOOodOO
+       ..YOP.  .YOP..
+     dOOOOOObOOdOOOOOOb
+    dOP' dOYO()OPOb 'YOb
+        O   OOOO   O
+    YOb. YOdOOOObOP .dOP
+jgs  YOOOOOOP  YOOOOOOP
+       ''''      ''''
+```
+
+=== ID: 9bd4472c4740ba18 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: biohazards | SIZE: 26x12 ===
+```
+            _   _
+          .-_; ;_-.
+         / /     \ \
+        | |       | |
+         \ \.---./ /
+     .-"~   .---.   ~"-.
+   ,`.-~/ .'`---`'. \~-.`,
+   '`   | | \(_)/ | |   `'
+   ,    \  \ | | /  /    ,
+   ;`'.,_\  `-'-'  /_,.'`;
+jgs '-._  _.-'^'-._  _.-'
+        ``         ``
+```
+
+=== ID: 1b468d5fc066fa55 | TITLE: Amnesty International | ARTIST: Harry Mason (Hajoma) | CATEGORY: logos | SUBCATEGORY: amnesty-international | SIZE: 8x6 ===
+```
+   _)_
+ -+| |-.
+ ,+-+-+'
+ `-|_|+-
+
+hjm
+```
+
+=== ID: 4387605cf721aee7 | TITLE: Amnesty International | ARTIST: Dave Bird | CATEGORY: logos | SUBCATEGORY: amnesty-international | SIZE: 13x7 ===
+```
+       )\
+      (_/
+ .-#-|  |-#-.
+   __|__|_.#'
+ .'  |  |   .
+ '#--|  |-#'
+xemu_|__|
+```
+
+=== ID: c57e7b7033133778 | TITLE: Light for Freedom | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: amnesty-international | SIZE: 21x16 ===
+```
+          |\
+         /  |
+        |  /
+        _\|__
+       |     |
+   __X-|     |-X__
+ /~    |     |     \
+X      |     |      X
+       |     |     /
+   _X-----X----X ~
+ /     |     |
+X      |     |      X
+ \     |     |    _/
+   X~--|     |-X~~
+       |_    |
+         ~--_|
+```
+
+=== ID: 97185246eed9c816 | TITLE: Small playboy bunny | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: playboy | SIZE: 14x7 ===
+```
+        |\ |\
+        \ \| |
+         \ | |
+       .--''/
+      /o     \
+      \      /
+jgs   {>o<}='
+```
+
+=== ID: bdc341073d342a07 | TITLE: Playboy bunny | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: playboy | SIZE: 19x20 ===
+```
+            O O
+           dO Ob
+          dOO OOO
+         dOOO OOOb
+        dOOOO OOOOb
+        OOOOO OOOOO
+        OOOOO OOOOO
+        OOOOO OOOOO
+        YOOOO OOOOO
+         YOOO OOOP
+    oOOOOOOOOOOOOb
+  oOOOOOOOOOOOOOOOb
+ oOOOb dOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOOOOP
+OOOOOOOOOOOOOOOOOP
+ YOOOOOOOOOOOOOOP
+   YOOOOOOOOOOOP
+  %%%%%%%%%%%%%%
+ %%%%%%OOOjgsOOO
+```
+
+=== ID: c48be070f197aaa5 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: logos | SUBCATEGORY: playboy | SIZE: 31x81 ===
+```
+       .
+       |`.
+       ;  `.
+       ; :. \           __
+       ; ; \ \      .--"  \
+       ; ;  ; ;     :      \
+       ; ;  : :     ; ;     ;
+       ' :   ; ;    ;::     :
+        \ \  : ;--.-;; l     ;
+         \ \  ;:    :;//'-.__:
+         /\ \ ::____:::-\
+        /  ).:+'""""""""=\
+       :_,=""     /"-.    ;
+       ;"       .'    `.  |
+      :      .-^=    ==.\ |
+      |  _.-".gp      gp:;:
+      ;    /  $$      $$;: ;
+     :    :  `--      --:  |
+     ;    ;\        ,   '  |
+    :    :  \      _   /   :
+    ;    |   `.   `-' /     ;
+   :     :    :`-.__.'      |
+   ;          ;     :       |
+  :     ...._/      '.__..  |
+  ;   .'                  \ ;
+ :   /                   _ Y
+ ;  :         .g$$p.    d$$+.
+ ;  ;     :.g$$$$$$$$p.d$$$$$b
+ :  :     :$$$$$$$$$$$T$$$$$$$;
+  \  ;    ;$$$$S$$$$$$$S$$$$$P
+   `.|    |$$$$S$$$$$$$S$$$$P
+     |    |T$$$$$SSSSS$$$$$$
+     :    | `T$$$$$$$$$$$$$;
+      ;   |   $$$$$$$$$$$$$
+      |   :   $$$$$$$$$$$$;
+      :    ; d$$$$$$$$$$$$;
+      |    :d$$$$$$$$$$$$$$
+      ;    :"^T$$$$$$$$$$$$b
+     :     ;   `T$$$$$$$$$$P;
+     ;    :      `T$$$$$$$P :
+     |    ;        T$$$$$P   ;
+     |   :          T$$P'    ;
+     :   ;           $'      :
+    ._;__;           :       :
+    ; ;  ;           |       :
+    :_L__:           |       ;
+    .'    ;          |       ;
+  .'      :          |      :
+ :/ _.-.  :;         |      |
+ /.'    \ |:         |      ;
+//  bug  ;| ;        |     :
+`        `' :        |     |
+             ;       |     ;
+             :       |    :
+              ;      |    |
+              :      :    ;
+              :    _.'-   ;
+              ;     /:    :
+             /     / ;     ;
+            /     :  ;     :
+           :      ;  ;     :
+           ;     :  :      :
+          :      ;  :      ;
+          ;     :   ;     :
+         :      ;   ;     ;
+         ;     :    ;    :
+         ;     ;    ;    ;
+         ;    :     ;   :
+         |    ;     ;   ;
+         |   :      ;  :
+         |   ;      ;  ;
+         :  :       :  ;
+         ;  :       :  :
+        :    ,      ;   ;
+        ;    ;      ;   :
+       :     :      :    ;
+       :     ;      :b__d$
+       $b   d$       $$$$$
+       :$bgd$;        T$P'
+        T$$$P
+         '"'
+```
+
+=== ID: ead15d9f910decf5 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: logos | SUBCATEGORY: peace | SIZE: 15x7 ===
+```
+   ..eeeee..
+ e8"   8   "8e
+d8     8     8b
+8!   .dWb.   !8
+Y8 .e* 8 *e. 8P
+ *8*   8   *8*
+   **ee8ee**
+```
+
+=== ID: 2a656a64bde96e73 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: logos | SUBCATEGORY: peace | SIZE: 27x12 ===
+```
+        ..--+++--..
+     .-'     |     `-.
+   +'        |        `+
+  '          |          `
+ '           |           `
+:            |            :
+:          +'|`+          :
+.        +'  |  `+        ;
+ +     +'    |    `+     +
+  `. +'      |      `+ .'
+    `._      |      _.'
+       `--.._|_..--' mh
+```
+
+=== ID: c5f8dafbdff373d3 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: logos | SUBCATEGORY: peace | SIZE: 31x13 ===
+```
+        _..od88888bo.._
+      .d""'   888   '""b.
+    .d"'      888      '"b.
+   d"'        888        '"b
+  d'          888          'b
+ 88          88888          88
+(88         8888888         88)
+ 88        888888888        88
+  YI      888 888 888      IP
+   YI    888  888  888    IP
+    "9. 888   888   888 .P"
+      "888    888    888"
+        `""Y8888888P""`
+```
+
+=== ID: 039272c7afddf0fe | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: logos | SUBCATEGORY: peace | SIZE: 29x13 ===
+```
+       _.od8888888bo._
+     .dP"'   @#@   '"Yb.
+   .d"'      #@#      '"b.
+  d"'        @#@        '"b
+ d'          #@#          'b
+dP           @#@           Yb
+8l          oDWBo          l8
+Yb        o@#@B@#@o        dP
+ YI     o@#* #P# *#@o     IP
+  YI  o@#*   @#@   *#@o  IP
+   "9@#*     #@#     *#@P"
+     "8b     @#@     d8"
+       `"Y888888888P"`
+```
+
+=== ID: 7f15b1ff90a371a6 | TITLE: Peace signs | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: peace | SIZE: 26x49 ===
+```
+             _____
+          .-'  |  '-.
+        .'     |     '.
+       /       |       \
+10    ;        |        ;
+      |        |        |
+      ;       /|\       ;
+       \    /` | `\    /
+        './`   |   `\.'
+          '-.__|__.-'
+              _____
+           .-'  |  '-.
+         .'     |     '.
+        ;       |       ;
+9      ;        |        ;
+       ;       /|\       ;
+        ;    /` | `\    ;
+         './`   |   `\.'
+           '-.__|__.-'
+            .-'"""'-.
+          .'    |    '.
+         /      |      \
+ 8      ;       |       ;
+        ;      /|\      ;
+         \    / | \    /
+          '. /  |  \ .'
+            '-..|..-'
+            .-"|"-.
+          .`   |   `.
+         /     |     \
+7        ;    /|\    ;
+         \   / | \   /
+          './  |  \.'
+            '-----'
+             .---.
+           /`  |  `\
+6         ;    |    ;
+          ;   /|\   ;
+           \ / | \ /
+            `'---'`
+             .-|-.
+            /  |  \
+5          ;  /|\  ;
+            \/ | \/
+             '---'
+              .-.
+4           /` | `\
+            \ /|\ /
+             `'-'`
+```
+
+=== ID: d8aab96ca7356a67 | TITLE: Hello Kitty | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: hello-kitty | SIZE: 18x12 ===
+```
+     .-. __ _ .-.
+     |  `  / \  |
+     /     '.()--\
+    |         '._/
+   _| O   _   O |_
+   =\    '-'    /=
+     '-._____.-'
+     /`/\___/\`\
+    /\/o     o\/\
+   (_|         |_)
+jgs  |____,____|
+     (____|____)
+```
+
+=== ID: 7a67406acdc0aeaf | TITLE: Untitled | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 9x4 ===
+```
+==.   .==
+`==`o'=='
+   (|)
+    8
+```
+
+=== ID: ee096dd11ad9d8f6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 11x6 ===
+```
+(`-._o_.-')
+ `--.|.--'
+   ( | )
+    (|)
+    (|)
+    '|`
+```
+
+=== ID: a90a067c256b07f7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 11x10 ===
+```
+(`-._o_.-')
+ (`- | -')
+  `-.|.-'
+    o|o
+   ( | )
+    `!'
+    (|)
+     X
+    (|)
+    '|`
+```
+
+=== ID: 17d9fffc879d09a4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 25x13 ===
+```
+           .-.
+     ___  (   )  ___
+,_.-'   `'-| |-'`   '-._,
+ '.      .-| |-.      .'
+   `~~~~`  |.') `~~~~`
+          (_.|
+           |._)
+           |.')
+          (_.|
+           |._)
+          ('.|
+           |._)
+    jgs    '-'
+```
+
+=== ID: b98c68293b7ba5f0 | TITLE: Untitled | ARTIST: llizard | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 25x14 ===
+```
+             _
+     _____  ( )  _____
+    vVVVVV\__|__/VVVVVv
+   vVVVVVVvvv|vvvVVVVVVv
+  vVVVV      |      VVVVv
+ vVVV        | >=.   VVVv
+ vVV         |____)   VVv
+ v          (|          v
+             |)
+            (|
+             |)
+            (|
+             |`
+ejm          |
+```
+
+=== ID: a91dc4ccfebec08b | TITLE: Untitled | ARTIST: unknown | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 17x15 ===
+```
+ _____  _  _____
+(___  \( )/  ___)
+  (___ | | ___)
+   /")`| |'("\
+  | |  | |  | |
+   \ \_| |_/ /
+    `._!' _.'
+      / .'\
+     | / | |
+      \|/ /
+       /.<
+      (| |)
+       | '
+       | |
+       `-'
+```
+
+=== ID: d5ee8f740fcc8509 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 39x19 ===
+```
+                   _
+        _..._    /` `\    _..._
+      .'     '. |     | .'     '.
+,    /         '.\   /.'         \    ,
+\`--'  .--.    .-.> <.-.    .--.  '--`/
+ '.__.'    '._/ ^ ) ( ^ \_.'    '.__.'
+             |  |`| |`|  |
+             \  \ | | /  /
+              '. '; ;' .'
+                '. ' .'
+                /  /` \
+               |  | |  |
+                \ \ / /
+                 '.'.'
+           jgs   / / \
+                / / \ \
+               | /| |\ |
+               \/ | | \/
+                  \_/
+```
+
+=== ID: c3444fc84b894d59 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: caduceus | SIZE: 39x21 ===
+```
+                   _
+        _..._    /` `\    _..._
+      .'     '. |     | .'     '.
+,    /         '.\   /.'         \    ,
+\`--'  .--.    .-.> <.-.    .--.  '--`/
+ '.__.'    '._/ ^ ) ( ^ \_.'    '.__.'
+             |  |`| |`|  |
+             \  \ | | /  /
+              '. '; ;' .'
+                '. ' .'
+                /  /` \
+               |  | |  |
+                \ \ / /
+                 '.'.'
+                 / Y \
+                | | | |
+                \ \ / /
+           jgs   '.'.'
+                 / / \
+                (_| |_)
+                  '-'
+```
+

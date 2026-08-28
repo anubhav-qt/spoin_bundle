@@ -1,0 +1,2234 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: SPORTS-AND-OUTDOORS
+# Total artworks in category fitting <=40 cols: 138
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: ff1f75b565d83f04 | TITLE: Mini juggler | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 3x3 ===
+```
+.:.
+:.:
+-Å-
+```
+
+=== ID: c9a66d2a8996d14e | TITLE: Passing | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 15x5 ===
+```
+        o
+    o      o
+ O/   o  o  \O
+ |-o       o-|
+/ \         / \
+```
+
+=== ID: 628e7b732a7cfd24 | TITLE: Juggling | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 11x5 ===
+```
+    o
+       o
+   o O
+  `\/Y\/~
+____/_\____
+```
+
+=== ID: fa3affe278bf034b | TITLE: Juggling Five balls | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 7x6 ===
+```
+  o
+o
+    o
+  o O
+  --|-o
+   / \
+```
+
+=== ID: 1bf0566a1341b60e | TITLE: Juggling four balls | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 6x6 ===
+```
+  o
+    o
+o  O
+`--|\o
+  /< '
+  \ \
+```
+
+=== ID: ae7d51a76d56144e | TITLE: Juggling three balls | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 5x6 ===
+```
+  .
+    .
+. O _
+_/=/
+  |
+_/ \_
+```
+
+=== ID: 833e7f216b43481c | TITLE: Juggling five torches | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 8x7 ===
+```
+      ~
+  \  /
+   ~   /
+~  O  ~
+ \/|\
+  / \\
+ /   \~
+```
+
+=== ID: 5c7f5ef901418908 | TITLE: Juggling on a unicycle | ARTIST: Donovan Baker | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 11x8 ===
+```
+     -o
+   o   `o
+   '
+   \_Q_/
+     I
+    /T\
+    \|/
+____=0=____
+```
+
+=== ID: 05f77786bf16517f | TITLE: Juggling | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 8x8 ===
+```
+     /
+o   o
+ \
+   0   o
+  /#\ /
+ + # +
+  / \
+ =   =
+```
+
+=== ID: fd3a2fd6c1d78341 | TITLE: Juggling thirteen balls | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 6x10 ===
+```
+  ..
+  . .
+  ..
+ .  .
+  . .
+ .   .
+. O _
+_/=/
+  |
+ / \
+```
+
+=== ID: 5a0726a5b51ebfae | TITLE: Juggling on wire | ARTIST: Veronica Karlsson | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 33x11 ===
+```
+             o
+          o     o
+
+         o       o
+             O
+         o__/|\__o
+             |
+             |\
+  |__________|_\______________|
+ /|                           |\
+/_|     o                    o|_\
+```
+
+=== ID: 7594e2e44db4fabb | TITLE: Juggler | ARTIST: Joris Bellenger | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 34x15 ===
+```
+ _
+(  )         ,,,,,
+  \\         . .  ,
+   \\       | -   D
+   (._)     \__-  |
+              |   |
+  \\|_  , ,---- _ |----.
+   \__ ( (           /  )       _
+      | \/ \.   '  _.|  \     (  )
+      |  \ /(   /    /\_ \    //
+       \ /  (       / /  )   //
+            (  ,   / / ,   (_.)
+            |......\ |  \,
+           /  /     ) \---
+    b'ger /___/___^//
+```
+
+=== ID: 550fe467e4efc7ce | TITLE: Fire Juggler | ARTIST: Andrew Carpenter | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 37x23 ===
+```
+                    )
+                   / (
+                   )  (
+      )|          ) /\ \
+    _)  \  .-.____.-----.   |(   ()
+   / \/|(  ._,----      |  /  ( //
+   \  \ (         `-----'  )|\.//
+    \  \(                  ) / Y,
+     \ Y'                  )/  /
+   )\ `\\                  /  /
+  )  \_ \\       .-.       \_/
+  ||\/ \ ()   #/a|"|a\#
+  ))/  /      d _____ b
+  )/  /       #\\"""//#
+  ,Y_/        ##\___/##
+\\y/|       ___//| |\\___       |\///
+\// |     /`  //\===/\\  '\ azc | ) /
+() /'\   /       """       \   /`\ /
+  Y   \ /   ,           .   \ /   ;
+   \   V   /             \   V   /
+    \     /               \     /
+     \   /                 \   /
+      \_/                   \_/
+```
+
+=== ID: 84c0c465b0c04047 | TITLE: Juggler | ARTIST: Shanaka Dias | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 24x24 ===
+```
+          _
+         (_) -
+               '
+       @_  _    '
+        )\/(@    '
+      __(/ \--._
+     (,-.---'--'@
+      @ )0_0(     _
+        ('-')    (_)
+   '    _\Y/_
+   ' .-'-\-/-'-._  '
+   _ /    '*     \ '
+  (_)  /)  *    .-.))>'
+    ._/  \__*_ /\__'.
+'<((_'    |__H/  \__\
+          /   ,_/ |_|
+          )-- /   |x|
+          \ _/    (_ x
+          /_/       \_\@
+         /_/
+snd     /_/
+       /x/
+      (_ x
+        \_\@
+```
+
+=== ID: 31ff99462edb10f1 | TITLE: Devil Juggler | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 34x29 ===
+```
+          ,oo
+         (  ^)
+          " "
+                       ,oo
+                      (  ^)
+                       " "
+ ,oo
+(  ^)                         ,oo
+ " "                         (  ^)
+                              " "
+             (\___/)
+  ,oo        \ (- -)       ,oo
+ (  ^)       c\   >'      (  ^)
+  " "          )D_/        " "
+   \\|,    ____| |__    ,|//
+     \ )  (  `  ~   )  ( /
+      #\ / /| . ' .) \ /#
+      | \ / )   , / \ / |
+       \,/ ;;,,;,;   \,/
+        _,#;,;;,;,
+       /,i;;;,,;#,;
+      //  %;;,;,;;,;
+     ((    ;#;,;%;;,,
+    _//     ;,;; ,#;,
+   /_)      #,;    ))
+           //      \|_
+           \|_      |#\
+    b'ger   |#\      -"
+             -"
+```
+
+=== ID: 96ed37ef1aeb633f | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 5x5 ===
+```
+  _
+ | |
+ ) (
+(   )
+ \_/
+```
+
+=== ID: 9ae67c69e9e34d76 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 27x5 ===
+```
+                    0 _
+ ii                / \ `O
+__iiii______________ /|____
+  iii               | \
+   i
+```
+
+=== ID: cbb6aaff508541a1 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 20x9 ===
+```
+         .-.
+      .-.\ /    .-.
+      \ /|=|    \ /
+      |=|   \   |=|
+     /   \ ---./   \
+     |   / ..  \   |
+     |  |#  '   |  |
+jgs   '._\     /_.'
+          '---'
+```
+
+=== ID: 77fc2e86bbb57c04 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 23x11 ===
+```
+         _....._
+      .;;'      '-.
+    .;;: _         '.
+   /;;:'(_)          \
+  |;;:'_     _        |
+  |;;:(_)   (_)       |
+  |;;::.              |
+   \;;::.            /
+    ';;::.         .'
+      '-;;:..  _.-'
+jgs       '''''
+```
+
+=== ID: d35096672045eb83 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 19x11 ===
+```
+  __  __  __  __
+  )(__)(__)(__)(
+ /  )(__)(__)(  \
+ | /  )(__)(  \ |
+ | | /  )(  \ | |
+ '-| | /  \ | |-'
+   '-| |  | |-'
+jgs  '-|  |-' .--.
+       '--'  / .  \
+             \'.  /
+              '--'
+```
+
+=== ID: 3fe8cd9870928db3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 28x12 ===
+```
+              .-.
+              \ /      .-.
+              |_|  .-. \ /
+              |=|  \ / |_|
+             /   \ |_| |=|
+            / (@) \|=|/   \
+       ____ |     /   \@)  \
+     .'    '.    / (@) \   |
+    / #      \   |     |   |
+    |    o o |'='|     |  /
+    \     o  /    \   /'='
+jgs  '.____.'      '=
+```
+
+=== ID: b3778d22b4e864a3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 29x14 ===
+```
+  _     _     _     _     _
+ | | _ | | _ | | _ | | _ | |
+ )  | | _ | | _ | | _ | |  (
+(   )  | | _ | | _ | |  (   )
+ \_(   )  | | _ | |  (   )_/
+    \_(   )  | |  (   )_/
+       \_(   ) (   )_/
+          \_(   )_/
+             \_/
+
+
+               __
+              (  )
+               ~~
+```
+
+=== ID: 421ced4e46d6d47f | TITLE: Bowling alley | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 25x17 ===
+```
+         _______
+         |"""""|
+         |iIjIi|
+        //     \\
+       //       \\
+      //         \\
+     //           \\
+    //             \\
+   //               \\
+  //                 \\
+ //                   \\
+//   /  /   |   \  \   \\
+
+  ___
+ /o o\
+|  o  |
+ \___/
+```
+
+=== ID: beb6e93974785fd4 | TITLE: Untitled | ARTIST: Normand Veilleux | CATEGORY: sports-and-outdoors | SUBCATEGORY: bowling | SIZE: 32x30 ===
+```
+         ,ad88ba,
+       ,dP'    `Yb,
+       8"        "8
+       8          8
+       8          8
+       Y,        ,P
+       `b        d'
+        8        8
+        8        8
+        8aaaaaaaa8
+       ,8aaaaaaaa8,
+      ,dP        Yb,
+     ,8P          Y8,
+    ,dP            Yb,
+   ,8P              Y8,
+  ,dP                Yb,
+ ,8P                  Y8,
+ dP                    Yb
+ 8I                    I8,
+I8'                    `8I
+I8                      8I
+I8                      8I
+`8                      8'
+ Yb                    dP
+ `8b                  d8'
+  `8baaaaaaaaaaaaaaaad8'
+   `8baaaaaaaaaaaaaad8'
+    `8b,          ,d8'  Normand
+     `8b,        ,d8'   Veilleux
+      `Y8baaaaaad8P'
+```
+
+=== ID: 7f0758ac5a321de5 | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-hockey | SIZE: 27x5 ===
+```
+          __O         O__
+          \/\         /\/
+          |\ \       / /|
+ejm97    /  | \_ = _/ |  \
+        ~   ~         ~   ~
+```
+
+=== ID: 60cf3c75253fbbd2 | TITLE: Canadian Hockey Player | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-hockey | SIZE: 17x8 ===
+```
+       .\^/.
+     . |   | .
+     |\| O |/|
+  .--'  /\\> '--.
+   \  _/ < \   /
+    > =  '  ` <
+   '~|/~~|~~\|~'
+jgs      |
+```
+
+=== ID: 473949017907cb1f | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-hockey | SIZE: 15x12 ===
+```
+          ___
+         [_  ]
+        [do\ ]
+         \L//
+         /XX\\
+        {XXX{ }
+\\       XXX N
+ \\=====[===[M]
+         / / /
+        [=[==]
+         \ \ \
+         doPdoP
+```
+
+=== ID: 95683f0f52450cc9 | TITLE: Untitled | ARTIST: Michael John Wagoner | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-hockey | SIZE: 24x22 ===
+```
+    |||||||
+   /       \
+   | o   o |
+   |   o   |
+   | |___| |
+   \_______/
+ _____| |______
+|              |
+|  |        |  |
+|  |        |  |      //
+|  |        |  |     //
+|  |========|  |======
+\__/        \__/
+   |        |
+   |   ||   |
+   |   ||   |
+   |   ||   |
+   ##  ||  ##
+___|#  ||  #|____
+|  #   ||   #   |
+|______||_______|
+|_|_|__||_|_|_|_|
+```
+
+=== ID: 99fd1d53b95d8806 | TITLE: Untitled | ARTIST: Zotiel R. Bell | CATEGORY: sports-and-outdoors | SUBCATEGORY: bungee-jumping | SIZE: 38x12 ===
+```
+=-=-=-=-=-=-=-=-=-)-=-=-=-=-=-=-=-=-=-
+_| |__| |________(_________| |__| |___
+ \  \/  /         )        \  \/  /
+  )    (         (          )    (
+  |    |         (          |    |
+  |    |          \|        |    |
+  |    |           \o       |    |
+  |    |           ( \      |    |
+  |    |                    |    |
+  |    |                    |    |
+  |    |                    |    |Zot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: 0e30c36d35a0e4ce | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: sports-and-outdoors | SUBCATEGORY: bungee-jumping | SIZE: 26x16 ===
+```
+               _
+  _____.------[_]
+ +------------|x|
+ |            |x|
+ |            |x|
+ |            |x|
+ |            |x|
+ j            |x|
+' \/\_        |X|
+  (           |X|
+ (o)          |X|
+              |X|
+    \         FXJ
+     z!      J>X<L
+            /_>x<_\
+           []     []    VK
+```
+
+=== ID: e3bb7c68b050c0db | TITLE: Untitled | ARTIST: Dylan Parker | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 38x4 ===
+```
+,_____,_____,    6 __
+T\  :.      .^\,_/_\_I_
+I ^T=====;=====T   /|   -Dylan Parker-
+   I           I _|_|
+```
+
+=== ID: 25e367a3e7c18766 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 9x5 ===
+```
+ .-"""-.
+/   _   \
+|  (8)  |
+\   ^   /
+ '-...-'
+```
+
+=== ID: a4958fa5d676a431 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 20x10 ===
+```
+         ,'|`.
+ _    _.-"-"`-.`. _
+|.`,-' .  .  . ".",|
+|C`:  . .  . . .,' |
+| R `._.  . . ,'   |
+|  A   |"-..-'     |
+|   Y  |C R A Y O N|
+ `.  O |        _.-"
+   `. N|    _.-"
+     `.|_.
+```
+
+=== ID: ee65b55f4748d7e8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 25x13 ===
+```
+        ____
+    ,dP9CGG88@b,
+  ,IP  _   Y888@@b,
+ dIi  (_)   G8888@b
+dCII  (_)   G8888@@b
+GCCIi     ,GG8888@@@
+GGCCCCCCCGGG88888@@@
+GGGGCCCGGGG88888@@@@...
+Y8GGGGGG8888888@@@@P.....
+ Y88888888888@@@@@P......
+ `Y8888888@@@@@@@P'......
+    `@@@@@@@@@P'.......
+        """"........
+```
+
+=== ID: 2d1b5548d9766ec7 | TITLE: Eight balls | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 26x14 ===
+```
+         _.-----._
+      .-'         `-.
+    .'     _..._     `.
+   :     .' .-. `.     :
+  :     :  :   :  :     :
+ :      :  :   :  :      :
+ :       `._`-'_.'       :
+ :       .' .-. `.       :
+ :      :  :   :  :      :
+  :     :  :   :  :     :
+   :     `._`-'_.'     :
+jgs `.      '''      .'
+      `-._       _.-'
+          `-----'
+```
+
+=== ID: eb6714b03f4fd6a6 | TITLE: Eight balls | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 26x14 ===
+```
+         _......._
+      .-:::::::::::-.
+    .:::::::::::::::::.
+   :::::::' .-. `:::::::
+  :::::::  :   :  :::::::
+ ::::::::  :   :  ::::::::
+ :::::::::._`-'_.:::::::::
+ :::::::::' .-. `:::::::::
+ ::::::::  :   :  ::::::::
+  :::::::  :   :  :::::::
+   :::::::._`-'_.:::::::
+    `:::::::::::::::::'
+jgs   `-:::::::::::-'
+         `'''''''`
+```
+
+=== ID: 4e7b2c2fc6286110 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 25x14 ===
+```
+       _.a$$$$$a._
+     ,$$$$$$$$$$$$$.
+   ,$$$$$$$$$$$$$$$$$.
+  d$$$$$$$$$$$$$$$$$$$b
+ d$$$$$$$$~'"`~$$$$$$$$b
+($$$$$$$p   _   q$$$$$$$)
+$$$$$$$$   (_)   $$$$$$$$
+$$$$$$$$   (_)   $$$$$$$$
+($$$$$$$b       d$$$$$$$)
+ q$$$$$$$$a._.a$$$$$$$$p
+  q$$$$$$$$$$$$$$$$$$$p
+   `$$$$$$$$$$$$$$$$$'
+     `$$$$$$$$$$$$$'
+       `~$$$$$$$~'
+```
+
+=== ID: 6a805dc6e8151a85 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 25x14 ===
+```
+       _.-"""""-._
+     ,'           `.
+   ,'               `.
+  /                   \
+ /       ,-'"`-.       \
+(       /   _   \       )
+|      (   (_)   )      |
+|      (   (_)   )      |
+(       \       /       )
+ \       `-._.-'       /
+  \                   /
+   `.               ,'
+     `.           ,'
+       `-._____.-'
+```
+
+=== ID: 8377b81296970dcc | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: billiards | SIZE: 38x17 ===
+```
+_
+ "-_
+    "-_
+_     ,"-_          _.-"""""-._
+ "-._(    :-.     ,'           `.
+     "-._(   )  ,'               `.
+         "`-'  /   ,'\             \
+              /    \,'              \
+             (                       )
+             |                       |
+             |                       |
+             (                       )
+              \                     /
+               \                   /
+                `.               ,'
+                  `.           ,'
+                    `-._____.-'
+```
+
+=== ID: 506b73743fd86e98 | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 25x4 ===
+```
+      |_O            O_\
+        |`-)--- ---(-'\
+        |\           / |
+ejm    /  |          |  \
+```
+
+=== ID: c239c88308173c5f | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 21x5 ===
+```
+             X
+      |_O   / \  O_\
+        |`-/   \-'\
+        |\       / |
+ejm    /  |      |  \
+```
+
+=== ID: d717c8cca8add582 | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 19x5 ===
+```
+           \ /
+      |_O   X  O_\
+        |`-/ \-'\
+        |\     / |
+ejm    /  |    |  \
+```
+
+=== ID: 09f2f3aa60a5b826 | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 19x5 ===
+```
+           \ /
+       |_O  X  O_\
+        /`-/ \-'\
+       | \     / |
+ejm   /   \    |  \
+```
+
+=== ID: c9200c99f364a046 | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 21x5 ===
+```
+             /
+       /_O  X
+        /`-/ \   O_\
+       | \    \-'_\
+ejm   /  /       \ |_
+```
+
+=== ID: 63803f62603d242a | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 20x6 ===
+```
+             /
+       /_O  X
+        /`-/ \  O_\
+       | \    \-'\
+ejm   /  /      / |
+                |  \
+```
+
+=== ID: c6309b4101ff0c47 | TITLE: Untitled | ARTIST: P.J. LaBrocca | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 14x7 ===
+```
+,  0
+ \/|\_,=(-----
+   |
+  / \
+ /   \  pjl
+ \   /
+ ^' '--
+```
+
+=== ID: da604863178409cd | TITLE: Untitled | ARTIST: BluePard | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 23x8 ===
+```
+    m
+   /
+   \C        \
+ _ /`--|)---- \_ O__/
+ \`\          `\/_\
+`` /_            \\
+                 ` \ BP
+                   -'
+```
+
+=== ID: 8773fdd422990a01 | TITLE: Untitled | ARTIST: P.J. LaBrocca | CATEGORY: sports-and-outdoors | SUBCATEGORY: fencing | SIZE: 23x12 ===
+```
+   ,-; __
+  /   (_`>            /
+ /    ooo            /
+<----((|))\         ,
+      \O/  \       /
+      |O|   v----#'
+      OOO       /
+      / \
+     /   \  pjl
+    (     >
+     \   /
+     ,} <_,
+```
+
+=== ID: 5a693253c832f9d1 | TITLE: Running | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: other | SIZE: 17x6 ===
+```
+            _( }
+   -=  _  <<  \
+      `.\__/`/\\
+ -=     '--'\\  `
+      -=    //
+jgs         \)
+```
+
+=== ID: 57172742dbbc67a0 | TITLE: Beachball | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: other | SIZE: 25x6 ===
+```
+            /    (%)
+            \O_
+              \|     O_\
+              /\/   _/\
+ejm           \       /\
+                     |  \
+```
+
+=== ID: e49ccd290c5f4ad6 | TITLE: Karate | ARTIST: H P Barmario (Morfina) | CATEGORY: sports-and-outdoors | SUBCATEGORY: other | SIZE: 14x8 ===
+```
+ ,.
+ \-'__
+/ o.__o____
+\/_/ /.___/--,
+  ||\'
+  | /
+  \_\
+  -'' mrf
+```
+
+=== ID: 7d91675d274fa31b | TITLE: Cricket balls | ARTIST: Andrew Hood (Andy, Flookster) | CATEGORY: sports-and-outdoors | SUBCATEGORY: other | SIZE: 36x8 ===
+```
+    .------.         .------.
+  .'      //`.     .'        `.
+ /       //   \   /            \
+|       //     : |    ......:::::
+:      //      | :::::''''''    |
+ \    //      /   \            /
+  `._//    _.'     `._      _.'  AsH
+    `"----"'         `"----"'
+```
+
+=== ID: f5120d78b0e17bdb | TITLE: Nude Beach Volley Ball! ;) | ARTIST: Shanaka Dias | CATEGORY: sports-and-outdoors | SUBCATEGORY: other | SIZE: 35x22 ===
+```
+ .:'.
+:::  :
+ ':.'
+             \
+            ,)\
+              \\,sSss
+               ')ssssS
+                \_sSSsSs
+                 _) ssSsss
+                /   s s s
+               / .'   (
+          ____/ / \.   \
+         {,----'    )   \
+                   /    ))
+                  /  .-'  \
+                 / .'  '.  \
+                ( <      '. ',--._
+                 \ \       '-----.(
+                  \ |            )/
+                   \;            '
+                   /_)
+             snd  L/
+```
+
+=== ID: c9a58c6637e97396 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: skiing | SIZE: 6x4 ===
+```
+ ,_ o
+/ //\,
+ \>> |
+  \\,
+```
+
+=== ID: 7ce96fc399e96fb7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: skiing | SIZE: 6x4 ===
+```
+  X__O
+\ (\(
+ \/ `
+  \,
+```
+
+=== ID: 875248a74e1b7c68 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: skiing | SIZE: 36x17 ===
+```
+              *
+              XX
+             MMMMM
+             //(00
+          .:.....
+        .:::::::::
+       :: %%%%%% ::.
+      ::  ::::::  :::::::I)
+      (%  ::::::         |
+      /   |   /_____     |
+     /    |         ))   |
+    /      ------/ //    |
+   /            / //     |
+  /            / //      |
+ *            ZZZZ       *
+    _________ZZZZZZ_________//_//
+------------------------------------
+```
+
+=== ID: f7e8450eaa781ad5 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: sports-and-outdoors | SUBCATEGORY: boxing | SIZE: 33x16 ===
+```
+               /////'
+              '  # o
+              C   - |
+ ___          '  =__'        ___
+(` _ \_       |   |        _/  ')
+ \  (__\  ,---- _ |----.  /__)- |
+  \__  ( (           /  ) )  __/
+    |_X_\/ \.   #  _.|  \/_X_|
+      |  \ /(   /    /\ /  |
+       \ /  (  ,    /  \ _/
+            /______/
+           [:::::::]
+          /*%*%*%*%*\
+          >%*%#%*%*%|
+         /%*%*#*%*%*\
+        ######^######  b'ger
+```
+
+=== ID: c04cff10de7d6260 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: boxing | SIZE: 38x23 ===
+```
+        |||||||||
+        | _   _ |
+       (  ' _ '  )
+        |  ___  |
+         |_____|
+  _______/     \_______
+ /                     \
+|   |\             /|   |
+|   ||  .       .  ||   |
+|   / \           / \   |
+\  |   | |_ | _| |   |  /
+|==|   | |_ | _| |   |==|
+/  /_ _|_|__|__|_|_ _\  \
+|___| /            \|___|
+      |     |      |
+      |     |      |
+      |MEX  |   MEX|
+      |     |      |
+      "|""|"""|""|""
+       |  |   |  |      -ThE PUNISHER-
+       |  |   |  |
+      /   )   (   \
+     Ooooo     ooooO
+```
+
+=== ID: b16f19c5f7ee4870 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 28x4 ===
+```
+                     ___
+ o__        o__     |   |\
+/|          /\      |   |X\
+/ > o        <\     |   |XX\
+```
+
+=== ID: e2cd4a46ded50033 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 10x6 ===
+```
+    __
+ .'".'"'.
+:._.""._.:
+:  \__/  :
+ './  \.'
+    ""
+```
+
+=== ID: 56b131f7aaf592fc | TITLE: Soccer ball | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 21x10 ===
+```
+          ___
+      _.-'___'-._
+    .'--.`   `.--'.
+   /.'   \   /   `.\
+  | /'-._/```\_.-'\ |
+  |/    |     |    \|
+  | \ .''-._.-''. / |
+   \ |     |     | /
+    '.'._.-'-._.'.'
+jgs   '-:_____;-'
+```
+
+=== ID: 98103970d2c9cfc7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 21x10 ===
+```
+          ___
+      .:::---:::.
+    .'--:     :--'.
+   /.'   \   /   `.\
+  | /'._ /:::\ _.'\ |
+  |/    |:::::|    \|
+  |:\ .''-:::-''. /:|
+   \:|    `|`    |:/
+    '.'._.:::._.'.'
+jgs   '-:::::::-'
+```
+
+=== ID: ea498c6858c0c6d8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 20x12 ===
+```
+         _
+        |.|
+        ]^[
+      ,-|||~\
+     {<|||||>}
+      \|||||/
+      {/   \}
+      /__9__\
+      | / \ |
+      (<   >)
+     _|)   (|_
+,.,.(  |.,.|  ).,.,.
+```
+
+=== ID: f304e3f5cc63cd7a | TITLE: Football (Soccer) | ARTIST: Sebastian Stoecker | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 27x14 ===
+```
+        _...----.._
+     ,:':::::.     `>.
+   ,' |:::::;'     |:::.
+  /    `'::'       :::::\
+ /         _____     `::;\
+:         /:::::\      `  :
+| ,.     /::SSt::\        |
+|;:::.   `::::::;'        |
+::::::     `::;'      ,.  ;
+ \:::'              ,::::/
+  \                 \:::/
+   `.     ,:.        :;'
+     `-.::::::..  _.''
+        ```----'''
+```
+
+=== ID: 3ba8ace2bf2c8bea | TITLE: Untitled | ARTIST: Peter Marquardt (last future, lastfuture) | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 17x16 ===
+```
+       ____
+       ( () )
+        \  /
+         ||
+         ||
+        [__]
+       /)  (\
+      (( () ))
+       \\__//
+        `..'
+         ||
+         ||    lf
+        //\\__
+     _ ((  `--'
+    (_) \)
+"""""""""""""""""
+```
+
+=== ID: 035dbd6d564600b3 | TITLE: Soccer Mom | ARTIST: Faux_Pseudo | CATEGORY: sports-and-outdoors | SUBCATEGORY: soccer | SIZE: 38x53 ===
+```
+        .--.-.\
+       .='/_ .-'\
+      /  /' - --.`\
+     /  .-'__.\`\. |
+    /  / //   |-. \\
+    | /  / .-'   `\\\
+    / | /|/        \\|
+   |  / |/   --.   |||
+   |  | |    <o \ -|/|
+  \|  | \        (o||
+  /\_/  ||         |
+ \ |    ||      _)/
+ ./ --. |\   __-_/    __
+/ |\-'- /_`-'    \_.-'  \
+`\ \\ //          \      \
+\/ _\ \\-          `\__   \
+ `--'\\|             \ \   \
+ /                    \ \   \
+|                      `\\   \
+|                        \    \
+|                _        `\   \
+|               /\`.        `\  \
+`               | \ `.        \ |
+ |                 \  `.         \
+ |  |               \.  `-_       \
+ `  \                |--.__\      |
+  |               \_/     _-`-.__/_
+  |  \             \    -.      .()\
+  `   \             ._.'/ \ __ / `\ \
+   \   \            | '/   /   \   | |
+    \   \           |' \__/     \__/ |
+     \   \          .               \/
+      \             |  /   \    /   |/
+       \  |         |_       ___    |/
+        . |          \\     /   |   /
+        | |           \\ __<    |--'
+        |              \|   \  /   '
+        |   '          \     `|  .'
+        '               `-.___.-'
+        '               |
+       /                |  :F_P:
+      / |/              `
+     .  /                |
+     | '                 |
+     |                   |
+     | |                 |
+     |                   |
+     ` `                 |
+      .  \               |
+       \  \              |
+        \--\_            |
+         \  |            |
+          \ |            |
+```
+
+=== ID: bfb251afcca70fa4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: football | SIZE: 16x5 ===
+```
+       _____
+    .-"/-/-/"-.
+   (           )
+jgs '._     _.'
+       `"""`
+```
+
+=== ID: e551f081adeaf41c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: football | SIZE: 21x5 ===
+```
+        _.-=""=-._
+      .'\\-++++-//'.
+jgs  (  ||      ||  )
+      './/      \\.'
+        `'-=..=-'`
+```
+
+=== ID: 929b939e7c0655b6 | TITLE: Football player | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: football | SIZE: 35x23 ===
+```
+                 __
+              .-'||'-.
+            .'   ||   '.
+           /   __||__   \
+           | /`-    -`\ |
+           | | 6    6 | |
+           \/\____7___/\/
+   .--------:\:I:II:I:/;--------.
+  /          \`:I::I:`/          \
+ |            `------'            |
+ |             \____/             |
+ |      ,     __   _____   ,      |
+ |======|    / /  /  _  \  |======|
+ |======|   / /__ \ <_> /  |======|
+ |~~~~~|   | <_> \/ <_> \   |~~~~~|
+ |     |\   \____/\_____/  /|     |
+  \    \|                  |/    /
+  `\    \  _ _.-=""=-._ _  /    /'
+    `\   '`_)\\-++++-//(_`'   /'
+jgs   ;   (__||      ||__)   ;
+       ;   ___\      /___   ;
+        '. ---/-=..=-\--- .'
+          `""`        `""`
+```
+
+=== ID: 5a603ed27badb285 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: football | SIZE: 35x23 ===
+```
+                 __
+              .-'||'-.
+            .'   ||   '.
+           /   __||__   \
+           | /`-    -`\ |
+           | | 6    6 | |
+           \/\____7___/\/
+   .--------:\:I:II:I:/;--------.
+  /          \`:I::I:`/          \
+ |            `------'            |
+ |             \____/             |
+ |      ,    __     ___    ,      |
+ |======|   /  |   / _ \   |======|
+ |======|   ^| |  | | | |  |======|
+ |~~~~~|     | |  | |_| |   |~~~~~|
+ |     |\   [___]  \___/   /|     |
+  \    \|                  |/    /
+  `\    \  _ _.-=""=-._ _  /    /'
+    `\   '`_)\\-++++-//(_`'   /'
+jgs   ;   (__||      ||__)   ;
+       ;   ___\      /___   ;
+        '. ---/-=..=-\--- .'
+          `""`        `""`
+```
+
+=== ID: c8e7372aa20bc72b | TITLE: Dancing in the rain | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: dancing | SIZE: 39x7 ===
+```
+   _O/                   ,
+     \                  /           \O_
+     /\_             `\_\        ,/\/
+     \  `       ,        \         /
+     `       O/ /       /O\        \
+             /\|/\.                `
+jgs
+```
+
+=== ID: 9632f2733c39338e | TITLE: Ballerina | ARTIST: H P Barmario (Morfina) | CATEGORY: sports-and-outdoors | SUBCATEGORY: dancing | SIZE: 15x20 ===
+```
+     _/.-
+  ../.-'(()
+ (( ) )))
+  /)- _))
+ ( \_  )
+  \-\|(__
+   \/-'  \
+   (_) |\-\
+    | (  ) )
+    |--\/_'
+_.-'  . \_'._
+'-.'_|_|__\.-'
+    | /. \
+    |(  '.\
+    \ \   \'.
+     \_)   \_)
+      )| mrf\|
+___,-'__)___|\
+            | )
+            '.'
+```
+
+=== ID: 6271d8ccebb29468 | TITLE: Milwaukee Bucks | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 36x8 ===
+```
+ ____                          ____
+`;   `.  _  _    __    _  __ ,'   ;'
+ | || | | || | ,'  `| | |/ / | ||_|
+ | || | | || | | ||_| | | /  | |
+ |   <  | || | | |    |  /   ` .` .
+ | || | | || | | | __ |  \    _ | |
+ | || | | || | | || | | | \  | || |
+ |___,' `.__.' `.__.' |_|\_\ `.__.'
+```
+
+=== ID: b0094d7630ae1fce | TITLE: New Jersey Nets | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 35x8 ===
+```
+|"""\ |"""|""""""""""""""""""""""\
+|    \|   |  ,-------.  ,-.   ,---`
+|  |\     |  `"""""/ |  |  \   \
+|  | \    |  ,----'  |  |   `.  `.
+|  |  |   |  `------,|  |,---'   ;
+|  |  |___|________/ |__|\_____,'
+|  |
+ \/
+```
+
+=== ID: de41dad7e8764585 | TITLE: Golden State Warriors | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 28x11 ===
+```
+         ,--"""|"""--.
+       .'      |      `,
+   __/_ `.     |     ,' `\
+  |    |  `.   |   ,'     |
+  `,   |    `--|--'        |
+.-'`-, `.______|___________|
+ ;'`;.   `-.   |           |
+    |\      `-.|-._       |
+     \;-._     `.  ".   ,/
+       \.-"-.___/    "-/
+         `--.__|__.--'
+```
+
+=== ID: 6ade77d59deb94b3 | TITLE: Indiana Pacers | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 39x11 ===
+```
+     ,--------------.
+     L_____.-"~\~"-. -
+    /     /""-.__\-/\ \
+    L____|_______|___| |
+   /     |       |   | |
+   L______\__--"/~"\/ /
+  /        `-._/_.-' -
+  |       _________-"
+ /       /    /"""] __  __  _    __  __
+ |       |   /---' ,_] /   /_)  /   (
+/_______/   /     (_/ [__ [__  /   __)
+```
+
+=== ID: c5e314c10605a5b9 | TITLE: Cleveland Cavaliers | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 22x14 ===
+```
+  ,----.
+ /      `-.
+|   _______\_________
+|  |HHHHH/"\"\HHHHHHH|
+ \ |HH`\|_.-)'|/'dP,H|
+  \|Hb.`\\_/_//'.oddH|
+   |HHHb|`.\/\,'|HHHH|
+   |HHHHb/\/\/\/|HHHH|
+   |HHHHHb/\/\/|HHHHH|
+   |HHHHHH|/\/\|HHHHH|
+   |"""""""""""""""""|
+   | |"" /\ \  / |"" |
+   | |__/--\ \/  __| |
+   `-----------------'
+```
+
+=== ID: 96acc2b82c08ed35 | TITLE: Detroit Pistons | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 31x15 ===
+```
+             _____
+       _,ooHHHHHHHHHoo._
+     ,dHHHP^^"""""^^?HHHb.
+   ,dHHP'             `?HHb.
+  dHHP'   _..-----.._   `?HHb
+ |HHP  ,-'           `-.  ?HH|
+|HHY  / |\[~"|"|)/\|"|" \  YHH|
+|HH|_|__|/|_ | |\\/| | __|_|HH|
+|HH| |  |)|(`"|"/\|\|(`  | |HH|
+|HHL  \_| |_) | \/| |_)_/  JHH|
+ |HHb   `-.__     __.-'   dHH|
+  ?HHb.      """""      .dHHP
+   `?HHbo._         _.odHHP'
+     `?HHHHbboooooddHHHHP'
+        `^^??HHHHHPP^^'
+```
+
+=== ID: 41c93a0aa73fd331 | TITLE: Detroit Pistons | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 31x15 ===
+```
+             _____
+       _,--""     ""--._
+     ,'  _.--"""""--._  `.
+   ,'  ,'             `.  `.
+  /  ,'   _..-----.._   `.  \
+ |  /  ,-'           `-.  \  |
+|  Y  / |\[~"|"|)/\|"|" \  Y  |
+|  |_|__|/|_ | |\\/| | __|_|  |
+|  | |  |)|(`"|"/\|\|(`  | |  |
+|  L  \_| |_) | \/| |_)_/  J  |
+ |  \   `-.__     __.-'   /  |
+  \  `.      """""      .'  /
+   `.  `-._         _.-'  ,'
+     `._   ""-----""   _,'
+        `--.._____..--'
+```
+
+=== ID: 2549da5c09428f02 | TITLE: Chicago Bulls | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 35x17 ===
+```
+ __  __ __ __  __   __    __   ___
+// ` ||_|| || // `  /\\  // ` // \\
+\\_,_|| ||_|| \\_,_/""\\ \\_T \\_//
+    , ____ __  _ __  __   __  .
+   /|  ||_) || | ||  ||  (( ` |\
+  |-|._||_) \\_/_||_,||_,__)),|-|
+  [  "-.___________________.-"  ]
+   \_     /   ___.___   \     _/
+     "-__[    ===!===    ]__-"
+   .-"" _|=__    |    __=|_ ""-,
+    `""" \  "`==' `=='"  / """'
+          \  \\     //  /
+           \  |\___/|  /
+            \,;-----;./
+            |  @@ @@  |
+             \ -"""- /
+              `-----'
+```
+
+=== ID: 8feb822fe2b4c4d0 | TITLE: Golden State Warriors | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 39x17 ===
+```
+           .---_."""""""---.
+        .-_   |_. |.|     _ "-.
+     ,-' ; `\ |_. |`|   _ \` . `-.
+    / .   `.".--"""|"""--"-' ,'.  \
+   /,  `,' .'      |      `.' _.-, \
+  |`.`,__/_ `.     |     ,' `\ >'`;.|
+ |. _'|    |  `.   |   ,'     | -" ' |
+| L__J`,   |    `--|--'        |,-,-, |
+|    .-'`-,`.______|___________|| | | |
+|     ;'`;.  `-.   |           |      |
+ |      |\      `-.|-._       |      |
+  |   /  \;-._     `.  ".   ,/ ,'   |
+   \ /-"/_,\.-"-.___/    "-/_-. "",/
+    \  /' ,'|`--.__|__.--'_ \-'- '/
+     `-. '`/  /") |", | (" \ ` ,-'
+        `._  /"|  |"|  | `-'_.'
+           "---._______.---"
+```
+
+=== ID: 2649f270ac2ecf55 | TITLE: New Jersey Nets | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 34x17 ===
+```
+|"""\ |"""|"""""""""""""""""""""\
+|    \|   |  ,------.  ,-.   ,---`
+|  |\     |  `""""/ |  |  \   \
+|  | \    |  ,---'  |  |   `.  `.
+|  |  |   |  `-----,|  |,---'   ;
+|  L  |___|_______/ |__|\_____,'
+ \ / ,'|"""""""/"""""""")`.
+  ` /  |      /        /   \
+   |    |    |       ,'     |
+  |_    |    |      /        |
+  | "-._ |   |     |   __..-"|
+  |     "|.._|___..|-""      |
+   |     |   |     |        |
+    \   /    |      \      /
+     `,'      |      `-._,'
+       `._     \      _,'
+          `--.._\..--'
+```
+
+=== ID: 412e8509aaf4939d | TITLE: Phoenix Suns | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 35x19 ===
+```
+       ___________________________
+       |         |'"-._-'`._.-;   |
+       |       __|.-\"";"-.  /    |
+      |        `./"""";.--"\ "-. |
+      |        <|   ,-'.\-._|_.-'|
+     |        ,'|  /  ;  |  |`. |
+     |     , ',',\'   |  | /.-- |
+    |   , ',', ',';-./__.''/   |
+    |, ',', ',', ','v\   /     |
+   |',', ',', ','     `v'     |
+   |, ',', ','                |
+  |',', ','                  |
+  |__________________________|
+  __        _   __
+ |__) |__|,' | |__ |\ | | `./
+|    |  | |_,'|__ | \| | /`.
+ .----  ,    ,  ,---.  .----
+`---.  /    /  /    / `---.
+----'  `---'  '    ' -----'
+```
+
+=== ID: 65a7f3099e024fc6 | TITLE: Miami Heat | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 31x23 ===
+```
+                      .
+                    ,-; . ,
+           ________i_,',//
+     _odHHHHHHHHHHHHHHHHbo_
+   dP^'         ;.| ||,; `^?b
+  |H           ))`'||/';    H|
+   ?bo.     .=;'   |||.' ,odP
+     `?oo.-','     ||'oodP'
+       /'  /      / |/
+      |   |    _-'  ||
+     ||  |   ,'     J|
+     | \ |   |     / |
+      |_\ L  L  .-' |
+       \.)`-.;-;__./
+         "-._;_.-"
+
+  || ||  ||   |||   || ||  ||
+ |||||| ||  || ||  |||||| || ,|
+|| | || || || `|| || | || || `|
+                              J
+       || || ||==   ||| ==||='
+      ||=|| ||==  || ||  ||
+      || || ||== || `||  ||
+```
+
+=== ID: 2e006daed4970747 | TITLE: Sacramento Kings | ARTIST: Brian T. Odom | CATEGORY: sports-and-outdoors | SUBCATEGORY: nba-logos | SIZE: 39x24 ===
+```
+                   |
+            .     | |     ,
+            |\    | |    /|
+.      .    | \  |   |  / |    ,      ,
+ `;.   \`.  |  \ |   | /  |  ,'/   ,;'
+  `.`.  \ `.|   `'   `'   |,' /  ,','
+    `.`. \    __.......__    / ,','
+     ;.';\;-""C R A M E N""-;/;`.;
+     `.-"S A__..-------..__T O"-.'
+,------`_.-"|| --------- ||"-._'------.
+| |""| |""| `"""""""""""""' |"""""""| |
+| |  | |  | |"||"`.|"||""""||  |"";.| |
+| |  |,' ,' | || i.  || |"`  \. `.  ` |
+| |   ,. `. | || | | || |,-.  `\. `.  |
+ | |  | |  || || | | || || ||._ |  | |
+ | |  | |  ||_||_| |_||____||  -'  | |
+ | |  | |_-;.--"",-.-.""--..`--._  | |
+  \ \-"..-"    ,'"/|\"`.    "-,. "/ /
+   |.-"  `.    ( / | \ )    ,'  "-.|
+        ,',`.  ;.' | `,;  ,'.`.
+      ,','   `"; `-`-' ;"'   `.`.
+    ,','                       `.`.
+  ,','                           `.`.
+  `'                               `'
+```
+
+=== ID: 6051c69669d8f265 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: sports-and-outdoors | SUBCATEGORY: surfing | SIZE: 30x17 ===
+```
+          -.--.
+          )  " '-,
+          ',' 2  \_
+           \q \ .  \
+        _.--'  '----.__
+       /  ._      _.__ \__
+    _.'_.'  \_ .-._\_ '-, }
+   (,/ _.---;-(  . \ \   ~
+ ____ (  .___\_\  \/_/
+(      '-._ \   \ |
+ '._       ),> _) >
+    '-._ c='  Cooo  -._
+        '-._           '.
+            '-._         `\
+       snd      '-._       '.
+                    '-._     \
+                        `~---'
+```
+
+=== ID: 2bc6674d3414de21 | TITLE: Baseball | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: baseball | SIZE: 15x6 ===
+```
+        ____
+      .'    '.
+     /'-....-'\
+     |        |
+     \.-''''-./
+jgs   '.____.'
+```
+
+=== ID: c46017a8de10dadf | TITLE: Cleveland Indians | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: baseball | SIZE: 35x23 ===
+```
+                             _-`.
+                          ,-"` |-`.
+                          |   | _-|
+                          |\  | _-|
+                         | \\|   |
+                         |  `| _-|
+                        |   | _-|
+                       |   |   |
+           ,===========;...'.-|
+         ,;||||||||||||||||\ |
+        /\""""""""/"\"`-.||||
+       //\\------/ /\\. `\||||
+      //  \       /  \ `. `.||
+     //  dP;     /   ,\  ` .\|.-.
+ ,-'' --^,'     /__  d#\   |;/   |
+|   _   Y          "-^;#\  `i   /
+ `. \"-.;      )               `.
+    \\ | `--""""""""""""`.      |
+     `:. |  |   |  |  |  |    _/
+       `:.  |   |  |  ' ,'_,-'
+         `:-._      _.-','
+           `--_"""""_.-'
+               """""
+```
+
+=== ID: 123142180b0fd8cf | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 16x5 ===
+```
+        __
+ LGB  ()__)+.-.
+  _.-' ()__) _/]
+// _.-' .---)\_
+ //`--;`    \_
+```
+
+=== ID: 28bcfaebac1cc4a0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 32x9 ===
+```
+         o
+        o  o
+        o o o
+      o
+     o    ______          ______
+     _ *o(_||___)________/___
+   O(_)(       o  ______/    \
+  > ^  `/------o-'            \
+D|_|___/
+```
+
+=== ID: 361858330fb134e2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 22x10 ===
+```
+            |\
+             \\
+        .-"""-||
+       / _\__ ||
+       |/____`||
+       ((__,__)|
+        |  __.'/
+jgs     '.(_).'
+
+             *Snorkel*
+```
+
+=== ID: 7ffcf3575d48a20d | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 18x16 ===
+```
+4er
+4$F
+4$F
+4$F
+4$F
+4$F
+4$F
+4$F
+4$F
+4$F
+4$F
+4$F    4$$$r
+4$F     4$F
+ $$     J$F
+ "$$...d$P
+   "*$$*"  Gilo94'
+```
+
+=== ID: ec1b9e3340567ca6 | TITLE: Untitled | ARTIST: Berton Corson | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 33x20 ===
+```
+                  _______ ______
+                  |     / |    /
+       O          |    /  |   /
+                  |   /   |  /
+    o  O 0         \  \   \  \
+    o               \  \   \  \
+       o            /  /   /  /
+        o     /\_  /\\\   /  /
+         O  /    /    /     /
+ ..       /    /    /\=    /
+.  ))))))) = /====/    \
+. (((((((( /    /\=  _ }
+. |-----_|_+( /   \}
+. \_<\_//|  \  \ }
+ ...=Q=  |==)\  \
+   \----/     ) )   Diving is OK!
+             / /
+            /=/   -Berton Corson-
+          \|/
+          o}
+```
+
+=== ID: a52aa6b7cfcb3cea | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 30x20 ===
+```
+     $e...eb
+  .e$$$$$$$$$e.      *Flipper*
+4$$$$$$$$$$$$$$$
+^$$$$$$$$$$$$$$$
+ $$$$$$$$$$$$$$F
+ 4$$$$$$$$$$$$$
+  $$$$$$$$$$$$F
+  4$$$$$$$$$$$
+   $$$$$$$$$$F
+   4$$$$$$$$$
+    $$$$$$$$F
+    3$$$$$$$F
+    4$$$$$$$
+    4$F   "$
+    ^$     3F
+     F     ^%
+     F     .
+     *     J
+      L   z  Gilo94'
+       ^""
+```
+
+=== ID: 1fc0d5c08491dd13 | TITLE: Untitled | ARTIST: A. Bormann | CATEGORY: sports-and-outdoors | SUBCATEGORY: scuba | SIZE: 36x28 ===
+```
+           _______///
+          /  ______/
+         /  /_____]
+         |==((_/\_)
+      __ \G  //==\
+     //\\ || [[==]
+    //  \\ |/)/_/
+    || __/-//  }\-\__
+    ||/ / // \  /  \ \
+    \\  |//   \/   |  |
+     \\_//     |   |  /
+     /  \          /  \
+     |  ||        ||  |
+     \  /|        |\  /
+     /  \ \___ __/\/  \
+     | /  |[]__[]|\\\ |
+     |/  |        |\\\|
+     |\  |        | \/|
+     ||  |    |   |  \\
+         |____|___|  [O]
+          \  /\  /   [O]
+          /{}\/{}\
+          |  ||  |
+          |  ||  |      -A. Bormann-
+          \  /\  /
+           \/  \/
+ __________/\  /\__________
+//_/_/_______\/_______\_\_\\
+```
+
+=== ID: ab7e4b2ca9bf3789 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: logos | SIZE: 34x18 ===
+```
+               ____
+          .-'""    ""`-.
+       .-'              `-.
+     ,'       ____         `.
+   ,'       ,'    `.         `.
+  /         '-')    \  _       \
+ /         ,'`'      \( ).--.   \
+;          \, / /\   ||/( ('     :
+:            / /  |  |  _) )     :
+|           / /___|  \ )__/      |
+:          /  ____    \          :
+:         (  /    |   |          ;
+ \        |  |    |    \_/)     /
+  \     .'   `--)  \    _/     /
+   `.  /,-'''"-'    `--'     ,'
+     \.'                   ,'
+       `-.              ,-'
+          `-.,,____,,.-'
+```
+
+=== ID: 456800870d287299 | TITLE: Tennis ball | ARTIST: Andrew Hood (Andy, Flookster) | CATEGORY: sports-and-outdoors | SUBCATEGORY: tennis | SIZE: 12x4 ===
+```
+  _._
+.'--.`.
+|  .' |  AsH
+ `--`'
+```
+
+=== ID: d894a30e8b8407e1 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: tennis | SIZE: 13x5 ===
+```
+     ,-"""-.
+    /\     /\
+    | |   | |
+    \/     \/
+jgs  '-...-'
+```
+
+=== ID: f31b311bc97f52d9 | TITLE: Untitled | ARTIST: Felix Lee | CATEGORY: sports-and-outdoors | SUBCATEGORY: tennis | SIZE: 15x8 ===
+```
+   ,odOO"bo,
+ ,dOOOP'dOOOb,
+,O3OP'dOO3OO33,
+P",ad33O333O3Ob
+?833O338333P",d
+`88383838P,d38'
+ `Y8888P,d88P'
+   `"?8,8P"'
+```
+
+=== ID: d07ff26994b211fb | TITLE: Golf ball | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: golf | SIZE: 18x8 ===
+```
+      .-::":-.
+    .'''..''..'.
+   /..''..''..''\
+  ;'..''..''..''.;
+  ;'..''..''..'..;
+   \..''..''..''/
+    '.''..''...'
+jgs   '-..::-'
+```
+
+=== ID: eacdb1024c9bb4a9 | TITLE: Golf ball and tee | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: golf | SIZE: 14x15 ===
+```
+    _...._
+  .'.o' o.'.
+ /o o .o' o'\
+|'.o 'o. o'.o|
+|o. o' o 'o .|
+ \ o .o.'o'./
+  '._o__o_.'
+     \  /
+      ||
+      ||
+      ||
+      ||
+      ||
+ jgs  ||
+      \/
+```
+
+=== ID: 04bf5341c22d2067 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 5x5 ===
+```
+ |\
+  \O
+   |
+  /|
+ |  \
+```
+
+=== ID: 0bce4facfa54822a | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 25x6 ===
+```
+            <\ __
+            /\>   \O___
+          /       __\   \
+        /       /  /
+       |          /
+_______|_______________
+```
+
+=== ID: 0477467541fbf71f | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 22x6 ===
+```
+           ____|
+        o  \%/ |~~\
+  o//              |
+  8                |
+ / >               |
+~ ~             ~~~~~~
+```
+
+=== ID: b6845ecfbec3d6d3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 25x6 ===
+```
+o- - -  \o          __|
+   o/   /|          vv`\
+  /|     |              |
+   |    / \_            |
+  / \   |               |
+ /  |                   |
+```
+
+=== ID: cf18ff3e22db375d | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 12x7 ===
+```
+|__  o\
+| W    \O
+|       |\_
+|      /-\
+|    /     \
+|
+|
+```
+
+=== ID: 24ea911841e62562 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 33x8 ===
+```
+            ________
+    o      |   __   |
+      \_ O |  |__|  |
+   ____/ \ |___WW___|
+   __/   /     ||
+               ||
+               ||
+_______________||________________
+```
+
+=== ID: 4794ca1d017586ee | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 24x7 ===
+```
+|__  o\
+| W    \O
+|       |\_         |\
+|      /-\           \O
+|    /     \          |
+|                    /|
+|                   |  \
+```
+
+=== ID: b554ee00d082d60d | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 26x10 ===
+```
+          o
+/|   o         o
+\|=--            o
+   ##
+                   \\
+                /   \O
+               O_/   T
+               T    /|
+               |\  | |
+_______________|_|________
+```
+
+=== ID: d3ced065443cf54d | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: basketball | SIZE: 34x42 ===
+```
+         __oooo
+       //  /    o
+     / /  |      o
+    | /  |__     o
+   | |   __/    o
+   | |  /  oooo
+  | /  |  _______________________
+ | |   | |_______________________|
+||    |___ \__/\_/\_/\/\/\/\/\/\/
+||    |    \ \/\/\/\/\/\/\/\/\/
+||    \     \ \/\/\/\/\/\/\/\/
+| |    |    |  \/\/\/\/\/\/\/
+ | |    |   |   \/\/\/\/\/\/
+  | |    \_/    |\/\/\/\/\/|
+   \ \     \__  |/\/\/\/\/\|
+    |         \
+   |           |
+   |           |
+   |           |
+   |           |
+    |          |
+    |         |
+     |________|
+     |________|
+    ||         |
+   | |          |
+  |  /          |
+ |  /          /
+ /\|__________|
+|   /       /
+|  |       /
+| |       |
+ \ |      \
+  \ \      \
+    \ \     |
+      \ \    |
+        \ \  |_
+          \\_/ \
+           |    |
+           |   /
+           |  |
+           |_/
+```
+
+=== ID: 5241c009a016d1c1 | TITLE: A dart | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 23x3 ===
+```
+     ____
+     \___\_.:::::::.___
+jgs  /___/ ':::::::'
+```
+
+=== ID: 9f495b27c0ff5683 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 28x3 ===
+```
+\\\\\\       ________
+ >>>>>>---==(________)------
+//////
+```
+
+=== ID: d807bd6768f4f108 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 27x4 ===
+```
+                       ___
+                   .-='   )
+---===(##]XXXXXXXXXXX>=- <
+                   `-=.___)
+```
+
+=== ID: c98b67b40a62db8a | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 36x5 ===
+```
+                           ,-'''''.
+        ________________.:'        :
+-------(________________-----------:
+                        ':,        :
+                           `-.....'
+```
+
+=== ID: 30dce128ef69b191 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 28x9 ===
+```
+    ,-'"""`-,    ,-----.
+  ,' \ _|_ / `.  | 501 |
+ /`.,'\ | /`.,'\ `-----'  |
+(  /`. \|/ ,'\  )      |  H
+|--|--;=@=:--|--|   |  H  U
+(  \,' /|\ `./  )   H  U  |
+ \,'`./ | \,'`./    U  | (|)
+  `. / """ \ ,'     | (|)
+hh  '-._|_,-`      (|)
+```
+
+=== ID: 0e2dc1194d7d3053 | TITLE: Pizza or dartboard? | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 23x12 ===
+```
+        _....._
+    _.:`.--|--.`:._
+  .: .'\o  | o /'. '.
+ // '.  \ o|  /  o '.\
+//'._o'. \ |o/ o_.-'o\\
+|| o '-.'.\|/.-' o   ||
+||--o--o-->|<o-----o-||
+\\  o _.-'/|\'-._o  o//
+ \\.-'  o/ |o\ o '-.//
+  '.'.o / o|  \ o.'.'
+    `-:/.__|__o\:-'
+       `"--=--"`
+```
+
+=== ID: 7441cfa93e696262 | TITLE: Untitled | ARTIST: Mic Barendsz | CATEGORY: sports-and-outdoors | SUBCATEGORY: darts | SIZE: 30x16 ===
+```
+       _  \|/
+ -c/,=<<  ) \
+  ( /    < ) |
+  //    "(  _/
+ //_,___,/-' `\_
+(___|       me \`\
+    '--)        \--
+       (         ) \
+        \=(===)==/\ \
+        |        >>(8\=
+        |    ,    \ ""
+        |   / \    \
+        |  /   \    \
+        |  \    \    \
+        |___\    \____\
+        ( )         ( )    miK
+```
+
+=== ID: fb42ed84ba3d2009 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: rodeo | SIZE: 28x21 ===
+```
+            **
+          '**'''
+          .'
+         **    .**
+          '*.***''
+  ..        ***.
+ ***.       *****
+ **''.      ***'*
+ *' .*.... .***  *
+ *  ***********...''
+.' ****************.
+'   ******************..
+    *****'*************..
+  .**'**' ***************'
+   ''***   '''************
+     **''.    '**  *'*****.
+      '* '     **  *  *****
+        *.     '*  * ******.
+         *.     **  ****'
+                 * '**'
+                 *
+```
+
+=== ID: 78cf7cdd06f0ff7f | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 35x4 ===
+```
+                       .    +
+       L-|  /')  (\)  ) (  ) (   o
+        U    U    U   ) (  ) (   U
+ejm    [_]  [_]  [_]  [_]  [_]  [_]
+```
+
+=== ID: d3ea6864b936ed93 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 12x5 ===
+```
+  o
+ (^)
+-=H=- BISHOP
+ ] [
+/___\
+```
+
+=== ID: 03bc21bc40bd401b | TITLE: Chess horses | ARTIST: Veronica Karlsson | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 17x5 ===
+```
+    _/|      |\_
+   // o\    /o \\
+   || ._)  (_. ||
+   //__\    /__\\
+VK )___(    )___(
+```
+
+=== ID: a98140684a614a41 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 9x7 ===
+```
+   |\_
+  /  .\_
+ |   ___)
+ |    \
+ |  =  |
+ /_____\
+[_______]
+```
+
+=== ID: f601a4a8df40eed4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 19x10 ===
+```
+   _______________
+8 |_|#|_|#|_|#|_|#|
+7 |#|_|#|_|#|_|#|_|
+6 |_|#|_|#|_|#|_|#|
+5 |#|_|#|_|#|_|#|_|
+4 |_|#|_|#|_|#|_|#|
+3 |#|_|#|_|#|_|#|_|
+2 |_|#|_|#|_|#|_|#|
+1 |#|_|#|_|#|_|#|_|
+   a b c d e f g h
+```
+
+=== ID: cba9220e0dd07c16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 34x10 ===
+```
+          __    __    __    __
+bw     8 /__////__////__////__////
+      7 ////__////__////__////__/
+     6 /__////__////__////__////
+    5 ////__////__////__////__/
+   4 /__////__////__////__////
+  3 ////__////__////__////__/
+ 2 /__////__////__////__////
+1 ////__////__////__////__/
+   a  b  c  d  e  f  g  h
+```
+
+=== ID: b7622e2c2f32c2db | TITLE: Knight | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: chess | SIZE: 20x17 ===
+```
+         ,....,
+      ,::::::<
+     ,::/^\"``.
+    ,::/, `   e`.
+   ,::; |        '.
+   ,::|  \___,-.  c)
+   ;::|     \   '-'
+   ;::|      \
+   ;::|   _.=`\
+   `;:|.=` _.=`\
+     '|_.=`   __\
+     `\_..==`` /
+      .'.___.-'.
+     /          \
+jgs ('--......--')
+    /'--......--'\
+    `"--......--"
+```
+
+=== ID: dc01df840ac355d0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-skating | SIZE: 19x7 ===
+```
+             _
+         __ ( }
+       '---. _`---,
+       ___/ /
+     /,---'\\
+           //
+jgs       '==
+```
+
+=== ID: c28b777e51d47827 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-skating | SIZE: 15x7 ===
+```
+      _
+     { ) __
+ ,---'_ .---'
+       \ \___
+       //'---,\
+       \\
+jgs    =='
+```
+
+=== ID: b755d4f67b469f5e | TITLE: Untitled | ARTIST: llizard | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-skating | SIZE: 17x12 ===
+```
+            (,
+        _   /|
+       {())/ |
+   ,)_,,((( /
+    `___ ))|
+        `  ,
+        /    `,
+       /`-- '\
+       \`   `.`
+        \|    \|
+ejm    _;_)  _;_)
+      -'-'- -'-'-
+```
+
+=== ID: 83fe1d8a7714deca | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-skating | SIZE: 27x15 ===
+```
+    ,--.
+    /=\ ) -------
+    "_/ (____
+     \ (____ \ ___
+     /\   \ \_\_
+ ___/ /\   \ \__)  ------
+(_|__/  \   )
+        /  /\ ______
+       /  A  \
+      /  / \  \
+      \ (   `. \   -------
+       \ \    \ \
+       _\ \   _\ \  _____
+______(____]_(____]________
+_________________________hh
+```
+
+=== ID: 2e7499e089e8f8da | TITLE: Untitled | ARTIST: Jan Foerster | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-skating | SIZE: 35x19 ===
+```
+    ,
+   /'.___
+  (      `.
+   `.----. )
+    (.(.)' )
+    /_   3(
+     |- /\_\
+     `-' (||),-'".
+___.----- )   _,. \
+`--'-----/   (   \ \__
+        f     |   `'--'
+        l_____;
+        /   ;  \
+       /  ,'`.  `----:,\
+       \  \   `------::,\
+        \  \          `' \
+         \  \  =jf=     `'
+       ,:::::
+     (___|_|__........ ...  . ..  .
+```
+
+=== ID: 87364cd029ac8b55 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: sports-and-outdoors | SUBCATEGORY: ice-skating | SIZE: 39x23 ===
+```
+          ,,.,
+        .&%%%%%.         /.'
+        $' '%%%&°._.-.  /_/
+         )^ ((%%%.-.  _/|   ____
+         \__  |%%%   / \|  '|_|_'
+          __) ))%%--' __/  /\o _)
+         / /_/*(,..--'     |'.'
+      __/ (* * /   _     .'\/
+\|_\ /\  / \* (__ / \___/  /
+ \__')__/   \_/* ' */   _.'   .  °  .
+         mrf| * */* \_.'
+            |*_* *__/
+           /* * */
+           \_/\_/
+             \  |
+              \ |
+               ( \
+                | \
+                |__)
+                 \ |
+               _.' o\       .  '. ° ° .
+              (______)     , ' .' '
+          ___._||__||_.__.'.'° ._°____
+```
+
+=== ID: 7ff757a140dde23d | TITLE: Swimming | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 29x6 ===
+```
+               ___
+              /___\
+          .-.|=0-0=|.-.
+     (\_.'.-\ \_o_/`/-.'._/)
+ ~` - ~`-^_`~ -_~ ^- ~_` -~ _
+jgs -  ~  -  ^   - ~ -  ~  -
+```
+
+=== ID: c3b919421aa9403f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 28x8 ===
+```
+            ___
+          /`  _\
+          |  / 0|--.
+     -   / \_|0`/ /.`'._/)
+ - ~ -^_| /-_~ ^- ~_` - -~ _
+ -  ~  -| |   - ~ -  ~  -
+jgs     \ \, ~   -   ~
+         \_|
+```
+
+=== ID: 471387f86be5c253 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 16x9 ===
+```
+     .-'~~'-.
+   .'        '.
+  /  .------.  \
+  | / _    _ \ |
+  |==(_)==(_)==|
+  \/     \    \/
+   :    ^^    ;
+jgs \  '=='  /
+     `-.__.-'
+```
+
+=== ID: 770b3c0201d5293b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 23x18 ===
+```
+         .-""-,
+        ;--.   \
+      _/oo==\===|
+     (_ ___, \  |
+       \\_/  / /
+        `--'\\`
+           /U/`--.
+          ///,____)
+         /// //  /
+        ''  // <`
+            \`\ \
+           _/_/__\_
+          \        |
+          ===   4  '--.
+            \         |
+ ~^~^~^~^~^~[_________|
+  ~^~^~^~^~^///////////
+~^~^~^~^~^~^//////jgs//
+```
+
+=== ID: 7e1da3f1fa5760ba | TITLE: Swimmer on starting block | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 27x22 ===
+```
+            ___
+          .'   '.
+         / .---. \
+         |=()_()=|
+         `(  _  )`
+          _)- -(_
+         /|`---`|\
+        / \_   _/ \
+       / /`\  _/`\ \
+     _//` /\   /\ `\\_
+     /|` |  \_/  | `|\
+         \   |   /
+          \_ | _/
+          / / \ \
+          |/   \|
+    .----/ \---/ \---.
+    |====`-'==='-`====|
+     \    _______    /
+      \--]=======[--/
+       '----._.----'
+__jgs______|   |__________
+~~^~-~^~-~^-~~^~-~^~~^~-~^~
+```
+
+=== ID: fd78385586a914d9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 19x26 ===
+```
+       .---.
+      / \__ \
+     |/`   `\|
+     (=()-()=)
+      |  _  |
+      '.___.'
+     .--' '--.
+   /`         `\
+  /  \_._|_._/  \
+ /  /|       |\  \
+/ .' |  -:-  | '. \
+\ \  |  -:-  |  / /
+ \ \ |___.___| / /
+  \ \|       |/ /
+  | (|'-._.-'|) |
+  \_/|   |   |\_/
+     \   |   /
+      |  |  |
+      (_ | _)
+      |  |  |
+      |  |  |
+       \ | /
+ jgs_.-'-|-'-._
+ .-'    / \    '-.
+  )_   /   \   _(
+    './     \.'
+```
+
+=== ID: ba9a4c37294efe67 | TITLE: Snorkel | ARTIST: Joan G. Stark (Spunk) | CATEGORY: sports-and-outdoors | SUBCATEGORY: swimming | SIZE: 19x28 ===
+```
+          |\
+           \\
+      .-"""-||
+     / _\__ ||
+     |/____`||
+     ((__,__)|
+      |  __.'/
+      '.(_).'
+     .--' '--.
+   /`         `\
+  /  \_._|_._/  \
+ /  /|       |\  \
+/ .' |  -:-  | '. \
+\ \  |  -:-  |  / /
+ \ \ |___.___| / /
+  \ \|       |/ /
+  | (|'-._.-'|) |
+  \_/|   |   |\_/
+     \   |   /
+      |  |  |
+      (_ | _)
+      |  |  |
+      |  |  |
+       \ | /
+ jgs_.-'-|-'-._
+ .-'    / \    '-.
+  )_   /   \   _(
+    './     \.'
+```
+

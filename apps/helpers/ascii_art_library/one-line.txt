@@ -1,0 +1,2444 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: ONE-LINE
+# Total artworks in category fitting <=40 cols: 488
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 19x1 ===
+```
+()___)____________)
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 4x1 ===
+```
+|_|>
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 9x1 ===
+```
+12x--<--@
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 9x1 ===
+```
+>>------>
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 7x1 ===
+```
+((-|-))
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 4x1 ===
+```
+(_)3
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 5x1 ===
+```
+[£::]
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 3x1 ===
+```
+~==
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 1x1 ===
+```
+A
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 3x1 ===
+```
+l_P
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 4x1 ===
+```
+C|_|
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 3x1 ===
+```
+[E}
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 3x1 ===
+```
+c[]
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 4x1 ===
+```
+c[~]
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 7x1 ===
+```
+====\_/
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 3x1 ===
+```
+\_/
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 9x1 ===
+```
+-=iii=<()
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 1x1 ===
+```
+T
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 13x1 ===
+```
+==-----------
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: objects | SIZE: 4x1 ===
+```
+|--<
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 2x1 ===
+```
+:F
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+?:^[]
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+(.V.)
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+}:^)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 6x1 ===
+```
+,_(|=|
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 10x1 ===
+```
+IIIIII8^)X
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+:-[x>
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+C):-)
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+c)=o)
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 3x1 ===
+```
+o-)
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+/oo\
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+(8<|
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+}:-)
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+<~8)
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 7x1 ===
+```
+(_8^(|)
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+=(:o)
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+_mmmP
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 8x1 ===
+```
+()()():|
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 6x1 ===
+```
+@@@@:|
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+[:|]
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 6x1 ===
+```
+*<|:-)
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 5x1 ===
+```
+*<:-)
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 3x1 ===
+```
+/s\
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 4x1 ===
+```
+]:->
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 3x1 ===
+```
+:-[
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: characters | SIZE: 3x1 ===
+```
+:-E
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 3x1 ===
+```
+~:0
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 5x1 ===
+```
+(';')
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 8x1 ===
+```
+d[-.-“>b
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 6x1 ===
+```
+(//_^)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 4x1 ===
+```
+_:^)
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 6x1 ===
+```
+(-::-)
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: people | SIZE: 6x1 ===
+```
+o>-<|=
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[==*==]
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[--o--]
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[>====]
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ O   ]
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ | | ]
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ |---]
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[==#==]
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[<(o)>]
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ |*| ]
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ |*| ]
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[*    ]
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[*>===]
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ >---]
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-+---]
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[--+--]
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-+---]
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ | | ]
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[  > >]
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-+---]
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[==o==]
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-----]
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ | | ]
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[ | | ]
+```
+
+=== ID: art_52_28 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[  o  ]
+```
+
+=== ID: art_52_29 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[>====]
+```
+
+=== ID: art_52_30 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[=====]
+```
+
+=== ID: art_52_32 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-+---]
+```
+
+=== ID: art_52_33 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[o>===<
+```
+
+=== ID: art_52_34 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[==*==]
+```
+
+=== ID: art_52_35 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-----]
+```
+
+=== ID: art_52_36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[*>===]
+```
+
+=== ID: art_52_37 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-+---]
+```
+
+=== ID: art_52_38 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[  +  ]
+```
+
+=== ID: art_52_39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[>----]
+```
+
+=== ID: art_52_40 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[(*   ]
+```
+
+=== ID: art_52_41 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[->|<-]
+```
+
+=== ID: art_52_42 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[-----]
+```
+
+=== ID: art_52_43 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 7x1 ===
+```
+[  *  ]
+```
+
+=== ID: art_52_44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: flags | SIZE: 5x1 ===
+```
+Spain
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-!
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-D
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+:-{}
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 15x1 ===
+```
+:-o zz z z Z  Z
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+\-o
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 7x1 ===
+```
+(9'-')9
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+:( )
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+\o/
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 9x1 ===
+```
+\ (^_^) /
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-9
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+;->
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 2x1 ===
+```
+:P
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(@_@)
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+:p~~
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:*)
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+\^o^/
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+>=D
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+>=D>
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 15x1 ===
+```
+,,!,,(^_^),,!,,
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 9x1 ===
+```
+('>o.o)'>
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 8x1 ===
+```
+:-)~~(-:
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+= )~
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+[-)
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+o/\o
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-|
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 4x1 ===
+```
+:-))
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 2x1 ===
+```
+:X
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-X
+```
+
+=== ID: art_52_28 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 7x1 ===
+```
+d(OwO)b
+```
+
+=== ID: art_52_29 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-&
+```
+
+=== ID: art_52_30 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 13x1 ===
+```
+\,,/(^_^)\,,/
+```
+
+=== ID: art_52_31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 2x1 ===
+```
+o7
+```
+
+=== ID: art_52_32 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(~.~)
+```
+
+=== ID: art_52_33 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(-_-)
+```
+
+=== ID: art_52_34 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-Q
+```
+
+=== ID: art_52_35 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+|^o
+```
+
+=== ID: art_52_36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:^)
+```
+
+=== ID: art_52_37 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-P
+```
+
+=== ID: art_52_38 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(;_;)
+```
+
+=== ID: art_52_39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-\
+```
+
+=== ID: art_52_40 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 10x1 ===
+```
+<(-^,^-)=b
+```
+
+=== ID: art_52_41 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 8x1 ===
+```
+d-(^_^)z
+```
+
+=== ID: art_52_42 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 8x1 ===
+```
+*\ (^_^)
+```
+
+=== ID: art_52_43 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+:-(O)
+```
+
+=== ID: art_52_44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 3x1 ===
+```
+:-@
+```
+
+=== ID: art_52_45 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 2x1 ===
+```
+:@
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 7x1 ===
+```
+(__!__)
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 5x1 ===
+```
+(_!_)
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+|o||o|
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 11x1 ===
+```
+( * ) ( * )
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 11x1 ===
+```
+( o ) ( o )
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 8x1 ===
+```
+(* )( *)
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(@)(@)
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 7x1 ===
+```
+(:o)(o)
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(*)(*)
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 8x1 ===
+```
+(. )( .)
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 7x1 ===
+```
+(. Y .)
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 10x1 ===
+```
+{ O }{ O }
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+8==D~~
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(%)(o)
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 10x1 ===
+```
+( + )( + )
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 14x1 ===
+```
+(  -  )(  -  )
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(*)(*)
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+($)($)
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 5x1 ===
+```
+(_x_)
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+8====D
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 2x1 ===
+```
+:-
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 5x1 ===
+```
+(_|_)
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 8x1 ===
+```
+|\o/\o/|
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 4x1 ===
+```
+8==D
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(o)(o)
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(Q)(Q)
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+[.][.]
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 8x1 ===
+```
+:-)-8<-<
+```
+
+=== ID: art_52_28 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 6x1 ===
+```
+(.)(.)
+```
+
+=== ID: art_52_29 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: naughty | SIZE: 3x1 ===
+```
+8=D
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 3x1 ===
+```
+:-*
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 3x1 ===
+```
+(-:
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 3x1 ===
+```
+:-(
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 3x1 ===
+```
+:-)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 2x1 ===
+```
+:)
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 3x1 ===
+```
+,-)
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: emoticons | SIZE: 3x1 ===
+```
+;-)
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 5x1 ===
+```
+|-o-|
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 16x1 ===
+```
+.,.,\______/,..,
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 6x1 ===
+```
+`o##o>
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 6x1 ===
+```
+`o=^o>
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 27x1 ===
+```
+===[[:]]====[[:]]====[[]]==
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 11x1 ===
+```
+___/<^>\___
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 10x1 ===
+```
+(((+))---+
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 5x1 ===
+```
+O='`o
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 3x1 ===
+```
+-^-
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 3x1 ===
+```
+=_O
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 5x1 ===
+```
+.-=-.
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 7x1 ===
+```
+.-=o=-.
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 11x1 ===
+```
+8===8O8===8
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: vehicles | SIZE: 8x1 ===
+```
+:>8{}8<:
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 6x1 ===
+```
+=):-)=
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 7x1 ===
+```
+==(:-)=
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 8x1 ===
+```
+|==|:-)>
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 5x1 ===
+```
+=|:-)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 6x1 ===
+```
+=|:-)=
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+/:#(
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+=:o]
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 5x1 ===
+```
+C|:-=
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 6x1 ===
+```
+C|:-)=
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 3x1 ===
+```
+Q:|
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+:-)B
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+:-)8
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 6x1 ===
+```
+===:-D
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 3x1 ===
+```
+&:;
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+&:-)
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+5:-)
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 5x1 ===
+```
+{{:-)
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+4:-)
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+l:['
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 7x1 ===
+```
+//0‑0\\
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 7x1 ===
+```
+((*J*))
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+:-.)
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 6x1 ===
+```
+|:-[|]
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+7:-)
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 4x1 ===
+```
+7:^]
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 6x1 ===
+```
++-(:-)
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 5x1 ===
+```
+=):-)
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: famous | SIZE: 7x1 ===
+```
+B-)===>
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 23x1 ===
+```
+[o_o] (^.^) (".") ($.$)
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+`o._.o'
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 9x1 ===
+```
+>={*-*}=<
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 8x1 ===
+```
+(<>..<>)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+{-_-}
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 13x1 ===
+```
+(”’\(*o*)/”’)
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(+_+)
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 4x1 ===
+```
+x__x
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 3x1 ===
+```
+^-^
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 8x1 ===
+```
+@[O],[O]
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 8x1 ===
+```
+@(o),(o)
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(“_^)
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+t(o.o)t
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 15x1 ===
+```
+(-(-_(-_-)_-)-)
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 9x1 ===
+```
+<'(o.o)'>
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+^*_*^
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 9x1 ===
+```
+//(*_*)\\
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 11x1 ===
+```
+_!_(`_`)_!_
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+t(^.^t)
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+t(o.ot)
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 14x1 ===
+```
+(>'.')><('.'<)
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 15x1 ===
+```
+>----(^_^)----<
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+\(^-^)/
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+d(-_-)b
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 11x1 ===
+```
+\-(o)-(o)-/
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 7x1 ===
+```
+(#^.^#)
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 3x1 ===
+```
+<_<
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 3x1 ===
+```
+>_>
+```
+
+=== ID: art_52_28 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(^o^)
+```
+
+=== ID: art_52_29 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(-.-)
+```
+
+=== ID: art_52_30 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 6x1 ===
+```
+(=.=)~
+```
+
+=== ID: art_52_31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 8x1 ===
+```
+(-_-)zzz
+```
+
+=== ID: art_52_32 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 21x1 ===
+```
+[{-_-}] ZZZzz zz z...
+```
+
+=== ID: art_52_33 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 3x1 ===
+```
+^_^
+```
+
+=== ID: art_52_34 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(n_n)
+```
+
+=== ID: art_52_35 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(=_=)
+```
+
+=== ID: art_52_36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 3x1 ===
+```
+@_@
+```
+
+=== ID: art_52_37 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(.^.)
+```
+
+=== ID: art_52_38 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(‘-‘)
+```
+
+=== ID: art_52_39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(o_^)
+```
+
+=== ID: art_52_40 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 5x1 ===
+```
+(^.~)
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+Q('.'Q)
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+<('.')>
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+(-'.'-)
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+(='.'=)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+<(^.^)>
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+<('.'<)
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+(>'.')>
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+<('-'<)
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 6x1 ===
+```
+(>'')>
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+c(-_-c)
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+c(','c)
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+^(^.^)^
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 15x1 ===
+```
+<(<) <( )> (>)>
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 23x1 ===
+```
+<('-'<) ^('-')^ (>'-')>
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 9x1 ===
+```
+(v-'.'-v)
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 9x1 ===
+```
+v(-'.'-)^
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 15x1 ===
+```
+(o'-')o Q('-'o)
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+(>^_^)>
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 9x1 ===
+```
+^( 'O' )^
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 21x1 ===
+```
+(-(-(-(-(-.-)-)-)-)-)
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 9x1 ===
+```
+(>-'.'-)>
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 9x1 ===
+```
+<(-'.'-)>
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 7x1 ===
+```
+t('.'t)
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 9x1 ===
+```
+6oooooooo
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+^O^
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+\-o-/
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 11x1 ===
+```
+~~(^._.^)~~
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 10x1 ===
+```
+//\(oo)/\\
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+^V^
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+('v')
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<(^v^)>
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+=:x
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+(\_/)
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+})i({
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 17x1 ===
+```
+(,,,)=(^.^)=(,,,)
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 6x1 ===
+```
+^.--.^
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 8x1 ===
+```
+(^._.^)/
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+(^._.^)
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+=^,^=
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+=^_^=
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 10x1 ===
+```
+,,,^..^,,,
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<(@.@)>
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 20x1 ===
+```
+,/\,/\,/\,/\,/\,/\,o
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<(o.O)>
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 4x1 ===
+```
+3:-o
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+:o=
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 4x1 ===
+```
+*J*m
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 8x1 ===
+```
+<`)))))<
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+><>
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 8x1 ===
+```
+><((((">
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 9x1 ===
+```
+/><{{{{">
+```
+
+=== ID: art_52_28 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<)))))<
+```
+
+=== ID: art_52_29 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 8x1 ===
+```
+><{{{{">
+```
+
+=== ID: art_52_30 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+><(((*>
+```
+
+=== ID: art_52_31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 6x1 ===
+```
+>++('>
+```
+
+=== ID: art_52_32 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 9x1 ===
+```
+:]~~~~~~*
+```
+
+=== ID: art_52_33 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<(^.^)>
+```
+
+=== ID: art_52_34 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 6x1 ===
+```
+]:(:))
+```
+
+=== ID: art_52_35 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+=^;^=
+```
+
+=== ID: art_52_36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+-##:>
+```
+
+=== ID: art_52_37 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 6x1 ===
+```
+=^..^=
+```
+
+=== ID: art_52_38 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 11x1 ===
+```
+@( * O * )@
+```
+
+=== ID: art_52_39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+C*u*D
+```
+
+=== ID: art_52_40 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 26x1 ===
+```
+ommmmmmmmmmmmmmmmmmmmmmmo'
+```
+
+=== ID: art_52_41 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+@(‘_’)@
+```
+
+=== ID: art_52_42 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+@('_')@
+```
+
+=== ID: art_52_43 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 8x1 ===
+```
+<:3)~~~~
+```
+
+=== ID: art_52_44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 10x1 ===
+```
+----{,_,">
+```
+
+=== ID: art_52_45 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<^__)~~
+```
+
+=== ID: art_52_46 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+<8~
+```
+
+=== ID: art_52_47 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 4x1 ===
+```
+~<>”
+```
+
+=== ID: art_52_48 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<:3 )~~
+```
+
+=== ID: art_52_49 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+~~(__^>
+```
+
+=== ID: art_52_50 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 8x1 ===
+```
+<:3 )~~~
+```
+
+=== ID: art_52_51 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+(o.o)
+```
+
+=== ID: art_52_52 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 10x1 ===
+```
+^(*(oo)*)^
+```
+
+=== ID: art_52_53 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 12x1 ===
+```
+~~~~~~^~~~~~
+```
+
+=== ID: art_52_54 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 13x1 ===
+```
+~~~^~~~\o/~~~
+```
+
+=== ID: art_52_55 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 15x1 ===
+```
+____/\___\o/___
+```
+
+=== ID: art_52_56 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 7x1 ===
+```
+<(‘–‘)>
+```
+
+=== ID: art_52_57 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 4x1 ===
+```
+__@/
+```
+
+=== ID: art_52_58 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+@_’-‘
+```
+
+=== ID: art_52_59 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 6x1 ===
+```
+‘-‘_@_
+```
+
+=== ID: art_52_60 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+@_'-'
+```
+
+=== ID: art_52_61 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 11x1 ===
+```
+<:=========
+```
+
+=== ID: art_52_62 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 12x1 ===
+```
+& <:========
+```
+
+=== ID: art_52_63 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+//O\\
+```
+
+=== ID: art_52_64 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 6x1 ===
+```
+/\oo/\
+```
+
+=== ID: art_52_65 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+/-o-\
+```
+
+=== ID: art_52_66 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+/\o/\
+```
+
+=== ID: art_52_67 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 15x1 ===
+```
+/\/\,(*-*),/\/\
+```
+
+=== ID: art_52_68 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 10x1 ===
+```
+///\oo/\\\
+```
+
+=== ID: art_52_69 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 5x1 ===
+```
+<:>==
+```
+
+=== ID: art_52_70 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 3x1 ===
+```
+^8^
+```
+
+=== ID: art_52_71 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 4x1 ===
+```
+_/\,
+```
+
+=== ID: art_52_72 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: animals | SIZE: 11x1 ===
+```
+_/\__/\__0>
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 4x1 ===
+```
+:-<>
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 4x1 ===
+```
+>:-(
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 2x1 ===
+```
+:D
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-c
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+%-)
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 5x1 ===
+```
+:(...
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 2x1 ===
+```
+;(
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 4x1 ===
+```
+:'-)
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:->
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+}:>
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 4x1 ===
+```
+}:->
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-e
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-<
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 5x1 ===
+```
+^*_*^
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-o
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-I
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 4x1 ===
+```
+ :-c
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-(
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 2x1 ===
+```
+:(
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 5x1 ===
+```
+:-( )
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 2x1 ===
+```
+:O
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+B-)
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+:-)
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 2x1 ===
+```
+:)
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 5x1 ===
+```
+(;_;)
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 5x1 ===
+```
+(._.)
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 3x1 ===
+```
+8-)
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 2x1 ===
+```
+;D
+```
+
+=== ID: art_52_0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 5x1 ===
+```
+[($)]
+```
+
+=== ID: art_52_1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 17x1 ===
+```
+===========(8888)
+```
+
+=== ID: art_52_2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+^i^
+```
+
+=== ID: art_52_3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+o:-)
+```
+
+=== ID: art_52_4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 12x1 ===
+```
+XXX-------->
+```
+
+=== ID: art_52_5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 7x1 ===
+```
+>>---->
+```
+
+=== ID: art_52_6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+d8-D
+```
+
+=== ID: art_52_7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+/T\
+```
+
+=== ID: art_52_8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 8x1 ===
+```
+(::()::)
+```
+
+=== ID: art_52_9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 8x1 ===
+```
+:------)
+```
+
+=== ID: art_52_10 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+[:-)
+```
+
+=== ID: art_52_11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+}:-)
+```
+
+=== ID: art_52_12 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+|:-)
+```
+
+=== ID: art_52_13 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 12x1 ===
+```
+|||\o_______
+```
+
+=== ID: art_52_14 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 25x1 ===
+```
+—=== O ………………………………….8888
+```
+
+=== ID: art_52_15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 8x1 ===
+```
+O-|-<“>:
+```
+
+=== ID: art_52_16 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+</3
+```
+
+=== ID: art_52_17 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+)i(
+```
+
+=== ID: art_52_18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+~O~
+```
+
+=== ID: art_52_19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+`=o==   o
+```
+
+=== ID: art_52_20 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+<$><$>
+```
+
+=== ID: art_52_21 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+c[_]
+```
+
+=== ID: art_52_22 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+-==|)-
+```
+
+=== ID: art_52_23 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+[_]3
+```
+
+=== ID: art_52_24 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 16x1 ===
+```
+8==||::;:;:;:;:>
+```
+
+=== ID: art_52_25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 1x1 ===
+```
+~
+```
+
+=== ID: art_52_26 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+8==8
+```
+
+=== ID: art_52_27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+<o><o>
+```
+
+=== ID: art_52_28 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+. : * : .
+```
+
+=== ID: art_52_29 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+(`.
+```
+
+=== ID: art_52_30 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 8x1 ===
+```
+@}-,-`--
+```
+
+=== ID: art_52_31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+@}->--
+```
+
+=== ID: art_52_32 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+@}}>-----
+```
+
+=== ID: art_52_33 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+@->-->---
+```
+
+=== ID: art_52_34 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+~=~
+```
+
+=== ID: art_52_35 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+<:-)
+```
+
+=== ID: art_52_36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+---=
+```
+
+=== ID: art_52_37 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 2x1 ===
+```
+O+
+```
+
+=== ID: art_52_38 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+O->
+```
+
+=== ID: art_52_39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+*G*
+```
+
+=== ID: art_52_40 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+\~/
+```
+
+=== ID: art_52_41 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 5x1 ===
+```
+-@-@-
+```
+
+=== ID: art_52_42 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 13x1 ===
+```
+{ o }===(:::)
+```
+
+=== ID: art_52_43 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+[|^^^^^^^
+```
+
+=== ID: art_52_44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+#==
+```
+
+=== ID: art_52_45 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 2x1 ===
+```
+<3
+```
+
+=== ID: art_52_46 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+|><|
+```
+
+=== ID: art_52_47 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 1x1 ===
+```
+8
+```
+
+=== ID: art_52_48 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+:-#
+```
+
+=== ID: art_52_49 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 7x1 ===
+```
+:-)*(-:
+```
+
+=== ID: art_52_50 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 17x1 ===
+```
+)xxxxx[;;;;;;;;;>
+```
+
+=== ID: art_52_51 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 17x1 ===
+```
+)xxxxx[;;;;;;;;;>
+```
+
+=== ID: art_52_52 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 16x1 ===
+```
+)xxx[::::::::::>
+```
+
+=== ID: art_52_53 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 29x1 ===
+```
+O/////])=====================
+```
+
+=== ID: art_52_54 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+,==,--
+```
+
+=== ID: art_52_55 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+|M|/
+```
+
+=== ID: art_52_56 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+$_$
+```
+
+=== ID: art_52_57 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 1x1 ===
+```
+*
+```
+
+=== ID: art_52_58 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 27x1 ===
+```
+0)xxxxx[=======------------
+```
+
+=== ID: art_52_59 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 2x1 ===
+```
+@=
+```
+
+=== ID: art_52_60 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 16x1 ===
+```
+()))))))))))))))
+```
+
+=== ID: art_52_61 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+X+X+X+X+X
+```
+
+=== ID: art_52_62 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 20x1 ===
+```
+--~~~=:>[XXXXXXXXX]>
+```
+
+=== ID: art_52_63 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 11x1 ===
+```
+@-->--->---
+```
+
+=== ID: art_52_64 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 12x1 ===
+```
+@)}---^-----
+```
+
+=== ID: art_52_65 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 8x1 ===
+```
+@->-->--
+```
+
+=== ID: art_52_66 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+—<–(@)
+```
+
+=== ID: art_52_67 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+@–,–‘—
+```
+
+=== ID: art_52_68 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 6x1 ===
+```
+@—-%——
+```
+
+=== ID: art_52_69 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 7x1 ===
+```
+@}->–>–
+```
+
+=== ID: art_52_70 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 11x1 ===
+```
+@}->-`-,---
+```
+
+=== ID: art_52_71 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 14x1 ===
+```
+--------{---(@
+```
+
+=== ID: art_52_72 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 7x1 ===
+```
+@--/---
+```
+
+=== ID: art_52_73 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+|--<
+```
+
+=== ID: art_52_74 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 7x1 ===
+```
+O-/-<]:
+```
+
+=== ID: art_52_75 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 1x1 ===
+```
+Y
+```
+
+=== ID: art_52_76 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 4x1 ===
+```
+@->-
+```
+
+=== ID: art_52_77 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 11x1 ===
+```
+O==I======>
+```
+
+=== ID: art_52_78 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 17x1 ===
+```
+<%%%%|==========>
+```
+
+=== ID: art_52_79 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 22x1 ===
+```
+(===||:::::::::::::::>
+```
+
+=== ID: art_52_80 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 9x1 ===
+```
+-|-------
+```
+
+=== ID: art_52_81 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 15x1 ===
+```
+oxx)=----------
+```
+
+=== ID: art_52_82 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 27x1 ===
+```
+()==={::::::::::::::::::::>
+```
+
+=== ID: art_52_83 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 19x1 ===
+```
+()==[:::::::::::::>
+```
+
+=== ID: art_52_84 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 37x1 ===
+```
+@()xxx[{:::":::":::":::":::":::":::=>
+```
+
+=== ID: art_52_85 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+//\
+```
+
+=== ID: art_52_86 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+/\\
+```
+
+=== ID: art_52_87 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+/|\
+```
+
+=== ID: art_52_88 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 11x1 ===
+```
+:.:.:.:.:.:
+```
+
+=== ID: art_52_89 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 5x1 ===
+```
+((#))
+```
+
+=== ID: art_52_90 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 21x1 ===
+```
+~^~^~'====>`~^~^~^~^~
+```
+
+=== ID: art_52_91 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+/"\
+```
+
+=== ID: art_52_92 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 3x1 ===
+```
+/V\
+```
+
+=== ID: art_52_93 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 21x1 ===
+```
+~~~~~~~ oO0OoO0OoO0Oo
+```
+
+=== ID: art_52_94 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 25x1 ===
+```
+_.~"~._.~"~._.~"~._.~"~._
+```
+
+=== ID: art_52_95 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 25x1 ===
+```
+_.~"(_.~"(_.~"(_.~"(_.~"(
+```
+
+=== ID: art_52_96 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 32x1 ===
+```
+"`-._,-'"`-._,-'"`-._,-'"`-._,-'
+```
+
+=== ID: art_52_97 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 11x1 ===
+```
+.-~-.-~-.-~
+```
+
+=== ID: art_52_98 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 12x1 ===
+```
+/)/)/)/)/)/)
+```
+
+=== ID: art_52_99 | TITLE: Untitled | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: miscellaneous | SIZE: 11x1 ===
+```
+oOoOoOoOoOo
+```
+

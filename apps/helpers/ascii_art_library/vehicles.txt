@@ -1,0 +1,810 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: VEHICLES
+# Total artworks in category fitting <=40 cols: 72
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 255518e6286ad112 | TITLE: DC-6 | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 19x2 ===
+```
+       __|__
+--@--@--(_)--@--@--
+```
+
+=== ID: 0f120e372017395e | TITLE: Generic bomber | ARTIST: David Goodman | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 19x2 ===
+```
+       __|__
+--o--o--(_)--o--o--
+```
+
+=== ID: 87e8f910ed9f1561 | TITLE: Untitled | ARTIST: Francis Jambon | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 17x2 ===
+```
+      __|__
+*---o--(_)--o---*
+```
+
+=== ID: a687d51d810b25f0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 13x3 ===
+```
+    __!__
+_____(_)_____
+   !  !  !
+```
+
+=== ID: d288ae352428018b | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 14x3 ===
+```
+   -----|-----
+*>=====[_]L)
+      -'-`-
+```
+
+=== ID: 86bae26498172cde | TITLE: Generic 4 engine Jet | ARTIST: Paul Tomblin | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 19x3 ===
+```
+       __|__
+--------(_)--------
+  O  O       O  O
+```
+
+=== ID: c5a6b18462ac9db4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 29x4 ===
+```
+                     __|__
+            __|__ *---o0o---*
+   __|__ *---o0o---*
+*---o0o---*
+```
+
+=== ID: b0795950c16bec70 | TITLE: Untitled | ARTIST: Paulo Santos | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 35x4 ===
+```
+   Biplane            ____       _
+   Paulo Santos     |__\_\_o,___/ \
+                   ([___\_\_____-\'
+                    | o'
+```
+
+=== ID: df8fd7dad393851b | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 14x6 ===
+```
+ __
+ \  \     _ _
+  \**\ ___\/ \
+X*#####*+^^\_\
+  o/\  \
+     \__\
+```
+
+=== ID: fefa0d5da1e6dae2 | TITLE: Stealth bomber | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 27x6 ===
+```
+ .-.    _,  .-.  ,_    .-.
+'-._'--'  \_| |_/  '--'_.-'
+    '-._  \ | | /  _.-'
+        `-.^| |^.-'
+           `\=/`
+             `
+```
+
+=== ID: 0da7970cba2d7ff9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 19x7 ===
+```
+           _
+         -=\`\
+     |\ ____\_\__
+   -=\c`""""""" "`)
+jgs   `~~~~~/ /~~`
+        -==/ /
+          '-'
+```
+
+=== ID: fb5bbb97bb4d3363 | TITLE: USAF | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 32x8 ===
+```
+            ____
+  |        | ___\          /~~~|
+ _:_______|/'(..)`\_______/  | |
+<_|``````  \__~~__/  USAF ___|_|
+  :\_____(=========,(*),--\__|_/
+  |       \       /---'
+           | (*) /
+           |____/
+```
+
+=== ID: 4b176ef6aa038c06 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 30x8 ===
+```
+            __/\__
+           `==/\==`
+ ____________/__\____________
+/____________________________\
+  __||__||__/.--.\__||__||__
+ /__|___|___( >< )___|___|__\
+           _/`--`\_
+jgs       (/------\)
+```
+
+=== ID: b0073eefea110f5a | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 32x8 ===
+```
+            ____
+  |        | ___\          /~~~|
+ _:_______|/'(..)`\_______/  | |
+<_|``````  \__~~__/       ___|_|
+  :\_____(=========,   ,--\__|_/
+  |       \       /---'
+            |     /
+            |____/
+```
+
+=== ID: 5fce6ab6a2880168 | TITLE: Biplane | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 30x8 ===
+```
+            __/\__
+           `==/\==`
+ ____________/__\____________
+/____________________________\
+  __||__||__/.--.\__||__||__
+ /__|___|___( >< )___|___|__\
+           _/`--`\_
+jgs       (/------\)
+```
+
+=== ID: b5aa16dac397f2a0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 26x10 ===
+```
+Smaller x-29
+          __
+          \ \
+        _  \ \
+   ____/ \_/  \_
+.-'  ,---,    __|_
+'-.__`---`_    _|
+       \_/ \  /
+           / /
+          /_/   Billcow168
+```
+
+=== ID: 4dd0c17d89479e8d | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 31x11 ===
+```
+__  _
+\ `/ |
+ \__`!
+ / ,' `-.__________________
+'-'\_____                LI`-.
+   <____()-=O=O=O=O=O=[]====--)
+     `.___ ,-----,_______...-'
+          /    .'
+         /   .'
+        /  .'         hjw
+        `-'
+```
+
+=== ID: 17714830c81a397d | TITLE: McDonnell XF-85 Goblin | ARTIST: Jonathon R. Oglesbee | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 29x12 ===
+```
+                    .--.-~-.
+                   /   \6524\
+            ____   \   /====/
+          .`   /`~-.\ /    /
+    _...-'----'____ ~/    /
+ .-~ ==        ````--    /_
+ ||== ......              ||
+ ||    _____________      ||
+ `~-._`~-._         `~._\  \
+      `~~--`~-._=======`.\__\
+JRO             `~-._____'.
+                    '======`
+```
+
+=== ID: 8a057cfac2ad14d5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 39x13 ===
+```
+                  /\
+                 |^^|
+                 |{}|
+  _______________/~~\________________
+ /               |  |                \
+`========--------.  .---------========'
+                 ||||
+                  ||
+                  ||
+                  ||
+                  ||
+              ,---||---,
+              '---<>---'
+```
+
+=== ID: 632a6259d24385f4 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 19x13 ===
+```
+__|__
+\___/
+ | |
+ | |
+_|_|______________
+        /|\
+      */ | \*
+      / -+- \
+  ---o--(_)--o---
+    /  0 " 0  \
+  */     |     \*
+  /      |      \
+*/       |       \*
+```
+
+=== ID: 1a0784dcc927d6c2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: airplanes | SIZE: 40x20 ===
+```
+              ##### | #####
+             # _ _ #|# _ _ #
+             #      |      #
+       |       ############
+                   # #
+|                  # #
+                  #   #
+       |     |    #   #      |        |
+|  |             #     #               |
+       | |   |   # .-. #         |
+                 #( O )#    |    |     |
+|  ################. .###############  |
+ ##  _ _|____|     ###     |_ __| _  ##
+#  |                                |  #
+#  |    |    |    |   |    |    |   |  #
+ ######################################
+                 #     #
+                  #####
+             OOOOOOO|OOOOOOO
+                    U
+```
+
+=== ID: 5e3d4e6de976abac | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 18x4 ===
+```
+  ______
+ /|_||_\`.__
+(   _    _ _\
+=`-(_)--(_)-'  hjw
+```
+
+=== ID: 89ea68ef7395e8b0 | TITLE: VW Beetle | ARTIST: Andreas Freise | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 22x5 ===
+```
+            ___
+  __       ( "o)
+ ( o)     (o\./o)
+(o\/o)     "   "   a:f
+ "  "
+```
+
+=== ID: cd1d64d4a8c2eab5 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 26x5 ===
+```
+  ___
+    _-_-  _/\______\\__
+ _-_-__  / ,-. -|-  ,-.`-.
+hjw _-_- `( o )----( o )-'
+           `-'      `-'
+```
+
+=== ID: 1ddffa9848407926 | TITLE: 1924 Studebaker | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 33x7 ===
+```
+              ______--------___
+             /|             / |
+  o___________|_\__________/__|
+ ]|___     |  |=   ||  =|___  |"
+ //   \\    |  |____||_///   \\|"
+|  X  |\--------------/|  X  |\"
+ \___/ 1924 Studebaker  \___/
+```
+
+=== ID: 35ea7bafcf8aad30 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 29x7 ===
+```
+                  .
+    __  Max       |\
+ __/__\___________| \_
+|   ___    |  ,|   ___`-.
+|  /   \   |___/  /   \  `-.
+|_| (O) |________| (O) |____|
+   \___/          \___/
+```
+
+=== ID: 7eb1202e86abfa18 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 33x6 ===
+```
+   -           __
+ --          ~( @\   \
+---   _________]_[__/_>________
+     /  ____ \ <>     |  ____  \
+    =\_/ __ \_\_______|_/ __ \__D
+________(__)_____________(__)____
+```
+
+=== ID: 71ff2a9aef3204c2 | TITLE: Untitled | ARTIST: Colin Douthwaite | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 23x8 ===
+```
+        _______
+       //  ||\ \
+ _____//___||_\ \___
+ )  _          _    \
+ |_/ \________/ \___|
+___\_/________\_/______
+
+~From: Colin Douthwaite
+```
+
+=== ID: 2408bec7c1ac7901 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 25x8 ===
+```
+        _________
+       |         |
+ _o_  _| ___=___ |_  _o_
+/`-'( )         ( ) /`-'\
+|   |-|  ___*___  |-|   |
+|   | | (-+-+-+-) | |   |
+|   |--\_KAR120C_/--|   |
+ ---                 ---
+```
+
+=== ID: 8a8014db96fc8b91 | TITLE: Ambulance Car | ARTIST: Sherry Stowers | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 33x9 ===
+```
+   o_______________}o{
+   |              |   \
+   |    911       |____\_____
+   | _____        |    |_o__ |
+   [/ ___ \       |   / ___ \|
+  []_/.-.\_\______|__/_/.-.\_[]
+     |(O)|             |(O)|
+      '-'   ScS         '-'
+---   ---   ---   ---   ---   ---
+```
+
+=== ID: 6d016392ceb53e81 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 27x12 ===
+```
+        __-------__
+      / _---------_ \
+     / /           \ \
+     | |           | |
+     |_|___________|_|
+ /-\|                 |/-\
+| _ |\       0       /| _ |
+|(_)| \      !      / |(_)|
+|___|__\_____!_____/__|___|
+[_________|MEIN1|_________]
+ ||||    ~~~~~~~~     ||||
+ `--'                 `--'
+```
+
+=== ID: 2f89c8c62a45f1c8 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: vehicles | SUBCATEGORY: cars | SIZE: 20x20 ===
+```
+__
+.-'--`-._
+'-O---O--'  Max
+
+.-'--`-._
+'-O---O--'  Max
+
+       \
+.-`"""""`-..  Max
+'=()===()=-'
+
+    ____
+ __/  |_\_
+|  _     _``-.
+'-(_)---(_)--'   Max
+
+
+ _.-.___\__
+|  _      _`-.   Max
+'-(_)----(_)--`
+```
+
+=== ID: b8c587d78ab186f2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 34x5 ===
+```
+                __/___
+          _____/______|
+  _______/_____\_______\_____
+  \              < < <       |
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: a98b37cb88f471a3 | TITLE: Ocean liner | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 25x5 ===
+```
+        _    _
+     __|_|__|_|__
+   _|____________|__
+  |o o o o o o o o /  hjw
+~'`~'`~'`~'`~'`~'`~'`~
+```
+
+=== ID: 9ea0b9d591e96e3f | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 21x7 ===
+```
+             /|~~~
+           ///|
+         /////|
+       ///////|
+     /////////|
+   \==========|===/
+~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: f5972d0cafd83906 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 26x7 ===
+```
+    __|__ |___| |\
+    |o__| |___| | \
+    |___| |___| |o \
+   _|___| |___| |__o\
+  /...\_____|___|____\_/
+  \   o * o * * o o  /
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: 5dc0171b62c9afb9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 19x8 ===
+```
+         /|\
+       /__| )
+     /____| ))
+   /______| )))
+ /________|  )))
+         _|____))
+ \======| o o /
+~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: f6db28d238c234ca | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 39x9 ===
+```
+              |    |    |
+             )_)  )_)  )_)
+            )___))___))___)\
+           )____)____)_____)\\
+         _____|____|____|____\\\__
+---------\                   /---------
+  ^^^^^ ^^^^^^^^^^^^^^^^^^^^^
+    ^^^^      ^^^^     ^^^    ^^
+         ^^^^      ^^^
+```
+
+=== ID: 0fafe92a1128d69a | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 28x9 ===
+```
+                 |~
+           |/    w
+          / (   (|   \
+         /( (/   |)  |\
+  ____  ( (/    (|   | )  ,
+ |----\ (/ |    /|   |'\ /^;
+\---*---Y--+-----+---+--/(
+ \------*---*--*---*--/
+  '~~ ~~~~~~~~~~~~~~~
+```
+
+=== ID: 6f1138a62127094c | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 23x10 ===
+```
+      I\
+      I \
+      I  \
+      I*--\
+      I    \
+      I     \
+      I______\
+ _____I__O______
+  \     ( )     b  ^  ^
+^^^^^^^^^^^^^^^^^    ^
+```
+
+=== ID: 60535fd7ae772966 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 26x12 ===
+```
+      I\
+      I \
+      I  \
+      I*--\
+      I    \
+      I     \
+      I______\
+ _____I__O______
+  \     ( )     b  ^  ^
+^^^^^^^^^^^^^^^^^    ^
+_____/\____/|            ^
+ >____,\---` \
+```
+
+=== ID: 3522e4d1d678a7b1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 27x12 ===
+```
+               /|___
+             ///|   ))
+           /////|   )))
+         ///////|    )))
+       /////////|     )))
+     ///////////|     ))))
+   /////////////|     )))
+  //////////////|    )))
+////////////////|___)))
+  ______________|________
+  \                    /
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: b79c7ed1f80ac3af | TITLE: Sailboat | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: boats | SIZE: 40x17 ===
+```
+             ____
+              ---|
+  \/            /|     \/
+               / |\
+              /  | \        \/
+             /   || \
+            /    | | \
+           /     | |  \
+          /      | |   \
+         /       ||     \
+        /        /       \
+       /________/         \
+       ________/__________--/
+ ~~~   \___________________/
+         ~~~~~~~~~~       ~~~~~~~~
+~~~~~~~~~~~~~     ~~~~~~~~~
+                               ~~~~~~~~~
+```
+
+=== ID: ae5721415275e27d | TITLE: Submarine | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: navy | SIZE: 27x4 ===
+```
+       |_
+ _____|~ |____
+(  --         ~~~~--_,
+ ~~~~~~~~~~~~~~~~~~~'`   dr
+```
+
+=== ID: 0fe3912a7f406ccb | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: navy | SIZE: 34x5 ===
+```
+                 __/___
+           _____/______|
+   _______/_____\_______\_____
+   \              < < <       |
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: de432433d00bd46f | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: other | SIZE: 10x4 ===
+```
+    ____
+\  i | o|
+|>#######
+/(_______)
+```
+
+=== ID: 5fe62ae8df56ee73 | TITLE: Tractor | ARTIST: Harry Mason (Hajoma) | CATEGORY: vehicles | SUBCATEGORY: other | SIZE: 21x4 ===
+```
+       |`o``\  ,
+       |_|-/ \_|__
+     _/..\-.\|   |
+_hjm__\""/`````(o)___
+```
+
+=== ID: ebc5c33f49b4f463 | TITLE: Dirigible | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: other | SIZE: 27x7 ===
+```
+       _..--=--..._
+    .-'            '-.  .-.
+   /.'              '.\/  /
+  |=-                -=| (
+   \'.              .'/\  \
+    '-.,_____ _____.-'  '-'
+jgs      [_____]=8
+```
+
+=== ID: 8e92f730158c8750 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: other | SIZE: 35x17 ===
+```
+          ,~-.
+         (  ' )-.          ,~'`-.
+      ,~' `  ' ) )       _(   _) )
+     ( ( .--.===.--.    (  `    ' )
+      `.%%.;::|888.#`.   `-'`~~=~'
+      /%%/::::|8888\##\
+     |%%/:::::|88888\##|
+     |%%|:::::|88888|##|.,-.
+     \%%|:::::|88888|##/    )_
+      \%\:::::|88888/#/ ( `'  )
+       \%\::::|8888/#/(  ,  -'`-.
+   ,~-. `%\:::|888/#'(  (     ') )
+  (  ) )_ `\__|__/'   `~-~=--~~='
+ ( ` ')  ) [VVVVV]
+(_(_.~~~'   \|_|/   hjw
+            [XXX]
+            `"""'
+```
+
+=== ID: 0bf5f9a53c15e629 | TITLE: Untitled | ARTIST: Rob Logan | CATEGORY: vehicles | SUBCATEGORY: choppers | SIZE: 14x3 ===
+```
+   -----|-----
+*>=====[_]L)
+      -'-`-
+```
+
+=== ID: 32765d035d8f4c59 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: choppers | SIZE: 36x6 ===
+```
+---------------+---------------
+          ___ /^^[___              _
+         /|^+----+   |#___________//
+       ( -+ |____|    ______-----+/
+        ==_________--'            \
+          ~_|___|__
+```
+
+=== ID: 4aea781653d5e961 | TITLE: Untitled | ARTIST: Graeme Porter | CATEGORY: vehicles | SUBCATEGORY: choppers | SIZE: 39x8 ===
+```
+  ______.........--=T=--.........______
+     .             |:|
+:-. //           /""""""-.
+': '-._____..--""(""""""()`---.__
+ /:   _..__   ''  ":""""'[] |""`\\
+ ': :'     `-.     _:._     '"""" :
+  ::          '--=:____:.___....-"
+                    O"       O" grp
+```
+
+=== ID: 20e5e241b9e0f035 | TITLE: Bike | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: bicycles | SIZE: 29x9 ===
+```
+             __
+  ,--.      <__)
+  `- |________7
+     |`.      |\
+  .--|. \     |.\--.
+ /   j \ `.7__j__\  \
+|   o   | (o)____O)  |
+ \     /   J  \     /
+  `---'        `---'      hjw
+```
+
+=== ID: 7974c05005ba564c | TITLE: Unicycle | ARTIST: Henry Segerman | CATEGORY: vehicles | SUBCATEGORY: bicycles | SIZE: 38x22 ===
+```
+                       -   ,--_--.
+               -           \      `.
+                      -     "-_ _   \
+     -                         / F   )
+                   -     -    / / `--'
+              -              / /
+                   -        / /
+            -            __/ /
+                        /,-pJ
+           -        _--"-L ||
+                  ,"      "//
+     -           /  ,-""".//\
+                /  /     // J____
+               J  /     // L/----\
+   .           F J     //__//^---'
+     `     ___J  F    '----| |
+  `       J---|  F         F F
+`   `. `   `--J  L        J  F
+    .   .`     L J       J  F
+       .  .    J  \    ,"  F
+         .  `.` \  "--"  ,"
+    hs      ` ``."-____-"
+```
+
+=== ID: 49616f663a0c0d19 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 11x4 ===
+```
+____
+|DD|____T_
+|_ |_____|<
+  @-@-@-oo\
+```
+
+=== ID: 8f759024ac484d1b | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 18x4 ===
+```
+    _____
+ ___ |[]|_n__n_I_c
+|___||__|###|____}
+ O-O--O-O+++--O-O
+```
+
+=== ID: e80c91850d9c8f1c | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 20x4 ===
+```
+       ____
+  ][_n_|OO[ ====__
+ (_____|__|_[_____].
+< oo    OO   o   o
+```
+
+=== ID: 83c5da296e2b93cb | TITLE: Untitled | ARTIST: Gregg 'L.A.' Anders | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 30x4 ===
+```
+   ~~~~ ____   |~~~~~~~~~~~~~|
+  Y_,___|[]|   | Go Boilers! |
+ {|_|_|_|PU|_,_|_____________|
+//oo---OO=OO     OOO     OOO
+```
+
+=== ID: 43068b15f29696ed | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 11x4 ===
+```
+      ___
+ _][__| |
+<_______|-1
+  O-O-O
+```
+
+=== ID: 5c13f5e65725fc03 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 19x4 ===
+```
+   o O___ _________
+ _][__|o| |O O O O|
+<_______|-|_______|
+ /O-O-O     o   o
+```
+
+=== ID: 8756015e88317df6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 25x5 ===
+```
+    ooOOOO
+   oo      _____
+  _I__n_n__||_|| ________
+>(_________|_7_|-|______|
+ /o ()() ()() o   oo  oo
+```
+
+=== ID: e8bcb366ff4bd94a | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 21x6 ===
+```
+     e@@@@@@@@@@@@@@@
+    @@@""""""""""
+   @" ___ ___________
+  II__[w] | [i] [z] |
+ {======|_|~~~~~~~~~|
+/oO--000'"`-OO---OO-'
+```
+
+=== ID: 5955bbb35dfd317e | TITLE: Untitled | ARTIST: Paul Foerster | CATEGORY: vehicles | SUBCATEGORY: trains | SIZE: 24x10 ===
+```
+O o
+    .
+   __
+  _||_
+  ||||
+ .----.
+ |o<>o|
+////\\\\
+  /--\   -Paul Foerster-
+ /----\
+```
+
+=== ID: 6c03054d03988c1b | TITLE: Harley Davidson Ultra Classic Electra Glide | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: vehicles | SUBCATEGORY: motorcycles | SIZE: 14x3 ===
+```
+   ,
+.-/c-.,::  Max
+(_)'==(_)
+```
+
+=== ID: afe9f503d682feba | TITLE: Harley Davidson Ultra Classic Electra Glide | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: vehicles | SUBCATEGORY: motorcycles | SIZE: 14x3 ===
+```
+   ,_o
+.-/c-/,::  Max
+(_)'==(_)
+```
+
+=== ID: 3f958b136b726109 | TITLE: Harley Davidson Ultra Classic Electra Glide | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: vehicles | SUBCATEGORY: motorcycles | SIZE: 14x3 ===
+```
+   ,_oo
+.-/c-//::  Max
+(_)'==(_)
+```
+
+=== ID: e57e1fbe447759f4 | TITLE: Motorbike | ARTIST: Jürgen Gröner | CATEGORY: vehicles | SUBCATEGORY: motorcycles | SIZE: 25x4 ===
+```
+         _
+       D/_
+       /(_`._,-.
+_____(o) `--'(o)_____ind_
+```
+
+=== ID: 7a258698cdeed056 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: vehicles | SUBCATEGORY: busses | SIZE: 21x4 ===
+```
+   _____________
+ _/_|[][][][][] | - -
+(      City Bus | - -
+=--OO-------OO--=dwb
+```
+
+=== ID: 13270f05097e85c8 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: vehicles | SUBCATEGORY: busses | SIZE: 33x6 ===
+```
+                          __
+ .-----------------------'  |
+/| _ .---. .---. .---. .---.|
+|j||||___| |___| |___| |___||
+|=|||=======================|
+[_|j||(O)\__________|(O)\___] hjw
+```
+
+=== ID: 50fe34db73191ff7 | TITLE: Truck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: trucks | SIZE: 21x4 ===
+```
+    .--------.__
+    |::::::::|[_I___,
+    |_.-.____I__.-~;|
+jgs  `(_)--------(_)"
+```
+
+=== ID: 978d7d3d9af2471c | TITLE: 18 wheeler truck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: vehicles | SUBCATEGORY: trucks | SIZE: 33x5 ===
+```
+ _______________________
+|jgs                    |h_ __
+|                       ||=|##L_
+|________________.====._||_|__._]
+ `(_)(_)`       `(_)(_)"""="=(_)
+```
+
+=== ID: 3d0f8847f4ece2a6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: vehicles | SUBCATEGORY: trucks | SIZE: 29x7 ===
+```
+ ================\
+ |----------||@  \\   ___
+ |____|_____|||_/_\\_|___|_
+<|  ___\    ||     | ____  |
+<| /    |___||_____|/    | |
+||/  O  |__________/  O  |_||
+   \___/ LAND ROVER \___/
+```
+

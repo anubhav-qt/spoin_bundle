@@ -1,0 +1,358 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: VIDEO-GAMES
+# Total artworks in category fitting <=40 cols: 18
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: f50af7ff4b0a90a9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: video-games | SUBCATEGORY: sonic-the-hedgehog | SIZE: 21x9 ===
+```
+          .,
+.      _,'f----.._
+|\ ,-'"/  |     ,'
+|,_  ,--.      /
+/,-. ,'`.     (_
+f  o|  o|__     "`-.
+,-._.,--'_ `.   _.,-`
+`"' ___.,'` j,-'
+  `-.__.,--'
+```
+
+=== ID: b333ecbb6a28812a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: video-games | SUBCATEGORY: sonic-the-hedgehog | SIZE: 31x14 ===
+```
+              .--._
+               `.  `-.
+               .-'    `.
+             .'      _..:._
+            `.  .--.'      `.
+            _.'  \.      .--.\
+          .'      |     |    |
+         `--.     |  .--|    D
+             `;  /'\/   ,`---'@
+           .'  .'   '._ `-.__.'
+         .'  .'      _.`---'
+       .'--''   .   `-..__.--.
+jgs ~-=  =-~_-   `-..___(  ===;
+    ~-=  - -    .'       `---'
+```
+
+=== ID: 97db44c87b98b17f | TITLE: Sonic the Hedgehog | ARTIST: Han J. Lee | CATEGORY: video-games | SUBCATEGORY: sonic-the-hedgehog | SIZE: 32x15 ===
+```
+       ___------__
+ |\__-- /\       _-
+ |/    __      -
+ //\  /  \    /__
+ |  o|  0|__     --_
+ \\____-- __ \   ___-
+ (@@    __/  / /_
+    -_____---   --_
+     //  \ \\   ___-
+   //|\__/  \\  \
+   \_-\_____/  \-\
+        // \\--\|   -Han J. Lee-
+   ____//  ||_
+  /_____\ /___\
+______________________
+```
+
+=== ID: 961fe3d4196f31a1 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: video-games | SUBCATEGORY: lara-croft | SIZE: 23x18 ===
+```
+      _ _
+     /.-.`.
+    //o;o\ \
+    \\_-_/)/
+    _`) ( _\\
+ .`) '-.-' ( `.
+/ `/   .   \`. \
+\ \\___A___/_` /
+ '-)|)=@=(|(-'`\
+   |/\   /\|  )/
+   /__\_/__\
+  '---' '---'
+   \ /   \ /
+   ( )   ( )
+   /_\   /_\
+  '---' '---'
+   \ /   \ /
+   /_\   /_\-=TWP/LGB=-
+```
+
+=== ID: a078365e9916354b | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: video-games | SUBCATEGORY: lara-croft | SIZE: 19x19 ===
+```
+       ,==;,
+       )a,a\g
+       \=_/8
+       _| (_3,
+      /(__/\]\
+     (_,,__) \\
+     //\  ;/  \\
+    //  )__\   \|_
+  _'/  |[]__L,  ,>}
+ /t}  / ,   [|
+6    /-.|=._|/
+    /  .'`-/`
+   ( .' | /
+   \ |  ( |
+    \_)  \_).
+     \ \  \ |
+      \ >  >|
+ snd /.'  / /
+         '-'
+```
+
+=== ID: 1fba18d030bdd0f1 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: video-games | SUBCATEGORY: lara-croft | SIZE: 19x19 ===
+```
+       ,~~;,
+       a,a)\9
+       \= ,6
+       _/'(_8,
+      /(__/\]\
+     (_,,__) \\
+     //\  ;/  \\
+    //  )__\   \|_
+  _'/  |[]__L,  ,>}
+ /t}  / ,   [|
+6    /-.|=._|/
+    /  .'`-/`
+   ( .' | /
+   \ |  ( |
+    \_)  \_).
+     \ \  \ |
+      \ >  >|
+ snd /.'  / /
+         '-'
+```
+
+=== ID: 70d2c5d091e83b95 | TITLE: Mistress of Adventure | ARTIST: John Stachowicz | CATEGORY: video-games | SUBCATEGORY: lara-croft | SIZE: 32x35 ===
+```
+  .<'"'=,,_
+ //__ -_"(XX,
+(y") \_  ) "X
+( \ r  )_|  X______
+ ) |     (_//"/\__ \
+    Y_<_   /_/ /\ \ \
+        |__\ \/ x\ \ \
+        /_--\ \x /  \ \
+       (  \  \ \/    | \_
+       |\  \  "' \  fu''_]
+       | \  \    |  | r""
+       \__\  |   \  ||
+        ,x"| |    ',"'
+       x"  | |\_.-"_>-.
+      x'   | |[_.-"    \
+      |\   | |/         |
+          _|_|      |   |
+         fl"Ol]   _/    /
+         |,U""-. / \_.-"|
+         ||    /"   |   |
+         "'   /     |   |
+        /    /      |   |
+       /    /       |  /_
+       |  .'         \   \
+       |   \          \   |
+       |   |           '._-\
+       |   |            ".  \
+       |  /               \  \
+       |__|               _\  \
+       f""l              (  _  ]
+       I  |               "" ""
+       I  |
+     __l  |
+    (   _ ]   jjs
+     """ ""
+```
+
+=== ID: b35c23430590d057 | TITLE: A Magnificent Bust | ARTIST: John Stachowicz | CATEGORY: video-games | SUBCATEGORY: lara-croft | SIZE: 36x38 ===
+```
+             __   ____
+           /   '~'   ) \
+          / _(__  (__   \_
+         / /(/  )) ) (\ \ \
+        ( / (   (     )\ ) )
+        )//"-_  )_.-"\ (    \
+        )|-._     _.-- )( \ (
+       (/){c)\| /"c)"7 )|\  )
+        )|"""'| `"""" ( |  /_)
+       ( |    --       ,/ / -_)
+         \    __      / ." \ -_)
+          \  /--\    //(   ( -_)
+           \ `--'   //     ( -_)
+            \____.-" |     ( -_)
+              |      |    ( -_)
+              |      |   ( -_)
+              |      |  ( -_)
+   _________-"\     / "-(_-_)___
+  /                              \
+ /                                \
+ \                              __ \
+  \     /             /        /   |
+  /    /      /      /        /   /
+ /     \____ /_____.'         \__/
+|                             /
+|                        |   /
+|          __            |  /
+\           __           /_"
+ \          _           /
+  '._______/ \________.'
+              ,      ,
+           ___(      )_______
+         ,"   (      )      ,|
+       ,"     '-.__.-'    ," | jjs
+     ,"________________ ,"  ,"
+    /   /  /| /) /|    /  ,"
+   /   /_ /"|/\ /"|   / ,"
+  /_________________ /."
+```
+
+=== ID: 39542b196e417d9d | TITLE: Untitled | ARTIST: unknown | CATEGORY: video-games | SUBCATEGORY: pacman | SIZE: 16x4 ===
+```
+  __        ___
+ / o\      /o o\
+|   <      |   |
+ \__/      |,,,|
+```
+
+=== ID: 5ba0f1ec3a7d9a27 | TITLE: Pacman | ARTIST: unknown | CATEGORY: video-games | SUBCATEGORY: pacman | SIZE: 33x6 ===
+```
+   ,##.                   ,==.
+ ,#    #.                 \ o ',
+#        #     _     _     \    \
+#        #    (_)   (_)    /    ;
+ `#    #'                 /   .'
+   `##'                   "=="
+```
+
+=== ID: 59902f7e8b1fe60b | TITLE: Norns | ARTIST: Shanaka Dias | CATEGORY: video-games | SUBCATEGORY: creatures | SIZE: 19x10 ===
+```
+        _____
+    .-,;='';_),-.
+     \_\(),()/_/
+       (,___,)
+      ,-/`~`\-,___
+     / /).:.('--._)
+    {_[ (_,_)
+        | Y |
+snd    /  |  \
+       """ """
+```
+
+=== ID: d154d91cef64c306 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: video-games | SUBCATEGORY: creatures | SIZE: 14x11 ===
+```
+      __ __
+   .-',,^,,'.
+  / \(0)(0)/ \
+  )/( ,_"_,)\(
+  `  >-`~(   '
+_N\ |(`\ |___
+\' |/ \ \/_-,)
+ '.(  \`\_<
+    \ _\|
+     | |_\_
+snd  \_,_>-'
+```
+
+=== ID: 1d2a543e25a59565 | TITLE: Zool | ARTIST: Rowan Crawford | CATEGORY: video-games | SUBCATEGORY: other | SIZE: 38x16 ===
+```
+         /\______  __
+        /-~     ,^~ / __n
+       / ,---x /_.-"L/__,\
+      /-".---.\_.-'/!"  \ \
+      0\/0___/   x' /    ) |
+      \.______.-'_.{__.-"_.^
+       `x____,.-",-~( .-"
+          _.-| ,^.-~ "\
+     __.-~_,-|/\/     `i
+    / u.-~ .-{\/     .-^--.
+    \/   v~ ,-^x.____}--r |
+        / /"            | |       -Row
+      _/_/              !_l_
+    o~_//)             (_\\_~o
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+             ->Zool<-
+```
+
+=== ID: b5d3e39e2617f53a | TITLE: Meowth | ARTIST: Joan G. Stark (Spunk) | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 26x12 ===
+```
+         .-. \_/ .-.
+         \.-\/=\/.-/
+      '-./___|=|___\.-'
+     .--| \|/`"`\|/ |--.
+    (((_)\  .---.  /(_)))
+     `\ \_`-.   .-'_/ /`_
+       '.__       __.'(_))
+           /     \     //
+          |       |__.'/
+          \       /--'`
+jgs   .--,-' .--. '----.
+     '----`--'  '--`----'
+```
+
+=== ID: ae81a937456fbb3d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 25x13 ===
+```
+`;-.          ___,
+  `.`\_...._/`.-"`
+    \        /      ,
+    /()   () \    .' `-._
+   |)  .    ()\  /   _.'
+   \  -'-     ,; '. <
+    ;.__     ,;|   > \
+   / ,    / ,  |.-'.-'
+  (_/    (_/ ,;|.<`
+    \    ,     ;-`
+     >   \    /
+    (_,-'`> .'
+jgs      (_,'
+```
+
+=== ID: 74c49dfd8df86527 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 25x13 ===
+```
+       ,___          .-;'
+       `"-.`\_...._/`.`
+    ,      \        /
+ .-' ',    / ()   ()\
+`'._   \  /()    .  (|
+    > .' ;,     -'-  /
+   / <   |;,     __.;
+   '-.'-.|  , \    , \
+      `>.|;, \_)    \_)
+       `-;     ,    /
+          \    /   <
+           '. <`'-,_)
+        jgs '._)
+```
+
+=== ID: bce6c6738005dded | TITLE: Pikachu | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 26x13 ===
+```
+       \:.             .:/
+        \``._________.''/
+         \             /
+ .--.--, / .':.   .':. \
+/__:  /  | '::' . '::' |
+   / /   |`.   ._.   .'|
+  / /    |.'         '.|
+ /___-_-,|.\  \   /  /.|
+      // |''\.;   ;,/ '|
+      `==|:=         =:|
+         `.          .'
+l42        :-._____.-:
+          `''       `''
+```
+
+=== ID: 739849bd4a803c7d | TITLE: Bulbasaur | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 38x17 ===
+```
+             `;,;.;,;.;.'
+              ..:;:;::;:
+        ..--''' '' ' ' '''--.
+      /' .   .'        '.   .`\
+     | /    /            \   '.|
+     | |   :             :    :|
+   .'| |   :             :    :|
+ ,: /\ \.._\ __..===..__/_../ /`.
+|'' |  :.|  `'          `'  |.'  ::.
+|   |  ''|    :'';          | ,  `''\
+|.:  \/  | /'-.`'   ':'.-'\ |  \,   |
+| '  /  /  | / |...   | \ |  |  |';'|
+ \ _ |:.|  |_\_|`.'   |_/_|  |.:| _ |
+/,.,.|' \__       . .      __/ '|.,.,\
+     | ':`.`----._____.---'.'   |
+l42   \   `:"""-------'""' |   |
+       ',-,-',             .'-=,=,
+```
+

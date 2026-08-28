@@ -83,9 +83,39 @@ export function TopicDiscoveryModal({
       const topic = await api.subscribeTopic(topicId);
       onFollowed(topic);
       setItems((current) =>
-        current.map((t) => (t.topic_id === topicId ? { ...t, followed: true } : t)),
+        current.map((t) =>
+          t.topic_id === topicId
+            ? { ...t, followed: true, subscriber_count: t.subscriber_count + 1 }
+            : t,
+        ),
       );
       setOpenTopicId((current) => (current === topicId ? null : current));
+    } finally {
+      setFollowingId(null);
+    }
+  };
+
+  /** The exact inverse of `follow`. `onTopicRemoved` is the same callback the
+   *  cancel-a-generation path already uses to drop a topic from the caller's
+   *  local subscription state — an unfollow needs precisely that, so it is
+   *  reused rather than threading a fourth callback through all three call
+   *  sites (RightRail, SettingsView, ShareTopicRail).
+   *
+   *  Unlike `follow`, this row stays in the list afterwards: "Browse All" is
+   *  the whole corpus, not the user's subscriptions, so an unfollowed topic
+   *  belongs here still — just followable again. */
+  const unfollow = async (topicId: string) => {
+    setFollowingId(topicId);
+    try {
+      await api.unsubscribeTopic(topicId);
+      onTopicRemoved(topicId);
+      setItems((current) =>
+        current.map((t) =>
+          t.topic_id === topicId
+            ? { ...t, followed: false, subscriber_count: Math.max(0, t.subscriber_count - 1) }
+            : t,
+        ),
+      );
     } finally {
       setFollowingId(null);
     }
@@ -193,17 +223,25 @@ export function TopicDiscoveryModal({
                     </div>
 
                     <div className="discover-card-actions">
+                      {/* A followed topic's button is the way OUT of it, not a
+                          disabled "Following" label — the state was previously
+                          a dead end here, so the only unfollow in the product
+                          was the one behind the topic-progress rail. */}
                       <button
                         type="button"
                         className="discover-follow-btn mono"
                         data-followed={item.followed}
-                        disabled={item.followed || followingId === item.topic_id}
+                        disabled={followingId === item.topic_id}
                         onClick={(e) => {
                           e.stopPropagation();
-                          void follow(item.topic_id);
+                          void (item.followed ? unfollow : follow)(item.topic_id);
                         }}
                       >
-                        {item.followed ? "Following" : followingId === item.topic_id ? "…" : "Follow"}
+                        {followingId === item.topic_id
+                          ? "…"
+                          : item.followed
+                            ? "Unfollow"
+                            : "Follow"}
                       </button>
                     </div>
                   </div>
@@ -295,12 +333,15 @@ export function TopicDiscoveryModal({
         </div>
       </div>
 
+      {/* Exactly one of the two is passed, so the modal shows the action that
+          actually applies rather than an inert "Following" pill next to it. */}
       {openTopic !== null ? (
         <TopicStatsModal
           topicId={openTopic.topic_id}
           topicName={openTopic.display_name}
           onClose={() => setOpenTopicId(null)}
-          onFollow={() => follow(openTopic.topic_id)}
+          onFollow={openTopic.followed ? undefined : () => follow(openTopic.topic_id)}
+          onUnfollow={openTopic.followed ? () => unfollow(openTopic.topic_id) : undefined}
           following={followingId === openTopic.topic_id}
         />
       ) : null}

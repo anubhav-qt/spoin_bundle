@@ -32,7 +32,9 @@ nothing else genuinely fits. Do not force a shape onto an idea that doesn't want
 things happen — request flow, a pipeline, a feedback loop, a timeline, a causal chain.
    - comparison: a specific, commonly-held WRONG belief worth correcting. \
 Only when a real misconception exists — an invented one is worse than none.
-   - ascii: an idea a small, funny stick-figure scene would genuinely dramatize.
+   - ascii: an idea a small, funny drawn scene would genuinely dramatize \
+-- characters, a checklist, a before/after, a timeline, a tiny chart, \
+whatever form makes the joke land.
 
 For each entry give:
 - canonical_title: the literal, descriptive name of the idea. Never playful, \
@@ -42,7 +44,7 @@ the name the concept is findable by.
 - asset_direction: what the card's non-prose element should actually SHOW. \
 Be concrete and specific to the idea: for diagram, name the actual boxes and \
 what flows between them; for code, name the language and what the snippet \
-demonstrates; for ascii, describe the gag and what makes it land; for \
+demonstrates; for ascii, describe the gag, the form it takes, and what makes it land; for \
 comparison, state the specific myth and the specific fact that corrects it. \
 Leave EMPTY for prose.
 - content_direction: the angle this card takes, in a sentence or two — what it \
@@ -72,57 +74,149 @@ Already covered in this subtopic — plan around these, never re-plan one of the
 
 ASCII_INSTRUCTIONS = r"""\
 Whenever a concept has a physical, spatial, or visual gag that would make it
-stick, ALSO draw a small ASCII scene that shows the idea rather than just
-describing it: a weird stickman gag, one or two panels, something silly but
-informative — it should actually dramatize the concept, not just decorate the
-card. Reach for one often; skip it only when nothing about the idea genuinely
-lends itself to a picture.
+stick, ALSO draw a small ASCII scene that SHOWS the idea rather than just
+describing it. One or two panels, silly, and genuinely informative -- it has
+to dramatize the concept, not decorate the card. Reach for one often; skip it
+only when nothing about the idea lends itself to a picture.
 
-Canonical Examples of Stickman ASCII Scenes (under 40 columns wide):
+There is NO required cast and no required style. A scene may be characters
+reacting, or it may be a labelled checklist, a before/after pair, a timeline
+whose ordering is itself the joke, a chart made of hashes, an object doing
+something absurd, or pure typography. Pick whatever form makes THIS idea
+land. Faces like (o_o) (-_-) (>_<) are available when a reaction is the gag;
+they are one option among many, never an obligation.
 
-Example 1 (System Design - Single Point of Failure):
+Two rules that are not negotiable:
+
+1. WIDTH. Every line at most 40 characters. A phone renders roughly 38-42
+   monospace columns, and art that wraps is destroyed, not degraded. Count
+   the characters in each line before committing to it. If a scene cannot
+   work in 40 columns, do not draw it at all rather than drawing it broken.
+
+2. LEFT-ALIGNED, SELF-CONTAINED. The scene renders left-aligned in a box
+   directly under the title, standing in for the usual one-line hook -- and
+   when the card is collapsed in the feed, the scene IS the preview. It has
+   to work as a stand-alone thumbnail, so no reference to text the reader
+   cannot see yet.
+
+WORKED EXAMPLES. Seven cards, seven different topics, seven different shapes
+of joke. Study what each one is doing; do not copy them:
+
+--- Topic: Gym (Physical Fitness) | Card: Progressive Overload ---
+The gag is the barbell getting bored. Two panels, same weight, different
+week; the punchline is in the captions, not the drawing.
 ```
-[Panel 1]          [Panel 2]
-  \o/   \o/          \o/   \o/
-   |     |            |     |
-   |-----|            |-----|
-      |                  |   *BOOM*
-   [SERVER]           [  X  ]
-   "We good!"         "WHO TRIPPED WIRE?!"
+  10kg           10kg  ...still?
+ [==|==]        [==|==]
+  (>_<)          (-_-) zzz
+  WEEK 1         WEEK 40
+"i am growing"  "i am furniture"
 ```
 
-Example 2 (Biology / Immunology - Antibodies tagging pathogens):
+--- Topic: The Epic of Gilgamesh | Card: The Plant of Immortality ---
+No characters at all -- the gag is a checklist with an unticked last box,
+and a snake leaving the frame with the payoff.
 ```
- [Antibody]         [Tagged Virus]
-   \o/ *Y*             (o_o)
-    |  -->            / | \ *Y*
-   / \                 / \  "GET IT OFF ME"
- "Target acquired."
+ GILGAMESH'S IMMORTALITY CHECKLIST
+ [x] cross the waters of death
+ [x] dive down, grab the plant
+ [x] set it down, take a quick bath
+ [ ] be immortal
+
+   ~~~~~~~~~~~
+   ~  bath   ~     ~~~~> [PLANT]
+   ~~~~~~~~~~~     snake, exiting
 ```
 
-Example 3 (Economics - Inflation):
+--- Topic: German (Language) | Card: Verb-Final Subordinate Clauses ---
+Pure typography. The joke is the reader being made to wait for the verb
+exactly as a German sentence makes them wait.
 ```
- 1990:              2026:
-  \o/ [$100]         \o/ [$100]
-   |   --> [BURGER]   |   --> [CRUMB]
-  / \                / \  "IS THIS AIR?!"
+ EN: ...that he ate the cake.
+              ^ verb, on time
+
+ DE: ...dass er den Kuchen
+       [ 4 more words of suspense ]
+                    gegessen hat.
+                    ^ verb, finally
 ```
 
-A card's ASCII scene, if it has one, renders right below the title, in place
-of the usual one-line summary/hook — the FIRST thing about the card's actual
-content, before body. When this card appears collapsed/previewed in the
-feed, the scene itself IS the preview (instead of the usual text teaser), so
-the art needs to work as a stand-alone thumbnail, not just as an
-illustration inside a longer read.
+--- Topic: PostgreSQL | Card: DELETE Does Not Free Disk Space ---
+A code line, then the disk that disagrees with it. The "(boo)" is doing all
+the comedy; the row layout is doing all the teaching.
+```
+ DELETE FROM users WHERE id = 7;
+             "gone!"  -- you, wrongly
+
+ ON DISK
+ [row 5][row 6][row 7][row 8]
+               ^^^^^^
+               dead tuple, (boo),
+               still taking up space
+
+ VACUUM;   -- ok NOW it is gone.
+```
+
+--- Topic: Financial Literacy & Investing | Card: Loss Asymmetry ---
+Two lines of arithmetic and a rude conclusion. The scene is almost entirely
+numbers, which is the right call when the numbers ARE the surprise.
+```
+ $100  -- lose 50% -->  $50
+  $50  -- gain 50% -->  $75
+
+        "we're back!"  <- no
+         $75 =/= $100
+
+ climbing out of a 50% hole
+ needs a 100% gain. holes are
+ rude like that.
+```
+
+--- Topic: 10M Air Pistol Shooting | Card: Follow-Through ---
+A timeline where the ordering is the entire punchline. Nothing is drawn
+except two markers at the end.
+```
+ trigger breaks ....... 0.0 ms
+ you peek at the target  0.5 ms
+ pellet leaves barrel .. 3.0 ms
+                         ^^^^^^
+ you moved the gun while the
+ pellet was still inside it.
+
+   [10] <- aimed      o <- landed
+```
+
+--- Topic: How Everyday Things Work | Card: The Microwave Turntable ---
+A tiny data visualisation plus a one-line reframe. The last two lines are
+the card's whole thesis compressed into a joke.
+```
+ a microwave makes STANDING waves
+ -- the hot spots never move:
+
+   hot  cold  hot  cold  hot
+   ###   ...  ###   ...  ###
+   ###   ...  ###   ...  ###
+
+ so the food is moved instead:
+
+     [ dinner ] ------> (spin)
+
+ the turntable is not a feature,
+ it is an apology.
+```
 
 If you draw one, set:
-- ascii_label: a short slug for it (e.g. "single-point-failure"), never empty if art is present.
-- ascii_art: the raw art itself, newline-separated. HARD LIMIT: every line at
-  most 40 characters — a phone renders roughly 38-42 monospace columns, and
-  art that wraps is destroyed, not degraded. Count characters before you
-  commit to a line. If you cannot make the scene work in 40 columns, do not
-  draw it at all rather than drawing it badly.
-- ascii_alt: one plain sentence describing the stick figure scene for a screen reader.
+- ascii_label: a short slug for it (e.g. "microwave-turntable-apology"),
+  never empty if art is present.
+- ascii_art: the raw art itself, newline-separated, every line <= 40
+  characters. Do NOT wrap it in a fence -- this field holds the drawing
+  only, and stray backticks render as literal backticks on the card.
+- ascii_alt: one plain sentence describing the scene for a screen reader.
+
+Do NOT also reproduce the same drawing inside `body`. The scene renders once,
+at the top of the card, in both the collapsed and the expanded state -- a
+second copy in `body` shows up as the same picture twice, and an abbreviated
+second copy shows up as a broken one.
 
 Leave all three empty (ascii_label, ascii_art, ascii_alt) for any card where
 no scene genuinely fits.
@@ -215,17 +309,19 @@ CARDS_ASCII_SYSTEM = (
     CARDS_COMMON_HEADER
     + r"""
 
-CARD TYPE REQUIREMENT — STICKMAN ASCII COMIC SCENE (MANDATORY):
-Every single card in this batch MUST include a funny, charming ASCII comic featuring \
-STICKMAN characters (using stick figures is a MUST).
-- The scene must be a 1 or 2 panel stick-figure gag/comic that dramatizes the concept:
-  * Characters reacting, wrestling, panicking, failing, or dramatizing the metaphor.
-  * Use facial expressions (`(o_o)`, `\o/`, `(-_-)`), speech quotes, and action labels.
-  * Every line MUST be STRICTLY <= 40 characters wide!
+CARD TYPE REQUIREMENT — ASCII SCENE (MANDATORY):
+Every single card in this batch MUST carry a funny, charming ASCII scene that \
+dramatizes its concept.
+- The form is yours to choose per card, and the batch must NOT converge on one:
+  * characters reacting, panicking, failing, or acting out the metaphor;
+  * a labelled checklist, a before/after pair, a timeline whose order is the joke;
+  * a tiny chart made of hashes, an object misbehaving, or pure typography.
+  * Faces (`(o_o)`, `(-_-)`, `(>_<)`) are one option among many, never a requirement.
+- Every line MUST be STRICTLY <= 40 characters wide.
 - Set all three ASCII fields on every card:
-  * ascii_label: short descriptive slug (e.g. "stickman-server-crash"), NEVER empty.
-  * ascii_art: the raw ASCII drawing.
-  * ascii_alt: one plain sentence describing the stick figure comic for screen readers.
+  * ascii_label: short descriptive slug (e.g. "vacuum-dead-tuple"), NEVER empty.
+  * ascii_art: the raw drawing, with no surrounding fence.
+  * ascii_alt: one plain sentence describing the scene for screen readers.
 """
 )
 
@@ -261,37 +357,82 @@ CARDS_DIAGRAM_SYSTEM = (
     CARDS_COMMON_HEADER
     + """
 
-CARD TYPE REQUIREMENT — DOMAIN-SPECIALIZED DIAGRAM (MANDATORY):
-Every single card in this batch MUST illustrate the concept using a clear ASCII / text diagram \
-tailored to the domain and topic.
-- Format the diagram in a fenced block (```text or ```diagram) or clean ASCII arrow chains.
-- Use domain-appropriate archetypes:
-  * **System Design / CS**: Multi-tier architecture, request routing, caching layers, \
-    primary/replica DBs, message queues, state machines.
-    Example:
-    ```text
-    Client ──> [Load Balancer]
-                  │
-      ┌───────────┴───────────┐
-      ▼                       ▼
-    [API Service 1]       [API Service 2]
-      │       ▲             │
-      │       └─[Redis]─────┘
-      ▼ (Write)
-    [Primary DB] ──Replica──> [Read DB]
+CARD TYPE REQUIREMENT — DIAGRAM, WRITTEN IN MERMAID (MANDATORY):
+Every single card in this batch MUST illustrate the concept with a diagram, and the \
+diagram MUST be written as MERMAID inside a ```mermaid fenced block.
+
+Mermaid, not hand-drawn ASCII boxes. An ASCII diagram has to be aligned by the writer \
+against a column count the writer cannot see, and it breaks silently: what lines up in \
+your head wraps and is destroyed at a phone's ~40 monospace columns. Mermaid carries \
+the STRUCTURE and lets the client lay it out at whatever width it actually has. Describe \
+what connects to what; never draw the picture yourself.
+
+SHAPE (this matters as much as the content):
+- Aim for a roughly SQUARE diagram. Not a tall thin column, not a wide flat strip \
+  — a shape that grows in both directions at once, so it fills a phone card \
+  without either overflowing sideways or turning into an endless scroll.
+- Prefer `flowchart TD` (top-down) over `LR` as the default: a card is taller than it \
+  is wide, so vertical flow is the right primary axis. Then BRANCH sideways to keep it \
+  from becoming a single narrow column — parallel paths, a fan-out to two or \
+  three siblings, a loop back up the side.
+- Practical target: about 4-8 nodes, roughly 2-4 rows deep and 2-3 nodes wide at the \
+  widest row. Beyond that a diagram stops teaching and starts needing its own diagram.
+- Keep node labels SHORT — a few words. A long label stretches its row and \
+  flattens the whole diagram into a strip. Detail belongs in the prose, not in a box.
+
+Use the diagram type the material actually wants:
+  * flow / architecture / causal chain    -> flowchart TD
+  * ordered interaction between parties   -> sequenceDiagram
+  * lifecycle with named states           -> stateDiagram-v2
+  * hierarchy / taxonomy                  -> flowchart TD
+  * a timeline of events                  -> timeline
+
+Examples of the shape to aim for:
+
+  * **System Design / CS**
+    ```mermaid
+    flowchart TD
+      C[Client] --> LB[Load Balancer]
+      LB --> A1[API 1]
+      LB --> A2[API 2]
+      A1 --> R[(Redis)]
+      A2 --> R
+      A1 --> DB[(Primary DB)]
+      DB --> RD[(Read Replica)]
     ```
-  * **Biology & Physical Sciences**: Pathways, feedback regulation, biochemical cycles.
-    Example:
-    ```text
-    [High Glucose] ──> [Beta Cells: Insulin]
-                              │
-                        (Cell Uptake)
-                              ▼
-    [Liver Stores Glycogen] ──> [Normal Glucose]
+
+  * **Biology / Physical Sciences**
+    ```mermaid
+    flowchart TD
+      G[High Glucose] --> B[Beta Cells]
+      B --> I[Insulin Released]
+      I --> U[Cell Uptake]
+      I --> L[Liver Stores Glycogen]
+      U --> N[Glucose Normal]
+      L --> N
+      N -.-> G
     ```
-  * **History & Humanities**: Timelines, causal chains, branching decisions.
-  * **Economics & Business**: Market loops, supply/demand cycles, multi-stage funnels.
-- Accompany the diagram with a clear explanation of how data or state moves through the system.
+
+  * **A lifecycle**
+    ```mermaid
+    stateDiagram-v2
+      [*] --> Pending
+      Pending --> Running
+      Running --> Complete
+      Running --> Failed
+      Failed --> Pending: retry
+      Complete --> [*]
+    ```
+
+TABLES: mermaid has no table type. When the material is genuinely tabular \
+(a comparison across several fixed attributes), write a normal MARKDOWN table with \
+pipes — it renders as a real table. Keep it to 2-3 columns; a wider one \
+cannot fit a phone. Never draw a table out of dashes and pipes as ASCII art.
+
+Accompany the diagram with a clear explanation of how data or state moves through it.
+
+LEGACY NOTE: older cards in the corpus carry ASCII diagrams in ```text / ```diagram \
+blocks and still render that way. Do not imitate them; new diagrams are mermaid.
 """
 )
 
@@ -330,8 +471,8 @@ new material, just the most important piece of it.
 """
     + ASCII_INSTRUCTIONS
     + """
-A hero card is exactly the kind of card an ASCII stickman scene suits best — it is \
-the one card in the subtopic guaranteed to be seen. If a humorous stickman gag or physical \
+A hero card is exactly the kind of card an ASCII scene suits best — it is \
+the one card in the subtopic guaranteed to be seen. If a gag or a physical \
 analogy fits the core idea, draw it!
 """
 )

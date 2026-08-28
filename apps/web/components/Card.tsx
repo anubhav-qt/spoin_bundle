@@ -34,7 +34,7 @@
  *   dwell_complete    -> they stayed past the threshold
  */
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import katex from "katex";
@@ -44,6 +44,7 @@ import { DwellTimer, engagement } from "@/lib/engagement";
 import { bookmarkedStore, likedStore } from "@/lib/engagementState";
 import { invalidate } from "@/lib/refresh";
 import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
+import { MermaidBlock } from "./MermaidBlock";
 import {
   BookmarkIcon,
   CheckIcon,
@@ -90,6 +91,14 @@ const DWELL_COMPLETE_MS = 10000;
  *  it passed. A second is long enough that the reader plausibly saw the card
  *  and short enough that ordinary browsing still advances the feed. */
 const IMPRESSION_DWELL_MS = 1000;
+
+/** How far the pointer may travel, and how long it may stay down, for a
+ *  press/release pair on the page background to still count as a deliberate
+ *  tap rather than the start of a scroll. Both are deliberately generous —
+ *  the cost of missing a real tap is one extra tap; the cost of a false
+ *  positive is every open card collapsing mid-scroll. */
+const TAP_SLOP_PX = 10;
+const TAP_MAX_MS = 500;
 
 const DIFFICULTY_RANK: Record<Difficulty, number> = {
   beginner: 1,
@@ -351,27 +360,59 @@ export function Card({
     return () => observer.disconnect();
   }, []);
 
-  // Click genuinely empty space — outside every card, not just this one — to
+  // Tap genuinely empty space — outside every card, not just this one — to
   // close it, and Escape too.
   //
-  // `pointerdown` rather than `click`: a click fires only after mouseup, so a
-  // press that starts outside and drags across the card would still close it.
-  // Listening on the capture phase catches it before the target card's own
-  // click handler runs.
+  // A *tap*, matched across pointerdown/pointerup, not a bare pointerdown.
+  // The feed scrolls at the window level, so the gaps between cards and the
+  // page margins are also where a scroll gesture most often starts: on
+  // pointerdown alone, one flick that happened to land 10px below a card
+  // collapsed EVERY open card at once, and the thread jumped up by their
+  // combined height mid-scroll. Requiring the pointer to come back up near
+  // where it went down, quickly, separates "I tapped the background" from
+  // "I started scrolling" without giving up the gesture on either mouse or
+  // touch. Both ends are checked so a press that starts outside and drags
+  // across the card still doesn't close it, which is what the old capture-
+  // phase pointerdown listener was there to guarantee.
   //
-  // A click on a *different* card does NOT close this one — cards can be
-  // expanded independently and simultaneously. Only a click that lands
-  // outside every `.card` (the gaps, the masthead, the margins) collapses
-  // this one.
+  // A tap on a *different* card does NOT close this one — cards can be
+  // expanded independently and simultaneously. Only one that lands outside
+  // every `.card` (the gaps, the masthead, the margins) collapses this one.
   useEffect(() => {
     if (!expanded || isHero) return;
 
-    const onPointerDown = (event: PointerEvent) => {
+    let start: { x: number; y: number; at: number; target: HTMLElement } | null = null;
+
+    const outsideEveryCard = (target: HTMLElement): boolean => {
       const el = article.current;
-      const target = event.target as HTMLElement;
-      if (el !== null && !el.contains(target) && target.closest(".card") === null) {
-        collapse();
-      }
+      return el !== null && !el.contains(target) && target.closest(".card") === null;
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      start = {
+        x: event.clientX,
+        y: event.clientY,
+        at: event.timeStamp,
+        target: event.target as HTMLElement,
+      };
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      const began = start;
+      start = null;
+      if (began === null) return;
+      if (Math.hypot(event.clientX - began.x, event.clientY - began.y) > TAP_SLOP_PX) return;
+      if (event.timeStamp - began.at > TAP_MAX_MS) return;
+      if (!outsideEveryCard(began.target)) return;
+      if (!outsideEveryCard(event.target as HTMLElement)) return;
+      collapse();
+    };
+
+    // A gesture the browser took over (a scroll, a pull-to-refresh) fires
+    // pointercancel instead of pointerup — drop the candidate tap outright
+    // rather than leaving it armed for the next unrelated pointerup.
+    const onPointerCancel = () => {
+      start = null;
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -379,10 +420,14 @@ export function Card({
     };
 
     document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("pointerup", onPointerUp, true);
+    document.addEventListener("pointercancel", onPointerCancel, true);
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("pointerup", onPointerUp, true);
+      document.removeEventListener("pointercancel", onPointerCancel, true);
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [expanded, isHero, collapse]);
@@ -529,11 +574,17 @@ export function Card({
 
   const archetype = getPrimaryArchetype(card.archetype);
   // ASCII scene (ADR-0021, or a model-drawn one on the free-form generation
-  // testing branch — see lib/api.ts). Renders right after the title, in the
-  // usual teaser/summary's slot, standing in for it entirely — the scene IS
-  // the preview while collapsed, not an addition to it.
-  const asciiArt = card.visual_id !== null ? card.visual_slots?.art : undefined;
-  const hasAsciiArt = asciiArt !== undefined && asciiArt.trim() !== "";
+  // testing branch — see lib/api.ts).
+  const rawArt = card.visual_id !== null ? card.visual_slots?.art : undefined;
+  const asciiArt = rawArt !== undefined && rawArt.trim() !== "" ? stripFenceWrapper(rawArt) : null;
+  // The card's ONE lead visual. Rendered right after the title at full
+  // height — collapsed and expanded alike — and suppressed from the body
+  // render via `skipFenceKey`, so a diagram/code/art card never shows the
+  // same block twice (see `resolveHero`).
+  const hero = useMemo(
+    () => resolveHero(archetype, card.body, asciiArt),
+    [archetype, card.body, asciiArt],
+  );
 
   return (
     <motion.div
@@ -585,20 +636,21 @@ export function Card({
 
           <h2 className="card-title">{inline(normalizeText(card.title))}</h2>
 
-          {/* An ascii-art card shows its scene right where the summary/teaser
-              normally goes — the FIRST thing after the title, ahead of
-              everything else, standing in for the usual collapsed hook
-              entirely (never both). Kept visible through expansion too,
-              unlike the code/diagram teaser above, since the art is a
-              standalone illustration, not a preview of something body
-              repeats. */}
-          {hasAsciiArt ? (
-            <AsciiArt art={asciiArt!} alt={card.visual_slots?.alt} />
-          ) : archetype === "default" ? (
+          {/* The lead visual sits where the summary/teaser normally goes — the
+              FIRST thing after the title, standing in for the collapsed hook
+              entirely. It is the SAME block the body would otherwise render,
+              at its real height, not a one-line stand-in for it: `Markdown`
+              below is told to skip that fence, so the card shows it exactly
+              once whether collapsed or expanded. A card carrying more than
+              one block still leads with only its primary type; the rest stay
+              in the body where they were. */}
+          {hero !== null ? (
+            <HeroVisual hero={hero} alt={card.visual_slots?.alt} />
+          ) : archetype === "comparison" ? (
+            !expanded ? <ComparisonTeaser /> : null
+          ) : (
             <p className="card-summary">{inline(normalizeText(card.summary))}</p>
-          ) : !expanded ? (
-            <ArchetypeTeaser archetype={archetype} body={card.body} />
-          ) : null}
+          )}
 
           {/* `inert` while collapsed. Clipping to zero height hides the body
               visually but leaves it in the tab order, so keyboard users would
@@ -606,7 +658,7 @@ export function Card({
           <div className="card-reveal" data-open={expanded} inert={!expanded}>
             <div className="card-reveal-body">
               <div className="card-body">
-                <Markdown source={card.body} />
+                <Markdown source={card.body} skipFenceKey={hero?.skipKey ?? null} />
               </div>
             </div>
           </div>
@@ -846,124 +898,160 @@ function normalizeText(source: string): string {
 }
 
 /** Presentation-only mirror of content/archetype.py's diagram heuristic — it
- *  exists here purely to pick which fenced block to preview in the collapsed
- *  teaser. `card.archetype` (server-derived) remains the single source of
- *  truth for WHICH archetype a card is; this never overrides it. */
+ *  exists here purely to pick which fenced block leads the card.
+ *  `card.archetype` (server-derived) remains the single source of truth for
+ *  WHICH archetype a card is; this never overrides it. */
 const DIAGRAM_LANG_TAGS = new Set(["diagram", "text", "ascii", "table", ""]);
 const DIAGRAM_CHARS_RE = /[─│┌└┐┘├┤┬┴┼→▶►]|-->|==>|──>|\+[-+]+\+|\|.*\|/;
 
+function isMermaidFence(lang: string): boolean {
+  return lang.toLowerCase() === "mermaid";
+}
+
 function isDiagramFence(lang: string, content: string): boolean {
   const normalized = lang.toLowerCase();
-  if (normalized === "diagram") return true;
+  if (normalized === "diagram" || normalized === "mermaid") return true;
   if (!DIAGRAM_LANG_TAGS.has(normalized)) return false;
   return DIAGRAM_CHARS_RE.test(content);
 }
 
 const FENCE_RE = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g;
 
-function firstFenceOfKind(body: string, kind: "code" | "diagram"): { lang: string; content: string } | null {
-  const normalized = normalizeText(body);
-  for (const match of normalized.matchAll(FENCE_RE)) {
-    const [, lang, content] = match;
-    if ((isDiagramFence(lang, content) ? "diagram" : "code") === kind) {
-      return { lang, content: content.replace(/\n$/, "") };
-    }
+interface Fence {
+  lang: string;
+  content: string;
+  kind: "code" | "diagram";
+}
+
+function firstFenceOfKind(body: string, kind: "code" | "diagram"): Fence | null {
+  for (const fence of fences(body)) {
+    if (fence.kind === kind) return fence;
   }
   return null;
 }
 
-function firstNonEmptyLine(text: string): string {
-  return text.split("\n").find((line) => line.trim().length > 0)?.trim() ?? "";
+function firstFence(body: string): Fence | null {
+  for (const fence of fences(body)) return fence;
+  return null;
 }
 
-/** The teaser renders as plain text, not through `inline()` — so this both
- *  picks a SHORT label (the bolded claim right after the marker, if the body
- *  follows the `❌ **claim** — explanation` shape; a truncated first line
- *  otherwise) and strips markdown syntax, rather than showing raw `**`/full
- *  paragraphs verbatim. */
-function extractComparisonTag(marker: string, body: string): string | null {
-  const normalized = normalizeText(body);
-  const boldClaim = new RegExp(`${marker}\\s*\\*\\*([^*]+)\\*\\*`).exec(normalized);
-  if (boldClaim !== null) return boldClaim[1].trim();
-
-  const line = new RegExp(`${marker}\\s*([^\\n]+)`).exec(normalized);
-  if (line === null) return null;
-  const plain = line[1].replace(/\*\*/g, "").trim();
-  return plain.length > 60 ? `${plain.slice(0, 57).trimEnd()}…` : plain;
+function* fences(body: string): Generator<Fence> {
+  for (const match of normalizeText(body).matchAll(FENCE_RE)) {
+    const [, lang, content] = match;
+    yield {
+      lang,
+      content: content.replace(/\n$/, ""),
+      kind: isDiagramFence(lang, content) ? "diagram" : "code",
+    };
+  }
 }
 
-function comparisonTags(body: string): { bad: string; good: string } | null {
-  const bad = extractComparisonTag("❌", body);
-  const good = extractComparisonTag("✅", body);
-  if (bad === null || good === null) return null;
-  return { bad, good };
+/** Identity of a fenced block, independent of the trailing whitespace and
+ *  fence wrapper that differ between `visual_slots.art` and the same scene
+ *  as it appears inside `body`. Two blocks with the same key are the same
+ *  block, so only one of them gets rendered — see `resolveHero`. */
+function fenceKey(text: string): string {
+  return text
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trim();
 }
 
-/** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art —
- *  see `Card.tsx`'s `hasAsciiArt`). */
+/** Same question, asked loosely. `visual_slots.art` and the body's copy of
+ *  the same scene routinely disagree about indentation and blank lines —
+ *  they came out of two different generation slots. Two blocks made of the
+ *  same non-whitespace characters in the same order are the same block, and
+ *  a card must never show one twice. */
+function looseFenceKey(text: string): string {
+  return text.replace(/\s+/g, "");
+}
+
+/** `visual_slots.art` is meant to hold raw ASCII, but the generator
+ *  intermittently leaves the ```lang fence it drew the scene inside. Left
+ *  alone those backticks render as literal text at the top of the card — the
+ *  broken "Shared Storage: The Pod Volume" scene. Stripped here rather than
+ *  in the prompt, per CLAUDE.md's "trusted for taste, never for constraints". */
+function stripFenceWrapper(art: string): string {
+  const text = normalizeText(art).replace(/^\n+/, "").replace(/\n+$/, "");
+  const fenced = /^```[a-zA-Z0-9_-]*\n([\s\S]*?)\n?```$/.exec(text.trim());
+  return fenced !== null ? fenced[1] : text;
+}
+
+/** The one visual block a card leads with. `skipKey` is what `Markdown`
+ *  matches against so the body drops its own copy of the very same block. */
+type HeroVisualBlock =
+  | { kind: "ascii"; content: string; skipKey: string }
+  | { kind: "diagram"; lang: string; content: string; skipKey: string }
+  | { kind: "code"; lang: string; content: string; skipKey: string };
+
+/** Picks the single block that leads the card, and nothing else — a card
+ *  carrying both a code fence and a diagram leads with its PRIMARY type only
+ *  (`getPrimaryArchetype`'s order), leaving the secondary block in the body
+ *  where it already was.
+ *
+ *  A fenced block in `body` OUTRANKS `visual_slots.art`, and that ordering is
+ *  the fix for a specific, real symptom rather than a preference. The two are
+ *  filled by different generation slots and the model routinely draws the
+ *  same picture into both — once in full in `body`, once abbreviated into
+ *  `art` ("[ EPISTEMOLOGY ] (What do we know?)" becoming "[ EPIST. ] (What
+ *  know?)"). Nothing here ever truncated anything: leading with `art` simply
+ *  led with the model's own shorter redraw, which read as the app cropping
+ *  the preview. The body's copy is the complete one, so it is the one shown,
+ *  and `art` leads only when the body has no block of its own. */
+function resolveHero(
+  archetype: ArchetypeTag | "combo" | "default",
+  body: string,
+  art: string | null,
+): HeroVisualBlock | null {
+  const kind =
+    archetype === "combo" || archetype === "code"
+      ? "code"
+      : archetype === "diagram"
+        ? "diagram"
+        : null;
+
+  // With an `art` slot present, ANY fence in the body is the fuller twin of
+  // it worth preferring — the archetype tags describe the card's teaching
+  // shape, and a scene drawn into both slots does not always earn the tag
+  // that would find it by kind alone.
+  const fence =
+    (kind !== null ? firstFenceOfKind(body, kind) : null) ??
+    (art !== null ? firstFence(body) : null);
+
+  if (fence !== null) {
+    const skipKey = fenceKey(fence.content);
+    return fence.kind === "diagram"
+      ? { kind: "diagram", lang: fence.lang, content: fence.content, skipKey }
+      : { kind: "code", lang: fence.lang, content: fence.content, skipKey };
+  }
+
+  if (art !== null) return { kind: "ascii", content: art, skipKey: fenceKey(art) };
+  return null;
+}
+
+function HeroVisual({ hero, alt }: { hero: HeroVisualBlock; alt: string | undefined }) {
+  if (hero.kind === "ascii") return <AsciiArt art={hero.content} alt={alt} />;
+  if (hero.kind === "diagram") return <DiagramBlock lang={hero.lang} content={hero.content} />;
+  return <CodeBlock lang={hero.lang} content={hero.content} />;
+}
+
+/** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art). */
 function AsciiArt({ art, alt }: { art: string; alt: string | undefined }) {
   return (
     <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
-      <pre>{normalizeText(art)}</pre>
+      <pre>{art}</pre>
     </div>
   );
 }
 
-/** Renders a diagram card's fenced diagram in full, in the same slot and at
- *  the same visual weight as `AsciiArt` — collapsed, this box IS the
- *  preview, not a truncated one-line stand-in for it. Only shown while
- *  collapsed; `card.body`'s own `DiagramBlock` takes over once expanded, so
- *  the diagram isn't rendered twice. */
-function DiagramArt({ content }: { content: string }) {
-  return (
-    <div className="card-ascii card-diagram-art">
-      <pre>{content}</pre>
-    </div>
-  );
-}
-
-function ArchetypeTeaser({ archetype, body }: { archetype: ArchetypeTag | "combo"; body: string }) {
-  if (archetype === "combo") {
-    const code = firstFenceOfKind(body, "code");
-    const diagram = firstFenceOfKind(body, "diagram");
-    return (
-      <div className="card-teaser card-teaser-combo">
-        <div className="card-teaser-code">
-          <span className="card-teaser-badge mono">{(code?.lang || "code").toUpperCase()}</span>
-          <code className="card-teaser-line mono">
-            {code !== null ? firstNonEmptyLine(code.content) : ""}
-          </code>
-        </div>
-        <div className="card-teaser-combo-divider" />
-        <p className="card-teaser-diagram mono">
-          {diagram !== null ? firstNonEmptyLine(diagram.content) : ""}
-        </p>
-      </div>
-    );
-  }
-
-  if (archetype === "code") {
-    const fence = firstFenceOfKind(body, "code");
-    return (
-      <div className="card-teaser card-teaser-code">
-        <span className="card-teaser-badge mono">{(fence?.lang || "code").toUpperCase()}</span>
-        <code className="card-teaser-line mono">
-          {fence !== null ? firstNonEmptyLine(fence.content) : ""}
-        </code>
-      </div>
-    );
-  }
-
-  if (archetype === "diagram") {
-    const fence = firstFenceOfKind(body, "diagram");
-    if (fence === null) return null;
-    return <DiagramArt content={fence.content} />;
-  }
-
-  // Minimal by design (ADR-0017 follow-up): the actual claim text is raw,
-  // occasionally-unparsed markdown from the generator, so the collapsed
-  // teaser shows only that a comparison exists, not its content. The full
-  // claim renders properly via ProseBlocks once expanded.
+/** Minimal by design (ADR-0017 follow-up): the actual claim text is raw,
+ *  occasionally-unparsed markdown from the generator, so the collapsed
+ *  teaser shows only that a comparison exists, not its content. The full
+ *  claim renders properly via ProseBlocks once expanded — a comparison's
+ *  content IS the body, so unlike a diagram or code fence there is no
+ *  standalone block to lift to the top without duplicating the whole card. */
+function ComparisonTeaser() {
   return (
     <div className="card-teaser card-teaser-comparison-mini">
       <span className="comparison-badge">
@@ -1021,16 +1109,31 @@ function InlineMath({ math }: { math: string }) {
  * Markdown renderer covering headings, paragraphs, ordered/unordered lists,
  * tables, blockquotes, bold, italic, inline code, links, LaTeX math formulas,
  * fenced code/diagram blocks, and ❌/✅ comparison pairs (ADR-0017).
+ *
+ * `skipFenceKey` drops the FIRST fence whose content matches it — the card's
+ * lead visual, already rendered above the body by `HeroVisual`. Only the
+ * first: a body that genuinely repeats the same block twice keeps its second
+ * copy, since that is the author's content, not this component's duplication.
  */
-function Markdown({ source }: { source: string }) {
-  const tokens = tokenize(source);
+function Markdown({ source, skipFenceKey }: { source: string; skipFenceKey?: string | null }) {
+  const all = tokenize(source);
+  const tokens: Token[] = [];
+  let skipped = skipFenceKey === null || skipFenceKey === undefined;
+  const loose = skipped ? "" : looseFenceKey(skipFenceKey!);
+  for (const token of all) {
+    if (!skipped && token.type === "fence" && looseFenceKey(token.content) === loose) {
+      skipped = true;
+      continue;
+    }
+    tokens.push(token);
+  }
 
   return (
     <>
       {tokens.map((token, index) =>
         token.type === "fence" ? (
           token.kind === "diagram" ? (
-            <DiagramBlock key={index} content={token.content} />
+            <DiagramBlock key={index} lang={token.lang} content={token.content} />
           ) : (
             <CodeBlock key={index} lang={token.lang} content={token.content} />
           )
@@ -1521,8 +1624,38 @@ function CodeBlock({ lang, content }: { lang: string; content: string }) {
   );
 }
 
-function DiagramBlock({ content }: { content: string }) {
+function DiagramBlock({ lang, content }: { lang: string; content: string }) {
   const [expanded, setExpanded] = useState(false);
+
+  // A mermaid fence is a diagram whose layout the CLIENT owns, so it skips
+  // the monospace box entirely rather than rendering its source as art.
+  if (isMermaidFence(lang)) {
+    return (
+      <div className="diagram-block diagram-block-mermaid">
+        <div className="diagram-block-head">
+          <button
+            type="button"
+            className="block-expand"
+            aria-label="Expand diagram"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(true);
+            }}
+          >
+            <ExpandIcon />
+          </button>
+        </div>
+        <MermaidBlock source={content} />
+        {expanded ? (
+          <BlockModal title="Diagram" onClose={() => setExpanded(false)}>
+            <div className="diagram-block diagram-block-mermaid">
+              <MermaidBlock source={content} />
+            </div>
+          </BlockModal>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <div className="diagram-block">

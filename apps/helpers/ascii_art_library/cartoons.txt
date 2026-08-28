@@ -1,0 +1,2708 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: CARTOONS
+# Total artworks in category fitting <=40 cols: 127
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 59d98bfcd6eba87a | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 31x6 ===
+```
+  _,---._  ,-- Beijing Mushroom
+,' _____ `.
+'-( \ / )-'
+   \(_)/
+    ) (
+    """
+```
+
+=== ID: 427c22bf3c9a77e9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 29x6 ===
+```
+  _,---._  ,-- Miner Mushroom
+,' ,(O). `.
+'-(-o-o-)-'
+   \(_)/
+    ) (
+    """
+```
+
+=== ID: 292ec438f885f77d | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 35x6 ===
+```
+  _,---._
+,' _____/  ,--  French hat Mushroom
+'-( . . )
+   \(_)/
+    )-(
+    """
+```
+
+=== ID: 4c561460fa871748 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 34x6 ===
+```
+ _,---._
+(______ `.  ,-- Christmas Mushroom
+ ( . . )-'*
+  \(_)/
+   ) (
+   """
+```
+
+=== ID: bbc83f76755e3a25 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 30x6 ===
+```
+ _,---._
+(______ `.  ,-- Santa Mushroom
+ ( . . )-'*
+  \(_)/
+  ((())
+   """
+```
+
+=== ID: 1e6594a5fdb995a5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 29x6 ===
+```
+_,---._
+\_____/  ,--  Sailor Mushroom
+( . . )
+ \(_)/
+  )-(
+  """
+```
+
+=== ID: 8970632ffa7f6b92 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 29x6 ===
+```
+  _,---._  ,-- Metal Mushroom
+,' _____ `.
+'-(|||||)-'
+  |\(_)/|
+  ||) (||
+    """
+```
+
+=== ID: 4c5c32dfcf8ddfae | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 33x6 ===
+```
+  _,---._
+,' _____ `. ,--  Shocked Mushroom
+'-( O O )-'
+   \(_)/
+    )O(
+    """
+```
+
+=== ID: ce503683947524cf | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 33x6 ===
+```
+  _,---._
+,' _____ `. ,--  Yawning Mushroom
+'-( - - )-'
+   \(_)/
+    )0(
+    """
+```
+
+=== ID: 6ab28dd877e388d1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 32x6 ===
+```
+  _,---._
+,' _____ `. ,--  Greedy Mushroom
+'-( $ $ )-'
+   \(_)/
+    )v(
+    """
+```
+
+=== ID: c1d74735f266cdb0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 29x6 ===
+```
+  _,---._
+,' _____ `. ,--  Sad Mushroom
+'-( / \ )-'
+   \(_)/
+    )~(
+    """
+```
+
+=== ID: 51089bc119d66fdd | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 31x6 ===
+```
+  _,---._
+,' _____ `. ,--  Drunk Mushroom
+'-( % % )-'
+   \(_)/
+    )o(
+    """
+```
+
+=== ID: a81990ce25ac7ee1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 32x6 ===
+```
+  _,---._
+,' _____ `. ,--  Amazed Mushroom
+'-( ! ! )-'
+   \(_)/
+    )0(
+    """
+```
+
+=== ID: 61995a63dc451091 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 30x6 ===
+```
+  _,---._
+,' _____ `. ,--  Dead Mushroom
+'-( X X )-'
+   \(_)/
+    )~(
+    """
+```
+
+=== ID: 54c8d6d89d226960 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 34x6 ===
+```
+  _,---._
+,' _____ `. ,--  Sleeping Mushroom
+'-( - - )-'
+   \(_)/
+    ) (
+    """
+```
+
+=== ID: 0744d2db5a0c880a | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 33x6 ===
+```
+  _,---._
+,' _____ `. ,--  Puzzled Mushroom
+'-( ? ? )-'
+   \(_)/
+    )o(
+    """
+```
+
+=== ID: 466855143715e54c | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 33x7 ===
+```
+      _
+   ,'" "`.  ,--  Trooper Mushroom
+ _/_______\_
+'-.( . . ).-'
+    \(_)/
+     )-(
+     """
+```
+
+=== ID: c469c15d38c4a5c6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 37x8 ===
+```
+ ,---.    ,-- Farroe Mufkatar Mushrom
+|     |
+|     |
+\,(O)./
+(-o-o-)
+ \(_)/
+  ) (
+  """
+```
+
+=== ID: daecba4853ea547a | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 32x10 ===
+```
+     _
+    / \
+   / * \   ,-- Merlin Mushroom
+  / * * \      Mushy Magic 'r us
+ / * * * \
+/ *__*__* \
+`-(-o^o-)-'
+   \(_)/
+    ) (
+    """
+```
+
+=== ID: 386fffc9a15d41bc | TITLE: Donald Duck | ARTIST: Kristian Kirsfeldt | CATEGORY: cartoons | SUBCATEGORY: other | SIZE: 24x10 ===
+```
+   .------._
+  /         \.-.
+  \_-_:===='; _.)
+   .'/''..''\', \\
+  | '   ||   '.|
+  | |   ||   | |
+  | | 0 || 0 | |
+ .'_ __.--.__ _'.
+(__. _.----._ .__)
+   `--======--'      dlK
+```
+
+=== ID: 3194145b4276197c | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: cartoons | SUBCATEGORY: other | SIZE: 12x14 ===
+```
+    ,-`-.
+  ,' .___;
+ /_ ,'@@,-.
+ (C`____ -'
+  \ `--' ;
+   ``:`:'
+  .-`  '--.
+ ( /7   \7 )
+  \\i--._|/
+ (,-,)   |
+ ,--:_.  /
+(  ..__,/
+ `-' ;  ``.
+ dwb `---`
+```
+
+=== ID: 494b82738ac73383 | TITLE: Goofy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: other | SIZE: 38x14 ===
+```
+                  .
+                \ | /
+                _\|/_
+              .' ' ' '.        ___
+            _.|.--.--.|.___.--'___`-.
+          .'.'||  |  ||`----'"`   ``'`
+        .'.'  ||()|()||
+.___..-'.'    /       \
+`----'"`     /   .-.   \
+            (.'.(___).'.)
+             `.__.-.__.'
+        jgs   |_|   |_|
+               `.`-'.'
+                 `"`
+```
+
+=== ID: c45e32ac87b45393 | TITLE: Babar | ARTIST: Shanaka Dias | CATEGORY: cartoons | SUBCATEGORY: other | SIZE: 29x18 ===
+```
+           _  .   .   .
+         .' '; '-' '-'|-.
+        (     '------.'  )
+         ;            \ /
+          :     '   ' |/
+          '._._       \    .;
+         .-'   ;--.    '--' /
+        /      \-'---.___.'
+       |     / 7 \(>o<) /\
+       |     | \ |  . \   \
+       |=====|   |  .  \ |-)
+        |-'-'   ./_.-._.\|"
+        '-.----'        |
+          |       |     |
+          |     | |   | |
+          |_____|_|___|_|
+snd       (-------',----'.
+           '-'-----'-----'
+```
+
+=== ID: 152e65989b484fc1 | TITLE: Goofy | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: other | SIZE: 32x37 ===
+```
+                 /\
+               /    \    /""\
+              !       \/      \
+               \  /            )
+                /            /
+              /          / ""
+            /||||||||||/
+         l"""""""""\|/
+         l          \
+         l /\   /\   )
+         /mmm\/mmmm\/"
+       /mmm/\mmm/\mmm\
+      lmm/   \/    \mml
+      lml           lml
+      lml  XX  XX   lml
+      lml  XX  XX   lml
+      lml  XX  XX   lml
+     /lml  XX  XX   lml\
+    lMlml /"""""""\ lmlMl
+    lMlm/  """"""   \mlMl
+    lM//   (MMMM)     \\l
+    /     (MMMMMM)       \
+  /        (MMMM)          \
+(                           )
+(            (@)            )
+  \         (@@@)          /
+    \    \ \      / /    /
+    lMMMMMM\ \../ /MMMMMMl
+    lMMMMMMl \../ lMMMMMMl
+    lMMMMMMl      lMMMMMMl
+    lMMMMMMl      lMMMMMMl
+    lMMMMMMl      lMMMMMMl
+    lMMMMMMl      lMMMMMMl
+    lMMMMMMl      lMMMMMMl
+     \MMMMMl,    ,lMMMMMM/
+       \MMMM/     \MMMM/
+         \/         \/
+```
+
+=== ID: bd35b685f237aa77 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: flintstones | SIZE: 23x14 ===
+```
+  \/________________
+ /     _____________)
+/     /     /   \ |
+\/\/\/     (O) (O)|
+  |           ------,
+  |  _       ______/
+  | (_      /   \  \
+  |        /  ___\_ \
+  |        \      / /
+__|_________\______/
+\______________\./__\
+ /     .       | \  |
+ \    /_\   .  |  \ |\
+ |`\       /_\ |   \| \
+```
+
+=== ID: 693614176a071859 | TITLE: Untitled | ARTIST: Amykate | CATEGORY: cartoons | SUBCATEGORY: flintstones | SIZE: 39x19 ===
+```
+               _____________________
+              /                    /\()
+             /                    /  `.
+            /                    /  .,'
+           /____________________/_.-`
+           (_____________________()
+           || ||
+           || || _
+           ||/|/  /|_____      _
+           || /  / /     /|  .//|
+           ||/  / /     / |__// /-.
+         ,'|/_ / /     / /  // /    ".
+       ,'  || | /     / /  // /       "
+     ,-__. || |/     / /  ||/__-.     "
+   ," |__`.||_|_____/_/____.'__| "   '
+   "   O_) ________________ (_O   " '
+   "   |_.' "            " `._|   "
+akg`.      ,'            `.      ,'
+     `----'                `---
+```
+
+=== ID: 0974b18a9cf14d76 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: flintstones | SIZE: 37x32 ===
+```
+          ________
+        _/~~~~~~~~\_    _
+       /~~~/~~~~~~~~~\_//____
+      /~~/~~~~~~~~~~~~~~~~~~~\
+     /~/~~~~~~_________~~~~~~~\
+    _/~~~~___/         \~~~~~~|
+   /~~~~~/             |~~~/\~|
+   |~~~ /    _    _    |~~/. \|
+   |___/    / \  / \   |~|  !
+     !      (O)  (O)   \~/  !
+     !                      !
+     !                      !
+    /      __      __        \
+   !()   ./          \     ()!
+    \   . \          / .     /
+    !  .   \        /   .   !
+    ! .     \______/    .   !
+    ! .     . ^  ^ .  _  .  !
+    / .    .         /o) .  !
+   ! .              //   .  !_
+  _! .   (=========//    . /_ \
+ /\\ .     \\I#I#I//    __//o\|\__
+/||\\.      \\I#I//    /__/oo||   \_
+ ||o\\_       ===     //ooooo||     \
+ ||ooo\\_            //oooooo||     I
+ ||ooooo\\_         //ooooooo||     I
+ ||ooooooo\\_      //oooooooo||     I
+ ||ooooooooo\\_   //ooooooooo||     I
+ ||ooooooooooo\\ //oooooooooo||     I
+ ||ooooooooooo|| ||oooooooooo||     I
+ ||ooooooooooo||_||oooooooooo||     I
+ ||oooooooooooo\_//ooooMEPHoo||     I
+```
+
+=== ID: c3dc291faf9c4a0b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: betty-boop | SIZE: 37x10 ===
+```
+           _.---.(       ..--._)
+       (_.'       `''-.'`      `'.
+        /            /            \_)
+     (_|    _,.-'""'-,-'""'-.,_   |
+        \  /.--'           '--.\  /_)
+      ,__\ ) (_(_(       )_)_) ) /__,
+       \  (_, (  o)      (  o) /    /
+       `--.-`  '-'   c    '-'  `-'-`
+         (O\                   (O)
+jgs         '-.....__w__.....-'
+```
+
+=== ID: 238acfbdb04cc9fe | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: betty-boop | SIZE: 37x10 ===
+```
+         _(,__           __),
+     (_,d888888888b,d888888888b
+      d888888888888/888888888888b_)
+   (_8888888P'""'`Y8Y`'""'"Y88888b
+     Y8888P.-'     `      '-.Y8888b_)
+    ,_Y88P (_(_(        )_)_) d88Y_,
+     Y88b,  (o  )      (o  ) d8888P
+     `Y888   '-'        '-'  `88Y`
+     ,d/O\         c         /O\b,
+jgs    \_/'.,______w______,.'\_/
+```
+
+=== ID: 57b4cb593f312148 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: betty-boop | SIZE: 34x31 ===
+```
+      _(,__           __),
+  (_,d888888888b,d888888888b
+   d888888888888/888888888888b_)
+(_8888888P'""'`Y8Y`'""'"Y88888b
+  Y8888P.-'     `      '-.Y8888b_)
+ ,_Y88P (_(_(        )_)_) d88Y_,
+  Y88b,  (o  )      (o  ) d8888P
+  `Y888   '-'        '-'  `88Y`
+  ,d/O\         c         /O\b,
+    \_/'.,______w______,.'\_/
+       .-`             `-.
+      /   , d88b  d88b_   \
+     /   / 88888bd88888`\  \
+    /   / \ Y88888888Y   \  \
+    \  \   \ 88888888    /  /
+     `\ `.  \d8888888b, /\\/
+       `.//.d8888888888b; |
+         |/d888888888888b/
+         d8888888888888888b
+      ,_d88p""q88888p""q888b,
+      `""'`\    "`|    /`'""`
+            `.    |===/
+              >   |   |
+              /   |   |
+             |    |   |
+             |    Y  /
+             \   /  /
+       jgs    | /| /
+             / / / |
+            /=/  |=/
+           `"`   `"`
+```
+
+=== ID: 9198a08bfec3f368 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: betty-boop | SIZE: 32x31 ===
+```
+      _.---.(       ..--._)
+  (_.'       `''-.'`      `'.
+   /            /            \_)
+(_|    _,.-'""'-,-'""'-.,_   |
+   \  /.--'           '--.\  /_)
+ ,__\ ) (_(_(       )_)_) ) /__,
+  \  (_, (  o)      (  o) /    /
+  `--.-`  '-'   c    '-'  `-'-`
+    (O\                   (O)
+       '-.....__w__.....-'
+       .-'             '-.
+      /   , .--.  .--._   \
+     /   / (    \/    )`\  \
+    /   / \ \        /   \  \
+    \  \   \ |      (    /  /
+     `\ `.  \/       \  /\\/
+       `.//.'         '-; |
+         |/             \/
+         /               \
+      ,_/ _,--,_  __,--,_ \_,
+      `--' \    ``|    / '--'
+            `.    |===/
+              >   |   |
+              /   |   |
+             |    |   |
+             |    Y  /
+             \   /  /
+              | /| /
+      jgs    / / / |
+            /=/  |=/
+            `"`  `"`
+```
+
+=== ID: 5e66784752e1fc8a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: casper | SIZE: 16x7 ===
+```
+      .-""""-.
+     / -   -  \
+    |  .-. .- |
+    |  \o| |o (
+    \     ^    \
+     '.  )--'  /
+jgs    '-...-'`
+```
+
+=== ID: 29f628f35454686a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: casper | SIZE: 19x16 ===
+```
+     .-""""-.
+    / -   -  \
+   |  .-. .- |
+   |  \o| |o (
+   \     ^    \
+   |'.  )--'  /|
+  / / '-. .-'`\ \
+ / /'---` `---'\ \
+ '.__.       .__.'
+     `|     |`
+      |     \
+      \      '--.
+       '.        `\
+         `'---.   |
+jgs         ,__) /
+             `..'
+```
+
+=== ID: da62b80982acd905 | TITLE: Casper, the Friendly Ghost | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: casper | SIZE: 18x17 ===
+```
+    .-----.
+   .' -   - '.
+  /  .-. .-.  \
+  |  | | | |  |
+   \ \o/ \o/ /
+  _/    ^    \_
+ | \  '---'  / |
+ / /`--. .--`\ \
+/ /'---` `---'\ \
+'.__.       .__.'
+    `|     |`
+     |     \
+     \      '--.
+      '.        `\
+        `'---.   |
+   jgs     ,__) /
+            `..'
+```
+
+=== ID: f9ea7f5f79c69549 | TITLE: Tweety Bird | ARTIST: Shanaka Dias | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 10x7 ===
+```
+     \/
+   /^ ^\
+   \0 0/
+   ('V')
+    \ /
+snd/(_)\
+ ==/\=/\==
+```
+
+=== ID: f2df76b827adff5b | TITLE: Marvin the Martian | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 17x9 ===
+```
+       ,,,,
+        ))))
+       .-"";___
+      / _."`   `;
+     | (_.--""-./
+     \  | (.)(.)\
+jgs   ) \      //
+     [   `]'-'\`]
+      `""`     `
+```
+
+=== ID: 69500915e3b6080c | TITLE: Tweetie Bird | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 14x9 ===
+```
+     .-"-.
+    /_ _  \
+    \@ @  /
+    (_> _)
+      `)(_
+      /((_`)_,
+      \__(/-"
+     __|||__
+jgs ((__|__))
+```
+
+=== ID: 8a42e16bbfdc388a | TITLE: Tweetie Bird | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 14x9 ===
+```
+     .-"-,
+    /_ _  \
+    \@ @  /
+    (_= _)
+      `)(_
+      /((_`)_,
+      \__(/-"
+     __|||__
+jgs ((__|__))
+```
+
+=== ID: 97ab1fd59e47fa42 | TITLE: Tweetie Bird | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 14x9 ===
+```
+        .-"-.
+       /  - -\
+       \  @ @/
+        (_ <_)
+        _)(`
+    ,_(`_))\
+     "-\)__/
+      __|||__
+jgs  ((__|__))
+```
+
+=== ID: 9decd9ec6793e4a5 | TITLE: Sylvester the Cat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 29x12 ===
+```
+               / ,
+          /\  \|/  /\
+          |\\_;=._//|
+           \."   "./
+           //^\ /^\\
+    .'``",/ |0| |0| \,"``'.
+   /   ,  `'\.---./'`  ,   \
+  /`  /`\,."(     )".,/`\  `\
+  /`     ( '.'-.-'.' )     `\
+  /"`     "._  :  _."     `"\
+   `/.'`"=.,_``=``_,.="`'.\`
+jgs          )   (
+```
+
+=== ID: ba320b832bda9321 | TITLE: Marvin the Martian | ARTIST: Shanaka Dias | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 31x13 ===
+```
+       ___
+      /]_/
+     |\/|.--/'-.
+     \|/:o /  /\    ._,
+        \_/_.'0/    _|_
+         \____]] (>[___]=]]]===
+         /    \___/P{]
+      __//    /----\/
+     (_[-'\__/_
+         / | | \
+        '=='='=='
+       ____||||___
+snd   (_""_/ \_""_)
+```
+
+=== ID: 047e3d2c275ba4e0 | TITLE: Yosemite Sam | ARTIST: Donovan Baker | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 19x13 ===
+```
+        ___
+    .-``   ``-.
+  .'           '.
+ /               \
+|      __ __      |
+'      /\_/\      '
+ \  ___\O_O/___  /
+  \/    ___    \/
+  (    (___)    )
+   \   /\_/\   /
+    \  |._.|  /
+     \ |   | /
+   dwb\/   \/
+```
+
+=== ID: ca91b93263a5923f | TITLE: Marvin the Martian | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 32x17 ===
+```
+           ||||||||||||,,
+           |WWWWWWWWW|W|||,
+           |_________|~WWW||,
+            ~-_      ~_  ~WW||,
+            __-~---__/ ~_  ~WW|,
+        _-~~         ~~-_~_  ~W
+  _--~~~~~~~~~~___       ~-~_/
+ -                ~~~--_   ~_
+|                       ~_   |
+|   ____-------___        -_  |
+|-~~              ~~--_     - |
+ ~| ~--___________     |-_   ~_
+   | \`~'/  \`~'_-~~  |  |~-_-
+  _-~_~~~    ~~~   _-~  |  |
+ ---.--__         ---.-~  |
+ | |    -~~-----~~| |    -
+ |_|__-~          |_|__-~
+```
+
+=== ID: 0f932b2ab5fde02e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 28x21 ===
+```
+                /|         ,
+              ,///        /|
+             // //     ,///
+            // //     // //
+           // //     || ||
+           || ||    // //
+           || ||   // //
+           || ||  // //
+           || || || ||
+           \\,\|,|\_//
+            \\)\)\\|/
+            )-."" .-(
+           //^\` `/^\\
+          //  |   |  \\
+        ,/_| 0| _ | 0|_\,
+      /`    `"=.v.="`    `\
+     /`    _."{_,_}"._    `\
+jgs  `/`  ` \  |||  / `  `\`
+      `",_  \\=^~^=//  _,"`
+          "=,\'-=-'/,="
+              '---'
+```
+
+=== ID: 4d822824be4a24f1 | TITLE: Elmer Fud | ARTIST: Shanaka Dias | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 27x22 ===
+```
+      ....
+    .'   ,:
+  .'      \.___..
+.'      .-'   _.'
+'.\  \/...-''`\
+  :.'   /   \  :
+   :    () () /
+   (_ .  '--' ':        .':
+     / |_'-- .'       .'.'
+     \   \  .'_\    .'.'
+    .|__  \/_/:   .'.'
+   /          :\.',;'
+  .' -./      .'{\|))
+  '.   ',_,-.',;'--:
+  / '../_   \,;'_.'
+  :.   ,''-'-'  \
+   \'.'   / \..':
+   .'    /.-.   :
+   '.   / \  |''\
+     './--:  /   \._
+snd   \.   '.'._.___:
+        '...'
+```
+
+=== ID: 975e3383190d868f | TITLE: Tweetie Bird | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 35x23 ===
+```
+          ___
+      _.-'   ```'--.._
+    .'                `-._
+   /                      `.
+  /                         `.
+ /                            `.
+:       (                       \
+|    (   \_                  )   `.
+|     \__/ '.               /  )  ;
+|   (___:    \            _/__/   ;
+:       | _  ;          .'   |__) :
+ :      |` \ |         /     /   /
+  \     |_  ;|        /`\   /   /
+   \    ; ) :|       ;_  ; /   /
+    \_  .-''-.       | ) :/   /
+   .-         `      .--.'   /
+  :         _.----._     `  <
+  :       -'........'-       `.
+   `.        `''''`           ;
+     `'-.__                  ,'
+           ``--.   :'-------'
+           jgs :   :
+              .'   '.
+```
+
+=== ID: 9358d1c5d110f9cf | TITLE: Tweetie Bird | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: looney-tunes | SIZE: 38x32 ===
+```
+                       .   `:
+                        :   :  .
+                     __.'_ .'   :
+                _.--'     `-._.'
+             .-'..     ..    `.
+            : .-.    .--.`.    :
+           : :  :   :   :       :
+           : :`;;   :`; ;       :
+           `.`O;'   `O;.'       :
+          .' .---.  .--.        ;
+  .      :  '._   :'           ;
+  ::     :   .-`-.;       .  .'
+ .':     `.   ``` `.      :-'
+:  :       `-.__   ._   _.'
+ : ;           :    ;```
+  : `.    _.-.' .  ``-._
+   :  `.-'   : :        `-.
+    :      _.: `  `-._     `,
+     `._.-'   ;     `.`-.   ;_,  _.,
+              :       `.:  ;' ;-'  ;
+             :         ``.___.'   :
+             :             ;_..--'
+             `.            ;
+               `-.__   ...'
+                   : :  :
+              jgs  :-:__;
+                   : :  :
+        .-~~~--..__: :  :___..---..
+      .'.'           :             `,
+     :,'             :            `; ;
+     `:           _.'`._           :,'
+       `~~~'----''     `'-.____....'
+```
+
+=== ID: 0d45d2ac2f14ac62 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: mickey-mouse | SIZE: 20x9 ===
+```
+         .-"""-.
+        /       \
+        \       /
+ .-"""-.-`.-.-.<  _
+/      _,-\ ()()_/:)
+\     / ,  `     `|
+ '-..-| \-.,___,  /
+       \ `-.__/  /
+  jgs   `-.__.-'`
+```
+
+=== ID: ecb21921da4153ce | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: mickey-mouse | SIZE: 22x10 ===
+```
+  .-"-.         .-"-.
+ /     \ _____ /     \
+ \      `     `      /
+  `--/,'^^'.'^^',\--`
+    || /^\   /^\ |\
+    |\ |0| _ |0| /|
+    \_\`~`.-.`~`/_/
+    /     '-'     \
+    \  `-,...,-`  /
+jgs  '-._ \^/ _.-'
+```
+
+=== ID: 8bc9b4c962be4585 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: mickey-mouse | SIZE: 29x21 ===
+```
+            .-"""-.
+           /       \
+           \       /
+    .-"""-.-`.-.-.<  _
+   /      _,-\ ()()_/:)
+   \     / ,  `     `|
+    '-..-| \-.,___,  /
+          \ `-.__/  /
+     jgs / `-.__.-\`
+        / /|    ___\
+       ( ( |.-"`   `'\
+        \ \/    {}{}  |
+         \|           /
+          \        , /
+          ( __`;-;'__`)
+          `//'`   `||`
+         _//       ||
+ .-"-._,(__)     .(__).-""-.
+/          \    /           \
+\          /    \           /
+ `'-------`      `--------'`
+```
+
+=== ID: c22d8d56cfd4a127 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: spongebob-squarepants | SIZE: 11x21 ===
+```
+   .,--.
+ .' __  \
+ | .._  |
+ |{)(} .'
+ / /|  |.
+(_/ /____)
+  |_||
+    /'
+    //
+  .'''\
+ /\:::/\
+( /|::|\\
+_\:|;;|{/_
+'.;|**|\;,/
+   \_ /
+   | ||
+   | ||
+   | ||
+   | ||
+ ._| ||_.
+;,_.-._,;
+```
+
+=== ID: 4d4133a58d45a332 | TITLE: Squidward | ARTIST: lgbeard | CATEGORY: cartoons | SUBCATEGORY: spongebob-squarepants | SIZE: 28x38 ===
+```
+        .--'''''''''--.
+     .'      .---.      '.
+    /    .-----------.    \
+   /        .-----.        \
+   |       .-.   .-.       |
+   |      /   \ /   \      |
+    \    | .-. | .-. |    /
+     '-._| | | | | | |_.-'
+         | '-' | '-' |
+          \___/ \___/
+       _.-'  /   \  `-._
+     .' _.--|     |--._ '.
+     ' _...-|     |-..._ '
+            |     |
+            '.___.'
+              | |
+             _| |_
+            /\( )/\
+           /  ` '  \
+          | |     | |
+          '-'     '-'
+          | |     | |
+          | |     | |
+          | |-----| |
+       .`/  |     | |/`.
+       |    |     |    |
+       '._.'| .-. |'._.'
+             \ | /
+             | | |
+             | | |
+             | | |
+            /| | |\
+          .'_| | |_`.
+LGB       `. | | | .'
+       .    /  |  \    .
+      /o`.-'  / \  `-.`o\
+     /o  o\ .'   `. /o  o\
+     `.___.'       `.___.'
+```
+
+=== ID: 5746306823684442 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: inspector-gadget | SIZE: 29x30 ===
+```
+           ___
+     _..--"\  `|`""--.._
+  .-'       \  |        `'-.
+ /           \_|___...----'`\
+|__,,..--""``(_)--..__      |
+'\     _.--'`.I._     ''--..'
+  `''"`,#JGS/_|_\###,---'`
+    ,#'  _.:`___`:-._ '#,
+   #'  ,~'-;(oIo);-'~, '#
+   #   `~-(  |    )=~`  #
+   #       | |_  |      #
+   #       ; ._. ;      #
+   #  _..-;|\ - /|;-._  #
+   #-'   /_ \\_// _\  '-#
+ /`#    ; /__\-'__\;    #`\
+;  #\.--|  |O  O   |'-./#  ;
+|__#/   \ _;O__O___/   \#__|
+ | #\    [I_[_]__I]    /# |
+ \_(#   /  |O  O   \   #)_/
+       /   |        \
+      /    |         \
+     /    /\          \
+    /     | `\         ;
+   ;      \   '.       |
+    \-._.__\     \_..-'/
+     '.\  \-.._.-/  /'`
+        \_.\    /._/
+         \_.;  ;._/
+       .-'-./  \.-'-.
+      (___.'    '.___)
+```
+
+=== ID: 31eea1a78180bca6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: inspector-gadget | SIZE: 29x32 ===
+```
+           ___
+     _..--"\  `|`""--.._
+  .-'       \  |        `'-.
+ /           \_|___...----'`\
+|__,,..--""``(_)--..__      |
+'\     _.--'`.I._     ''--..'
+  `''"`,#JGS/_|_\###,.--'`
+    ,#'  _.:`___`:-._'#,
+   #'  ,~'-;(oIo);-'~, '#
+   #   `~-(  |    )=~`  #
+   #       | |_  |      #
+   #       ; ._. ;      #
+   #  _..-;|\ - /|;-._  #
+   #-'   /_ \\_// _\  '-#
+ /`#    ; /__\-'__\;    #`\
+;  #\.--|  |O  O   |'-./#  ;
+|__#/   \ _;O__O___/   \#__|
+ | #\    [I_[_]__I]    /# |
+ \_(#   ;  |O  O   ;   #)_/
+        |  |       |
+        |  ;       |
+        |  |       |
+        ;  |       |
+        |  |       |
+        |  |       ;
+        |  |       |
+        '-.;____..-'
+          |  ||  |
+          |__||__|
+          [__][__]
+        .-'-.||.-'-.
+       (___.'  '.___)
+```
+
+=== ID: 7c894e77b4f68f6b | TITLE: Dizzy Devil | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: tiny-toon-adventures | SIZE: 32x13 ===
+```
+   .    _  .     _____________
+   |\_|/__/|    /             \
+  / / \/ \  \  / Happy! Happy! \
+ /__|O||O|__ \ \   Joy! Joy!   /
+|/_ \_/\_/ _\ | \  ___________/
+| | (____) | ||  |/
+\/\___/\__/  // _/
+(_/         ||
+ |          ||\
+  \        //_/
+   \______//
+  __|| __||
+ (____(____)
+```
+
+=== ID: 6cd8433b14d4742a | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 10x9 ===
+```
+ |\/\/\/|
+ |      |
+ |      |
+ | (o)(o)
+ C      _)
+  | ,___|
+  |   /
+ /____\
+/      \
+```
+
+=== ID: 96f0c3ec5df6891b | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 14x9 ===
+```
+/\ /\  /\
+| V  \/  \---.
+ \_        /
+  (o)(o)  <__.
+ _C         /
+/____,   )  \
+  \     /----'
+   ooooo
+  /     \
+```
+
+=== ID: a531c90a823e1a62 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x9 ===
+```
+       /\
+ .----/  \----.
+  \          /
+.--\ (o)(o) /__.
+ \     ()     /
+  >   (C_)   <
+ /___\____/___\
+    /|    |\
+   /        \
+```
+
+=== ID: 95a09cf435f73b8d | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 11x10 ===
+```
+   __&__
+  /     \
+ |       |
+ |  (o)(o)
+ C   .---_)
+  | |.___|
+  |  \__/
+  /_____\
+ /_____/ \
+/         \
+```
+
+=== ID: 43e419e1dcdf517b | TITLE: Homer Simpson | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x11 ===
+```
+         &
+      .-"`"-.
+     /       \
+     |   __  _|
+     |  /  \/ \
+    WW  \_o/_o/
+    (        _)
+     |   .----\
+     ;  | '----'
+      \__'--;`
+jgs   |___/\|
+```
+
+=== ID: c8566f9b4b4329dc | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 18x12 ===
+```
+    |\/\  ,.
+    /   `' |,-,
+   /         /_
+ _/            /
+(.-,--.       /
+/o/  o \     /
+\_\    /   _/
+(__`--'    _)
+ /         |
+(_____,'    \  hjw
+   \_       _\
+     `._..-'
+```
+
+=== ID: b27fe5339b95297b | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x14 ===
+```
+    ___
+   //_\\_
+ ."\\    ".
+/          \
+|           \_
+|       ,--.-.)
+ \     /  o \o\
+ /\/\  \    /_/
+  (_.   `--'__)
+   |     .-'  \
+   |  .-'.     )
+   | (  _/--.-'
+   |  `.___.'
+         (
+```
+
+=== ID: 137f3725ae4b2c40 | TITLE: Untitled | ARTIST: Matthew Kurth | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 15x14 ===
+```
+  |\/\/\/\/\/|
+  |          |
+  |          |
+  |          |
+  |    __  __|
+  |   /  \/  \
+  |  (o   )o  )
+ /c   \__/ --.
+ \_   ,     -'
+  |  '\_______)
+  |      _)
+  |     |
+ /`-----'\
+/         \
+```
+
+=== ID: c07844afb093d383 | TITLE: Untitled | ARTIST: Matthew Kurth | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x14 ===
+```
+      /\  /\
+  ___/  \/  \___
+ |             /
+ |            /_
+ /     \_| \_| /
+/     \/  \/  \/
+\     (o   )o  )
+ \ /c  \__/ --.
+ | \_  ,     -'
+ |_ | '\_______)
+   ||      _)
+    |     |
+    ooooooo
+   /       \
+```
+
+=== ID: d56097e54f1dc5ed | TITLE: Untitled | ARTIST: Matthew Kurth | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x14 ===
+```
+      /\  /\
+  ___/  \|\ /|__
+ |       |_o_| /
+ |            /_
+ /     \_| \_| /
+/     \/  \/  \/
+\     (o   )o  )
+ \ /c  \__/ --.
+ | \_      _ -')
+ |_ |     /(_ \
+   ||    (   ) )
+    |____.\(__/
+    |     |
+   /       \
+```
+
+=== ID: 0c97691df4990feb | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 23x15 ===
+```
+ /\/\/\/\/\/\/\
+:              :
+|              |   Bart
+|              |
+|              |
+|            __`,
+|           /   \
+|           \__*/__
+:               ___)
+ \              \
+  :      _______/
+  |         /
+  ;        :
+ ;         ;
+  `""*--*"" SSt
+```
+
+=== ID: 1ca8882eebe6d182 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 34x16 ===
+```
+     ________________________
+    |                        |
+    |                        |
+    | __----__      __----__ |
+    |/      * \    /      * \|
+    |          |  |          |
+  --|\        /    \        /|--
+ /  | --____--      --____-- |  \
+| (-|                        |-) |
+ \  |.                      .|  /
+  --/                        \--
+   /                          \
+    `--______________________--'
+      \_|__|__|__|__|__|_|_/
+        `---__      __---'
+              )    (
+```
+
+=== ID: cc390e436e3c5a95 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 19x16 ===
+```
+            (####)
+          (#######)
+        (#########)
+       (#########)
+      (#########)
+     (#########)
+    (#########)
+   (#########)
+  (#########)
+   (o)(o)(##)
+ ,_C     (##)
+/___,   (##)
+  \     (#)
+   |    |
+   OOOOOO
+  /      \
+```
+
+=== ID: 9b2b3f600020f509 | TITLE: Untitled | ARTIST: Rowan Crawford | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 34x17 ===
+```
+   ___  _____
+ .'/,-Y"     "~-.
+ l.Y             ^.
+ /\               _\_      "Doh!"
+i            ___/"   "\
+|          /"   "\   o !
+l         ]     o !__./
+ \ _  _    \.___./    "~\
+  X \/ \            ___./
+ ( \ ___.   _..--~~"   ~`-.
+  ` Z,--   /               \
+    \__.  (   /       ______)
+      \   l  /-----~~" /      -Row
+       Y   \          /
+       |    "x______.^
+       |           \
+       j            Y
+```
+
+=== ID: 4f50ae08e7150561 | TITLE: Untitled | ARTIST: Tim Brennan | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 35x17 ===
+```
+   ^^^^^^^
+   |      |
+   |      |
+   |  (o)o)
+  (c      _)
+   |   ___)
+   L____/
+  /     \
+ /       \
+ |L_|    |
+ | ||    |             Bart Simpson
+ | ||    |
+ L(_)___/
+   \###|
+    |||
+    LLL_
+   (___))       teb
+```
+
+=== ID: 99c92768f5b1047e | TITLE: Untitled | ARTIST: Matthew Kurth | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 17x17 ===
+```
+        _
+      /X \
+    _------_
+   /        \
+  |          |
+  |          |
+  |     __  __)
+  |    /  \/  \
+ /\/\ (o   )o  )
+ /c    \__/ --.
+ \_   _-------'
+  |  /         \
+  | | '\________)
+  |  \_____)
+  |_____ |
+ |_____/\/\
+ /        \
+```
+
+=== ID: 7c00b3e1214a9b3c | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 26x18 ===
+```
+          /\/\/\/\
+         /       /
+        (. (.  )
+         (      ]
+        /____  /
+         \     |
+         /-----\
+       / /     /  \
+     / \/       \/  \
+   / / /           \  \
+ ((()  /__________\ (/\)))
+        /         \
+        |    /\    \
+        ----| |----
+        |__ |  \__ \
+       {____|   {___}
+=======================/
+   (o)           (o)
+```
+
+=== ID: 147726fe5357a1ee | TITLE: Marge Simpson | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 30x18 ===
+```
+ (
+  \  _,--._,-.__,         )
+  / (,  ,       ,`-._    /
+ (  ,^--^-. ;--^--/ (    \
+  :'      `/       \ )   /
+  (  o    (   o    |(  \'
+   \  ,----\       /(,-.)
+  ,'`-\___  `.___,'  ,. )
+,'                   __/
+`-.______________   |,---,
+      `-^;-^--^-'\  |   '----,
+        ( '------'  .',-.___/
+         ;._____,--' / \
+ -hrr-  (           /   \
+        (`-        /     \
+         \       ,'       \
+        / )  _,-'          \
+       / (,-'       \       \
+```
+
+=== ID: c32c8d3470aacf39 | TITLE: Marge Simpson | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 40x19 ===
+```
+        ,
+        (                          )
+         \                        /
+        ,' ,__,___,__,-._         )
+        )-' ,    ,  , , (        /
+-hrr-   ;'"-^-.,-''"""\' \       )
+       (      (        ) /  __  /
+        \o,----.  o  _,'( ,.^. \
+        ,'`.__  `---'    `\ \ \ \_
+ ,.,. ,'                   \    ' )
+ \ \ \\__  ,------------.  /     /
+( \ \ \( `---.-`-^--,-,--\:     :
+ \       (   (""""""`----'|     :
+  \   `.  \   `.          |      \
+   \   ;  ;     )      __ _\      \
+   /     /    ,-.,-.'"Y  Y  \      `.
+  /     :    ,`-'`-'`-'`-'`-'\       `.
+ /      ;  ,'  /              \        `
+/      / ,'   /                \
+```
+
+=== ID: ad404c672766e6fb | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 34x20 ===
+```
+            |\|\,'\,'\ ,.
+            )        ;' |,'
+           /              |,'|,.
+          /                  ` /__
+         ,'                    ,-'
+        ,'                    :
+       (_                     '
+     ,'                      ;
+     |---._ ,'     .        '
+     :   o Y---.__  ;      ;
+     /`,""-|     o`.|     /
+    ,  `._  `.    ,'     ;
+    ;         `""'      ;
+   /                   -'.
+   \                   G  )
+    `-.__________,   `._,'
+            (`   `     |)\
+-hrr.      / `.       ,'  \
+          /    `-----'     \
+         /
+```
+
+=== ID: 80b28093daf4836a | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 31x21 ===
+```
+         , ,\ ,'\,'\ ,'\ ,\ ,
+   ,  ;\/ \' `'     `   '  /|
+   |\/                      |
+   :                        |
+   :                        |
+    |                       |
+    |                       |
+    :               -.     _|
+     :                \     `.
+     |         ________:______\
+     :       ,'o       / o    ;
+     :       \       ,'-----./
+      \_      `--.--'        )
+     ,` `.              ,---'|
+     : `                     |
+      `,-'                   |
+      /      ,---.          ,'
+   ,-'            `-,------'
+  '   `.        ,--'
+        `-.____/
+-hrr-           \
+```
+
+=== ID: fc8eecfef47728c3 | TITLE: Bart Raven | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 39x22 ===
+```
+Bart   |^^^^^^^^|
+Raven  |        |
+       |        |
+       |        |
+       |     _ _,    .---------------.
+       |    (.).)   |                 |
+       |    .-^--_  | EAT MY SHORTS ! |
+       \   ' _____) |                 |
+        | \ (__    /_-----------------'
+       /   -__/
+      /       \
+     / /   .   |
+    / /    /   |
+    / \   /    '
+   /   \ /    /
+  /     .    /
+ / /  X     /
+/ /  / |--| |____
+\/\_/  |--|   ----.
+      /   |\ \----'
+     / /| | \ \
+    `_/_|_.  `-
+```
+
+=== ID: 2d3c0b5bac046d0b | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 39x22 ===
+```
+         _,----.
+      ,-'     __`.
+     /    .  /--\`)
+    /  .  )\/_,--\
+   /  ,'\/,-'    _\_
+  |  /  ,' ,---'  __\
+ ,' / ,:     _,-\'_,(
+  (/ /  \ \,'   |'  _)         ,. ,.,.
+   \/   |          '  \        \ ,. \ )
+    \, ,-              \       /,' )//
+     ; \'`      _____,-'      _|`  ,'
+      \ `"\    (_,'_)     _,-'    ,'
+       \   \       \  _,-'       ,'
+       |, , )       `'       _,-'
+       /`/ Y    ,    \   _,-'
+          :    /      \-'
+          |     `--.__\___
+          |._           __)
+-hrr-     |  `--.___    _)
+          |         `----'
+         /                \
+        '                . )
+```
+
+=== ID: fb6ce58d33468f09 | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 30x22 ===
+```
+     ,---.
+   ,.'-.   \
+  ( ( ,'"""""-.
+  `,X          `.
+  /` `           `._
+ (            ,   ,_\
+ |          ,---.,'o `.
+ |         / o   \     )
+  \ ,.    (      .____,
+   \| \    \____,'     \
+ '`'\  \        _,____,'
+ \  ,--      ,-'     \
+   ( C     ,'         \
+    `--'  .'           |
+      |   |         .O |
+    __|    \        ,-'_
+   / `L     `._  _,'  ' `.
+  /    `--.._  `',.   _\  `
+  `-.       /\  | `. ( ,\  \
+ _/  `-._  /  \ |--'  (     \
+'  `-.   `'    \/\`.   `.    )
+      \  -hrr-    \ `.  |    |
+```
+
+=== ID: 2f7a76072fa0803e | TITLE: Bart Simpson | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 37x23 ===
+```
+              ,  ,
+             / \/ \,'| _
+            ,'    '  ,' |,|
+           ,'           ' |,'|
+          ,'                 ;'| _
+         ,'                    '' |
+        ,'                        ;-,
+       (___                        /
+     ,'    `.  ___               ,'
+    :       ,`'   `-.           /
+    |-._ o /         \         /
+   (    `-(           )       /
+  ,'`.     \      o  /      ,'
+ /    `     `.     ,'      /
+(             `"""'       /
+ `._                     /
+    `--.______        '"`.
+       \__,__,`---._   '`;
+            ))`-^--')`,-'
+          ,',_____,'  |
+          \_          `).
+  -hrr-     `.      _,'  `
+            /`-._,-'      \
+```
+
+=== ID: 56c10191ad96ee58 | TITLE: Bart Simpson | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 35x23 ===
+```
+                /\/\,\,\ ,
+                /        ` \'\,
+               /               '/|_
+              /                   /
+             /                   /
+            /                   ;
+            ;-""-.  ____       ,
+           /      )'    `.     '
+          (    o |        )   ;
+           ),'"""\    o   ;  :
+           ;\___  `._____/ ,-:
+          ;                 @ )
+         /                `;-'
+      ,. `-.______________,|
+ ,(`._||         \__\__\__)|
+,`.`-   \        '.        |
+ `._  ) :          )______,;\_
+    \    \_   _,--/       ,   `.
+     \     `--\   :      /      `.
+      \        \  ;     |         \
+       `-._____ ;|      |       _,'
+   -hrr-       \/'      `-.----' \
+                /          \      \
+```
+
+=== ID: c795e3535360d069 | TITLE: Marge Simpson | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 32x23 ===
+```
+            ,---,------.
+          ,'   /        `.
+        _/,   (     .___, \
+      -:_    ,'`-.______`--)
+      `---,-''-/-'-'-';    `.
+        ,(o    \ o   /|    \|__
+      ,'__\-,--'`---' `,    -<'
+        ,'  `--       |       \
+       ,`._______,--, |     .-.)
+    -::_      /----'  |.     `.
+     ,:___,-  `|      | )`--,-.\
+           ),',.-.-.-'_)   `-.
+         ,' `,`^-^-'`';--'    \
+        (   ( |-. ,' |"---,- _/
+         `,',-`. `--:_   _,-\_
+         ,\ ,`--      \,'_,-._)
+-hrr-    \/ `---.__    \'    :
+         /|        \    \     :
+        :  `.       \    \    ;
+        |    |      :     `   :
+        ;   /|       \        |
+       /   / |        `.     ;
+                        `---'
+```
+
+=== ID: 1d41fbf7ef09d9c6 | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 36x24 ===
+```
+      _ _,---._
+   ,-','       `-.___
+  /-;'               `._
+ /\/          ._   _,'o \
+( /\       _,--'\,','"`. )
+ |\      ,'o     \'    //\
+ |      \        /   ,--'""`-.
+ :       \_    _/ ,-'         `-._
+  \        `--'  /                )
+   `.  \`._    ,'     ________,','
+     .--`     ,'  ,--` __\___,;'
+      \`.,-- ,' ,`_)--'  /`.,'
+       \( ;  | | )      (`-/
+         `--'| |)       |-/
+           | | |        | |
+           | | |,.,-.   | |_
+           | `./ /   )---`  )
+          _|  /    ,',   ,-'
+ -hrr-   ,'|_(    /-<._,' |--,
+         |    `--'---.     \/ \
+         |          / \    /\  \
+       ,-^---._     |  \  /  \  \
+    ,-'        \----'   \/    \--`.
+   /            \              \   \
+```
+
+=== ID: 3584e8adf66d0b82 | TITLE: Untitled | ARTIST: Matthew Kurth | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 18x25 ===
+```
+   OOOO
+ OOOOOOOOO
+OOOOOOOOOOOO
+OOOOOOOOOOOOO
+OOOOOOOOOOOOOO
+OOOOOOOOOOOOOO
+ OOOOOOOOOOOOOO
+ OOOOOOOOOOOOOO
+ OOOOOOOOOOOOOO
+  OOOOOOOOOOOOOO
+  OOOOOOOOOOOOOO
+  OOOOOOOOOOOOOO
+  OOOOOOOOOOOOOO
+   OOOOOOOOOOOOOO
+   OOOOOOOOOOOOOO
+   OOOOO \_| \_|O
+   OOOO \/  \/  \
+   OOOO (o   )o  )
+   O/c   \__/ --.
+   O\_   ,     -'
+    O|  '\_______)
+     |       _)
+     |      |
+     oooooooo
+    /        \
+```
+
+=== ID: ad2db8bb76debc89 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 28x26 ===
+```
+   |    _________
+   |   /  mmmmm, \
+   |   \doughnuts/   _
+   |        O      _//\-\
+   |         O    /      \
+  _|_         o  /       |
+ /   \         (.(.) /|\/
+|  0  |         (___    ,)
+ \___/          /   \   \
+     _          \o  /   |
+   _( \_         _| _____\
+  (___  \_______/\_/______\
+  (___         /    /    \|
+  (___________/     |____||
+             /      |    ||
+            /_______|    |_\
+            \      _|    | /
+             |    (_     \/
+             | \__  | | | |
+             |    \ |_|_|_|
+             |     |     |
+             |     |     |
+             |     |     |
+             |_____|_____|
+             |_____|_____|
+            /     /      |
+```
+
+=== ID: 1181135c05a5605a | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 40x28 ===
+```
+                          (####)
+                        (#######)
+                      (#########)
+                     (#########)
+                    (#########)
+                   (#########)
+   __&__          (#########)
+  /     \        (#########)   |\/\/\/|
+ |       |      (#########)    |      |
+ |  (o)(o)       (o)(o)(##)    |      |
+ C   .---_)    ,_C     (##)    | (o)(o)
+  | |.___|    /____,   (##)    C      _)
+  |  \__/       \     (#)       | ,___|
+  /_____\        |    |         |   /
+ /_____/ \       OOOOOO        /____\
+/         \     /      \      /      \
+   Homer         Marge          Bart
+
+    /\ /\  /\               /\
+    | V  \/  \---.    .----/  \----.
+     \_        /       \          /
+      (o)(o)  <__.   .--\ (o)(o) /__.
+    _C         /     \     ()     /
+    /____,   )  \      >   (C_)   <
+        \     /----'    /___\____/___\
+         ooooo             /|    |\
+       /     \           /        \
+        Lisa             Baby Maggie
+```
+
+=== ID: db8dba10fa53ca07 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 34x29 ===
+```
+      .sS$$$$$$$$$$$$$$Ss.
+     .$$$$$$$$$$$$$$$$$$$$$$s.
+     $$$$$$$$$$$$$$$$$$$$$$$$S.
+     $$$$$$$$$$$$$$$$$$$$$$$$$$s.
+     S$$$$'        `$$$$$$$$$$$$$
+     `$$'            `$$$$$$$$$$$.
+      :               `$$$$$$$$$$$
+     :                 `$$$$$$$$$$
+  .====.  ,=====.       $$$$$$$$$$
+.'      ~'       ".    s$$$$$$$$$$
+:       :         :=_  $$$$$$$$$$$
+`.  ()  :   ()    ' ~=$$$$$$$$$$$'
+  ~====~`.      .'    $$$$$$$$$$$
+   .'     ~====~     sS$$$$$$$$$'
+   :      .         $$$$$' $$$$
+ .sS$$$$$$$$Ss.     `$$'   $$$'
+$$$$$$$$$$$$$$$s         s$$$$
+$SSSSSSSSSSSSSSS$        $$$$$
+     :                   $$$$'
+      `.                 $$$'
+        `.               :
+         :               :
+         :              .'`.
+        .'.           .'   :
+       : .$s.       .'    .'
+       :.S$$$S.   .'    .'
+       : $$$$$$`.'    .'
+          $$$$   `. .'
+                   `
+```
+
+=== ID: df85722acfd8280a | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 36x29 ===
+```
+             _F^^^^"+\_
+        _/"^F         ^,
+       _' _]*P""^'^^^^""^*,_
+       },F'               "9\_
+      ,P~                   "X_
+     ,F                      "4_
+    _F                        "b_
+   _F                          "F
+   9F                           b~
+   ]F         ,*0***b\,_ _,,,,,,]-
+   "F       _4"'      ^9XX'    ""O_
+    b       8^   __     9F        9b
+  ],4_,*_   d   -88-    -F    _,_  b
+ ]' "X^ "F  [X_         {X    ~0P  8
+ '   b       "Ob,___,*dP'"b_     _d'
+  ,**94         ^^^^'      "^\*d0"'
+ "F           ___*****d__    ]'
+ "b_      _,*0"^       ^"9**0X_
+   "9P   ,P'                 "4_
+    d-  ]O-                    b
+   _F  -8'*"""b,__             4
+   X-  "F ^\_/' ^X9**,__    _,+'
+  ]'   "d   ^"'-d___P' ^"F""^
+__P     "*,_     ^^"9*,/F_
+^Xb__      "9\,________,/"
+  ""40,,_        ^^^^]X,
+      _8'          _+P" d
+     ,8'          ,'    8**\,,
+    -"'           4     ^     ^
+```
+
+=== ID: 1d0f74a2b4be1e9e | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 28x32 ===
+```
+    |\/\  ,.
+    /   `' |,-,
+   /         /_
+ _/            /
+(.-,--.       /
+/o/  o \     /
+\_\    /   _/
+(__`--'    _)
+ /         |
+(_____,'    \
+   \_       _\_
+     `._..-'   `._
+      /       ,'  `.
+    .'|      /      \
+    |_|      |      |
+     ||      |______|
+     |/        |   |\
+     /         |   | \
+    /          |   |  \
+    `.         |   |   \
+    ( `-.._____|   |---i
+     `.       _|   |  /
+       |     (_     \ |
+       |    |  | | |_)|
+       `-+--f--`-^-'--'
+         |  |   |  |
+         |  |   |  |
+      _,(`--'), |  |
+   .-'   `--'_t(`--'),
+  /       .-'   `--' |
+  `-..___/        (_)|   hjw
+         `-.._____..-'
+```
+
+=== ID: 40e6fa9411e05c71 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 32x32 ===
+```
+        ######
+       ##      ### ####
+     ##          ## #  #
+    #      ##     ## #  #
+   #              # # #  #
+   #           #  #  # # #
+  #            #  ##  # ##
+  #               # # ## #
+  #   ##          # ##  ##
+  #         ##    #  #   #
+  #                # ### #
+  #           #    # #  #
+   #         ##     ## #
+   #        #  #       #
+    ##    ###  #        #
+    ######    ##        #
+    #   # #  #          #
+     # #  ####          #
+      #                 #
+      #                  #
+     #  #          ##    #
+     # # #       ## *    #
+    #    #      # *X#    #
+    #   #     *# X#       #
+    #  #     ## *#        ##
+   #  ##   ##* X  #      #  #
+   #  # ### X      #     #  ##
+   # #    *        #    #   ###
+   ###            # #   #   ####
+                 ##  # #    ####
+                ###   #     ####
+The Dutch Dude #################
+```
+
+=== ID: e23e27ebe21f2934 | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 27x33 ===
+```
+           , ,\/\/\
+     , |\|\|`     :
+  .-.|`            \
+ \-\                \
+  \                  \
+   \          ____ ,-^-.
+    \       ,'    `.   o\
+     \     (    o  :    ;
+      \     \      ;`-"' )
+       \_    `-..-'   -'(
+      ,'a`               \
+      `._,'   ,           )
+         \   '`----=-----'
+         ;       ,-'
+        /        \
+      ,'          \
+     ;             \
+    '    ,        \ \
+   /    /    .    .) \
+  :    /           \  \
+  ;   |;            \  :
+  ;   |              | |
+  \   |          .   | :
+  )   \             ,' |
+  ,    )  ,---------|_;;
+ (_/ //   |CENSURADO|
+   `' |   |_________|
+      |     ; |    |
+      |     | |    |
+-hrr- |     |,'    `-._
+      |     `-._    `..)
+      |       `.;""---`
+       `--._;_)-'
+```
+
+=== ID: 1204a6aee8f38570 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 27x42 ===
+```
+               ___
+             _//_\\
+           ,"    //".
+          /          \
+        _/           |
+       (.-,--.       |
+       /o/  o \     /
+       \_\    /  /\/\
+       (__`--'   ._)
+       /  `-.     |
+      (     ,`-.  |
+       `-,--\_  ) |-.
+        _`.__.'  ,-' \
+       |\ )  _.-'    |
+       i-\.'\     ,--+.
+     .' .'   \,-'/     \
+    / /         /       \
+    7_|         |       |
+    |/          "i.___.j"
+    /            |     |\
+   /             |     | \
+  /              |     |  |
+  |              |     |  |
+  |____          |     |-i'
+   |   """"----""|     | |
+   \           ,-'     |/
+    `.         `-,     |
+     |`-._      / /| |\ \
+     |    `-.   `' | ||`-'
+     |      |      `-'|
+     |      |         |
+     |      |         |
+     |      |         |
+     |      |         |
+     |      |         |
+     |      |         |
+     )`-.___|         |
+   .'`-.____)`-.___.-'(
+ .'        .'-._____.-i
+/        .'           |h
+`-------/         .   |j
+        `--------' "--'w
+```
+
+=== ID: a78dcd6127ee9fa5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: felix-the-cat | SIZE: 20x15 ===
+```
+_       )\
+\`-.___/ _\.
+ \    __( \ \__
+  :  j   \O/   )
+  :  |  ()(__-'
+  ;  `-.-'  /====
+   `-//__.-'\_
+    ///       `-.
+     /          |
+    (           | /|
+     \          |/ |
+      `-.       U  |
+       _I  D   \\rs'
+      (         }
+       `--.___.'
+```
+
+=== ID: 62812faf63331140 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: felix-the-cat | SIZE: 31x16 ===
+```
+              .:.
+             .::::.
+..         ..::::::''::
+::::..  .::''''':::    ''.
+':::::::'         '.  ..  '.
+ ::::::'            : '::   :
+  :::::     .        : ':'   :
+  :::::    :::       :.     .'.
+ .::::::    ':'     .' '.:::: :
+ ::::::::.         .    ::::: :
+:::::    '':.... ''      '''' :
+':::: .:'              ...'' :
+ ..::.   '.........:::::'   :
+  '':::.   '::'':'':::'   .'
+        '..  ''.....'  ..'
+           ''........''
+```
+
+=== ID: 4c10252110b07ab4 | TITLE: Stimpy | ARTIST: Peter Marquardt (last future, lastfuture) | CATEGORY: cartoons | SUBCATEGORY: ren-and-stimpy | SIZE: 20x14 ===
+```
+     /|_\|/_/|
+    , ,--,-. .
+   / ( O  O ) \
+   |  (___)'  |
+   |.   ,     |
+  /  '-'\__,' |
+ //|.      \\\ \
+ ||| ,     `-'|\\
+ |||        ' |||
+c  D  '    ,  c  D
+ UU '  '-'   ' UU
+     \  __  /
+    __||  ||__
+   (___/  \___) [lf]
+```
+
+=== ID: 2c2c1f40dba351f6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: ren-and-stimpy | SIZE: 32x15 ===
+```
+    ____            .    _  .
+   /# /_\_          |\_|/__/|
+  |  |/o\o\        / / \/ \  \
+  |  \\_/_/       /__|O||O|__ \
+ / |_   |        |/_ \_/\_/ _\ |
+|  ||\_ ~|       | | (____) | ||
+|  ||| \/        \/\___/\__/  //
+|  |||_          (_/         ||
+ \//  |           |          ||
+  ||  |           |          ||\
+  ||_  \           \        //_/
+  \_|  o|           \______//
+  /\___/          __ || __||
+ /  ||||__       (____(____)
+    (___)_)
+```
+
+=== ID: de66da7dccc6f864 | TITLE: Untitled | ARTIST: Peter Marquardt (last future, lastfuture) | CATEGORY: cartoons | SUBCATEGORY: ren-and-stimpy | SIZE: 40x20 ===
+```
+                  ,-------------------.
+                 ( WHAT EEEEES IT MAN? )
+                  `-------------------'
+                         '
+                          \    ,-_
+                              ',' )
+     /|_\|/_/|              _// ,'
+    , ,--,-. .           ,'  / ,
+   / ( O _O ) \        _;___    .
+   |  (___)'  |        ()/()/   ,
+   |.   ,     |        ,>     ,'
+  /  '-'\__,' |         |  /',\
+ //|.      \\\ \        '^;  <-^.
+ ||| ,     `-'|\\             )  '
+ |||        ' |||        _n___|/, |
+c  D  '    ,  c  D      -_ ---,'  |
+ UU '  '-'   ' UU         U   <   (
+     \  __  /                ,.-. ._,.
+    __||  ||__              ((   `'- |
+   (___/  \___) [lf]      c___)     U
+```
+
+=== ID: 92d9c4f3bf18f25a | TITLE: Stimpy | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: ren-and-stimpy | SIZE: 40x33 ===
+```
+                     ,|
+          f\  . ,-  / |
+          | \_|f,,-/  |-.
+         ,'-. ,-.       `.
+        (,-.  ,-.        Y
+        f   Yf   Y       |       ,----.
+        l 0 jl 0 j       l      f  Oh  Y
+      ,,-`-'  `-'         Y     l joy! j
+  ,-'"""`-.       ,--.    I      \ ,--'
+ (         )  _,-'    \   l      //
+  `-,.__,,'''". .  /   Y   Y --=''
+   (        .    ,'\   |   |
+    `.__,-._,,-l"\  Y  |   |
+   _ _ / /      \   j  j  -l
+  f f f f\       `-'  f     \
+  l    'j Y           l      \
+   Y_ _j /j            Y  .   \
+   (___)/f             |   \   Y
+    |  | |             |    Y  |
+    l  ` |             |    j  j
+     `--'|             |   /__/
+         |             |  (_  )
+         l             j  /   |-.
+          \    .      /  ( . . ` )
+          l`._       /    \_\_\_/
+           \  "`----'    /
+            `._         f
+             | `""-.    |
+             |   |  Y   |
+           __j   l__j   `-.
+        ,''      ,'        Y
+       l        l          j
+........`--------`--------' ...........
+```
+
+=== ID: 7a4c93ab6c221ff6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 35x18 ===
+```
+               _._
+           __.{,_.).__
+        .-"           "-.
+      .'  __.........__  '.
+     /.-'`___.......___`'-.\
+    /_.-'` /   \ /   \ `'-._\
+    |     |   '/ \'   |     |
+    |      '-'     '-'      |
+    ;                       ;
+    _\         ___         /_
+   /  '.'-.__  ___  __.-'.'  \
+ _/_    `'-..._____...-'`    _\_
+/   \           .           /   \
+\____)         .           (____/
+    \___________.___________/
+      \___________________/
+jgs  (_____________________)
+"I`m not fat, I`m festively plump!"
+```
+
+=== ID: 92a242b276222e68 | TITLE: Untitled | ARTIST: Matzec | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 32x26 ===
+```
+          _.-*'""'*-._
+       .-"            "-.
+     ,"                  ",
+   .'      _.-.--.-._      ',
+  /     .-'.-"    "-.'-.     \
+ /     /  /"'-.  .-'"\  \     \
+:     :  :     ;:     ;  ;     ;
+;     :  ; *   !! *   :  ;     :
+;      ; :   .'  '.   ; :      :
+:       \ \-'      '-/ /       ;
+ \       '.'-_    _-'.'       /
+  \        '*-"-+"-*'        /
+   '.          /|          .'
+     *,       / |        ,*
+     / '-_            _-'  \
+    /     "*-.____.-*"      \
+   /            |            \
+  :    :        |        ;    ;
+  |.--.;        |        :.--.|
+  (   ()        |        ()   )
+   '--^_        |        _^--'
+      | "'*--.._I_..--*'" |
+      | __..._  | _..._   |
+     .'"      `"'"     ''"'.
+     """""""""""""""""""""""
+       K E N N Y by Matzec
+```
+
+=== ID: ff81d1d042a796a6 | TITLE: Untitled | ARTIST: Matzec | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 32x27 ===
+```
+             .-""-.
+          _.->    <-._
+       .-"   '-__-'   "-.
+     ,"                  ",
+   .'                      ',
+  /    ___...------...___    \
+ /_.-*"__...--------...__"*-._\
+:_.-*"'  .*"*-.  .-*"*.  '"*-._;
+;       /      ;:      \       :
+;      ;    *  !!  *    :      :
+:      :     .'  '.     ;      ;
+ \      '-.-'      '-.-'      /
+  \                          /
+   '.                      .'
+     *,      '-__-'      ,*
+     /.'-_            _-'.'\
+    /  "-_"*-.____.-*"_-"   \
+   /      '"*-.___.-*'       \
+  :    :        |        ;    ;
+  |.--.;       *|        :.--.|
+  (   ()        |        ()   )
+   '--^_       *|        _^--'
+      | "'*--.._I_..--*'" |
+      | __..._  | _..._   |
+     .'"      `"'"     ''"'.
+     """""""""""""""""""""""
+        S T A N by Matzec
+```
+
+=== ID: 3c65475ab04570da | TITLE: Untitled | ARTIST: Matzec | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 34x27 ===
+```
+    .*""""""""""""""""""""""*.
+   :                          ;
+   :                          ;
+   :  ......................  ;
+   : :                      ; ;
+   :_:                      ;_;
+  /  :  __...--------...__  ;  \
+ /   :"'  .*"*-.  .-*"*.  '";   \
+:    ;   /      ;:      \   :    ;
+!    !  ;    *  !!  *    :  !    !
+;   ;   :     .'  '.     ;   ;   :
+:  .'    '-.-'      '-.-'    '.  ;
+'-"\                          /"-'
+    '.                      .'
+      *,      '-__-'      ,*
+      /.'-_            _-' .\
+     /  "-_"*-.____.-*" _-"  \
+    /      '-_  /'\  _-'      \
+   :    :   __'" | "'__   ;    ;
+   |.--.;  |\/|  |  |\/|  :.--.|
+   (   ()  |__|  |  |__|  ()   )
+    '--^_        |        _^--'
+       | "'*--.._I_..--*'" |
+       | __..._  | _..._   |
+      .'"      `"'"     ''"'.
+      """""""""""""""""""""""
+         K Y L E by Matzec
+```
+
+=== ID: db72e27c141136d8 | TITLE: Sparky | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 32x27 ===
+```
+                            %+++
+                           %HHH+
+                %%%%%    %%HHHH+
++++++        +%%HHHHH%% %HHHHH+
++HHHH++    +%HHHHHHHHHH%HHHHH+
+ +HHHH$++ +HHHHHHHHHHHHHHHHHH+
+  +HHHHH$+HHHHHHHHH$++$HHHHH+
+   +HHHHHHHHHHHHH%.    =$HHH+
+    +HHHHHH+==/HH       .$H+
+    +HHHH$.     /        :H+
+     +HHH-      ,        -H+
+      +H$       - ,:      H+
+      +H=    .: .,,#      $+
+      +H     .#  $       =H+
+      +H        -MM:,::. $H+
+      +H,    .=:MMMM+++++HHH+
+      +H$   -++++MM++++++HHH+
+      +HH$,:++++++$++++++$HH+
+      +HHHH$++++++$+++++++HH+
+       +HHH+++++++H$++++++%H+
+       +HHH++++++HHHH+++++++
+        +HH++++++HHHH+++++++
+         +H++++++HHHHH+++++
+         +$++++++HHHHHH+++
+          +$+++$HHHHHH+
+           ++++++HHH++
+                ++++
+```
+
+=== ID: 7fca78ce35f18809 | TITLE: Butters | ARTIST: Matzec | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 32x28 ===
+```
+         -.._       _-*"`
+           \ '-._.*' <"
+       _.--'          "*-._
+    _-'             :''"*--^-
+ -='.-*'.   _.-"-.  '.    ",
+   /    ;.-'      '*-.'-.   \
+  /    /'             '"*-   \
+ ;                            :
+:        .*"*-.  .-*"*.        ;
+;       /      ;:      \       :
+;      ;    *  !!  *    :      :
+:      :     .'  '.     ;      ;
+ ;      '-.-'      '-.-'      :
+  \                          /
+   \                        /
+    '.                    .'
+     /'.      _.._      .' \
+    /   '-.          .-'    \
+   /       "--.,,.--"        \
+  :    :        |        ;    ;
+  |.--.;        |        :.--.|
+  (   ()        |        ()   )
+   '--^_        |        _^--'
+      | "'*--.._I_..--*'" |
+      | __..._  | _..._   |
+     .'"      `"'"     ''"'.
+     """""""""""""""""""""""
+     B U T T E R S by Matzec
+```
+
+=== ID: 3d367da3a4ad90dd | TITLE: Cartman | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 32x29 ===
+```
+              ----
+            -===,=--
+          --,-,,,,,,-
+        :-;==:========:
+      :=---------------::
+     :-------------------::
+    :----------------------:
+   :------------------------:
+  :--------------------------:
+ :----------=:::==::::-------:
+ :------:====--,,,,--====:=---:
+:----:===,=++++...++++..--===::
+:-===--...+    +.+    +.....,-=/
+/==-.....+      +      +......./
+;-......+     - / -     +....../
+/.......+    -# . #-    +....../
+/.......+       +       +....../
+/.......+      +.+      +....../
+/........+    +...+    +......./
+/.........++++.....++++......./
+ /..........................-./
+ /.-.......................-./
+  /.-......M##M$HM###M....-../
+   /.-......########$....-../
+    /.--......$$$$+-....-.-/
+     /..--.....,,,,...--.//
+      //..----.....---.//
+        ///-..-----.-//
+           //////////
+```
+
+=== ID: e4c276711a29f89b | TITLE: Chef | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 28x32 ===
+```
+      =====   =======
+  ====     ===       =====
+ =                        =
+=                          =
+=                          =
+=                      ,  =
+=.   -     =    ==     .-=
+ ===  ==== =    = ===== =
+   =   =    ===      =  =
+   =   =      =      =  =
+   =   =      =      =  =
+   =   =      =      =  =
+   =                 =  =
+   =        ....        =
+   =  .-;+++++$/++/:,   =
+   =:+;;;+   ./    +;;/==
+  $MH;;;$     =     +;;H+
+  $MH;;;+   #.;,#   +;;M$
+  $MH;;;+     ;     +;;#$
+  $MH;;;;+   +;+   +;;H#$
+  $MH;;;;;+++;;;+++;;;H#$
+  $M#;;;;;H#MHHH##;;;;##$
+  $M#H;;;;HM####MH;;;;##$
+  $M##H;;H####MM##H;;H##$
+  $MM#MHH#H;;;;;;M#H;M##$
+   $M####H;;;HMH;;#HH###$
+   $M#####M;;##H;;#M###M$
+   $MM################M$
+    $MMM############MM$
+     $$MMMMMMMMMMMMMM$
+       $$MMMMMMMMMM$$
+         $$$$$$$$$$
+```
+
+=== ID: 2a643b7a18a6df0e | TITLE: Elroy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: jetsons | SIZE: 24x15 ===
+```
+    o        _
+    =\.=    | \
+    ='\____/__/....,_
+       | .'        _-;
+       |/;-._     -_,'
+       /  \  ``"""` (
+       |   |  ^   ^ \
+       /`'`   o  _ o \
+       \_,      ' '  |
+         ;.   /.__.' /
+       .`._`'._____.'-.
+      /`.| `-,.____.-;\
+     /   |  |      | \ \
+jgs  |   |  '------' | |
+     \   \           | /
+```
+
+=== ID: c539ee03a1f0ebd7 | TITLE: Jane, his wife | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: jetsons | SIZE: 29x15 ===
+```
+         .-""',.-"""-.
+   ,_  .'.--. /_.---. `-.__.,
+   '\`'-'  _ /___    `-._.-/
+     '-..-'_'` _ `'-._  _.;
+     .'   /_   _      \`  \
+    /    /(_9 (_9  .   |   \
+    ;  _/   (      \`-'    /
+     `(_\  .===,    '.___.'
+         '. `""`     _(_)
+           '-.   .-'`
+    .====="""|   |""======,
+    '.       |   |      .'
+jgs   `-.    |_.-'   .-'
+         `-. `   _.-'
+            '-.-'
+```
+
+=== ID: 36a77a553914690d | TITLE: Astro | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: jetsons | SIZE: 17x18 ===
+```
+    _
+   /|\    .--,
+  | |/__.'/`/
+  | .-~-(--'
+  | .-~~-\
+  ;       \
+  |   .-. .\
+  |   | | |`\
+  |  _\o|_|o|\
+  | / __--,=""",
+  | | ||  '=,_,'\
+  ; | ||    /\  |
+   \; \ \_.' |\/
+    \\ \._ \ ;-,
+jgs  \\ \_:-' /_
+    ((\\_____/_))
+     }'======'{`
+    /`"""""""""`\
+```
+
+=== ID: 02292551bdcb7cf0 | TITLE: Daughter, Judy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: jetsons | SIZE: 29x23 ===
+```
+   _...._
+ .'      '.
+/     __   \
+|   .'  \  /
+ \  |   /.'
+  \ |
+   '.\ _
+   \_><_\
+     | `-._   _...__
+     |    -"``      ``"-,
+     |,               _. )
+     /      /``"'---"`|-'
+    /      |   .-'  '-;
+   |       \   6_)  6_)\
+   \        '.      )   \
+    '.    ,---'  _.--.` /
+      '-.._\-     `""`.'
+           `'-.   .--'
+    .=========|   |=========,
+    '.        |   |       .'
+jgs   `-._    `-._|    .-'
+          `-._    `_.-'
+              '-.-'
+```
+
+=== ID: 973305bf4ee8840e | TITLE: George Jetson | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: jetsons | SIZE: 24x24 ===
+```
+        .-.
+          _\...._
+      .-"`       `"-.
+    |` ._         _. `|
+    |  \ `"""""""` /  |
+    \  |           |  /
+    ;  |  /     \  |  ;
+    |  |  _     _  |  |
+    |  | / |   | \ |  |
+    _\/  \0|   |0/  \/_
+   / \    .-----.    / \
+   |  /_.-\     /-._\  |
+    \|/    '--;'    \|/
+      |  /     \    |
+      |  `\'.___\   |
+      ;    \   |    ;
+       \    \'-\   /
+        \    '--' /
+         \       /
+jgs   ____\_   _/____
+     '._    \ /    _.'
+        '-,  ^  ,-'
+         /  ___  \
+        /   ---   \
+```
+
+=== ID: 1c736964dc6109e7 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: cartoons | SUBCATEGORY: two-stupid-dogs | SIZE: 26x13 ===
+```
+          _ _
+     _(,_/ \ \____________
+     |`. \_@_@   `.     ,'
+     |\ \ .        `-,-'
+     || |  `-.____,-'
+     || /  /
+     |/ |  |
+`..     /   \
+  \\   /    |
+  ||  |      \
+   \\ /-.    |
+   ||/  /_   |
+hh \(_____)-'_)
+```
+
+=== ID: c1bcb52e8e05c39a | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: cartoons | SUBCATEGORY: two-stupid-dogs | SIZE: 28x20 ===
+```
+            _
+           / )
+        ,-(,' ,---.
+       (,-.\,' `  _)-._
+          ,' `(_)_)  ,-`--.
+         /          (      )
+        /            `-.,-'|
+       /                |  /
+       |               ,^ /
+      /                   |
+      |                   /
+     /                   /
+     |                   |
+     |                   |
+    /                    \
+  ,.|                    |
+(`\ |                    |
+(\  |   --.      /  \_   |
+ (__(   ___)-.   | '' )  /)
+hh   `---...\\\--(__))/-'-'
+```
+
+=== ID: bd877ce5bea61178 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: pink-panther | SIZE: 23x11 ===
+```
+  .--.            .--.
+ ( (`\\."--``--".//`) )
+  '-.   __   __    .-'
+   /   /__\ /__\   \
+  |    \ 0/ \ 0/    |
+  \     `/   \`     /
+   `-.  /-"""-\  .-`
+     /  '.___.'  \
+     \     I     /
+      `;--'`'--;`
+jgs     '.___.'
+```
+
+=== ID: fc7e8f37fef1da22 | TITLE: Untitled | ARTIST: Kristian Kirsfeldt | CATEGORY: cartoons | SUBCATEGORY: pink-panther | SIZE: 20x25 ===
+```
+  (O_/ __ \_O)
+  / (o)__(o) \
+ (__.--\/--.__)
+====(__/\__)====
+      `--'
+      _||_
+    /'....'\
+   | :    : |
+   ||:    :||
+   ||:    :||
+   ||:    :||
+   ||:    :||
+   ||:    :||
+   ||:    :||
+   ||:    :||
+   || `..' ||
+   ( | || | )
+    \| || |/
+     | || |
+     | || |
+     | || |
+     | || |
+     | || |
+ __,-' || '-,__
+(___,--'`--,___) dlK
+```
+
+=== ID: 3d73e8c9072cc58d | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: cartoons | SUBCATEGORY: smurfs | SIZE: 13x11 ===
+```
+    ____
+   (__  '.
+    /_____)
+   ()@ @ )))
+    'C ,()(()
+    ,.'_'.' \
+ __/ )   (--'
+'._./     \
+   (_._._._)
+    _|| ||_
+mrf(__.).__)
+```
+
+=== ID: 6f741b3029ee654a | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: cartoons | SUBCATEGORY: smurfs | SIZE: 13x11 ===
+```
+    ____
+   (__  '.
+    /_____)
+   ()- - )))
+    'C ,()(()
+    ,.'_'.' \
+ __/ )   (--'
+'._./     \
+   (_._._._)
+    _|| ||_
+mrf(__,),__)
+```
+
+=== ID: e898f72ac5cd718f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: smurfs | SIZE: 22x21 ===
+```
+       .-""""--.
+      /         )
+     /      --"`
+    /       _`:---.
+   |     .-'       `\
+    \   /    .----'./
+     \  : ,-' ~(.).)\
+      \_| \      ._) |
+       /   |  \.__, /
+  _.--'    )`///-,-'
+ /        / _| (_\\
+|        (____/____)
+ \     ___/       | _
+  `---(            ` )
+       `-,          .'
+        (__.'._/'._/
+             |`| |
+          __/ / /
+         //   | `--.
+        ||    /_____)
+  jgs   `=---`
+```
+
+=== ID: 2fa1d3af05b31b7f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 19x7 ===
+```
+          .-'-.
+       __|     `\
+      `-,-`--._  `\
+ []  .->'  a   `|-'
+  `=/ (__/_     /
+    \_,    `  _)
+jgs   `----; |
+```
+
+=== ID: 6120a10f6f4a3111 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 23x7 ===
+```
+         .-'-.
+       /`     |__
+     /`  _.--`-,-`
+     '-|`   a '<-.   []
+       \     _\__) \=`
+        C_  `    ,_/
+jgs       | ;----'
+```
+
+=== ID: 3896a781ab09260b | TITLE: Olive Oyl | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 17x9 ===
+```
+        ____
+      .---. `\
+     /o o  \  |
+    |     .'  /_
+    c    (   /</
+     `.~_ `-'
+       __\ \___
+jgs  /(( `  ` ))\
+       `======`
+```
+
+=== ID: 27c958640f2f56fa | TITLE: Olive Oyl | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 19x9 ===
+```
+         ____
+       /` .---.
+      |  /  o o\
+     _\  '.     |_
+     \>\   )    .-'
+        '-` _~.'
+       ___/ /__
+jgs  /(( '  ' ))\
+    /  `======`  \
+```
+
+=== ID: 67a4c03fdb4a8bd1 | TITLE: Popeye | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 27x15 ===
+```
+          ____
+          \__/         # ##
+         `(  `^=_ p _###_
+          c   /  )  |   /
+   _____- //^---~  _c  3
+ /  ----^\ /^_\   / --,-
+(   |  |  O_| \\_/  ,/
+|   |  | / \|  `-- /
+(((G   |-----|
+      //-----\\
+     //       \\
+   /   |     |  ^|
+   |   |     |   |
+   |____|    |____|
+  /______)   (_____\
+```
+
+=== ID: 8b2ce5638da6fb5b | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 12x16 ===
+```
+ ('.'''.
+  ()/ ..)
+  o'.__.>
+  _ || _  |\
+ (_|\/|_)\ /
+ //|  |\\//
+(( |()\ \/
+ \\|   \
+_/_| () \
+   |     \
+   \_._._.'
+     \\//
+  mrf ))\
+     // \\
+    (x\_/x)
+    (_(___)
+```
+
+=== ID: 56f96499013eeb5b | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 14x16 ===
+```
+ ('.'''.
+  ((/ ..)
+  o'.__.>
+  _ || _  /
+ (_|\/|_)(\/
+ //|  |\\//
+(( |()\ \/
+ \\|   \
+_/_| () \
+   \     \
+   '|'-'-'\
+    ||    \\
+    || mrf ))
+    ||.   //
+    ( \_ | \_
+    (___)(___)
+```
+
+=== ID: 58b17d1666be5cac | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 32x32 ===
+```
+          .-'-.
+        /`     |__
+      /`  _.--`-,-`
+      '-|`   a '<-.   []
+        \     _\__) \=`
+         C_  `    ,_/
+           | ;----'
+      _.---| |--._
+    .'  _./' '\._ '.
+   /--'`  `-.-`  `'-\
+  |         o        \
+  |__ .             / )
+ (___)|     o     \/ /
+  | | |           |-'\     .--.
+ /  |_.-"""-.-'=_ |   '--./ = .`
+<   `  =-->    _= /        __/
+ '._     _.-"-.= /`"-...-"`
+    `;"""`     __/
+      /```````` |
+     |     ,     \
+     \      \     \
+      \      \     \
+jgs   |       \     \
+     /        |      |
+    /         /      |
+   /        /`     /`
+ .'        |       |
+(          /--.___.'
+ `--...__.' /    \__
+ /     \__ |        `)
+|         `)---'----`
+'----'----`
+```
+
+=== ID: 0a1438efc1969901 | TITLE: Olive Oyl | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 20x35 ===
+```
+        ____
+      .---. `\
+     /o o  \  |
+    |     .'  /_
+    c    (   /</
+     `.~_ `-'
+       __\ \___
+     /(( `  ` ))\
+    /  `======`  \
+   / /|        |\ \
+  / / |        | \ \
+  \ \ |        | / /
+   \ \|        |/ /
+    \/|        |\/
+     \(        )/
+      /`""""""`\
+     ;          ;
+     |          |
+     |          |
+     |          |
+     |          |
+     |          |
+     |          |
+     |          |
+     |__________|
+        | || |
+        | || |
+  jgs   | || |
+       _|_||_|_
+      \   |\  /
+ .----'    /  \
+(         |    |
+ `'----'--|    |
+          \    /
+           '--'
+```
+

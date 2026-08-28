@@ -1,0 +1,182 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: ARTISTS
+# Total artworks in category fitting <=40 cols: 10
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 32e0a09a20214b36 | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 5x4 ===
+```
+.:::.
+:.".:
+( L )
+  -
+```
+
+=== ID: 789441fd7f510e48 | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 11x7 ===
+```
+   IIIII
+  IIIIIII
+ II(^ ^)II
+II[_O"O_]II
+0 (  i  ) 0
+I  [ w ]  I
+    \_/
+```
+
+=== ID: 1eaec9c41d5615af | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 17x8 ===
+```
+     ,-.,~~.
+   ,'///||\\`.
+  ///(((||)))\\.
+ (((  ,   ,  )))
+ _)))   -    |(_
+._//\   -   /\\_.
+`-'_/`-._.-'\-`-'
+  ' \/=._.=\/ hjw
+```
+
+=== ID: 5194d6fc0696105b | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 39x10 ===
+```
+    |||||      ||||    ||||     |||||
+   ||. .||    ||| .   ||| .    |||||||
+  |||\=/|||   ||| _'  ||| _'  |||||||||
+  |.-- --.|   ||-.    ||-.    |||||||||
+  /(.) (.)\   |// )   ||\\)   /|||||||\
+  \ ) . ( /   |\\ (   || \\   \ )|||( /
+  '(  v  )`    (' )    (  ``  '(  Y  )`
+    \ | /       \ |     \ |     \"|"/
+VK  ( | )       ( |     ( |     ( | )
+    '- -`       '--`    '--`    '- -`
+```
+
+=== ID: 1b14c7df2f131be0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 19x12 ===
+```
+    /'~~~~~~~\|/
+  ,/'     ____ `\
+ |   ,,__/    '| \
+,|_./___   ___ |  |
+  |-(  .)-(.  )`|,'
+ (|  ~~~   ~~~   |)
+  |     `-'      |'
+   \   ,____,   /
+    \   `--'   /
+     |\______/|
+    |\________/|
+    \----------/
+```
+
+=== ID: b2b933feb12f63c0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 35x13 ===
+```
+       \\||||//
+      =       =    self portrait of
+      | "" "" |        Donovan
+      -<0>^<0>-
+ ,-.  |   j   |
+: | :  \ ___ / "PEACE
+`/|\'   \ - /    BRO"
+ _______|\_/|_______
+(       \   /       )
+|        \%/        |
+|   |     V     |   |
+|   |       dwb |   |
+|   |           |   |
+```
+
+=== ID: d44623914ab5ecde | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 23x17 ===
+```
+         .---
+        / # o
+        \,__>
+     .o-'-'--._
+    / |\_      '.
+   |  |  \   -,  \
+   \  /   \__| ) |
+    '|_____[)) |,/
+       |===H=|\ >>
+       \  __,| \_\
+        \/   \  \_\
+        |\    |  \/
+        | \   \   \\
+        |  \   |   \\
+        |__|\ ,-ooD \\
+        |--\_(\.-'   \o
+snd     '-.__)
+```
+
+=== ID: 90244af307489413 | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 38x18 ===
+```
+                __
+         _,--.,'  `--._
+       ,'    ;         `._
+      /    ,'`-""-.       \
+     y  ,-' ))||\\`.       y
+    /   /// // || \\ \      `.
+   /   ((( /   ||  \\ \      \
+  7    |` ,,a..` `  ,,a\      y
+  |    | '-`-'-`   '-`-'\      `.
+  y    |        ,        \       )
+ /     |       (._.)      y      7
+7      \                  |      \
+ `.    | `---',--.--.`---'|     )`)
+  \    \    |  `---'  |   |    (`-'
+  ``-.  ".   \  -    /   /     \`-
+  `-'    |`---`-----'---(   \ \ `-'
+  --'    /              \ \ `-`-'
+   `--'-'                `-`-'     hjw
+```
+
+=== ID: 7ff56d693c967b5c | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 33x22 ===
+```
+      .r\##\###=#=##=#####.
+     /#/:#\#=#(/////#=|#||#.
+    /#/##:\#=(!!!!!########\#.
+   #!/                     ##|
+   ##)                      ##
+   |!                       #|
+   #!  ,==.           .==.  ##;
+ _;!  _.--._         _.--._ '#;_
+(,/:'  `-"-' ;  `  : `-"-'   !\,)
+\!:: '  `  `    `    `  `     : /
+ \::'            :           :`/
+  `::     ,   (,_,)          :`
+   `:          ` '     `    :'
+    :   '  _.-''-''-._      :
+    :     :---"'-'"-=-;     :
+    ` (    `--.___.--'    ) '
+     `  .              ,   ')
+      `.      _..._      .' |
+       |`-.           .-'   |
+       !|:'`-._____.-'   .-'
+        '. '    _    . '  AsH
+        = a.k.a. Flookster =
+```
+
+=== ID: db88bb2880e9e0e9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: artists | SUBCATEGORY: portrait | SIZE: 30x27 ===
+```
+             ___
+          ,'" __`.,'"`.
+        ,;,,'" _`Y'"`.\\
+       //// ,'"'`Y'"`.\YY
+      ffffff'    '   'Y||
+      |||||l ,--   --.|||
+      jjj|l`  ,-.  ,-.|ll
+      ,-```  f  | f  ||-.
+      l (|   l_0, l_0,| j
+       Y |       `.   |f
+       `-|,        )  l'
+       ||f ,-  `--'  _ Y
+       jjj  `.       ,`|
+       '''\   `-----'  j
+           |.        ,'
+           | `-._.,-'
+      ____ |      l ____
+    ,'-+-->l   -'  Y<--+-`,
+   /+--+,' \`-.__,'| `.+--+\
+  /-+--+`-, \.____,j ,'+--+-\
+ f--+--+-<   \    /  >-+--+--Y
+ j--+--+--`.  `. / ,'--+--+--l
+ +--+--+--+-`.  Y /-+--+--+--+
+ +--+--+--+--+\ |f--+--+--+--+
+ +--+-f+--+--+-\|j--+--+Y-+--+
+ +--+-|+--+--+--|+--+--+|-+--+
+ +--+-|+--+--+--|+--+--+|-+--+
+```
+

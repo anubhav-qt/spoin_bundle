@@ -1,0 +1,1868 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: HOLIDAY-AND-EVENTS
+# Total artworks in category fitting <=40 cols: 99
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 14b1513ae644bf1b | TITLE: Horseshoe | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: luck | SIZE: 40x24 ===
+```
+ 88888888888a              a88888888888
+ 8         YI              IP         8
+ 8         `8,            ,8'         8
+ 8          8I            I8          8
+ 8          8I            I8          8
+ 888     O  8I            I8  O     888
+   8        8I            I8        8
+  ,8       ,8'            `8,       8,
+ ,8'      ,8I              I8,      `8,
+,8'   O  ,8I'              `I8,  O   `8,
+IP       dP'                `Yb       YI
+8'      d8'                  `8b      `8
+8       I8                    8I       8
+8,      I8,                  ,8I      ,8
+Yb   O  `8b,                ,d8'  O   dP
+`8,      `8b,              ,d8'      ,8'
+ Yb       `Yba            adP'       dP
+ `8b        `Yba,_    _,adP'        d8'
+  `Yb,        `"YYbbddPP"'        ,dP'
+   `Yba     O              O     adP'
+     "Yba,                    ,adP"
+       `"YbaaaaaaaaaaaaaaaaaadP"'
+          `"YYba,      ,adPP"'
+             `""YYbbddPP""'
+```
+
+=== ID: 799ad3bacfb7769a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: saint-patricks-day | SIZE: 24x4 ===
+```
+       .-.-.
+      (_\|/_)
+      ( /|\ )       __
+jgs    '-'-'`-.__.-'  `-
+```
+
+=== ID: c712bb652186f966 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: saint-patricks-day | SIZE: 17x6 ===
+```
+    .-.-.
+   (     )
+ .-.\ : /.-.
+(   .`:`.   )
+ (   /|\   )  jgs
+  `"` | `"`
+```
+
+=== ID: 071769ad556a750f | TITLE: Untitled | ARTIST: Niki Fowler | CATEGORY: holiday-and-events | SUBCATEGORY: saint-patricks-day | SIZE: 14x8 ===
+```
+    .-.-.
+ __ \   / __
+(  ` \.'.'  )
+(__.', \ .__)
+    /   \`===,
+    `-^-'
+
+niki
+```
+
+=== ID: 385154bf70ca3fac | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: holiday-and-events | SUBCATEGORY: saint-patricks-day | SIZE: 15x8 ===
+```
+    .-. .-.
+   (   |   )
+ .-.:  |  ;,-.
+(_ __`.|.'_ __)
+(    ./Y\.    )
+ `-.-' | `-.-'
+       |
+       |   hjw
+```
+
+=== ID: d270c92e16af43a9 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: holiday-and-events | SUBCATEGORY: saint-patricks-day | SIZE: 15x10 ===
+```
+    .-. .-.
+   (   |   )
+ .-.:  |  ;,-.
+(_ __`.|.'__ _)
+(    .'|`.    )
+ `-'/  |  \`-'
+   (   !   )
+    `-' `-'\
+            \
+ hjw         )
+```
+
+=== ID: ab7ac19a71f213dd | TITLE: Untitled | ARTIST: Bungle | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 20x5 ===
+```
+,d88b.d88b,
+88888888888
+`Y8888888Y'
+  `Y888Y'    -Bungle
+    `Y'
+```
+
+=== ID: ef52885cb23720f6 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 10x5 ===
+```
+ __  __
+/  \/  \
+\      /
+ `.  .'
+   \/  Max
+```
+
+=== ID: 3a07f690a89f9340 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 17x6 ===
+```
+     _  _
+   /` \/ `\_  _
+   \     /` \/ `\
+    '.  .\      /
+      \/  '.  .'
+jgs         \/
+```
+
+=== ID: 27fab11d5a1a6d0c | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 38x8 ===
+```
+KKK     KKK   III    SSSSSS     SSSSSS
+KKK    KKK    III   SSSSSSS    SSSSSSS
+KKK  KKKK     III   SSS        SSS
+KKKKKK        III   SSSSSS     SSSSSS
+KKKKKK        III   SSSSSSS    SSSSSSS
+KKK  KKKK     III       SSS        SSS
+KKK    KKK    III   SSSSSSS    SSSSSSS
+KKK     KKK   III   SSSSSS     SSSSSS
+```
+
+=== ID: dfba4402e55a50eb | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 23x9 ===
+```
+         .`.`.
+    <---(     )----::::
+         \   /
+          \ /
+           \
+          / \
+         /   \
+::::----(     )--->
+         `.`.`  LGB
+```
+
+=== ID: 33d6c36dbcfa033e | TITLE: Two love birds | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 37x10 ===
+```
+                 _  _
+                ( \/ )
+         .---.   \  /   .-"-.
+        /   6_6   \/   / 4 4 \
+        \_  (__\       \_ v _/
+        //   \\        //   \\
+       ((     ))      ((     ))
+jgs=====""===""========""===""=======
+          |||            |||
+           |              |
+```
+
+=== ID: 281b282652defc02 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 18x10 ===
+```
+    .--.  .--.
+   :  _ \/ _  :
+_\/ \ 6    6 /
+  \__\  '   /
+      \'--'/ \__/_
+      /\  /\    \
+     /  \/  \
+     \      /
+jgs  _\    /_
+    (__\  /__)
+```
+
+=== ID: a5d3daa4fb958589 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 24x11 ===
+```
+           K \
+          IS\Fr\
+         SKISS\om\
+        KISSKIS \Me\
+       SKISSKISS
+     sKISSKISSKISs
+   sSKISSKISSKISSKIs
+ sSKISSKISSKISSKISSKISs
+SKISSKISSKISSKISSKISSKIS
+SKISSKISSKISSKISSKISSKIS
+ SKISSKISSKISSKISSKISSK
+```
+
+=== ID: f6ac8081ffb22494 | TITLE: Untitled | ARTIST: BluePard | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 38x13 ===
+```
+        __  __
+     ,-'  `'  \         _---``--
+    /    _  _  ;      __        `.
+   /    / `' \;        /`-----    )
+  /  .-/    ,(         ),     \-. ;
+  |  \(       \       /        )/;
+  |   -      _5       `7       -;
+ /    (  ___-'         `-____    |
+(   ___`-_                 \ ____|
+ \ /   `,/ \     _(\__      /    \
+  \      ;  \  .' /'  `i.  /      |
+   |      \ _-'( _\__-/  `-       |
+   |       `   ,`     `_          | BP
+```
+
+=== ID: 8d7abea2b912b19e | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 29x14 ===
+```
+     ******       ******
+   **********   **********
+ ************* *************
+*****************************
+*****************************
+*****************************
+ ***************************
+   ***********************
+     *******************
+       ***************
+         ***********
+           *******
+             ***
+              *
+```
+
+=== ID: ebbc31b4e1b4ec84 | TITLE: Lovebirds III - flamingos | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 26x14 ===
+```
+         (\/)
+          \/
+  (\/)   .-.  .-.
+   \/   ((`-)(-`))
+         \\    //   (\/)
+          \\  //     \/
+   .="""=._))((_.="""=.
+  /  .,   .'  '.   ,.  \
+ /__(,_.-'      '-._,)__\
+`    /|             |\   `
+    /_|__         __|_\
+      | `))     ((` |
+      |             |
+jgs  -"==         =="-
+```
+
+=== ID: 09d43daeb115b141 | TITLE: Untitled | ARTIST: Normand Veilleux | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 33x16 ===
+```
+      _____           _____
+  ,ad8PPPP88b,     ,d88PPPP8ba,
+ d8P"      "Y8b, ,d8P"      "Y8b
+dP'           "8a8"           `Yb
+8(              "              )8
+I8                             8I
+ Yb,                         ,dP
+  "8a,                     ,a8"
+    "8a,                 ,a8"
+      "Yba             adP"
+        `Y8a         a8P'
+          `88,     ,88'
+            "8b   d8"  Normand
+             "8b d8"   Veilleux
+              `888'
+                "
+```
+
+=== ID: f77f176442d3a8ff | TITLE: Untitled | ARTIST: Normand Veilleux | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 33x16 ===
+```
+      _____           _____
+  ,ad8PPPP88b,     ,d88PPPP8ba,
+ d8P"      "Y8b, ,d8P"      "Y8b
+dP'           "8a8"           `Yd
+8(              "              )8
+I8                             8I
+ Yb,                         ,dP
+  "8a,                     ,a8"
+    "8a,                 ,a8"
+      "Yba             adP"
+        `Y8a         a8P'
+          `88,     ,88'
+            "8b   d8"  Normand
+             "8b d8"   Veilleux
+              `888'
+                "
+```
+
+=== ID: 3fbd8491f180eb74 | TITLE: Untitled | ARTIST: Normand Veilleux | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 33x16 ===
+```
+      _____           _____
+  ,ad8PPPP88b,     ,d88PPPP8ba,
+ d8P"      "Y8b, ,d8P"      "Y8b
+dP'           "8a8"           `Yb
+8(              "              )8
+I8                             8I
+ Yb,                         ,dP
+  "8a,                     ,a8"
+    "8a,                 ,a8"
+      "Yba             adP"
+        `Y8a         a8P'
+          `88,     ,88'
+            "8b   d8"  Normand
+             "8b.d8"   Veilleux
+              `Y8P'
+                "
+```
+
+=== ID: 44d2a931f4bbb8e2 | TITLE: Untitled | ARTIST: Christian Jensen (also C.J. and CJ) | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 37x16 ===
+```
+        ,-,-.           ,-,-.
+        `._.'   ,-,-.   `._.'
+   ,-,-.   ___  `._.'  ___   ,-,-.
+   `._.','"   "`.   .'"   "`.`._.'
+       /         `.'         \
+,-,-. :     ,-=-.   ,>@<.     : ,-,-.
+`._.' :     \ '.'   '.' /     ; `._.'
+       \     o( )   ( )o     /
+  ,-,-. `.   `0-0   0-0'   .' ,-,-.
+  `._.'   `.             .'   `._.'
+      ,-,-. `.         .' ,-,-.
+      `._.'   `.     .'   `._.'
+          ,-,-. `. .' ,-,-.
+          `._.'   `   `._.'
+                ,-,-.        (CJ)
+                `._.'
+```
+
+=== ID: 47e9d5f5854b04df | TITLE: Cupid at the bowling alley | ARTIST: lgbeard | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 36x18 ===
+```
+     .'`..'`.          .'`..'`.
+    (    `   )'`.  .'`(    `   )
+     \      /`   )(   `\      /
+ .'`..'`.  /    /..\    \  .'`..'`.
+(    `   )/    /  ` \    \(    `   )
+ \      /  \  /\    /\  /  \      /
+  \  .'`..'`./  \  /  \.'`..'`.  /
+   \(    `   )   \/   (    `   )/
+    \\      /          \      /
+      \  .'`..'`.  .'`..'`.  /
+       \(    `   )(    `   )/
+        \\      /  \      /
+          \   .'`..'`.   /
+           \ (    `   ) /
+            \/\      /\/
+               \    /
+                \  /
+                 \/ LGB
+```
+
+=== ID: 448b1f4bf8347702 | TITLE: Untitled | ARTIST: Tua Xiong | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 35x20 ===
+```
+         ,;;;;;;;,
+        ;;;;;;;;;;;,
+       ;;;;;'_____;'
+       ;;;(/))))|((\
+       _;;((((((|))))
+      / |_\\\\\\\\\\\\
+ .--~(  \ ~))))))))))))
+/     \  `\-(((((((((((\\
+|    | `\   ) |\       /|)
+ |    |  `. _/  \_____/ |
+  |    , `\~            /
+   |    \  \           /
+  | `.   `\|          /
+  |   ~-   `\        /
+   \____~._/~ -_,   (\
+    |-----|\   \    ';;
+   |      | :;;;'     \
+  |  /    |            |
+  |       |            | -Tua Xiong
+   |      `.           /
+```
+
+=== ID: 9a9a8836c36925d4 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 37x21 ===
+```
+   .mPMMNNHHmo.       _, n!it6XHm.
+ ,8PMWWHHKKDDXY8.   _o86SSXXDDKKH8b.
+,8FMWNKKQDXX665Y8. d8YJYY5566XXDQKY8.
+d8MWNKKDDSS55YYtY88PjjtjJtYY55SSDDK8b
+Y8NNKKDXS65YJtjjiPPi=i=iijjtJY56SXDY8
+i8WHKDDS65Yttcc==++>+>++==ccttY56SDd8
+`8bKQDSS5Yttci=+>!;;:;;!>+=icttY5SSd8
+ Y8KQXX65JJjc==>!::~~~::!>==cjJJ56X8P
+ `8LDX66YJjji=>>;:'. .':;>>=ijjJY668'
+  i8QXX65JJjc==>!::~~~::!>==cjJJ568P
+   Y8DSS5Yttci=+>!;;:;;!>+=icttY58P
+    8bDS65Yttcc==++>+>++==ccttY58P
+     Y8XS65YJtjjii=i=i=iijjtJY58'
+      `8bSS55YYtJjtjjjtjJtYY5d8'
+        `8oX6655YYJYJYJYY556dP
+          `8oXXSS6666666SSo8'
+            `YbDXDXXXXXo8P'
+              `YbKKQKdP'
+                `Yb8P'
+                  Y8
+                   ' mh
+```
+
+=== ID: 426969f136a86ac5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 39x20 ===
+```
+        @@@@@@           @@@@@@
+      @@@@@@@@@@       @@@@@@@@@@
+    @@@@@@@@@@@@@@   @@@@@@@@@@@@@@
+  @@@@@@@@@@@@@@@@@ @@@@@@@@@@@@@@@@@
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      @@@@@@@@@@@@@@@@@@@@@@@@@@@
+        @@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@
+            @@@@@@@@@@@@@@@
+              @@@@@@@@@@@
+                @@@@@@@
+                  @@@
+                   @
+```
+
+=== ID: bfa3eff553c5b8a2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 34x26 ===
+```
+        ..
+         $. ,o$$$o.
+         $. $$$$$$$o.   ..
+        .$. $' $$$$$$ ,o''
+       .$'  $  '$$$$$,o'.,'   .oo'
+      .$'   $.   $$$$'  ,,  .o'.
+     .$'    '$o. 'O$ ..ooo''',oo'
+    .$'     .o$'  '$$''     ,,o'
+  .%$,,,,,ooO'      '      ,,o''
+.$o.          ,o'   $o    ..oo'
+ ''O'''''''''','      $'$. .o'
+    '$        $       '$,'o' '
+    '$        $      .o $
+     '$       $       .$$
+      '$      $,     .o$$
+       '$     $.    ,o' $
+        $.    '$.   $,oooo''o,
+        $.     $.  'o'       '$
+        $.     $.     .,ooo,  $
+      .''      'oo...o'  $ 'o $
+                      $  $   ''
+                      $  $
+                      $  %
+                     ,$  $
+                     $  $'
+                      ''
+```
+
+=== ID: 84319c5a1db5d9c3 | TITLE: Untitled | ARTIST: Normand Veilleux, Tua Xiong | CATEGORY: holiday-and-events | SUBCATEGORY: valentine | SIZE: 24x28 ===
+```
+        ,;;;;;,
+       ,;;;;;;;;,
+       ;;;'____ ;
+       ;;;(\\\\\;
+       `/'((|||||
+    ___<  C))||||
+  ,'    \__(((||),
+  |    \  _)))))))\,_
+ /|    |/"\`\`""""' |)
+;  \    \  ) \_____/_|
+|  |\    \'    _.,-' |
+|  ' \    \.,-'   _./ |
+(  _,-\      _.-''  |  ;
+ "'|___\__.-'       ;  )
+    |----|   _.--,;'   ;
+   ,'  , | (     __.,-'
+   | ,' ,'  `""''   `.
+   |    ;            )
+   `,   (            )
+    |   (           ,'
+    |   |           (
+    |   |           |
+    |   |           |
+    |   |___________|
+    |   |      |    |
+    Normand Veilleux
+    based on work by
+       Tua Xiong
+```
+
+=== ID: 3136617ed80991e0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: hanukkah | SIZE: 25x14 ===
+```
+ooooooooooooooooooooooooo
+o    Happy Hanukkah     o
+o          ! !          o
+o        ! | | !        o
+o      ! | H H | !      o
+o    ! | H H!H H | !    o
+o    | H H H|H H H |    o
+o    (_H_H_H|H_H_H_)    o
+o     (___________)     o
+o           H           o
+o           H           o
+o           H           o
+o        ___H___        o
+ooooooooooooooooooooooooo
+```
+
+=== ID: 784fca43f16ab5aa | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: easter | SIZE: 28x24 ===
+```
+     .-.            .-.
+    /   \          /   \
+   |   _ \        / _   |
+   ;  | \ \      / / |  ;
+    \  \ \ \_.._/ / /  /
+     '. '.;'    ';,' .'
+       './ _    _ \.'
+       .'  a __ a  '.
+  '--./ _,   \/   ,_ \.--'
+ ----|   \   /\   /   |----
+  .--'\   '-'  '-'    /'--.
+      _>.__  -- _.-  `;
+    .' _     __/     _/
+   /    '.,:".-\    /:,
+   |      \.'   `""`'.\\
+    '-,.__/  _   .-.  ;|_
+    /` `|| _/ `\/_  \_|| `\
+   |    ||/ \-./` \ / ||   |
+    \   ||__/__|___|__||  /
+     \_ |_Happy Easter_| /
+jgs .'  \ =  _= _ = _= /`\
+   /     `-;----=--;--'   \
+   \    _.-'        '.    /
+    `""`              `""`
+```
+
+=== ID: 16b21758ece16e8c | TITLE: Gift | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: other | SIZE: 17x8 ===
+```
+      _   _
+     ((\o/))
+.-----//^\\-----.
+|    /`| |`\    |
+|      | |      |
+|      | |      |
+|      | |      |
+'------===------'
+```
+
+=== ID: 4dc35e5d63cc1f49 | TITLE: Gif | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: other | SIZE: 29x14 ===
+```
+       .__.      .==========.
+     .(\\//).  .-[ for you! ]
+    .(\\()//)./  '=========='
+.----(\)\/(/)----.
+|     ///\\\     |
+|    ///||\\\    |
+|   //`||||`\\   |
+|      ||||      |
+|      ||||      |
+|      ||||      |
+|      ||||      |
+|      ||||      |
+|      ||||      |
+'------====------'
+```
+
+=== ID: f007c098c56b8ce5 | TITLE: Party | ARTIST: H P Barmario (Morfina) | CATEGORY: holiday-and-events | SUBCATEGORY: other | SIZE: 37x24 ===
+```
+.-._.-._.-._.-._.-._.-._.-._.-.
+-._.".--.._.-._.-._"_._.-._.-._
+  ( (  ° )  .--."  (°'.___   (
+ * ) '--' *(  ° )   '.____) * )
+  (     (   '--'   *     _   (
+   )     )   __ _.      /,'   )
+* (     (  .'  ' '-   ° °    (
+   )     )-  /.;, ) °  °  *   )
+  (     * . ( ^ ('  > POP! < (
+   )       /)\_v/   /'.°      )
+  (       .-|\/|-../"/.      (
+   )     /_/    /'. °\_)      *
+  (     (___'. /# / //
+   )       \\_;'./ //
+  *        /--'.___/
+          ( _/ ' '.
+      °    \  \-.  '. <- me uncorking
+            \  \ '.  \   a  bottle of
+             \  )  )  )  *CHAMPAGNE*!
+           mrf) | /  |
+             /  |(___|
+         °  |   | \ -\
+      °     \.--:_ \__)
+    ___,_____\____) _____._______
+```
+
+=== ID: c592a0f6aa5bc83e | TITLE: Joan as Lucia | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: other | SIZE: 28x72 ===
+```
+    ()  ()  () ()
+    ||  ||  || ||
+    ||  ||  || ||
+    ||{{||}}||.||
+    ||{{||}}||}||
+   {.............}
+  }}}}} _   _ {{{{{
+  }}}}  6   6  {{{{
+ {{{{{()__^__()}}}}}
+{{{{{{\ `._.' /}}}}}}
+{{{{{{{;.___.;}}}}}}}
+ {{{{{{{)   (}}}}}}}'
+  `""'"':   :'"'"'`
+jgs/VK   `@`
+
+    ()  ()  ()
+    ||  ||  ||    ()
+    ||  ||  ||   //
+    ||{{||}}||. //
+    ||{{||}}||}//
+   {.............}
+  }}}}} _   _ {{{{{
+  }}}}  O   O  {{{{
+ {{{{{    ^    }}}}}
+{{{{{{\ ----- /}}}}}}
+{{{{{{{;.___.;}}}}}}}
+ {{{{{{{)   (}}}}}}}'
+  `""'"':   :'"'"'`
+jgs/VK   `@`
+
+    ()  ()  ()
+    ||  ||  ||
+    ||  ||  ||
+    ||{{||}}||.
+    ||{{||}}||}
+   {.............}
+  }}}}} _   _ {{{{{
+  }}}}  @   @  {{{{  )
+ {{{{{    ^    }}}})(
+{{{{{{\  <_>  /}}}}( )
+{{{{{{{;.___.;}}}}}})
+ {{{{{{{)   (}}}}}}}'
+  `""'"':   :'"'"'` ______()
+jgs/VK   `@`        ------'
+
+    ()  ()  ()
+    ||  ||  ||
+    ||  ||  ||   (
+    ||{{||}}||. ( )  )
+    ||{{||}}||( )  )(
+   {...........( )(  )
+  }}}}} _   _ ( )( )(  )
+  }}}} (@) (@) {( )( )(
+ {{{{{   _^_   ( ( )( )
+{{{{{{\ (___) /}( )( )
+{{{{{{{;.___.;}( )( )
+ {{{{{{{)   (}( )( )'
+  `""'"':   :'"'"'` ______()
+jgs/VK   `@`        ------'
+
+
+       _.---._
+      /       \
+     |         |
+     |  _   _  |
+     |  o   o  |
+     (    ^    )
+      \   -   /
+       `.___.'
+        )   (
+  `""'"':   :'"'"'`
+jgs/VK   `@`
+```
+
+=== ID: df619f8c81cdd50a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 26x4 ===
+```
+                       (
+      __________       )\
+     /         /\______{,}
+jgs  \_________\/
+```
+
+=== ID: f559481e28f0c66a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 30x6 ===
+```
+                      . : .
+      __________    '.  :  .'
+     /         /\__.__'.:.'  .
+jgs  \_________\/  .  .':'.  .
+                    .'  :  '.
+                      ' : '
+```
+
+=== ID: f07c66a1de39b284 | TITLE: Sparks | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 38x6 ===
+```
+                                 .
+    .              .   .'.     \   /
+  \   /      .'. .' '.'   '  -=  o  =-
+-=  o  =-  .'   '              /   \
+  /   \                          '
+    '
+```
+
+=== ID: 2fb07f458870185b | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 10x10 ===
+```
+        .
+      .' |
+    .'   |
+    /`-._'
+   /   /
+  /   /
+ /   /
+(`-./
+ )
+'
+```
+
+=== ID: 741f25f9e875df1e | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 28x32 ===
+```
+     .;*;;.
+.;;*;;'' '*;.
+          .;'
+          '*.
+          .;*'
+     _.---';:.-----.._
+   / .-```  *;.``--..  \
+   \ '._   .;*'    _.' /
+    '-._``--.._.--'_.-'|
+    |   ``--------'   .|
+    |   .'______    .' |
+    | .' |_    _| .'   |
+    |'    .'_  '.'    .|
+    |   .|.' '._|   .' |
+    | .' /`-.'    .'   |
+    |'   _'. \  .'    .|
+    |   .\.--'.'    .' |
+    | .'  _______ .'   |
+    |'   |       |    .|
+    |   .| o v.o |  .' |
+    | .' '..'''..'.'   |
+    |'    .---. .'    .|
+    |   .( ( ).)    .' |
+    | .'  '---'   .'   |
+    |'    .---. .'    .|
+    |   .( ( ) )    .' |
+    | .'  '---'   .'   |
+    |'    _______'    .|
+    |   .`---. _.`  .' |
+    | .'  __< _>. .'   |
+    |'   `-------`     | LGB
+    '---...______...---'
+```
+
+=== ID: 3a2153191020e413 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 32x43 ===
+```
+          .e.
+         .e<e.
+        .e<<<e.
+       .e<<<<<e.
+      .e<<<<<<<e.
+     .e<<<<<<<<<e.
+    .e<<<<<<<<<<<e.
+   .e<<<<<<<<<<<<<e.
+  .e<<<<<<<<<<<<<<<e.
+ .e<<<<<<<<<<<<<<<<<e.
+.e<<<<<<<<<<<<<<<<<<<e.
+.e<<eeee$$$$$$$$eeee<<e.
+.ee$$$$7777777777$$$$ee.
+ 'e$d$<<<<<<<<<<<<$d$*'
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<<<<<<<<<<<<$
+     $<ed777777de>$
+     '-fdLLLLLLdf-'
+           $$.
+           $$$.             :'
+           $$ $d.        : :
+           $$   '$e         . :`
+           $$      'e.
+           $$             '
+           $$     ':     '
+           $$               ':
+           $$
+           $$
+           $$
+           $$
+           $$
+           $$
+           $$
+           $$
+```
+
+=== ID: bcf620682f3c374f | TITLE: Untitled | ARTIST: Bill Hirst | CATEGORY: holiday-and-events | SUBCATEGORY: fireworks | SIZE: 24x47 ===
+```
+           /\
+          /  \
+         /    \
+        /      \
+       /        \
+      /          \
+     /            \
+    /              \
+   /                \
+  /                  \
+ /                    \
+/______________________\
+  |                  |
+  |            _     |
+  |        _.-'_)    |
+  |    _.-'_.-'      |
+  |   (_  (._        |
+  |     `-._ `-_     |
+  |         `-. )    |
+  |   /~`-._  | |    |
+  |   |  _  | | |    |
+  |   | | | | | |    |
+  |   | | | `~  |    |
+  |   | |  ~-._/'    |
+  |   (_ `-._        |
+  |     `-._ `-_     |
+  |        _)  _)    |
+  |    _.-'_.-'      |
+ _|   (_  (._        |
+| |     `-._ `-_     |
+| |         `-. )    |
+| |        _.-'_|    |
+| |    _.-'_.-'      |
+| |   (_  (._        |
+| |     `-._ `-_     |
+| |         `-._)    |
+| |                  |
+| |                  |
+| |                  |
+| |~~~~~~~~||~~~~~~~~
+| |        ||
+| |         \\  ,
+| |          \*'
+| |          ',``
+| |
+| |
+| |
+```
+
+=== ID: b185c1bec64b056b | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: holiday-and-events | SUBCATEGORY: new-year | SIZE: 19x9 ===
+```
+|_|  .  |) |) \./
+| | /-\ |  |   |
+' ''   ''  '   '
+ . .  _ |  |
+ |\| |- \/\/
+ ' '  ~
+\./  _  .  |)
+ |  |- /-\ |\
+ '   ~'   '' '  ldb
+```
+
+=== ID: 5ad84b33a58cb735 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: birthdays | SIZE: 39x17 ===
+```
+                            __/\__
+                            \    /
+                            /_  _\
+                              \/
+
+
+             ,   ,   ,   ,
+           , |_,_|_,_|_,_| ,
+       _,-=|;  |,  |,  |,  |;=-_
+     .-_| , | , | , | , | , |  _-.
+     |:  -|:._|___|___|__.|:=-  :|
+     ||*:  :    .     .    :  |*||
+     || |  | *  |  *  |  * |  | ||
+ _.-=|:*|  |    |     |    |  |*:|=-._
+-    `._:  | *  |  *  |  * |  :_.'    -
+ =_      -=:.___:_____|___.: =-     _=
+    - . _ __ ___  ___  ___ __ _ . -
+```
+
+=== ID: 04322c7c3ec05917 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: birthdays | SIZE: 39x23 ===
+```
+                {}   {}
+               // @@@ \\
+              {{ {~ ~} }}
+               \\*)^(*//
+                (o) (o)
+                 ) . (
+                (  v  )
+               {}\ | /{}
+               ||{ | }||
+              _||_}|{_||_
+         {}  {~ ~ ~ ~ ~ ~}  {}
+         ||  { ~ ~ ~ ~ ~ }  ||
+       __||__{___________}__||__
+      {\/\/\/\/\/\/\/\/\/\/\/\/\}
+   {} {        H a p p y       \} {}
+   || {\/\/\/\/\/\/\/\/\/\/\/\/\} ||
+ __||_{_________________________}_||__
+{\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\}
+{                                     }
+{         B i r t h d a y ! ! !       }
+{                                     }
+{/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/}
+{_____________________________________}
+```
+
+=== ID: 558bd9045bdd1a23 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: birthdays | SIZE: 40x34 ===
+```
+                 \\\ ,
+                  \ `|
+                   ) (   .-""-.
+                   | |  /_  {  '.
+                   | | (/ `\   } )
+                   | |  ^L ^`}   {
+                   \  \ \=  ( {   )
+                    \  \ '-, {   {{
+                     \  \_.'  ) }  )
+                      \.-'   (     (
+                      /'-.'_. ) (  }
+                      \_(    {   _/\
+                       ) '--' `-;\  \
+                   _.-'       /  / /
+            <\/>_.'         .'  / /
+        <\/></\>/.  '      /<\// /
+        </\>  _ |\`- _ . -/|<// (
+     <\/>    - _- `\  _.-'_/- |  \
+     </\>        -  - -  -     \\\
+      }`<\/>                <\/>`{
+      { </\>-<\/>_<\/>_<\/>-</\> }
+      }      </\> </\> </\>      {
+   <\/>.                         <\/>
+   </\>                          </\>
+    {`<\/>                     <\/>`}
+    } </\>-<\/>_<\/>_<\/>_<\/>-</\> {
+    {      </\> </\> </\> </\>      }
+    }                               }
+    {           H A P P Y           {
+ <\/>        B I R T H D A Y        <\/>
+ </\>                               </\>
+   `<\/>                          <\/>'
+jgs </\>-<\/>_<\/>_<\/>_<\/>_<\/>-</\>
+         </\> </\> </\> </\> </\>
+```
+
+=== ID: e9e17acbd5e8a95d | TITLE: Graduation cap and diploma | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: holiday-and-events | SUBCATEGORY: graduation | SIZE: 27x5 ===
+```
+  ,-"-.
+,'  .----.   _________
+`.     ,' ) (@)__))___)
+ |`-.-'| #       \\
+  `---'           ^     hjw
+```
+
+=== ID: adbbf20b8d7f07a9 | TITLE: Untitled | ARTIST: Paul Foerster | CATEGORY: holiday-and-events | SUBCATEGORY: graduation | SIZE: 35x6 ===
+```
+      __--__
+  __--      --__
+--__          __--
+    --__  __--  |
+     |  --  |   |   -Paul Foerster-
+      --__--    *
+```
+
+=== ID: f1ceb36f4b28649b | TITLE: Graduation cap | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: graduation | SIZE: 18x7 ===
+```
+      _.-'`'-._
+   .-'    _    '-.
+    `-.__  `\_.-'
+      |  `-``\|
+jgs   `-.....-A
+              #
+              #
+```
+
+=== ID: b527aee7259ea1bf | TITLE: Graduation caps | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: graduation | SIZE: 31x12 ===
+```
+,_
+| `""---..._____
+'-...______    _````"""""""'`|
+       \   ```` ``"---...__  |
+       |`              |   ``!
+       |               |     A
+       |               /    /#\
+     jgs`--..______..-'     ###
+                            ###
+                            ###
+                            ##'
+                            `#
+```
+
+=== ID: aa868273222af847 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: graduation | SIZE: 30x13 ===
+```
+     |""-..._____
+     '-.____    _````"""""'`|
+         \  ``` ``"---... _ |
+         |              /  /#\
+         }--..______..-{   ###
+        }}}}} _   _ {{{{{
+        }}}}  6   6  {{{{
+       {{{{{    ^    }}}}}
+      {{{{{{\  -=-  /}}}}}}
+      {{{{{{{;.___.;}}}}}}}
+       {{{{{{{)   (}}}}}}}'
+        `""'"':   :'"'"'`
+after/jgs      `@`
+```
+
+=== ID: 61b7c4a7eca64932 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: graduation | SIZE: 31x18 ===
+```
+,_
+| `""---..._____
+'-...______    _````"""""""'`|
+       \   ```` ``"---...__  |
+       |`              |   ``!
+       |               |     A
+       |               /\   /#\
+       /`--..______..-'  |  ###
+      |   /  `\    /`--. |  ###
+     _|  |  .-;`-./;-.  ||  ###
+    / \  \ /\_|    |_/\ //\ ##'
+    |  `-' \__/ _  \__/ |  |`#
+    \_,                 /_/
+       `\              /
+         '.  '.__.'  .'
+  jgs      `-,____,-'
+            /"""I""\
+           /`---'--'\
+```
+
+=== ID: 40aef84c2447fc5e | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 27x9 ===
+```
+          ___
+       ___)__|_
+  .-*'          '*-,
+ /      /|   |\     \
+;      /_|   |_\     ;
+;   |\           /|  ;
+;   | ''--...--'' |  ;
+ \  ''---.....--''  /
+  ''*-.,_______,.-*'    low
+```
+
+=== ID: be8589ef64f13b0a | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 22x9 ===
+```
+      __J"L__
+  ,-'`--...--'`-.
+ /  /\  ___  /\  \
+J   ""  \_/  ""   L
+|                 |
+J    /\/VWV\/\    F
+ \  (/\/\_/\/\)  /
+  "-._       _,-"Krogg
+      """""""
+```
+
+=== ID: 9acfe5ea764a94e5 | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 22x9 ===
+```
+      __J"L__
+  ,-"`--...--'"-.
+ /  /\       /\  \
+J  /__\  _  /__\  L
+|       / \       |
+J    _  """  _    F
+ \   \\/\_/\//   /
+  "-._\/\_/\/_,-"Krogg
+      """""""
+```
+
+=== ID: 8d9cd75e49ca33fb | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 38x12 ===
+```
+.___,_______,_____Happy_Halloween____.
+| ./(       )\.        |             |
+| )  \/\_/\/  (        |             |
+| `)  (^Y^)  (`      \(|)/           |
+|  `),-(~)-,(`      --(")--          |
+|      '"'      \\    /`\            |
+|          .-'```^```'-.    ,     ,  |
+|         /   (\ __ /)  \   )\___/(  |
+|         |    ` \/ `   |  {(@)v(@)} |
+|         \    \____/   /   {|~~~|}  |
+|          `'-.......-'`    {/^^^\}  |
+.___ldb______________________`m-m`___.
+```
+
+=== ID: e8a05b0051cb5ea4 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 30x14 ===
+```
+                  ,
+                 /.\
+                //_`\
+           _.-`| \ ``._
+       .-''`-.       _.'`.
+     .'      / /'\/`.\    `.
+    /   .    |/         `.  \
+   '   /                  \  ;
+  :   '            \       : :
+  ;  ;             ;      /  .
+   ' :             .     '  /
+    \ \           /       .'
+LGB  `.`        .'      .'
+       `-..___....----`
+```
+
+=== ID: 32c6464ca004990b | TITLE: Untitled | ARTIST: Zeus Simeoni | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 33x14 ===
+```
+             /}
+      _,---~-LJ,-~-._
+   ,-^  '   '   '    ^:,
+  :   .    '      '     :
+ :     /| .   /\   '     :
+:   . //|    // \   '     :
+:     `~` /| `^~`    '     ;
+:  '     //|         '    :
+:   \-_  `~`    ,    '    :
+;  . \.\_,--,_;^/   ,    :
+ :    ^-_!^!__/^   ,    :
+  :,  ,  .        ,    :   -ZEUS-
+    ^--_____     .   ;`
+            `^''----`
+```
+
+=== ID: b2ad7cef79b509c3 | TITLE: Bride and groom | ARTIST: Riitta Rasimus | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 32x6 ===
+```
+  ...     _M_
+ /( )\    ( )
+/ / \ \  / : \
+~~\%/~~  \|:|/
+ /   \    |||
+/,,,,,\   |||     Riitta Rasimus
+```
+
+=== ID: 04b6d9d3f2c9e04a | TITLE: Rings | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 14x6 ===
+```
+      ,**,
+      .\/.
+     //  \\-.
+     \\_///`\\
+jgs   '-\\__//
+         '--'
+```
+
+=== ID: 1d97836472fb1e2b | TITLE: Diamond ring | ARTIST: llizard | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 16x7 ===
+```
+          __
+         _\/__
+       //----\\
+      ||      ||
+      ||      ||
+ejm    \\____//
+         ----
+```
+
+=== ID: 1fdf9c427e1cd004 | TITLE: Bride & groom | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 19x8 ===
+```
+                _
+         mMm  _[_]_
+        /(_)\  (_)
+       //)^(\\//:\\
+      /(/&@&\)\|~|/
+     / /-~`~-\ |||
+jgs  `/       \|||
+     `--------'-'--
+```
+
+=== ID: e79c5f6a6b382089 | TITLE: Bride & groom | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 18x8 ===
+```
+               _
+        mMm  _[_]_
+       /(")\  (")
+      //)^(\\//:\\
+     /(/&@&\\/|~|/
+    / /-~`~-\ |||
+jgs `/       \|||
+    `----------'--
+```
+
+=== ID: 9af31e7ae9ed53b0 | TITLE: Bride | ARTIST: llizard | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 16x8 ===
+```
+         ,~,
+         )))
+        ((((***
+        \) \|/
+        /   \
+       /     \
+      /       \
+ejm  ,`_,`_,`_,`
+```
+
+=== ID: 0caf59bc3dc889c1 | TITLE: Bridal couple | ARTIST: llizard | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 20x9 ===
+```
+                 _
+         ,~,    {()
+         )))    - -
+        ((((***/| ||
+        \) \|// | ||
+        /   \   |_|)
+       /     \  |||
+      /       \ |||
+ejm  ,`_,`_,`_,`|||
+```
+
+=== ID: 70b8a0e90286ec57 | TITLE: Rings | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 19x11 ===
+```
+   ,-==-,
+   \/\/\/
+    \\//
+   .-''-.
+ .'.-""-.'.---.
+/ /    .'\ \--.'.
+| |   / /| |   \ \
+\ \  | | / /    | |
+ '.'-:\ \.'    / /
+   '---; '-..-'.'
+ jgs    `'----'
+```
+
+=== ID: 2fcff8cdfb6ba080 | TITLE: Untitled | ARTIST: llizard | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 19x14 ===
+```
+          @@@
+         (( }
+         ``)
+        ``( \  @@@
+       ```\`.\_`|/
+      ```` )|---~
+     ~~~~~/ \`
+         / ' \`
+        /  '  \`
+       /   '    `
+      /   _!__.-._`
+     /_.-'    ( \
+     /,        ` \
+ejm |`_         |`_
+```
+
+=== ID: 23aafc4a1546a7e8 | TITLE: Untitled | ARTIST: llizard | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 32x15 ===
+```
+                         --.
+          @@@           /  ))
+         (( }           7_ /
+         ``)             / \
+        ``( \           |<| |
+       ```\`.\__     __/|/| |
+      ```` )|---~o_)|___| | |
+     ~~~~~/ \`          | |_|
+         / ' \`         |__>)
+        /  '  \`        || |
+       /   '    `       |\ \
+      /   _!__.-._`     | \ \
+     /_.-'  ( |         | |\ \
+        /    `|         |_| \_\
+ejm    |`_   |`_      __'_)__.-'
+```
+
+=== ID: 3fdc8ce9e83f5c39 | TITLE: Wedding cake | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 18x16 ===
+```
+       O O
+      /Y/|\
+      /_<<
+      )~~~(
+    @@@@@@@@@
+     )'-'-'(
+  @@@@@@@@@@@@@
+   ) *  *  * (
+   )'-''-''-'(
+  @@@@@@@@@@@@@
+    ||     ||
+@@@@@@@@@@@@@@@@@@
+ ) *  *  *  *  *(
+ )'-''-''-''-''-(
+ )*  *  *  *  * (
+@@@@@@@@@@@@@@JGS@
+```
+
+=== ID: 7993d0a562826c3d | TITLE: Untitled | ARTIST: llizard | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 24x16 ===
+```
+            _
+           | |
+          @@@--
+         (( }_`
+         ``) (
+        ``( \<\@@@
+       ```\`.\_`|/
+      ```` )| |
+     ~~~~~/ \`
+         / ' \ `
+        /  '  \  `
+       /   '       _)
+      /   _!____.-'\
+     /_.-'/_/ ( \ \_\
+     /,  '-.__ ` \ (_`__
+ejm |`_         |`_
+```
+
+=== ID: 51249193a66a0877 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 21x18 ===
+```
+         /"\
+     /"\|\./|/"\
+    |\./|   |\./|
+    |   |   |   |
+    |   |>~<|   |/"\
+    |>~<|   |>~<|\./|
+    |   |   |   |   |
+/~T\|   |   =[@]=   |
+|_/ |   |   |   |   |
+|   | ~   ~   ~ |   |
+|~< |             ~ |
+|   '               |
+\                   |
+ \                 /
+  \               /
+   \.            /
+     |          |
+     |          |
+```
+
+=== ID: 73e967bb7ee40412 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 28x21 ===
+```
+      ___
+     /\/_\_
+     \/ ))))
+      ",".//
+      \%_,O
+        _||___
+       /)___/_\
+      '(_/\_)\/\
+     />,\\/ / \/\
+     \o\/==/\  \/o__
+      (/| /o\\   \,\\-
+      //  \ | \
+     /o|  |  \ \
+    / /  / o  \ \
+   / /   \    |  \
+  /  | o /    \ o \
+  \  /   |     \   \
+  / /   /    o /    \
+ / | o  \      )    |
+/__/\___/_____/\___o/  b'ger
+     ='      ='
+```
+
+=== ID: cfb89223ba8e4c3e | TITLE: Untitled | ARTIST: Glory Py Yip (Glory Moon) | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 33x23 ===
+```
+               ,-,
+             ,**@**.
+             /&&&-b\
+            / &&&/& \
+            /  _!!_ \
+           / /]{  }[\ \
+           \| (~~~~) |/
+            /^\)  (/^\
+           ( \\(@*)// )
+           ," (*@@*) ".
+          /  ,~(*@)~`  \
+         '      ;:      '
+        /      :  ;      \
+       '        ;:        '
+      '        :  '        '
+     @                      @
+    ':     ,@.      ,@.     ;'
+   '  '-=-'   '-__-'   '-=-'  '
+  '                            '
+ /                              \
+ ~=._                        _,=~
+     `=-.__            __,-='
+gpyy       `-=.____,=-'
+```
+
+=== ID: f7723774b5045f66 | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: holiday-and-events | SUBCATEGORY: wedding | SIZE: 26x24 ===
+```
+          .:::::.
+        .::|||||:.
+        :: .   . ;
+        ::   ^   ;
+        ::\  =  /;
+        ::::`-'|;'
+        _::::. `-._
+       /\\`:::   //\
+      / ("":::.""") \
+     (  /Yi::'|iiP\  )
+      \ \/::'A (@@) /
+      /)/:: /I\(@@)(\
+     / J : J I F F\' \
+    J  F I I I | IVJ  F
+    F J  F F I J J KF J
+   J  F J J  I  F F\J  F
+   F J  I |  I  I IK F J
+  J  F  F F  I  J J RJ  F
+  F J  J J   I   F F OF J
+ J  F  I I   I   I I  G  F
+ F.J.._F_F_  I  _F_J_..G.J
+           """""
+
+Krogg
+```
+
+=== ID: 85bb2e4b7e1e3e74 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 15x4 ===
+```
+   _==_ _
+ _,(",)|_|
+  \/. \-|
+__( :  )|_  hjw
+```
+
+=== ID: 87dcfa5f979d6eac | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 15x6 ===
+```
+     __
+   _|==|_
+    ('')___/
+>--(`^^')
+  (`^'^'`)
+  `======'  ldb
+```
+
+=== ID: 4326e27fbb09fc49 | TITLE: Tiny snowman | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 15x6 ===
+```
+         _
+       _[_]_
+        (")
+    `--( : )--'
+      (  :  )
+jgs ""`-...-'""
+```
+
+=== ID: ec6a0a6e1b7f0648 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 32x17 ===
+```
+        .-. _.--._ .-.
+ VK    (   '      `.  )
+        `/          \'
+        J   *   *    L
+        |     W      |
+        J     |      F
+   .-.   \  -' `-   /  .-.
+   |  \   `.     .'   /  |
+    \  \ .-'      `-./  /
+     \ .'            `./
+      /                \
+     J                  L
+     F                  J
+     L                  J
+     J                  F
+-.    \                /
+  `---.>              <_.----.__
+```
+
+=== ID: f79549e5b707e174 | TITLE: Snow woman | ARTIST: Veronica Karlsson | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 32x17 ===
+```
+           _.----._
+ VK      .'        `.
+        /  _______   \
+       J  / *   * \   L
+       | |    *    |  |
+       | | *     * |  |
+       | \   * *   /  |
+   _|  J  `.     .'   L
+     \ \ .-'      `-. /   |__
+      |.'   /        `._.-'
+      `| *  |  *    |
+       \     \      |
+        `-    `-    |
+         |          |
+        '            `
+-.     |              |
+  `---.>   ***        <_.----.__
+```
+
+=== ID: 2b2f4a2055d664ef | TITLE: Season's greetings snowman | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 38x19 ===
+```
+||::|:||   .--------,
+|:||:|:|   |_______ /        .-.
+||::|:|| ."`  ___  `".    {\('v')/}
+\\\/\///:  .'`   `'.  ;____`(   )'____
+ \====/ './  o   o  \|~     ^" "^   //
+  \\//   |   ())) .  |   Season's    \
+   ||     \ `.__.'  /|              //
+   ||   _{``-.___.-'\|   Greetings   \
+   || _." `-.____.-'`|    ___       //
+   ||`        __ \   |___/   \_______\
+ ."||        (__) \    \|     /
+/   `\/       __   vvvvv'\___/
+|     |      (__)        |
+ \___/\                 /
+   ||  |     .___.     |
+   ||  |       |       |
+   ||.-'       |       '-.
+jgs||          |          )
+   ||----------'---------'
+```
+
+=== ID: 464d5c17d5ceb4c9 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 32x5 ===
+```
+__     _  __
+| \__ `\O/  `--  {}    \}    {/
+\    \_(~)/______/=____/=____/=*
+ \=======/    //\\  >\/> || \>
+----`---`---  `` `` ```` `` ``
+```
+
+=== ID: d7c9d38bb60979b8 | TITLE: Santa Claus | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 15x8 ===
+```
+  .-""-.
+ /,..___\
+() {_____}
+  (/-@-@-\)
+  {`-=^=-'}
+  {  `-'  } Max
+   {     }
+    `---'
+```
+
+=== ID: 9a923d808e292df7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 19x12 ===
+```
+       __
+    .-'  |
+   /   <\|
+  /     \'
+  |_.- o-o
+  / C  -._)\
+ /',        |
+|   `-,_,__,'
+(,,)====[_]=|
+  '.   ____/
+   | -|-|_
+   |____)_) [n4biS]
+```
+
+=== ID: 3a2ea8ed3167ba2d | TITLE: Young Santa Claus throwing a snowball | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 21x14 ===
+```
+           ____
+          /    \
+ ._.     /___/\ \
+:(_):    |6.6| \|
+  \\     '.-.'  O
+   \\____.-"-.____
+   '----|     |--.\
+        |==[]=|  _\\_
+         \___/    /|\
+         // \\
+        //   \\
+        \\    \\  Max
+        _\\    \\__
+       (___|    \__)
+```
+
+=== ID: 0a3094db825b1830 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 24x18 ===
+```
+       ____
+     {} _  \
+        |__ \
+       /_____\
+       \o o)\)_______
+       (<  ) /#######\
+     __{'~` }#########|
+    /  {   _}_/########|
+   /   {  / _|#/ )####|
+  /   \_~/ /_ \  |####|
+  \______\/  \ | |####|
+   \__________\|/#####|
+snd |__[X]_____/ \###/
+    /___________\
+     |    |/    |
+     |___/ |___/
+    _|   /_|   /
+   (___,_(___,_)
+```
+
+=== ID: cc1328270d17faae | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 31x29 ===
+```
+      .-"```"-.
+     /_\ _ _ __\
+    | /{` ` `  `}
+    {} {_,_,_,_,}
+       )/ a  a \(
+      _(<o_()_o>)_          __
+     { | /_)(_\ | }       _/  \
+   /`{ \        / }`\   _| `  |
+  /   { '.____.' }   \ {_`-._/
+ /     {_,    ,_}     \/ `-._}
+|        `{--}`    \  /    /
+|    /    {  }     | `    /
+;    |    {  }     |\    /
+ \    \   {__}     | '..'
+  \_.-'}==//\\====/
+  {_.-'\==\\//====\
+   |   ,)  ``     |
+    \__|          |
+     |     __     |
+     | _   /\   _ |
+     |     ||     |
+     \ _ _ || _ _ /
+     {` ` `}{` ` `}
+     {_,_,_}{_,_,_}
+      |    ||    |
+      /-. _||_ .-\
+ jgs /    /  \    \
+    |___ /    \ ___|
+    `"""`      `"""`
+```
+
+=== ID: 8a3ba4d727d46055 | TITLE: Waving Santa | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 35x32 ===
+```
+             _.--"""""-.._
+ __        .'_ _          '.
+/  \      / ` ` `'-.        `\
+|   \/|   \_ ___ _  `\        \
+\  _..;    )` _ `_"--.\       |
+;"     \   |  a/ a    (`\     |
+|    _.;   /_.<_..___, )\\    |
+\_.-'  |  ;-.__,__..-'  '.'.  /
+  |    ;  /            (  ) \_|
+  |     \(   (      (     )/   \
+   \     (       (       .'\   /
+    \ ,   \           _.'   '-'`.
+     `|    '-(.___.--' ,;,-\_,   \
+      |         o:  .-'(())_/     ;
+      ;          :  |.-'  / `'.   |
+       \        o:  \   .-\    \ _/
+        ;--._   _:_  \ /   \    |\
+        )    `'|.-.|"'\\__.-`'-'\|
+       /``'-.._||_||_..\      _.'
+      /        '-;-'    \__.-'  \
+    /``'--..__   :       __..--'``\
+    \_        ```````````        _/
+      `'--,...__       __...,--'`
+          |     ```;```     |
+          \        |        /
+           \_ _  _ | _ _ _ /
+           /` ` ` `|` ` ` `\
+           \_._._./ \._._._/
+            |=    | |    =|
+    jgs  .--'-.   | |   .-'--.
+        /         | |         \
+        \______,__/ \__,______/
+```
+
+=== ID: 78c91ba4250cc628 | TITLE: Joseph, Mary, and Jesus | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/religious | SIZE: 23x6 ===
+```
+             |
+           -=*=-
+     (| (}   |
+      |/||\        {\
+      | ||  ___o  /|/_
+jgs   | ||  X--X   |__\
+```
+
+=== ID: ab42b159c37fec60 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/religious | SIZE: 29x25 ===
+```
+                 .-""```""-.
+  ,-"```````"-, ;   .-"-.   ;
+ ;    .-=-.    ; '=/=====\='
+ ',  /=====\  ,'   |/"""\|
+   "=|/"""\|="     \ ^ ^ /
+     |\^ ^/|       /'._.'\
+     ||'-'||      /   _   \
+    / | _ | \    /   /|\   \
+   /\/ /|\ \/\  | \_/ | \_/ |
+  | \_/ | \_/ | |   |/ \|   |
+  |   |/ \|   |  \__|   |__/
+   \__|   |__/    >=;=====<
+    |       |  |  | |     |
+    |       | \'/ | |     |
+    |       |-=*=-| |     |
+    |       | /.\ | |     |
+    |       |  |  | |     |
+    |       |     | |     |
+    |   .-------------,   |
+    |  < ~-_~-_=`|( :) >  |
+    |   \`"""""""""""`/   |
+    |    \           /____|
+jgs |;,;,;>         <_/\_/
+         /           \
+         `"""""""""""`
+```
+
+=== ID: 4b2eef0398c5b108 | TITLE: Christmas Tree | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 21x8 ===
+```
+          *
+         /.\
+        /..'\
+        /'.'\
+       /.''.'\
+       /.'.'.\
+"'""""/'.''.'.\""'"'"
+  jgs ^^^[_]^^^
+```
+
+=== ID: 6eeb185e39989d45 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 14x10 ===
+```
+      /\
+     /\*\
+    /\O\*\
+   /*/\/\/\
+  /\O\/\*\/\
+ /\*\/\*\/\/\
+/\O\/\/*/\/O/\
+      ||
+      ||
+      ||
+```
+
+=== ID: 7dc2c204937e549d | TITLE: Untitled | ARTIST: Laura Brown (SheDragon) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 16x11 ===
+```
+      .
+   __/ \__
+   \     /
+   /.'o'.\
+    .o.'.
+   .'.'o'.
+  o'.o.'.o.
+ .'.o.'.'.o.
+.o.'.o.'.o.'.
+   [_____]
+    \___/    ldb
+```
+
+=== ID: 2c2418524c2a20dc | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 19x12 ===
+```
+         *
+        /|\
+       /*|O\
+      /*/|\*\
+     /X/O|*\X\
+    /*/X/|\X\*\
+   /O/*/X|*\O\X\
+  /*/O/X/|\X\O\*\
+ /X/O/*/X|O\X\*\O\
+/O/X/*/O/|\X\*\O\X\
+        |X|
+        |X|
+```
+
+=== ID: 24a0c8157277a401 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 13x13 ===
+```
+    _\/_
+     /\
+     /\
+    /  \
+    /~~\o
+   /o   \
+  /~~*~~~\
+ o/    o \
+ /~~~~~~~~\~`
+/__*_______\
+     ||
+   \====/
+    \__/
+```
+
+=== ID: 818a38e831196f49 | TITLE: Untitled | ARTIST: Jens Reissenweber (Reißenweber) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 24x13 ===
+```
+   *    *  ()   *   *
+*        * /\         *
+      *   /i\\    *  *
+    *     o/\\  *      *
+ *       ///\i\    *
+     *   /*/o\\  *    *
+   *    /i//\*\      *
+        /o/*\\i\   *
+  *    //i//o\\\\     *
+    * /*////\\\\i\*
+ *    //o//i\\*\\\   *
+   * /i///*/\\\\\o\   *
+  *    *   ||     * jrei
+```
+
+=== ID: a52e657a94e04412 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 19x17 ===
+```
+         v
+        >X<
+         A
+        d$b
+      .d\$$b.
+    .d$i$$\$$b.
+       d$$@b
+      d\$$$ib
+    .d$$$\$$$b
+  .d$$@$$$$\$$ib.
+      d$$i$$b
+     d\$$$$@$b
+  .d$@$$\$$$$$@b.
+.d$$$$i$$$\$$$$$$b.
+        ###
+        ###
+        ### mh
+```
+
+=== ID: fee3a578b4ac68e0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 38x19 ===
+```
+                 __/\__
+                 \ ** /
+                 /_**_\
+                 / \/ \
+               // ^  $ \\
+             /____________\
+            //  *  %    \\^
+          ^/ /  @   +  #  \ \
+         /__/______________\__\^
+        * /  /   +        \  \ *
+       /%  /$ M E R R Y * \ # \
+     ^/____/____o___________\____\
+     * /  ^/            @  \    \ *
+     / %  /C H R I S T M A S\   # \
+  o/^    /o          #   %   \o    ^\
+/_____/_______________________\______\
+*   o   *    o   | * |  o   *    o   *
+                 |   |
+                 |___|
+```
+
+=== ID: a13aa119478ae4ff | TITLE: Untitled | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/trees | SIZE: 28x25 ===
+```
+             /\
+            <  >
+             \/
+             /\
+            /  \
+           /++++\
+          /  ()  \
+          /      \
+         /~`~`~`~`\
+        /  ()  ()  \
+        /          \
+       /*&*&*&*&*&*&\
+      /  ()  ()  ()  \
+      /              \
+     /++++++++++++++++\
+    /  ()  ()  ()  ()  \
+    /                  \
+   /~`~`~`~`~`~`~`~`~`~`\
+  /  ()  ()  ()  ()  ()  \
+  /*&*&*&*&*&*&*&*&*&*&*&\
+ /                        \
+/,.,.,.,.,.,.,.,.,.,.,.,.,.\
+           |   |
+          |`````|
+          \_____/
+```
+
+=== ID: afdd1cbc19191172 | TITLE: Wreath | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/other | SIZE: 14x8 ===
+```
+     _...._
+   .::o:::::.
+  .:::'''':o:.
+  :o:_    _:::
+  `:(_>()<_):'
+    `'//\\''
+jgs  //  \\
+    /'    `\
+```
+
+=== ID: e2bb3c6308260a8e | TITLE: Candy canes | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/other | SIZE: 25x13 ===
+```
+                _..._
+              .'\\ //`,
+             /\\.'``'.=",
+            / \/     ;==|
+           /\\/    .'\`,`
+          / \/     `""`
+         /\\/
+        /\\/
+jgs    /\ /
+      /\\/
+     /`\/
+     \\/
+      `
+```
+
+=== ID: 95ea99185001b060 | TITLE: Smiley face santa | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/other | SIZE: 25x14 ===
+```
+      .-""""""""""-.
+     /              `\
+    / .--.---.-.-.--.-;.
+   ; { ' . '  .  '  .  '}
+   | {__'_,__.__'__.__'_}
+   |  /    _      _    \
+   | ;    / \    / \    ;
+   | |    |0|    |0|    |
+   \ |    \_/    \_/    |
+ .-'\;  \            /  ;
+|.  ' \  '.        .'  /
+\  ` / '.  '-.__.-'  .'
+ '--'    '-._    _.-'
+  jgs        ''''
+```
+

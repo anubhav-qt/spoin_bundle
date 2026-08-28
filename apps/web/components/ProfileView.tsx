@@ -26,6 +26,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 
 import { type ProfileStatsOut, type User, api } from "@/lib/api";
 import { useRefreshEffect } from "@/lib/refresh";
@@ -267,7 +268,7 @@ function TrendStrip({
 // ─── Main view ────────────────────────────────────────────────────────────────
 
 export function ProfileView() {
-  const { user, applyUser } = useAuth();
+  const { user, applyUser, logout } = useAuth();
 
   const [stats, setStats] = useState<ProfileStatsOut | null>(null);
   const [error, setError] = useState(false);
@@ -388,10 +389,24 @@ export function ProfileView() {
         </div>
       </header>
 
+      {/* Profile is the only account surface reachable from every viewport —
+          `Sidebar` carries the same two controls but is `display:none` below
+          900px, which left phone and tablet users with no way out of a
+          session at all. Same actions, same `logout` from AuthProvider; the
+          rail keeps its copy for the desktop muscle memory. */}
       <div className="collection-controls profile-identity-actions">
         <button type="button" className="collection-action" onClick={() => setIsEditing(true)}>
           EDIT PROFILE
         </button>
+        {user.is_guest ? (
+          <Link href="/claim" className="collection-action">
+            SIGN UP
+          </Link>
+        ) : (
+          <button type="button" className="collection-action collection-action-danger" onClick={logout}>
+            LOG OUT
+          </button>
+        )}
       </div>
 
       <hr className="collection-rule" />

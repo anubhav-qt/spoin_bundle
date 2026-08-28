@@ -1,0 +1,7633 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: ANIMALS
+# Total artworks in category fitting <=40 cols: 563
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 80c90fbd73cd8011 | TITLE: Wolf | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: wolves | SIZE: 24x11 ===
+```
+                     .
+                    / V\
+                  / `  /
+                 <<   |
+                 /    |
+               /      |
+             /        |
+           /    \  \ /
+          (      ) | |
+  ________|   _/_  | |
+<__________\______)\__)
+```
+
+=== ID: 0a6b19713453457c | TITLE: Wolf | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: wolves | SIZE: 21x14 ===
+```
+        _
+       / \      _-'
+     _/|  \-''- _ /
+__-' { |          \
+    /             \
+    /       "o.  |o }
+    |            \ ;
+                  ',
+       \_         __\
+         ''-_    \.//
+           / '-____'
+          /
+        _'
+      _-'
+```
+
+=== ID: 3fda5a87949f0a2a | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: wolves | SIZE: 31x15 ===
+```
+                        ,     ,
+                        |\---/|
+                       /  , , |
+                  __.-'|  / \ /
+         __ ___.-'        ._O|
+      .-'  '        :      _/
+     / ,    .        .     |
+    :  ;    :        :   _/
+    |  |   .'     __:   /
+    |  :   /'----'| \  |
+    \  |\  |      | /| |
+     '.'| /       || \ |
+     | /|.'       '.l \\_
+snd  || ||             '-'
+     '-''-'
+```
+
+=== ID: 43d5f0c1a1219ace | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: wolves | SIZE: 34x16 ===
+```
+     _                  _
+    | '-.            .-' |
+    | -. '..\\,.//,.' .- |
+    |   \  \\\||///  /   |
+   /|    )M\/%%%%/\/(  . |\
+  (/\  MM\/%/\||/%\\/MM  /\)
+  (//M   \%\\\%%//%//   M\\)
+(// M________ /\ ________M \\)
+ (// M\ \(',)|  |(',)/ /M \\) \\\\
+  (\\ M\.  /,\\//,\  ./M //)
+    / MMmm( \\||// )mmMM \  \\
+     // MMM\\\||///MMM \\ \\
+      \//''\)/||\(/''\\/ \\
+      mrf\\( \oo/ )\\\/\
+           \'-..-'\/\\
+              \\/ \\
+```
+
+=== ID: 2717ef726b5e8ea6 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: animals | SUBCATEGORY: wolves | SIZE: 39x26 ===
+```
+                              __
+                            .d$$b
+                          .' TO$;\
+                         /  : TP._;
+                        / _.;  :Tb|
+                       /   /   ;j$j
+                   _.-"       d$$$$
+                 .' ..       d$$$$;
+                /  /P'      d$$$$P. |\
+               /   "      .d$$$P' |\^"l
+             .'           `T$P^"""""  :
+         ._.'      _.'                ;
+      `-.-".-'-' ._.       _.-"    .-"
+    `.-" _____  ._              .-"
+   -(.g$$$$$$$b.              .'
+     ""^^T$$$P^)            .(:
+       _/  -"  /.'         /:/;
+    ._.'-'`-'  ")/         /;/;
+ `-.-"..--""   " /         /  ;
+.-" ..--""        -'          :
+..--""--.-"         (\      .-(\
+  ..--""              `-\(\/;`
+    _.                      :
+                            ;`-
+                           :\
+                           ;  bug
+```
+
+=== ID: 950ef42d2be6615d | TITLE: Frog | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 5x2 ===
+```
+  o
+_`O'_
+```
+
+=== ID: d15a316f36831891 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 15x4 ===
+```
+        ()-()
+      .-(___)-.
+       _<   >_
+jgs    \/   \/
+```
+
+=== ID: c705ac28dc807062 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 21x5 ===
+```
+       _e-e_
+     _(-._.-)_
+  .-(  `---'  )-. hjw
+ __\ \\\___/// /__
+'-._.'/M\ /M\`._,-
+```
+
+=== ID: 112cd18ba0c3a3a2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 26x6 ===
+```
+            _     _
+           (')-=-(')
+         __(   "   )__
+        / _/'-----'\_ \
+     ___\\ \\     // //___
+jgs  >____)/_\---/_\(____<
+```
+
+=== ID: 6b52da4d1f212ffa | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 20x7 ===
+```
+        _  _
+       (.)(.)
+   ,-.(.____.),-.
+  ( \ \ '--' / / )
+   \ \ / ,. \ / /
+    ) '| || |' ( mrf
+OoO'- OoO''OoO -'OoO
+```
+
+=== ID: 62cbaf7ef2429d29 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 17x7 ===
+```
+         _ _
+        (oTo)
+     _.-( _ )-._
+    `/`( '-' )`\`
+       /'---'\
+     __\     /__
+jgs  \_/     \_/
+```
+
+=== ID: 034027c43ea0078a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 24x7 ===
+```
+            _   _
+           (.)_(.)
+        _ (   _   ) _
+       / \/`-----'\/ \
+     __\ ( (     ) ) /__
+     )   /\ \._./ /\   (
+jgs   )_/ /|\   /|\ \_(
+```
+
+=== ID: b9c8b0f467ef2fdc | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 22x10 ===
+```
+     /     \
+     _(I)(I)_
+    ( _ .. _ )
+     `.`--'.'
+      )    (
+  ,-./      \,-.
+ ( _( ||  || )_ )
+__\ \\||--||'/ /__ hjw
+`-._//||\/||\\_.-'
+     `--'`--'
+```
+
+=== ID: 76c1f94ebef26083 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 31x12 ===
+```
+           .--._.--.
+          ( O     O )
+          /   . .   \
+         .`._______.'.
+        /(           )\
+      _/  \  \   /  /  \_
+   .~   `  \  \ /  /  '   ~.
+  {    -.   \  V  /   .-    }
+_ _`.    \  |  |  |  /    .'_ _
+>_       _} |  |  | {_       _<
+ /. - ~ ,_-'  .^.  `-_, ~ - .\
+         '-'|/   \|`-`
+```
+
+=== ID: 666480bac8c513e5 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 27x12 ===
+```
+          ,-.___.-.
+       ,-.(|)   (|),-.
+       \_*._ ' '_.* _/
+        /`-.`--' .-'\
+   ,--./    `---'    \,--.
+   \   |(  )     (  )|   /
+hjw \  | ||       || |  /
+`97  \ | /|\     /|\ | /
+     /  \-._     _,-/  \
+    //| \\  `---'  // |\\
+   /,-.,-.\       /,-.,-.\
+  o   o   o      o   o    o
+```
+
+=== ID: f0e6ad7014a30c5a | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 27x14 ===
+```
+         o  o   o  o
+         |\/ \^/ \/|
+         |,-------.|
+       ,-.(|)   (|),-.
+       \_*._ ' '_.* _/
+        /`-.`--' .-'\
+   ,--./    `---'    \,--.
+   \   |(  )     (  )|   /
+hjw \  | ||       || |  /
+`97  \ | /|\     /|\ | /
+     /  \-._     _,-/  \
+    //| \\  `---'  // |\\
+   /,-.,-.\       /,-.,-.\
+  o   o   o      o   o    o
+```
+
+=== ID: d999706d2ceeda7d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 40x19 ===
+```
+       ____  __.---""---.__  ____
+      /####\/              \/####\
+     (   /\ )              ( /\   )
+     \____/                \____/
+    __/                          \__
+ .-"    .                      .    "-.
+ |  |   \.._                _../   |  |
+  \  \    \."-.__________.-"./    /  /
+    \  \    "--.________.--"    /  /
+  ___\  \_                    _/  /___
+./    )))))                  (((((    \.
+\                                      /
+ \           \_          _/           /
+   \    \____/""-.____.-""\____/    /
+     \    \                  /    /
+      \.  .|                |.  ./
+    ." / |  \              /  | \  ".
+ ."  /   |   \            /   |   \   ".
+/.-./.--.|.--.\          /.--.|.--.\.-.|
+```
+
+=== ID: f6de40b994d165cc | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 8x4 ===
+```
+_(~)_
+ )"(
+(@_@)
+ ) ( hjw
+```
+
+=== ID: 495363fc8e89c778 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 22x5 ===
+```
+\|/          (__)
+     `\------(oo)
+       ||    (__)
+       ||w--||     \|/
+   \|/
+```
+
+=== ID: fae79fdf0518ec7d | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 14x5 ===
+```
+ (\(~)/)
+  )@_@(  #
+ ((q_p))'
+ /\|U|/\
+/  `='  \  hjw
+```
+
+=== ID: 398e152523e9291d | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 19x6 ===
+```
+           __n__n__
+    .------`-\00/-'
+   /  ##  ## (oo)
+  / \## __   ./
+     |//YY \|/
+snd  |||   |||
+```
+
+=== ID: 789451bf1480fff4 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 13x9 ===
+```
+  (\(~)/)
+   )@_@(  #
+  ((q_p))'
+  /\|U|/\
+ /_o`='(_\
+((_)O oO O)
+ \O )o( O/
+  \(`-')/
+  /_] [_\ hjw
+```
+
+=== ID: fff81a31bb515df0 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 27x15 ===
+```
+             /)  (\
+        .-._((,~~.))_.-,
+         `=.   99   ,='
+           / ,o~~o. \
+          { { .__. } }
+           ) `~~~\' (
+          /`-._  _\.-\
+         /         )  \
+       ,-X        #   X-.
+hjw   /   \          /   \
+     (     )| |  | |(     )
+      \   / | |  | | \   /
+       \_(.-( )--( )-.)_/
+       /_,\ ) /  \ ( /._\
+           /_,\  /._\
+```
+
+=== ID: 46081994e5650af6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 36x17 ===
+```
+          .=     ,        =.
+  _  _   /'/    )\,/,/(_   \ \
+   `//-.|  (  ,\\)\//\)\/_  ) |
+   //___\   `\\\/\\/\/\\///'  /
+,-"~`-._ `"--'_   `"""`  _ \`'"~-,_
+\       `-.  '_`.      .'_` \ ,-"~`/
+ `.__.-'`/   (-\        /-) |-.__,'
+   ||   |     \O)  /^\ (O/  |
+   `\\  |         /   `\    /
+     \\  \       /      `\ /
+      `\\ `-.  /' .---.--.\
+        `\\/`~(, '()      ('
+         /(O) \\   _,.-.,_)
+        //  \\ `\'`      /
+  jgs  / |  ||   `""""~"`
+     /'  |__||
+           `o
+```
+
+=== ID: 20e8f383c23f288e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 31x20 ===
+```
+             /( ,,,,, )\
+            _\,;;;;;;;,/_
+         .-"; ;;;;;;;;; ;"-.
+         '.__/`_ / \ _`\__.'
+            | (')| |(') |
+            | .--' '--. |
+            |/ o     o \|
+            |           |
+           / \ _..=.._ / \
+          /:. '._____.'   \
+         ;::'    / \      .;
+         |     _|_ _|_   ::|
+       .-|     '==o=='    '|-.
+      /  |  . /       \    |  \
+      |  | ::|         |   | .|
+      |  (  ')         (.  )::|
+      |: |   |; U U U ;|:: | `|
+      |' |   | \ U U / |'  |  |
+      ##V|   |_/`"""`\_|   |V##
+jgs      ##V##         ##V##
+```
+
+=== ID: c78088c9153d6cec | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 35x21 ===
+```
+              (      )
+              ~(^^^^)~
+               ) @@ \~_          |\
+              /     | \        \~ /
+             ( 0  0  ) \        | |
+              ---___/~  \       | |
+               /'__/ |   ~-_____/ |
+o          _   ~----~      ___---~
+  O       //     |         |
+         ((~\  _|         -|
+   o  O //-_ \/ |        ~  |
+        ^   \_ /         ~  |
+               |          ~ |
+               |     /     ~ |
+               |     (       |
+                \     \      /\
+               / -_____-\   \ ~~-*
+               |  /       \  \
+               / /         / /
+             /~  |       /~  |
+             ~~~~        ~~~~
+```
+
+=== ID: dce1acdce8fb752b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 33x22 ===
+```
+                      ,     ,
+                  ___('-&&&-')__
+                 '.__./     \__.'
+     _     _     _ .-'  6  6 \
+   /` `--'( ('--` `\         |
+  /        ) )      \ \ _   _|
+ |        ( (        | (0_._0)
+ |         ) )       |/ '---'
+ |        ( (        |\_
+ |         ) )       |( \,
+  \       ((`       / )__/
+   |     /:))\     |   d
+   |    /:((::\    |
+   |   |:::):::|   |
+   /   \::&&:::/   \
+   \   /;U&::U;\   /
+    | | | u:u | | |
+    | | \     / | |
+jgs | | _|   | _| |
+    / \""`   `""/ \
+   | __|       | __|
+   `"""`       `"""`
+```
+
+=== ID: 7d76b8757da503ab | TITLE: Mad Cow | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 29x22 ===
+```
+      db         db
+    d88           88
+   888            888
+  d88             888b
+  888             d88P
+  Y888b  /``````\8888
+,----Y888        Y88P`````\
+|        ,'`\_/``\ |,,    |
+ \,,,,-| | o | o / |  ```'
+       |  """ """  |
+      /             \
+     |               \
+     |  ,,,,----'''```|
+     |``   @    @     |
+      \,,    ___    ,,/
+	 \__|   |__/
+            | | |
+            \_|_/
+     _
+ \\ |_|  _   _  _  _  _  | //
+    |   (_\ |  |  |  |_| o
+                     |
+```
+
+=== ID: 88a91f644f99f451 | TITLE: Untitled | ARTIST: Keely M. Swenson | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 6x5 ===
+```
+  /~\
+ C oo
+ _( ^)
+/   ~\
+Keely
+```
+
+=== ID: 31e2fb956b7018ff | TITLE: Untitled | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 19x8 ===
+```
+          __
+     w  c(..)o   (
+      \__(-)    __)
+          /\   (
+         /(_)___)
+         w /|
+          | \
+ejm97    m  m
+```
+
+=== ID: 55f4ba91ff6241c7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 22x10 ===
+```
+           ."`".
+       .-./ _=_ \.-.
+      {  (,(oYo),) }}
+      {{ |   "   |} }
+      { { \(---)/  }}
+      {{  }'-=-'{ } }
+      { { }._:_.{  }}
+      {{  } -:- { } }
+jgs   {_{ }`===`{  _}
+     ((((\)     (/))))
+```
+
+=== ID: 079486fd9c3e6807 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 28x11 ===
+```
+            __,__
+   .--.  .-"     "-.  .--.
+  / .. \/  .-. .-.  \/ .. \
+ | |  '|  /   Y   \  |'  | |
+ | \   \  \ 0 | 0 /  /   / |
+  \ '- ,\.-"`` ``"-./, -' /
+   `'-' /_   ^ ^   _\ '-'`
+       |  \._   _./  |
+       \   \ `~` /   /
+jgs     '._ '-=-' _.'
+           '~---~'
+```
+
+=== ID: d70babad092bf034 | TITLE: Untitled | ARTIST: David Berner | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 32x11 ===
+```
+       __    EEEK!
+      /  \   ~~|~~
+     (|00|)    |
+      (==)  --/
+    ___||___
+   / _ .. _ \
+  //  |  |  \\
+ //   |  |   \\
+ ||  / /\ \  ||
+_|| _| || |_ ||_  -David Berner-
+\|||___||___|||/
+```
+
+=== ID: 15a9c553faa91bbb | TITLE: Monkey typing | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 38x12 ===
+```
+                        .="=.
+                      _/.-.-.\_     _
+                     ( ( o o ) )    ))
+                      |/  "  \|    //
+      .-------.        \'---'/    //
+     _|~~ ~~  |_       /`"""`\\  ((
+   =(_|_______|_)=    / /_,_\ \\  \\
+     |:::::::::|      \_\\_'__/ \  ))
+     |:::::::[]|       /`  /`~\  |//
+     |o=======.|      /   /    \  /
+jgs  `"""""""""`  ,--`,--'\/\    /
+                   '-- "--'  '--'
+```
+
+=== ID: 829df75a4aec52ec | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 21x12 ===
+```
+       .="=.
+     _/.-.-.\_     _
+    ( ( o o ) )    ))
+     |/  "  \|    //
+      \'---'/    //
+jgs   /`"""`\\  ((
+     / /_,_\ \\  \\
+     \_\\_'__/ \  ))
+     /`  /`~\  |//
+    /   /    \  /
+,--`,--'\/\    /
+ '-- "--'  '--'
+```
+
+=== ID: 7bd20997998dafcb | TITLE: Long-ear monkey | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 32x13 ===
+```
+               ',
+            .-`-,\__
+              ."`   `,
+            .'_.  ._  `;.
+        __ / `      `  `.\ .--.
+       /--,| 0)   0)     )`_.-,)
+      |    ;.-----.__ _-');   /
+       '--./         `.`/  `"`
+          :   '`      |.
+          | \     /  //
+           \ '---'  /'
+            `------' \
+jgs/a:f      _/       `--...
+```
+
+=== ID: 1a33d995c9781651 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 29x15 ===
+```
+                  __
+                 / _,\
+                 \_\
+      ,,,,    _,_)  #      /)
+     (= =)D__/    __/     //
+    C/^__)/     _(    ___//
+      \_,/  -.   '-._/,--'
+_\\_,  /           -//.
+ \_ \_/  -,._ _     ) )
+   \/    /    )    / /
+   \-__,/    (    ( (
+              \.__,-)\_
+               )\_ / -(
+    b'ger     / -(////
+             ////
+```
+
+=== ID: 50a95ac752876c9f | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 22x17 ===
+```
+         ||
+         ||
+        _;|
+       /__3
+      / /||
+     / / // .--.
+     \ \// / (OO)
+      \//  |( _ )
+      // \__/`-'\__
+     // \__      _ \
+ _.-'/    | ._._.|\ \
+(_.-'     |      \ \ \
+   .-._   /    o ) / /
+  /_ \ \ /   \__/ / /
+    \ \_/   / /  E_/
+     \     / /
+      `-._/-' :F_P:
+```
+
+=== ID: 49d07c9e68c44170 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 31x18 ===
+```
+     _...._
+   .-.     /
+  /o.o\ ):.\
+  \   / `- .`--._
+  // /            `-.
+ '...\     .         `.
+  `--''.    '          `.
+      .'   .'            `-.
+   .-'    /`-.._            \
+ .'    _.'      :      .-'"'/
+| _,--`       .'     .'    /
+\ \          /     .'     /
+ \///        |    ' |    /
+             \   (  `.   ``-.
+              \   \   `._    \
+            _.-`   )    .'    )
+  LGB       `.__.-'  .-' _-.-'
+                     `.__,'
+```
+
+=== ID: 2d2d456e4d753d44 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 27x19 ===
+```
+               .-"""-.
+             _/-=-.   \
+            (_|a a/   |_
+             / "  \   ,_)
+        _    \`=' /__/
+       / \_  .;--'  `-.
+       \___)//      ,  \
+        \ \/;        \  \
+         \_.|         | |
+          .-\ '     _/_/
+        .'  _;.    (_  \
+       /  .'   `\   \\_/
+      |_ /       |  |\\
+     /  _)       /  / ||
+jgs /  /       _/  /  //
+    \_/       ( `-/  ||
+              /  /   \\ .-.
+              \_/     \'-'/
+                       `"`
+```
+
+=== ID: fae562f81757d9fe | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 35x20 ===
+```
+                __------__
+              /~          ~\
+             |    //^\\//^\|
+           /~~\  ||  o| |o|:~\
+          | |6   ||___|_|_||:|
+           \__.  /      o  \/'
+            |   (       O   )
+   /~~~~\    `\  \         /
+  | |~~\ |     )  ~------~`\
+ /' |  | |   /     ____ /~~~)\
+(_/'   | | |     /'    |    ( |
+       | | |     \    /   __)/ \
+       \  \ \      \/    /' \   `\
+         \  \|\        /   | |\___|
+           \ |  \____/     | |
+           /^~>  \        _/ <
+          |  |         \       \
+          |  | \        \        \
+          -^-\  \       |        )
+               `\_______/^\______/
+```
+
+=== ID: 06551242c7e6621c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 38x20 ===
+```
+_______AAAA____j_o_a_n____AAAA________
+       VVVV               VVVV
+       (__)               (__)
+        \ \               / /
+         \ \   \\|||//   / /
+          > \   _   _   / <
+ hang      > \ / \ / \ / <
+  in        > \\_o_o_// <
+  there...   > ( (_) ) <
+              >|     |<
+             / |\___/| \
+             / (_____) \
+             /         \
+              /   o   \
+               ) ___ (
+              / /   \ \
+             ( /     \ )
+             ><       ><
+            ///\     /\\\
+            '''       '''
+```
+
+=== ID: b73ca8c7b4b63506 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 36x23 ===
+```
+        _
+      |>(|)<|
+      .-'^'-.
+     '/"'"^"\'
+    :( *   * ):
+    ::)  ,| (::
+    '(       )'          _.
+     '\ --- /'          / /
+   .-'       '-.      .__D
+ ,"      |      \    / : (=|
+:   Y    |    \  \  /  : (=|
+|   |o__/ \__o:   \/  " \ \
+|   |          \     '   "-.
+|    `.    ___ \:._.'
+ ".__  "-" __ \ \
+  .|''---''------|               _
+  / -.          _""-.--.        C )
+ '    '/.___.--'        '._    : |
+|     --_   ^"--...__      ''-.' |
+|        ''---.o)    ""._        |
+ ^'--.._      |o)        '`-..._.jku
+        '--.._|o)
+              'O)
+```
+
+=== ID: ba2a7cabd3b15c50 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 24x24 ===
+```
+    || __   ||
+    ||=\_`\=||
+    || (__/ ||
+    ||  | | :-"""-.
+    ||==| \/-=-.   \
+    ||  |(_|o o/   |_
+    ||   \/ "  \   ,_)
+    ||====\ ^  /__/
+    ||     ;--'  `-.
+    ||    /      .  \
+    ||===;        \  \
+    ||   |         | |
+    || .-\ '     _/_/
+    |:'  _;.    (_  \
+    /  .'  `;\   \\_/
+   |_ /     |||  |\\
+  /  _)=====|||  | ||
+ /  /|      ||/  / //
+ \_/||      ( `-/ ||
+    ||======/  /  \\ .-.
+jgs ||      \_/    \'-'/
+    ||      ||      `"`
+    ||======||
+    ||      ||
+```
+
+=== ID: 440142d47edc8135 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 36x35 ===
+```
+         .-"-.
+       _/.-.-.\_
+      ( ( o o ) )
+       |/  "  \|    speak no evil...
+        \'/^\'/
+        /`\ /`\
+       /  /|\  \
+      ( (/ T \) )
+ jgs   \__/^\__/
+
+
+         .-"-.
+       _/_-.-_\_
+      / __> <__ \
+     / //  "  \\ \   see no evil...
+    / / \'---'/ \ \
+jgs \ \_/`"""`\_/ /
+     \           /
+
+         .-"-.
+       _/_-.-_\_
+      /|( o o )|\
+     | //  "  \\ |   hear no evil...
+    / / \'---'/ \ \
+jgs \ \_/`"""`\_/ /
+     \           /
+
+
+         .-"-.
+       _/.-.-.\_
+      ( ( o o ) )
+       |/  "  \|     have no fun...
+  jgs   \ .-. /
+        /`"""`\
+       /       \
+```
+
+=== ID: ebe843cdc14a402c | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: moose | SIZE: 9x4 ===
+```
+prs \\_//
+   __/".
+  /__ |
+  || ||
+```
+
+=== ID: 5dcf5991598c19cd | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: moose | SIZE: 20x12 ===
+```
+ ___            ___
+/   \          /   \
+\_   \        /  __/
+ _\   \      /  /__
+ \___  \____/   __/
+     \_       _/
+       | @ @  \_
+       |
+     _/     /\
+    /o)  (o/\ \_
+    \_____/ /
+      \____/
+```
+
+=== ID: 57048db289a8ea7e | TITLE: Spider | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 12x4 ===
+```
+ /\ \  / /\
+//\\ .. //\\
+//\((  ))/\\
+/  < `' >  \
+```
+
+=== ID: d3665c1b7a9100ac | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 8x4 ===
+```
+ ||  ||
+ \\()//
+//(__)\\
+||    ||
+```
+
+=== ID: a8723302c7086b32 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 12x4 ===
+```
+  / _ \
+\_\(_)/_/
+ _//o\\_ Max
+  /   \
+```
+
+=== ID: ac6d200e334edba2 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 13x4 ===
+```
+  / _ \
+\_\(_)/_/
+ _//"\\_  Max
+  /   \
+```
+
+=== ID: bdab63acdde86fe6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 13x7 ===
+```
+       ,,,
+        \\\
+ .---.  ///
+(:::::)(_)():
+ `---'  \\\
+ jgs    ///
+       '''
+```
+
+=== ID: ca225967ff036d30 | TITLE: Web | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 21x10 ===
+```
+     \_______/
+ `.,-'\_____/`-.,'
+  /`..'\ _ /`.,'\
+ /  /`.,' `.,'\  \
+/__/__/     \__\__\__
+\  \  \     /  /  /
+ \  \,'`._,'`./  /
+  \,'`./___\,'`./
+ ,'`-./_____\,-'`.
+     /       \
+```
+
+=== ID: 4a6d088cff7d1bdf | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 26x14 ===
+```
+              (
+               )
+              (
+        /\  .-"""-.  /\
+       //\\/  ,,,  \//\\
+       |/\| ,;;;;;, |/\|
+       //\\\;-"""-;///\\
+      //  \/   .   \/  \\
+     (| ,-_| \ | / |_-, |)
+       //`__\.-.-./__`\\
+      // /.-(() ())-.\ \\
+     (\ |)   '---'   (| /)
+      ` (|           |) `
+jgs     \)           (/
+```
+
+=== ID: 26028cbbd9fef91b | TITLE: Spiderweb | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 40x16 ===
+```
+         ___________
+        /\__________/\
+       / /\________/\ \
+      / / /\______/\ \ \
+     / / / /\____/\ \ \ \
+    / / / / /\  /\ \ \ \ \
+___/_/_/_/_/_ \/_ \_\_\_\_\______
+   \ \ \ \ \  /\  / / / / /   |
+    \ \ \ \ \/__\/ / / / /    |
+     \ \ \ \/____\/ / / /     |
+      \ \ \/______\/ / /      |
+       \ \/________\/ /       |
+        \/__________\/        * whew !!!
+        /            \
+       /              \
+                       \
+```
+
+=== ID: 219e0804bfdf61b8 | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 39x32 ===
+```
+           ;               ,
+         ,;                 '.
+        ;:                   :;
+       ::                     ::
+       ::                     ::
+       ':                     :
+        :.                    :
+     ;' ::                   ::  '
+    .'  ';                   ;'  '.
+   ::    :;                 ;:    ::
+   ;      :;.             ,;:     ::
+   :;      :;:           ,;"      ::
+   ::.      ':;  ..,.;  ;:'     ,.;:
+    "'"...   '::,::::: ;:   .;.;""'
+        '"""....;:::::;,;.;"""
+    .:::.....'"':::::::'",...;::::;.
+   ;:' '""'"";.,;:::::;.'""""""  ':;
+  ::'         ;::;:::;::..         :;
+ ::         ,;:::::::::::;:..       ::
+ ;'     ,;;:;::::::::::::::;";..    ':.
+::     ;:"  ::::::"""'::::::  ":     ::
+ :.    ::   ::::::;  :::::::   :     ;
+  ;    ::   :::::::  :::::::   :    ;
+   '   ::   ::::::....:::::'  ,:   '
+    '  ::    :::::::::::::"   ::
+       ::     ':::::::::"'    ::
+       ':       """""""'      ::
+        ::                   ;:
+        ':;                 ;:"
+-hrr-     ';              ,;'
+            "'           '"
+              '
+```
+
+=== ID: d93fb5e5ab0d1214 | TITLE: Camel | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 21x6 ===
+```
+   __,  .-.  .-.
+  (__ _ |  \/  | _
+     (_|||\__/||(/_|
+        ||    ||   |_
+jgs    _||   _||
+      `""`  `""`
+```
+
+=== ID: bfdbae8975af6aa6 | TITLE: Camel | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 18x7 ===
+```
+              ,,_
+              (=-'
+         /\/\  ))
+       ~/    \/ |
+       | )___(  |
+       |/     \||
+ejm98  |'      |'
+```
+
+=== ID: 94411a29b04099f0 | TITLE: Dromedar | ARTIST: Asik aka Asia Mazur (asioleck) | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 20x8 ===
+```
+       _v   ,,
+      /`|   &&.
+      `-\`-&&&&&.
+         \&&&&&&&\
+          &&#""&& \
+         / |   |\  x
+         \ |  / /
+as
+```
+
+=== ID: 2a7aace95c2ec423 | TITLE: Camel | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 16x8 ===
+```
+   //
+ _oo\
+(__/ \  _  _
+   \  \/ \/ \
+   (         )\
+    \_______/  \
+     [[] [[]
+     [[] [[]
+```
+
+=== ID: f05b461eb6de2b62 | TITLE: Dromedar | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 25x13 ===
+```
+        _
+    .--' |
+   /___^ |     .--.
+       ) |    /    \
+      /  |  /`      '.
+     |   '-'    /     \
+     \         |      |\
+      \    /   \      /\|
+       \  /'----`\   /
+       |||       \\ |
+       ((|        ((|
+       |||        |||
+jgs   //_(       //_(
+```
+
+=== ID: 1f99285ae25cb32e | TITLE: Camel | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 30x16 ===
+```
+ _______\\__
+(_. _ ._  _/
+ '-' \__. /
+      /  /
+     /  /    .--.  .--.
+    (  (    / '' \/ '' \   "
+     \  \_.'            \   )
+     ||               _  './
+      |\   \     ___.'\  /
+        '-./   .'    \ |/
+           \| /       )|\
+            |/       // \\
+            |\    __//   \\__
+           //\\  /__/  mrf\__|
+       .--_/  \_--.
+      /__/      \__\
+```
+
+=== ID: a3f56047698d8ad0 | TITLE: Camel | ARTIST: Andreas Freise | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 38x18 ===
+```
+                   ,.
+       .           :%%%.    .%%%.
+   __%%%(\        `%%%%%   .%%%%%
+ /a  ^  '%        %%%% %: ,%  %%"`
+'__..  ,'%     .-%:     %-'    %
+ ~~""%:. `     % '          .   `.
+     %% % `   %%           .%:  . \.
+      %%:. `-'   `        .%% . %: :\
+      %(%,%..."   `%,     %%'   %% ) )
+       %)%%)%%'   )%%%.....- '   "/ (
+       %a:f%%\ % / \`%  "%%% `   / \))
+        %(%'  % /-. \      '  \ |-. '.
+        `'    |%   `()         \|  `()
+              ||    /          ()   /
+              ()   0            |  o
+               \  /\            o /
+               o  `            /-|
+            ,-/ `           ,-/
+```
+
+=== ID: 6906928d83051be2 | TITLE: Camel | ARTIST: Joris Bellenger | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 40x24 ===
+```
+                              ________
+                            c' e    -`-
+                         _   )    ___ ~'
+                       .|*|  |   `|
+                       '|+|  |    |
+                      _||*|_ |    |
+                     //`_,__\|    '
+                    //_/  ' \|    |
+                   ///  _    |    |
+                  /,|  /     \\   |
+                  |/          \\_//
+                   |           \+/
+                   |   '      ,/|
+                    \_/   ,__   )
+                     )\   |)   /
+                    (  \  ||  /
+                     ) ') |/ /
+                     # |\ ' /
+                       )(- -)\
+                      // \'( \\
+                    _//  | |  \\_
+                   //(  _)^(_  )\\  . ..
+b'ger .      ..   '^-  /`( )'\  -^'
+                      '^-' '-^' .. .
+```
+
+=== ID: 0517635d6f313ebf | TITLE: Dromedar | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 37x26 ===
+```
+      :
+       ::
+   ::::::
+ :: o :::
+::::::::::
+ ::  :::::
+ :   ::::
+ :   ::::
+ :  ::::
+ :  ::::
+ : :::::       .,,,.
+ : ::::       :::::::
+ : ::::::    :::::::::
+ :  ::::::::::::::::::::
+  : :::::::::::::::::::::
+   :::::::::::::::::::::::
+     :::::::::::::::::::::
+      :::::::::::::::::::
+      ::::::      :::::::
+       ::::       ::::::
+       :::         :::::
+       :::         ::: :
+       :::         ::: :
+       :::          :: :
+       :::          ::::   -diddle 2-
+      ::           :::
+```
+
+=== ID: af78e743c288e773 | TITLE: Dromedar | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 33x26 ===
+```
+     _    _
+    ( \__//)
+    .'     )
+ __/b d  .  )
+(_Y_`,     .)
+ `--'-,-'  )
+      (.  )
+      (   )
+     (   )
+    ( . )         .---.
+   (    )        (     )
+   (   . )      (  .    )
+   (      )    (      .  ),
+   ( .     `"'`  .       `)\
+    (      .              .)\
+    ((  .      .   (   .   )\\
+    ((       .    (        ) \\
+     ((     )     _( .   . )  \\
+     ( ( .   )"'"`(.(     )   ( ;
+     ( (    )      ( ( . )     \'
+      |~(  )        |~(  )
+      | ||~|        | ||~|
+ jgs  | || |        | || |
+     _| || |       _| || |
+    /___(| |      /___(| |
+       /___(         /___(
+```
+
+=== ID: b8735b25558b9df5 | TITLE: Dromedar | ARTIST: Colin Douthwaite | CATEGORY: animals | SUBCATEGORY: camels | SIZE: 33x26 ===
+```
+       \
+       |)
+   /~~~ ]
+ / .o.  ]
+( ,      ]
+ \/~~]   ]
+ :   ]  ]
+ :   ]  ]
+ :  [  ]
+ : [  ]
+ : [  ]        .---.
+ : [   [      [     ]
+ :  [   ] _ _[       ]_
+ :  [                  ]
+  : [                   ]
+   :[                    ]
+     [                   ]
+      [      _ _ _      ]
+      [    ]      [     ]
+       [  ]       [    ]
+       [ ]         [   ]
+       [ ]         [   ]
+       [ ]         [   ]
+       [ ]          [  ]   -cfbd-
+       [ ]          [  ]
+      [[           [[[
+```
+
+=== ID: 907804713db821fc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 19x4 ===
+```
+             ,
+           __)\_
+     (\_.-'    a`-.
+jgs  (/~~````(/~^^`
+```
+
+=== ID: f4c7d754291d0cd5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 5x4 ===
+```
+ _/|
+<_  \
+  `\|
+   '`
+```
+
+=== ID: 89eb39b19f5a1578 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 19x4 ===
+```
+             ,
+           __)\_
+     (\_.-'    a`-.
+jgs  (/~~````(/~^^`
+```
+
+=== ID: af583ad69c14cdc7 | TITLE: Untitled | ARTIST: John Stachowicz, Paul Gradenwitz | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 34x5 ===
+```
+           .--'\.
+         _',--/_.\
+       _  `     \|
+   _-'"/\       _
+_-'   (  '-_.-'".".       PGMG/jjs
+```
+
+=== ID: 11546f4307b76bf2 | TITLE: Dolphin | ARTIST: BluePard | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 15x5 ===
+```
+     .--
+ .--'  '.
+=`..-.'_ `---,
+      ` ` .\'
+           `'BP
+```
+
+=== ID: 52d1e3ffd3d3df5a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 20x5 ===
+```
+            ,
+          __)\___
+      _.-'      .`-.
+jgs .'/~~```"~z/~'"`
+    ^^
+```
+
+=== ID: c8100cf425c3f187 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 33x6 ===
+```
+                ;'-.
+    `;-._        )  '---.._
+      >  `-.__.-'          `'.__
+     /_.-'-._         _,   ^ ---)
+jgs  `       `'------/_.'----```
+                     `
+```
+
+=== ID: 14118eb22d5033d9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 26x6 ===
+```
+        _../|_
+      ='__   _~-.
+           \'  ~-`\._
+                 |/~`
+   .    .    .    .    .
+_.`(._.`(._.`(._.`(._.`(._
+```
+
+=== ID: 79adad0e8f61ee31 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 32x7 ===
+```
+                (`.
+                 \ `.
+                  )  `._..---._
+\`.       __...---`         o  )
+ \ `._,--'           ,    ___,'
+  ) ,-._          \  )   _,-'
+ /,'    ``--.._____\/--''
+```
+
+=== ID: 3def8555bc94e033 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 37x9 ===
+```
+             ,-._
+           _.-'  '--.
+         .'      _  -`\_
+        / .----.`_.'----'
+        ;/     `
+ jgs   /_;
+
+    ._      ._      ._      ._
+_.-._)`\_.-._)`\_.-._)`\_.-._)`\_.-._
+```
+
+=== ID: 5e43145bfe87949b | TITLE: Untitled | ARTIST: Tom R. Earlywine | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 37x12 ===
+```
+          __
+    .-'" (M /--.
+  .'   .'|o|  @ `..
+ /  .-/       _....'
+|  '-/      .' |
+|   /      |_\ |       Miami Dolphins
+ \  |    /\|  /
+  '.|   /   .'
+    |  /_.-'
+    | /
+    | |       tre
+   (,-,)
+```
+
+=== ID: 6891d11998b35720 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: dolphins | SIZE: 28x12 ===
+```
+              ,-.
+             /  (  '
+     *  _.--'!   '--._
+      ,'              ''.
+'    |!                   \
+   _.'  O      ___       ! \
+  (_.-^, __..-'  ''''--.   )
+      /,'        '    _.' /
+   '         *    .-''    |
+                 (..--^.  '
+                  mrf  | /
+                       '
+```
+
+=== ID: e17e5f05b1d85ab3 | TITLE: Aardvark | ARTIST: Veronica Karlsson | CATEGORY: animals | SUBCATEGORY: aardvarks | SIZE: 29x7 ===
+```
+       _.---._    /\\
+    ./'       "--`\//
+  ./              o \
+ /./\  )______   \__ \
+./  / /\ \   | \ \  \ \
+   / /  \ \  | |\ \  \7
+    "     "    "  "        VK
+```
+
+=== ID: d97c83c87c48888c | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 10x4 ===
+```
+     __
+ .--()°'.'
+'|, . ,'
+ !_-(_\
+```
+
+=== ID: 586af021d5e2065e | TITLE: Untitled | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 18x6 ===
+```
+    _  ,--.
+   ;c),. o}`
+   `._,=,   `.
+       / ,    `.
+       `/L`.    )~
+ejm         /_/\_\
+```
+
+=== ID: 242011599330f75c | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 16x7 ===
+```
+    _    _
+   /=\""/=\
+  (=(0_0 |=)__
+   \_\ _/_/   )
+     /_/   _  /\
+snd |/ |\ || |
+       ~ ~  ~
+```
+
+=== ID: 9da8f5613ca33b3a | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 37x11 ===
+```
+                        ____
+                   .---'-    \
+      .-----------/           \
+     /           (         ^  |   __
+&   (             \        O  /  / .'
+'._/(              '-'  (.   (_.' /
+     \                    \     ./
+      |    |       |    |/ '._.'
+       )   @).____\|  @ |
+   .  /    /       (    | mrf
+  \|, '_:::\  . ..  '_:::\ ..\).
+```
+
+=== ID: f4ee6ce1e3a9492a | TITLE: Baby Elephant | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 32x12 ===
+```
+     _.-- ,.--.
+   .'   .'    /
+   | @       |'..--------._
+  /      \._/              '.
+ /  .-.-                     \
+(  /    \                     \
+ \\      '.                  | #
+  \\       \   -.           /
+   :\       |    )._____.'   \
+    "       |   /  \  |  \    )
+      snd   |   |./'  :__ \.-'
+            '--'
+```
+
+=== ID: d88f8e8c5860a3b3 | TITLE: Elephant | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 34x12 ===
+```
+         ___     _,.--.,_
+      .-~   ~--"~-.   ._ "-.
+     /      ./_    Y    "-. \
+    Y       :~     !         Y
+    lq p    |     /         .|
+ _   \. .-, l    /          |j
+()\___) |/   \_/";          !
+ \._____.-~\  .  ~\.      ./
+            Y_ Y_. "vr"~  T
+            (  (    |L    j   -Row
+            [nn[nn..][nn..]
+        ~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: 6cbdf8a4248eaf3e | TITLE: Dumbo the elephant | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 38x15 ===
+```
+                   _
+                  ( \
+       __         _)_\_
+      ' \;---.-._S_____2_
+        /   / /_/       (______
+     __(  _;-'    =    =|____._'.__
+    /   _/     _  @\ _(@(      '--.\
+    (_ /      /\  _   =( ) ___     \\
+      /      /\ \_ '.___'-.___~.    '\
+snd  /      /\ \__'--') '-.__c` \    |
+    |     .'  )___'--'/  /`)     \   /
+    |    |'-|    _|--'\_(_/       '.'
+    |    |   \_  -\
+     \   |     \ /`)
+      '._/      (_/
+```
+
+=== ID: 71c4cbfbce2b056e | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: elephants | SIZE: 38x15 ===
+```
+ __
+'. \
+ '- \
+  / /_         .---.
+ / | \\,.\/--.//    )
+ |  \//        )/  /
+  \  ' ^ ^    /    )____.----..  6
+   '.____.    .___/            \._)
+      .\/.                      )
+       '\                       /
+       _/ \/    ).        )    (
+      /#  .!    |        /\    /
+      \  C// #  /'-----''/ #  /
+   .   'C/ |    |    |   |    |mrf  ,
+   \), .. .'OOO-'. ..'OOO'OOO-'. ..\(,
+```
+
+=== ID: e0d5669104b4f2bb | TITLE: Fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 4x2 ===
+```
+  _
+><_>
+```
+
+=== ID: df375a31ed85462b | TITLE: Whale | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 8x2 ===
+```
+ __v_
+(____\/{
+```
+
+=== ID: b10025eb543dfca2 | TITLE: Fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 15x4 ===
+```
+  ;,//;,    ,;/
+ o:::::::;;///
+>::::::::;;\\\
+  ''\\\\\'" ';\
+```
+
+=== ID: 362d695396060ec7 | TITLE: Fish | ARTIST: Blazej Kozlowski | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 25x4 ===
+```
+[bug]     /"*._         _
+      .-*'`    `*-.._.-'/
+    < * ))     ,       (
+      `*-._`._(__.--*"`.\
+```
+
+=== ID: f2291f993a23cb1f | TITLE: Skeleton fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 30x5 ===
+```
+|\    \ \ \ \ \ \ \      __
+|  \    \ \ \ \ \ \ \   | O~-_
+|   >----|-|-|-|-|-|-|--|  __/
+|  /    / / / / / / /   |__\
+|/     / / / / / / /
+```
+
+=== ID: 7e81019444443695 | TITLE: Fishes | ARTIST: Linda Ball | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 19x5 ===
+```
+               O  o
+          _\_   o
+>('>   \\/  o\ .
+       //\___=
+          ''
+```
+
+=== ID: 8a13045b87f7f6bb | TITLE: Shark | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 13x5 ===
+```
+      .
+\_____)\_____
+/--v____ __`<
+        )/
+        '
+```
+
+=== ID: c5167dd66f8a0ded | TITLE: Fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 17x5 ===
+```
+|\   \\\\__     o
+| \_/    o \    o
+> _   (( <_  oo
+| / \__+___/
+|/     |/
+```
+
+=== ID: af9728b371525f12 | TITLE: Fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 19x6 ===
+```
+      /`·.¸
+     /¸...¸`:·
+ ¸.·´  ¸   `·.¸.·´)
+: © ):´;      ¸  {
+ `·.¸ `·  ¸.·´\`·¸)
+     `\\´´\¸.·´
+```
+
+=== ID: ded1c74345581414 | TITLE: Whale | ARTIST: Riitta Rasimus | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 25x6 ===
+```
+       .
+      ":"
+    ___:____     |"\/"|
+  ,'        `.    \  /
+  |  O        \___/  |
+~^~^~^~^~^~^~^~^~^~^~^~^~
+```
+
+=== ID: 60d7a285b3d4d863 | TITLE: Cory | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 16x6 ===
+```
+Max   /\
+    _/./
+ ,-'    `-:..-'/
+: o )      _  (
+"`-....,--; `-.\
+    `'
+```
+
+=== ID: a9febaf01c8bfebe | TITLE: Fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 23x7 ===
+```
+o           //        +
+ o        //////    ++
+  .    @))))))))))+++
+   .}:<<)))))))))))++
+       <<\\)))))) +++
+          \\   \\   ++
+                      +
+```
+
+=== ID: c8ace02005c2884c | TITLE: Fish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 20x7 ===
+```
+.            ,
+           .:/
+.      ,,///;,   ,;/
+  .   o:::::::;;///
+     >::::::::;;\\\
+       ''\\\\\'" ';\
+          ';\
+```
+
+=== ID: cde2fe837ee33953 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 13x7 ===
+```
+     |\    o
+    |  \    o
+|\ /    .\ o
+| |       (
+|/ \     /
+    |  /
+     |/
+```
+
+=== ID: 5b1847994f2a3b3a | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 24x7 ===
+```
+O     O           ,
+  o o          .:/
+    o      ,,///;,   ,;/
+      o   o)::::::;;///
+         >::::::::;;\\\
+           ''\\\\\'" ';\
+              ';\
+```
+
+=== ID: cf5f9afe11792613 | TITLE: Untitled | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 24x7 ===
+```
+            ___
+         _ / __)_   °
+_  mrf .'_'-'\ /-'-. o °
+\'-._.'-'\ / _\-(O)_: O
+ \ (__\/_ \ '._)  _\ o
+ /.' (_.'----''./'
+               '
+```
+
+=== ID: eb05ad6699e0ec1d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 36x8 ===
+```
+ o
+o      ______/~/~/~/__           /((
+  o  // __            ====__    /_((
+ o  //  @))       ))))      ===/__((
+    ))           )))))))        __((
+    \\     \)     ))))    __===\ _((
+     \\_______________====      \_((
+                                 \((
+```
+
+=== ID: 10482272b14a4b57 | TITLE: Jellyfish | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 19x9 ===
+```
+      _______
+ ,-~~~       ~~~-,
+(                 )
+ \_-, , , , , ,-_/
+    / / | | \ \
+    | | | | | |
+    | | | | | |
+   / / /   \ \ \
+   | | |   | | |
+```
+
+=== ID: 479b9cd7cf906e98 | TITLE: Sea horse | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 15x9 ===
+```
+      \/)/)
+    _'  oo(_.-.
+  /'.     .---'
+/'-./    (
+)     ; __\
+\_.'\ : __|
+     )  _/
+    (  (,.
+  mrf'-.-'
+```
+
+=== ID: 6903da942ed86341 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 25x10 ===
+```
+ _________         .    .
+(..       \_    ,  |\  /|
+ \       O  \  /|  \ \/ /
+  \______    \/ |   \  /
+     vvvv\    \ |   /  |
+     \^^^^  ==   \_/   |
+      `\_   ===    \.  |
+      / /\_   \ /      |
+      |/   \_  \|      /
+ snd         \________/
+```
+
+=== ID: 119bfa25ef09ba64 | TITLE: Discus pair | ARTIST: Max Strandberg | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 22x11 ===
+```
+         ,--...,
+Max     .''-..'     _
+       /@    `.-:  _/`
+       > )<  ,-.: (_)
+        `..-',:-
+  ,--..   `-'
+ .''-.,'     _
+/@    `.-:  (_)
+> )<  ,-.:   +
+ `..-',`        Max
+   `-'
+```
+
+=== ID: f230973b75eca2b3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 26x13 ===
+```
+       o                 o
+                  o
+         o   ______      o
+           _/  (   \_
+ _       _/  (       \_  O
+| \_   _/  (   (    0  \
+|== \_/  (   (          |
+|=== _ (   (   (        |
+|==_/ \_ (   (          |
+|_/     \_ (   (    \__/
+          \_ (      _/
+            |  |___/
+           /__/
+```
+
+=== ID: 6e63e6433a63d56d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 15x14 ===
+```
+ O
+O
+ o  \``/
+    /o `))
+   /_/\_ss))
+       |_ss))/|
+      |__ss))_|
+     |__sss))_|
+     |___ss))\|
+      |_ss))
+       )_s))
+ (`(  /_s))
+  (_\/_s))
+   (\/))
+```
+
+=== ID: 21b022ec29502443 | TITLE: Freshwater Angelfish | ARTIST: Max Strandberg | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 9x30 ===
+```
+  ,
+ <><
+  `   Max
+
+  /
+ /\/
+ \/\
+  \   Max
+
+  /
+,'`./
+`.,'\
+  \   Max
+
+   ,
+  /|
+ /_/ ,
+/o \/|
+\<_/\|
+ \ \ `
+  \| Max
+   `
+   ,
+  /|
+ /_|  ,
+/o  \/|
+\<__/\|
+ \ |  `
+  \| Max
+   `
+```
+
+=== ID: 2fc65dc7a7776428 | TITLE: Discus | ARTIST: Max Strandberg | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 18x35 ===
+```
+   _______
+  /      /      _
+ /'''''\/ _    _/`
+/ @  _  \/ |  (_)
+>   <_)    |
+\       /\_|
+ \...../\
+  \\____/  Max
+
+   _______
+  /      /      _
+ /'''''\/ _    _/`
+/ @     \/ |  (_)
+>  _       |
+\ <_)   /\_|
+ \...../\
+  \\____/  Max
+
+   _______
+  /      /      _
+ /'''''\/ _    _/`
+/ @  _  \/ |  (_)
+>   <_)    |
+\       /\_|
+ \...../\
+  \\_____\  Max
+
+   _____
+  /     \
+ /'''''\/ _    _
+/ @  _  \/ |  (_)
+>   <_)    |   +
+\       /\_|
+ \...../\
+  \\____/  Max
+```
+
+=== ID: 52793a1a86d81d36 | TITLE: Fantasy Tetras | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 26x37 ===
+```
+Max    /`-._
+      /_,.._`:-         _
+  ,.-'  ,   `-:..-')   _/`
+ : o ):';      _  {   (_)
+  `-._ `'__,.-'\`-.)
+      `\\  \,.-'`
+
+
+Max   /`-._
+     /_,.._`:-          _
+ ,.-'  ,   ``-:_,-')   _/`
+: o ):';       _  {   (_)
+ `-._ `'__,.-''\`-.)
+     `\\  \,.-'``
+
+
+Max    /`-._
+     _/,.._/
+  ,-'   ,  `-:,.-')    _
+ : o ):';     _  {    (_)
+  `-.  `' _,.-\`-.)    +
+     `\\``\,.-'
+
+
+Max     /\
+      _/./
+   ,-'    `-:.,-'/
+  > O )<)    _  (
+   `-._  _.:' `-.\
+       `` \;
+
+
+        ,-,
+Max   ,/.(     __
+   ,-'    `!._/ /
+  > @ )<|    _ <
+   `-....,,;' \_\
+```
+
+=== ID: bab0fe5fee9570c7 | TITLE: A growing high body discus, from egg to juvenile | ARTIST: Max Strandberg | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 16x49 ===
+```
+        o    Max
+
+        ._   Max
+
+        o-   Max
+
+        O<   Max
+
+        ,
+       ()<   Max
+        `
+
+       ,,
+      (')<   Max
+       ``
+
+       ,-,
+      ('_)<  Max
+       `-`
+
+       _
+      /_|
+     ('_)<|
+      \_|    Max
+
+      __
+     /__|
+    /'  \/|
+    \<__/\|  Max
+     \__|
+
+     ____
+    /    \
+   /----./
+  / o    \/|
+  >        |
+  \ <)   /\|
+   \----'\   Max
+    \____/
+
+   ,-----.
+  /____  /
+ /     \/ _
+/ O     \/ |
+>          |
+\ <)    /\_|
+ \_____/\    Max
+  \      \
+   `-----'
+```
+
+=== ID: 75a52084ae1a2bdd | TITLE: Yack/ Bison | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: bisons | SIZE: 14x4 ===
+```
+((_,...,_))
+   |o o|
+   \   /
+    ^_^   cp97
+```
+
+=== ID: c4ea3391b2d27515 | TITLE: Bison | ARTIST: Donovan Baker, Mic Barendsz | CATEGORY: animals | SUBCATEGORY: bisons | SIZE: 38x12 ===
+```
+             _.-````'-,_
+   _,.,_ ,-'`           `'-.,_
+ /)     (\                   '``-.
+((      ) )                      `\
+ \)    (_/                        )\
+  |       /)           ' ,   ,'    / \
+  `\    ^'            '     (    /  ))
+    |      _/\ ,     /    ,,`\   (  "`
+     \Y,   |  \  \  | ````| / \_ \
+       `)_/    \  \  )    ( >  ( >
+                \( \(     |/   |/
+    mic & dwb  /_(/_(    /_(  /_(
+```
+
+=== ID: 07628da90b59d858 | TITLE: Hurt bison | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: bisons | SIZE: 37x20 ===
+```
+                        _
+                       //
+                      //
+             _.-````'//_
+         ,-'`       //  `'-.,_
+ /)     (\         //        '``-.
+( ( .,-') )       //             ``
+ \)'   (_/       `#'              !!
+  |       /)     ###   '          !!!
+  `\    X'       ###  '     !    !!!!
+    !      _/! , !## !  ! !  !   !!!
+     \Y,   |!!!  ! #! !!  !! !!!!!!!
+       `!!! !!!! !!# )!!!!!!!!!!!!!
+        !!  ! ! \( \(  !!!|/!  |/!
+               /_(/#(    /_(  /_(
+                 %%%%
+                %%%%%%%
+                 %%%%%%%
+                   %%%%
+                      %%
+```
+
+=== ID: 09e3066d66a5e085 | TITLE: Amoeba | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: amoeba | SIZE: 34x22 ===
+```
+             ,,,,,,,,
+           ,|||````||||
+     ,,,,|||||       ||,
+  ,||||```````       `||
+,|||`                 |||,
+||`     ....,          `|||
+||     ::::::::          |||,
+||     :::::::'     ||    ``|||,
+||,     :::::'               `|||
+`||,                           |||
+ `|||,       ||          ||    ,||
+   `||                        |||`
+    ||                   ,,,||||
+    ||              ,||||||```
+   ,||         ,,|||||`
+  ,||`   ||   |||`
+ |||`         ||
+,||           ||
+||`           ||
+|||,         |||
+ `|||,,    ,|||
+   ``||||||||`
+```
+
+=== ID: b1be10c26aff68cb | TITLE: Cat face | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 7x3 ===
+```
+|\---/|
+| o_o |
+ \_^_/
+```
+
+=== ID: 93447ab3a0233637 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 7x3 ===
+```
+ /\_/\
+( o.o )
+ > ^ <
+```
+
+=== ID: ab4709c404160f65 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 18x3 ===
+```
+    |\__/,|   (`\
+  _.|o o  |_   ) )
+-(((---(((--------
+```
+
+=== ID: 8e03bfe9f5b3c218 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 23x4 ===
+```
+ _._     _,-'""`-._
+(,-.`._,'(       |\`-/|
+    `-.-' \ )-`( , o o)
+          `-    \`_`"'-
+```
+
+=== ID: 408330980dc0ac38 | TITLE: Cat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 14x4 ===
+```
+      \    /\
+       )  ( ')
+      (  /  )
+jgs    \(__)|
+```
+
+=== ID: d9bd4946e440f038 | TITLE: Cat face | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 7x4 ===
+```
+ /\_/\
+( o o )
+==_Y_==
+  `-'
+```
+
+=== ID: 4e009cc7c3ae1d49 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 15x4 ===
+```
+ |\__/,|   (`\
+ |_ _  |.--.) )
+ ( T   )     /
+(((^_(((/(((_/
+```
+
+=== ID: a776850c8d433165 | TITLE: Cat | ARTIST: Julie Rhodes | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 40x4 ===
+```
+    /\_/\           ___
+   = o_o =_______    \ \  -Julie Rhodes-
+    __^      __(  \.__) )
+(@)<_____>__(_____)____/
+```
+
+=== ID: 1939d7cfa2cd18cd | TITLE: Cat | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 11x4 ===
+```
+  ^~^  ,
+ ('Y') )
+ /   \/
+(\|||/) hjw
+```
+
+=== ID: 92a2f147411288ea | TITLE: Puma | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 33x5 ===
+```
+("`-''-/").___..--''"`-._
+ `6_ 6  )   `-.  (     ).`-.__.`)
+ (_Y_.)'  ._   )  `._ `. ``-..-'
+   _..`--'_..-_/  /--'_.'
+  ((((.-''  ((((.'  (((.-'
+```
+
+=== ID: 8d0a25efc30a5dd7 | TITLE: Cat | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x5 ===
+```
+     _
+  |\'/-..--.
+ / _ _   ,  ;
+`~=`Y'~_<._./
+ <`-....__.'  fsc
+```
+
+=== ID: 26d512f21454369e | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 11x5 ===
+```
+  /\_/\  (
+ ( ^.^ ) _)
+   \"/  (
+ ( | | )
+(__d b__)
+```
+
+=== ID: 837960fd3689bc1d | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 16x5 ===
+```
+   |\__/,|   (`\
+   |o o  |__ _)
+ _.( T   )  `  /
+((_ `^--' /_<  \
+`` `-'(((/  (((/
+```
+
+=== ID: f083cef3687f6633 | TITLE: Cat | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 25x5 ===
+```
+        ,-""""""-.
+     /\j__/\  (  \`--.
+hjw  \`@_@'/  _)  >--.`.
+    _{.:Y:_}_{{_,'    ) )
+   {_}`-^{_} ```     (_/
+```
+
+=== ID: 55524d5eaa832c8b | TITLE: Cat | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 33x5 ===
+```
+                       /)
+              /\___/\ ((
+              \`@_@'/  ))
+              {_:Y:.}_//
+hjw ----------{_}^-'{_}----------
+```
+
+=== ID: 678843f4bb012900 | TITLE: Cat | ARTIST: Linda Ball | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 12x6 ===
+```
+  _  ,/|
+ '\`o.O'   _
+  =(_*_)= (
+    )U(  _)
+   /   \(
+  (/`-'\)
+```
+
+=== ID: 058f56111c153ee0 | TITLE: Puma | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x6 ===
+```
+    ,-. __ .-,
+  --;`. '   `.'
+   / (  ^__^  )
+  ;   `(_`'_)' \
+  '  ` .`--'_,  ;
+~~`-..._)))(((.'
+```
+
+=== ID: 0353117bbb92ec30 | TITLE: Cat | ARTIST: Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 26x6 ===
+```
+   |\---/|
+   | ,_, |
+    \_`_/-..----.
+ ___/ `   ' ,""+ \  sk
+(__...'   __\    |`.___.';
+  (_,...'(_,.`__)/'.....+
+```
+
+=== ID: 523ffc5809ab5973 | TITLE: Lion | ARTIST: Laura Brown (SheDragon) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 34x6 ===
+```
+      /";;:;;"\
+    (:;/\,-,/\;;)
+   (:;{  d b  }:;)
+    (:;\__Y__/;;)-----------,,_
+     ,..\  ,..\      ___/___)__`\
+ldb (,,,)~(,,,)`-._##____________)
+```
+
+=== ID: 74888aa349fdd618 | TITLE: Panther | ARTIST: Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 26x6 ===
+```
+                  /)-._
+                 Y. ' _]
+          ,.._   |`--"=
+         /    "-/   \
+/)  sk  |   |_     `\|___
+\:::::::\___/_\__\_______\
+```
+
+=== ID: 83187fc3cd145d28 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 11x6 ===
+```
+ .       .
+ |\_---_/|
+/   o_o   \
+|    U    |
+\  ._I_.  /
+ `-_____-'
+```
+
+=== ID: 70772c977d359b5c | TITLE: Lion | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 20x6 ===
+```
+       sSSSs
+      s(oo)s
+      s(Y)Ss'._
+        |\,    "._
+       / /| /___  \
+snd  cc-'cc'cc-,-__)
+```
+
+=== ID: f53b52445fcd7f1e | TITLE: Cat | ARTIST: Lara Allen | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 18x7 ===
+```
+      /\_/\
+ /\  / o o \
+//\\ \~(*)~/
+`  \/   ^ /
+   | \|| ||  Lara
+   \ '|| ||  Allen
+    \)()-())
+```
+
+=== ID: dacc020d3a1b26c5 | TITLE: Lion | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 12x7 ===
+```
+   _='`'=_
+  //(@_@)\\
+  |||(Y)|||
+  \\\\ ////
+   / )`( \
+<\(  )'(  )
+ (__w)_(w__)
+```
+
+=== ID: 92514812fc67761f | TITLE: Panther | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 26x7 ===
+```
+                   _ |\_
+                   \` ..\
+              __,.-" =__Y=
+            ."        )
+      _    /   ,    \/\_
+     ((____|    )_-\ \_-`
+jgs  `-----'`-----` `--`
+```
+
+=== ID: 918346b180e39896 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x7 ===
+```
+    /\_____/\
+   /  o   o  \
+  ( ==  ^  == )
+   )         (
+  (           )
+ ( (  )   (  ) )
+(__(__)___(__)__)
+```
+
+=== ID: 1274c130e4323958 | TITLE: Cat | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 34x8 ===
+```
+        _..---...,""-._     ,/}/)
+     .''        ,      ``..'(/-<
+    /   _      {      )         \
+   ;   _ `.     `.   <         a(
+ ,'   ( \  )      `.  \ __.._ .: y
+(  <\_-) )'-.____...\  `._   //-'
+ `. `-' /-._)))      `-._)))
+   `...'         hjw
+```
+
+=== ID: e416ee6927976f74 | TITLE: Cat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 15x8 ===
+```
+    .       .
+    \`-"'"-'/
+     } 6 6 {
+    =.  Y  ,=
+      /^^^\  .
+     /     \  )
+jgs (  )-(  )/
+     ""   ""
+```
+
+=== ID: 8d95217c554a004d | TITLE: Cat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 18x8 ===
+```
+     .       .
+     \`-"'"-'/
+      } 6 6 {
+     =.  Y  ,=
+   (""-'***`-"")
+    `-/     \-'
+jgs  (  )-(  )==='
+      ""   ""
+```
+
+=== ID: c0fd761cdd8f3937 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x8 ===
+```
+  ^___^
+ " o o "
+ ===X===       _
+  ' " '_     __\\
+ /''''  \___/ __/
+|           /
+("|")__\   |
+"" ""(_____/
+```
+
+=== ID: df495b0b714049fa | TITLE: Racoon | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 30x8 ===
+```
+                 __        .-.
+             .-"` .`'.    /\\|
+     _(\-/)_" ,  .   ,\  /\\\/
+    {(#b^d#)} .   ./,  |/\\\/
+    `-.(Y).-`  ,  |  , |\.-`
+         /~/,_/~~~\,__.-`
+        ////~    // ~\\
+jgs   ==`==`   ==`   ==`
+```
+
+=== ID: 0068b8d81b977b74 | TITLE: Cat | ARTIST: Berton Corson | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 20x9 ===
+```
+  /\ ___ /\
+ (  o   o  )
+  \  >#<  /
+  /       \
+ /         \       ^
+|           |     //
+ \         /    //
+  ///  ///   --
+Berton Corson
+```
+
+=== ID: b6aaa7dca767c9bc | TITLE: Puma | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 29x9 ===
+```
+                      (`.-,')
+                    .-'     ;
+                _.-'   , `,-
+          _ _.-'     .'  /._
+        .' `  _.-.  /  ,'._;)
+       (       .  )-| (
+        )`,_ ,'_,'  \_;)
+('_  _,'.'  (___,))
+ `-:;.-'
+```
+
+=== ID: 3a0ef3673430102a | TITLE: Cat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 20x10 ===
+```
+      ,_     _,
+      |\\___//|
+      |=6   6=|
+      \=._Y_.=/
+       )  `  (    ,
+      /       \  ((
+      |       |   ))
+     /| |   | |\_//
+jgs  \| |._.| |/-`
+      '"'   '"'
+```
+
+=== ID: 9d33f7e1d8a14942 | TITLE: Two cats | ARTIST: Mike Lukacs | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 34x10 ===
+```
+     /\_/\ /\_/\
+     (^ ^) {@ @}
+     ==~== ==o==
+      \@/   \^/
+      |=|   ###_     -Mike Lukacs-
+(    /  \  /    \
+ \  /   |  |     \
+  )/ ||||  ||||(  \   \
+ (( /||||  |||| \  )   )
+   m !m!m  m!m! m-~(__/
+```
+
+=== ID: 64248696ab474307 | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x10 ===
+```
+ ,_     _
+ |\\_,-~/
+ / _  _ |    ,--.
+(  @  @ )   / ,-'
+ \  _T_/-._( (
+ /         `. \
+|         _  \ |
+ \ \ ,  /      |
+  || |-_\__   /
+ ((_/`(____,-'
+```
+
+=== ID: b0cd6ed96c6b2988 | TITLE: Cat | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x10 ===
+```
+         ,    ,
+        | \--/ |
+        ( (0_0)(
+         \==Y==/
+         /'-"-'>
+       _/ < ; (;
+      / ,_ |_|_\
+snd  ( _,,)\,,),)
+     \ '.___
+      '-----'
+```
+
+=== ID: 8c5113000921d06a | TITLE: Cat | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 29x11 ===
+```
+  ,-.       _,---._ __  / \
+ /  )    .-'       `./ /   \
+(  (   ,'            `/    /|
+ \  `-"             \'\   / |
+  `.              ,  \ \ /  |
+   /`.          ,'-`----Y   |
+  (            ;        |   '
+  |  ,-.    ,-'         |  /
+  |  | (   |        hjw | /
+  )  |  \  `.___________|/
+  `--'   `--'
+```
+
+=== ID: cb1729f46471da5b | TITLE: Cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 22x11 ===
+```
+ /\     /\
+{  `---'  }
+{  O   O  }
+~~>  V  <~~
+ \  \|/  /
+  `-----'____
+  /     \    \_
+ {       }\  )_\_   _
+ |  \_/  |/ /  \_\_/ )
+  \__/  /(_/     \__/
+    (__/
+```
+
+=== ID: 6bb20bf12b2a1891 | TITLE: Cat | ARTIST: Audrey Ming Hwang | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 38x11 ===
+```
+    /\___/\
+   /       \
+  l  u   u  l
+--l----*----l--
+   \   w   /     - Meow!
+     ======
+   /       \ __
+   l        l\ \
+   l        l/ /   -Audrey Ming Hwang-
+   l  l l   l /
+   \ ml lm /_/
+```
+
+=== ID: 98b7130e2b63bf1b | TITLE: Untitled | ARTIST: VeeJay | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 28x12 ===
+```
+      _          ___
+    /' '\       / " \
+   |  ,--+-----4 /   |
+   ',/   o  o     --.;
+--._|_   ,--.  _.,-- \----.
+------'--`--' '-----,' VJ  |
+     \_  ._\_.   _,-'---._.'
+       `--...--``  /
+         /###\   | |
+         |.   `.-'-'.
+        .||  /,     |
+       do_o00oo_,.ob
+```
+
+=== ID: 0cbba5b5aa9c0aca | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 22x12 ===
+```
+                   .-.
+                  / /
+                 / |
+   |\     ._ ,-""  `.
+   | |,,_/  7        ;
+ `;=     ,=(     ,  /
+  |`q  q  ` |    \_,|
+ .=; <> _ ; /  ,/'/ |
+';|\,j_ \;=\ ,/   `-'
+    `--'_|\  )
+   ,' | /  ;'
+  (,,/ (,,/      fsc
+```
+
+=== ID: 71a4b352c07289f2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 28x12 ===
+```
+ _
+( \
+ \ \
+ / /                |\\
+/ /     .-`````-.   / ^`-.
+\ \    /         \_/  {|} `o
+ \ \  /   .---.   \\ _  ,--'
+  \ \/   /     \,  \( `^^^
+   \   \/\      (\  )
+    \   ) \     ) \ \
+jgs  ) /__ \__  ) (\ \___
+    (___)))__))(__))(__)))
+```
+
+=== ID: 24b076a3a8db2aec | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 27x12 ===
+```
+     _
+    / )
+   / /
+  / /               /\
+ / /     .-```-.   / ^`-.
+ \ \    /       \_/  (|) `o
+  \ \  /   .-.   \\ _  ,--'
+   \ \/   /   )   \( `^^^
+    \   \/    (    )
+     \   )     )  /
+jgs   ) /__    | (__
+     (___)))   (__)))
+```
+
+=== ID: 1eabc11fdecdef46 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 22x12 ===
+```
+ /\     /\
+{  `---'  }
+{  O   O  }
+~~>  V  <~~
+ \  \|/  /
+  `-----'__
+  /     \  `^\_
+ {       }\ |\_\_   W
+ |  \_/  |/ /  \_\_( )
+  \__/  /(_E     \__/
+    (  /
+     MM
+```
+
+=== ID: 045cc3a4d355a605 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 31x12 ===
+```
+           .'\   /`.
+         .'.-.`-'.-.`.
+    ..._:   .-. .-.   :_...
+  .'    '-.(o ) (o ).-'    `.
+ :  _    _ _`~(_)~`_ _    _  :
+:  /:   ' .-=_   _=-. `   ;\  :
+:   :|-.._  '     `  _..-|:   :
+ :   `:| |`:-:-.-:-:'| |:'   :
+  `.   `.| | | | | | |.'   .'
+    `.   `-:_| | |_:-'   .'
+ jgs  `-._   ````    _.-'
+          ``-------''
+```
+
+=== ID: 991e8b3e0bb658ee | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 26x14 ===
+```
+                        _
+                       | \
+                       | |
+                       | |
+  |\                   | |
+ /, ~\                / /
+X     `-.....-------./ /
+ ~-. ~  ~              |
+    \             /    |
+     \  /_     ___\   /
+     | /\ ~~~~~   \ |
+     | | \        || |
+     | |\ \       || )
+    (_/ (_/      ((_/
+```
+
+=== ID: 1d682a969f9b486c | TITLE: Untitled | ARTIST: Felix Lee | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 37x14 ===
+```
+             ,  ,, ,
+       , ,; ; ;;  ; ;  ;
+    , ; ';  ;  ;; .-''\ ; ;
+ , ;  ;`  ; ,; . / /8b \ ; ;
+ `; ; .;'         ;,\8 |  ;  ;
+  ` ;/   / `_      ; ;;    ;  ; ;
+     |/.'  /9)    ;  ; `    ;  ; ;
+    ,/'          ; ; ;  ;   ; ; ; ;
+   /_            ;    ;  `    ;  ;
+  `?8P"  .      ;  ; ; ; ;     ;  ;;
+  | ;  .:: `     ;; ; ;   `  ;  ;
+  `' `--._      ;;  ;;  ; ;   ;   ;
+   `-..__..--''   ; ;    ;;   ; ;   ;
+fL             ;    ; ; ;   ;     ;
+```
+
+=== ID: 40e94553cf590a1d | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 32x15 ===
+```
+       _
+       \`*-.
+        )  _`-.
+       .  : `. .
+       : _   '  \
+       ; *` _.   `*-._
+       `-.-'          `-.
+         ;       `       `.
+         :.       .        \
+         . \  .   :   .-'   .
+         '  `+.;  ;  '      :
+         :  '  |    ;       ;-.
+         ; '   : :`-:     _.`* ;
+[bug] .*' /  .*' ; .*`- +'  `*'
+      `*-*   `*-*  `*-*'
+```
+
+=== ID: 18ddacf9379219f6 | TITLE: Poor kitty lost all its 9 lives | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 21x15 ===
+```
+           ___
+          (___)
+   ____
+ _\___ \  |\_/|
+\     \ \/ , , \ ___
+ \__   \ \ ="= //|||\
+  |===  \/____)_)||||
+  \______|    | |||||
+      _/_|  | | =====
+     (_/  \_)_) snd
+  _________________
+ (                _)
+  (__   '          )
+    (___    _____)
+        '--'
+```
+
+=== ID: 837a32bf7fbb9439 | TITLE: Untitled | ARTIST: Joris Bellenger | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 36x25 ===
+```
+            /)
+           //
+          //
+         ((
+          \\
+           ))
+          //
+      _,-'"._
+     /_  ,   \
+     |   '   /
+     \)    ,\'
+     '|      \
+     /   |   )
+    /_   ,  /
+   /  _  % (
+   ) /    ' \
+  /        \_)
+  ),    )_   \_  ,
+ _/    _/%     \/)
+('  __/ \ ___    \,
+ \   (   `"-  __  /
+  '\  \   ((   >  \
+    )  \   '-.-,_='~~~  ~
+   ('  /         ' ~~ ~  ~~ ~~ b'ger
+   " ""
+```
+
+=== ID: ce5d921aac85ac3a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: scorpions | SIZE: 13x9 ===
+```
+   _    _
+  /_]  [_\
+ //      \\
+ \\      //
+  \`-..-'/
+   `\  /`
+     ||    _
+jgs  ||   ( )
+     \\___/
+```
+
+=== ID: 265374fc913ba9bf | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: scorpions | SIZE: 13x13 ===
+```
+ ___    ___
+( _<    >_ )
+//        \\
+\\___..___//
+ `-(    )-'
+   _|__|_
+  /_|__|_\
+  /_|__|_\
+  /_\__/_\
+   \ || /  _)
+     ||   ( )
+Max  \\___//
+      `---'
+```
+
+=== ID: a279aa755ea14464 | TITLE: Scorpion | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: scorpions | SIZE: 29x24 ===
+```
+  /|  |\            /|  |\
+  /|  |\            /|  |\
+ / |  | \          / |  | \
+ | |  | |          | |  | |
+ \  \/  /  __  __  \  \/  /
+  \    /  / /  \ \  \    /
+   \  /   \ \__/ /   \  /
+   \  /   /      \   \  /
+  _ \ \__/ O    O \__/ / _
+  \\ \___          ___/ //
+_  \\___/  ______  \___//  _
+\\  ----(          )----  //
+ \\_____( ________ )_____//
+  ~-----(          )-----~ _
+   _____( ________ )_____  \\
+  /,----(          )----  _//
+ //     (  ______  )     /  \
+ ~       \        /      \  /
+          \  __  /       / /
+           \    /       / /
+            \   \      / /
+             \   ~----~ /
+              \________/
+Watch out for the BUGS!!!
+```
+
+=== ID: 527e0135b624f4f3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 10x4 ===
+```
+ __    __
+/ \\..// \
+  ( oo )
+   \__/
+```
+
+=== ID: 51b7d880532809fb | TITLE: Rabbit | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 5x4 ===
+```
+  //
+ ('>
+ /rr
+*\))_
+```
+
+=== ID: fa30cd4349f066c3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 25x6 ===
+```
+               ((`\
+            ___ \\ '--._
+         .'`   `'    o  )
+        /    \   '. __.'
+       _|    /_  \ \_\_
+jgs   {_\______\-'\__\_\
+```
+
+=== ID: b9f657f8b4895654 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 12x7 ===
+```
+     \\
+      \\_
+      ( _\
+      / \__
+     / _/`"`
+    {\  )_
+jgs   `"""`
+```
+
+=== ID: 5e0c48335dc827a9 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 29x7 ===
+```
+                    |  |
+ ______|        dwb |  |
+|    # |,\|/--,_____|__|O___
+|    # |  ` o  ,____________)
+|    # |( c o ,_____o000____)
+|____#_|'.,-'`
+       | /|\
+```
+
+=== ID: c66d798afddb1d2e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 20x8 ===
+```
+             ,\
+             \\\,_
+              \` ,\
+         __,.-" =__)
+       ."        )
+    ,_/   ,    \/\_
+    \_|    )_-\ \_-`
+jgs    `-----` `--`
+```
+
+=== ID: 29294bc3b1db42d0 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 32x15 ===
+```
+                              __
+                     /\    .-" /
+                    /  ; .'  .'
+                   :   :/  .'
+                    \  ;-.'
+       .--""""--..__/     `.
+     .'           .'    `o  \
+    /                    `   ;
+   :                  \      :
+ .-;        -.         `.__.-'
+:  ;          \     ,   ;
+'._:           ;   :   (
+    \/  .__    ;    \   `-.
+ bug ;     "-,/_..--"`-..__)
+     '""--.._:
+```
+
+=== ID: 0adef9fa57327097 | TITLE: Untitled | ARTIST: Susie Oviatt | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 25x15 ===
+```
+   /gg\           /gg\
+  /g.gg\         /gg.g\
+ |gg..gg\       /gg..gg|
+ |gg...g|       |g...gg|
+ |gg...g|       |g...gg|
+  \gg..g/       \g..gg/
+   |gg.gvgggggggvg.gg|
+  /ggggggggggggggggggg\
+ /gggg(((ggggggg)))gggg\
+|ggggg....ggggg....ggggg|
+|ggggg....ggggg....ggggg|
+|ggcccgggg\___/ggggcccgg|
+|ggcccccgggg|ggggcccccgg|
+  \gcccggg\---/gggcccg/
+     \ggggggggggggg/
+```
+
+=== ID: c025a22fc2eea153 | TITLE: Rabbit with Long Ears | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 27x18 ===
+```
+   ***
+  ** **
+ **   **
+ **   **         ****
+ **   **       **   ****
+ **  **       *   **   **
+  **  *      *  **  ***  **
+   **  *    *  **     **  *
+    ** **  ** **        **
+    **   **  **
+   *           *
+  *             *
+ *    0     0    *
+ *   /   @   \   *
+ *   \__/ \__/   *
+   *     W     *
+     **     **
+       *****
+```
+
+=== ID: 1acb19f790edf503 | TITLE: Rabbit | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 28x20 ===
+```
+             ,
+            /|      __
+           / |   ,-~ /
+          Y :|  //  /
+          | jj /( .^
+          >-"~"-v"
+         /       Y
+        jo  o    |
+       ( ~T~     j
+        >._-' _./
+       /   "~"  |
+      Y     _,  |
+     /| ;-"~ _  l
+    / l/ ,-"~    \
+    \//\/      .- \
+     Y        /    Y    -Row
+     l       I     !
+     ]\      _\    /"\
+    (" ~----( ~   Y.  )
+~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: 4ac53317cb2fac38 | TITLE: Rabbit | ARTIST: Scott C. Sullivan | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 21x21 ===
+```
+     / \
+    / _ \
+   | / \ |
+   ||   || _______
+   ||   || |\     \
+   ||   || ||\     \
+   ||   || || \    |
+   ||   || ||  \__/
+   ||   || ||   ||
+    \\_/ \_/ \_//
+   /   _     _   \
+  /               \
+  |    O     O    |
+  |   \  ___  /   |
+ /     \ \_/ /     \
+/  -----  |  -----  \
+|     \__/|\__/     |
+\       |_|_|       /
+ \_____       _____/
+       \     /
+       |     |
+```
+
+=== ID: b277627422da5b44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 37x4 ===
+```
+   _____,,;;;`;       ;';;;,,_____
+,~(  )  , )~~\|       |/~~( ,  (  )~;
+' / / --`--,             .--'-- \ \ `
+ /  \    | '             ` |    /  \
+```
+
+=== ID: 5737dd0dd349a199 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 30x5 ===
+```
+       _ ____
+     /( ) _   \
+    / //   /\` \,  ||--||--||-
+      \|   |/  \|  ||--||--||-
+~^~^~^~~^~~~^~~^^~^^^^^^^^^^^^
+```
+
+=== ID: c4511b62cdba8551 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 15x6 ===
+```
+           ,--,
+     _ ___/ /\|
+ ,;'( )__, )  ~
+//  //   '--;
+'   \     | ^
+     ^    ^
+```
+
+=== ID: bbc6f2442bf498b5 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 16x6 ===
+```
+            .''
+  ._.-.___.' (`\
+ //(        ( `'
+'/ )\ ).__. )
+' <' `\ ._/'\
+   `   \     \
+```
+
+=== ID: 34d6e28cc0c68151 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 12x6 ===
+```
+        ,--,
+  _ ___/ /\|
+ ;( )__, )
+; //   '--;
+  \     |
+   ^    ^
+```
+
+=== ID: 3d7650243ee1a4d1 | TITLE: Horse Jumper | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 15x9 ===
+```
+ ~,  O
+ /)\~_/\
+'  \ \~_\__ ~
+  _|_)_\_( )~~~
+//   /|   \|\
+  ()//|     \`
+  ||/||
+  ||
+  || ejm98
+```
+
+=== ID: 2857989aabc4a9bf | TITLE: Untitled | ARTIST: Tua Xiong | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 22x10 ===
+```
+           {)
+        c==//\
+   _-~~/-._|_|
+  /'_,/,   //'~~~\;;,
+  `~  _( _||_..\ | ';;
+    /'~|/ ~' `\<\>  ;
+    "  |      /  |
+       "      "  "
+
+-Tua Xiong
+```
+
+=== ID: 52a461adac317c9f | TITLE: Knight and horse | ARTIST: Andreas Freise | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 13x10 ===
+```
+  |
+  |
+  + \
+  \\.G_.*=.
+   `(#'/.\|
+    .>' (_--.
+ _=/d   ,^\
+~~ \)-'   '
+   / |   a:f
+  '  '
+```
+
+=== ID: 443db5eec9926903 | TITLE: Untitled | ARTIST: Stephen C.E.S. Wilson (S.C.E.S.W.) | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 32x12 ===
+```
+            a@@@@a
+        a@@@@@@@@@@@@a
+      a@@@@@@by@@@@@@@@a
+    a@@@@@S@C@E@S@W@@@@@@a
+    @@@@@@@@@@@@@@@@@@@@@@
+     `@@@@@@`\\//'@@@@@@'
+          ,,  ||  ,, S.C.E.S.W.
+         /(-\ || /.)m
+    ,---' /`-'||`-'\ `----,
+   /( )__))   ||   ((,==( )\
+_ /_//___\\ __|| ___\\ __\\ ____
+    ``    `` /MM\   ''   ''
+```
+
+=== ID: e831003f578848c6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 39x19 ===
+```
+          /           /
+         /' .,,,,  ./
+        /';'     ,/
+       / /   ,,//,`'`
+      ( ,, '_,  ,,,' ``
+      |    /@  ,,, ;" `
+     /    .   ,''/' `,``
+    /   .     ./, `,, ` ;
+ ,./  .   ,-,',` ,,/''\,'
+|   /; ./,,'`,,'' |   |
+|     /   ','    /    |
+ \___/'   '     |     |
+  `,,'   |      /     `\
+        /      |        ~\
+       '       (
+      :
+     ; .         \
+    :   \         ;       Horse?
+       .                  by Ooyamaneko
+```
+
+=== ID: dbd71b9a4be2b9b6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 38x19 ===
+```
+                            _(\_/)
+                          ,((((^`\
+                         ((((  (6 \
+                       ,((((( ,    \
+   ,,,_              ,(((((  /"._  ,`,
+  ((((\\ ,...       ,((((   /    `-.-'
+  )))  ;'    `"'"'""((((   (
+ (((  /            (((      \
+  )) |                      |
+ ((  |        .       '     |
+ ))  \     _ '      `t   ,.')
+ (   |   y;- -,-""'"-.\   \/
+ )   / ./  ) /         `\  \
+    |./   ( (           / /'
+    ||     \\          //'|
+jgs ||      \\       _//'||
+    ||       ))     |_/  ||
+    \_\     |_/          ||
+    `'"                  \_\
+```
+
+=== ID: b543eda4cd66ca84 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: horses | SIZE: 18x20 ===
+```
+,~~_
+|/\ =_ _ ~
+ _( )_( )\~~
+ \,\  _|\ \~~~
+    \`   \
+    `    `
+
+((^--__
+| /\  --___ __
+   (  /  \  ) \\
+   / |~~~~/  \  \\
+ /    \ /      \
+
+ ,
+/,`\
+` | \____\\
+ _(      ) \
+ \-\~~~_|\  \
+    \ `   \  `
+    `     `
+```
+
+=== ID: d5f31d200022ed72 | TITLE: Walrus | ARTIST: Harry Mason (Hajoma) | CATEGORY: animals | SUBCATEGORY: other-water | SIZE: 12x4 ===
+```
+       ___
+      /  .\
+     /  =__|
+hjm /    ||
+```
+
+=== ID: 99f06b44faacc35b | TITLE: Octopus | ARTIST: Michele Cerulli | CATEGORY: animals | SUBCATEGORY: other-water | SIZE: 26x9 ===
+```
+       .'.'
+      .'-'.
+  .  (  o O)
+   \_ `  _,   _
+-.___'.) ( ,-'
+     '-.O.'-..-..       mc
+ ./\/\/ | \_.-._
+        ;
+     ._/
+```
+
+=== ID: 4e83b729d50775af | TITLE: Seaweed, the otter | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: other-water | SIZE: 28x10 ===
+```
+  .-"""-.
+ /      o\
+|    o   0).-.
+|       .-;(_/     .-.
+ \     /  /)).---._|  `\   ,
+  '.  '  /((       `'-./ _/|
+    \  .'  )        .-.;`  /
+     '.             |  `\-'
+       '._        -'    /
+ jgs      ``""--`------`
+```
+
+=== ID: 6078a1f1b2def6b1 | TITLE: Lobster | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: other-water | SIZE: 37x13 ===
+```
+                         ,.---.
+               ,,,,     /    _ `.
+                \\\\   /      \  )
+                 |||| /\/``-.__\/
+                 ::::/\/_
+ {{`-.__.-'(`(^^(^^^(^ 9 `.========='
+{{{{{{ { ( ( (  (   (-----:=
+ {{.-'~~'-.(,(,,(,,,(__6_.'=========.
+                 ::::\/\
+                 |||| \/\  ,-'/\
+  jgs           ////   \ `` _/  )
+               ''''     \  `   /
+                         `---''
+```
+
+=== ID: 563b100c24ad27d9 | TITLE: Pinchers, the lobster | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: other-water | SIZE: 33x17 ===
+```
+           ."".-._.-."".
+          |   \  |  /   |
+           \   \.T./   /
+            '-./   \.-'
+              /     \
+             ;       ;
+             |       |
+             |       |
+            /         \
+            |    .    |
+         __.|    :    |.__
+     .-'`   |    :    |   `'-.
+   /`     ."\  0 : 0  /".     `\
+  |     _/   './ : \.'   \_     |
+  |    /      /`"""`\      \    |
+   \   \   .-'       '._   /   /
+jgs '-._\                 /_.-'
+```
+
+=== ID: 198c3a2776901c47 | TITLE: Duck | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 3x2 ===
+```
+>o)
+(_>
+```
+
+=== ID: 9d09aae3624de3fb | TITLE: Swans | ARTIST: Linda Ball | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 12x3 ===
+```
+        (o_
+  c_  \\\_\
+\\)   <____)
+```
+
+=== ID: 97259f32b8415094 | TITLE: Penguins | ARTIST: Linda Ball | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 11x3 ===
+```
+       (o_
+(o_    //\
+(/)_   V_/_
+```
+
+=== ID: a26b9a172d0b5129 | TITLE: Duck | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 6x3 ===
+```
+   (@_
+\\\_\
+<____)
+```
+
+=== ID: 79802752bbded889 | TITLE: Little ducks | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 25x3 ===
+```
+  _      _      _
+>(.)__ <(.)__ =(.)__
+ (___/  (___/  (___/  hjw
+```
+
+=== ID: 2999faf9e6270787 | TITLE: Duck | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 13x4 ===
+```
+  __
+<(o )___
+ ( ._> /
+  `---'   hjw
+```
+
+=== ID: e96696f77022f398 | TITLE: Duck | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 12x4 ===
+```
+    __
+___( o)>
+\ <_. )
+ `---'   hjw
+```
+
+=== ID: 66d4ed1791b61e62 | TITLE: Penguin | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 5x4 ===
+```
+ __
+( o>
+///\
+\V_/_
+```
+
+=== ID: 297aaae25c989aac | TITLE: Duck | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 17x5 ===
+```
+       ,~&.
+(\_   (  e )>
+ ) `~~'   (
+(   `-._)  )
+ `-._____,'   hjw
+```
+
+=== ID: abab6576008013a7 | TITLE: Duck | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 14x5 ===
+```
+      ,~~.
+ ,   (  - )>
+ )`~~'   (
+(  .__)   )
+ `-.____,' hjw
+```
+
+=== ID: c6aba41371aa1a53 | TITLE: Duck | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 16x5 ===
+```
+      ,~~.
+     (  6 )-_,
+(\___ )=='-'
+ \ .   ) )
+  \_`-'_/    hjw
+```
+
+=== ID: e5562ec05c24278e | TITLE: Duck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 28x5 ===
+```
+                 ,-.
+         ,      ( {o\
+         {`"=,___) (`~
+          \  ,_.-   )
+jgs  ~^~^~^`- ~^ ~^ '~^~^~^~
+```
+
+=== ID: 611e9edc4a1bfcd1 | TITLE: Penguin | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 17x6 ===
+```
+         __
+      -=(o '.
+         '.-.\
+         /|  \\
+         '|  ||
+snd       _\_):,_
+```
+
+=== ID: 43140606a5d9530a | TITLE: Duck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 24x7 ===
+```
+              ..
+             ( '`<
+              )(
+       ( ----'  '.
+       (         ;
+        (_______,'
+jgs~^~^~^~^~^~^~^~^~^~^~
+```
+
+=== ID: 8e26a76e0469131f | TITLE: Duck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 21x7 ===
+```
+           ..
+          ( '`<
+           )(
+    ( ----'  '.
+    (         ;
+     (_______,'   jgs
+~^~^~^~^~^~^~^~^~^~^~
+```
+
+=== ID: 4128ead0d74ed59a | TITLE: Flamingo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 16x13 ===
+```
+            __
+           /(`o
+     ,-,  //  \\
+    (,,,) ||   V
+   (,,,,)\//
+   (,,,/w)-'
+   \,,/w)
+   `V/uu
+     / |
+     | |
+     o o
+     \ |
+\,/  ,\|,.  \,/
+```
+
+=== ID: 2e5ef0982cbcf027 | TITLE: Penguin | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 33x14 ===
+```
+             . --- .
+           /        \
+          |  O  _  O |
+          |  ./   \. |
+          /  `-._.-'  \
+        .' /         \ `.
+    .-~.-~/           \~-.~-.
+.-~ ~    |             |    ~ ~-.
+`- .     |             |     . -'
+     ~ - |             | - ~
+         \             /
+       ___\           /___
+       ~;_  >- . . -<  _i~
+          `'         `'
+```
+
+=== ID: ebbc31b4e1b4ec84 | TITLE: Lovebirds III - flamingos | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 26x14 ===
+```
+         (\/)
+          \/
+  (\/)   .-.  .-.
+   \/   ((`-)(-`))
+         \\    //   (\/)
+          \\  //     \/
+   .="""=._))((_.="""=.
+  /  .,   .'  '.   ,.  \
+ /__(,_.-'      '-._,)__\
+`    /|             |\   `
+    /_|__         __|_\
+      | `))     ((` |
+      |             |
+jgs  -"==         =="-
+```
+
+=== ID: d8d9c030b81e2b56 | TITLE: Duck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 36x15 ===
+```
+        ,----,
+   ___.`      `,
+   `===  D     :
+     `'.      .'
+        )    (                   ,
+       /      \_________________/|
+      /                          |
+     |                           ;
+     |               _____       /
+     |      \       ______7    ,'
+     |       \    ______7     /
+      \       `-,____7      ,'   jgs
+^~^~^~^`\                  /~^~^~^~^
+  ~^~^~^ `----------------' ~^~^~^
+ ~^~^~^~^~^^~^~^~^~^~^~^~^~^~^~^~
+```
+
+=== ID: b3e0c02f09905094 | TITLE: Flamingo | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 35x20 ===
+```
+   __
+ .^o ~\
+Y /'~) }      _____
+l/  / /    ,-~     ~~--.,_
+   ( (    /  ~-._         ^.
+    \ "--'--.    "-._       \
+     "-.________     ~--.,__ ^.
+               \"~r-.,___.-'-. ^.
+                YI    \\      ~-.\
+                ||     \\        `\
+                ||     //
+                ||    //
+                ()   //
+                ||  //     -Row
+                || ( c
+   ___._ __  ___I|__`--__._ __  _
+ "~     ~  "~   ::  ~~"    ~  ~~
+                ::
+                .:
+                 .
+```
+
+=== ID: 3c57277cdaabb90a | TITLE: Duck | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-water | SIZE: 29x23 ===
+```
+              .-""-.
+             /      \
+            /     (0 \______
+            |         "_____)
+            \        ,-----'
+             \_    _/
+              /    \
+             /      \
+            /        \
+           /          \
+          /        :   |
+         /     ;   :   |
+\\\     /  _.-'    :   |
+ \\\\  / _'        :   |
+  \\\\/ ;         :   /
+   \\  ;         :   /
+    \   `._`-'_.'  _/
+     \     ''' _.-'
+      \      / /
+  jgs  \    / /
+        \  /)(_______
+         )(_________<
+        (__________<
+```
+
+=== ID: b027ab97312bcb49 | TITLE: Bear face | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: bears | SIZE: 15x7 ===
+```
+ __         __
+/  \.-"""-./  \
+\    -   -    /
+ |   o   o   |
+ \  .-'''-.  /
+  '-\__Y__/-'
+     `---`
+```
+
+=== ID: 0c60ec7e5a6ae726 | TITLE: Bear face | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bears | SIZE: 27x10 ===
+```
+    .--.              .--.
+   : (\ ". _......_ ." /) :
+    '.    `        `    .'
+     /'   _        _   `\
+    /     0}      {0     \
+   |       /      \       |
+   |     /'        `\     |
+    \   | .  .==.  . |   /
+     '._ \.' \__/ './ _.'
+jgs  /  ``'._-''-_.'``  \
+```
+
+=== ID: 7f5bab3fd9ecf572 | TITLE: Bear with a honey pot | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: bears | SIZE: 21x12 ===
+```
+     (()__(()
+     /       \
+    ( /    \  \
+     \ o o    /
+     (_()_)__/ \
+    / _,==.____ \
+   (   |--|      )
+   /\_.|__|'-.__/\_
+  / (        /     \
+  \  \      (      /
+   )  '._____)    /
+(((____.--(((____/mrf
+```
+
+=== ID: 2b02ab6a57ca0d07 | TITLE: Bear face | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bears | SIZE: 37x15 ===
+```
+ .'"'.        ___,,,___        .'``.
+: (\  `."'"```         ```"'"-'  /) ;
+ :  \                         `./  .'
+  `.                            :.'
+    /        _         _        \
+   |         0}       {0         |
+   |         /         \         |
+   |        /           \        |
+   |       /             \       |
+    \     |      .-.      |     /
+     `.   | . . /   \ . . |   .'
+ jgs   `-._\.'.(     ).'./_.-'
+           `\'  `._.'  '/'
+             `. --'-- .'
+               `-...-'
+```
+
+=== ID: b323e6f51af43d4d | TITLE: Bat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 21x4 ===
+```
+        _   ,_,   _
+       / `'=) (='` \
+      /.-.-.\ /.-.-.\
+jgs   `      "      `
+```
+
+=== ID: e2d58aba41efa9f8 | TITLE: Bat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 24x4 ===
+```
+       (_    ,_,    _)
+       / `'--) (--'` \
+      /  _,-'\_/'-,_  \
+jgs  /.-'     "     '-.\
+```
+
+=== ID: bc9ffe9f70e74a09 | TITLE: Bat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 31x7 ===
+```
+    =/\                 /\=
+    / \'._   (\_/)   _.'/ \
+   / .''._'--(o.o)--'_.''. \
+  /.' _/ |`'=/ " \='`| \_ `.\
+ /` .' `\;-,'\___/',-;/` '. '\
+/.-' jgs   `\(-V-)/`       `-.\
+`            "   "            `
+```
+
+=== ID: 73a5258e8d672f57 | TITLE: Bat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 26x7 ===
+```
+   /\                 /\
+  / \'._   (\_/)   _.'/ \
+ /_.''._'--('.')--'_.''._\
+ | \_ / `;=/ " \=;` \ _/ |
+  \/ `\__|`\___/`|__/`  \/
+jgs`      \(/|\)/       `
+           " ` "
+```
+
+=== ID: 5425910757fedaaa | TITLE: Bat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 23x7 ===
+```
+ /\                 /\
+/ \'._   (\_/)   _.'/ \
+|.''._'--(o.o)--'_.''.|
+ \_ / `;=/ " \=;` \ _/
+   `\__| \___/ |__/`
+jgs     \(_|_)/
+         " ` "
+```
+
+=== ID: 69e1d9cd2b39c79a | TITLE: Bat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 40x10 ===
+```
+               /'.    .'\
+               \( \__/ )/
+         ___   / (.)(.) \   ___
+    _.-"`_  `-.|  ____  |.-`  _`"-._
+ .-'.-'//||`'-.\  V--V  /.-'`||\\'-.'-.
+`'-'-.// ||    / .___.  \    || \\.-'-'`
+      `-.||_.._|        |_.._||.-'
+               \ ((  )) /
+           jgs  '.    .'
+                  `\/`
+```
+
+=== ID: 5af3f1e0d69cf3de | TITLE: Fox | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 12x4 ===
+```
+ ^...^
+<_* *_>
+  \_/
+        cp97
+```
+
+=== ID: d984df627fab6edf | TITLE: Pig | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 11x4 ===
+```
+    _____
+^..^     \9
+(oo)_____/
+   WW  WW
+```
+
+=== ID: b4913cd57eda3bcf | TITLE: Hedgehog | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 36x4 ===
+```
+  .::::::::..          ..::::::::.
+ :::::::::::::        :::::::::::::
+:::::::::::' .\      /. `:::::::::::
+`::::::::::_,__o    o__,_::::::::::'
+```
+
+=== ID: 48b240123430e305 | TITLE: Hedgehog | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 36x4 ===
+```
+  .|||||||||.          .|||||||||.
+ |||||||||||||        |||||||||||||
+|||||||||||' .\      /. `|||||||||||
+`||||||||||_,__o    o__,_||||||||||'
+```
+
+=== ID: e44ea2a1a0da3509 | TITLE: Fox | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 17x4 ===
+```
+|\_/|,,_____,~~`
+(.".)~~     )`~}}
+ \o/\ /---~\\ ~}}
+   _//    _// ~}
+```
+
+=== ID: 90406b87b67adb61 | TITLE: Armadillo | ARTIST: Armando Frazăo (Seal do Mar) | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 30x4 ===
+```
+       ,::////;::-.
+      /:'///// ``::>/|/
+    .',  ||||    `/( e\
+-==~-'`-Xm````-mm-' `-_\  Seal
+```
+
+=== ID: 8dc3a6a70d5bea39 | TITLE: Kangaroo | ARTIST: Laura Brown (SheDragon) | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 15x4 ===
+```
+  /  /)_
+//  /.'-'
+\\ /_(=
+ \(__)__,   ldb
+```
+
+=== ID: e6cdd4b77c245bda | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 22x5 ===
+```
+   .\\Y\\\\Y\\Y\\\\\.
+ .\\\Y\X\Y\\\X\\'_ _)
+,\\\\\\\\\XY\\\' ' '_
+X\\X\\\Y\\\\X\___ ,__@
+ ''\(,,,)\Y\\(,,,)--'
+```
+
+=== ID: 65cbb3a1775f57dc | TITLE: Pig | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 12x5 ===
+```
+&_--~- ,_
+{        ",
+(  )_ ,{ ,_@
+ |/  {|\{
+ ""   " "
+```
+
+=== ID: 48dcfff6ae7798c3 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 16x5 ===
+```
+        --.__.--
+     ___\(0_0)/
+  ~~/     (OO)
+    \  __  /
+snd  `='`='=
+```
+
+=== ID: 3ecb319c52c81240 | TITLE: Little creature | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 9x6 ===
+```
+  |\_/|
+=( o O )=
+ /\ " /\
+| |\_/| |
+\_>---<_/
+(___|___)
+```
+
+=== ID: c11e7407a8a044d9 | TITLE: Lemur | ARTIST: Colin Douthwaite | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 36x6 ===
+```
+             ...
+  .":.   .:""   "".
+ :    :.:    .     "'.<"""">
+       :   ..:   .:..<(=)(=)>
+       :..')) ; .').  )/~\(
+       ')))   )))      \U/    -cfbd-
+```
+
+=== ID: 430b8e3785a9025e | TITLE: Pig | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 18x6 ===
+```
+     ^..^
+_||__(oo)____||___
+-||--"--"----||---
+_||_( __ )___||___
+-||--"--"----||---
+ ||          ||
+```
+
+=== ID: 4e5e2b54d8e75669 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 18x6 ===
+```
+  .--.
+ <|00/>~~~~~~~~\__
+  |_/( ' , )  ).)V
+     \. ( ')  ,)
+snd   |[/~~~|[/
+     '"'   '"'
+```
+
+=== ID: 93473923548fb81b | TITLE: Hippo | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 25x7 ===
+```
+      c~~p ,---------.
+ ,---'oo  )           \
+( O O                  )/
+ `=^='                 /
+       \    ,     .   /
+       \\  |-----'|  /
+       ||__|    |_|__|
+```
+
+=== ID: 877a52f3a926bb19 | TITLE: Small giraffe | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 13x7 ===
+```
+     .-",
+     `~||
+       ||___
+       (':.)`
+       || ||
+jgs    || ||
+       ^^ ^^
+```
+
+=== ID: b1c8d7e804498fc8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 20x7 ===
+```
+ (\__/)  .~    ~. ))
+ /O O `./      .'
+{O__,   \    {
+  / .  . )    \
+  |-| '-' \    } ))
+ .(   _(   )_.'
+'---.~_ _ _&
+```
+
+=== ID: 33fdf18494d0a9d9 | TITLE: Hippopotamus | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 25x7 ===
+```
+      c~~p ,---------.
+ ,---'oo  )           \
+( O O                  )/
+ `=^='                 /
+       \    ,     .   /
+       \\  |-----'|  /
+       ||__|    |_|__|
+```
+
+=== ID: 3afa121721d36bc2 | TITLE: Untitled | ARTIST: David Berner | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 19x9 ===
+```
+     !!!!
+  !!!!!!!!
+!!!!!!!!!!!   O_O
+!!!  !!!!!!! /@ @\
+      !!!!!! \ x /
+      !!!!!!/ m  !m
+       !!!!/ __  |
+       !!!!|/  \__
+        !!!\______\
+```
+
+=== ID: 75780685a865303a | TITLE: Sheeps | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 33x9 ===
+```
+        __  _
+    .-.'  `; `-._  __  _
+   (_,         .-:'  `; `-._
+ ,'o"(        (_,           )
+(__,-'      ,'o"(            )>
+   (       (__,-'            )
+    `-'._.--._(             )
+       |||  |||`-'._.--._.-'
+                  |||  |||  -bdsm
+```
+
+=== ID: 96784e23d616c126 | TITLE: Zebra | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 19x9 ===
+```
+  \\/),
+ ,'.' /,
+(_)- / /,
+   /\_/ |__..--,  *
+  (\___/\ \ \ / ).'
+   \____/ / (_ //
+    \\_ ,'--'\_(
+    )_)_/ )_/ )_)
+mrf(_(_.'(_.'(_.'
+```
+
+=== ID: f4d4a676b5382514 | TITLE: Fox | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 22x9 ===
+```
+   /|_/|
+  / ^ ^(_o
+ /    __.'
+ /     \
+(_) (_) '._
+  '.__     '. .-''-'.
+     ( '.   ('.____.''
+     _) )'_, )mrf
+    (__/ (__/
+```
+
+=== ID: d53f470262bd0df0 | TITLE: Animal | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 18x11 ===
+```
+       ____
+ __  _/    \_  __
+|  \/        \/  |
+| \            / |
+ \_/ _      _ \_/
+  | /_\    /_\ |
+  | \_/\__/\_/ |
+  |     \/     |
+   | \__/\__/ |
+    \_      _/
+      \____/
+```
+
+=== ID: 390db58a5b3888b6 | TITLE: Ewes | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 31x11 ===
+```
+           __  _
+    .-.'  `; `-._  __  _
+   (_,         .-:'  `; `-._
+ ,'o"(        (_,           )
+(__,-'      ,'o"(            )>
+   (       (__,-'            )
+    `-'._.--._(             )
+       |||  |||`-'._.--._.-'
+                  |||  |||
+
+           Two Ewes
+```
+
+=== ID: 51b52e59b0210b15 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 23x12 ===
+```
+                 _,._
+             __.'   _)
+            <_,)'.-"a\
+              /' (    \
+  _.-----..,-'   (`"--^
+ //              |
+(|   `;      ,   |
+  \   ;.----/  ,/
+   ) // /   | |\ \
+   \ \\`\   | |/ /
+    \ \\ \  | |\/
+     `" `"  `"`
+```
+
+=== ID: ece6b9f1e0a92a30 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 23x13 ===
+```
+      .     .
+     (>\---/<)
+     ,'     `.
+    /  q   p  \
+   (  >(_Y_)<  )
+    >-' `-' `-<-.
+   /  _.== ,=.,- \
+  /,    )`  '(    )
+ ; `._.'      `--<
+:     \        |  )
+\      )       ;_/  hjw
+ `._ _/_  ___.'-\\\
+    `--\\\
+```
+
+=== ID: db404ec8608ac2da | TITLE: Goat | ARTIST: Horroroso | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 27x16 ===
+```
+             ,--._,--.
+           ,'  ,'   ,-`.
+(`-.__    /  ,'   /
+ `.   `--'        \__,--'-.
+   `--/       ,-.  ______/
+     (o-.     ,o- /
+      `. ;        \
+       |:          \
+      ,'`       ,   \
+     (o o ,  --'     :
+      \--','.        ;
+       `;;  :       /
+ -hrr-  ;'  ;  ,' ,'
+        ,','  :  '
+        \ \   :
+         `
+```
+
+=== ID: 0edf785b6d57c74b | TITLE: Untitled | ARTIST: Newton | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 33x17 ===
+```
+=====(((=))=====(=)))===========
+      " `,      |' /
+      /"/        |""
+     """|        \"|
+     |"||        " "
+     "" "        |"|\
+    /""~\\.      /" ""~,
+   ""~""""`"",~`~"!!"!" \
+   /"""""/""! "~""" "" "~",
+  //\""!!""~"!"!"\"""/~!~, C~"~P
+ // !!"""""! "~ " !!"!! "," O o"~
+ ||   !!"!!~!!~||"  !     "" Y ""
+ \\     !  !  !            `"U"'
+  \\
+   \\  0))       -newton-
+    \`-~/~
+     `~'
+```
+
+=== ID: f437119889b28a59 | TITLE: Untitled | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 23x22 ===
+```
+   ___,A.A_  __
+   \   ,   7"_/
+    ~"T(  r r)
+      | \    Y
+      |  ~\ .|
+      |   |`-'
+      |   |
+      |   |
+      |   |
+      |   |
+      j   l
+     /     \
+    Y       Y
+    l   \ : |
+    /\   )( (
+   /  \  I| |\
+  Y    I l| | Y
+  j    ( )( ) l
+ / .    \ ` | |\   -Row
+Y   \    i  | ! Y
+l   .\_  I  |/  |
+ \ /   [\[][]/] j
+```
+
+=== ID: 4e8a0f3e2fe7334d | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: animals | SUBCATEGORY: other-land | SIZE: 23x27 ===
+```
+         _...,
+    _..o"  )  `.
+   Q      `     ;
+    \_.         |
+     `---,,/:.  '
+          |:.    ;
+ .-.      :.     ;
+/:..\  ,/:.      |
+;:.. v:..        '
+`\:..            |
+  `\:::.,/:.     ;
+        ;..      '
+       ;:.        ;
+       ;:.        ;
+       ':.        '
+      ;:..         ;
+      |:..         ;
+      ;:..         |
+      ;:.:,..      ;
+      ':/:..       ;
+       j:..       '\
+       |:..      /-'
+       ':..    ,'
+        \,:.. ;:|
+        _,\:. |:/
+      /:::... \
+      `-------'     fsc
+```
+
+=== ID: ca0b8bc3a6f8a783 | TITLE: Owl | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 7x4 ===
+```
+ /\ /\
+((ovo))
+():::()
+  VVV
+```
+
+=== ID: 577aa4b03583403a | TITLE: Owl | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 7x4 ===
+```
+ /\_/\
+((@v@))
+():::()
+ VV-VV
+```
+
+=== ID: 792f82605d6c5a1d | TITLE: Two birds | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 16x4 ===
+```
+   ___     ___
+  (o o)   (o o)
+ (  V  ) (  V  )
+/--m-m- /--m-m-
+```
+
+=== ID: 05ca2a8e588536a3 | TITLE: Bird | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 7x4 ===
+```
+   ,_
+  >' )
+  ( ( \
+mrf''|\
+```
+
+=== ID: 8fa9938dd0617977 | TITLE: Hummingbird | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 15x4 ===
+```
+  __/)       __
+-(__(  ---@./ww
+    \)     (\
+ejm         "`
+```
+
+=== ID: c482928beaf41f86 | TITLE: Owl | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 13x4 ===
+```
+       , ___
+     `\/{o,o}
+      / /)  )
+ejm  /,--"-"-
+```
+
+=== ID: bc7bc8044b2f21ee | TITLE: Owl | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 11x4 ===
+```
+ ^ ^
+(O,O)
+(   )
+-"-"---dwb-
+```
+
+=== ID: 395e252afb508324 | TITLE: Owl | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 11x4 ===
+```
+ ,_,
+(.,.)
+(   )
+-"-"---dwb-
+```
+
+=== ID: b42c0861d7392da9 | TITLE: Owl | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 11x4 ===
+```
+ ,_,
+(O,O)
+(   )
+-"-"---dwb-
+```
+
+=== ID: eae4303907336ea4 | TITLE: Parrot | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 6x5 ===
+```
+  (@>
+ {||
+--""--
+  ||
+  ||
+```
+
+=== ID: de3d52ba570d5138 | TITLE: Bird | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 6x5 ===
+```
+   \\
+   (o>
+\\_//)
+ \_/_)
+  _|_
+```
+
+=== ID: fba40f8a28b30612 | TITLE: Bird | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 10x5 ===
+```
+   .-.
+  /'v'\
+ (/   \)
+='="="===<
+mrf|_|
+```
+
+=== ID: 44371c0afdc40c98 | TITLE: Chicken | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 18x5 ===
+```
+ ),-.     /\
+<(a  `---','   hjw
+( `-, ._> )
+ ) _<.___/
+     _/
+```
+
+=== ID: b64814b23d811dac | TITLE: Chicken | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 16x5 ===
+```
+/\     ,-.(
+`.`---'  e)>
+( <_.  .-' )
+ \___.<_  (
+   \_        hjw
+```
+
+=== ID: e74efd80a1dbb6ad | TITLE: Bird | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 10x5 ===
+```
+  ,~
+ ('v)__
+(/ (``/
+ \__>' hjw
+  ^^
+```
+
+=== ID: 27075eb7662cec23 | TITLE: Parakeets | ARTIST: Linda Ball | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 17x6 ===
+```
+         \\
+ \\      (o>
+ (o>     //\
+_(()_____V_/_____
+ ||      ||
+         ||
+```
+
+=== ID: 36be9f03959c5ffe | TITLE: Hen | ARTIST: Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 15x6 ===
+```
+    /""\      ,
+   <>^  L____/|
+    `) /`   , /
+     \ `---' /
+      `'";\)`
+   sk   _/_Y
+```
+
+=== ID: acf22698900d5ad0 | TITLE: Parrot | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 23x6 ===
+```
+              __
+             /'{>
+         ____) (____
+       //'--;   ;--'\\
+      ///////\_/\\\\\\\
+jgs          m m
+```
+
+=== ID: f6dc4636037e1a6f | TITLE: Parrot | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 17x6 ===
+```
+           .--,
+       ,.-( (o)\
+      /   .)/\ ')
+    .',./'/   )/
+()=///=))))==()
+  /
+```
+
+=== ID: 0582a325071f766d | TITLE: Eagle | ARTIST: Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 12x6 ===
+```
+  .`.   _ _
+__;_ \ /,//`
+--, `._) (
+ '//,,,  |
+      )_/
+ sk  /_|
+```
+
+=== ID: d17cd9de14d4d6ba | TITLE: An eagle with a fish | ARTIST: Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 14x6 ===
+```
+  .`.   _ _
+__;_ \ /,//`
+--, `._) (  __
+ '//,,,  |_/(/
+      )_7"q`|>
+ sk  /_|   >\
+```
+
+=== ID: a0acfe13b2035637 | TITLE: Eagle | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 22x6 ===
+```
+            __
+          _/ '>
+    _ _.-'(   )'-._ _
+   '=._.=-(   )-=._.='
+          |/-\|
+cjr       Y   Y
+```
+
+=== ID: 82882e0908185d8e | TITLE: Eagle | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 23x6 ===
+```
+  _\|             |/_
+_-  \_   _/"=_   _/  -_
+-_    `-'(   )`-'    _-
+ `=.__.=-(   )-=.__.='
+         |/-\|
+cjr      Y   Y
+```
+
+=== ID: e6d69068d4ce7964 | TITLE: Eagle | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 26x6 ===
+```
+     _\|      __     |/_
+   _-  \_   _/"->   _/  -_
+   -_    `-'(   )`-'    _-
+    `=.__.=-(   )-=.__.='
+            |/-\|
+cjr         Y   Y
+```
+
+=== ID: ed729f06f56004a1 | TITLE: Owl | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 9x6 ===
+```
+  , _ ,
+ ( o o )
+/'` ' `'\
+|'''''''|
+|\\'''//|
+   """
+```
+
+=== ID: 902994bd7289b5de | TITLE: baby chick in egg | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 18x6 ===
+```
+  ,''.
+ (9/\9)
+|\}\/{ /| ,     ,
+\ `^./^ / \`/\/`/
+ `.___.'   `._,'
+               hjw
+```
+
+=== ID: c1dfe3e98bba71c6 | TITLE: Bird | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 19x7 ===
+```
+     __.oOo.__
+    /'(  _  )`\
+   / . \/^\/ . \
+  /  _)_`-'_(_  \
+ /.-~   ).(   ~-.\
+/'     /\_/\     `\
+     . "-V-"
+```
+
+=== ID: 59d0d61a2daf69f4 | TITLE: Bird | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 36x7 ===
+```
+                    |
+____________    __ -+-  ____________
+\_____     /   /_ \ |   \     _____/
+ \_____    \____/  \____/    _____/
+  \_____                    _____/
+     \___________  ___________/
+               /____\
+```
+
+=== ID: 3cd973facf885ac8 | TITLE: Rooster | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 13x7 ===
+```
+          /')
+  ////  /' )'
+ @   \/'  )'
+< (  (_...)'
+  \      )
+   \,,,,/
+     _|_
+```
+
+=== ID: 8db774e0e7305c13 | TITLE: Eagle/falcon | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 31x7 ===
+```
+               _.------.
+           _.-`    ('>.-`"""-.
+ '.__.---'`       _'`   _ .--.)
+jgs     -'         '-.-';`   `
+        ' -      _.'  ``'--.
+            '---`    .-'""`
+                   /`
+```
+
+=== ID: 14d0c77160f692b9 | TITLE: Bird | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 10x8 ===
+```
+   (
+  `-`-.
+  '( @ >
+   _) (
+  /    )
+ /_,'  /
+   \  /
+===m""m===
+```
+
+=== ID: 80d859945ef11267 | TITLE: Bird | ARTIST: Joan G. Stark (Spunk), Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 30x8 ===
+```
+            _.-.
+        .-.  `) |  .-.
+    _.'`. .~./  \.~. .`'._
+.-'`.'-'.'.-:    ;-.'.'-'.`'-.
+ `'`'`'`'`   \  /   `'`'`'`'`
+             /||\
+  jgs       / ^^ \
+            `'``'`
+```
+
+=== ID: b0b30cdb5caca9c6 | TITLE: Parrot | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 22x8 ===
+```
+       _------.
+      /  ,     \_
+    /   /  /{}\ |o\_
+   /    \  `--' /-' \
+  |      \      \    |
+ |              |`-, |
+ /              /__/)/
+|              |
+```
+
+=== ID: ebf1699194c66537 | TITLE: Bird | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 14x8 ===
+```
+  .--.
+  \  |
+   \|\''(.
+   /| )) ''-.
+   \'.__( , ,)
+   ('---.\-v
+mrf_\__ ,-\_,
+    |'-   '-
+```
+
+=== ID: f8e1003e91699bec | TITLE: Eagle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 33x8 ===
+```
+              _..
+ ___..-"""-.  `)^|   .-"""-..___
+`-...___ '=.'-.'  \-'.=' ___...-'
+        `\  ' ##### '  /`
+          '--;|||||;--'
+             /\|||/\
+       jgs  ( /;-;\ )
+             '-...-'
+```
+
+=== ID: af8a39403a2fced5 | TITLE: Eagle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 20x8 ===
+```
+       .~~~~-.
+      /    ,__`)
+     |      \o/|'-.
+     |         /  ,\
+     |        ('--./
+jgs  /         \
+    /  ,  ,  ,  \
+    `--'--'--'--'
+```
+
+=== ID: a3e5e4ad574e8677 | TITLE: Eagle | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 26x9 ===
+```
+      .'''''.
+     '       .
+  __' 0       ;
+ /  \         ;
+|  .-|         ;    -Gurno
+\/~~'          ;
+   /;.  .;;.  . ;
+  /;;;;;;;;;;;;;\
+ |;;;;;;;;;;;;;;;\
+```
+
+=== ID: 8e5150d9f214a62b | TITLE: Flying bird | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 20x9 ===
+```
+           ___
+       _,-' ______
+     .'  .-'  ____7
+    /   /   ___7
+  _|   /  ___7
+>(')\ | ___7     jgs
+  \\/     \_______
+  '        _======>
+  `'----\\`
+```
+
+=== ID: fc38423f9a65435c | TITLE: Flying bird | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 18x10 ===
+```
+             /
+\\\' ,      / //
+ \\\//    _/ //'
+  \_-//' /  //<'
+    \ ///  <//'
+    /  >>   \\\`
+   /,)-^>>  _\`
+   (/   \\ / \\\
+         //  //\\\
+        ((`
+```
+
+=== ID: 6ed4466eaa36392c | TITLE: Owl | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 15x10 ===
+```
+  __________
+ / ___  ___ \
+/ / @ \/ @ \ \
+\ \___/\___/ /\
+ \____\/____/||
+ /     /\\\\\//
+|     |\\\\\\
+ \      \\\\\\
+   \______/\\\\
+    _||_||_
+```
+
+=== ID: 33d6c36dbcfa033e | TITLE: Two love birds | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 37x10 ===
+```
+                 _  _
+                ( \/ )
+         .---.   \  /   .-"-.
+        /   6_6   \/   / 4 4 \
+        \_  (__\       \_ v _/
+        //   \\        //   \\
+       ((     ))      ((     ))
+jgs=====""===""========""===""=======
+          |||            |||
+           |              |
+```
+
+=== ID: 32b2cf6489cf18a3 | TITLE: Eagle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 32x10 ===
+```
+          _.-'`)     (`'-._
+        .' -' / __    \ '- '.
+       / .-' ( '-,`|   ) '-. \
+      / .-',-`'._/ \_.'`-,'-. \
+     ; ; /.`'.-'(   )'-.'`.\ ; ;
+     | .-'|\//'-/   \-'\\/|'-. |
+     |` |; :|'._\   /_,'|: ;| `|
+     || : |;    `Y-Y`    ;| : ||
+jgs  \:| :/======"="======\| |:/
+     /_:-`                 `-;_\
+```
+
+=== ID: 48d209f1f977f20f | TITLE: Eagle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 31x10 ===
+```
+       .------._
+ .-"""`-.<')    `-._
+(.--. _   `._       `'---.__.-'
+ `   `;'-.-'         '-    ._
+   .--'``  '._      - '   .
+    `""'-.    `---'    ,
+          `\
+            `\      .'
+              `'. '
+            jgs `'.
+```
+
+=== ID: 51e2b1710d786908 | TITLE: Bird | ARTIST: Daron Brewood | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 31x11 ===
+```
+      .---.        .-----------
+     /     \  __  /    ------
+    / /     \(  )/    -----
+   //////   ' \/ `   ---
+  //// / // :    : ---
+ // /   /  /`    '--
+//          //..\\
+       ====UU====UU====
+           '//||\\`
+             ''``
+        Daron Brewood
+```
+
+=== ID: fd26b41404b34ed1 | TITLE: Owl | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 40x11 ===
+```
+ ,`````.          _________
+' CiCi  `,       /_  ___   \
+'  ^_^   `.     /@ \/@  \   \
+ ` , . , '  `.. \__/\___/   /
+                 \_\/______/
+                 /     /\\\\\
+                |     |\\\\\\
+                 \      \\\\\\
+                  \______/\\\\     -ccw-
+            _______ ||_||_______
+           (______(((_(((______(@)
+```
+
+=== ID: e457451b3e5ae457 | TITLE: Peace and love | ARTIST: Mic Barendsz | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 25x12 ===
+```
+ /L/\
+_\   \_
+\      )  _,    ,,_
+_|    (  ( 9`> < 6 ) _ __
+\_     \__) (__,) (_ )' /
+  \_    _)   \-/  / `-,(_
+    `--'Z    /`\_ `,___,/
+       /(__,/    ))/
+      /  \((_   /`/`
+     /   |\`\
+     `-^-'
+               mic
+```
+
+=== ID: d643c0eca00ad663 | TITLE: Woodpecker | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 19x13 ===
+```
+          | o     |
+          |       |
+       _  | |  () |
+      ( '=| |     |
+     /  ( |     | |
+    / / |/|   |   |
+    |/\ |/|       |
+       \\ | ()    |
+        \\|    |  |
+          |    |  |
+          |       |
+          |  |    |
+-dana`98- |       |
+```
+
+=== ID: d893946eb7a517c2 | TITLE: Bird | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 21x13 ===
+```
+      _...._
+    /       \
+   /  o _ o
+   (    \/  )
+  )          (
+(    -  -  -  )
+(             )
+ (            )
+  [          ]
+---/l\    /l\--------
+  ----------------
+     (  )
+    ( __ _)
+```
+
+=== ID: 920e27833c19a4a2 | TITLE: Goose | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 28x13 ===
+```
+      _.-.
+ __.-' ,  \
+'--'-'._   \
+        '.  \
+         )-- \ __.--._
+        /   .'        '--.
+       .               _/-._
+       :       ____._/   _-'
+        '._          _.'-'
+           '-._    _.'
+               \_|/
+              __|||
+ snd          >__/'
+```
+
+=== ID: de1526fdff899eaf | TITLE: Night owl | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 26x13 ===
+```
+   ...    *    .   _  .
+*  .  *     .   * (_)   *
+  .      |*  ..   *   ..
+   .  * \|  *  ___  . . *
+*   \/   |/ \/{o,o}     .
+  _\_\   |  / /)  )* _/_ *
+      \ \| /,--"-"---  ..
+_-----`  |(,__,__/__/_ .
+       \ ||      ..
+        ||| .            *
+        |||
+ejm98   |||
+  , -=-~' .-^- _
+```
+
+=== ID: 7fe5e0a846488003 | TITLE: Eagle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 33x14 ===
+```
+          .-"""""""-.
+        .'       __  \_
+       /        /  \/  \
+      |         \_0/\_0/______
+      |:.          .'       oo`\
+      |:.         /             \
+      |' ;        |             |
+      |:..   .     \_______     |
+      |::.|'     ,  \,_____\   /
+      |:::.; ' | .  '|      )_/
+      |::; | | ; ; | |
+     /::::.|-| |_|-|, \
+    /'-=-'`  '-'   '--'\
+jgs/                    \
+```
+
+=== ID: 6a4dfc7b74b3172a | TITLE: Parrot | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 32x16 ===
+```
+                           .
+                          | \/|
+  (\   _                  ) )|/|
+      (/            _----. /.'.'
+.-._________..      .' @ _\  .'
+'.._______.   '.   /    (_| .')
+  '._____.  /   '-/      | _.'
+   '.______ (         ) ) \
+     '..____ '._       )  )
+        .' __.--\  , ,  // ((
+        '.'  mrf|  \/   (_.'(
+                '   \ .'
+                 \   (
+                  \   '.
+                   \ \ '.)
+                    '-'-'
+```
+
+=== ID: ec31d1ecabd3efd1 | TITLE: Chicken | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 31x17 ===
+```
+      ,~.
+   ,-'__ `-,
+  {,-'  `. }              ,')
+ ,( a )   `-.__         ,',')~,
+<=.) (         `-.__,==' ' ' '}
+  (   )                      /
+   `-'\   ,                  )
+       |  \        `~.      /
+       \   `._        \    /
+        \     `._____,'   /
+         `-.            ,'
+            `-.      ,-'
+               `~~~~'
+               //_||
+            __//--'/`   hjw
+          ,--'/`  '
+             '
+```
+
+=== ID: 2eaf2706cc157e92 | TITLE: Eagle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: birds-land | SIZE: 36x22 ===
+```
+         .   ,
+       '. '.  \  \
+      ._ '-.'. `\  \
+        '-._; .'; `-.'.
+       `~-.; '.       '.
+        '--,`           '.
+           -='.          ;
+ .--=~~=-,    -.;        ;
+ .-=`;    `~,_.;        /
+`  ,-`'    .-;         |
+   .-~`.    .;         ;
+    .;.-   .-;         ,\
+      `.'   ,=;     .-'  `~.-._
+       .';   .';  .'      .'   '-.
+         .\  ;  ;        ,.' _  a',
+        .'~";-`   ;      ;"~` `'-=.)
+      .' .'   . _;  ;',  ;
+      '-.._`~`.'  \  ; ; :
+           `~'    _'\\_ \\_
+                 /=`^^=`""/`)-.
+            jgs  \ =  _ =     =\
+                  `""` `~-. =   ;
+```
+
+=== ID: a9b3ef3685f795c0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 24x6 ===
+```
+            ___
+    `=/~~~~~   ~\
+     | ,      ,_ `\_/~\-
+     >/'>/ ~|||`\( ,~\-
+     |  |   `||   \;
+\\\\//\\\/TX\\//\\\\|//
+```
+
+=== ID: eeaa9ab26d853167 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 23x6 ===
+```
+  __.------~~~-.
+,'/             `\
+" \  ,..__ | ,_   `\_,
+   >/|/   ~~\||`\(`~,~'
+   | `\     /'|   \_;
+   "   "   "
+```
+
+=== ID: c6c9b726775b0055 | TITLE: Deer | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 26x7 ===
+```
+(             )
+ `--(_   _)--'
+      Y-Y
+     /@@ \
+    /     \
+    `--'.  \             ,
+        |   `.__________/)
+```
+
+=== ID: 29f9d550a0cda662 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 19x9 ===
+```
+\|/    \|/
+  \    /
+   \_/  ___   ___
+   o o-'   '''   '
+    O -.         |\
+        | |'''| |
+         ||   | |
+         ||    ||
+         "     "
+```
+
+=== ID: a3d355f9dda70dde | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 16x9 ===
+```
+         { }
+         {^^,
+         (   `-;
+    _     `;;~~
+   /(______);
+  (         (
+   |:------( )
+ _//         \\
+/ /          vv
+```
+
+=== ID: 0a41a4cb97f2a0e2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 15x10 ===
+```
+   ()
+   ))    ((
+  //      \\
+ | \\____// |
+\~/ ~    ~\/~~/
+ (|    _/o  ~~
+  /  /     ,|
+ (~~~)__.-\ |
+  ``~~    | |
+   |      | |
+```
+
+=== ID: de77d024e788a72c | TITLE: Untitled | ARTIST: Philip Powell | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 36x12 ===
+```
+         /',  _
+       _(  ;-'.'
+  _,-'~     '".
+'"          ~. .
+        _.      '.
+    _.-'  ~'--.   )
+  '~           ~--'=._
+               /)_.-.
+           _.-' ' <~
+        .-"    _ ~ \
+            .-' '-._)
+          .'                     PjP
+```
+
+=== ID: 98a2ad039ef41ff3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 27x15 ===
+```
+                   .     _,
+                   |`\__/ /
+                   \  . .(
+                    | __T|
+                   /   |
+      _.---======='    |
+     //               {}
+    `|      ,   ,     {}
+     \      /___;    ,'
+      ) ,-;`    `\  //
+     | / (        ;||
+     ||`\\        |||
+     ||  \\       |||
+jgs  )\   )\      )||
+     `"   `"      `""
+```
+
+=== ID: 3bf2767b3fc1e74c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 36x23 ===
+```
+(\ (\       /) /)
+ \\||       ||//
+  > /       \ <
+ //\\       //\\
+(/ /,\ .-. /,\ \)
+  </(\`   `/)\>
+     | _ _ |
+     \<.I.>/
+     |     |\
+     | _   | \ @         _.... _
+     \(_)  /  `@-------"`     ` \
+      `"""`\  @                \/
+           @-@'                 \
+            |          /        |
+            |         |         |
+            /\         \       /
+           / ,)  .-"";"`'.    (
+          / //  /     \  /`-.  '-.
+         / //  /      | /    `-.  \
+        /_// /`      / /        \  |
+       (_(/ /       /_/          | |
+         /_/ jgs   (_(           |_|
+        (_(                      (_(
+```
+
+=== ID: 55286557533ffabd | TITLE: Untitled | ARTIST: Marie Bird | CATEGORY: animals | SUBCATEGORY: deer | SIZE: 37x26 ===
+```
+   /|       |\
+`__\\       //__'
+   ||      ||
+ \__`\     |'__/
+   `_\\   //_'
+   _.,:---;,._
+   \_:     :_/
+     |@. .@|
+     |     |
+     ,\.-./ \
+     ;;`-'   `---__________-----.-.
+     ;;;                         \_\
+     ';;;                         |
+      ;    |                      ;
+       \   \     \        |      /
+        \_, \    /        \     |\
+          |';|  |,,,,,,,,/ \    \ \_
+          |  |  |           \   /   |
+          \  \  |           |  / \  |
+           | || |           | |   | |
+           | || |           | |   | |
+           | || |           | |   | |
+           |_||_|           |_|   |_|
+          /_//_/           /_/   /_/
+
+     by Valkyrie
+```
+
+=== ID: 97658006b28d3af6 | TITLE: Oska, the koala bear | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 23x6 ===
+```
+ .-""-._,-"""-,_.-""-.
+/  .- , (.)_(.) ,  -. \
+| (_ /   -\_/-   \ _) |
+ '._.\  '.___.   /._.'
+      `'-.....-'`
+ jgs  ((()   ()))
+```
+
+=== ID: 0bbfe854a249f609 | TITLE: Kangaroo | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 18x10 ===
+```
+      |\\._
+      |   66__
+       \    _.P
+   ,    `) (
+   )\   / __\__
+  / /  / -._);_)
+ |  `\/  \ __|\
+  \  ;    )  / )
+   `\|   /__/ /__
+jgs  `\______)___)
+```
+
+=== ID: ca820571e0f6e656 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 34x11 ===
+```
+    __                      __
+ .-'  `'.._...-----..._..-'`  '-.
+/                                \
+|  ,   ,'                '.   ,  |
+ \  '-/                    \-'  /
+  '._|          _           |_.'
+     |    /\   / \    /\    |
+     |    \/   | |    \/    |
+      \        \"/         /
+       '.    =='^'==     .'
+jgs      `'------------'`
+```
+
+=== ID: a773bc621757a8c4 | TITLE: Sitting koala bear | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 27x12 ===
+```
+/'--.._ `'-="""=-'` _..--'\
+|   ~. )  _     _  ( .~   |
+ \  '~/   a  _  a   \~'  /
+  \  `|     / \     |`  /
+   `'--\    \_/    /--'`
+       .'._  J__.-'.
+      / /  '-/_ `-  \
+     / -"-'-.  '-.__/
+     \__,-.\/     | `\
+     /  ;---.  .--'   |
+    |     /\'-'      /
+jgs '.___.\   _.--;'`)
+```
+
+=== ID: a4a76e6022aa6d3a | TITLE: Kangaroo | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 19x15 ===
+```
+      (\-"""-/)
+       |     |
+       \ ^ ^ /  .-.
+        \_o_/  / /
+       /`   `\/  |
+      /       \  |
+      \ (   ) /  |
+     / \_) (_/ \ /
+    |   (\-/)   |
+    \  --^o^--  /
+     \ '.___.' /
+jgs .'  \-=-/  '.
+   /   /`   `\   \
+  (//./       \.\\)
+   `"`         `"`
+```
+
+=== ID: 35c247e167a1204b | TITLE: Oska, the koala bear | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 33x17 ===
+```
+            __.....__
+  .-"""-.-"`.-     -.`"-.-"""-.
+ /  .--,    .-.   .-.   , --.  \
+|  /    /  ( o_)_(_o )  \    \  |
+|  \_, ;  '==`(   )`=='  ; ,_/  |
+ \    ;     "` '.' `"     ;    /
+  `'--`'.  -;       .   .'`--'`
+         ;-._`'----'_.-;
+        / /  `'---'`  \ \
+       / /             \ \
+      / ;               ; \
+     / |     .----.      | \
+  _,|`';    '            ;'`|,_
+ (_ |   \      :        /   | _)
+  (_\    \._   '     _./    /_)
+     \    |.'-.....-'.|    /
+ jgs  '.__/           \__.'
+```
+
+=== ID: ad84ac9b2b0607c3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 30x20 ===
+```
+             |       :     . |
+             | '  :      '   |
+             |  .  |   '  |  |
+   .--._ _...:.._ _.--. ,  ' |
+  (  ,  `        `  ,  )   . |
+   '-/              \-'  |   |
+     |  o   /\   o  |       :|
+     \     _\/_     / :  '   |
+     /'._   ^^   _.;___      |
+   /`    `""""""`      `\=   |
+ /`                     /=  .|
+;             '--,-----'=    |
+|                 `\  |    . |
+\                   \___ :   |
+/'.                     `\=  |
+\_/`--......_            /=  |
+            |`-.        /= : |
+            | : `-.__ /` .   |
+            |jgs .   ` |    '|
+            |  .  : `   . |  |
+```
+
+=== ID: 57722bf4ad4860da | TITLE: Untitled | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 33x21 ===
+```
+              .
+          /\ /l
+         ((.Y(!
+          \ |/
+          /  6~6,
+          \ _    +-.
+           \`-=--^-'
+            \ \
+           _/  \
+          (  .  Y
+         /"\ `--^--v--.
+        / _ `--"T~\/~\/
+       / " ~\.  !
+ _    Y      Y./'
+Y^|   |      |~~7
+| l   |     / ./'
+| `L  | Y .^/~T
+|  l  ! | |/| |
+| .`\/' | Y | !   Rowan Crawford.
+l  "~   j l j_L______
+ \,____{ __"~ __ ,\_,\_
+```
+
+=== ID: 413b73ec59c987c0 | TITLE: Brushtail Possum | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: marsupials | SIZE: 37x32 ===
+```
+              :     :
+        __    |     |    _,_
+       (  ~~^-l_____],.-~  /
+        \    ")\ "^k. (_,-"
+         `>._  ' _ `\  \
+      _.-~/'^k. (0)  ` (0
+   .-~   {    ~` ~    ..T
+  /   .   "-..       _.-'
+ /    Y        .   "T
+Y     l         ~-./l_
+|      \          . .<'
+|       `-.._  __,/"r'
+l   .-~~"-.    /    I
+ Y         Y "~[    |
+  \         \_.^--, [
+   \            _~> |
+    \      ___)--~  |
+     ^.       :     l
+       ^.   _.j     |
+         Y    I     |
+         l    l     I
+          Y    \    |    -Row
+           \    ^.  |
+            \     ~-^.
+             ^.       ~"--.,_
+              |~-._          ~-.
+              |    ~Y--.,_      ^.
+              :     :     "x      \
+                            \      \.
+                             \      ]
+                              ^._  .^
+                                 ~~
+```
+
+=== ID: 90911cfe0a802764 | TITLE: Beaver | ARTIST: Willem Romijn | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 22x5 ===
+```
+     .-"""-.__     ltb
+    /      ' o'\
+ ,-;  '.  :   _c
+:_."\._ ) ::-"
+       ""m "m
+```
+
+=== ID: 73002d257feb7634 | TITLE: Beaver | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 27x7 ===
+```
+             ___
+          .="   "=._.---.
+        ."         c ' Y'`p
+       /   ,       `.  w_/
+   jgs |   '-.   /     /
+ _,..._|      )_-\ \_=.\
+`-....-'`------)))`=-'"`'"
+```
+
+=== ID: 6c335a2222cffbfe | TITLE: Beaver | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 37x7 ===
+```
+ \
+  \
+   \         ___
+ \  \       ('+'`)_------_   ######
+  ><          W           -##########
+ }  { ejm 96    /|/----\|\  #######
+ }  {          " "      " "
+```
+
+=== ID: d109451779785abd | TITLE: Beaver | ARTIST: Przemyslaw Skoczkowski | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 26x9 ===
+```
+       (\.---./)    (PS)
+        /.-.-.\
+       /| 0_0 |\
+      |_`-(v)-'_|
+      \`-._._.-'/      .-.
+-~-(((.`-\_|_/-'.)))-~' <_
+       `.     .'
+         `._.'
+-----~--~---~~~----~-`.-;~
+```
+
+=== ID: 967443ec63fc6251 | TITLE: Beaver | ARTIST: BluePard | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 15x10 ===
+```
+     .---.
+    @ @   )
+    ^     |
+   [|]    | ##
+   /      |####
+  (       |####
+   \| /   |#BP#
+  / |.'   |###
+ _\ ``\   )##
+/,,_/,,____#
+```
+
+=== ID: 62814d4acea57d07 | TITLE: Beaver | ARTIST: F. Wiese | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 37x11 ===
+```
+             _,--""--,_
+        _,,-"          \
+    ,-e"                ;
+   (*             \     |
+    \o\     __,-"  )    |
+     `,_   (((__,-"     L___,,--,,__
+        ) ,---\  /\    / -- '' -'-' )
+      _/ /     )_||   /---,,___  __/
+     """"     """"|_ /         ""
+                  """"
+miK
+```
+
+=== ID: d0be96be9cce1fa2 | TITLE: Beaver working | ARTIST: Christian Garbs | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 33x13 ===
+```
+                   |    :|
+                   |     |
+                   |    .|
+               ____|    .|
+             .' .  ).   ,'
+           .' c   '7 ) (
+       _.-"       |.'   `.
+     .'           "8E   :|
+     |          _}""    :|
+     |         (   |     |
+    .'         )   |    :|
+.odCG8o_.---.__8E  |    .|
+`Y8MMP""       ""  `-...-'   cgmm
+```
+
+=== ID: a554c60e4afb8f4b | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 14x4 ===
+```
+  __    __
+o-''))_____\\
+"--__/ * * * )
+c_c__/-c____/
+```
+
+=== ID: cf6bbc9460003289 | TITLE: Dog | ARTIST: Maija Haavisto | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 11x4 ===
+```
+  .
+ ..^____/
+`-. ___ )
+  ||  || mh
+```
+
+=== ID: 491b7f288951bae9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x4 ===
+```
+            __
+(\,--------'()'--o
+ (_    ___    /~"
+  (_)_)  (_)_)
+```
+
+=== ID: d350134f132151b7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 15x4 ===
+```
+           __
+      (___()'`;
+      /,    /`
+jgs   \\"--\\
+```
+
+=== ID: df7c1996e74d9389 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 11x4 ===
+```
+^..^      /
+/_/\_____/
+   /\   /\
+  /  \ /  \
+```
+
+=== ID: f691ba8f588314ef | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 11x4 ===
+```
+  __      _
+o'')}____//
+ `_/      )
+ (_(_/-(_/
+```
+
+=== ID: de5d48322e90df0b | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 10x5 ===
+```
+,'.-.'.
+'\~ o/` ,,
+ { @ } f
+ /`-'\$
+(_/-\_)
+```
+
+=== ID: 2238ec918f018671 | TITLE: Razza - a mix of Lab and Chow | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 13x5 ===
+```
+   / \__
+  (    @\___
+  /         O
+ /   (_____/
+/_____/   U
+```
+
+=== ID: 204b4769db069528 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 40x5 ===
+```
+                                  .-.
+     (___________________________()6 `-,
+     (   ______________________   /''"`
+     //\\                      //\\
+jgs  "" ""                     "" ""
+```
+
+=== ID: 00314a6c0c9496f0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 22x5 ===
+```
+             .--~~,__
+:-....,-------`~~'._.'
+ `-,,,  ,_      ;'~U'
+  _,-' ,'`-__; '--.
+ (_/'~~      ''''(;
+```
+
+=== ID: a78295823a488aff | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 38x5 ===
+```
+            |\_/|        D\___/\
+            (0_0)         (0_o)
+           ==(Y)==         (V)
+----------(u)---(u)----oOo--U--oOo---
+__|_______|_______|_______|_______|___
+```
+
+=== ID: 44bff4368ed8afc3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 15x5 ===
+```
+          __
+ \ ______/ V`-,
+  }        /~~
+ /_)^ --,r'
+|b      |b
+```
+
+=== ID: f3b3231dec765345 | TITLE: Dog with dog dish | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x5 ===
+```
+    ,    /-.
+   ((___/ __>
+   /      }
+   \ .--.(    ___
+jgs \\   \\  /___\
+```
+
+=== ID: 4bac8e5d69380eaf | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 13x5 ===
+```
+,-.___,-.
+\_/_ _\_/
+  )O_O(
+ { (_) }
+  `-^-'   hjw
+```
+
+=== ID: 6487ea4fae7051e3 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x5 ===
+```
+   __
+o-''|\_____/)
+ \_/|_)     )
+    \  __  /
+    (_/ (_/    hjw
+```
+
+=== ID: 2d1788549fe7b6f8 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 33x5 ===
+```
+              /\___/\
+              `)9 9('
+              {_:Y:.}_
+hjw ----------( )U-'( )----------
+              ```   '''
+```
+
+=== ID: 9c923dc9476dd3c1 | TITLE: Untitled | ARTIST: Sarah Kearsley | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 22x6 ===
+```
+    ___
+ __/_  `.  .-"""-.
+ \_,` | \-'  /   )`-')
+  "") `"`    \  ((`"`
+ ___Y  ,    .'7 /|
+(_,___/...-` (_/_/ sk
+```
+
+=== ID: ca81d563859aa43f | TITLE: Untitled | ARTIST: David Berner | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 17x6 ===
+```
+       ''',
+    o_)O \)____)"
+     \_        )
+woof!  '',,,,,,
+         ||  ||
+        "--'"--'
+```
+
+=== ID: ff31641aaf016ae6 | TITLE: Cocoa - a mix of Rottie and Shepard | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 8x6 ===
+```
+  /^ ^\
+ / 0 0 \
+ V\ Y /V
+  / - \
+ /    |
+V__) ||
+```
+
+=== ID: 6348b6f39a7509ff | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 17x6 ===
+```
+        .-"-.
+       /|6 6|\
+      {/(_0_)\}
+       _/ ^ \_
+jgs   (/ /^\ \)-'
+       ""' '""
+```
+
+=== ID: 4eebbb642fe449e8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 8x6 ===
+```
+ /^ ^\
+/ 0 0 \
+V\ Y /V
+ / - \
+ |    \
+ || (__V
+```
+
+=== ID: 097940d9c11f7b9c | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 13x6 ===
+```
+   ''',
+o_)O \)____)"
+ \_        )
+   '',,,,,,
+     ||  ||
+    "--'"--'
+```
+
+=== ID: 793528a5b95f8a33 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 12x6 ===
+```
+ _   _
+/(. .)\    )
+  (*)____/|
+  /       |
+ /   |--\ |
+(_)(_)  (_)
+```
+
+=== ID: f15f490b3361d54f | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 23x7 ===
+```
+    _____^_(smart bump)
+   |    |    \
+    \   /  ^ |
+   / \_/   0  \
+  /            \
+ /    ____      0
+/      /  \___ _/
+```
+
+=== ID: e0e3baf7a3e5b351 | TITLE: Untitled | ARTIST: Sandy Morton | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 36x7 ===
+```
+           ^\
+ /        //o__o
+/\       /  __/
+\ \______\  /     -ARF! [says Sandy]
+ \         /
+  \ \----\ \
+   \_\_   \_\_
+```
+
+=== ID: 4f61589def1d4e6d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x7 ===
+```
+   |\|\
+  ..    \       .
+o--     \\    / @)
+ v__///\\\\__/ @
+   {           }
+    {  } \\\{  }
+    <_|      <_|
+```
+
+=== ID: 9d5ae48db012a686 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 29x7 ===
+```
+     |\_/|
+     | @ @   Woof!
+     |   <>              _
+     |  _/\------____ ((| |))
+     |               `--' |
+ ____|_       ___|   |___.'
+/_/_____/____/_______|
+```
+
+=== ID: ecdf88a2938a3a3e | TITLE: Puppy | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 22x7 ===
+```
+   _='`'=_
+  //(@_@)\\
+  |||(Y)|||    Puppy
+  \\\\ ////      by
+   / )`( \   VampLadee
+<\(  )'(  )
+ (__w)_(w__)
+```
+
+=== ID: 4c9c647986331c7b | TITLE: Noodles | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 14x8 ===
+```
+       /^-^\
+      / o o \
+     /   Y   \
+     V \ v / V
+       / - \
+      /    |
+(    /     |
+ ===/___) ||
+```
+
+=== ID: 46daf3c3a44091f3 | TITLE: Ralph | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 15x8 ===
+```
+/^-----^\
+V  o o  V
+ |  Y  |
+  \ Q /
+  / - \
+  |    \
+  |     \     )
+  || (___\====
+```
+
+=== ID: 8bd97372e1be99a1 | TITLE: Butch | ARTIST: Edward Farrow | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 16x8 ===
+```
+  ___    ___
+ / / \__/ \ \
+ \/| /\/\ |\/
+  _||o o ||_
+ /. .\__/. .\
+/ . .(__) . .\
+\ .  /__\  . /
+ \__/\__/\__/etf
+```
+
+=== ID: 1fd05f1e33479bee | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 15x8 ===
+```
+          "",_o
+!       ( (  _)
+`\ ,,,,_'),)=~
+ (          )
+  ,   ,,,,  ,
+  ) ,)   < (
+ < <      ",\
+  ",)      "_)
+```
+
+=== ID: 093f1ab29994473b | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 20x8 ===
+```
+    __    __
+    \/----\/
+     \0  0/    WOOF!
+     _\  /_
+   _|  \/  |_
+  | | |  | | |
+ _| | |  | | |_
+"---|_|--|_|---"
+```
+
+=== ID: e540245ea3e0677c | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 36x8 ===
+```
+       /^-^\         /^-----^\
+      / o o \        V  o o  V
+     /   Y   \        |  Y  |
+     V \ v / V         \ Q /
+       / - \           / - \
+      /    |           |    \
+(    /     |           |     \     )
+ ===/___) ||           || (___\====
+```
+
+=== ID: c0a21304e8174547 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 20x8 ===
+```
+       _=,_
+    o_/6 /#\
+    \__ |##/
+     ='|--\
+       /   #'-.
+       \#|_   _'-. /
+        |/ \_( # |"
+snd    C/ ,--___/
+```
+
+=== ID: d953644028fac1af | TITLE: Dogs | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x9 ===
+```
+        __
+     __/o \_
+     \____  \
+         /   \
+   __   //\   \
+__/o \-//--\   \_/
+\____  ___  \  |
+     ||   \ |\ |
+    _||   _||_||
+```
+
+=== ID: 58f35da2c2aa3134 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x9 ===
+```
+            ,
+            |`-.__
+            / ' _/
+           ****`
+          /    }
+         /  \ /
+     \ /`   \\\
+jgs   `\    /_\\
+       `~~~~~``~`
+```
+
+=== ID: 046708aad0d316f7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 38x9 ===
+```
+_     /)---(\          /~~~\
+\\   (/ . . \)        /  .. \
+ \\__)-\(*)/         (_,\  |_)
+ \_       (_         /   \@/    /^^^\
+ (___/-(____) _     /      \   / . . \
+              \\   /  `    |   V\ Y /V
+               \\/  \   | _\    / - \
+                \   /__'|| \\_  |    \
+                 \_____)|_).\_).||(__V
+```
+
+=== ID: c4c82af0b6ad2a61 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 22x9 ===
+```
+             ____
+            /    \__
+|\         /    @   \
+\ \_______|    \  .:|>
+ \      ##|    | \__/
+  |    ####\__/   \
+  /  /  ##       \|
+ /  /__________\  \
+ L_JJ           \__JJ
+```
+
+=== ID: 29939b8f2fcde100 | TITLE: Dog | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 15x10 ===
+```
+         __
+        /  \
+       / ..|\
+      (_\  |_)
+      /  \@'
+     /     \
+_   /  `   |
+\\/  \  | _\
+ \   /_ || \\_
+  \____)|_) \_)
+```
+
+=== ID: 05d2f2d3c60b97a3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 20x10 ===
+```
+        __      _
+        \.'---.//|
+         |\./|  \/
+        _|.|.|_  \
+       /(  ) ' '  \
+      |  \/   . |  \
+jrjc   \_/\__/| |
+        V  /V / |
+          /__/ /
+          \___/\
+```
+
+=== ID: fb88e4cb4e054383 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 15x10 ===
+```
+         __
+        /  \
+       / ..|\
+      (_\  |_)
+      /  \@'
+     /     \
+ _  /  `   |
+\\/  \  | _\
+ \   /_ || \\_
+  \____)|_) \_)
+```
+
+=== ID: 8abd40a0121e285f | TITLE: Untitled | ARTIST: Felix Lee | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 28x10 ===
+```
+                _,)
+        _..._.-;-'
+     .-'     `(
+    /      ;   \
+   ;.' ;`  ,;  ;
+  .'' ``. (  \ ;
+ / f_ _L \ ;  )\
+ \/|` '|\/;; <;/
+((; \_/  (()       Felix Lee
+     "
+```
+
+=== ID: 1844a139ba1bbedd | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 40x11 ===
+```
+         .--.             .---.
+        /:.  '.         .' ..  '._.---.
+       /:::-.  \.-"""-;` .-:::.     .::\
+      /::'|  `\/  _ _  \'   `\:'   ::::|
+  __.'    |   /  (o|o)  \     `'.   ':/
+ /    .:. /   |   ___   |        '---'
+|    ::::'   /:  (._.) .:\
+\    .='    |:'        :::|
+ `""`       \     .-.   ':/
+       jgs   '---`|I|`---'
+                  '-'
+```
+
+=== ID: fc26cb767494836f | TITLE: Dog in doghouse | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 26x14 ===
+```
+              _
+            ,/A\,
+          .//`_`\\,
+        ,//`____-`\\,
+      ,//`[_ROVER_]`\\,
+    ,//`=  ==  __-  _`\\,
+   //|__=  __- == _  __|\\
+   ` |  __ .-----.  _  | `
+     | - _/       \-   |
+     |__  | .-"-. | __=|
+     |  _=|/)   (\|    |
+     |-__ (/ a a \) -__|
+jgs  |___ /`\_Y_/`\____|
+          \)8===8(/
+```
+
+=== ID: b950b1fb593e3102 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 35x15 ===
+```
+   ,_____ ,
+  ,._ ,_. 7\
+ j `-'     /
+ |o_, o    \
+.`_y_`-,'   !
+|/   `, `._ `-,
+|_     \   _.'*\
+  >--,-'`-'*_*'``---.
+  |\_* _*'-'         '
+ /    `               \
+ \.         _ .       /
+  '`._     /   )     /
+   \  |`-,-|  /c-'7 /
+    ) \ (_,| |   / (_
+   ((_/   ((_;)  \_)))       -nabis
+```
+
+=== ID: 6139c5ab7329278b | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 25x15 ===
+```
+    ___
+ __/ / \
+|    |/\
+|_--\   \              /-
+     \   \-___________/ /
+      \                :
+      |                :
+      |       ___ \    )
+       \|  __/     \  )
+        | /         \  \
+        |l           ( l
+        |l            ll
+        |l            |l
+       / l           / l
+       --/           --
+```
+
+=== ID: 2b86d841c35b3a3d | TITLE: Wayne | ARTIST: Keely M. Swenson | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 34x21 ===
+```
+  ,_-~~~-,    _-~~-_
+ /        ^-_/      \_    _-~-.
+|      /\  ,          `-_/     \
+|   /~^\ '/  /~\  /~\   / \_    \
+ \_/    }/  /        \  \ ,_\    }
+        Y  /  /~  /~  |  Y   \   |
+       /   | {Q) {Q)  |  |    \_/
+       |   \  _===_  /   |
+       /  >--{     }--<  \
+     /~       \_._/       ~\
+    /    *  *   Y    *      \
+    |      * .: | :.*  *    |
+    \    )--__==#==__--     /
+     \_      \  \  \      ,/
+       '~_    | |  }   ,~'
+          \   {___/   /
+           \   ~~~   /
+           /\._._._./\
+          {    ^^^    }
+           ~-_______-~
+            /       \
+```
+
+=== ID: 5760d93c938acc4c | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 34x28 ===
+```
+Just standing around:
+                  ;~~,__
+   :-....,-------'`-'._.'
+    `-,,,  ,       ,'~~'
+        ; ,'~.__; /
+        :|      :|
+        `-'     `-'
+4 legs, a little action:
+                  ;~~,__
+   :-....,-------'`-'._.'
+    `-,,,  ,       ,'~~'
+        ; ,'~.__; /--.
+        :| :|   :|``(;
+        `-'`-'  `-'
+Jumping:
+                  ;~~,__
+   :-....,-------'`-'._.'
+    `-,,,  ,       ;'~~'
+       ,'_,'~.__; '--.
+      //'       ````(;
+     `-'
+Running, ears flapping and tongue
+hanging out the side of the mouth:
+                .--~~,__
+   :-....,-------`~~'._.'
+    `-,,,  ,_      ;'~U'
+     _,-' ,'`-__; '--.
+    (_/'~~      ''''(;
+```
+
+=== ID: c5cbb901008782c2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: reptiles/turtles | SIZE: 17x5 ===
+```
+  _____     ____
+ /      \  |  o |
+|        |/ ___\|
+|_________/
+|_|_| |_|_|
+```
+
+=== ID: 3ab16796deadd24b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: reptiles/turtles | SIZE: 23x6 ===
+```
+                    __
+         .,-;-;-,. /'_\
+       _/_/_/_|_\_\) /
+     '-<_><_><_><_>=/\
+jgs    `/_/====/_/-'\_\
+        ""     ""    ""
+```
+
+=== ID: 61abb19fffe27dc0 | TITLE: Smiling turtle | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: reptiles/turtles | SIZE: 19x6 ===
+```
+     _..---.--.
+   .'\ __|/O.__)
+  /__.' _/ .-'_\
+ (____.'.-_\____)
+  (_/ _)__(_ \_)\_
+mrf(_..)--(.._)'--'
+```
+
+=== ID: f550f0caf0c6486d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: reptiles/turtles | SIZE: 17x10 ===
+```
+       /^\
+      |   |
+/\     |_|     /\
+| \___/' `\___/ |
+ \_/  \___/  \_/
+  |\__/   \__/|
+  |/  \___/  \|
+ ./\__/   \__/\,
+ | /  \___/  \ |
+ \/     V     \/
+```
+
+=== ID: 714b1db99abba825 | TITLE: Beetle | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/beetles | SIZE: 31x15 ===
+```
+       ,_    /) (\    _,
+        >>  <<,_,>>  <<
+       //   _0.-.0_   \\
+       \'._/       \_.'/
+        '-.\.--.--./.-'
+        __/ : :Y: : \ _
+';,  .-(_| : : | : : |_)-.  ,:'
+  \\/.'  |: : :|: : :|  `.\//
+   (/    |: : :|: : :|    \)
+         |: : :|: : :;
+        /\ : : | : : /\
+       (_/'.: :.: :.'\_)
+        \\  `""`""`  //
+    jgs  \\         //
+          ':.     .:'
+```
+
+=== ID: 69a7a751d0046184 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/beetles | SIZE: 17x17 ===
+```
+      _   _
+     /(   )\
+     \(   )/
+   |/ \\_//  \|
+  /  (#) (#)  \
+  \  /     \  /
+   \ \_____/ /
+    \/  |  \/
+  _ | o | o | _
+ | \|o  |  o|/ |
+ |  |  o|o  |  |
+/|\ |o  |  o| /|\
+    \  o|o  /
+    /\__|__/\
+   /         \
+   \         /
+   |\       /|
+```
+
+=== ID: 10de40e6e0725c43 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/beetles | SIZE: 37x20 ===
+```
+          .--.         .--.
+              \       /
+       |\      `\___/'       /|
+        \\    .-'@ @`-.     //
+        ||  .'_________`.  ||
+         \\.'^    Y    ^`.//
+         .'       |       `.
+        :         |         :
+       :          |          :
+       :          |          :
+       :     _    |    _     :
+       :.   (_)   |   (_)    :
+     __::.        |          :__
+    /.--::.       |         :--.\
+ __//'   `::.     |       .'   `\\___
+`--'     //`::.   |     .'\\     `--'
+         ||  `-.__|__.-'   ||
+jgs      ||                ||
+         //                \\
+        |/                  \|
+```
+
+=== ID: 69a0417c3b2fc47b | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: reptiles/snakes | SIZE: 12x1 ===
+```
+---===e  Max
+```
+
+=== ID: 4dfa0728df23d5b1 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: reptiles/snakes | SIZE: 9x3 ===
+```
+ ,=e
+ `-.  Max
+_,-'
+```
+
+=== ID: 35fa1e39caee4783 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: reptiles/snakes | SIZE: 10x3 ===
+```
+  ,-
+,-'    Max
+`=e
+```
+
+=== ID: 53357aead9797536 | TITLE: Cobra | ARTIST: Matthew Thomas | CATEGORY: animals | SUBCATEGORY: reptiles/snakes | SIZE: 19x6 ===
+```
+             ____
+            / . .\
+MT          \  ---<
+             \  /
+   __________/ /
+-=:___________/
+```
+
+=== ID: d1c5a1df3f39b982 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: reptiles/snakes | SIZE: 29x30 ===
+```
+      _______
+     / _   _ \
+    / (.) (.) \
+   ( _________ )
+    \`-V-|-V-'/
+     \   |   /
+      \  ^  /
+       \    \
+        \    `-_
+         `-_    -_
+            -_    -_
+Max         _-    _-
+          _-    _-
+        _-    _-
+      _-    _-
+      -_    -_
+        -_    -_
+          -_    -_
+            -_    -_
+            _-    _-
+  ,-=:_-_-_-_ _ _-_-_-_:=-.
+ /=I=I=I=I=I=I=I=I=I=I=I=I=\
+|=I=I=I=I=I=I=I=I=I=I=I=I=I=|
+|I=I=I=I=I=I=I=I=I=I=I=I=I=I|
+\=I=I=I=I=I=I=I=I=I=I=I=I=I=/
+ \=I=I=I=I=I=I=I=I=I=I=I=I=/
+  \=I=I=I=I=I=I=I=I=I=I=I=/
+   \=I=I=I=I=I=I=I=I=I=I=/
+    \=I=I=I=I=I=I=I=I=I=/
+     `================='
+```
+
+=== ID: afd4ebd2e7fb2f58 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 34x4 ===
+```
+          __         .' '.
+        _/__)        .   .       .
+       (8|)_}}- .      .        .
+jgs     `\__)    '. . ' ' .  . '
+```
+
+=== ID: b6a6bf671e772886 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 38x4 ===
+```
+                .' '.            __
+       .        .   .           (__\_
+        .         .         . -{{_(|8)
+jgs       ' .  . ' ' .  . '     (__/
+```
+
+=== ID: 4dac770ca292fe44 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 20x5 ===
+```
+  ,,     ,,     ,,
+  oo    _oo_   ,oo,
+ /==\   /==\   /==\
+(/==\) (/==\) (/==\)
+  \/     \/     \/
+```
+
+=== ID: a5d56d91ecaf966a | TITLE: Untitled | ARTIST: Stephane Abello | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 23x5 ===
+```
+              _   _
+             ( | / )
+           \\ \|/,'_
+           (")(_)()))=-
+Stef00        <\\
+```
+
+=== ID: ce6b24212c1256d4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 14x5 ===
+```
+    _  _
+   | )/ )
+\\ |//,' __
+(")(_)-"()))=-
+   (\\
+```
+
+=== ID: 245a0f4125e36b1c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 34x5 ===
+```
+        _
+       /_/_      .'''.
+    =O(_)))) ...'     `.
+jgs    \_\              `.    .'''
+                          `..'
+```
+
+=== ID: 3df5d21c840a22d3 | TITLE: Untitled | ARTIST: Sara Wallen (Very Small Monster) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 28x5 ===
+```
+                      __
+                     // \
+                     \\_/ //
+sjw''-.._.-''-.._.. -(||)(')
+                     '''
+```
+
+=== ID: 8489c61563d8733f | TITLE: Bee | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 8x5 ===
+```
+ ,-.
+ \ /
+{|||)<
+ / \ hjw
+ `-^
+```
+
+=== ID: 7d67789da5de0dc3 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 11x5 ===
+```
+    __
+   (  y--.
+ \ _\/_,'
+--("))))))=
+   < > >
+```
+
+=== ID: 83f6c62d6bd20124 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 15x6 ===
+```
+     _ ___
+     \.\'.\
+      \'\'.\
+     __\.\:/_//
+    {{{{{(__(")
+jgs `~~~~ >>>^
+```
+
+=== ID: 8190d8556aeac7d6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 23x7 ===
+```
+   .--.    W    .--.
+ .'    ', {_} ,'    '.
+<       =( X )=       >
+ '.    .`/'''\`.    .'
+   '--' <XXXXX> '--'
+         <XXX>
+          <X>  jgs
+```
+
+=== ID: 8fd33293805a288a | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 28x9 ===
+```
+                .-~~~-.
+              /        }
+             /      .-~
+            |        }
+___\.~~-.-~|     .-~_
+    { O  |  ` .-~.   ; ~-.__
+     ~--~/-|_\|  :   : .-~
+        /  |  \~ - - ~
+       /   |   \
+```
+
+=== ID: 9027293365512a0f | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 30x10 ===
+```
+                      //)
+                |`.  (###-
+                |  `. ""
+ (\\   _        //"""
+-###) ( \      //   _
+  ""   ) );   //   / )    //)
+      (_/ `; // ,;( (    (###-
+           `;.,;'  \_)    ""
+           //`;;
+          // ;'`;
+```
+
+=== ID: 3c869d38ac3cb457 | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 28x11 ===
+```
+      .-.         .--''-.
+    .'   '.     /'       `.
+    '.     '. ,'          |
+ o    '.o   ,'        _.-'
+  \.--./'. /.:. :._:.'
+ .'    '._-': ': ': ': ':
+:(#) (#) :  ': ': ': ': ':>-
+ ' ____ .'_.:' :' :' :' :'
+  '\__/'/ | | :' :' :'
+        \  \ \
+        '  ' 'MJP
+```
+
+=== ID: 76eeaae1d7cb407f | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat), Peter Marquardt (last future, lastfuture) | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 30x11 ===
+```
+      .-.         .--''-.
+    .'   '.     /'       `.
+    '.     '. ,'          |
+ o    '.o   ,'        _.-'
+  \.--./'. /.:. :._:.'
+ .\   /'._-':#0: ':#0: ':
+:(#) (#) :  ':#0: ':#0: ':>#=-
+ ' ____ .'_.:J0:' :J0:' :'
+  'V  V'/ | |":' :'":'
+        \  \ \
+        '  ' 'MJP/lf
+```
+
+=== ID: 1ade30106c0188db | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 35x12 ===
+```
+              \     /
+          \    o ^ o    /
+            \ (     ) /
+ ____________(%%%%%%%)____________
+(     /   /  )%%%%%%%(  \   \     )
+(___/___/__/           \__\___\___)
+   (     /  /(%%%%%%%)\  \     )
+    (__/___/ (%%%%%%%) \___\__)
+            /(       )\
+          /   (%%%%%)   \
+               (%%%)
+                 !
+```
+
+=== ID: f1440aab53cdaf66 | TITLE: Giant wasps invaders | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/bees | SIZE: 40x12 ===
+```
+                 _  _
+                | )/ )
+             \\ |//,' __
+             (")(_)-"()))=-
+                (\\
+                             _   _
+  HEELP                     ( | / )
+                          \\ \|/,' __
+    \_o_/                 (")(_)-"()))=-
+       )                     <\\
+      /\__
+_____ \ ________________________________
+```
+
+=== ID: daa50cfbb9e5d32c | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/worms | SIZE: 34x10 ===
+```
+                           (o)(o)
+                          /     \
+                         /       |
+                        /   \  * |
+          ________     /    /\__/
+  _      /        \   /    /
+ / \    /  ____    \_/    /
+//\ \  /  /    \         /
+V  \ \/  /      \       /
+    \___/        \_____/
+```
+
+=== ID: 2420fa3ad6235277 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 10x5 ===
+```
+   !__!
+  (@)(-)
+ \.'||'./
+-:  ::  :-
+/'..''..'\
+```
+
+=== ID: aeee424a82c12140 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 9x6 ===
+```
+  .   .
+   \ /
+ `/ ! \`
+ | o:o |
+~| o:o |~
+/ \_:_/ \
+```
+
+=== ID: ccce864b6c1cfd27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 11x7 ===
+```
+    \ /
+    oVo
+\___XXX___/
+ __XXXXX__
+/__XXXXX__\
+/   XXX   \
+     V
+```
+
+=== ID: 8efa0fd219f73279 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 8x7 ===
+```
+  '__'
+ \O__O/
+==x||x==
+ /^||^\
+/^^||^^\
+\^^||^^/
+ '-''-'
+```
+
+=== ID: d6313fc582eed0de | TITLE: Computer virus | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 33x8 ===
+```
+You have a small bug in your code
+          \ /
+          oVo
+      \___XXX___/
+       __XXXXX__
+      /__XXXXX__\
+      /   XXX   \
+           V
+```
+
+=== ID: a2e6f5bfedb8d828 | TITLE: Ladybug | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 11x8 ===
+```
+ o       o
+  \     /
+    \ /
+ /   |   \
+| () | () |
+|    |    |
+| () | () |
+ \__/~\__/
+```
+
+=== ID: 7aae8a9aab69764f | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 20x9 ===
+```
+        \   /
+        .\-/.
+    /\ ()   ()
+   /  \/~---~\.-~^-.
+.-~^-./   |   \---.
+     {    |    }   \
+   .-~\   |   /~-.
+  /    \  A  /    \
+        \/ \/
+```
+
+=== ID: 1d0f36b2eaaddb20 | TITLE: Untitled | ARTIST: Der BluT | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 33x18 ===
+```
+V       ---^---       V
+\      /       \      /
+ \    ##       ##    /
+  \  -------------  /
+   -/   \  ^  /   \-
+   /     \/ \/     \
+   \      |_|      /
+   /\    /   \    /\
+  /  -------------  \
+ /  /  | | v | |  \  \
+|  | | | | | | | | |  |
+^ /| | | | | | | | |\ ^
+ / | | | | | | | | | \         db
+|  |___|_|_|_|_|___|  |
+|   |_|_|_|_|_|_|_|   |
+^   |_|_|_|_|_|_|_|   ^
+      |_|_|_|_|_|
+       \_|_|_|_/
+```
+
+=== ID: 0db4a4af649c4add | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/other | SIZE: 32x22 ===
+```
+    ,__                   __
+    '~~****Nm_    _mZ*****~~
+            _8@mm@K_
+           W~@`  '@~W
+          ][][    ][][
+    gz    'W'W.  ,W`W`    es
+  ,Wf    gZ****MA****Ns    VW.
+ gA`   ,Wf     ][     VW.   'Ms
+Wf    ,@`      ][      '@.    VW
+M.    W`  _mm_ ][ _mm_  'W    ,A
+'W   ][  i@@@@i][i@@@@i  ][   W`
+ !b  @   !@@@@!][!@@@@!   @  d!
+  VWmP    ~**~ ][ ~**~    YmWf
+    ][         ][         ][
+  ,mW[         ][         ]Wm.
+ ,A` @  ,gms.  ][  ,gms.  @ 'M.
+ W`  Yi W@@@W  ][  W@@@W iP  'W
+d!   'W M@@@A  ][  M@@@A W`   !b
+@.    !b'V*f`  ][  'V*f`d!    ,@
+'Ms    VW.     ][     ,Wf    gA`
+  VW.   'Ms.   ][   ,gA`   ,Wf
+   'Ms    'V*mmWWmm*f`    gA`
+```
+
+=== ID: 199107cd28327dc2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 24x3 ===
+```
+       ____()()
+      /      @@
+`~~~~~\_;m__m._>o    jgs
+```
+
+=== ID: 1073e7303c4fe320 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 9x3 ===
+```
+()-()
+ \"/  jgs
+  `
+```
+
+=== ID: 0b6da3e63e3b648c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 11x3 ===
+```
+  __QQ
+ (_)_">
+_)      jgs
+```
+
+=== ID: dedba09f6d664019 | TITLE: Untitled | ARTIST: Jola Backiel | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 15x3 ===
+```
+()(),~~,.
+ .. ___; )
+=`=     (_.  jb
+```
+
+=== ID: 22540ef676f632a0 | TITLE: Small mice | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 23x3 ===
+```
+            _
+           (c).-.
+jgs     .-" , _( )____)
+```
+
+=== ID: cfee258bea00c122 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x3 ===
+```
+    ()-().----.          .
+jgs  \"/` ___  ;________.'
+      ` ^^   ^^
+```
+
+=== ID: b507c1ce40f06583 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 21x3 ===
+```
+           ____()()
+          /      @@
+jgs `~~~~~\_;m__m._>o
+```
+
+=== ID: d95b1d7d048157f5 | TITLE: Untitled | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x4 ===
+```
+ ()()         ____
+ (..)        /|o  |
+ /\/\       /o|  o|
+c\db/o...  /o_|_o_|   -Row
+```
+
+=== ID: 5e4a039e0101a64d | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x4 ===
+```
+ _  _
+(o)(o)--.
+ \../ (  )hjw
+ m\/m--m'`--.
+```
+
+=== ID: 1754836868261108 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x4 ===
+```
+       (`-()_.-=-.
+       /66  ,  ,  \
+     =(o_/=//_(   /======`
+jgs      ~"` ~"~~`
+```
+
+=== ID: d7e5180deb9efe21 | TITLE: Untitled | ARTIST: Sara Wallen (Very Small Monster) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 34x4 ===
+```
+    sjw       ..----.._    _
+            .' .--.    "-.(O)_
+'-.__.-'"'=:|  ,  _)_ \__ . c\'-..
+             ''------'---''---'-"
+```
+
+=== ID: 3bc6397d29d82e3d | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x4 ===
+```
+      _..c_c
+,,_,/' _( ``\
+    `\,/_`-.j
+fsc     `-'-'
+```
+
+=== ID: 8c3ec242f876220f | TITLE: Small mice | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x4 ===
+```
+                     _
+                 .-.(c)
+jgs       (_____( )  , "-.
+                 `~  ~""`
+```
+
+=== ID: b2084f53b51f3668 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 11x4 ===
+```
+  q-p
+ /\"/\
+(`=*=') hjw
+ ^---^`-._
+```
+
+=== ID: 15a47ce6e11e9411 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x4 ===
+```
+ _  _
+(o)(o)--.
+ \../ (  )hjw
+ m\/m--m'`--
+```
+
+=== ID: 0deb67d90505d06a | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 12x4 ===
+```
+  O~O
+ (\"/)
+(\"o"/)hjw
+ m`-'m'`---.
+```
+
+=== ID: 77969d9fa4487e9c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 35x5 ===
+```
+          ___
+ _  _  .-'   '-.
+(.)(.)/         \   jgs
+ /@@             ;
+o_\\-mm-......-mm`~~~~~~~~~~~~~~~~`
+```
+
+=== ID: 1ff917bb5da45cea | TITLE: Untitled | ARTIST: Axel Poque | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 22x5 ===
+```
+               _,_
+           _.-~' o'~;,
+ _      .-~_  =,,-~~
+' ~--._(___ )__/
+         ~~~^ ~^   apx
+```
+
+=== ID: e2fe624e9857ff60 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 9x5 ===
+```
+  q-p
+ /   \
+(     )
+ `-(-'
+    ) hjw
+```
+
+=== ID: 60d3dcc70d3dca69 | TITLE: Peeking Mouse | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 22x5 ===
+```
+     ) _     _
+    ( (^)-~-(^)
+__,-.\_( 6 6 )__,-.___
+  'M'   \   /   'M'
+hjw      >o<
+```
+
+=== ID: 9142d38518d4770c | TITLE: Untitled | ARTIST: Glo Pearl | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 18x5 ===
+```
+    )
+   (
+ ()-()
+_(o o)_  Glo Pearl
+ /\o/\
+```
+
+=== ID: 146d6ff31ec64163 | TITLE: Untitled | ARTIST: Michele Cerulli | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x5 ===
+```
+ .   .
+( ).( )
+ (o o) .-._."
+(  -  )
+ mm mm     mc
+```
+
+=== ID: e5c7ea0822c0757b | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 9x5 ===
+```
+  q-p
+ /   \
+(     )
+ `-(-'
+    ) hjw
+```
+
+=== ID: d86015872854e2ff | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 22x5 ===
+```
+     ) _     _
+    ( (^)-~-(^)
+__,-.\_( 6 6 )__,-.___
+  'M'   \   /   'M'
+hjw      >o<
+```
+
+=== ID: d0d11fec8995791f | TITLE: Mouse or rat | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 20x6 ===
+```
+              (\_/)
+      .-""-.-.-' a\
+     /  \      _.--'
+    (\  /_---\\_\_
+     `'-.
+jgs   ,__)
+```
+
+=== ID: 4ce1fe7342ae3d70 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 30x6 ===
+```
+             (\-.
+             / _`> .---------.
+     _)     / _)=  |'-------'|
+    (      / _/    |O   O   o|
+jgs  `-.__(___)_   | o O . o |
+                   `---------'
+```
+
+=== ID: 22cc8aa369961e50 | TITLE: Untitled | ARTIST: Axel Poque | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 27x6 ===
+```
+  ,        .
+ (_         )
+ _ )_     _(_
+(    )   (   )          apx
+"-oo-"   "o^o"
+ =\/=     =.=
+```
+
+=== ID: d70992a05279859c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 28x6 ===
+```
+      _   _
+     (q\_/p)
+      /. .\.-""""-.      ___
+     =\_t_/=    /  `\   (
+jgs    )\ ))__ _\    |___)
+      nn-nn`  `nn---'
+```
+
+=== ID: 3afebc3d8d6a5482 | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 40x6 ===
+```
+ _    _
+( )__( )
+ ( o o)
+  (=*=) -Yeah, I got my "Mouse-ears" on.
+  _)"(_
+ / .'. \MJP
+```
+
+=== ID: 386fd7b811effde5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 7x6 ===
+```
+  )
+ (__
+ _  )_
+(_)_(_)
+ (o o)
+==\o/==
+```
+
+=== ID: ed1e6430c62fa306 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 8x6 ===
+```
+ _    _
+(o)__(o)
+ \ .. /
+ ==\/==
+ (m  m)
+m(____)m
+```
+
+=== ID: 635dcc61ecc801c6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x8 ===
+```
+      _._
+   .-'   `
+ __|__
+/     \
+|()_()|
+\{o o}/   jgs
+ =\o/=
+  ^ ^
+```
+
+=== ID: 2b2d924ba8fbe474 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 17x8 ===
+```
+     _   _
+    (q\_/p)
+.-.  |. .|
+   \ =\,/=
+    )/ _ \  |\
+   (/\):(/\  )\
+jgs \_   _/ |Oo\
+    `""^""` `"""`
+```
+
+=== ID: becaee21352de1d6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 16x8 ===
+```
+       _ _
+  (\  (c)_)_
+   \\  )  ee\_
+    )) \ \___=D=
+   ((  / _ / \_
+    \\/ (/|  |\)
+     \    /_ /_
+jgs   `"""""`""`
+```
+
+=== ID: 93e3a24e9e27914e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 39x8 ===
+```
+         _
+       (( )_,     ,
+.--.    \ '/     /.\
+    )   / \=    /O o\     _
+   (   / _/    /' o O| ,_( ))___     (`
+    `-|   )_  /o_O_'_(  \'    _ `\    )
+jgs   `""""`            =`---<___/---'
+                            "`
+```
+
+=== ID: cf2d2d3e6cdb1b8a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 15x8 ===
+```
+           _._
+        .-'   `
+      __|__
+     /     \
+     |()_()|
+     \{o o}/
+jgs   =\o/=
+       ^ ^
+```
+
+=== ID: 4edc971a9452b8b5 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 12x8 ===
+```
+    _   _
+   ( )_( )
+    (0 0)
+    _(o)_  O
+   /\|_|/\/
+   \( _ )
+snd  ||||
+    (_)(_)
+```
+
+=== ID: 73224026c903af74 | TITLE: Untitled | ARTIST: Sara Wallen (Very Small Monster) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 16x9 ===
+```
+  ___     ___
+ / _ \   / _ \
+| |_| |_| |_| |
+ \_   ___   _/
+   | | | | |
+   | |o|o| |
+   /  <0>  \
+   |   __/ |
+   `'\___/'` sjw
+```
+
+=== ID: 5bdde84d1723e878 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 18x9 ===
+```
+       _   _
+      (q\_/p)
+       /. .\
+      =\_t_/=   __
+       /   \   (
+      ((   ))   )
+      /\) (/\  /
+jgs   \  Y  /-'
+       nn^nn
+```
+
+=== ID: d526cab0838daefa | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 15x9 ===
+```
+         _   _
+        (q\_/p)
+         /. .\
+   __   =\_t_/=
+     )   /   \
+    (   ((   ))
+     \  /\) (/\
+jgs   `-\  Y  /
+         nn^nn
+```
+
+=== ID: a9d5fd156e62987d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 15x9 ===
+```
+       _   _
+      (.\_/.)
+       \6 6/
+       =\ /=
+        /O\   /
+       /   \ (
+       U   U  )
+      (|   |)/
+jgs    w'-'w
+```
+
+=== ID: 457849e2e25c91fa | TITLE: Untitled | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 31x11 ===
+```
+                              #
+                             #
+   ejm           /\_/\      #
+   _             (@.@ )_.-._#
+ (( )_ (         > C < .-.  )
+ <;___)_)            |/   |/
+   " "   .. .
+       __
+        /|
+       /
+mouse trail
+```
+
+=== ID: 4c4b2ca8f4880c9b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x12 ===
+```
+  .--,       .--,
+ ( (  \.---./  ) )
+  '.__/o   o\__.'
+     {=  ^  =}
+      >  -  <
+     /       \
+    //       \\
+   //|   .   |\\
+   "'\       /'"_.-~^`'-.
+      \  _  /--'         `
+jgs ___)( )(___
+   (((__) (__)))
+```
+
+=== ID: cbe02c0c1f152e24 | TITLE: Mouse on ladder | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x12 ===
+```
+  \   (()
+\-'@_<"/  _,
+ \_.\` \ (
+  \ _`) \_)
+   \,(__/
+    \' \
+     \-'\
+      \.-\
+       \_.\
+        \  \
+    jgs  \- \
+          \
+```
+
+=== ID: ea7ca370d7172a53 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 29x12 ===
+```
+   _____             _____
+  / ___ \           / ___ \
+ / /   \ \_________/ /   \ \
+| |     _/ \    / \_      | |
+ \     /  ^ \  / ^  \      /
+  \   |  | | \/ | |  |    /
+  /   |  |O|    |O|  |    \
+ |__ /------ @@ -------\ __|
+  \     __   @@   __      /
+   \      \______/       /
+    \__     \__/      __/
+       \_____________/
+```
+
+=== ID: 331b1ba950ce1cac | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 19x12 ===
+```
+          _   _
+         (_)/` |
+       _(_) ^ /
+       >\|  -;   _
+       \_/    \_/<
+        /    ,__/
+       ;     |
+       |    .-.
+jgs    |       )_
+     .-\______;__>
+    (__..._      _
+           `--''` )
+```
+
+=== ID: 31f7dd4fced30bb8 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x12 ===
+```
+  .--,       .--,
+ ( (  \.---./  ) )
+  '.__/o   o\__.'
+     {=  ^  =}
+      >  -  <
+     /       \
+    //       \\
+   //|   .   |\\
+   "'\       /'"_.-~^`'-.
+      \  _  /--'         `
+jgs ___)( )(___
+   (((__) (__)))
+```
+
+=== ID: 1088d64bbafd0975 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 34x13 ===
+```
+            _     _
+            \).-.(/
+             (O O) (
+             />@<\ )
+    ___ ____(\ _ /)__    _______
+ .-" _ "     ** **   "=-"  \\   \
+|   ( )     _           o   :.   .
+|    "     ( )     ()       ::   :
+|_          "          ..   ::   :
+  )              ()   (  )  :|   |
+|"    ()               ""   :|   |
+|   O        o .-.     _    :.   /
+\____.--._____(---)___(-)__//__dv
+```
+
+=== ID: 9fc8d54d7265c99b | TITLE: Untitled | ARTIST: Joshua Bell | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 19x14 ===
+```
+     __
+  ,-'' `-.
+ /\\`    _\ ,
+|\\     (_\/|
+ `   /  /-'o `-.
+    |  /    --'
+    | (  (_/(   /_,
+   /' /\_,-'|`-'/
+  |  |_.--._|/-'
+  |  |  ,  /)`
+  \\_|  ,) ||
+   `--\ |_//
+       |' |__,
+      /|\   `
+```
+
+=== ID: dd59864886d84241 | TITLE: Walking mouse | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 21x14 ===
+```
+             __
+          __/  \
+         /  \-./
+         \_   66\_
+           \  ____)o
+            ) (_
+   .-.     /   \\___
+(_/   \   / /   |___)
+       |  \ \   /
+        \  \_) (
+         '-'/ \ \  _
+           / / \ \/ )
+          (  \  \  /
+   jgs     \__)  "`
+```
+
+=== ID: 8667513a86100441 | TITLE: Walking mouse | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 25x14 ===
+```
+          __
+         /  \__
+         \.-/  \
+       _/99   _/
+     o(____  /
+         _) (
+     ___//   \     .-.
+    (___|   \ \   /   \_)
+        \   / /  |
+         ) (_/  /
+     _  / / \'-'
+    ( \/ / \ \
+jgs  \  /  /  )
+      `"  (__/
+```
+
+=== ID: 4c3efc0e9958aacf | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 24x14 ===
+```
+ .--,  .--.  .--,
+( (  )/_  _\(  ) )
+ '·-·/(_)(_)\·-·'
+    (  =^^=  )
+     >  --  <
+    /.      .\
+   //        \\
+  /(    *     )\
+ (_)\        /(_)
+     \  __  /~·._
+   ___)(  )(___  `·-._
+  (((___)(___)))      `.
+               tressa .'
+                *_.-·
+```
+
+=== ID: 2c2ad9a9bb8ac422 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x14 ===
+```
+             __
+          __/  \
+         /  \-./
+         \_   66\_
+           \  ____)o
+            )_(_________
+   .-.     /|  W I L L  |
+(_/   \   / |  W O R K  ()
+       |  \ \   F O R   |
+        \  \_)C A C H E |
+         '-'/ \"\""""""`
+           / / \ \/^)
+          (  \  \  /
+   jgs     \__)  "`
+```
+
+=== ID: 5e3675ee9ce70723 | TITLE: Untitled | ARTIST: Joshua Bell | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 20x16 ===
+```
+        ,  .
+       c(\/|
+       /  o `-.
+      |    --'
+    _-_    (_
+   /`` `---' \     /
+/  `---. \ \-'\__./
+\  ( -< -'-'|\_.-/'
+ |  `-.`. ,`(
+ |   /`'----'\
+ \\_/ | | | | \
+  `-~~\~~|~/~~'
+       \ |/
+        \|\_,
+      ,_/  '
+       `
+```
+
+=== ID: d48c8ff900bc1d98 | TITLE: Mean mouse | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 28x16 ===
+```
+          __       __     _
+         /-.\     /  \   //
+         \  \|_,_/|  /  ((
+          `\ `    `\"    \\
+          /  _   _  \     ))
+         |  (0\ /0)  |   //
+         \           /  //
+         /`.== 0 ==.`\ ((
+        /   `~~W~~`   \ \\
+       |   ,       ,   | ))
+       \   \       /   ///
+       /`vvvv     vvvv`\/
+      |                 |
+      |   |         |   |
+jgs  /    (         )    \
+    (v(v(v)`=.....=`(v)v)v)
+```
+
+=== ID: 06c6df47086bb755 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x16 ===
+```
+             .---.
+           .'     `.
+          :         ;
+           \       /.---.
+            `.   .^'     ;
+             + ,         :
+ .-.   ..-""   "  ,      ;
+; g$b-"           ;`.__.'
+'d$$^"""---...  _.'
+            .'  ;
+          .'   ;:
+        .'   __;:
+        `.    /\: bug
+          "j--jt'
+        ___l__l_"""-,
+                "    `---.
+```
+
+=== ID: 4866b3b099e1b6e4 | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 14x16 ===
+```
+ _    _
+( )__( )
+ ( o o)
+  (=*=)
+  _)"(_
+ / .'. \
+ ||' '|\\
+ ||'.'| \\   )
+ ||   |\ \\ (
+ ((.'.)\\ E[_]
+  || || ))
+  || ||((
+  (| |) \\
+  || ||  \\
+ _|| ||_  ))
+(__) (__)(/MJP
+```
+
+=== ID: 8611b69f67e56c78 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 27x17 ===
+```
+    .---.     .-""-.
+   /.'``\\   / /``'.\
+  |    .-=~~~=-.    |
+   \__           __/   (\
+     |   6_6     |      ))
+    =/    Y      \=    //
+     \   'w'     /    ((
+     .'-..-.__.-';     \\
+    /    /o .\    \     \\
+   |    ))) O |    |     ))
+   `.__,.'o' o/    /\   //
+       _{`._o|    /  | //
+      / {    ((((/   |//
+      \ {     /       /
+jgs    > \____\      |
+    .-'   /--:-'   .'
+   ((((--'  ((((--`
+```
+
+=== ID: 9343955839e0e588 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: insects/snails | SIZE: 18x5 ===
+```
+    .----.   @   @
+   / .-"-.`.  \v/
+   | | '\ \ \_/ )
+ ,-\ `-.' /.'  /
+'---`----'----'
+```
+
+=== ID: 8693c5f40b2c7a75 | TITLE: Untitled | ARTIST: Dirk-Lueder Kreie | CATEGORY: animals | SUBCATEGORY: insects/snails | SIZE: 21x6 ===
+```
+         __,._
+        /  _  \
+       |  6 \  \  oo
+        \___/ .|__||
+ __,..="^  . , "  , \
+<.__________________/
+```
+
+=== ID: 41ca000c160ae0fb | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: insects/snails | SIZE: 20x6 ===
+```
+    ______
+   /  ___ \
+  |  / ,.\ |O    O
+  | |  \d/ | \__/
+  |__\_____/-(..)
+_/_____________/ dwb
+```
+
+=== ID: fb370e6caa56ad01 | TITLE: Happy Snail | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/snails | SIZE: 23x8 ===
+```
+o       o
+ \_____/
+ /=O=O=\     _______
+/   ^   \   /\\\\\\\\
+\ \___/ /  /\   ___  \
+ \_ V _/  /\   /\\\\  \
+   \  \__/\   /\ @_/  /
+    \____\____\______/
+```
+
+=== ID: 8d540e8c392e2f46 | TITLE: Snail | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/snails | SIZE: 31x8 ===
+```
+@             _________
+ \____       /         \
+ /    \     /   ____    \
+ \_    \   /   /    \    \
+   \    \ (    \__/  )    )
+    \    \_\ \______/    /
+     \      \           /___
+      \______\_________/____"-_
+```
+
+=== ID: e0187d1f2bd71484 | TITLE: Small Butterfly | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 5x2 ===
+```
+(\o/)
+(/|\)
+```
+
+=== ID: 60c9653ddd4a68af | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 26x3 ===
+```
+(\ o /)
+ ))¥((   Butterfly / Angel
+(/ ^ \)
+```
+
+=== ID: 0550f1ecfadfd3a5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 9x4 ===
+```
+k\     /j
+((^\V/^))
+ \\_|_//
+ ((/|\))
+```
+
+=== ID: 79c3938e596ecf9f | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 14x5 ===
+```
+        ,   ,
+       { \w/ }
+        `>!<`
+jgs     (/^\)
+        '   '
+```
+
+=== ID: 0557efffda176b5c | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 17x5 ===
+```
+ //\         /\\
+|| * \ . . / * ||
+ \\____\X/____//
+  / *  /O\  * \
+  \__/  "  \__/
+```
+
+=== ID: 6844c7309ba84b04 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 18x5 ===
+```
+ (\  \/  /)
+ /@\ () /@\
+ }`=`||'='{
+( %'/||\`% )   hjw
+ `~' \/ `~'
+```
+
+=== ID: b19b8fb2d6c60e4d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 15x6 ===
+```
+      __ \/ __
+     /o \{}/ o\
+     \   ()   /
+      `> /\ <`
+jgs   (o/\/\o)
+       )    (
+```
+
+=== ID: 5202ff2fca6a0667 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 20x6 ===
+```
+    _.._      _.._
+  :'    \    /    `;
+  (  `-. \()/_.-'  )
+   \   (__()__)   /
+    ),'  /()\  ',(
+bms \___/ () \___/
+```
+
+=== ID: c83d018a462c2bd6 | TITLE: Untitled | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 38x6 ===
+```
+                                _ " _
+ _ " _                         (_\|/_)
+(_\|/_)  _ " _         _ " _    (/|\)
+ (/|\)  (_\|/_) " _   (_\|/_)
+ ejm     (/|\)_\|/_)   (/|\)
+              (/|\)
+```
+
+=== ID: a770d0863f76fe9d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 39x7 ===
+```
+      \    /                \    /
+       \  /                  \  /
+  .----.().----.        .----.().----.
+ {(). o(  )o .()}      { \o .(  ). o/ }
+   {/  /\/\  \}         {/   /\/\   \}
+ds. /O/    \O\       ds. (/_/    \_\)
+    (/      \)
+```
+
+=== ID: 9a74bd05ad73e2fd | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 18x8 ===
+```
+    .-=-.   .-=-.
+   ( 0   \V/   0 )
+    \     O     /
+     `.__ # __.'
+      .'  #  '.
+jgs  (o  /#\  o)
+      )/'   '\(
+     (         )
+```
+
+=== ID: daf305070e46bd51 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 22x8 ===
+```
+             \    /
+              \  /
+           .--.().--.
+          {\_o(  )o_/}
+           {/_/\/\_\}
+            \/    \/
+-Dana'98-  ,/      \,
+          (/        \)
+```
+
+=== ID: f3aa9da422b7adff | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 19x9 ===
+```
+  (`-.           ,*
+   \  `--..  _.-'/
+    \(_),  Y'  .'
+*._  \_____|_ /
+   :=(_______:=-
+     /_    |  \
+    /(_)'  A.  `.
+   /  ,--''  "`-.\
+  (,-'           `*
+```
+
+=== ID: 5b18613f3e3eb413 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 19x9 ===
+```
+   .  .
+ __ \/ __
+/O*\()/*O\
+\***||***/   Max
+ `>-||-<'
+ (o/\/\o)    _   _
+  "    "    (o\w/o)
+   Max       `>I<'
+             (/'\)
+```
+
+=== ID: 8beb4cfc1f2552ad | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 25x10 ===
+```
+      ,-'"-.     ,-"`-.
+and  /  _   \. ,/   _  \
+    (  (_)   \Y/   (_)  )
+     \   \    A    /   /
+      \   O   H   O   /
+       `---,--H--.---'
+          / / V \ \
+         / O_/ \_O \
+        /,-'     `-.\
+        '           '
+```
+
+=== ID: 46372d5b22d87dc7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 21x10 ===
+```
+  ____         ____
+ /. . \       / . .\
+/ .-~-.\ \_/ /.-~-. \
+\ '._.'.\(_)/.'._.' /
+ \. ..-. |=| .-.. ./
+  \  `-' |=| `-'  /
+   \____/|=|\____/
+    /.-..|=|..-.\
+   /.`-'./^\.`-'.\
+   \____/   \____/
+```
+
+=== ID: 4fe580d766673ff3 | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 29x10 ===
+```
+        ,-.    |    ,-.
+        \  `-.(+),-'  /
+         \:-) (+) (-:/
+        .'`-._(+)_.-'`.
+      ,'__/\_ (+) _/\__`.
+     / /  _/_)(+)(_\_  \ \
+    / (__/   _(+)_   \__) \
+   /    _,-'" (") "`-._    \
+  (_,-'"     /   \     "`-._)
+Krogg
+```
+
+=== ID: 87146150fdfbde27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 28x10 ===
+```
+                      .;;,
+ .,.               .,;;;;;,
+;;;;;;;,,        ,;;%%%%%;;
+ `;;;%%%%;;,.  ,;;%%;;%%%;;
+   `;%%;;%%%;;,;;%%%%%%%;;'
+     `;;%%;;%:,;%%%%%;;%%;;,
+        `;;%%%,;%%%%%%%%%;;;
+           `;:%%%%%%;;%%;;;'
+              .:::::::.
+                   s.
+```
+
+=== ID: 657ee38b4298b97a | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 30x11 ===
+```
+.==-.                   .-==.
+ \()8`-._  `.   .'  _.-'8()/
+ (88"   ::.  \./  .::   "88)
+  \_.'`-::::.(#).::::-'`._/
+    `._... .q(_)p. ..._.'
+      ""-..-'|=|`-..-""
+      .""' .'|=|`. `"".
+    ,':8(o)./|=|\.(o)8:`.
+   (O :8 ::/ \_/ \:: 8: O)
+    \O `::/       \::' O/
+     ""--'         `--""   hjw
+```
+
+=== ID: a84b4e44aad76d4b | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 26x11 ===
+```
+   .      .-~\
+   / `-'\.'    `- :
+   |    /          `._
+   |   |   .-.        {
+    \  |   `-'         `.
+     \ |                /
+~-.`. \|            .-~_
+    .\-.\       .-~      \
+     `-'/~~ -.~          /
+   .-~/|`-._ /~~-.~ -- ~
+  /  |  \    ~- . _\
+```
+
+=== ID: b0f892507340c940 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 37x11 ===
+```
+                 o   o       __,--,
+    ____         `\ /'   ,-~~|     \
+,-~~   |~~~~-,_    Y  /~~\   |     /'
+\      |     / '\,/,\'   /\_/    /'
+ `\    `\,/~~\_,-|,,,|--|_  |  /'
+   `\.    \_/'   |,,,|    |~\-'
+      `-'|' |    |,,,|   _| |
+         |   \   /\,/\  |  |'
+         `-.  `~~\,/\/~~  /'
+            `.,--|'  `~. |
+             ||         \,
+```
+
+=== ID: 158cc07998defeef | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 24x11 ===
+```
+       o        o
+  ___   \      /   ___
+.` __`-. \/\/\/ .-'__ '.
+( /  \  \/(..)\/  /  \ )
+\ \ O ) ( (oo) ) ( O / /
+ \ \_/ __>----<__ \_/ /
+  ".   >_      _<   ."
+    >   /      \   <
+   / /( \      / )\ \
+  / `" _/ ____ \_ "' \
+  \_.-` A/  & \A '-._/
+```
+
+=== ID: 4b04b264e7cfb9ca | TITLE: Butterfly for Lodis | ARTIST: Lorrie | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 33x13 ===
+```
+ / `._      .       .      _.' \
+'.@ = `.     \     /     .' = @.'
+ \ @`.@ `.    \   /    .' @.'@ /
+  \;`@`.@ `.   \ /   .' @.'@`;/
+   \`.@ `.@ `'.(").'` @.' @.'/
+    \ '=._`. @ :=: @ .'_.=' /
+     \ @  '.'..'='..'.'  @ /
+      \_@_.==.: = :.==._@_/
+      /  @ @_.: = :._@ @  \
+     /@ _.-'  : = :  '-._ @\
+    /`'@ @ .-': = :'-.@ @`'`\
+    \.@_.=` .-: = :-. `=._@./
+      \._.-'   '.'   '-._./  lc
+```
+
+=== ID: a619b08cc0e6a252 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 34x13 ===
+```
+           ,,_
+       zd$$??=
+     z$$P? F:`c,                _
+    d$$, `c'cc$$i           ,cd$?R
+   $$$$ cud$,?$$$i       ,=P"2?z "
+    $" " ?$$$,?$$$.    ,-''`>, bzP
+     'cLdb,?$$,?$$$   ,h' "I$'J$P
+  ... `?$$$,"$$,`$$h  $$PxrF'd$"
+d$PP""?-,"?$$,?$h`$$,,$$'$F44"
+?,,_`=4c,?=,"?hu?$`?L4$'? '
+   `""?==""=-"" `""-`'_,,,,
+           .ccu?m?e?JC,-,"=?
+                     """=='?"
+```
+
+=== ID: bff9fbcd39eb0233 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 31x14 ===
+```
+                           .oMc
+                        .MMMMMP
+                      .MM888MM
+....                .MM88888MP
+MMMMMMMMb.         d8MM8tt8MM
+ MM88888MMMMc `:' dMME8ttt8MM
+  MM88tt888EMMc:dMM8E88tt88MP
+   MM8ttt888EEM8MMEEE8E888MC
+   `MM888t8EEEM8MMEEE8t8888Mb
+    "MM88888tEM8"MME88ttt88MM
+     dM88ttt8EM8"MMM888ttt8MM
+     MM8ttt88MM" " "MMNICKMM"
+     3M88888MM"      "MMMP"
+      "MNICKM"
+```
+
+=== ID: 504d821055763d96 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 34x15 ===
+```
+   _                           _
+  / `._                     _.' \
+ ( @ : `.                 .' : @ )
+  \  `.  `.  ._     _.  .'  .'  /
+   \;' `.  `.  \   /  .'  .' `;/
+    \`.  `.  \  \_/  /  .'  .'/
+     ) :-._`. \ (:) / .'_.-: (
+     (`.....,`.\/:\/.',.....')
+      >------._|:::|_.------<
+     / .'._>_.-|:::|-._<_.'. \
+     |o _.-'_.-^|:|^-._`-._ o|
+     |`'   ;_.-'|:|`-._;   `'|
+jgs  ".o_.-' ;."|:|".; `-._o."
+       ".__."   \:/   ".__."
+                 ^
+```
+
+=== ID: 521e9016b889f68f | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 40x16 ===
+```
+ __   __       ___   ___      ___   ___
+(  \,/  )     ( @ \Y/ @ )    ((o)\,/(o))
+ \_ | _/       \__+|+__/      \__ | __/
+ (_/ \_)        {_/ \_}        {_/'\_}
+
+
+ ___   ___     ___   ___       __   __
+( @ \v/ m )   { ~ \,/ ~ }     (()\,/  )
+ \__+|+__/     \_~_|_~_/       \_ | _/
+  {_/ \_}       (_/'\_)        { /'\*}
+
+
+ __ Y __        __   __       ___   ___
+(()\o/())     ( s \Y/ s )    ( q \,/ p )
+ \_ I _/       \_<>|<>_/      \_ 6|9 _/
+  (/I\)         (_/'\_)        {_/ \_}
+```
+
+=== ID: 441c4d76853171d1 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 32x23 ===
+```
+          '          '
+           '        '
+   ''''''   '      '    '''''
+ '''''''''   '    '   '''''''''
+'''..oooo''   '  '   '''oooo..''
+''.....oooo''  oo  ''ooooo...<<'
+'<<.....oooo'' '' '''ooo....<<'
+'<<<......oo'' '''''ooo....<<''
+ ''<<......oo'''''ooo.....<<''
+  '<<<<.....oo'''ooo....<<<''
+   ''<<<....ooo''oo....<<<<'
+    '<<<<....oo''o....<<<<''
+     '<<<<....o''o...<<<<''
+     '<<<<<...o''o...<<<<'
+     '<<<<<...o''o..<<<<<'
+      '<<<<...o''o..<<<<<'
+      '<<<<<..o''o..<<<<<'
+      ''<<<<..''''...<<<''
+       '<<<...'''''...<''
+        ''...''   ''..''
+         '''''    '''''
+          '' Pru    ''
+           '        '
+```
+
+=== ID: 9d470c4b02a85d27 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 40x24 ===
+```
+  _   _        .-.             _
+ (_\ /_)       \  `.-.        \ ' .-.
+ /  |  \       ,\_|_/         ,\_|_/
+(__/`\__)       / | \          / | \
+               /  .`-`        /_. '-'
+               `-'
+
+ .-.            .-.               .-.
+ \  |.-.        \  |.-.       .-.|  /
+ ,\_|_/         ,\_|_/         \_|_/,
+  / | \          / | \         / | \
+ /_. '-'        /  |`-`       '-'|  \
+                `-'               '-'
+
+ .-.            .-._           _
+ \  |.-.        \   `.        \ ' .-.
+  \_|_/          \__/          \_|_/
+  `              `             `
+
+   .-.            .-.            .-.
+  (  |.-.        (  |.-.      .-.|  )
+ .-\/__ )        .-'/__ )     ( __\ '-.
+(__/ \          (__/ \           / \___)
+   \_/             \_/           \_/
+```
+
+=== ID: 0b4240c141c399be | TITLE: Untitled | ARTIST: Prudence | CATEGORY: animals | SUBCATEGORY: insects/butterflies | SIZE: 32x30 ===
+```
+    ''{'                '}''
+  {{    '  ''     ''   '    }}
+ '       '   '   '    '       '
+{         '   ' '    '         }
+{  ==~=    '  ' '   '   =~==   }
+{ ======    ' ...  '   ======  }
+{ =======    'o o'   =======   }
+{  =======   '==='   =======   }
+{   ===p===  '==='  ===p===    }
+ {   ======  '==='  ======    }
+  {   =====  '==='  =====    }
+   {   =~=   '==='   =~=    }
+    '        '==='         '
+     '       '==='        '
+      '      '==='       '
+      {      '==='       }
+     {       '==='        }
+    {  =~=   '==='   =~=   }
+   {  =====  '==='  =====   }
+  {  ======  '==='  ======   }
+  ' ===p===  '==='  ===p===  '
+  ' ======   '==='   ======  '
+  '  ==~=   ' ... '   =~==   '
+   {  ==   '       '   ==   }
+    {     '         '      }
+     {   '           '    }
+    ' '{'             ''}' '
+   ' '                    ' '
+  ' 'Pru                   ' '
+  ''                        ''
+```
+
+=== ID: 06500544e81e619a | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: reptiles/dinosaurs | SIZE: 21x6 ===
+```
+               __
+              / _)
+     _/\/\/\_/ /
+   _|         /
+ _|  (  | (  |
+/__.-'|_|--|_|  PapaJ
+```
+
+=== ID: f885f9d8821053f8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: reptiles/dinosaurs | SIZE: 18x6 ===
+```
+               __
+              / _)
+     _.----._/ /
+    /         /
+ __/ (  | (  |
+/__.-'|_|--|_|
+```
+
+=== ID: a79576c0cc9841e9 | TITLE: Happy Dinosaur | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: reptiles/dinosaurs | SIZE: 21x13 ===
+```
+       __
+      /oo\
+     |    |
+ ^^  (vvvv)   ^^
+ \\  /\__/\  //
+  \\/      \//
+   /        \
+  |          |    ^
+  /          \___/ |
+ (            )     |
+  \----------/     /
+    //    \\_____/
+   W       W
+```
+
+=== ID: d8221b2001fb4560 | TITLE: Hampster | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/other | SIZE: 11x4 ===
+```
+ C...C
+( . . )
+ \   /
+  `o`  cp97
+```
+
+=== ID: a70d9dacf3e81355 | TITLE: Squirrel | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/other | SIZE: 9x4 ===
+```
+ __  (\_
+(_ \ ( '>
+  ) \/_)=
+  (_(_ )_
+```
+
+=== ID: a1f19ee01f561749 | TITLE: Squirrel | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: rodents/other | SIZE: 16x5 ===
+```
+        />>
+ __   .' '}
+{_ \.'  <<
+  \(  )_/``
+   ``---``   hjw
+```
+
+=== ID: 138eee4e49a471b2 | TITLE: Rat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/other | SIZE: 28x6 ===
+```
+  ,,==.
+ //    `
+||      ,--~~~~-._ _(\--,_
+ \\._,-~   \      '    *  `o
+  `---~\( _/,___( /_/`---~~
+        ``==-    `==-,
+```
+
+=== ID: 1c041a55f117481a | TITLE: Squirrel | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rodents/other | SIZE: 20x7 ===
+```
+ (\__/)  .~    ~. ))
+ /O O  ./      .'
+{O__,   \    {
+  / .  . )    \
+  |-| '-' \    }
+ .(   _(   )_.'
+'---.~_ _ _&
+```
+
+=== ID: 4fed017d34c9d476 | TITLE: Ant | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 5x3 ===
+```
+    ,
+ooo<
+|||
+```
+
+=== ID: c75ed68d6fb8f1da | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 5x3 ===
+```
+\(")/
+-( )-
+/(_)\
+```
+
+=== ID: b18e0be533facd57 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 14x3 ===
+```
+      __
+:@.o.(__)
+ /  |  \   [J]
+```
+
+=== ID: 6f6d4e224492079d | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 15x3 ===
+```
+ __     ,
+(__).o.@c
+ /  |  \    [J]
+```
+
+=== ID: f6ba26bb5c3d01f9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 23x3 ===
+```
+ _.-----._     _  ,
+(_       _).O.(_)c
+  `-----'  |  \     [J]
+```
+
+=== ID: 7757e5763a65dc49 | TITLE: Untitled | ARTIST: Graeme Porter | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 11x4 ===
+```
+_ .
+ \|
+<o)Oo()
+   ;;; [gp]
+```
+
+=== ID: 1220b92538969720 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 3x4 ===
+```
+\ /
+>v<
+>O<
+>O<
+```
+
+=== ID: 49d7a4ffc1d6b073 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 13x4 ===
+```
+/\/\
+  \_\  _..._
+  (" )(_..._)
+   ^^  // \\
+```
+
+=== ID: bacb32e57c1188d2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 15x4 ===
+```
+   |\
+ __ \)  ,
+(__).o.@c
+ /  |  \    [J]
+```
+
+=== ID: 189d759aa7de2200 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 14x4 ===
+```
+ \  \
+ |__/ _   .-.
+(o_o)(_`>(   )
+ { }//||\\`-'
+```
+
+=== ID: f6192f39abc3b9e4 | TITLE: Untitled | ARTIST: Graeme Porter | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 6x8 ===
+```
+_   ._
+ \  |
+  \_|
+ .' '.
+ :O O:
+ '/ \'
+  :X:
+  :X:
+```
+
+=== ID: b3cdd6923202f29e | TITLE: Untitled | ARTIST: Michael J. Penick (Mike Chat, mikechat) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 33x10 ===
+```
+ \       /
+  \     /
+   \.-./
+  (o\^/o)  _   _   _     __
+   ./ \.\ ( )-( )-( ) .-'  '-.
+    {-} \(//  ||   \\/ (   )) '-.
+         //-__||__.-\\.       .-'
+        (/    ()     \)'-._.-'
+        ||    ||      \\
+MJP     ('    ('       ')
+```
+
+=== ID: 0eaf47af9298cbd0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 19x11 ===
+```
+       ,_     _,
+         '._.'
+    '-,   (_)   ,-'
+      '._ .:. _.'
+       _ '|Y|' _
+     ,` `>\ /<` `,
+    ` ,-`  I  `-, `
+      |   /=\   |
+    ,-'   |=|   '-,
+          )-(
+jgs       \_/
+```
+
+=== ID: dc9cb810313eafca | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 19x11 ===
+```
+      ,_      _,
+        '.__.'
+   '-,   (__)   ,-'
+     '._ .::. _.'
+       _'(^^)'_
+    _,` `>\/<` `,_
+   `  ,-` )( `-,  `
+      |  /==\  |
+    ,-'  |=-|  '-,
+         )-=(
+jgs      \__/
+```
+
+=== ID: 2c7e05d707eb4ad9 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 23x12 ===
+```
+           |   /
+            \  |
+             \_|
+        __  /` ;
+      `'  \ `\_/ _
+           '-/ \/ '._
+        /'-./| |.--. `
+      _/  _.-\/--.  |
+     `   |   /`-. \ '-.
+         |   |   | \
+jgs     /    |   /  `-.
+      -'     \__/
+```
+
+=== ID: 95ae577dc8242d78 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod), Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 24x12 ===
+```
+           |     |
+            \   /
+             \_/
+        __   /^\   __
+       '  `. \_/ ,'  `
+            \/ \/
+       _,--./| |\.--._
+    _,'   _.-\_/-._  `._
+         |   / \   |
+         |  /   \  |
+jgs     /   |   |   \
+ hh   -'    \___/    `-
+```
+
+=== ID: 79ac4a5516b213cb | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 21x12 ===
+```
+            |      /
+            \    ,'
+             \_,'
+        __   /")
+     _,'  `.(_/,---.
+       ,-._,')'     `
+     _/ _,/ /--..
+      ,' (_/\    \_
+   _,' ,' |  `.
+      /   )    \
+hh   /   /
+     \__/
+```
+
+=== ID: ecf7080096a03514 | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 38x12 ===
+```
+    _.._.-..-._
+ .-'  .'  /\  \`._
+/    /  .'  `-.\  `.
+    :_.'  ..    :       _.../\
+    |           ;___ .-'   //\\.
+     \  _..._  /    `/\   //  \\\
+      `-.___.-'  /\ //\\       \\:
+           |    //\V/ :\\       \\
+            \      \\/  \\      /\\
+             `.____.\\   \\   .'  \\
+               //   /\\---\\-'     \\
+         fsc  //   // \\   \\       \\
+```
+
+=== ID: 33f6bad572278d13 | TITLE: Untitled | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 21x12 ===
+```
+Max    /\   /\
+         \_/
+    __   / \   __
+  -'  `. \_/ .'  `-
+        \/ \/
+   _.---(   )---._
+_.'   _.-\_/-._   `._
+     /   /_\   \
+    /   /___\   \
+   /   |_____|   \
+_.'    | ___ |    `._
+        \___/
+```
+
+=== ID: 1dccd39af639cc21 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 22x13 ===
+```
+            |      /
+            \    ,'
+             \_,'
+        __   /")
+     _,'  `.(_/,---.
+       ,-._,',)'     `
+     _/ _,/ ,/--..
+      ,' (_,/\    \_
+   _,' ,' ;|  `.
+      /   .)    \
+hh   /   -/
+Pr   \__-/
+59    '''
+```
+
+=== ID: bb5e228f8145d492 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 11x14 ===
+```
+       \_/
+      '-0-'
+      --0--
+      .-0-.
+
+       \_/
+      '-0-'
+      --0--
+      .-0-.
+
+       \_/
+      '-0-'
+      --0--
+jgs   .-0-.
+```
+
+=== ID: 9ce920c50279efae | TITLE: Untitled | ARTIST: Krogg Zothommog | CATEGORY: animals | SUBCATEGORY: insects/ants | SIZE: 36x18 ===
+```
+   |         J
+   |         J
+   |         J
+   |         J
+   |         |
+   F         |
+   F        \J
+   F         7
+  J          ;:.
+ /   .        ::::...
+J   :             ""::::...
+F   `                    ":::"-..___
+J        ___.....____   Krogg    `"F
+ ""----""            """----"""---'
+
+              _
+         ,()-(_>
+          '//'\
+```
+
+=== ID: 1a613ec1b0b03480 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/cockroaches | SIZE: 27x15 ===
+```
+        .--.       .--.
+    _  `    \     /    `  _
+     `\.===. \.^./ .===./`
+            \/`"`\/
+         ,  |     |  ,
+        / `\|`-.-'|/` \
+       /    |  \  |    \
+    .-' ,-'`|   ; |`'-, '-.
+        |   |    \|   |
+        |   |    ;|   |
+        |   \    //   |
+        |    `._//'   |
+jgs    .'             `.
+    _,'                 `,_
+    `                     `
+```
+
+=== ID: 589e1dfb393e671c | TITLE: Untitled | ARTIST: kirara | CATEGORY: animals | SUBCATEGORY: insects/cockroaches | SIZE: 27x15 ===
+```
+     ,--.     .--.
+    /    \. ./    \
+   /  /\ / " \ /\  \
+  / _/  {~~v~~}  \_ \
+ /     {   |   }     \
+;   /\{    |    }/\   \
+| _/  {    |    }  \_  :
+|     {    |    }      |
+|    /{    |    }\     |
+|   / {    |    } \    |
+|  /  {    |    }  \   |
+|  \  \    |    /  /   |
+|   \  \   |   /  /    |
+\    \  \  |  /  /     /
+ \   /   ~~~~~   \    / krr
+```
+
+=== ID: ed58e23ca009462a | TITLE: Untitled | ARTIST: kirara | CATEGORY: animals | SUBCATEGORY: insects/cockroaches | SIZE: 27x15 ===
+```
+     ,--.     .--.
+    /    \. ./    \
+   /  /\/  "  \/\  \
+  / _/ /~~~v~~~\ \_ \
+ /    /####|####\    \
+;  /\{#####|#####}/\  \
+|_/  {#####|#####}  \_:
+|    {#####|#####}    |
+|   /{#####|#####}\   |
+|  / {#####|#####} \  |
+| /  {#####|#####}  \ |
+|  \ \#####|#####/ /  |
+|   \ \####|####/ /   |
+ \   \ \###|###/ /   /
+  \  /   ~~~~~   \  /   krr
+```
+
+=== ID: e415536455c20ddc | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: animals | SUBCATEGORY: insects/cockroaches | SIZE: 24x18 ===
+```
+  ,--.       ,---.
+  /    '.    /     \
+         \  ;
+          \-|
+         (o o)      (/
+         /'v'     ,-'
+ ,------/ >< \---'
+/)     ;  --  :
+   ,---| ---- |--.
+  ;    | ---- |   :
+ (|  ,-| ---- |-. |)
+    | /| ---- |\ |
+    |/ | ---- | \|
+    \  : ---- ;  |
+     \  \ -- /  /
+     ;   \  /  :
+    /   / \/ \  \
+   /)           (\ -hrr-
+```
+
+=== ID: e845019ddceababc | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: animals | SUBCATEGORY: insects/cockroaches | SIZE: 30x23 ===
+```
+          .-.
+         o   \     .-.
+            .----.'   \
+          .'o)  / `.   o
+         /         |
+         \_)       /-.
+           '_.`    \  \
+            `.      |  \
+             |       \ |
+         .--/`-.     / /
+       .'.-/`-. `.  .\|
+      /.' /`._ `-    '-.
+ ____(|__/`-..`-   '-._ \
+|`------.'-._ `      ||\ \
+|| #   /-.   `   /   || \|
+||   #/   `--'  /  /_::_|)__
+`|____|-._.-`  /  ||`--------`
+      \-.___.` | / || #      |
+       \       | | ||   #  # |
+       /`.___.'\ |.`|________|
+       | /`.__.'|'.`
+     __/ \    __/ \
+    /__.-.)  /__.-.) LGB
+```
+
+=== ID: 42707aa63f78800c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/caterpillars | SIZE: 25x3 ===
+```
+    \_/-.--.--.--.--.--.
+    (")__)__)__)__)__)__)
+jgs  ^ "" "" "" "" "" ""
+```
+
+=== ID: e0745c5bd54d1066 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: insects/caterpillars | SIZE: 33x5 ===
+```
+                           .    .
+                            )  (
+      _ _ _ _ _ _ _ _ _ _ _(.--.)
+    {{ { { { { { { { { { { ( '_')
+jgs  >>>>>>>>>>>>>>>>>>>>>>>`--'>
+```
+
+=== ID: 570248da1a8351c2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: insects/caterpillars | SIZE: 22x11 ===
+```
+o    o
+ \__/
+ /oo\
+ \()/
+ |~~|
+ |~~|
+ |~~|               /\
+ \~~\              /\/
+  \~~\____________/\/
+   \/ | | | | | | \/
+    ~~~~~~~~~~~~~~~
+```
+
+=== ID: ec5e5b7f1fcdb519 | TITLE: Untitled | ARTIST: Philip Kaulfuss | CATEGORY: animals | SUBCATEGORY: insects/caterpillars | SIZE: 36x30 ===
+```
+                    _,-------.
+                  ,'          `.
+                 ;              ;
+        ,-'"`-. ;,---._         ;
+       ;  ,-. ,'_      `.       ;
+       ;  ;_;;;' ;      ;      ;
+       `.    ;`-'       ;      ;
+         `-,''.        ,'     ;
+       _,-'    `-.__,-'      ;
+_,,-"""                     ;
+`.                         ;
+ ;`.                      ;
+ ;  `.                   ;
+ ;.   `.       ;        ;
+  ;     `.     ;       ;
+  ;       `-.. ;      ;
+  ;           ,'     ;
+  ;                  ;
+   ;                ;
+   ;                ;
+   ;               ;
+    ; --.          ;
+    ; .___         ;
+     ;    '--..   ;
+     ; '--..      ;
+      ;_    '"    ;
+       ;""'-._    ;
+       ;-.._      ;  Philip Kaulfuss
+       ;_   '""   ;
+       ; '- .     ;
+```
+
+=== ID: c65f37b7b4cc2b78 | TITLE: Untitled | ARTIST: Andreas Freise | CATEGORY: animals | SUBCATEGORY: reptiles/lizards | SIZE: 38x7 ===
+```
+                       )/_
+             _.--..---"-,--c_
+        \L..'           ._O__)_
+,-.     _.+  _  \..--( /           a:f
+  `\.-''__.-' \ (     \_
+    `'''       `\__   /\
+                ')
+```
+

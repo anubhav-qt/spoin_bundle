@@ -1,0 +1,1911 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: BUILDINGS-AND-PLACES
+# Total artworks in category fitting <=40 cols: 111
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 228b8753fdcb779d | TITLE: small barn | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 14x5 ===
+```
+           x
+.-. _______|
+|=|/     /  \
+| |_____|_""_|
+|_|_[X]_|____|
+```
+
+=== ID: 7add3a82fccb5772 | TITLE: Cottage | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 30x5 ===
+```
+ (')) ^v^  _           (`)_
+(__)_) ,--j j-------, (__)_)
+      /_.-.___.-.__/ \
+    ,8| [_],-.[_] | oOo
+,,,oO8|_o8_|_|_8o_|&888o,,,hjw
+```
+
+=== ID: 4cee907aab6131f3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 19x5 ===
+```
+                x
+     .-. _______|
+     |=|/     /  \
+     | |_____|_""_|
+jgs  |_|_[X]_|____|
+```
+
+=== ID: 10daa48801416de4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 12x5 ===
+```
+       +
+       A_
+      /\-\
+jgs  _||"|_
+    ~^~^~^~^
+```
+
+=== ID: e6cf08ac6fd8151f | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 14x6 ===
+```
+  ____||____
+ ///////////\
+///////////  \
+|    _    |  |
+|[] | | []|[]|
+|   | |   |  |
+```
+
+=== ID: 678a26b54e7f4393 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 25x7 ===
+```
+      `'::::.
+        _____A_
+       /      /\
+    __/__/\__/  \___
+---/__|" '' "| /___/\----
+   |''|"'||'"| |' '||
+   `""`""))""`"`""""`
+```
+
+=== ID: 60635330afd894c7 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 27x7 ===
+```
+      ':.
+         []_____
+        /\      \
+    ___/  \__/\__\__
+---/\___\ |''''''|__\-- ---
+   ||'''| |''||''|''|
+   ``"""`"`""))""`""`
+```
+
+=== ID: a7575ce29951a6af | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 32x8 ===
+```
+        `'::.
+    _________H ,%%&%,
+   /\     _   \%&&%%&%
+  /  \___/^\___\%&%%&&
+  |  | []   [] |%\Y&%'
+  |  |   .-.   | ||
+~~@._|@@_|||_@@|~||~~~~~~~~~~~~~
+     `""") )"""`
+```
+
+=== ID: 20ba80cc30064c9f | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 32x8 ===
+```
+  \_/       .:'    .:'    .:'
+-=(_)=-  /\||   /\||   /\||
+  / \   //\\|  //\\|  //\\|
+       //  \\ //  \\ //  \\
+      //    \^/    \^/    \\
+      |[]  []|[]  []|[]  []|
+     &|  ||  %  ||  |  ||  |%
+  &%&--==--&%-==--%&"""""%&%""""
+```
+
+=== ID: 16529c3c8054c0ee | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 25x10 ===
+```
+       _
+     _|=|__________
+    /              \
+   /                \
+  /__________________\
+   ||  || /--\ ||  ||
+   ||[]|| | .| ||[]||
+ ()||__||_|__|_||__||()
+( )|-|-|-|====|-|-|-|( )
+^^^^^^^^^^====^^^^^^^^^^^
+```
+
+=== ID: 20320b7a5947488e | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 35x10 ===
+```
+ .-. ,-.
+'   (%%'`.               __
+ `-(%|%)% )             /()\````\
+   (%\K /,             /____\____\
+    %.\V/%.)           |n  n|.___|
+   (%\%`(',            | __ /_\___\
+     %| ,)   ____      | || |n|n_n|
+      | |  /____ "_     / |
+      | |_" .-. "_ "__,'  /
+     ,| |  |,' |  "__,...'  zm
+```
+
+=== ID: fdf5bdce93a75ad2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 19x10 ===
+```
+         _
+      _-'_'-_
+   _-' _____ '-_
+_-' ___________ '-_
+ |___|||||||||___|
+ |___|||||||||___|
+ |___|||||||o|___|
+ |___|||||||||___|
+ |___|||||||||___|
+ |___|||||||||___|
+```
+
+=== ID: 3c2c7916204e740d | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 26x10 ===
+```
+    , .    .--.
+   __|__  |____|
+  /     \ |____|
+ /   []   |____|
+|__________|  |
+|   ____   |  |        _
+|  |\  /|  |  |      _[_]_
+|  | \/ |  |  |       c")
+|  | /\ |  |  |      ,(_)'
+|__|/__\|__|__|       -"-
+```
+
+=== ID: e145e553584a0bfd | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 32x15 ===
+```
+    ) )        /\
+   =====      /  \
+  _|___|_____/ __ \____________
+ |::::::::::/ |  | \:::::::::::|
+ |:::::::::/  ====  \::::::::::|
+ |::::::::/__________\:::::::::|
+ |_________|  ____  |__________|
+  | ______ | / || \ | _______ |
+  ||  |   || ====== ||   |   ||
+  ||--+---|| |    | ||---+---||
+  ||__|___|| |   o| ||___|___||
+  |========| |____| |=========|
+ (^^-^^^^^-|________|-^^^--^^^)
+ (,, , ,, ,/________\,,,, ,, ,)
+','',,,,' /__________\,,,',',;;
+```
+
+=== ID: e971dfc26f13f075 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 36x16 ===
+```
+                          []=++-
+                      _II__|
+                     [[__] |
+    _________________||  |___
+   /^^^^^^,-.^^^^^^^^\|__|^^^\
+  /     ,',-.`.               \
+ /    ,','   `.`.     ,-"""-.  \
+/___,','__   __`.`.__/_,"T"._\__\
+ |='-'||/\| |^^||`-`=|_|_|_|_|=|
+ |= = ||)(| |__||= ==|_|_|_|_|=|
+ |= ==|"""" """"| = =____= =_==|
+ |== =| __   __ |= =| [] | |^|=|
+ |= ==||/\| |==||== |   o|=|_| |
+ |== =||)(| |  || = | == | == =|
+ |= ==|"""" """"|== |____|= = =| hjw
+ """""|_________|"""'====`""""""
+```
+
+=== ID: c3a808ed59736662 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 38x18 ===
+```
+                           ====
+                           !!!!
+      ==========================
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  ||      _____          _____    ||
+  ||      | | |          | | |    ||
+  ||      |-|-|          |-|-|    ||
+  ||      #####          #####    ||
+  ||                              ||
+  ||      _____   ____   _____    ||
+  ||      | | |   @@@@   | | |    ||
+  ||      |-|-|   @@@@   |-|-|    ||
+  ||      #####   @@*@   #####    ||
+  ||              @@@@            ||
+******************____****************
+**************************************
+```
+
+=== ID: bd0638f2f7f42b44 | TITLE: Mushroom house | ARTIST: lgbeard | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 37x25 ===
+```
+          .
+        ('
+        '|
+        |'
+       [::]
+       [::]   _......_
+       [::].-'      _.-`.
+       [:.'    .-. '-._.-`.
+       [/ /\   |  \        `-..
+       / / |   `-.'      .-.   `-.
+      /  `-'            (   `.    `.
+     |           /\      `-._/      \
+     '    .'\   /  `.           _.-'|
+    /    /  /   \_.-'        _.':;:/
+  .'     \_/             _.-':;_.-'
+ /   .-.             _.-' \;.-'
+/   (   \       _..-'     |
+\    `._/  _..-'    .--.  |
+ `-.....-'/  _ _  .'    '.|
+          | |_|_| |      | \  (o)
+     (o)  | |_|_| |      | | (\'/)
+    (\'/)/  ''''' |     o|  \;:;
+     :;  |        |      |  |/)
+ LGB  ;: `-.._    /__..--'\.' ;:
+          :;  `--' :;   :;
+```
+
+=== ID: e58809766c5de51a | TITLE: Simple House | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: houses | SIZE: 30x28 ===
+```
+               /\
+              /  \
+       __    /    \
+      |  |  /      \
+      |  | /        \
+      |  |/          \
+      |  |            \
+      |                \
+      |                 \
+      |                  \
+     /                    \
+    /                      \
+   /                        \
+  /___                    ___\
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+     |                    |
+VK   |                    |
+     |____________________|
+```
+
+=== ID: 060a9535218b2b84 | TITLE: Scottish flag (Saltire) | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 10x5 ===
+```
+    o____
+    |\\//|
+    |//\\|
+    |
+VK  |
+```
+
+=== ID: 14afe002ebe801a5 | TITLE: Dragon with flag | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 40x10 ===
+```
+            ,a_a
+           {/ ''\_
+           {\ ,_oo)
+           {/  (_^_____________________
+ .=.      {/ \___)))*)----------;=====;`
+(.=.`\   {/   /=;  ~~           |||::::
+    \ `\{/(   \/\               |||::::
+     \  `. `\  ) )              |||||||
+ jgs  \    // /_/_              |||||||
+       '==''---))))             |||||||
+```
+
+=== ID: d8a1abf536070691 | TITLE: United Kingdom flag | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 23x10 ===
+```
+o
+|______________________
+|-._`-._ :| |: _.-'_.-|
+|   `-._`:| |:`_.-'   |
+|-------`-' '-'-------|
+|------_.-. .-._------|
+|  _.-'_.:| |:._`-._  |
+|-'_.-'  :| |:  `-._`-|
+|~~~~~~~~~~~~~~~~~~~~~~
+jgs
+```
+
+=== ID: ac4309a15dece7d9 | TITLE: US flag | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 27x11 ===
+```
+============;===========;()
+            # # # #::::::
+            # # # #::::::
+            # # # #::::::
+            # # # #::::::
+            # # # # # # #
+            # # # # # # #
+            # # # # # # #
+            # # # # # # #
+            # # # # # # #
+ jgs        # # # # # # #
+```
+
+=== ID: 20e58c99f6922991 | TITLE: Japan flag | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 27x12 ===
+```
+   ___
+   >_<
+   | |--------------------.
+   | |                    |
+   | |       .-""-.       |
+   | |      /      \      |
+   | |     |        |     |
+   | |      \      /      |
+   | |       '-..-'       |
+   | |                    |
+jgs| |~~~~~~~~~~~~~~~~~~~~'
+   | |
+```
+
+=== ID: 268098c565be76ae | TITLE: Welsh Flag | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 35x13 ===
+```
+ ___
+(_ _)
+ | |____....----....____         _
+ | |\                . .~~~~---~~ |
+ | | |         __\\ /(/(  .       |
+ | | |      <--= '|/_/_( /|       |
+ | | |       }\~) | / _(./      ..|
+ | | |..::::::\\/      --...::::::|
+ | | |:::::::::\//::\\__\:::::::::|
+ | | |::::::::_//_:_//__\\_:::::::|
+ | | |::::::::::::::::::::::::::::|
+ | |/:::''''~~~~''''::::::::::::''~
+ | |        DrS         ~~~~~
+```
+
+=== ID: 3e7276dad50d0c20 | TITLE: Dragon with flag | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 36x14 ===
+```
+                             o
+                            /\
+                           /::\
+                          /::::\
+            ,a_a         /\::::/\
+           {/ ''\_      /\ \::/\ \
+           {\ ,_oo)    /\ \ \/\ \ \
+           {/  (_^____/  \ \ \ \ \ \
+ .=.      {/ \___)))*)    \ \ \ \ \/
+(.=.`\   {/   /=;  ~/      \ \ \ \/
+    \ `\{/(   \/\  /        \ \ \/
+     \  `. `\  ) )           \ \/
+ jgs  \    // /_/_            \/
+       '==''---))))
+```
+
+=== ID: 4326ff34e386d21d | TITLE: US flag | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 35x25 ===
+```
+  _
+ (_)
+<___>
+ | |______
+ | |* * * )
+ | | * * (_________
+ | |* * * |* *|####)
+ | | * * *| * |   (________________
+ | |* * * |* *|####|##############|
+ | | * * *| * |    |              |
+ | |* * * |* *|####|##############|
+ | |~~~~~~| * |    |              |
+ | |######|* *|####|##############|
+ | |      |~~~'    |              |
+ | |######|########|##############|
+ | |      |        |              |
+ | |######|########|##############|
+ | |~~~~~~|        |              |
+ | |      |########|##############|
+ | |      '~~~~~~~~|              |
+ | |               |##########JGS#|
+ | |               '~~~~~~~~~~~~~~~
+ | |
+ | |
+ | |
+```
+
+=== ID: 202238b4a7c97b82 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 40x26 ===
+```
+ _
+(_)
+ |_____________________________________
+ |&&&&&&                         &&&&&&|
+ |&&&&&&                         &&&&&&|
+ |&&&&&&                         &&&&&&|
+ |&&&&&&          .\^/.          &&&&&&|
+ |&&&&&&        . |   | .        &&&&&&|
+ |&&&&&&        |\|   |/|        &&&&&&|
+ |&&&&&&     .--'       '--.     &&&&&&|
+ |&&&&&&      \           /      &&&&&&|
+ |&&&&&&       >         <       &&&&&&|
+ |&&&&&&      '~|/~~|~~\|~'      &&&&&&|
+ |&&&&&&            |            &&&&&&|
+ |&&&&&&                         &&&&&&|
+ |&&&&&&                         &&&&&&|
+ |&&&&&&_________________________&JGS&&|
+ |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ |
+ |
+ |
+ |
+ |
+ |
+ |
+ |
+```
+
+=== ID: 5d0e66012753eb72 | TITLE: The swedish flag | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: buildings-and-places | SUBCATEGORY: flags | SIZE: 38x31 ===
+```
+   .^.
+  (( ))
+   |#|_______________________________
+   |#||########$$$###################|
+   |#||########$$$###################|
+   |#||########$$$###################|
+   |#||########$$$###################|
+   |#||$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$|
+   |#||$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$|
+   |#||########$$$###################|
+   |#||########$$$###################|
+   |#||########$$$###################|
+   |#||########$$$###################|
+   |#|'""""""""""""""""""""""""""""""'
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+   |#|
+  //|\\
+"""""""""""""""""""""""""""""Max"""""
+```
+
+=== ID: d7a07a05832bf50b | TITLE: Windmill | ARTIST: Philipp Schwartz | CATEGORY: buildings-and-places | SUBCATEGORY: windmills | SIZE: 31x8 ===
+```
+               /\     /\
+              '. \   / ,'
+                `.\-/,'
+                 ( X   )
+                ,'/ \`.\
+              .' /   \ `,
+               \/-----\/'
+          ______ |_H___|PhS____
+```
+
+=== ID: c8f9fcb78e1a126b | TITLE: Windmills | ARTIST: Theo van Eck (The Dutch Dude) | CATEGORY: buildings-and-places | SUBCATEGORY: windmills | SIZE: 38x13 ===
+```
+      ##        ##
+       ##      ##
+        ##|--|##
+       | ##  ## |
+      |___####___|
+     |~~~~####~~~~|
+      ===##==##===
+     |..##....##..|
+    |..##......##..|
+   |..##........##..|
+  |........__........|
+ |........|__|........|   -Dutch Dude-
+|_________|__|_________|
+```
+
+=== ID: e38105cab9ef7218 | TITLE: Windmill | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: windmills | SIZE: 19x13 ===
+```
+  ,             ,
+ / '.         .' \
+/    '.     .'    \
+ '-._  '. .'  _.-'
+     '-. ; .-'
+    _.-;(_);-._
+_.-'   .'_'.   '-._
+\    .'/[+]\'.    /
+ \_.' /     \ '._/
+      |  _  |
+      | [_] |
+ jgs /III III\
+     `"""""""`
+```
+
+=== ID: 0a0a74a271704d6a | TITLE: Windmills | ARTIST: Volker Hellmich | CATEGORY: buildings-and-places | SUBCATEGORY: windmills | SIZE: 35x15 ===
+```
+__          __
+\\\        ///
+ \\\  __  ///
+  \\\/__\///
+   \\\__///
+   |\\\///|
+   |_XXXX_|
+   \///\\\/
+   ///__\\\
+  ///1878\\\
+ ///______\\\
+///________\\\
+~|__________|~
+ ||_||  ||_||
+ |___|  |___|     -Volker Hellmich-
+```
+
+=== ID: 153bc8a9794e0d2d | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: lighthouses | SIZE: 7x8 ===
+```
+  /^\
+  |#|
+ |===|
+  |0|
+  | |
+ =====
+_||_||_
+-------
+```
+
+=== ID: 284201911e9de8cd | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: lighthouses | SIZE: 27x12 ===
+```
+  _^_
+  |@|
+ =====
+  #::
+  #::
+  #::
+  #::
+  #::
+  #::
+###::^-..
+         ^ ~ ~~ ~~ ~ ~ ~
+          \~~ ~~ ~ ~  ~~~~~
+```
+
+=== ID: 4d138238c472ae79 | TITLE: lighthouse | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: lighthouses | SIZE: 38x13 ===
+```
+        .n.                     |
+       /___\          _.---.  \ _ /
+       [|||]         (_._ ) )--;_) =-
+       [___]           '---'.__,' \
+       }-=-{                    |
+       |-" |
+       |.-"|                p
+~^=~^~-|_.-|~^-~^~ ~^~ -^~^~|\ ~^-~^~-
+^   .=.| _.|__  ^       ~  /| \
+ ~ /:. \" _|_/\    ~      /_|__\  ^
+.-/::.  |   |""|-._    ^   ~~~~
+  `===-'-----'""`  '-.              ~
+                 __.-'      ^
+```
+
+=== ID: 4728146fb4c8fe67 | TITLE: Lighthouse | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: lighthouses | SIZE: 16x22 ===
+```
+       /\
+       ||
+      ====
+      |  |
+      |  |
+      ====
+      XXXX
+      |\/|
+      |/\|
+      |\/|
+      |/\|
+      |\/|
+      |/\|
+     /____\
+     |    |
+     |    |
+    /      \
+   /        \
+  /          \
+ /            \
+/              \
+----------------
+```
+
+=== ID: 98a5f3aa43ec1dd5 | TITLE: Oil Rigs | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: other | SIZE: 31x12 ===
+```
+              /\
+             /\/\
+            _|/\|_
+           |______|
+            |\/\/|
+           \|/\/\|   .''`/:
+   :\''.    \`'. |  ||  /  :
+   : \ ||   |\ |||  || /    o
+   j _\||__/__\||_\_||/___
+     |___________________|
+      |  |   |   |   |  |
+~~~~~~|~~|~~~|~~~|~~~|~~|~~~~~~
+```
+
+=== ID: d22388d2f1bfa825 | TITLE: Window | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: other | SIZE: 21x16 ===
+```
+(IIIIIIIIIIIIIIIIIII)
+)'.'.'.':;:;:'.'.'.'(
+('.'.'.;' | `:.'.'.')
+)'.'.';'  |  `:'.'.'(
+('.'.;'   |   `:.'.')
+)'.';'____|____`:'.'(
+(==@'     |     `@==)
+)'.:     @()     :.'(
+('.'.   ()@()   .'.')
+)'.'.  ()@()@)  .'.'(
+('.'.   _\|/_   .'.')
+)'.'.  |-----|  .'.'(
+('.'.___\___/___.'.')
+)'.'============='.'(
+('.'             '.')
+ ~                 ~
+```
+
+=== ID: c937ff130348f192 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: buildings-and-places | SUBCATEGORY: other | SIZE: 37x31 ===
+```
+                 __
+               .'/\'.
+             .'-/__\-'.
+           .'--/____\--'.
+         .'--./______\.--'.
+       .'--../________\..--'.
+     .'--.._/__________\_..--'.
+   .'--..__/____________\__..--'.
+ .'--..___/______________\___..--'.
+'========'================'========'
+      [_|__]            [_|__]
+     =[__|_]=====""=====[__|_]==.
+      [_|__]     '|     [_|__]  |
+      [__|_]     |'     [__|_]  |
+      [_|__]  .--JL--.  [_|__]  '===O
+      [__|_]   \====/   [__|_]
+      [_|__]_.-| .; |-._[_|__]
+      [__|_]'._ \__/(_.'[__|_]
+      [.-._]            [_.-.]
+      [_.-.'--..____..--'.-._]
+ (o)  [(_.'   .-.     .-.'._)\ (o)
+(\'/) [  .-. (_.'.-. (_.' .-.](\'/)
+   ;: [ (_.'.-. (_.' .-. (_.'| ;:'
+;:    [ .-. '._) .-. '._).-. ]   ;:.
+      [(_.'  .-. '._) .-.'._)]
+  (o) /.-.  (_.'.-.  (_.' .-.];:(o)
+ (\'/)['._).-. (_.'   .-.(_.'] (\'/)
+      [   (_.'.-.  .-.'._)   \ ;:
+;:'   '-._    '._) '._)   _.-'
+  LGB      `---..____..---'   ;:`
+   ;:'      ;:'.:;     ;;"
+```
+
+=== ID: d96509e7fdb67754 | TITLE: Small City | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: cities | SIZE: 25x4 ===
+```
+            |   _   _
+      . | . x .|.|-|.|
+   |\ ./.\-/.\-|.|.|.|
+~~~|.|_|.|_|.|.|.|_|.|~~~
+```
+
+=== ID: b0d092a57ff0b87d | TITLE: Small Village | ARTIST: Steven Maddison | CATEGORY: buildings-and-places | SUBCATEGORY: cities | SIZE: 32x11 ===
+```
+~         ~~          __
+       _T      .,,.    ~--~ ^^
+ ^^   // \                    ~
+      ][O]    ^^      ,-~ ~
+   /''-I_I         _II____
+__/_  /   \ ______/ ''   /'\_,__
+  | II--'''' \,--:--..,_/,.-{ },
+; '/__\,.--';|   |[] .-.| O{ _ }
+:' |  | []  -|   ''--:.;[,.'\,/
+'  |[]|,.--'' '',   ''-,.    |
+  ..    ..-''    ;       ''. '
+```
+
+=== ID: 1aaf02e3f86d5a0a | TITLE: A flying Citadel | ARTIST: Shanaka Dias | CATEGORY: buildings-and-places | SUBCATEGORY: cities | SIZE: 30x12 ===
+```
+                P
+             P /\  P
+            /\|  |/\
+         [] ||_/\_|| []
+         ||_||____||_||
+         ||____[]____||
+        {::     \__    }
+    ___  \v:    .'"  _V ___
+snd(      \_      __/  --  )_
+  (__---    |::\ :/  ---     )
+     (       \::\/  ----- ___)
+      (______  \/     _____)
+```
+
+=== ID: 50c953b4f93daeb6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk), Matthew Thomas | CATEGORY: buildings-and-places | SUBCATEGORY: cities | SIZE: 31x18 ===
+```
+          _o8888888o_
+       .o888"'    `"888o,
+    .o88'    ,=|      `88o,
+   ,88'  `'    A        `88,
+  ,88'        ,".        `88,
+ ,88'        [!!!]  `'    `88,
+ 88'         `="='         `88
+.88        '  F:J  `        88.
+[8[     '     F:J     `     ]8]
+[8[   '       F:J       `   ]8]
+`88  ' =|    ,F:J.   =|  `  88'
+ 88 '  ,".   ||_||   ,".  `,88
+ `88. _|:|,,,'"_"`,,,|:|  ,88'
+  `88;:,^.---//^\\---,^.:,88'
+   `88o!II::::|H|::::II;o88'
+     `88o.""",':`.""",o88'
+       `888o;:-:-:;o888'
+          `mt-2(+jgs)'
+```
+
+=== ID: 662d5b69d17fcbb9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: church | SIZE: 8x5 ===
+```
+   +
+   A_
+  /\-\
+ _||"|_
+~^~^~^~^
+```
+
+=== ID: d850b4f1668de8bc | TITLE: Small chapel | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: buildings-and-places | SUBCATEGORY: church | SIZE: 24x6 ===
+```
+            +
+           /_\
+ ,%%%______|O|
+ %%%/_________\
+ `%%| /\[][][]|%
+___||_||______|%&,__ hjw
+```
+
+=== ID: 1d0d46eabea1b23f | TITLE: Church | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: church | SIZE: 17x7 ===
+```
+ *      +
+        A
+     __/_\__  *
+    /\-'o'-/\
+   _||:<_>:||_
+  /\_/=====\_/\
+__|:_:_[I]_:_:|__
+```
+
+=== ID: e90a7c50af847ee0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: church | SIZE: 30x18 ===
+```
+         _
+        / \
+       //_\\
+      //(_)\\
+       |/^\|
+       // \\    ,@@@@@@@,
+      //   \\ ,@@@\@@@@/@@,
+     // === \\ @@\@@@/@@@@@
+    // =-=-= \\@@@@\@@@@@@;%
+   //   ===   \\@@@@@@/@@@%%%,
+  //|         |\\@\\//@@%%%%%%
+  ~ |         | ~ @|| %\\//%%%
+    |  __ __  |    || %%||%%'
+    | |  |  | |    ||   ||
+    | | -|- | |    ||   ||
+    |_|__|__|_|    ||   ||
+  /`  =======  `\__||_._||
+/`    =======            `\
+```
+
+=== ID: bc70747eeb338064 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: church | SIZE: 19x21 ===
+```
+        _|_
+         |
+         |
+        / \
+       //_\\
+      //(_)\\
+       |/^\|
+       ||_||
+       // \\
+      //   \\
+     // === \\
+    // =-=-= \\
+   //   ===   \\
+  //|         |\\
+    |         |
+    |  __ __  |
+    | |  |  | |
+    | | -|- | |
+    |_|__|__|_|
+  /`  =======  `\
+/`    =======    `\
+```
+
+=== ID: d31f8a6ec725f023 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: church | SIZE: 25x23 ===
+```
+             .
+            -|-
+             |
+            /A\
+           //^\\
+         ,// _ \\,
+         |/`/_\`\|
+          |  ,  |
+          | /^\ |
+          |//'\\|
+        ,//` _ `\\,
+      ,//` .'|'. `\\,
+    ,//`   |-|-|   `\\,
+  ,//`     [_|_]     `\\,
+  |/T                 T\|
+    |  _   __ __   _  |
+    | /_\ |  |  | /_\ |
+    | |_| | .|. | |_| |
+    |     |__|__|     |
+jgs '----[_______]----'
+          =======
+         ======
+      ======
+```
+
+=== ID: e2b5ae7a6a23759d | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: buildings | SIZE: 7x7 ===
+```
+  /^\
+  |#|
+ |===|
+  |0|
+  | |
+ =====
+_||_||_
+```
+
+=== ID: 7b8733e09c4e6042 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: buildings | SIZE: 26x10 ===
+```
+             +
+             A
+          __/_\__
+         /\-'o'-/\
+        _||:<_>:||_
+       /\_/=====\_/\
+      _|:_:_[I]_:_:|_
+   _/::::::::::::::::\_
+ _/::::::::::::::::::::\_
+/::::::::::::::::::::::::\
+```
+
+=== ID: fc27c345be1f3e49 | TITLE: Small Castel | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: castles | SIZE: 11x5 ===
+```
+ _   |~  _
+[_]--'--[_]
+|'|""`""|'|
+| | /^\ | |
+|_|_|I|_|_|
+```
+
+=== ID: 0c1de5c80ab6ce98 | TITLE: Castle | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: castles | SIZE: 20x8 ===
+```
+ [][][] /""\ [][][]
+  |::| /____\ |::|
+  |[]|_|::::|_|[]|
+  |::::::__::::::|
+  |:::::/||\:::::|
+  |:#:::||||::#::|
+ #%*###&*##&*&#*&##
+##%%*####*%%%###*%*#
+```
+
+=== ID: 1681b92014c351d5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: castles | SIZE: 23x15 ===
+```
+               T~~
+               |
+              /"\
+      T~~     |'| T~~
+  T~~ |    T~ WWWW|
+  |  /"\   |  |  |/\T~~
+ /"\ WWW  /"\ |' |WW|
+WWWWW/\| /   \|'/\|/"\
+|   /__\/]WWW[\/__\WWWW
+|"  WWWW'|I_I|'WWWW'  |
+|   |' |/  -  \|' |'  |
+|'  |  |LI=H=LI|' |   |
+|   |' | |[_]| |  |'  |
+|   |  |_|###|_|  |   |
+'---'--'-/___\-'--'---'
+```
+
+=== ID: fa23cc4e3b53ca62 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: castles | SIZE: 25x18 ===
+```
+  / \               / \
+ /   \             /   \
+(_____)           (_____)
+ |   |  _   _   _  |   |
+ | O |_| |_| |_| |_| O |
+ |-  |          _  | - |
+ |   |   - _^_     |   |
+ |  _|    //|\\  - |   |
+ |   |   ///|\\\   |  -|
+ |-  |_  |||||||   |   |
+ |   |   |||||||   |-  |
+ |___|___|||||||___|___|
+         (      (
+          \      \
+           )      )
+           |      |
+           (      (
+            \      \
+```
+
+=== ID: 1221b71f35bb6138 | TITLE: Castle on Rock | ARTIST: Volker Hellmich | CATEGORY: buildings-and-places | SUBCATEGORY: castles | SIZE: 37x23 ===
+```
+                  ^
+                 / \
+            ^   _|.|_   ^
+          _|I|  |I .|  |.|_
+          \II||~~| |~~||  /
+           ~\~|~~~~~~~|~/~
+             \|II I ..|/
+        /\    |II.    |    /\
+       /  \  _|III .  |_  /  \
+       |-~| /(|I.I I  |)\ |~-|
+     _/(I | +-----------+ |. )\_
+     \~-----/____-~-____\-----~/
+      |I.III|  /(===)\  |  .. |
+      /~~~-----_________---~~~\
+     `##########!\-#####%!!!!!| |\
+    _/###########!!\~~-_##%!!!\_/|
+    \##############!!!!!/~~-_%!!!!\
+     ~)#################!!!!!/~~--\_
+  __ /#####################%%!!!!/ /
+  \,~\-_____##############%%%!!!!\/
+  /!!!!\ \ \~-_###########%%%!!!!\
+ /#####!!!!!!!\~-_#######%%%!!!!!!\_
+/#############!!!\#########%%%!!!!!!\
+```
+
+=== ID: d3c635e9462b98f2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: fences | SIZE: 21x4 ===
+```
+           o
+          /|\
+=|===|===|(=)|===|===
+=|===|===|`='|===|===
+```
+
+=== ID: a4b6faebd3ced464 | TITLE: Pig on pigsty fence | ARTIST: Ian F. Stewart | CATEGORY: buildings-and-places | SUBCATEGORY: fences | SIZE: 18x6 ===
+```
+     ^..^
+_||__(oo)____||___
+-||--"--"----||---
+_||_( __ )___||___
+-||--"--"----||---
+ ||          ||
+```
+
+=== ID: 43056a31699ea261 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: buildings-and-places | SUBCATEGORY: fences | SIZE: 31x22 ===
+```
+  .     .     .     .     .
+ (` `) (` `) (` `) (` `) (` `)
+ `\./` `\./` `\./` `\./` `\./`
+__|`|___|`|___|`|___|`|___|`|__
+  |_|   |_|   |_|   |_|   |_|
+______________________________
+______________________________
+  | |   | |   | |   | |   | |
+  | |   | |   | |   | |   | |
+  | |   | |   | |   | |   | |
+`.| |.`.| |.`.| |.`.| |.`.| |
+ /| |\  | |  /| |\  | |  /| |
+/ | | \ | | / | | \ | | / | |
+  | |  \| |/  | |  \| |/  | |
+.`| |`.`| |`.`| |`.`| |`.`| |
+  | |   | |   | |   | |   | |
+__| |___| |___| |___| |___| |__
+  |_|   |_|   |_|   |_|   |_|
+______________________________
+______________________________
+  | |   | |   | |   | |   | |
+  | |   | |   | |   | |   | |
+```
+
+=== ID: 082d3a83dbde390c | TITLE: World map | ARTIST: Shanaka Dias | CATEGORY: buildings-and-places | SUBCATEGORY: maps | SIZE: 30x6 ===
+```
+        _,--',   _._.--._____
+ .--.--';_'-.', ";_      _.,-'
+.'--'.  _.'    {`'-;_ .-.>.'
+      '-:_      )  / `' '=.
+        ) >     {_/,     /~)
+snd     |/               `^ .'
+```
+
+=== ID: 717017aa1342ab2d | TITLE: Globe | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: maps | SIZE: 24x14 ===
+```
+          ___,
+     _.-'` __|__
+   .'  ,-:` \;',`'-,
+  /  .'-;_,;  ':-;_,'.
+ /  /;   '/    ,  _`.-\
+|  | '`. (`     /` ` \`|
+|  |:.  `\`-.   \_   / |
+|  |     (   `,  .`\ ;'|
+ \  \     | .'     `-'/
+  \  `.   ;/        .'
+   '._ `'-._____.-'`
+      `-.____|
+        _____|_____
+  jgs  /___________\
+```
+
+=== ID: f70a782c311d317f | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: maps | SIZE: 27x15 ===
+```
+    .  .-+  ._/V\
+   / \/   \/    /__
+  )                "-+._
+ ."                      \
+(       B R A S I L       )
+ \                      /
+   \__                 (
+      >_               )
+        \_.           /
+           < S.Paulo /
+            \   *  _/
+             >    º
+            /    /
+           <    /
+            "^./
+```
+
+=== ID: 67f3450b2fea9893 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: maps | SIZE: 29x17 ===
+```
+      \
+       \
+       \\  <---- Auckland
+        \\
+         )`--')
+        <  o /
+         `\  /
+          / /
+     /_,, ~~  <--- Wellington
+    /   )
+    |  /
+   /  _> <---- Christchurch
+  /  /
+ /   |
+|    /
+\___/
+  o
+```
+
+=== ID: ee2b5eb449af274c | TITLE: Untitled | ARTIST: Randy Ransom | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 23x5 ===
+```
+     _
+    | |
+ ___| |
+(    .'
+ )  (    -Randy Ransom-
+```
+
+=== ID: 9af8fad2ff979b91 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 13x5 ===
+```
+     _
+    [_]|
+    | ||.==.
+    |_ ``""`)
+jgs  _)    (_
+```
+
+=== ID: 7e94cf762dede368 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 15x6 ===
+```
+       O
+   |  /|
+   |_(__\
+    \  )\
+jgs  )( /_
+ """"""""""""""
+```
+
+=== ID: 8bc5ad1eddf52eb7 | TITLE: Untitled | ARTIST: Andrew Hood (Andy, Flookster) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 13x8 ===
+```
+ .__   .-".
+(o\"\  |  |
+   \_\ |  |
+  _.---:_ |
+ ("-..-" /
+  "-.-" /
+    /   |
+    "--"  AsH
+```
+
+=== ID: cd5c8b6edf81e606 | TITLE: Untitled | ARTIST: Praseodymium 59 | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 24x9 ===
+```
+  _____
+  |   D
+  |   |
+  |   |
+  \___|            _
+    ||  _______  -( (-
+    |_'(-------)  '-'
+       |       /
+_____,-\__..__|_____Pr59
+```
+
+=== ID: 81dd7a2ae84a8be4 | TITLE: Untitled | ARTIST: Zotiel R. Bell | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 16x12 ===
+```
+       ,,,,,
+       |'o'|
+       ( - )
+      _.'-'._
+     /_)   (_\
+    //|_   _|\\
+   ||(( )_( ))||
+   (@=| |=| |=@)
+    \{:::V:::}/
+     {-- j _-}
+     {_ -}- _}
+Zot /{,-.{,-.}\
+```
+
+=== ID: cec78ba530a668d6 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 25x13 ===
+```
+  +---------+-----------+
+  |   [_]   |  |     ,'\|
+  |  ((_))  |  | shower |
+  |   `-'   |  | ,',',' |
+  |         |   \_______|
+  | toilet \            |
+  |         \    sink .-|
+  +---------+        ( &|
+            |    \    `-|
+            |     \     |
+            +--    `----+
+
+VK
+```
+
+=== ID: 5bb07eb64e874fd8 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 28x16 ===
+```
+ .----------------.
+ ;----------------;
+ | ~~ .------.    |
+ |   /        \   |
+ |  /          \  |
+ |  |          |  |  ,----.
+ |   \ ,    , /   | =|____|=
+ '---,########,---'  (---(
+    /##'    '##\      )---)
+    |##,    ,##|     (---(
+     \'######'/       '---`
+      \`""""`/
+       |`""`|
+     .-|    |-.
+jgs /  '    '  \
+    '----------'
+```
+
+=== ID: f03531cb7f181dad | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/pyramids | SIZE: 38x16 ===
+```
+               .
+              /=\\
+             /===\ \
+            /=====\' \
+           /=======\'' \
+          /=========\ ' '\
+         /===========\''   \
+        /=============\ ' '  \
+       /===============\   ''  \
+      /=================\' ' ' ' \
+     /===================\' ' '  ' \
+    /=====================\' '   ' ' \
+   /=======================\  '   ' /
+  /=========================\   ' /
+ /===========================\'  /
+/=============================\/
+```
+
+=== ID: db1eecf9a5ecad89 | TITLE: Untitled | ARTIST: Lukasz Tyrala | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/benches | SIZE: 18x10 ===
+```
+       /\
+c=j==)/  \
+_/_ (_|\  \    lt.
+\  \\  \\  \
+J\  \\  \\  \
+  \  \\  \\ /
+   \ c=j=)\Y
+    \_/\\(_|
+     |F===Y
+     J    L
+```
+
+=== ID: 0189e674e0a93f54 | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/benches | SIZE: 33x12 ===
+```
+  .-.________.---.________.-.
+  | |.-.-.-.-. L .-.-.-.-.| |
+  | |                     | |
+  | |                     | |
+  | |                     | |
+  |_|_____________________|_|
+ / /                       \ \
+.-.-------------------------.-.
+| |_________________________| |
+| |_]                     [_| |
+| |                         | |
+[_]                         [_]lc
+```
+
+=== ID: f64e1f2b563e2c8e | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/benches | SIZE: 26x13 ===
+```
+   .=gp.
+ .'/$$$$
+ || "TP"
+ ||          .:
+ ||       .-' |
+ ||    .-'    |
+ ||    |      !____
+ ||    |   .-'  .-'
+ ||    '.____.-'(
+ ||     \  /  /__\
+ ||      )(
+|::|    /__\           fsc
+|::|
+```
+
+=== ID: ec8f1ec1f1d4441d | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/benches | SIZE: 31x14 ===
+```
+    _                     _
+  _|_|___________________|_|_
+ |__:_____________________:__|
+ |___________________________|
+ |__:_____________________:__|
+ |___________________________|
+   |_|___________________|_|
+  /__.___________________.__\
+ /__._____________________.__\
+/_____________________________\
+   | |_|               |_| |
+   | |                   | |
+   | |                   | |
+   |_|                   |_|lc
+```
+
+=== ID: c139f29c77718ff6 | TITLE: Period Hall Bench | ARTIST: Lorrie | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/benches | SIZE: 33x16 ===
+```
+     _                     _
+    (_).-----------------.(_)
+    /.'                   '.\
+    |:                     :|
+    |:                     :|
+    |:                     :|
+    |:                     :|
+    .'---------------------'.
+  .'                         '.
+.'-----------------------------'.
+'lc.............................'
+  \   _____________________   /
+   | |_)                 (_| |
+   | |                     | |
+   | |                     | |
+  (___)                   (___)
+```
+
+=== ID: 25e0eba470bc0f4b | TITLE: Bar stool | ARTIST: Riitta Rasimus | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/other | SIZE: 7x6 ===
+```
+ _____
+|_/_\_|
+ || ||
+ || ||
+ ||=||
+ || ||
+```
+
+=== ID: 72621cd4f2363e89 | TITLE: A place to keep your CD player, VCR etc. | ARTIST: Riitta Rasimus | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/other | SIZE: 22x6 ===
+```
+ ____________________
+|  o  | ,----------, |
+|_____| |_===___O__| |
+|  o  | | ... ### .| |
+|_____|_|_O__ooo___|_|
+ (_)              (_)
+```
+
+=== ID: 4f83e7f42bb0aec5 | TITLE: Drawer | ARTIST: Riitta Rasimus | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/other | SIZE: 9x6 ===
+```
+ _______
+|_o_|_o_|
+|___o___|
+|___o___|
+|___o___|
+ ||   ||
+```
+
+=== ID: 2a3045016160dcc0 | TITLE: Bed | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/other | SIZE: 31x6 ===
+```
+      ()___
+    ()//__/)_________________()
+    ||(___)//#/_/#/_/#/_/#()/||
+    ||----|#| |#|_|#|_|#|_|| ||
+    ||____|_|#|_|#|_|#|_|#||/||
+jgs ||    |#|_|#|_|#|_|#|_||
+```
+
+=== ID: fef590d64d19ab2b | TITLE: Sink | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/other | SIZE: 38x14 ===
+```
+                       ___
+                     .' _ '.
+                    / /` `\ \
+                    | |   [__]
+                    | |    {{
+                    | |    }}
+                 _  | |  _ {{
+     ___________<_>_| |_<_>}}________
+         .=======^=(___)=^={{====.
+        / .----------------}}---. \
+       / /                 {{    \ \
+      / /                  }}     \ \
+     (  '========================='  )
+jgs   '-----------------------------'
+```
+
+=== ID: 23ec7741f6ee01c4 | TITLE: Working table with lamp | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/other | SIZE: 36x21 ===
+```
+                  M
+                 ' `
+                |  :|`-._
+                |  :|`-._`-._
+               /   ::\   `-._`-._
+              /     ::\      `-(_)
+             |_________|      / /
+                 `-'         / /
+                            / /
+                           / /
+                          / /
+         ________________/ _&_______
+        /8P'             `'    Y888/
+       /P'        ____________  Y8/
+ VK   /'  /\     /           /   /
+     /  . \ \   /           /   /
+    /  //  \ \ /           /   /
+   /  //    \ \___________/   /
+  / ///      \ \       __    /
+ /8 `'        \/      /_/  ./
+/88b.____________________.8/
+```
+
+=== ID: 1de98c63d56067ae | TITLE: Untitled | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/notre-dame | SIZE: 16x9 ===
+```
+    ,__     __,
+    |..|   |..|
+    ||||_|_||||
+    |::|:::|::|
+    |,.|.-,|,.|
+    |nn|`-'|nn|
+    |||||||||||
+    |_ |.-.| _|
+l42_|||||_|||||_
+```
+
+=== ID: 1da79ff9867f8b93 | TITLE: Untitled | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/notre-dame | SIZE: 21x14 ===
+```
+   ,             ,
+   :===.     .===:
+   |/V\|     |/V\|
+   ||||;  |  |||||
+   |||||__T__|||||
+   |;:;|.,.,.|;:;|
+   |:;:|;:;:;|:;:|
+   |.o.| ,=. |,o.|
+   |/V\|({o})|/V\|
+   ||||| `=' |||||
+   |;:;|:;;;:|:::|
+   |,".|,:::.|,".|
+l42||:|||:::|||:||
+---''"'-'"""'-'"''---
+```
+
+=== ID: bd861202ca77ec73 | TITLE: Untitled | ARTIST: David Issel | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/statue-of-liberty | SIZE: 21x9 ===
+```
+ W
+[ ]
+ E,
+ U\
+ \ \\|/
+  |-( )-
+  | V |
+  L   `.  ___
+  |     \/  /     dsi
+```
+
+=== ID: 20308754eb4ce46a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/statue-of-liberty | SIZE: 20x26 ===
+```
+ (
+(_)
+###
+ #
+( c     .\|/.
+ \/\    wWWWw
+ |  \  (/. .\)
+ |   \  \ = /
+ \    \__) (___
+  `\    \\ //  `\
+    `\   \^/  _  \
+      \   ` //^\  \
+       ;    \\  |  |
+       |    .-'|-' /
+       |    '--\_.'
+       |    .:|
+       |    .:|
+       ||    ||
+       | |;.::|
+       |,  .::|
+       | ,| .;|
+  jgs__|__,_.:|__
+    [            ]
+    |            |
+   _|            |_
+  /=--------------=\
+```
+
+=== ID: 0dfc3b9fff2aad83 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/statue-of-liberty | SIZE: 22x28 ===
+```
+ (
+(_)
+###       .
+(#c    __\|/__
+ #\     wWWWw
+ \ \-. (/. .\)
+ /\ /`\/\   /\
+ |\/   \_) (_|
+ `\.' ; ; `' ;`\
+   `\;  ;    .  ;/\
+     `\;    ;  ;|  \
+      ;   .'  ' ;  /
+      |_.'   ;  | /)
+      (     ''._;/`
+      |    ' . ;
+      |.-'   .:)
+      |        |
+      (  .'  : |
+      |,-  .:: |
+      | ,-'  .;|
+  jgs_/___,_.:_\_
+    [I_I_I_I_I_I_]
+    | __________ |
+    | || |  | || |
+   _| ||_|__|_|| |_
+  /=--------------=\
+ /                  \
+|                    |
+```
+
+=== ID: 8c5ac1f3556805c8 | TITLE: Untitled | ARTIST: Joris Bellenger, Matthew Thomas | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/statue-of-liberty | SIZE: 24x29 ===
+```
+         ^
+       ,' \
+       L""/
+       ` |
+       J |
+       J L
+       | | .  ,
+       | |.`v_L.'
+      // ,>-(-\'_
+      \`' \ - /-.
+      /   /`""|
+       ),'    `-
+      (    ,-'  \
+       ) ,' ,'   h
+      / /  /     `)--..
+      \/  /       \  <)
+       <        ,  L<'
+       F/     _/  ,'
+       L   ,-'     \
+       |         ___L
+      /         (  F
+     J      ___,'  L
+     |    ,'       |
+     F  ,'         |
+    (_,--..__  mt-2|_
+   ,'        `"`--.._\
+ ,' /                 \
+/                     (_
+(diddled by b'ger}
+```
+
+=== ID: 74d5347b6aab8124 | TITLE: Bed | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/beds | SIZE: 31x6 ===
+```
+      ()___
+    ()//__/)_________________()
+    ||(___)//#/_/#/_/#/_/#()/||
+    ||----|#| |#|_|#|_|#|_|| ||
+    ||____|_|#|_|#|_|#|_|#||/||
+jgs ||    |#|_|#|_|#|_|#|_||
+```
+
+=== ID: b3f6cdf9c22fbf10 | TITLE: Bed | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/beds | SIZE: 20x6 ===
+```
+       .           .
+      /|__________/|
+    .// /       .//|
+    |/_/________|//|
+    |_|_________|/
+VK  |           |
+```
+
+=== ID: 14b9f53917d0569d | TITLE: Duchamp's Wooden Bed | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/beds | SIZE: 26x14 ===
+```
+     _   ()
+() .'_`'.||
+||/.| ||\ |
+| /|| || ||         _   ()
+|| || || ||    () .'_`'.||
+|| || || ||    ||/.| ||\ |
+|| || |I-'`-._ | /|| || ||
+||_I'`_.-||-._`'| || || ||
+m._ <'_  ||   `|| || || ||
+i| `-._`-'|    || || |I-'|
+c)     `-._`-._||_I'`_.-||
+           `-._` _.-'   ()
+               ||       `
+               ()
+```
+
+=== ID: bc34399b63061879 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 13x6 ===
+```
+     .-===-.
+     | . . |
+     | .'. |
+    ()_____()
+    ||_____||
+jgs  W     W
+```
+
+=== ID: ba31f84ae27956e2 | TITLE: Untitled | ARTIST: Normand Veilleux | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 10x8 ===
+```
+  i______i
+  I______I
+  I      I
+  I______I
+ /      /I
+(______( I
+I "    I "
+I      I
+```
+
+=== ID: 02a42246c58e847e | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 22x9 ===
+```
+   __________.
+  /_/-----/_/|   __
+  ( ( ' ' ( (| /'--'\
+  (_( ' ' (_(|/.    .\
+  / /=====/ /|  '||'
+ /_//____/_/ |   ||
+(o|:.....|o) |   ||
+|_|:_____|_|/'  _||_
+ '        '    /____\
+```
+
+=== ID: 201ec220dbcecdca | TITLE: Rocking chair | ARTIST: llizard | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 21x9 ===
+```
+     \
+      \
+       \
+        \
+         \_______
+          |_____\
+          |======\
+          |       \ .
+ejm   `.__|_______.'
+```
+
+=== ID: 98535f4dbccb34a8 | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 29x18 ===
+```
+        .............
+      .'             '.
+     : '.           .' :
+     :  :           :  :
+     :  :           :  :
+     :  :           :  :
+     :  :           :  :
+    .'  :           :  '.
+ _.'    :...........:    '._
+(     .'             '.     )
+ '._.'                 '._.'
+   (.....................)
+    \___________________/
+     (. . . . . . . . .)
+      \  /_/     \_\  /
+       ||           ||
+       )|           |(
+      (_/           \_)  lc
+```
+
+=== ID: e046243cdfdc5152 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 28x19 ===
+```
+        _.--"""""""--._
+      .'               '.
+     /         o         \
+     |    o         o    |
+     |      o     o      |
+     |         o         |
+     |    o         o    |
+     |.-.      o      .-.|
+     /   |  o     o  |   \
+    /--. |___________| .--\
+   /    \/           \/    \
+   |    /_____________\    |
+   |    |             |    |
+   |    '-------------'    |
+   |    :             :    |
+   |____:_____________:____|
+   |                       |
+   |_______________________|
+jgs (__)               (__)
+```
+
+=== ID: c35de35a0bfe7636 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 34x19 ===
+```
+   /~~|~~~~~~~~~~~~~~~~~~~~|~~\
+  (   |                    |   )
+   \  |    *    *    *     |  /
+    | |                    | |
+    | |      *     *       | |
+    | |                    | |
+    | |    *    *    *     | |
+    | |                    | |
+    / |      *     *       | \
+   /  \                    /  \
+  /    |__________________|    \
+ /~~~,/                    \,~~~\
+(    )______________________(    )
+ '\ /                        \ /'
+   |__________________________|
+   |                          |
+   |                          |
+   |                          |
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: 6d0be192c7f4c67d | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/chairs | SIZE: 34x21 ===
+```
+            __________
+     _ ,-'""          ""`-. _
+    f Y      *     *       Y Y
+    | |                    | |
+    | |    *    *    *     | |
+    | |                    | |
+    | |      *     *       | |
+    | |                    | |
+    | |    *    *    *     | |
+    | |                    | |
+    j.|      *     *       |,l
+   /  l`-..____________.,-'j  \
+  /    Y                  f    \
+ /---. j                  l ,---\
+(     ),------------------.(     )
+ `._,'                      `._,'
+   l                          j
+   f`------------------------'Y
+   |                          |
+   |                          |
+   `--------------------------'
+```
+
+=== ID: 94edccbf330b62a9 | TITLE: Untitled | ARTIST: Henry Segerman | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/stonehenge | SIZE: 39x19 ===
+```
+           .|+.
+         .' |  '.
+        J   |    '.
+        L  .+.     '.
+       J .'   '.     '+
+       +' .'|'. '+.    \
+        '+  |  "+  '+.  \
+         F  |   J     '. \
+         F  |    L  .+. ';+
+        J   |    |.'  L';
+        J   |     L   J  L
+        |   |     |    L  L
+        F   |     J    J  J
+        F   |      L    L  L
+_______J    |      |    J   |__________
+       J    |      J     L   L
+       |    |       L--.,;,--'
+       +._  |    _,.+
+          '-|,.-'      hs
+```
+
+=== ID: 3b7335e5d4687fa3 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/sofas | SIZE: 23x6 ===
+```
+     .-="""""""""""=-.
+     | . . . . . . . |
+     | .'.'.'.'.'.'. |
+    ()_______________()
+    ||_______________||
+jgs  W               W
+```
+
+=== ID: 368878cefc4ce627 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/sofas | SIZE: 23x7 ===
+```
+     .-="""""""""""=-.
+     | . . . . . . . |
+     | .'.'.'.'.'.'. |
+    ()____ _____ ____()
+    ||____I_____I____||
+    ||_______________||
+jgs  W               W
+```
+
+=== ID: 9724c83f4488c15c | TITLE: Untitled | ARTIST: Lorrie | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/sofas | SIZE: 38x11 ===
+```
+  .--------------.--------------.
+  |              |              |
+  |      **      |      **      |
+  |              |              |
+  |______________|______________|
+  /                             \
+ /                               \
+/_________________________________\
+|                                 |
+|_________________________________|
+[]                               [] lc
+```
+
+=== ID: 942c02b9ff40a15b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/eiffel-tower | SIZE: 19x14 ===
+```
+            .
+           .|.
+           |||
+           |||
+           |||
+           |||
+           j_I
+          .)_(.
+          |===|
+          /___\
+         //___\\
+        /=======\
+       / .-"""-. \
+jgs   |__|     |__|
+```
+
+=== ID: 232beb533c9aed71 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/eiffel-tower | SIZE: 13x14 ===
+```
+      .
+     .|.
+     |||
+     |||
+     |||
+     |||
+     j_I
+    .)_(.
+    |===|
+    /___\
+   //___\\
+  /=======\
+ / .-"""-. \
+|__|     |__|
+```
+
+=== ID: b30e8590ea10b742 | TITLE: Untitled | ARTIST: unknown | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/eiffel-tower | SIZE: 30x22 ===
+```
+              ()
+              /\
+             |==|
+             ====
+              XX
+             xXXx
+             XXXX
+             XXXX
+             XXXX
+            xXXXXx
+            XXXXXX
+            XXXXXX
+           xXXXXXXx
+           XXXXXXXX
+          xXXXXXXXXx
+          XXXXXXXXXX
+         XXXXX  XXXXX
+        xXXXX"  "XXXXx
+       XXXXXxxxxxxXXXXX
+     xXXXXX""""""""XXXXXx
+   xXXXXXX"        "XXXXXXx
+xxXXXXXXX            XXXXXXXxx
+```
+
+=== ID: 9991de61600d4ed1 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/eiffel-tower | SIZE: 33x28 ===
+```
+                |
+                |
+                A
+              _/X\_
+              \/X\/
+               |V|
+               |A|
+               |V|
+              /XXX\
+              |\/\|
+              |/\/|
+              |\/\|
+              |/\/|
+              |\/\|
+              |/\/|
+             IIIIIII
+             |\/_\/|
+            /\// \\/\
+            |/|   |\|
+           /\X/___\X/\
+          IIIIIIIIIIIII
+         /`-\/XXXXX\/-`\
+       /`.-'/\|/I\|/\'-.`\
+      /`\-/_.-"` `"-._ \-/\
+     /.-'.'           '.'-.\
+jgs /`\-/               \-/`\
+ _/`-'/`_               _`\'-`\_
+`"""""""`                `""""""`
+```
+
+=== ID: 563b7d68009d1305 | TITLE: Untitled | ARTIST: Steven Maddison | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/eiffel-tower | SIZE: 27x31 ===
+```
+             .
+             |~
+            /|\
+           |-.-|
+           '-:-'
+            [|]
+            [|]
+            [|]
+            [|]
+            [|]
+           .[|].
+           :/|\:
+           [/|\]
+           [/|\]
+         .:_#|#_:.
+         |_ '-' _|
+         /\:-.-:/\
+        /\|_[|]_|/\
+      _/\|~ [|] ~|/\_
+      [''=-.[|].-='']
+      :-._   |   _.-:
+      //\;::-:-::;/\\
+     /\.'-\\/|\//-'./\
+   .'\/'   :\|/:   '\/'.
+ .//\('    [\|/]    ')/\\.
+'':][\.'  .[\|/].  './][:''
+    ''    :/\|/\:    ''
+         .[\/|\/].
+           '.|.'
+             '
+Steven Maddison
+```
+
+=== ID: 1f64ae7c0e4b18f3 | TITLE: Liberty Bell | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/other | SIZE: 27x17 ===
+```
+     .--.-,-.-.-,-.--.
+     |     \   /     |
+     |      \ /      |
+     |  .===,=,===.  |
+   _/\_; .-'`^`'-. ;_/\_
+  (  /` /_________\ `\  )
+  |  | |===========| |  |
+  |  | |           | |  |
+  |  | |  ,        | |  |
+  |  | ;_{_________; |  |
+  |  |/===`>========\|  |
+  |  ;-._<`________.-;  |
+  |  | |     U     | |  |
+ /   | |___________| |   \
+|                         |
+|jgs                      |
+'-------------------------'
+```
+
+=== ID: 0ba05350a365ba7d | TITLE: Westminster Abbey | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: buildings-and-places | SUBCATEGORY: monuments/other | SIZE: 31x17 ===
+```
+         ,   ,     ,   ,
+         A,|,A     A,,,A
+         |";"|     |";"|
+         T/"\T     T/"\T
+         ||#||     ||#||
+         |'='|  t  |'='|
+         |.=.| / \ |.=.|
+         |(e)|/,n,\|(o)|
+        =T==='"""""'===T=
+        ||/"\.o.=.o./"\||
+        |||H||/\T/\||H|||
+        |||H|||TTT|||H|||
+        ||/8\||TTT||/8\||
+   ...  ||/"\|;;:;;|/"\||
+;::::; |||T||;;;;;;.,:;:,.,.,.,
+;:::;;;||===| /:\ :T:Tn_n_T___n
+l42;::_||:::||;;;|||;;|;;|;;|;;
+```
+

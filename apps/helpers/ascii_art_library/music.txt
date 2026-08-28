@@ -1,0 +1,901 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: MUSIC
+# Total artworks in category fitting <=40 cols: 51
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 14c771cd0170ecd1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: pianos | SIZE: 11x4 ===
+```
+_______
+|_____|
+|=====|
+|--w--| kat
+```
+
+=== ID: f39452b337477168 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: pianos | SIZE: 11x4 ===
+```
+_______
+|__o__|
+|=^|^=|
+|-(I)-| kat
+```
+
+=== ID: f0359cd2f495159d | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: pianos | SIZE: 10x4 ===
+```
+   ___
+o  | |
+|^=| |
+I\,J-| kat
+```
+
+=== ID: 492628bcb426e3ea | TITLE: Untitled | ARTIST: llizard | CATEGORY: music | SUBCATEGORY: pianos | SIZE: 27x11 ===
+```
+            _____
+           | |   \
+           | |    \
+           | |     \___
+           | |         \
+           | |          \
+    0     _|_|___________|
+   /\/  /____|____________)
+. /  \_|__________________|
+|/__    | )(            )(
+| |\\  :| )(   ejm 97   )(
+```
+
+=== ID: 9d994802a060bfce | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 21x5 ===
+```
+    |~~~~~~~~~~~~~~~|
+    |~~~~~~~~~~~~~~~|
+    |               |
+/~~\|           /~~\|
+\__/            \__/
+```
+
+=== ID: dcb70260dd5776b0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 22x6 ===
+```
+             |\
+---|\--------|-\\-----
+---|/-------0---\|----
+--/|-------------|----
+-|-/-\----------0-----
+--\|/-----------------
+```
+
+=== ID: 4cb0e0ce3154238f | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 19x8 ===
+```
+        __________
+       1          1
+       1          1
+       1          1
+  ____ 1     ____ 1
+ /    \1    /    \1
+1      1   1      1
+ \____/     \____/
+```
+
+=== ID: 6c640382447f7269 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 9x11 ===
+```
+ ,
+ ;;
+ ;;
+ ;;
+ ;;
+ ;; .;;;,
+ ;;.'  ;;
+ ;;' .;'
+ ;;.;'
+ ;;'
+,'
+```
+
+=== ID: 919f7a7dbcfe2358 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 24x12 ===
+```
+     ;;;;;;;;;;;;;;;;;;;
+     ;;;;;;;;;;;;;;;;;;;
+     ;                 ;
+     ;                 ;
+     ;                 ;
+     ;                 ;
+     ;                 ;
+     ;                 ;
+     ;                 ;
+,;;;;;            ,;;;;;
+;;;;;;            ;;;;;;
+`;;;;'            `;;;;'
+```
+
+=== ID: 5591cb1103657bd8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 12x12 ===
+```
+     ;
+     ;;
+     ;';.
+     ;  ;;
+     ;   ;;
+     ;    ;;
+     ;    ;;
+     ;   ;'
+     ;  '
+,;;;,;
+;;;;;;
+`;;;;'
+```
+
+=== ID: 08285a93ebbb1cfe | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 25x13 ===
+```
+      |\          .
+      |/          |\
+------|-----------|/-----
+     /|           |
+----/-|----------/|------
+   / _|_        / |
+--/-/-|-\------/-_|_-----
+ ( (  |  \    / / | \
+--\-\_|)-/----\-\_|) )---
+   \__|_/      \__|_/
+------|-----------|------
+      |          \|
+    `-'
+```
+
+=== ID: 8c91bc1fb0d127cf | TITLE: Untitled | ARTIST: Ben Norwood | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 11x14 ===
+```
+      |\
+      | \
+      |  \
+      |   )
+      |  /
+mbfh _|.'
+   .' |
+  /   |_.
+ |  .'|  '.
+  \ * |   /
+   '._|_.'
+      |
+    * |
+    '.'
+```
+
+=== ID: b59b265061ed7a40 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 35x15 ===
+```
+        ..,,,,,..
+    .,;;;;;;;;;;;;;;,.
+  ,;;;'            `;;;;,       ,,
+ ,;'                 ';;;;,    ;;;;
+.;.;;;;,               ;;;;;.   ''
+;;;;;;;;                ;;;;;
+`;;;;;;'                ;;;;;
+                        ;;;;'   ,,
+                      .;;;;'   ;;;;
+                     ,;;;'      ''
+                   ,;;;'
+                ,;;;'
+            .;;;;'
+        .,;;;''
+    .,;;''
+```
+
+=== ID: 5f6c6187ca315894 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 10x16 ===
+```
+,;;;;,
+ ;;;;;;;
+ ;`::::'
+ ;,::::,
+ ;;;;;;;
+ ;`;;;;'
+ ;     ',
+ ;      ;;
+ ;      ;;
+ ;     ;;
+ ;    ;;
+ ;   ;;
+ ;  ;;
+ ; ;;
+ ;;
+ '
+```
+
+=== ID: a550fc516cce9881 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 35x28 ===
+```
+              .,,,.
+           .;;;;;;;;;,
+          ;;;'    `;;;,
+         ;;;'      `;;;
+         ;;;        ;;;
+         ;;;.      ;;;'
+         `;;;.    ;;;'
+          `;;;.  ;;;'
+           `;;',;;'
+            ,;;;'
+         ,;;;',;' ...,,,,...
+      ,;;;'    ,;;;;;;;;;;;;;;,
+   ,;;;'     ,;;;;;;;;;;;;;;;;;;,
+  ;;;;'     ;;;',,,   `';;;;;;;;;;
+ ;;;;,      ;;   ;;;     ';;;;;;;;;
+;;;;;;       '    ;;;      ';;;;;;;
+;;;;;;            .;;;      ;;;;;;;
+;;;;;;,            ;;;;     ;;;;;;'
+ ;;;;;;,            ;;;;   .;;;;;'
+  `;;;;;;,           ;;;; ,;;;;;'
+   `;;;;;;;,,,,,,,,,, ;;;; ;;;'
+      `;;;;;;;;;;;;;;; ;;;; '
+          ''''''''''''' ;;;.
+               .;;;.    `;;;.
+              ;;;; '     ;;;;
+              ;;;;,,,..,;;;;;
+              `;;;;;;;;;;;;;'
+                `;;;;;;;;;'
+```
+
+=== ID: f178afabcdc7f00f | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 26x30 ===
+```
+             ;I;
+             +It.
+             +II+
+             +III;
+             +IIII;
+             iIIIII;
+             titIIII;
+             I;.iIIII;
+            .I;  =IIII;
+            .I;   ;IIII:
+            .I;    :tIIt
+            .I;     .tII=
+            .I;      :III
+            :I;       +II;
+            :I;       .II=
+            :I:        iIi
+            :I.        ;Ii
+            ;I.        =I;
+            ;I.        tt
+            +I        ;I;
+            +I       ;I;
+            tI      ;I;
+     :;itIIIII     +t:
+   ;tIIIIIIIII   :t;
+ .tIIIIIIIIIIi  ;i.
+.tIIIIIIIIIII;.;:
+;IIIIIIIIIII;
+;IIIIIIIIIt;
+ ;tIIIIt+;
+   ....
+```
+
+=== ID: 5e66e6060eafb06c | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-notation | SIZE: 21x31 ===
+```
+       =IY;
+      XRVRRi
+     =Ri :RR
+     VR  ;RR
+     RY  tRY
+     RX ;RR;
+     tR=RRR
+     ;RRRR;
+     ;RRRi
+    ;RRRV
+   ;RRRRR:
+  :RRRV.RX
+  VRRR: ;R=
+ =RRR+   YRitti;.
+ VRRR  :YRRRRRRRRt.
+.RRRY ;RRYYR;;iRRRR.
+:RRRi RR; .Rt  .XRRY
+:RRR= RV   +R.  .RRR
+:RRRt tR    Rt   IRR.
+ RRRR  ;;   +R.  XRY
+ ;RRRt      .R+ +RR:
+  ;RRRX;     YRIRX:
+   .+RRRRIiitRRY;
+      :;+ii+;tR:
+             ;R:
+             iR
+    ;VRRi    Vi
+    RRRRR.  tR.
+    YRRR+ ;YV:
+    .tRRRRR+
+      .;;:
+```
+
+=== ID: 2d093be77703f2b2 | TITLE: Violin | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 15x3 ===
+```
+ /~(_)~\
+(  :=:  =====II
+ \_(~)_/
+```
+
+=== ID: 7d1566dea2500ff2 | TITLE: Drums | ARTIST: Alyssa | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 19x6 ===
+```
+======o     o======
+   ___________
+  |___________|
+   |\  /\  /\|
+   |_\/__\/__|
+  |___________| AH
+```
+
+=== ID: 49256a8b996875f8 | TITLE: Trumpet | ARTIST: Alyssa | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 36x7 ===
+```
+                     /|
+       =  =  =      / |
+  ____| || || |____/  | -_-_-_-_-_-_
+|)----| || || |____   |     AH
+  ((  | || || |  ))\  | _-_-_-_-_-_-
+   \\_|_||_||_|_//  \ |
+    \___________/    \|
+```
+
+=== ID: d32ae0097dd6eb33 | TITLE: Guitar | ARTIST: Harry Mason (Hajoma) | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 32x13 ===
+```
+                          ,
+                      ,   |
+   _,,._              |  0'
+ ,'     `.__,--.     0'
+/   .--.        |           ,,,
+| [=========|==|==|=|==|=|==___]
+\   "--"  __    |           '''
+ `._   _,'  `--'
+    ""'     ,   ,0     ,
+hjm         |)  |)   ,'|
+  ____     0'   '   | 0'
+  |  |             0'
+ 0' 0'
+```
+
+=== ID: 985672476ac83e08 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 17x22 ===
+```
+       ___
+     o|* *|o
+     o|* *|o
+     o|* *|o
+      \===/
+       |||
+       |||
+       |||
+       |||
+    ___|||___
+   /   |||   \
+  /    |||    \
+ |     |||     |
+  \   (|||)   /
+   |   |||   |
+  /    |||    \
+ /     |||     \
+/      |||      \
+|     [===]     |
+ \             /
+  '.         .'
+    '-------'
+```
+
+=== ID: bad3c6e18c0b81f5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 17x22 ===
+```
+       ___
+     o|* *|o
+     o|* *|o
+     o|* *|o
+      \===/
+       |||
+       |||
+       |||
+       |||
+    ___|||___
+   /   |||   \
+  /    |||    \
+ |     |||     |
+  \   (|||)   /
+   |   |||   |
+  /    |||    \
+ /     |||     \
+/      |||      \
+|     [===]     |
+ \             /
+  '.         .'
+    '-------'
+```
+
+=== ID: f0f257081e199427 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musical-instruments | SIZE: 37x41 ===
+```
+                  _,.,
+                ,'   ,'
+               /   ,'
+              /   ,
+             /   ,
+            /   '
+           /   ,'
+           '.__|
+            |  |
+            |__|
+            |  |
+            |__|
+            |  |
+            |__|
+            |  |
+            |__|
+            |, |
+            |--|
+            |__|
+            |  |
+            |--|
+            |__|
+            |__|        ,-.
+            |__|'     ,'  /
+       _,.-'     ',_,' o /
+      /     8888        /
+      |                /
+       1              /
+       `L   8888     /
+        |           /
+       /    ====    \
+      /     ____     \
+     /     (____)  o  \
+    /             o    \
+   /             o     ,'
+  /               _,.'^
+ /        __,.-"~^
+',,..--~~^        Ryan S.
+             Gibson Gothic Explorer
+             Limited Edition
+   (note the 12th fret moon and star)
+```
+
+=== ID: 3c54fab2cda7a3a3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: other | SIZE: 30x4 ===
+```
+    o    o_    >=O   o
+   <d-=  t`\u    Y   6-='
+   /\    |\ "   /|  /||v|
+(Bass)(Sax)(Trumpet)(Keyboard)
+```
+
+=== ID: f09093aacd2a0478 | TITLE: Phantom Mask | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: other | SIZE: 26x11 ===
+```
+         .,ad88888ba,.
+     .,ad8888888888888a,
+    d8P"""98888P"""98888b,
+    9b    d8888,    `9888B
+  ,d88aaa8888888b,,,d888P'
+ d8888888888888888888888b
+d888888P""98888888888888P
+88888P'    9888888888888
+`98P'       9888888888P'
+             `"9888P"'
+                `"'
+```
+
+=== ID: 189fcb0d6d86d50a | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pink-floyd | SIZE: 22x6 ===
+```
+        /\    ___---
+ ------/  \---
+ -----/    \---------
+-----/      \---___
+    /        \     ---
+   /__________\
+```
+
+=== ID: 724b6d3bc37bd6b2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pink-floyd | SIZE: 29x8 ===
+```
+          .
+         . .
+--------.   .--------
+       .     .\ Dark Side
+      .       . \ of the Moon
+     .         .  \
+    .           .   \
+   ...............
+```
+
+=== ID: 439f4807a8c49bfb | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pink-floyd | SIZE: 30x12 ===
+```
+    .------.       .------.
+   |      _  \   /  _      |
+   |    / _`._) (_.'_ \    |
+   |     (o) |   | (o)     |
+    \____    |   |    ____/
+   .'\     /_|   |_\     /`.
+   |  |   ' |     | `   |  |
+   |  |    /. . . .\    |  |
+   |.      \       /      .|
+   |_\______|     |______/_|
+
+PINK FLOYD * THE DIVISION BELL
+```
+
+=== ID: db9330f7ffc4a202 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/beatles | SIZE: 40x5 ===
+```
+////\\     //||\\     //\|\\      ///||\
+/`O-O'     ` @ @\     //o o//       a a
+   ]          >        ) | (         _)
+   -          -          -           ~
+ John        Paul      George      Ringo
+```
+
+=== ID: 42a96e51761d76f0 | TITLE: Untitled | ARTIST: Maria Pia | CATEGORY: music | SUBCATEGORY: musicians/beatles | SIZE: 36x7 ===
+```
+      /     |    \
+     /      |     \
+    /O   O  | O   O\
+   //|\ /|\  /|\ /|\\
+  /=/ \=/ \= / \=/ \=\
+ / ==  ==  ==  ==  == \
+/ ==   ==  ==  ==   == \   Maria Pia
+```
+
+=== ID: 77a24e1feb5b843d | TITLE: Go West | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pet-shop-boys | SIZE: 15x5 ===
+```
+ .---.   .---.
+:_>_Y_: :_>_Y_:
+ |___|   :. .:
+ ( - )   ( - )
+   -       -
+```
+
+=== ID: 41b4409b0324091b | TITLE: Discography | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pet-shop-boys | SIZE: 17x6 ===
+```
+   ___
+ _|___|_  .:::.
+  `o-o'   :.".:
+  ( - )   ( - )
+  _ - _   _ - _
+.'#-H-#`.'  Y  `.
+```
+
+=== ID: 2e86370f9e7e24e9 | TITLE: Can you forgive her? | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pet-shop-boys | SIZE: 14x8 ===
+```
+   A       A
+  J L     J L
+  YJY     YJY
+ JJY L   JJY L
+.YY_JY.  YY_JY
+|__n__|  :. .:
+ ( - )   ( - )
+   -       -
+```
+
+=== ID: e6f1b6a1191190e3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pet-shop-boys | SIZE: 40x9 ===
+```
+   .-"""""-.        .-""""-.
+ .'  > /\ / `.    .'  > /\  `.
+. \ / <  Y  / .  . \ / <  \ / .
+:__Y___>___<__:  :__Y___>__Y__:
+  |         |        '.  .`
+  `---------'      (        )
+   (  (_)  )            )
+      ___              __
+       -                         Go West
+```
+
+=== ID: dc4565427ab7a8dd | TITLE: Chris (circa Suburbia) | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/pet-shop-boys | SIZE: 25x13 ===
+```
+          _____
+        .'     `.
+        |       |
+        |.-----.|
+        .'`.-.'`.
+        `..' `..'
+        (  (_)  )
+           ___
+            -
+    _.==='-._.-`===._
+  .===================.
+ =======================
+:=======================:
+```
+
+=== ID: 2bb25d749719d5b5 | TITLE: Queensryche | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 14x4 ===
+```
+  _-~(/\)~-_
+ -_,-.<>.-._-
+`' .-~)(~-, `'
+      \/
+```
+
+=== ID: e080dca8b207414c | TITLE: Rolling Stones | ARTIST: David Riley | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 19x7 ===
+```
+         ,-.  ,-.
+       ,',-,`'_  \
+      < <,' `' `; >
+       `/      (,'
+       (       ;
+        `-,.,-'
+David Riley
+```
+
+=== ID: bc9f366e54aa71f3 | TITLE: KISS | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 25x7 ===
+```
+ _   _   _     _      _
+| | / / | |   / /    / /
+| |/ /  | |  / /__  / /__
+|   /   | | /__  / /__  /
+|   \   | |   / /    / /
+| |\ \  | |  / /    / /
+|_| \_\ |_| /_/    /_/
+```
+
+=== ID: b5e9fe218c03ece6 | TITLE: Biohazard | ARTIST: Henry Segerman | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 16x8 ===
+```
+    /    \
+   J      L
+    \,--./
+  __/`--'\__
+,' J`\  /'L `.
+    \ || /
+     J--L
+  --"    "--  hs
+```
+
+=== ID: dcb3d0b3111fbe51 | TITLE: Van halen | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 25x8 ===
+```
+        _____  __
+ccccc\      / /    /ccccc
+ ccccc\    / /___ /ccccc
+  ccccc\  / /    /ccccc
+        \/ /    /
+          /    /
+              /
+             /
+```
+
+=== ID: 809391ec5682608b | TITLE: Rammstein | ARTIST: Peter Punk | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 27x9 ===
+```
+    ______
+   |      |
+ __|__    |__
+|     |      |
+|     |      |
+|     \      |
+|__|\__\   __|
+   |      |
+   |______|      Peter Punk
+```
+
+=== ID: 9bf7d7df069b0900 | TITLE: Dream Theater | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 39x18 ===
+```
+               .........
+             .uue$$$$$Nou.
+     ^$$$$$$#"   '$$$E   `"*$$$$$"
+      d$$F       '$$$E       '9$NL
+    d$$$$$       '$$$E       J$$$$$L
+  :$$F'$$$$      <$$$N      :$$$E'$$&
+ :$$F '$E'$$    :$$$$$N    :$$'$E '$$B
+ $$$  '$E '$$  :$$$$$$$N  :$$ '$E  `$$k
+X$$F  '$E  '$$:$$`$$$E"$N:$$  '$E   $$$
+9$$>  '$E   '$$$ '$$$E "$$$   '$E   9$$
+9$$>  '$E   :$$N '$$$E :$$N   '$E   $$$
+'$$E  '$E  :$$"$N'$$$E:$$"$N  '$E  :$$E
+ 4$$> '$E  $$  `$$$$$N$$  ?$B '$E  9$$
+  #$$>'$E $$    `$$$$$$    ?$B'$E d$$
+   "$$i$B$$      `$$$$      ?$$$&@$R
+     "$$$$       '$$$E       ?$$$$`
+    .z$$$$Nu     '$$$E     .z$$$$NL
+           ^"*$$W@$$$$b@$*#"
+```
+
+=== ID: b45ac71208b9aa01 | TITLE: Crass | ARTIST: David Riley | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 39x22 ===
+```
+              _........._
+          .e*"""@"""""@"""*e.
+       .e"      @     @      "e.
+     .@"        @     @     .@""@.
+    dP       _o*@     @   .@"    "@.
+   @"     .*"   @     @ .@"       "@.
+  @"    .@"     @     @;"          "@.
+ @F    .@       @   .@"     .'*.    "@
+d@_____@________@ .@"     .@___@_____@b
+@@              @;"     .@"          @@
+@*            .@"     .@"            @@
+q@__________.@"     .@_______________@P
+ @"    @  .@"     .@" @        @     @"
+ "b    `*@"     .@"   @       d"    dP
+  *c          .@@     @     ,e"    e@
+   *b       .@" @     @   e;"     e@
+    "@.   .@"   @     @*`"      .@"
+      "@e@"     @     @       .d*
+        "*b.    @     @     .d*
+            "*e.@_____@_,e;*"
+               `""""""'''
+   by David Riley
+```
+
+=== ID: b54054111972d069 | TITLE: Frank Zappa | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 38x24 ===
+```
+             8888888888888
+          88888o8888888o88888
+        888o88888888o8888o88888
+      888888888888o88888888888888
+     8888o88             888888888
+    88888888             88888o888
+    8888888              888888o888
+   888888                 8o8888888
+  88 888 ,*8888o, ,o8888*, 8888 88 8
+ 8888888 '`(0))`~ ~`((0)`' 8888888 8
+ 8888888l  `'` `; ;` `'`   88888888 8
+  88 8888       ; d;       8888888 88
+  8888888       ( 7,       8888 888  8
+ 88888888      @@@@@@      888888888 8
+ 8 88888o   ,@@@@@@@@@, , o8888888  88
+88888888`o  @@;~^~^~;@@ 0;`8 8888888
+8888 88 8`v    `@@@`    o`88888 888 8
+88888888  `;,        ,;o`8 88888888 8
+ 8 8888     `o,  ,;,;o` 888888 88 8
+ 8888 88      ``'''`     88 8888888 8
+88888888                  8 8888 8888
+8888888                    88  888888
+                                888888
+                                888888
+```
+
+=== ID: 310ad7a7713b3730 | TITLE: Grateful Dead | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/other | SIZE: 38x27 ===
+```
+                ......
+          .,;;##########::,.
+       .;##''       ,/|  ``##;.
+     .;#'         ,/##|__    `#;.
+   .;#'          /######/'     `#;.
+  ;#'             ,/##/__        `#;
+ ;#'            ,/######/'        `#;
+;#'            /######/'           `#;
+;#'             ,/##/___           `#;
+;#            ,/#######/'           #;
+;#           /#######/'             #;
+;#             ,/##/__              #;
+`#;          ,/######/'            ;#'
+`#;.        /######/'             ,;#'
+ `#;.        ,/##/__             ,;#'
+  `#;.      /######/'           ,;#'
+    ##;_      |##/'           _;##
+    :#`-;#;...|/'       ...;#;-'#:
+    :`__ `-#### __  __ ####-' __':
+    :  ``------.. `' ..------''  :
+    `.. `--------`..'--------' ..'
+      :                        :
+      `:..      /:  :\      ..:'
+         `.     ::  ::     .'
+          #.              .#
+          `'##;##;##;##;##`'
+            `' `' `' `' `'
+```
+
+=== ID: 6d0fa270d8f89e0e | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: music | SUBCATEGORY: musicians/elvis-presley | SIZE: 18x9 ===
+```
+       G   __
+       \\  ,,)_
+        \'-\( /
+          \ | ,\
+           \|_/\\
+           / _ '.D
+          / / \ |
+         /_\  /_\
+snd     '-    '-
+```
+
+=== ID: a8779e42dfc737af | TITLE: A little Elvis :) | ARTIST: Shanaka Dias | CATEGORY: music | SUBCATEGORY: musicians/elvis-presley | SIZE: 11x9 ===
+```
+G   __
+\\  ,,)_
+ \'-\( /
+   \ | ,\
+    \|_/\\
+    / _ '.D
+   / / \ |
+  /_\  |_\
+  '-    '-
+```
+
+=== ID: e907cc57c7d48d6e | TITLE: Later in life ;) | ARTIST: Shanaka Dias | CATEGORY: music | SUBCATEGORY: musicians/elvis-presley | SIZE: 12x9 ===
+```
+G   __
+|\  ,,)_
+\ '-(/ /__
+ \  |   _ \
+  '(_|__)\ |
+   /    \ D
+  /  /\  \
+ /__\  |__\
+  '--    '--
+```
+
+=== ID: 6d1b54ccecf57345 | TITLE: Untitled | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/elvis-presley | SIZE: 27x24 ===
+```
+             ((~
+         ,))))))),
+         )))'`')))
+         (( ',' ))
+          {; = ;}
+     \\\  /`'v'`\  ///
+      /''`\_/o\_/`''\
+     /ooo    |    ooo\
+    /===/    |    \===\
+   /ooo/     |     \ooo\
+  /===(      |      )===\
+ /ooooo\_____|_____/ooooo\
+/_______\===(E)===/_______\
+   (()(~~~~~~~~~~~~~)())
+       \           /
+       |    /^\    |
+       |oooo| |oooo|
+       |====| |====|
+       )oooo| |oooo(
+      /=====| |=====\
+     /oooooo| |oooooo\
+    /_______| |_______\
+        (__)   (__)
+         ~~     ~~
+```
+
+=== ID: db6c3da189354b4e | TITLE: Untitled | ARTIST: Marc Schmitz | CATEGORY: music | SUBCATEGORY: musicians/marilyn-manson | SIZE: 33x76 ===
+```
+                   ___
+                __/   \__
+               /      /  \
+              /      /    |
+             |   ___|_     \
+             |  /     \     |
+             / |       |    |
+            |  |       |    |
+            |  /        \   |
+            | |          |   \
+            / |          |   |
+           |  |\__    __/|   |
+           |  |\##\  /##/|   |
+           |  | \#o||o#/ |   |
+           |  |  \#||#/  |   |
+           \   \        /    |
+            |  |   VV   |    |
+            |  |        |    |
+            |  \       /     |
+            |   \ -=- /      |
+        ____|   |     |_     |
+       /    \___|     | \    |
+      |          \___/   \   |
+      /                   \__|
+     |                        \
+     |                         \
+     |                          |
+     | |                        |
+     | |                        |
+     | |                        |
+     | |                        |
+     | /                   __   |
+      /                    ||   |
+     |                     //   /
+     |                    ||   |
+      \____/      |       ||   |
+      | |         |       /|   |
+      | |         \      / |   |
+      | |          \____/  |   /
+      | |                  |  |
+      | |                  /  |
+      | \                 |   |
+      |  |                |   |
+      |  |                |   |
+      |  |                |   |
+      |  |                |   |
+      /  |                |   |
+     |   /                |   |
+     |  |                 \   |
+    /   |                  |  |
+   |   //                  |  |
+   |  ||                   |  |
+   /  ||                   |  |
+  /  / | _               _ |  |
+ |  /  /  \             /  |  |
+ |  | |    \           /   |  |
+ /  | |     \         /    |  |
+|   / |                    |  |
+|  |  |                    |  |
+|  |  |                    |  |
+|  |  |       \_____/      |  \
+|  |  |         | |        |   |
+|  \  \         / \        |   |
+| |\\  |        | |        |   |
+| \    |        | |        /   |
+ \_\   |        | |       |    |
+       |        | |       | _  |
+       |        | |       || | |
+       |        | |       \| | |
+       |        | |       |  | |
+       |        | |       |  |/
+       |        / \       |
+       |       |   |      |
+       |       |   |      |
+       |       |   |      |
+       |       |   | MEPH.|
+```
+

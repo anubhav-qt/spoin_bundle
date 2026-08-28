@@ -852,70 +852,15 @@ body {
   text-transform: uppercase;
 }
 
-/* -- archetype teasers (ADR-0017): the collapsed-state preview when a card
-   has a code/diagram/comparison tag, in place of the plain summary line. */
+/* -- archetype teasers (ADR-0017) -----------------------------------------
+   Only the comparison teaser survives here. A code/diagram/art card's
+   collapsed preview is no longer a one-line stand-in for its block: the
+   block itself now leads the card at full height, collapsed and expanded
+   alike, and is suppressed from the body render so it appears exactly once
+   (see `HeroVisual`/`resolveHero` in Card.tsx). A comparison keeps a badge
+   because its content IS the body — there is no standalone block to lift. */
 .card-teaser {
   margin: 0 0 10px;
-}
-
-.card-teaser-code {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: var(--bg-3);
-  overflow: hidden;
-}
-
-.card-teaser-badge {
-  flex: 0 0 auto;
-  font-size: 9.5px;
-  letter-spacing: 0.06em;
-  color: var(--fg-3);
-}
-
-.card-teaser-line {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: 12.5px;
-  color: var(--accent-syntax);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-teaser-diagram {
-  font-size: 12.5px;
-  color: var(--fg-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-teaser-comparison {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* combo teaser (code + diagram both present) */
-.card-teaser-combo {
-  display: flex;
-  flex-direction: column;
-  margin: 0 0 10px;
-}
-.card-teaser-combo .card-teaser-code { margin: 0; border-radius: 8px 8px 0 0; }
-.card-teaser-combo-divider {
-  height: 1px;
-  margin: 0 10px;
-  background: repeating-linear-gradient(to right, var(--line-strong) 0, var(--line-strong) 4px, transparent 4px, transparent 8px);
-}
-.card-teaser-combo .card-teaser-diagram {
-  margin: 0;
-  padding: 6px 10px;
-  background: color-mix(in srgb, var(--fg) 4%, var(--bg-3));
-  border-radius: 0 0 8px 8px;
 }
 
 /* minimal "myth vs fact" comparison teaser */
@@ -936,23 +881,6 @@ body {
 .comparison-badge-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; }
 .comparison-badge-dots i:first-child { background: color-mix(in srgb, var(--accent) 75%, var(--bg-3)); }
 .comparison-badge-dots i:last-child { background: var(--good); }
-
-.teaser-tag {
-  padding: 4px 9px;
-  border-radius: var(--r-pill);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.teaser-tag[data-tone="bad"] {
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg-3));
-  color: var(--fg-2);
-}
-
-.teaser-tag[data-tone="good"] {
-  background: color-mix(in srgb, var(--good) 15%, var(--bg-3));
-  color: var(--fg-2);
-}
 
 /* ASCII scene (ADR-0021 / free-form generation testing branch) — sits right
    after `.card-title`, where `.card-summary`/`.card-teaser` normally go,
@@ -976,13 +904,11 @@ body {
   line-height: 1.4;
   white-space: pre;
   color: var(--fg-2);
-  text-align: center;
-}
-
-/* Diagram cards reuse .card-ascii's box treatment (ADR-0021's "the preview
-   IS the collapsed hook" idiom) but left-align, since box-drawn diagrams
-   read as structure, not as centered artwork. */
-.card-diagram-art pre {
+  /* Never centered. Every scene, diagram and table in the corpus is drawn
+     against a left margin — the generator lines up arrows, box edges and
+     columns relative to column 0, so centering the block re-aligns art that
+     was already aligned and breaks anything wider than the box asymmetrically.
+     The lead render shows the source as drawn. */
   text-align: left;
 }
 
@@ -1267,13 +1193,20 @@ body {
 
 /* -- code blocks (ADR-0017) --------------------------------------------- */
 
+/* The horizontal scroll lives on the `pre`, NOT on this container.
+   With `overflow-x` here, `.code-block-head` was a block child of the scroll
+   box: it sized itself to the VISIBLE width, then slid left along with the
+   code when the box was scrolled — so its `border-bottom` detached from the
+   right edge and the head's own controls wandered off screen. Scrolling only
+   the `pre` keeps the head pinned to the box while the content moves under
+   it. `overflow: hidden` is still needed for the corner radius to clip. */
 .code-block {
   position: relative;
   margin: 0 0 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--bg-3);
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 .code-block-head {
@@ -1364,6 +1297,7 @@ body {
   padding: 10px 12px;
   display: flex;
   gap: 12px;
+  overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.6;
@@ -1399,14 +1333,15 @@ body {
 
 /* -- diagram blocks (ADR-0017) -------------------------------------------
    `white-space: pre` and `overflow-x: auto` rather than wrapping — a wrapped
-   box-drawing diagram is corrupted, not just reflowed. */
+   box-drawing diagram is corrupted, not just reflowed. The scroll lives on
+   the `pre`, not here; see the note on `.code-block` for why. */
 .diagram-block {
   position: relative;
   margin: 0 0 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 .diagram-block-head {
@@ -1421,11 +1356,54 @@ body {
 .diagram-block pre {
   margin: 0;
   padding: 12px 14px;
+  overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.5;
   white-space: pre;
+  text-align: left;
   color: var(--fg-2);
+}
+
+/* -- mermaid diagrams ------------------------------------------------------
+   Rendered client-side from a ```mermaid fence (see MermaidBlock.tsx), which
+   replaced hand-drawn ASCII box art for connective diagrams. Unlike the ASCII
+   box above there is nothing to scroll horizontally in the normal case:
+   mermaid is told `useMaxWidth`, so the SVG scales to the card instead of
+   overflowing it. The overflow guard stays for the diagrams that genuinely
+   cannot shrink further (a wide sequence diagram), and they scroll inside the
+   block rather than widening the card. */
+.mermaid-block {
+  padding: 10px 12px 12px;
+  overflow-x: auto;
+}
+
+.mermaid-block-svg svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Mermaid emits its own inline font-family on text nodes; the palette's mono
+   face has to win so a diagram doesn't read in a different typeface from the
+   code block six lines below it. */
+.mermaid-block-svg svg text,
+.mermaid-block-svg svg .nodeLabel,
+.mermaid-block-svg svg .edgeLabel {
+  font-family: var(--font-mono) !important;
+}
+
+.mermaid-block-loading {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--fg-3);
+}
+
+.diagram-block-mermaid {
+  background: color-mix(in srgb, var(--fg) 3%, var(--bg-2));
 }
 
 /* -- comparison pairs (ADR-0017) ------------------------------------------ */
@@ -1436,10 +1414,17 @@ body {
   margin: 12px 0;
 }
 
+/* Label ABOVE its section, not beside it. Side by side, the badge took a
+   fixed ~90px out of every line of the claim and the text reflowed into a
+   narrow column beside it — on a phone that cost roughly a quarter of the
+   card's width for the whole height of the block, for a two-word label.
+   Stacked, the claim gets the full measure and the label still reads as the
+   section's heading. */
 .comparison-row {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 6px;
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 14.5px;
@@ -1468,7 +1453,6 @@ body {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-top: 1px;
 }
 
 .comparison-tone-badge[data-tone="bad"] {
@@ -1490,7 +1474,7 @@ body {
 }
 
 .comparison-content {
-  flex: 1 1 auto;
+  align-self: stretch;
   min-width: 0;
   color: var(--fg);
 }
@@ -3057,7 +3041,14 @@ body.custom-cursor-active textarea {
   color: var(--accent);
 }
 
+/* Quieter than "Follow", but still plainly a button — it now says "Unfollow"
+   and acts, where it used to be an inert 0.5-opacity "Following" label. */
 .discover-follow-btn[data-followed="true"] {
+  border-color: var(--line);
+  color: var(--fg-3);
+}
+
+.discover-follow-btn:disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -6212,6 +6203,9 @@ body.custom-cursor-active textarea {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  /* Also worn by an <a> (Profile's guest "SIGN UP"), so the underline has to
+     go here rather than at each call site. */
+  text-decoration: none;
   cursor: pointer;
   transition:
     background var(--dur-1) var(--ease),
@@ -6232,6 +6226,21 @@ body.custom-cursor-active textarea {
 .collection-action:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* Reads as an exit, not as a destructive action — it ends a session, it
+   doesn't delete anything. Quiet until hovered, where --accent confirms what
+   it is before the click lands. */
+.collection-action-danger {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--fg-2);
+}
+
+.collection-action-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .collection-action-quiet {
@@ -6688,6 +6697,7 @@ body.custom-cursor-active textarea {
 
 .profile-identity-actions {
   flex-direction: row;
+  flex-wrap: wrap;
   margin-top: -6px;
 }
 

@@ -128,7 +128,7 @@ class CardPlan(BaseModel):
     #: it doesn't recognise, falls back to the type it asked for.
     card_type: str
     #: What the card's non-prose asset should actually depict -- the scene a
-    #: stickman gag should stage, what the diagram's boxes and arrows are, what
+    #: ascii gag should stage, what the diagram's nodes and edges are, what
     #: the code block should demonstrate. Empty for a card whose type carries no
     #: asset (`prose`).
     asset_direction: str = ""

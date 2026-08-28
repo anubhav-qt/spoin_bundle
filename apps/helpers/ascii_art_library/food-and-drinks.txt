@@ -1,0 +1,775 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: FOOD-AND-DRINKS
+# Total artworks in category fitting <=40 cols: 53
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 0fcf3816bc37f9a4 | TITLE: Grapes | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 6x5 ===
+```
+  \
+ ()()
+()()()
+ ()()
+  ()
+```
+
+=== ID: 3504547cf20184a1 | TITLE: Pizza | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 18x5 ===
+```
+// ""--.._
+||  (_)  _ "-._
+||    _ (_)    '-.
+||   (_)   __..-'
+ \\__..--""
+```
+
+=== ID: a0feebc06bb9f439 | TITLE: Egg | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 13x5 ===
+```
+  ,'"`.
+ /     \
+:       :
+:       :
+ `.___,'  hjw
+```
+
+=== ID: 29b1f8abc9d52689 | TITLE: Eggs | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 27x5 ===
+```
+  ,-""""-.     ,'"`.
+ /        `.  /     \
+|           );       :
+ \        ,' :       ;
+  `-....-'    `.___,'   hjw
+```
+
+=== ID: c245477a6beea63e | TITLE: Gingerbread man | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 12x5 ===
+```
+   ,-.
+ _(*_*)_
+(_  o  _)
+  / o \
+ (_/ \_) hjw
+```
+
+=== ID: 56c871fb85764566 | TITLE: Untitled | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 38x6 ===
+```
+Peanut:  Acorn:    Coconut:  Chestnut:
+ ,+.      ,=|=.     ,+.       ,-"-.
+((|))    (XXXXX)   //|\\     / ,-. \
+ )|(      |   |    |||||     |(:::)|
+((|))     \   /    \\|//     \ `-' /
+ `-'       `+'      `+'       `-.-'
+```
+
+=== ID: 67c53d122d6796fe | TITLE: Cake | ARTIST: Matthew Thomas | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 19x6 ===
+```
+      $$  $$  $$
+    __||__||__||__
+   | * * * * * * *|
+   |* * * * * * * |
+MT | * * * * * * *|
+   |______________|
+```
+
+=== ID: ed0bc272ace229c9 | TITLE: Pineapple | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 17x6 ===
+```
+          \||/
+          \||/
+        .<><><>.
+       .<><><><>.
+       '<><><><>'
+jgs     '<><><>'
+```
+
+=== ID: 36c9a0a24ad3ff67 | TITLE: Carrot | ARTIST: Riitta Rasimus | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 5x6 ===
+```
+  \/_
+ _/
+(,;)
+(,.)
+(,/
+|/
+```
+
+=== ID: af385a2d68b04f1e | TITLE: Pie | ARTIST: Riitta Rasimus | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 21x6 ===
+```
+         (
+          )
+     __..---..__
+ ,-='  /  |  \  `=-.
+:--..___________..--;
+ \.,_____________,./
+```
+
+=== ID: efff4b2e3b9892f7 | TITLE: Cheese | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 17x7 ===
+```
+          ___
+        .'o O'-._
+       / O o_.-`|
+      /O_.-'  O |
+      | o   o .-`
+jgs   |o O_.-'
+      '--`
+```
+
+=== ID: 3e283fe628ba5d94 | TITLE: Wok | ARTIST: Glory Py Yip (Glory Moon) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 37x9 ===
+```
+ __       ___,.-------..__        __
+//\\ _,-''                `'--._ //\\
+\\ ;'                           `: //
+ `(                               )'
+   :.                           ,;
+    `.`--.___           ___.--','
+      `.     ``-------''     ,'
+         -.               ,-
+      gpyy  `-._______.-'
+```
+
+=== ID: 8be79cb7eb054edd | TITLE: Acorn | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 17x10 ===
+```
+          _
+        _/-\_
+     .-`-:-:-`-.
+    /-:-:-:-:-:-\
+    \:-:-:-:-:-:/
+     |`       `|
+     |         |
+jgs  `\       /'
+       `-._.-'
+          `
+```
+
+=== ID: 41f1841ff61fb0cd | TITLE: Grapes | ARTIST: H P Barmario (Morfina) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 21x10 ===
+```
+   _         )).
+,))-._--__.-))
+   .-.||.  ..
+  (°  )'°)(° )
+   '-'_)(° ). )
+   (_ .-.''_ )_
+  (° (°  )° )  '))
+   '' '-'.-'.-.
+   mrf(°  )(.° ). _
+   ____'_'(__)'__)_).
+```
+
+=== ID: 33a13d1ecff749d4 | TITLE: Untitled | ARTIST: Glory Py Yip (Glory Moon) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 37x11 ===
+```
+    (\
+     \ \
+ __    \/ ___,.-------..__        __
+//\\ _,-'\\               `'--._ //\\
+\\ ;'      \\                   `: //
+ `(          \\                   )'
+   :.          \\,----,         ,;
+    `.`--.___   (    /  ___.--','
+      `.     ``-----'-''     ,'
+         -.               ,-
+      gpyy  `-._______.-'
+```
+
+=== ID: 0e2dc1194d7d3053 | TITLE: Pizza or dartboard? | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 23x12 ===
+```
+        _....._
+    _.:`.--|--.`:._
+  .: .'\o  | o /'. '.
+ // '.  \ o|  /  o '.\
+//'._o'. \ |o/ o_.-'o\\
+|| o '-.'.\|/.-' o   ||
+||--o--o-->|<o-----o-||
+\\  o _.-'/|\'-._o  o//
+ \\.-'  o/ |o\ o '-.//
+  '.'.o / o|  \ o.'.'
+    `-:/.__|__o\:-'
+       `"--=--"`
+```
+
+=== ID: 4b5e22c8caec5821 | TITLE: Untitled | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 23x14 ===
+```
+            _
+        /> //  __
+    ___/ \// _/ /
+  ,' , \_/ \/ _/__
+ /    _/ |--\  `  `~,
+' , ,/  /`\ / `  `   `,
+|    |  |  \> `  `  ` |
+|  ,  \/ ' '    `  `  /
+`,   '  '    ' `  '  /
+  \ `      '  ' ,  ,'
+   \ ` ` '    ,  ,/
+    `,  `  '  , ,'
+      \ `  ,   /
+       `~----~'
+```
+
+=== ID: 17fed6f349e25bbb | TITLE: Grapes with wine glasses | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 26x14 ===
+```
+     __
+ __ {_/
+ \_}\\ _
+    _\(_)_
+   (_)_)(_)_
+  (_)(_)_)(_)
+   (_)(_))_)  ____
+    (_(_(_)  |    |  ____
+     (_)_)   |~~~~| |    |
+jgs   (_)    '-..-' |~~~~|
+               ||   '-..-'
+              _||_    ||
+             `""""`  _||_
+                    `""""`
+```
+
+=== ID: 6034c6dc57d60fd3 | TITLE: Milk | ARTIST: Elissa Potier | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 15x17 ===
+```
+   _________
+  | _______ |
+ / \         \
+/___\_________\
+|   | \       |
+|   |  \      |
+|   |   \     |
+|   | M  \    |
+|   |     \   |
+|   |\  I  \  |
+|   | \     \ |
+|   |  \  L  \|
+|   |   \     |
+|   |    \  K |
+|   |     \   |
+|   |      \  |
+|___|_______\_|
+```
+
+=== ID: 9282f06d3e18e1f6 | TITLE: A piece of cake | ARTIST: Veronica Karlsson | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 31x18 ===
+```
+                   .
+                  / `.
+                .'... `-.
+              .'.. .   ..\
+             /. . . .   ..`.
+            /...  ... .    .\
+           /.. . ........   .\
+VK       .'.   ...   ......  .|
+       .' ... . ..... . ..--'.|
+     .' ...  ...   ._.--'    .|
+   .'... . ...  _.-'O   OO O .|
+  /... .___.---'O OO .O. OO O.|
+ /__.--' OO O  .OO O  OO O ...|
+ | OO OO O OO . .O. OO O  ..O.|
+ (O. OO. .O O O O  OO  ..OO O.|
+ ( OO .O. O  O  OO............|
+ (OOO........O_______.-------'
+ |_____.-----'
+```
+
+=== ID: 12b7a4ac05867c24 | TITLE: Untitled | ARTIST: David Palmer | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 31x21 ===
+```
+                d888P
+      d8b d8888P:::P
+    d:::888b::::::P
+   d:::dP8888b:d8P
+  d:::dP 88b  Yb   .d8888b.
+ d::::P  88Yb  Yb .P::::::Y8b
+ 8:::8   88`Yb  YbP::::   :::b
+ 8:::P   88 `8   8!:::::::::::b
+ 8:dP    88  Yb d!!!::::::::::8
+ 8P    ..88   Yb8!!!::::::::::P
+  .d8:::::Yb  d888VKb:!:!::!:8
+ d::::::  ::dP:::::::::b!!!!8
+8!!::::::::P::::::::::::b!8P
+8:!!::::::d::::::: ::::::b
+8:!:::::::8!:::::::  ::::8
+8:!!!:::::8!:::::::::::::8
+Yb:!!:::::8!!::::::::::::8
+ 8b:!!!:!!8!!!:!:::::!!:dP
+  `8b:!!!:Yb!!!!:::::!d88
+      """  Y88!!!!!!!d8P
+              """""""
+```
+
+=== ID: 0ad50a4dbd885d05 | TITLE: Cherries | ARTIST: Veronica Karlsson | CATEGORY: food-and-drinks | SUBCATEGORY: other | SIZE: 31x21 ===
+```
+                d888P
+      d8b d8888P:::P
+    d:::888b::::::P
+   d:::dP8888b:d8P
+  d:::dP 88b  Yb   .d8888b.
+ d::::P  88Yb  Yb .P::::::Y8b
+ 8:::8   88`Yb  YbP::::   :::b
+ 8:::P   88 `8   8!:::::::::::b
+ 8:dP    88  Yb d!!!::::::::::8
+ 8P    ..88   Yb8!!!::::::::::P
+  .d8:::::Yb  d888VKb:!:!::!:8
+ d::::::  ::dP:::::::::b!!!!8
+8!!::::::::P::::::::::::b!8P
+8:!!::::::d::::::: ::::::b
+8:!:::::::8!:::::::  ::::8
+8:!!!:::::8!:::::::::::::8
+Yb:!!:::::8!!::::::::::::8
+ 8b:!!!:!!8!!!:!:::::!!:dP
+  `8b:!!!:Yb!!!!:::::!d88
+ VK   """  Y88!!!!!!!d8P
+              """""""
+```
+
+=== ID: 9c9e45300cf16b13 | TITLE: Candy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: candies | SIZE: 24x6 ===
+```
+___      .-""-.      ___
+\  "-.  /      \  .-"  /
+ > -=.\/        \/.=- <
+ > -='/\        /\'=- <
+/__.-'  \      /  '-.__\
+  jgs    '-..-'
+```
+
+=== ID: e068baea9c381e31 | TITLE: Bubble gum machine | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: candies | SIZE: 17x10 ===
+```
+         ___
+      .-Ooo0O-.
+     /.o0O0o0O0\
+    |:o0O0ooO0o0|
+    |:ooOo0o0oOo|
+     \.oOoo0o0O/
+      /`'O0o''\
+jgs  /   (_)   \
+    (`-.,___,.-')
+     `-.,___,.-'
+```
+
+=== ID: e2bb3c6308260a8e | TITLE: Candy canes | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: candies | SIZE: 25x13 ===
+```
+                _..._
+              .'\\ //`,
+             /\\.'``'.=",
+            / \/     ;==|
+           /\\/    .'\`,`
+          / \/     `""`
+         /\\/
+        /\\/
+jgs    /\ /
+      /\\/
+     /`\/
+     \\/
+      `
+```
+
+=== ID: 8439dfd7b030f9c2 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: apples | SIZE: 18x5 ===
+```
+  ,--./,-.
+ / #      \
+|          |
+ \        /    hjw
+  `._,._,'
+```
+
+=== ID: 0f28f41b68941356 | TITLE: Apple core | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: apples | SIZE: 15x5 ===
+```
+ ,--./,-.
+/,-._.--~\
+ __}  {
+\`-._,-`-,
+ `._,._,'   hjw
+```
+
+=== ID: 8b3fbae7931ff21f | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: food-and-drinks | SUBCATEGORY: apples | SIZE: 19x6 ===
+```
+      _        ,..
+ ,--._\\_.--, (-00)
+; #         _:(  -)
+:          (_____/
+:            :
+ '.___..___.`dwb
+```
+
+=== ID: 40a90dfc67686350 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: apples | SIZE: 36x22 ===
+```
+                             ___
+                          _/`.-'`.
+                _      _/` .  _.'
+       ..:::::.(_)   /` _.'_./
+     .oooooooooo\ \o/.-'__.'o.
+    .ooooooooo`._\_|_.'`oooooob.
+  .ooooooooooooooooooooo&&oooooob.
+ .oooooooooooooooooooo&@@@@@@oooob.
+.ooooooooooooooooooooooo&&@@@@@ooob.
+doooooooooooooooooooooooooo&@@@@ooob
+doooooooooooooooooooooooooo&@@@oooob
+dooooooooooooooooooooooooo&@@@ooooob
+dooooooooooooooooooooooooo&@@oooooob
+`dooooooooooooooooooooooooo&@ooooob'
+ `doooooooooooooooooooooooooooooob'
+  `doooooooooooooooooooooooooooob'
+   `doooooooooooooooooooooooooob'
+    `doooooooooooooooooooooooob'
+     `doooooooooooooooooooooob'
+jgs   `dooooooooobodoooooooob'
+       `doooooooob dooooooob'
+         `"""""""' `""""""'
+```
+
+=== ID: 3b9321c84c0a547a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 26x8 ===
+```
+    _____
+   /.---.\
+   |`````|
+   \     /
+    `-.-'           ____
+      |    /\     .'   /\
+    __|__  |K----;    |  |
+jgs`-----` \/     '.___\/
+```
+
+=== ID: 4147cc9f23329420 | TITLE: Untitled | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 12x10 ===
+```
+    .
+ |^ .
+\O___.____ /
+  \   .  /
+    \ ,/
+     []
+     []
+     []
+  --------
+  Chuckles
+```
+
+=== ID: 1aec70fd023b8180 | TITLE: Untitled | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 7x11 ===
+```
+   .
+  .
+ . .
+  ...
+\~~~~~/
+ \   /
+  \ /
+   V
+   |
+   |
+  ---
+```
+
+=== ID: ae6e5b9879506445 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 18x13 ===
+```
+  _
+ {_}
+ |(|
+ |=|
+/   \
+|.--|
+||  |
+||  |    .    ' .
+|'--|  '     \~~~/
+'-=-' \~~~/   \_/
+       \_/     Y
+        Y     _|_
+jgs    _|_
+```
+
+=== ID: 1fda517f8fae7d8c | TITLE: Untitled | ARTIST: Elissa Potier | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 14x14 ===
+```
+ ____________
+<____________>
+|            |
+|            |
+|            |
+ \          /
+  \________/
+      ||
+      ||
+      ||
+      ||
+   ___||___
+  /   ||   \
+  \________/
+```
+
+=== ID: f9c9a34d3d74b143 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 38x14 ===
+```
+ _..--""````""--.._
+(_                _;..--""````""--.._
+\ ```"""----"""```(_                _)
+ '-.            .-\ ```"""----"""``` /
+    `\        /`   '-.            .-'
+      '-.__.-'        `\        /`
+         ||             '-.__.-'
+         ||                ||
+         ||                ||
+         ||                ||
+jgs _..--||--.._           ||
+   (_          _)     _..--||--.._
+     ```""""```      (_          _)
+                       ```""""```
+```
+
+=== ID: eb4977b4eb85f959 | TITLE: Bottle and glasses | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 40x19 ===
+```
+                           (
+*                           )   *
+              )     *      (
+    )        (                   (
+   (          )     (             )
+    )    *           )        )  (
+   (                (        (      *
+    )          H     )        )
+              [ ]            (
+       (  *   |-|       *     )    (
+ *      )     |_|        .          )
+       (      | |    .
+ )           /   \     .    ' .        *
+(           |_____|  '  .    .
+ )          | ___ |  \~~~/  ' .   (
+        *   | \ / |   \_/  \~~~/   )
+            | _Y_ |    |    \_/   (
+*     jgs   |-----|  __|__   |      *
+            `-----`        __|__
+```
+
+=== ID: f7ff9a0e2fed03ea | TITLE: Untitled | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 21x20 ===
+```
+()   ()      ()    /
+  ()      ()  ()  /
+   ______________/___
+   \            /   /
+    \^^^^^^^^^^/^^^/
+     \     ___/   /
+      \   (   )  /
+       \  (___) /
+        \ /    /
+         \    /
+          \  /
+           \/
+           ||
+           ||
+           ||
+           ||
+           ||
+           /\
+          /;;\
+     ==============
+```
+
+=== ID: 33e9e66fd22f4de6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 40x23 ===
+```
+                   o           o
+                      o   o
+                         o         o
+
+                     o       o  o
+                  ________._____________
+                  |   .                |
+                  |^^^.^^^^^.^^^^^^.^^^|
+                  |     .   .   .      |
+                   \      . . . .     /
+C H E E R S !!!      \     .  .     /
+                       \    ..    /
+                         \      /
+                           \  /
+                            \/
+                            ||
+                            ||
+                            ||
+                            ||
+                            ||
+                            /\
+                           /;;\
+                      ==============
+```
+
+=== ID: 6edcf290c01f6c4b | TITLE: Untitled | ARTIST: Elissa Potier | CATEGORY: food-and-drinks | SUBCATEGORY: drinks | SIZE: 22x23 ===
+```
+*      *    .   *    .
+     ..  *    o
+   o   *  .    *
+     ________
+    (________)
+    |    o   |
+    | o    o |
+    |   o    |
+    | o    o |
+    | o  o   |
+    |      o |
+    ( o      )
+     \   o  /
+      \    /
+       \  /
+        ||
+        ||
+        ||
+        ||
+        ||
+     ___||___
+    /   ||   \
+    \________/
+```
+
+=== ID: dddf6dfa0ca9a3f1 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: food-and-drinks | SUBCATEGORY: ice-creams | SIZE: 15x12 ===
+```
+         _.-.
+       ,'/ //\
+      /// // /)
+     /// // //|
+    /// // ///
+   /// // ///
+  (`: // ///
+   `;`: ///
+   / /:`:/
+  / /  `'
+ / /
+(_/  hh
+```
+
+=== ID: e7519fd92bd52d1d | TITLE: Chocolate bar | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: chocolates | SIZE: 22x4 ===
+```
+       __ __ __ __ __
+     /__/__/__/__/__/|
+    /__/__/__/__/__/|/
+jgs |__'__'__'__'__|/
+```
+
+=== ID: 94ed9bffc857841b | TITLE: Chocolate bar | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: chocolates | SIZE: 34x6 ===
+```
+      _____________,-.___     _
+     |____        { {]_]_]   [_]
+     |___ `-----.__\ \_]_]_    . `
+     |   `-----.____} }]_]_]_   ,
+     |_____________/ {_]_]_]_] , `
+hjw                `-'
+```
+
+=== ID: 3496bbd4cfe36f23 | TITLE: Untitled | ARTIST: Herman Hiddema (Shimrod) | CATEGORY: food-and-drinks | SUBCATEGORY: chocolates | SIZE: 37x7 ===
+```
+    __________________,.............,
+   /_/_/_/_/_/_/_/_/,-',  ,. -,-,--/|
+  /_/_/_/_/_/_/_/,-' //  /-| / /--/ /
+ /_/_/_/_/_/_/,-' `-''--'  `' '--/ /
+/_/_/_/_/_/_,:................../ /
+|________,'                   hh|/
+         """""""""""""""""""""""'
+```
+
+=== ID: 1233e98381636d7d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: bananas | SIZE: 16x5 ===
+```
+         _
+       _ \'-_,#
+      _\'--','`|
+      \`---`  /
+jgs    `----'`
+```
+
+=== ID: db4197858dcc70f2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: food-and-drinks | SUBCATEGORY: bananas | SIZE: 13x9 ===
+```
+        .-.
+       /  |
+      |  /
+   .'\|.-; _
+  /.-.;\  |\|
+  '   |'._/ `
+      |  \
+       \  |
+jgs     '-'
+```
+
+=== ID: 0dcf1de8308f8f86 | TITLE: Coffee and cereal | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: coffee-and-tea | SIZE: 20x5 ===
+```
+  ;)( ;
+ :----:     o8Oo./
+C|====| ._o8o8o8Oo_.
+ |    |  \========/
+ `----'   `------'
+```
+
+=== ID: cf9c3c141dd1bb6f | TITLE: Teapot | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: coffee-and-tea | SIZE: 17x6 ===
+```
+             ;,'
+     _o_    ;:;'
+ ,-.'---`.__ ;
+((j`=====',-'
+ `-\     /
+    `-=-'     hjw
+```
+
+=== ID: 0f4e4c43bc5a1c83 | TITLE: Coffee mug | ARTIST: H P Barmario (Morfina) | CATEGORY: food-and-drinks | SUBCATEGORY: coffee-and-tea | SIZE: 14x9 ===
+```
+      )  (
+     (   ) )
+      ) ( (
+ mrf_______)_
+ .-'---------|
+( C|/\/\/\/\/|
+ '-./\/\/\/\/|
+   '_________'
+    '-------'
+```
+
+=== ID: e2a52963c769d345 | TITLE: Tea | ARTIST: Elissa Potier | CATEGORY: food-and-drinks | SUBCATEGORY: coffee-and-tea | SIZE: 25x11 ===
+```
+    (  )   (   )  )
+     ) (   )  (  (
+     ( )  (    ) )
+     _____________
+    <_____________> ___
+    |             |/ _ \
+    |               | | |
+    |               |_| |
+ ___|             |\___/
+/    \___________/    \
+\_____________________/
+```
+
+=== ID: ebf6293769cf3fe9 | TITLE: A used teabag | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: coffee-and-tea | SIZE: 25x20 ===
+```
+            .------.____
+         .-'       \ ___)
+      .-'         \\\
+   .-'        ___  \\)
+.-'          /  (\  |)
+         __  \  ( | |
+        /  \  \__'| |
+       /    \____).-'
+     .'       /   |
+    /     .  /    |
+  .'     / \/     |
+ /      /   \     |
+       /    /    _|_
+       \   /    /\ /\
+        \ /    /__v__\
+         '    |       |
+              |     .#|
+              |#.  .##|
+              |#######|
+              |#######|
+```
+
+=== ID: a3b0334008c81673 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: food-and-drinks | SUBCATEGORY: beers | SIZE: 12x5 ===
+```
+.~~~~.
+i====i_
+|cccc|_)
+|cccc|   hjw
+`-==-'
+```
+
+=== ID: 09c99eb54c4d2683 | TITLE: Beer glass sliding on a bar | ARTIST: unknown | CATEGORY: food-and-drinks | SUBCATEGORY: beers | SIZE: 20x6 ===
+```
+         . .
+       .. . *.
+- -_ _-__-0oOo
+ _-_ -__ -||||)
+    ______||||______
+~~~~~~~~~~`""'
+```
+
+=== ID: 476b636d123b6ad8 | TITLE: Untitled | ARTIST: Elissa Potier | CATEGORY: food-and-drinks | SUBCATEGORY: beers | SIZE: 22x13 ===
+```
+  .   *   ..  . *  *
+*  * @()Ooc()*   o  .
+    (Q@*0CG*O()  ___
+   |\_________/|/ _ \
+   |  |  |  |  | / | |
+   |  |  |  |  | | | |
+   |  |  |  |  | | | |
+   |  |  |  |  | | | |
+   |  |  |  |  | | | |
+   |  |  |  |  | \_| |
+   |  |  |  |  |\___/
+   |\_|__|__|_/|
+    \_________/
+```
+

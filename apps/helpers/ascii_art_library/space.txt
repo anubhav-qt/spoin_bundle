@@ -1,0 +1,1310 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: SPACE
+# Total artworks in category fitting <=40 cols: 67
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 0049377c6cc2ed78 | TITLE: Space | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: other | SIZE: 23x11 ===
+```
+   .       .
+ +  :      .
+           :       _
+       .   !   '  (_)
+          ,|.'
+-  -- ---(-O-`--- --  -
+         ,`|'`.
+       ,   !    .
+           :       :  "
+           .     --+--
+ .:        .       !
+```
+
+=== ID: 44ef836d0f495c58 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: space | SUBCATEGORY: other | SIZE: 24x19 ===
+```
+     .-.
+     \  \
+      \  \     `{{{{}}
+       \  \     ).  c
+        \  \     _  /
+         \  \ //  _\\__
+          \  \/\`\ ++ /|
+           \//  \ \__/ |
+          o/)    \_____)
+          /=\.   .~~~~~|
+         // \\   |_____|
+        //   \\  | | | |
+       //     \\ | | | |
+      //      .\\( | ( |
+     //         \\ | | |
+    //          .\\| | |
+   //           _|\\_| |
+  //           (___\\__)
+.//Pru              \\
+```
+
+=== ID: 14b71380f597ebab | TITLE: Comet and earth / sun | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: other | SIZE: 25x24 ===
+```
+                      .:'
+       _         _.::'
+     .'.-;;-.   (_.'
+    / / ;;;' \
+    ||.  `:   |
+    \ \:   `;/
+     '.:-..-'
+ jgs    /___\
+                      .:'
+                  _.::'
+        .-;;-.   (_.'
+       / ;;;' \
+      |.  `:   |
+       \:   `;/
+jgs     '-..-'
+
+                      .:'
+         ....     _.::'
+       .:-""-:.  (_.'
+     .:/      \:.
+     :|        |:
+     ':\      /:'
+ jgs  '::-..-::'
+        `''''`
+```
+
+=== ID: 96ccf88ce8de10b0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: satellites | SIZE: 39x14 ===
+```
+                }--O--{
+                  [^]
+                 /ooo\
+ ______________:/o   o\:______________
+|=|=|=|=|=|=|:A|":|||:"|A:|=|=|=|=|=|=|
+^""""""""""""""!::{o}::!""""""""""""""^
+                \     /
+                 \.../
+      ____       "---"       ____
+     |\/\/|=======|*|=======|\/\/|
+     :----"       /-\       "----:
+                 /ooo\
+                #|ooo|#
+                 \___/
+```
+
+=== ID: 45c92962f688149f | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: satellites | SIZE: 22x14 ===
+```
+         ooo
+        / : \
+       / o0o \
+ _____"~~~~~~~"_____
+ \+###|U * * U|###+/
+  \...!(.>..<)!.../
+   ^^^^o|   |o^^^^
++=====}:^^^^^:{=====+#
+.____  .|!!!|.  ____.
+|#####:/" " "\:#####|
+|#####=|  O  |=#####|
+|#####>\_____/<#####|
+ ^^^^^   | |   ^^^^^
+         o o
+```
+
+=== ID: 4daf316445a7926c | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: space | SUBCATEGORY: spaceships | SIZE: 15x12 ===
+```
+           ___
+     |     | |
+    / \    | |
+   |--o|===|-|
+   |---|   |d|
+  /     \  |w|
+ | U     | |b|
+ | S     |=| |
+ | A     | | |
+ |_______| |_|
+  |@| |@|  | |
+___________|_|_
+```
+
+=== ID: 56ed312d17c6051d | TITLE: Untitled | ARTIST: Andrew Hood (Andy, Flookster) | CATEGORY: space | SUBCATEGORY: spaceships | SIZE: 22x15 ===
+```
+    /\
+   /  \
+  |    |
+  |NASA|
+  |    |
+  |    |
+  |    |
+ '      `
+ |      |
+ |      |
+ |______|
+  '-`'-`   .
+  / . \'\ . .'
+ ''( .'\.' ' .;'
+'.;.;' ;'.;' ..;;' AsH
+```
+
+=== ID: a0a70c1fe88389f9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: spaceships | SIZE: 23x23 ===
+```
+       _________
+      (=========)
+      |=========|
+      |====_====|
+      |== / \ ==|
+      |= / _ \ =|
+   _  |=| ( ) |=|
+  /=\ |=|     |=| /=\
+  |=| |=| USA |=| |=|
+  |=| |=|  _  |=| |=|
+  |=| |=| | | |=| |=|
+  |=| |=| | | |=| |=|
+  |=| |=| | | |=| |=|
+  |=| |/  | |  \| |=|
+  |=|/    | |    \|=|
+  |=/NASA |_| NASA\=|
+  |(_______________)|
+  |=| |_|__|__|_| |=|
+  |=|   ( ) ( )   |=|
+ /===\           /===\
+|||||||         |||||||
+-------         -------
+ (~~~)           (~~~)
+```
+
+=== ID: ab447d2a506f9cb2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: spaceships | SIZE: 15x30 ===
+```
+       !
+       !
+       ^
+      / \
+     /___\
+    |=   =|
+    |     |
+    |     |
+    |     |
+    |     |
+    |     |
+    |     |
+    |     |
+    |     |
+    |     |
+   /|##!##|\
+  / |##!##| \
+ /  |##!##|  \
+|  / ^ | ^ \  |
+| /  ( | )  \ |
+|/   ( | )   \|
+    ((   ))
+   ((  :  ))
+   ((  :  ))
+    ((   ))
+     (( ))
+      ( )
+       .
+       .
+       .
+```
+
+=== ID: e0ff01555b8a6414 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: spaceships | SIZE: 34x63 ===
+```
+                /\
+                ||
+               ====
+               |  |
+               |  |
+               ====
+               XXXX
+               |\/|
+               |/\|
+               |\/|
+               |/\|
+               |\/|
+               |/\|
+              /____\
+              |    |
+              |    |
+             /      \
+            /        \
+           /          \
+          /            \
+         /              \
+         ----------------
+         |--------------|
+         |              |
+         |    |     |   |
+         |    |-----|   |
+         |    |  _  |   |
+         |      / \     |
+         |     /___\    |
+         |    /     \   |
+         |              |
+         |    |\   /|   |
+         |    | \_/ |   |
+         |    |  _  |   |
+         |      <__     |
+         |         \    |
+         |     \___/    |
+         |    _______   |
+         |       |      |
+         |       |      |
+         |       |      |
+         |     ______   |
+         |     |        |
+         |     |---     |
+         |     |_____   |
+         |     _____    |
+         |     |    \   |
+         |     |____/   |
+         |     |   \    |
+         |              |
+         |              |
+         |              |
+         |      __      |
+        /|      ||      |\
+       / |      ||      | \
+      /  |      ||      |  \
+     /   |      ||      |   \
+-----    |      HH      |    -----
+|   |    |      HH      |    |   |
+|   |    |      HH      |    |   |
+|   |    |      HH      |    |   |
+|   |    |______HH______|    |   |
+--------/       HH       \--------
+```
+
+=== ID: d780ad38b7a4be79 | TITLE: Wacky telescope | ARTIST: lgbeard | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 34x14 ===
+```
+         __
+ _.----'`|| `.                _..
+]_       ||   `.         _..--\  \
+  ```````--.    `._ ..--'    `|  |
+         /\ `.    \ \         |  |
+         ||   `.   \ \        |  |
+        /  \    `. | |        | .|
+       //\/\\     `/_/......._/  /
+      /. || \\                `-'
+     //  ||  `\
+    //   ||   \\
+   /.    ||    .\ LGB
+  //     ||    ||
+ ||      ||
+```
+
+=== ID: a9c5203578bf9765 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 23x17 ===
+```
+      ,-.
+     / \  `.  __..-,O
+    :   \ --''_..-'.'
+    |    . .-' `. '.
+    :     .     .`.'
+     \     `.  /  ..
+      \      `.   ' .
+       `,       `.   \
+      ,|,`.        `-.\
+     '.||  ``-...__..-`
+      |  |
+      |__|
+      /||\
+     //||\\
+    // || \\
+ __//__||__\\__
+'--------------' SSt
+```
+
+=== ID: 7243fa729dd1f8de | TITLE: Stargazer | ARTIST: Dokusan | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 17x18 ===
+```
+             _
+           /(_))
+         _/   /
+        //   /
+       //   /
+       /\__/
+       \O_/=-.
+   _  / || \  ^o
+   \\/ ()_) \.
+    ^^ <__> \()
+      //||\\
+     //_||_\\  ds
+    // \||/ \\
+   //   ||   \\
+  \/    |/    \/
+  /     |      \
+ /      |       \
+        |
+```
+
+=== ID: 75b1348ba6b967b9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 30x19 ===
+```
+             (``',
+            / `''/
+           /    /
+        O\/    /
+        \,    /
+        (    /
+       /x`''7/
+      (x   //`\
+     / `''7'`\ \
+    /    /   /()\
+   (    /   `|~~|`
+    `'''     |  |
+             |  |
+             |  |
+             |  |
+             |  |
+           /`    `\
+ ,-------'`        `'-------,
+`~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
+```
+
+=== ID: 962316efb2bf3e03 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 30x21 ===
+```
+          (``',
+         / `''/
+        /    /
+     o\/    /
+     \,    /          _
+     (    /         ,',`,
+    /x`''7/_________r_ ,=,
+   (x   //---, (------',=,
+  / `''7'     \ \   ' ,=,
+ /    /        \ \   '-'
+(    /          ) \
+ `'''          /(o)\
+              `|~~~|`
+               |   |
+               |   |
+               |   |
+               |   |
+               |   |
+              /     \
+      ,-----'`       `'-----,
+     `~~~~~~~~~~~~~~~~~~~~~~~`
+```
+
+=== ID: fc808e00c62f45ef | TITLE: Untitled | ARTIST: Lauri Kangas | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 40x26 ===
+```
+             ______
+          ,'"       "-._
+        ,'              "-._ _._
+        ;              __,-'/   |
+       ;|           ,-' _,'"'._,.
+       |:            _,'      |\ `.
+       : \       _,-'         | \  `.
+        \ \   ,-'             |  \   \
+         \ '.         .-.     |       \
+          \  \         "      |        :
+           `. `.              |        |
+             `. "-._          |        ;
+             / |`._ `-._      L       /
+            /  | \ `._   "-.___    _,'
+           /   |  \_.-"-.___   """"
+           \   :            /"""
+            `._\_       __.'_
+       __,--''_ ' "--'''' \_  `-._
+ __,--'     .' /_  |   __. `-._   `-._
+<            `.  `-.-''  __,-'     _,-'
+ `.            `.   _,-'"      _,-'
+   `.            ''"lka    _,-'
+     `.                _,-'
+       `.          _,-'
+         `.   __,'"
+           `'"
+```
+
+=== ID: f4d0a07bc519ecd6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: telescopes | SIZE: 34x26 ===
+```
+            #  /\
+             #/  \
+             /    \
+            /     /
+           /     /
+          /     /
+         /     /
+        /     /
+       /     /
+      /     /\
+     /     /__|
+    /     /\_/\
+   /     /   \|
+  /     /    ||
+  \    /     ||
+   \  /     /__\
+    \/    .''..''.
+        .'   ''   '.
+       .'    ''    '.
+      .'     ''     '.
+     .'      ''      '.
+    .'       ''       '.
+   .'        ''        '.  FeliX-D
+  .'         ''         '.
+ .'          ''          '.
+<>           <>           <>
+```
+
+=== ID: 923c4824a0c2258b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: astronauts | SIZE: 23x16 ===
+```
+        _..._
+      .'     '.      _
+     /    .-""-\   _/ \
+   .-|   /:.   |  |   |
+   |  \  |:.   /.-'-./
+   | .-'-;:__.'    =/
+   .'=  *=|NASA _.='
+  /   _.  |    ;
+ ;-.-'|    \   |
+/   | \    _\  _\
+\__/'._;.  ==' ==\
+         \    \   |
+         /    /   /
+         /-._/-._/
+  jgs    \   `\  \
+          `-._/._/
+```
+
+=== ID: 402996362947ef58 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: stars | SIZE: 7x6 ===
+```
+   ,
+__/ \__
+\     /
+/_   _\
+  \ /
+   '
+```
+
+=== ID: 47b4ee99b2bde470 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: space | SUBCATEGORY: stars | SIZE: 12x7 ===
+```
+     /\
+____/  \____
+\          /
+ >        <
+/___    ___\
+    \  /
+     \/mh
+```
+
+=== ID: 23bdd224d7de09b1 | TITLE: Untitled | ARTIST: Neil Smith | CATEGORY: space | SUBCATEGORY: stars | SIZE: 13x7 ===
+```
+    A
+___/_\___
+ ',. ..'
+ /.'^'.\
+/'     '\
+
+-- Neil Smith
+```
+
+=== ID: 96937e147a3d03b3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: stars | SIZE: 18x8 ===
+```
+       .
+  ---./|\.---
+  '._/ | \_.'
+_.-'_'.|.'_'-._
+ '-._.'|'._.-'
+  .' \ | / '.
+  ---'\|/'---
+       ' Starshine
+```
+
+=== ID: 07539fb240e597f4 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: stars | SIZE: 17x8 ===
+```
+      ,
+   \  :  /
+`. __/ \__ .'
+_ _\     /_ _
+   /_   _\
+ .'  \ /  `.
+   /  :  \    hjw
+      '
+```
+
+=== ID: f3494dd731e9747b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: stars | SIZE: 28x8 ===
+```
+                 /\
+           .--._/  \_.--.
+            `)        (`
+         _.-'          '-._
+        '-.              .-'
+           `)          ('
+           /.-"-.  .-"-.\
+jgs        `     \/
+```
+
+=== ID: 78fdcae1160e4282 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: space | SUBCATEGORY: stars | SIZE: 28x9 ===
+```
+       .
+      /|\               .
+     / | \            ./|\,
+  ,-' \|/ `-.        <-=O=->
+<'--==<O>==--`>       '\|/`
+  `-. /|\ ,-'           '
+     \ | /
+      \|/   SSt
+       '
+```
+
+=== ID: 176a2e38d73c13c4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: stars | SIZE: 17x9 ===
+```
+        .
+       ,O,
+      ,OOO,
+'oooooOOOOOooooo'
+  `OOOOOOOOOOO`
+    `OOOOOOO`
+    OOOO'OOOO
+   OOO'   'OOO
+  O'         'O
+```
+
+=== ID: 016803bc93204d53 | TITLE: Compass of Sparks | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: stars | SIZE: 22x10 ===
+```
+  .       .
+       .  |  .
+        \ | /    +
+*        \|/
+    --==> * <==--   '
+   +     /|\   .
+        / | \
+.      '  |  '       *
+          |
+    .     '    .
+```
+
+=== ID: 3f63e1c054962841 | TITLE: Big and Little Dipper | ARTIST: Ojosh!ro | CATEGORY: space | SUBCATEGORY: stars | SIZE: 36x32 ===
+```
+                 '
+            *          .
+                   *       '
+              *                *
+
+
+
+
+
+   *   '*
+           *
+                *
+                       *
+               *
+                     *
+
+         .                      .
+         .                      ;
+         :                  - --+- -
+         !           .          !
+         |        .             .
+         |_         +
+      ,  | `.
+--- --+-<#>-+- ---  --  -
+      `._|_,'
+         T
+         |
+         !
+         :         . :
+         .       *
+
+Ojo
+```
+
+=== ID: 94178ed70efde9f9 | TITLE: Tiny Cresecent Moon | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 8x5 ===
+```
+ ,-,
+/.(
+\ {
+ `-`
+     hjw
+```
+
+=== ID: 731af7e83305f53c | TITLE: Moon and Stars | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 8x5 ===
+```
+ ,-,-.
+/.( +.\
+\ {. */
+ `-`-'
+     hjw
+```
+
+=== ID: 551d474673d14668 | TITLE: man in the moon | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 30x6 ===
+```
+               ___
+      ~*    .'`  _\
+           /  (o/       *
+*         |     _\           *
+           \  '==.    *
+ jgs    *   '.____\       ~*
+```
+
+=== ID: 73f2b4c70ca42c00 | TITLE: crescent moons | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 17x7 ===
+```
+         _.._
+        .' .-'`
+       /  /
+       |  |
+       \  '.___.;
+jgs     '._  _.'
+           ``
+```
+
+=== ID: 167c4f070a14f0bc | TITLE: crescent moons | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 14x7 ===
+```
+         _.._
+       .' .-'`
+      /  /
+      |  |
+      \  \
+jgs    '._'-._
+          ```
+```
+
+=== ID: 497025a091bd2128 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 20x9 ===
+```
+      _.-'''-._
+     .'   .-'``|'.
+    /    /    -*- \
+   ;   <{      |   ;
+   |    _\ |       |
+   ;   _\ -*- |    ;
+    \   \  | -*-  /
+jgs  '._ '.__ |_.'
+        '-----'
+```
+
+=== ID: 09e44c5330cefee6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: moons | SIZE: 17x11 ===
+```
+ .------.
+(        )    ..
+ `------'   .' /
+      O    /  ;
+        o i  OO
+         C    `-.
+         |    <-'
+         (  ,--.
+          V  \_)
+           \  :
+            `._\.
+```
+
+=== ID: 5d86fa9b0a414d55 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 30x15 ===
+```
+         ___---___
+      .--         --.
+    ./   ()      .-. \.
+   /   o    .   (   )  \
+  / .            '-'    \
+ | ()    .  O         .  |
+|                         |
+|    o           ()       |
+|       .--.          O   |
+ | .   |    |            |
+  \    `.__.'    o   .  /
+   \                   /
+    `\  o    ()      /' JT/jgs
+      `--___   ___--'
+            ---
+```
+
+=== ID: 5d424c2b42c2d3ac | TITLE: man in the moon | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 31x16 ===
+```
+          ______          \'/
+      .-'` .    `'-.    -= * =-
+    .'  '    .---.  '.    /.\
+   /  '    .'     `'. \
+  ;  '    /          \|
+ :  '  _ ;            `
+;  :  /(\ \
+|  .       '.
+|  ' /     --'
+|  .   '.__\
+;  :       /
+ ;  .     |            ,
+  ;  .    \           /|
+   \  .    '.       .'/
+    '.  '  . `'---'`.'
+jgs   `'-..._____.-`
+```
+
+=== ID: e38456dfc71a8e5b | TITLE: Untitled | ARTIST: Colin J. Randall (CJRandall) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 28x22 ===
+```
+                       .-'`/
+                   .-'`  _/
+               .-'`    _/
+            .-'       /
+         .-'         /
+       .'           (
+     .'       ,,////)
+    .         __,-^/
+   .           \()(
+   :               \
+   :             _  \
+   :            (____\
+   :              (
+   `          )-.__)
+    `              )
+     `.           (
+       `.          \
+         `-.        \
+            `-.      \_
+               `'-.    \_
+cjr                `'-.  \_
+17apr00                `'-.\
+```
+
+=== ID: 4a1e80eac3588e5f | TITLE: scaffolding to the moon | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 22x34 ===
+```
+             ___
+      ~*  .'`  _\
+         /  (o/   *
+   *    |     _\     *
+         \  '==. *
+jgs   *   '.____\   ~*
+
+    *     ~*
+                   *
+            \O
+      *      |\
+            /|
+       |____\|___|
+       |`'-.:.-'`|
+       |_.-':'-._|
+      O|----:----|
+     /_|`'-.:.-'`|
+     \/|_.-':'-._|
+      \|----:----|
+       |`'-.:.-'`|
+       |_.-':'-._|
+       |----:----|
+       |`'-.:.-'`|
+       |_.-':'-._|
+       |----:----|
+       |`'-.:.-'`|
+       |_.-':'-._|
+       |----:----|
+       |`'-.:.-'`|
+       |_.-':'-._|
+       |----:----|
+       |`'-.:.-'`|
+       |_.-':'-._|
+  jgs  |----:----|
+```
+
+=== ID: 43240015b2f2240a | TITLE: Phases of the Moon | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: moons | SIZE: 34x54 ===
+```
+       _..._
+     .:::::::.
+    :::::::::::   NEW  MOON
+    :::::::::::
+    `:::::::::'
+      `':::''
+       _..._
+     .::::. `.
+    :::::::.  :    WAXING CRESCENT
+    ::::::::  :
+    `::::::' .'
+      `'::'-'
+       _..._
+     .::::  `.
+    ::::::    :    FIRST QUARTER
+    ::::::    :
+    `:::::   .'
+      `'::.-'
+       _..._
+     .::'   `.
+    :::       :    WAXING GIBBOUS
+    :::       :
+    `::.     .'
+      `':..-'
+       _..._
+     .'     `.
+    :         :    FULL MOON
+    :         :
+    `.       .'
+      `-...-'
+       _..._
+     .'   `::.
+    :       :::    WANING GIBBOUS
+    :       :::
+    `.     .::'
+      `-..:''
+       _..._
+     .'  ::::.
+    :    ::::::    LAST QUARTER
+    :    ::::::
+    `.   :::::'
+      `-.::''
+       _..._
+     .' .::::.
+    :  ::::::::    WANING CRESCENT
+    :  ::::::::
+    `. '::::::'
+jgs   `-.::''
+       _..._
+     .:::::::.
+    :::::::::::    NEW MOON
+    :::::::::::
+    `:::::::::'
+      `':::''
+```
+
+=== ID: f5f308f899fcf657 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 28x6 ===
+```
+                       .-.
+        .-""`""-.    |(@ @)
+     _/`oOoOoOoOo`\_ \ \-/
+    '.-=-=-=-=-=-=-.' \/ \
+jgs   `-=.=-.-=.=-'    \ /\
+         ^  ^  ^       _H_ \
+```
+
+=== ID: f2c11967f211bce2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 18x7 ===
+```
+       _________
+      /___   ___\
+     //@@@\ /@@@\\
+     \\@@@/ \@@@//
+      \___ " ___/
+jrjc     | - |
+          \_/
+```
+
+=== ID: ecfb339d354e22f9 | TITLE: Untitled | ARTIST: Clyde W. Watson | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 27x7 ===
+```
+    .  .
+     \/
+    (@@)
+ g/\_)(_/\e
+g/\(=--=)/\e
+    //\\
+   _|  |_ cww  clyde watson
+```
+
+=== ID: 42c58d2e22f70446 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 17x8 ===
+```
+        _..._
+      .'     '.
+     / \     / \
+    (  |     |  )
+    (`"`  "  `"`)
+     \         /
+      \  ___  /
+jgs    '.___.'
+```
+
+=== ID: 0b3a9a7558205274 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 16x9 ===
+```
+ o            o
+  \          /
+   \        /
+    :-'""'-:
+ .-'  ____  `-.
+( (  (_()_)  ) )
+ `-.   ^^   .-'
+    `._==_.'
+jgs  __)(___
+```
+
+=== ID: 050225dc9fb8fb09 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 13x9 ===
+```
+     ___
+ ___/   \___
+/   '---'   \
+'--_______--'
+     / \
+    /   \
+    /\O/\
+    / | \
+    // \\
+```
+
+=== ID: 667de1e87ed23453 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 20x10 ===
+```
+          (
+       __..)__
+     .'       `'.
+    / - -        `\
+   /(')(')         \
+   /  ^        )   |
+   \.--.           |
+    \--'          /
+     \__.-' __..''
+jgs    /     |
+```
+
+=== ID: e471774a2ba624b0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 34x11 ===
+```
+       .-""""-.        .-""""-.
+      /        \      /        \
+     /_        _\    /_        _\
+    // \      / \\  // \      / \\
+    |\__\    /__/|  |\__\    /__/|
+     \    ||    /    \    ||    /
+      \        /      \        /
+       \  __  /        \  __  /
+        '.__.'          '.__.'
+         |  |            |  |
+jgs      |  |            |  |
+```
+
+=== ID: bb67b7a04d4fd458 | TITLE: Untitled | ARTIST: Andrew Carpenter | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 28x12 ===
+```
+o
+ \_/\o
+( Oo)                    \|/
+(_=-)  .===O-  ~~Z~A~P~~ -O-
+/   \_/U'                /|\
+||  |_/
+\\  |
+{K ||
+ | PP
+ | ||
+ (__\\
+Andrew Carpenter
+```
+
+=== ID: b2dde6e9f6c667b4 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 16x12 ===
+```
+    o   o
+     )-(
+    (O O)
+     \=/
+    .-"-.
+   //\ /\\
+ _// / \ \\_
+=./ {,-.} \.=
+    || ||
+    || ||    hjw
+  __|| ||__  `97
+ `---" "---'
+```
+
+=== ID: d9a65d010542a2dc | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 29x14 ===
+```
+            ____
+     _,-ddd888888bbb-._
+   d88888888888888888888b
+ d888888888888888888888888b
+6888888888888888888888888889
+68888b8""8q8888888p8""8d88889
+`d8887     p88888q     4888b'
+ `d8887    p88888q    4888b'
+   `d887   p88888q   488b'
+     `d8bod8888888dob8b'
+       `d88888888888d'
+         `d8888888b' hjw
+           `d8888b' `97
+             `bd'
+```
+
+=== ID: 7b962b4edf421e54 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 16x16 ===
+```
+      .--.   |V|
+     /    \ _| /
+     q .. p \ /
+      \--/  //
+jgs  __||__//
+    /.    _/
+   // \  /
+  //   ||
+  \\  /  \
+   )\|    |
+  / || || |
+  |/\| || |
+     | || |
+     \ || /
+   __/ || \__
+  \____/\____/
+```
+
+=== ID: 5ba3da68e1b3c391 | TITLE: Untitled | ARTIST: Genoveva Galarza | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 16x16 ===
+```
+     _____
+ ___/     \___
+`-._)     (_,-`
+    \O _ O/
+     \ - /
+      `-(
+       ||
+      _||_
+     |-..-|
+     |/. \|
+     |\__/|
+   ._|//\\|_,
+   `-((  ))-'
+    __\\//__ gnv
+    >_ /\ _<,
+      ''
+```
+
+=== ID: b6573eb40b34276a | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 37x17 ===
+```
+                _____
+             ,-"     "-.
+            / o       o \
+           /   \     /   \
+          /     )-"-(     \
+         /     ( 6 6 )     \
+        /       \ " /       \
+       /         )=(         \
+      /   o   .--"-"--.   o   \
+     /    I  /  -   -  \  I    \
+ .--(    (_}y/\       /\y{_)    )--.
+(    ".___l\/__\_____/__\/l___,"    )
+ \                                 /
+  "-._      o O o O o O o      _,-"
+      `--Y--.___________.--Y--'
+         |==.___________.==| hjw
+         `==.___________.==' `97
+```
+
+=== ID: 56f1cd1816a24020 | TITLE: Untitled | ARTIST: David Palmer, Veronica Karlsson | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 23x17 ===
+```
+       o o
+       | |
+      _L_L_
+   }\/__-__\/{
+   }(|~o.o~|){
+   }/ \`-'/ \{
+     _/`U'\_
+    ( .   . )
+   / /     \ \
+   \ |  ,  | /
+    \|=====|/
+     |_.^._|
+     | |"| |
+     ( ) ( )
+     |_| |_|
+ _.-' _j L_ '-._
+(___.'     '.___) dp/vk
+```
+
+=== ID: 8089078ff1902a38 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 20x18 ===
+```
+      _       _
+     (_\     /_)
+       ))   ((
+     .-"""""""-.
+ /^\/  _.   _.  \/^\
+ \(   /__\ /__\   )/
+  \,  \o_/_\o_/  ,/
+    \    (_)    /
+     `-.'==='.-'
+      __) - (__
+     /  `~~~`  \
+    /  /     \  \
+    \ :       ; /
+     \|==(*)==|/
+      :       :
+       \  |  /
+     ___)=|=(___
+jgs {____/ \____}
+```
+
+=== ID: f1180ab7263f1383 | TITLE: Funny Alien | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 35x19 ===
+```
+             @      @
+     / \     { _____}      / \
+   /  |  \___/*******\___/  |  \
+  (   I  /   ~   '   ~   \  I   )
+   \  |  |   0       0   |  |  /
+     \   |       A       |   /
+       \__    _______    __/
+          \_____________/
+    _-------*         *-------_
+   /  /---               ---\  \
+ /  /     (             )     \  \
+{  (     (               )     )  }
+ \  \    |               |    /  /
+   \  \  |               |  /  /
+    **** |               | ****
+   //|\\  \_____________/  //|\\
+   *         '*** ***'         *
+  ***.       .*** ***.       .***
+  '*************' '*************'
+```
+
+=== ID: 0c8461701a218e91 | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 37x20 ===
+```
+         ___--=--------___
+        /. \___\____   _, \_      /-\
+       /. .  _______     __/=====@
+       \----/  |  / \______/      \-/
+   _/         _/ o \
+  / |    o   /  ___ \
+ / /    o\\ |  / O \ /|      __-_
+|o|     o\\\   |  \ \ /__--o/o___-_
+| |      \\\-_  \____  ----  o___-
+|o|       \_ \     /\______-o\_-
+| \       _\ \  _/ / |
+\o \_   _/      __/ /
+ \   \-/   _       /|_
+  \_      / |   - \  |\
+    \____/  \ | /  \   |\
+            | o |   | \ |
+            | | |    \ | \
+           / | /      \ \ \
+         /|  \o|\--\  /  o |\--\
+         \----------' \---------'
+```
+
+=== ID: fe9e22adbe029dae | TITLE: Untitled | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 18x20 ===
+```
+       ______
+      /_.  ._\
+     (( \\// ))
+      \\ \/ //
+       \\/\//
+  \\\  ( '' )  ///
+   )))  \__/  (((
+  (((.'__||__'.)))
+   \\  )    (  //
+    \\/.'  '.\//
+     \/ |,,| \/
+jrjc    |  |
+        |  |
+        //\\
+       //  \\
+      ||    ||
+      ||    ||
+      ||    ||
+   ___))    ((___
+  (____)    (____)
+```
+
+=== ID: 38f08f419f9152e4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 31x24 ===
+```
+              (
+           __..)__
+         .'       `'.
+        / - -        `\
+       /(')(')         \
+       /  ^        )   |
+ _     \.--.           |
+/ \_    \--'          /
+\   )    \__.-' __..''
+ `) '.   /     |
+  \   './   \   \
+   '.  /     |   \
+    '\;      |   ,;
+     |       |   | |
+     |       |  /  |      __
+     |       \ '-, |      \ '.
+     |        '._) |      |   \
+      \            |      /_  |
+       '.          /_..--"  \/
+         `;.    .-'--..___.-'
+jgs       | |  /
+ .-"""""-.| | |__..--""-.
+(         _.|            \
+ '-....-'`   `""--...__.-'
+```
+
+=== ID: a10ebb5fc4f16732 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 26x27 ===
+```
+       _..._
+     .'     '.
+    /`\     /`\    |\
+   (__|     |__)|\  \\  /|
+   (     "     ) \\ || //
+    \         /   \\||//
+     \   _   /  |\|`  /
+      '.___.'   \____/
+       (___)    (___)
+     /`     `\  / /
+    |         \/ /
+    | |     |\  /
+    | |     | "`
+    | |     |
+    | |     |
+    |_|_____|
+   (___)_____)
+   /    \   |
+  /   |\|   |
+ //||\\  Y  |
+|| || \\ |  |
+|/ \\ |\||  |
+    \||__|__|
+     (___|___)
+jgs  /   A   \
+    /   / \   \
+   \___/   \___/
+```
+
+=== ID: aecf6a2ee466e629 | TITLE: Saturn | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: planets | SIZE: 27x7 ===
+```
+         ,MMM8&&&.
+    _...MMMMM88&&&&..._
+ .::'''MMMMM88&&&&&&'''::.
+::     MMMMM88&&&&&&     ::
+'::....MMMMM88&&&&&&....::'
+   `''''MMMMM88&&&&''''`
+   jgs   'MMM8&&&'
+```
+
+=== ID: 6443c9c58b43a8a3 | TITLE: Earth | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: planets | SIZE: 21x10 ===
+```
+        _____
+    ,-:` \;',`'-,
+  .'-;_,;  ':-;_,'.
+ /;   '/    ,  _`.-\
+| '`. (`     /` ` \`|
+|:.  `\`-.   \_   / |
+|     (   `,  .`\ ;'|
+ \     | .'     `-'/
+  `.   ;/        .'
+jgs `'-._____.
+```
+
+=== ID: a5e06526e7b3ae4b | TITLE: Earth | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: planets | SIZE: 25x10 ===
+```
+             _____
+          .-'.  ':'-.
+        .''::: .:    '.
+       /   :::::'      \
+      ;.    ':' `       ;
+      |       '..       |
+      ; '      ::::.    ;
+       \       '::::   /
+        '.      :::  .'
+jgs        '-.___'_.-'
+```
+
+=== ID: b1774bcb58e220d4 | TITLE: Saturn | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: planets | SIZE: 25x11 ===
+```
+                     .::.
+                  .:'  .:
+        ,MMM8&&&.:'   .:'
+       MMMMM88&&&&  .:'
+      MMMMM88&&&&&&:'
+      MMMMM88&&&&&&
+    .:MMMMM88&&&&&&
+  .:'  MMMMM88&&&&
+.:'   .:'MMM8&&&'
+:'  .:'
+'::'  jgs
+```
+
+=== ID: 3fb74246e1249476 | TITLE: Saturn | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: planets | SIZE: 36x12 ===
+```
+        ~+
+
+                 *       +
+           '                  |
+       ()    .-.,="``"=.    - o -
+             '=/_       \     |
+          *   |  '=._    |
+               \     `=./`,        '
+            .   '=.__.=' `='      *
+   +                         +
+        O      *        '       .
+jgs
+```
+
+=== ID: 3fae3a2f313089c8 | TITLE: Earth | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: planets | SIZE: 28x12 ===
+```
+             _______
+          .-' _____ '-.
+        .' .-'.  ':'-. '.
+       / .''::: .:    '. \
+      / /   :::::'      \ \
+     | ;.    ':' `       ; |
+     | |       '..       | |
+     | ; '      ::::.    ; |
+      \ \       '::::   / /
+       \ '.      :::  .' /
+        '. '-.___'_.-' .'
+jgs       '-._______.-
+```
+

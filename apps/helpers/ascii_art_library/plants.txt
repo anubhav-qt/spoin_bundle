@@ -1,0 +1,2201 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: PLANTS
+# Total artworks in category fitting <=40 cols: 118
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: a66308849d63af8c | TITLE: Untitled | ARTIST: llizard | CATEGORY: plants | SUBCATEGORY: bonsai-trees | SIZE: 18x7 ===
+```
+         #o#
+       ####o#
+      #o# \#|_#,#
+     ###\ |/   #o#
+      # {}{      #
+ejm      }{{
+        ,'  `
+```
+
+=== ID: df6ba1f43c392173 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: bonsai-trees | SIZE: 14x12 ===
+```
+     ,\
+    # (_
+      _)\##
+  ###/((_
+       ))\####
+     _((
+####/  )\
+     ,;;"`;,
+    (_______)
+      \===/
+      /===\
+     /=aat=\
+```
+
+=== ID: 019606cace4da8c9 | TITLE: Untitled | ARTIST: Corwyn Yasuo Miyagishima | CATEGORY: plants | SUBCATEGORY: bonsai-trees | SIZE: 37x14 ===
+```
+       ,.,
+      MMMM_    ,..,
+        "_ "__"MMMMM          ,...,,
+ ,..., __." --"    ,.,     _-"MMMMMMM
+MMMMMM"___ "_._   MMM"_."" _ """"""
+ """""    "" , \_.   "_. ."
+        ,., _"__ \__./ ."
+       MMMMM_"  "_    ./
+        ''''      (    )
+ ._______________.-'____"---._.
+  \                          /
+   \________________________/
+   (_)                    (_)
+   Corwyn Yasuo Miyagishima
+```
+
+=== ID: d7bc221944c95842 | TITLE: Untitled | ARTIST: llizard | CATEGORY: plants | SUBCATEGORY: bonsai-trees | SIZE: 31x15 ===
+```
+             &&
+           &&&&&
+         &&&\/& &&&
+        &&|,/  |/& &&
+         &&/   /  /_&  &&
+           \  {  |_____/_&
+           {  / /          &&&
+           `, \{___________/_&&
+            } }{       \
+            }{{         \____&
+           {}{           `&\&&
+           {{}             &&
+     , -=-~{ .-^- _
+ejm        `}
+            {
+```
+
+=== ID: 12ebba5c0177cdef | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 14x5 ===
+```
+ _,-._
+/ \_/ \
+>-(_)-<    hjw
+\_/ \_/
+  `-'
+```
+
+=== ID: 12bf72a6247aebea | TITLE: Untitled | ARTIST: Matthew Thomas | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 10x6 ===
+```
+      _
+    .\ /.
+MT < ~O~ >
+    '/_\'
+    \ | /
+     \|/
+```
+
+=== ID: acae9b99a2638ca0 | TITLE: Untitled | ARTIST: llizard | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 19x7 ===
+```
+              __/)
+           .-(__(=:
+        |\ |    \)
+ejm97   \ ||
+         \||
+          \|
+           |
+```
+
+=== ID: b30c6fedff99aa4c | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 21x8 ===
+```
+    .'`'.'`'.
+.''.`.  :  .`.''.
+'.    '. .'    .'
+.```  .' '.  ```.
+'..',`  :  `,'..'
+     `-'`'-`))
+            ((    ldb
+             \|
+```
+
+=== ID: 8b9131a5cdb0a59c | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 17x8 ===
+```
+      .--.
+    .'_\/_'.
+    '. /\ .'
+      "||"
+       || /\
+    /\ ||//\)
+   (/\\||/
+______\||/_______
+```
+
+=== ID: 3d9152af34ba7626 | TITLE: Lilies | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 24x8 ===
+```
+   ,_('--,
+     (.--; ,--')_,
+         | ;--.)
+     .-. |.| .-.
+        \|\|/ .-.
+    .-.`\|/|/`_
+       `\|/|/` '
+`^jgs`^^`^``^``^``^``^``
+```
+
+=== ID: fa64500883923bbc | TITLE: Untitled | ARTIST: llizard | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 20x13 ===
+```
+               __/)
+            .-(__(=:
+            |    \)
+ejm97 (\__  |
+     :=)__)-|  __/)
+      (/    |-(__(=:
+    ______  |  _ \)
+   /      \ | / \
+        ___\|/___\
+       [         ]\
+        \       /  \
+         \     /
+          \___/
+```
+
+=== ID: b691c27fa5cbd77f | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 21x14 ===
+```
+        _____
+      /  ___  \
+    /  /  _  \  \
+  /( /( /(_)\ )\ )\
+ (  \  \ ___ /  /  )
+ (    \ _____ /    )
+ /(               )\
+|  \             /  |
+|    \ _______ /    |
+ \    / \   / \    /
+   \/    | |    \/
+         | |
+         | |
+         | |
+```
+
+=== ID: b64dc51a86891814 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 19x14 ===
+```
+         *
+     *  *r*  *
+  * *a* ^Y^ *i* *
+ *m*^Y^*^\^*^Y^*s*
+ ^Y^*\*e*/*l*/*^Y^
+ *\*t*|Y^\^Y|*l*/*
+*s*|Y^\\^/^//^Y|*a*
+^Y^\\_^\\\//^_//^Y^
+^\_^\_\_\//_/_/^_/^
+ ^^\_^\_\\/_/^_/^^
+   ^^\_ \// _/^^
+       \_\_/
+        /|\
+       /\\/\
+```
+
+=== ID: 78eff873967edf19 | TITLE: Lotus | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 21x14 ===
+```
+       .=.A.=.
+ __.=./\ / \ /\.=.__
+(-.'-;  |   |  ;-'.-)
+   \ `\/     \/` /
+    ;  `\   /`  ;
+    |    | |    |
+    ;,"-.-"-.-",;
+     \\/^\ /^\//
+      \   `   /
+  jgs  ',___,'
+        \\V//
+         |||
+         |||
+         |||
+```
+
+=== ID: 2e3b19d236e599b4 | TITLE: Tulip | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 14x16 ===
+```
+         ,
+     /\^/`\
+    | \/   |
+    | |    |
+    \ \    /
+     '\\//'
+       ||
+       ||
+       ||
+       ||  ,
+   |\  ||  |\
+   | | ||  | |
+   | | || / /
+    \ \||/ /
+jgs  `\\//`
+    ^^^^^^^^
+```
+
+=== ID: 5aa24a76f020e7b8 | TITLE: Bouquet of flowers | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 19x16 ===
+```
+        @(\/)
+     (\/)-{}-)@
+   @(={}=)/\)(\/)
+  (\/(/\)@| (-{}-)
+ (={}=)@(\/)@(/\)@
+  (/\)\(={}=)/(\/)
+  @(\/)\(/\)/(={}=)
+  (-{}-)""""@/(/\)
+   (/\)|:   |
+      /::'   \
+     /:::     \
+    |::'       |
+    |::        |
+    \::.       /
+jgs  ':______.'
+      `""""""`
+```
+
+=== ID: 3481c8d47f97e0f2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 27x19 ===
+```
+             .-.'  '.-.
+          .-(   \  /   )-.
+         /   '..oOOo..'   \
+ ,       \.--.oOOOOOOo.--./
+ |\  ,   (   :oOOOOOOo:   )
+_\.\/|   /'--'oOOOOOOo'--'\
+'-.. ;/| \   .''oOOo''.   /
+.--`'. :/|'-(   /  \   )-'
+ '--. `. / //'-'.__.'-;
+   `'-,_';//      ,  /|
+        '((       |\/./_
+          \\  . |\; ..-'
+           \\ |\: .'`--.
+            \\, .' .--'
+             ))'_,-'`
+       jgs  //-'
+           //
+          //
+         |/
+```
+
+=== ID: 4b25ba2c1ccbb126 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 27x19 ===
+```
+      _.-.
+    -'    '      .-'-.
+  .',      '    '     '
+  ', `,     .  '.-.   '
+   '   \    ' ."   ".'
+    '.' \   ;.",    "-._
+     '   '. ,"  "-."    '.
+      _.--'.    ." ,.--.  .
+   , '     "-..".-'     \ '
+ -`     _.''".    ' .    '
+'     -'   "  '-     '.
+'    '    "     '      '
+ '.'     "       '    .'
+   ',    "        ' .'
+         "        ,'
+         "
+         "
+       _."._
+       [mrr]
+```
+
+=== ID: 076e6105456b0866 | TITLE: Tulip | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 22x19 ===
+```
+         .-==-.
+        /{.=-.}\
+       | / .  \ |
+       |;   :  :|
+       \(   :  )/
+        `._'__.'
+      |\   ||
+      \ \  ||
+       | | ||
+       | | ||   /|
+       \  \||  / /
+        \ ||| | |
+         | || | |
+          \||/  /
+           ||| /
+           || |
+           ||/
+           ||
+^^^^^jgs^^^^^^^^^^^^^^
+```
+
+=== ID: 6d4adaed24bc1b8e | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 34x29 ===
+```
+                _..
+       ;-._   .'   `\
+     .'    `\/       ;
+     |       `\.---._|
+  .--;   . ( .'      '.
+ / _  \_  './ _.       `-._
+( = \  )`""'\;--.         /
+{= (|  )     /`.         /     .'|
+( =_/  )__..-\         .'     / /
+ \    }/    / ;.____.-;/\   .` /
+  '--' |  .'   |       \ \  |  ;
+       \  '    /       |. ;  \/
+        )    .'`-.    / ; |  /\
+       /__.-'   , \_.'  | | ;  ;
+                |\      |`| |  |
+                 \`\    | | |  |
+                  \ `\  | | ;  ;
+                   |  ; | | /  /
+                   |  | | |/  /
+                   ;  | | /  /
+                    \  \;/  /
+                     \  \  /
+                      \  Y/
+                   jgs |  |
+                       |  |
+                       |  |
+                       |  |
+                       \  |
+                        \_/
+```
+
+=== ID: d5606db9d24951f1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 38x29 ===
+```
+                 ..   .
+           /^)  (^^) \^^\
+         (()(  ( ~~ ) ))))\
+        ((ooo) |\@@/) ||o)))
+        (((oo) |\oo)/ ))o)))
+          \(o( (\o)/ //o///
+     /^^^\  `(o \(( ((o//
+  /??+++++>'-.\\\\o`//??.++^^^+++;,,
+???''^^+====(??`>\o)'''++++=====????^^
+  ^++++++++/?  (())))) ^^^^+++++^^
+     ?~~~??     (()))       ^^^
+      `^^^       ())
+                  \\
+                   \\
+                    \\
+                    ||''^""^''
+                    ))`^^^""^^^
+                   //  `^^^""^^^^
+                  //    ^^^""^^^
+                 //    ^^""^^
+                //    ^^"^^
+      ++^"^^++.//    ^"^
+    ^^^"'^^^''//     ^"
+  ^^^""^^^^^ //       '
+^^^""^^^^   //
+ `^"^^^    //
+  `"^     //
+   '     ((
+         ``
+```
+
+=== ID: cc4aabc27897af39 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 33x30 ===
+```
+         #       #       #
+         ##     ###     ##
+         ###   #####   ###
+         #### ####### ####
+         #################
+         #################
+          ###############
+            ###########
+              #######
+                ***
+                ***
+                ***      ***
+                ***   *********
+                *****************
+                ***   *********
+                ***      ***
+                ***
+   ******      ***
+************* ***
+   ******    ***
+            ***
+           ***
+          ***
+         ***
+        ***
+       ***
+      ***
+     ***
+    ***
+     *
+```
+
+=== ID: 03eac5a5215f1aa4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 19x30 ===
+```
+      , .-.-,_,
+      )`-.>'` (
+     /     `\  |
+     |       | |
+      \     / /
+      `=(\ /.=`
+       `-;`.-'
+         `)|     ,
+          ||  .-'|
+        ,_||  \_,/
+  ,      \|| .'
+  |\|\  , ||/
+ ,_\` |/| |Y_,
+  '-.'-._\||/
+     >_.-`Y|
+     ` .-"||"-.
+       \'----'/
+        |:.  |
+        |::. |
+       /::::  \
+     .:::'     '.
+    /:::         \
+   ;:::'          ;
+   |:::           |
+   |:::           |
+   |:::           |
+   ;:::           ;
+   \:::.          /
+jgs ':::..      .'
+     `""-----""`
+```
+
+=== ID: 8caa2edad65f0fc0 | TITLE: Tulip | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 29x31 ===
+```
+         .-""--.,
+       /` \.-.{/ \
+      /  .' ; '.  \
+      | /       \ |
+      |/         \|
+      T      :    Y
+      |      :    ;
+      |      :    |
+|\.   \     :     /
+| \'.  '.  .    .'
+| |  \   `"T=T"`
+| /   \    | |
+|` :   |   | |
+\   :  |   | |    _
+ |   .  \  | |  /` `-._
+ |   :   | | | |   .'  /'.
+ \   .   | | | |  .   |   `\
+ |       | | | |      /     |
+ |   '    \| | | :   /'-.   |
+  \   '   || |/  ;   |   \  /
+  |   :   ;| ||  .   |   '-'
+  \   :   || |/ ;    /
+   |   '  ;| |  '   |
+    \  :  || | '   /
+     `\ ' \| ;'   /
+   jgs `\' | |  /`
+         `\| |/`
+           | |
+           | |
+           | |
+           |/
+```
+
+=== ID: 56577257a8340a96 | TITLE: Untitled | ARTIST: Chris Remley | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 30x35 ===
+```
+      ,
+ ,,   %%   ,   ,
+:%%%; ;%%% ;%  %%:
+ :%%% %%%% %% %%:
+:%%%%% %%%% % %%%:
+:%%%%%% %%%% %%%%:
+ :%%%%% %%% %%%%:
+  :%%%% %% %%%%:
+   :%%%%% %%%%:
+    :%%%% %%%:
+     &%:%&:%&
+      &&:&:&
+       &&&&
+       ;&&;     ;
+        ::    ;;;;
+        ::   ;;;;;
+        ::  ;;;;;;
+        :: ;;;;;;
+  ;     :: ;;;;;
+ ;;     ::;;;;
+;;;;    ::;
+;;;;;   ::
+;;;;;;  ::
+ ;;;;;  ::
+   ;;;; ::        chris remley
+      ;;::
+       ;::
+        ::
+        ::
+        ::
+        ::
+        ::
+        ::
+        ::
+        ::
+```
+
+=== ID: 0dc5e8aa100b4f1d | TITLE: Untitled | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: plants | SUBCATEGORY: flowers | SIZE: 35x37 ===
+```
+           .-._
+          : .-.'.
+         :.'-';`:
+          :'-' ':
+          '.__.'
+             ;
+   .-.       ;
+ .'.-.i.    .;
+ :'-': '.    ;
+i''-'   :    ;              _.-._
+ '-.__.i.    ;'            : ..-.'.
+        "; ,  ;           : '.''-':
+          ;  .;       ._.-": :"'.'
+         ,',  ; '   ,-'     '=-"
+           ;  ;  i,'-
+           ',_;_,'
+       _.-""; ;; ""-._
+     ."    ,; ;       ".
+    :       ';; ;'     :
+    i-.__...----...__.-i
+     :                :
+      '.            .'
+        :          :
+         :        :
+         :        :
+         :        :
+       ,'          '.
+    ,-'              '-.
+   ;                    ;
+  :                      :
+ :                        :
+ :                        :
+ :                        :
+  :                      :
+   '.                  .'   fsc
+     '-.___      ___.-'
+           """"""
+```
+
+=== ID: d8f8a4d1604c5b8f | TITLE: Small rose | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 37x5 ===
+```
+              ';.
+    .---.,       \
+   {}-.__,>=======;==================
+    `----'      ,/
+jgs           .;'
+```
+
+=== ID: 4a0f8fb2635eb082 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 37x8 ===
+```
+             __
+        _   / /|
+       |\\  \/_/
+       \_\| / __
+          \/_/__\           .-=='/~\
+   ____,__/__,_____,______)/   /{~}}}
+   -,------,----,-----,---,\'-' {{~}}
+jgs                         '-==.\}/
+```
+
+=== ID: 5272462150d58a73 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 37x10 ===
+```
+             __
+        _   /  |
+       | \  \/_/
+       \_\| / __
+          \/_/__\           .--='/~\
+   ____,__/__,_____,______)/   /{~}}}
+   -,-----,--\--,-----,---,\'-' {{~}}
+jgs        __/\_            '--=.\}/
+          /_/ |\\
+               \/
+```
+
+=== ID: f6228441fb19b59a | TITLE: Rose (diddles by Joan) | ARTIST: Shanaka Dias | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 23x14 ===
+```
+    _,--._.-,
+   /\_r-,\_ )
+.-.) _;='_/ (.;
+ \ \'     \/S )
+  L.'-. _.'|-'
+ <_`-'\'_.'/
+   `'-._( \
+    ___   \\,      ___
+    \ .'-. \\   .-'_. /
+     '._' '.\\/.-'_.'
+        '--``\('--'
+        snd   \\
+              `\\,
+                \|
+```
+
+=== ID: 2dc7d3f9d9598906 | TITLE: Rose | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 15x19 ===
+```
+  /-_-\
+ /  /  \
+/  /    \
+\  \    /
+ \__\__/
+    \\
+    -\\    ____
+      \\  /   /
+____   \\/___/
+\   \ -//
+ \___\//-
+    -//
+     \\
+     //
+    //-
+  -//
+  //
+  \\
+   \\
+```
+
+=== ID: a3c61fefaf60c0be | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 38x29 ===
+```
+                 ..   .
+           /^)  (^^) \^^\
+         (()(  ( ~~ ) ))))\
+        ((ooo) |\@@/) ||o)))
+        (((oo) |\oo)/ ))o)))
+          \(o( (\o)/ //o///
+     /^^^\  `(o \(( ((o//
+  /??+++++>'-.\\\\o`//??.++^^^+++;,,
+???''^^+====(??`>\o)'''++++=====????^^
+  ^++++++++/?  (())))) ^^^^+++++^^
+     ?~~~??     (()))       ^^^
+      `^^^       ())
+                  \\
+                   \\
+                    \\
+                    ||''^""^''
+                    ))`^^^""^^^
+                   //  `^^^""^^^^
+                  //    ^^^""^^^
+                 //    ^^""^^
+                //    ^^"^^
+      ++^"^^++.//    ^"^
+    ^^^"'^^^''//     ^"
+  ^^^""^^^^^ //       '
+^^^""^^^^   //
+ `^"^^^    //
+  `"^     //
+   '     ((
+         ``
+```
+
+=== ID: fe956c66a6740f16 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: roses | SIZE: 29x31 ===
+```
+         .-""--.,
+       /` \.-.{/ \
+      /  .' ; '.  \
+      | /       \ |
+      |/         \|
+      T      :    Y
+      |      :    ;
+      |      :    |
+|\.   \     :     /
+| \'.  '.  .    .'
+| |  \   `"T=T"`
+| /   \    | |
+|` :   |   | |
+\   :  |   | |    _
+ |   .  \  | |  /` `-._
+ |   :   | | | |   .'  /'.
+ \   .   | | | |  .   |   `\
+ |       | | | |      /     |
+ |   '    \| | | :   /'-.   |
+  \   '   || |/  ;   |   \  /
+  |   :   ;| ||  .   |   '-'
+  \   :   || |/ ;    /
+   |   '  ;| |  '   |
+    \  :  || | '   /
+     `\ ' \| ;'   /
+   jgs `\' | |  /`
+         `\| |/`
+           | |
+           | |
+           | |
+           |/
+```
+
+=== ID: 0e6c95f6b0e841b6 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 15x7 ===
+```
+      .;;.
+   _   ||
+   >'. ||  _
+   `> \||.'<
+     `>|/ <`
+      `||/`
+^jgs^^^^^^^^^^^
+```
+
+=== ID: d5e7e9a57e693b34 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 20x8 ===
+```
+     .;:;:.     `::`
+     ::;:':      /
+   _ ';:;;'     `
+   >'. ||  _
+   `> \||.'<
+     `>|/ <`
+      `||/`
+^jgs^^^^^^^^^^^
+```
+
+=== ID: 97cc9a5b56796a8e | TITLE: Untitled | ARTIST: Jonathon R. Oglesbee | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 27x9 ===
+```
+                .--.
+              .'_\/_'.
+              '. /\ .'
+                "||"
+                 || /\
+              /\ ||//\)
+             (/\\||/
+          ______\||/_______
+JRO
+```
+
+=== ID: facfea94d89de9b2 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 20x13 ===
+```
+           `::`
+            /
+           `    `;:`
+
+
+     .;:;        /
+     ::;        `
+   _ ';:;;'
+   >'. ||  _
+   `> \||.'<
+     `>|/ <`
+      `||/`
+^jgs^^^^^^^^^^^
+```
+
+=== ID: 1055b0d8ba75b8d2 | TITLE: Blowing a Dandelion | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 37x17 ===
+```
+     8888
+  -%8888C88
+ -%888888C88
+ 888888 <O(           ''
+888888C   _o   / ' ''   ''
+88888D  .) )c ---"   ''
+888888C___)    \ |
+  8888 (__       ))
+ 8 8  8 V  )    //
+     ] \\  \\  //
+     [  \\  \__/          * * *
+     ]   \\    ----      *|*|*|*
+     [    \\  / /\ \     | |*|*|  *
+     ]-----\\/ /  \ \    v v|*|* *|*
+     (      ((--***\ \___O  v|v| |v|*
+      (______ --*** \____o   v v v v|
+                                    v
+```
+
+=== ID: 5ec831042c724dcc | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 24x21 ===
+```
+      _.--'--._
+    .'. ':. ' :'.
+   '`' : `. `: ':'
+  : : '.'. .'.':.`:
+  :' -`= `+ .= - `:
+  :.' .'.' :.'.`:':
+   : : .:`' .:`.':
+    '.: . :`. :.'
+      `'--,--'`
+          y
+         (
+          \       _
+           \    /`/
+     _      |__/:/_
+     \`\    |\ :  /
+     _\:\_  /\ : /_
+     \ : /_/\  :  /
+     _\ : /_/ : /`
+     \  :  /.'/`
+ jgs  `\ :/'/``
+`^^`^`^``^^`^^^`^^`^^^`^
+```
+
+=== ID: cbb0aec931930013 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: dandelions | SIZE: 40x29 ===
+```
+                            ,'
+                        ,'         ,'
+                   .,.         ,'
+                 .`.`.`.  ,'       ,'
+                .`.`.`.`.   ,'  ,'
+                .`.`.`.`.
+                .`.`.`.`.  ,'     ,'
+                \\`.`.`.      ,'
+                 /\.,.   ,'     ,'
+                /
+               :
+               :
+              /
+             :
+             :           core_dump 2003
+             :
+            /
+           :
+           /
+          :
+     /   /  /        /
+    :   :  :        :   /  /
+   /:  /   :     /  :  :  :
+ /: : : / /    ::   :  :  :     /  / / /
+ :: / :: :    / :  /  /  / /   :  : : :
+/ ::  /  : : :  : :  :  : : : /   : : :
+ //  :  / / /  / /  /  / / / :   / / /
+: : :: : : :  : :  :  : : :  :  : : :  :
+""""""""""""""""""""""""""""""""""""""""
+```
+
+=== ID: eb3b01ab930219c8 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: daffodils | SIZE: 14x10 ===
+```
+       _ _
+      (_\_)
+     (__<_{}
+      (_/_)
+     |\ |
+      \\| /|
+       \|//
+        |/
+   ,.,.,|.,.,.
+jgs^`^`^`^`^`^
+```
+
+=== ID: 869815c500e18bf0 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: daffodils | SIZE: 31x14 ===
+```
+                  _..
+         ;-._   .'   `\
+       .'    `\/       ;
+       |       `\.---._|
+    .--;   . ( .'      '.
+   / _  \_  './ _.       `-._
+  ( = \  )`""'\;--.         /
+  {= (|  )     /`.         /
+  ( =_/  )__..-\         .'
+   \    }/    / ;.____.-;/\
+    '--' |  .'   |       \ \
+         \  '    /       |\.\
+          )    .'`-.    /  \ \
+jgs      /__.-'     \_.'    \ \
+```
+
+=== ID: d8eee048b7d32fdf | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: daffodils | SIZE: 28x15 ===
+```
+             _._
+           .'   '.
+          /       \  ___
+   _.--. |     /  |.'   `'.
+ .'     `\   \|   /        \
+/     _   \.=..=./  _.'    /
+'.   .-'-.}`.<>.`{-'-.    /
+  \ .---.{ <>()<> }.--..-'
+  '/     _},'<>`.{_    `\
+ .'   .-'/ )=..=;`\`-    \
+(         /  /| \         )
+ '-..___.'    :  '.___..-'
+        |      `   |
+   jgs   '.      _.'
+           `--.-'
+```
+
+=== ID: 25e7b50375518680 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: daffodils | SIZE: 34x29 ===
+```
+                _..
+       ;-._   .'   `\
+     .'    `\/       ;
+     |       `\.---._|
+  .--;   . ( .'      '.
+ / _  \_  './ _.       `-._
+( = \  )`""'\;--.         /
+{= (|  )     /`.         /     .'|
+( =_/  )__..-\         .'     / /
+ \    }/    / ;.____.-;/\   .` /
+  '--' |  .'   |       \ \  |  ;
+       \  '    /       |. ;  \/
+        )    .'`-.    / ; |  /\
+       /__.-'   , \_.'  | | ;  ;
+                |\      |`| |  |
+                 \`\    | | |  |
+                  \ `\  | | ;  ;
+                   |  ; | | /  /
+                   |  | | |/  /
+                   ;  | | /  /
+                    \  \;/  /
+                     \  \  /
+                      \  Y/
+                   jgs |  |
+                       |  |
+                       |  |
+                       |  |
+                       \  |
+                        \_/
+```
+
+=== ID: b97598145e229e15 | TITLE: Shamrock | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 5x4 ===
+```
+  _
+ ( )
+(_X_)
+  j
+```
+
+=== ID: d5dc0fd05aff4eef | TITLE: Iris | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 16x6 ===
+```
+       , .-. ,
+      /(/ \ \)\
+      '.\_8_/.'
+jgs  .-'`/ \`'-.
+     \_/|   |\_/
+         \_/
+```
+
+=== ID: df69731c153296be | TITLE: Orchid | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 18x7 ===
+```
+           _
+       _ (`-`) _
+     /` '.\ /.' `\
+     ``'-.,=,.-'``
+       .'//v\\'.
+jgs   (_/\ " /\_)
+          '-'
+```
+
+=== ID: 0f94eee357c39e7a | TITLE: Pansies/violets | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 34x8 ===
+```
+      .---. .---.           .-'/
+    /`     \'    `\      .-.| '--.
+   |   .-.  ).-.   |      \   ; (`
+   \ /`   '.'   `\ /    .-.' / .'
+    '\   .-o-.   /`   ___\_.' _/
+jgs   '-( `"` )-'    /.----,`(
+         `"""`\'.__.'/      `\\
+               `----'
+```
+
+=== ID: 6d23fcef0679adef | TITLE: Sunflower | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 17x8 ===
+```
+        _ _
+     .-( : )-.
+    (   \'/   )
+   ( `'.;;;.'` )
+  ( :-=;;;;;=-: )
+   (  .';;;'.  )
+    (`  /.\  `)
+jgs  '-(_:_)-'
+```
+
+=== ID: 1edac305d71e78fd | TITLE: Sunflower | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 19x8 ===
+```
+        _   _
+     .-( '.' )-.
+    (   \ : /   )
+   ( `'-.;;;.-'` )
+  ( :-==;;;;;==-: )
+   (  .-';;;'-.  )
+    (`  / : \  `)
+jgs  '-(_.'._)-'
+```
+
+=== ID: e337af2b0d232e28 | TITLE: Sunflower | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 20x8 ===
+```
+       __   __
+    .-(  '.'  )-.
+   (   \  |  /   )
+  ( `'-.;;;;;.-'` )
+ ( :-==;;;;;;;==-: )
+  (  .-';;;;;'-.  )
+   (`  /  |  \  `)
+jgs '-(__.'.__)-'
+```
+
+=== ID: 9382ad24076374c0 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: plants | SUBCATEGORY: other | SIZE: 19x9 ===
+```
+      |
+    \|/|/
+  \|\\|//|/
+   \|\|/|/
+    \\|//
+     \|/
+     \|/
+      |
+_\|/__|_\|/____\|/_
+```
+
+=== ID: 27bb499deeb3524a | TITLE: Woman tending to her garden | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 33x9 ===
+```
+    _         ___
+  _(_)_    .-'   '-.
+ (_)@(_)  /         \  ,,,   _
+   (_),,, \^^^^|^^^^/ {{{}}_(_)_
+    |{{{}} \   |   /,  ~Y~(_)@(_)
+    | ~Y~(@)\  |  /{}} \|/  (_)
+  (\|/)| \Y/ \ | / ~Y~ \|/ (\|/)
+   \|/\|/\|/  \|/  \|/\\|//\\|//
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: 3110f09b67d84b80 | TITLE: Pansy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 15x11 ===
+```
+      _ _
+    _{ ' }_
+   { `.!.` }
+   ',_/Y\_,'
+     {_,_}
+       |
+     (\|  /)
+      \| //
+       |//
+jgs \\ |/  //
+^^^^^^^^^^^^^^^
+```
+
+=== ID: 6c7c630cebd5307e | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: other | SIZE: 21x12 ===
+```
+     .{{}}}}}}.
+    {{{{{{(`)}}}.
+   {{{(`)}}}}}}}}}
+  }}}}}}}}}{{(`){{{
+  }}}}{{{{(`)}}{{{{
+ {{{(`)}}}}}}}{}}}}}
+{{{{{{{{(`)}}}}}}}}}}
+{{{{{{{}{{{{(`)}}}}}}
+ {{{{{(`)   {{{{(`)}'
+  `""'" |   | "'"'`
+  (`)  /     \
+ ~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: 7a8a030dd62266cd | TITLE: Basket of flowers w/bow | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 30x13 ===
+```
+                   _       _
+         _.=;;;;;;/ '.,-,.' \
+       .:="`   _ _\_.'\_/'._/
+      //_ _   (_I_)  / | \
+     ||(_I_) (_>@<_)/_/_\ \
+     |(_>@<_)_(_I_) (_I_)\|_
+     |_(_I_)_I_)-_.(_>@<(_I_)
+    (_I_)-(_>@<_(_I_)_I(_>@<_)
+   (_>@<_)-(_I_(_>@<_)=_(_I_)
+    (_I_)_-=_==_(_I_)=__=-/
+      \-=_=-_-=_-_=__=-_=/
+jgs    \_=-_-_==-_=-__=-/
+        '-==--===-===--'
+```
+
+=== ID: 78bf6b1bfad939ae | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 15x15 ===
+```
+     __
+  .-/  \-.
+ (  \__/  )
+/`-./;;\.-`\
+\ _.\;;/._ /
+ (  /  \  )
+  '-\__/-'.-,
+ ,    \\ (-. )
+ |\_   ||/.-`
+ \'.\_ |;`
+  '--,\||     ,
+      `;|   _/|
+       // _/.'/
+ jgs  //_/,--'
+     ||'-`
+```
+
+=== ID: aab2a063de5fc2ca | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 28x16 ===
+```
+            .--.
+      .-"-:`    `:-"-.
+   .-/     '.  .'     \-.
+  ;__|      _::_      |__;
+ /`   '.  /` \/ `\  .'   `\
+ |      _ \      / _      |
+ \    /` '.'.  .'.' `\    /
+/ '-._'.  _'./\.'_  .'_.-' \
+\ .-' .'`  .'\/'.  `'. '-. /
+ /    \._.'.'  '.'._./    \
+ |        /      \        |
+ \.__ .'  \._/\_./  '. __./
+  ;  |       ::       |  ;
+   '-\     .'  '.     /-'
+ jgs  '-.-:_    _:-.-'
+            '--'
+```
+
+=== ID: 4c41bb3ebb956951 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: other | SIZE: 28x17 ===
+```
+              * *
+           *    *  *
+      *  *    *     *  *
+     *     *    *  *    *
+ * *   *    *    *    *   *
+ *     *  *    * * .#  *   *
+ *   *     * #.  .# *   *
+  *     "#.  #: #" * *    *
+ *   * * "#. ##"       *
+   *       "###
+             "##
+              ##.
+              .##:
+              :###
+              ;###
+            ,####.
+/\/\/\/\/\/.######.\/\/\/\/\
+```
+
+=== ID: 0c42e3be871ee0d5 | TITLE: Daisies | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 22x17 ===
+```
+       .-.
+ __   /   \   __
+(  `'.\   /.'`  )
+ '-._.(;;;)._.-'
+ .-'  ,`"`,  '-.
+(__.-'/   \'-.__)/)_
+      \   /\    / / )
+       '-'  |   \/.-')
+       ,    | .'/\'..)
+       |\   |/  | \_)
+       \ |  |   \_/
+        | \ /
+         \|/    _,
+    jgs   /  __/ /
+         | _/ _.'
+         |/__/
+          \
+```
+
+=== ID: bb8ee5d0113ab9e0 | TITLE: Daisies | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 19x17 ===
+```
+       .-.
+ __   /   \   __
+(  `'.\   /.'`  )
+ '-._.(;;;)._.-'
+ .-'  ,`"`,  '-.
+(__.-'/   \'-.__)
+      \   /\
+       '-'  \
+        ,    |
+        |\   |
+        \ |  |
+         | \ /
+          \|/    _,
+           /  __/ /
+      jgs | _/ _.'
+          |/__/
+           \
+```
+
+=== ID: 8deda4e97cb5c232 | TITLE: May basket | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 31x17 ===
+```
+         _...,..,..,..,_
+      .=\-=\-\=-=\-=\-=\=,
+     /=}`""`""`""`""`""`{=\
+    {\}        .--.     (\/)
+    {-(\/)  .=<\__{}   (=()=)
+.--.{(=()=)/@  '--'(\/)q_p=.--.
+}__/>=(/\)@(\/)q_p(=()=)^b<\__{
+'--'{q_p(\/)()=)@(\/)\)@q_p`--'
+    {d^(-()-)\)\(=()=)\-(\/)
+    /=\@(/\)q_p\\(/\)@-(=()=)
+   /-\=\-\=\d^(\/)@q_p=\(/\)@\
+  {=\-\=\--\=(=()=)d^b-\=\-\-\}
+  {=\-\=\-\\=-(/\)\=-\=\-\=\=-}
+  {=\-\=\-\\=-\=\-\=-\=\-\==\-}
+   \=\-\=\-\=\-\-\=\-\-\-=\\-/
+jgs \=-\=-\=-=\=-\=\-\=\-=\-/
+     `""`""`""`""`""`""`"""`
+```
+
+=== ID: 876dc98d50492660 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 31x17 ===
+```
+         _...,..,..,..,_
+      .='               ',
+     / }`""`""`""`""`""`{ \
+    { }        .--.     (\/)
+    { (\/)  .=<\__{}   (=()=)
+.--.{(=()=)/@  '--'(\/)q_p=.--.
+}__/>=(/\)@(\/)q_p(=()=)^b<\__{
+'--'{q_p(\/)()=)@(\/)\)@q_p`--'
+    {d^(-()-)\) (=()=)  (\/)\
+    /  @(/\)q_p  (/\)@ (=()=)
+   /        d^(\/)@q_p  (/\)@\
+  {          (=()=)d^b        }
+  {           (/\)            }
+  {                           }
+   \                         /
+jgs \                       /
+     `""`""`""`""`""`""`"""`
+```
+
+=== ID: 1442ea63487e6c07 | TITLE: Iris | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 19x18 ===
+```
+    ,         ,
+   /|   _,_   |\
+  | \.'` \ `'./ |
+  | /   /`>   \ |
+  ; | / |o| \ | ;
+   \_\ /.8.\ /_/
+_.-' .'/   \'. '-._
+\__.'  |   | `;.__/
+  / |  | ; |  | \
+  |  \ '._.'  | |
+   \  \ | |  /  /
+   |  | | | /  /
+   |  | | | |  |
+   \  \ | |/  /
+    \  \| /  /
+ jgs `\ \ | /
+       \ `;/
+       `| |
+```
+
+=== ID: 55f04340abf262b1 | TITLE: Pansies/violets | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 33x19 ===
+```
+    .-'`"'-.      _.---.
+  .'        \   .'      '.
+ /           \ /          \
+|      __     Y    __      |
+|   .'`   '-./  .-'  `'.   |
+ \ /        ',,'        \ /-.
+  \|      .-"()"-.      |/--.`\
+   |    /`  /||\  `\    |    \ \
+    \   |          |   /      ; ;
+     '--`\        /`--'       | |
+          '-.__.-'            ; ;
+          __                  / /
+   .-'''-`  '.  .-.   _     /`/`
+  (_  .--..._ `-'  \_| \  /`/`
+   '.__.     `---._    |/`/`
+        `)    _..  '-./`/`
+        (__.-'  _)  /`/`
+           jgs  `--`/`
+                   `
+```
+
+=== ID: 43b763dfeaa06e54 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 27x20 ===
+```
+                 __
+             .-.'  '.-.
+          .-(   \  /   )-.
+         /   '..oOOo..'   \
+ ,       \.--.oOOOOOOo.--./
+ |\  ,   (   :oOOOOOOo:   )
+_\.\/|   /'--'oOOOOOOo'--'\
+'-.. ;/| \   .''oOOo''.   /
+.--`'. :/|'-(   /  \   )-'
+ '--. `. / //'-'.__.'-;
+   `'-,_';//      ,  /|
+        '((       |\/./_
+          \\  . |\; ..-'
+           \\ |\: .'`--.
+            \\, .' .--'
+             ))'_,-'`
+       jgs  //-'
+           //
+          //
+         |/
+```
+
+=== ID: 8631b2009902cd2a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: other | SIZE: 40x21 ===
+```
+        ,
+        }`-.   ,          ,
+        \ \ '-' \      .-'{
+        _} .  | ,`\   /  ' ;    .-;\
+       {    \ |    | / `/  '-.,/ ; |
+       { -- -.  '  '`-, .--._.' ;  \__
+        \     \ | '  /  |`.    ;    _,`\
+         '. '-     ' `_- '.`;  ; ,-`_.-'
+     ,--.  \    `   /` '--'  `;.` (`  _
+  .--.\  '._) '-. \ \ `-.    ;     `-';|
+  '. -. '         __ '.  ;  ;     _,-' /
+   { __'.\  ' '-,/; `-'   ';`.- `   .-'
+    '-.  `-._'  | `;     ;`'   .-'`
+      <_ -'   ` .\  `;  ;     (_.'`\
+      _.;-"``"'-._'. `:;  ___, _.-' |
+  .-'\'. '.` \ \_,_`\ ;##`   `';  _.'
+ /_'._\ \  \__;#####./###.      \`
+ \.' .'`/"`/ (#######)###::.. _.'
+  '.' .'  ; , |:.  `|()##`"""`
+jgs `'-../__/_\::   /O()()o
+             ()'._.'`()()'
+```
+
+=== ID: cbf9a2d19a217484 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 13x5 ===
+```
+  .-"""-.
+ /* * * *\
+:_.-:`:-._;
+    (_)
+ \|/(_)\|/dwb
+```
+
+=== ID: d580700bbe652de5 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 13x5 ===
+```
+  .-"""-.
+ /* * * *\
+:_.-:`:-._;
+    (_)
+ \|/(_)\|/dwb
+```
+
+=== ID: 0360eec1a5463366 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 15x7 ===
+```
+      ,xXXXXx,
+     ,XXXXXXXX,
+     XXXXXXXXXX
+     `"""XX"""`
+         XX
+         XX
+jgs      XX
+```
+
+=== ID: 5b9f50c032cfe769 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 17x9 ===
+```
+   __.......__
+ ."           ".
+:               :
+:               :
+ `.._________..'
+      :   :
+      :   :
+      :   :
+      `...' mh
+```
+
+=== ID: 81a5ae2633b0f9c2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 6x12 ===
+```
+  n
+ / `\
+(___:)
+ """"
+  ||
+  ||
+  ))
+ //
+((
+ \\
+  ))
+  ||
+```
+
+=== ID: ae876a62a45c9735 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 26x12 ===
+```
+       ------------
+     /  (_)_   _    \
+  /)      (_) (_)      \
+ |       _          _   |
+| _     (_)   _    (_) _ |
+|(_)  _      (_)  _   (_)|
+|____(_)_________(_)_____|
+ \\\\\\\\\||||||||///////
+          |      |
+          |      |
+          |      |
+           \____/
+```
+
+=== ID: f4dffdebbf8bb70f | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 20x13 ===
+```
+         m
+        / \
+       .   \
+      ( O   \
+     /  _   O\
+    /  (_)    .
+   .       O   \
+  (__O__________)
+   \((((())))))/
+       /  X
+      /   ) ShrOOmS
+     |   /
+_m.n.(___)nmm._.,n._
+```
+
+=== ID: c8cc0ebe54da56f3 | TITLE: Untitled | ARTIST: Ilmari Karonen | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 21x14 ===
+```
+         ___..._
+    _,--'       "`-.
+  ,'.  .            \
+,/:. .     .       .'
+|;..  .      _..--'
+`--:...-,-'""\
+        |:.  `.
+        l;.   l
+        `|:.   |
+         |:.   `.,
+        .l;.    j, ,
+     `. \`;:.   //,/
+      .\\)`;,|\'/(
+       ` `itz `(,
+```
+
+=== ID: b4ee587149ce6c22 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 25x14 ===
+```
+        __.....__
+     .'"         "`.
+   .'               `.
+  .                   .
+ .       __...__       .
+. _.--"""       """--._ .
+:"                     ";
+ `-.__    :   :    __.-'
+      """-:   :-"""
+         J     L
+         :     :
+        J       L
+        :       :
+        `._____.' mh
+```
+
+=== ID: 9bbf5a35132b7160 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 25x14 ===
+```
+        __.....__
+     .'" _  o    "`.
+   .' O (_)     () o`.
+  .           O       .
+ . ()   o__...__    O  .
+. _.--"""       """--._ .
+:"                     ";
+ `-.__    :   :    __.-'
+      """-:   :-"""
+         J     L
+         :     :
+        J       L
+        :       :
+        `._____.' mh
+```
+
+=== ID: ad694ed4ad96206a | TITLE: Untitled | ARTIST: Ilmari Karonen | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 21x14 ===
+```
+         ___..._
+    _,--'       "`-.
+  ,'.  .            \
+,/:. .     .       .'
+|;..  .      _..--'
+`--:...-,-'""\
+        |:.  `.
+        l;.   l
+        `|:.   |
+         |:.   `.,
+        .l;.    j, ,
+     `. \`;:.   //,/
+      .\\)`;,|\'/(
+       ` `itz `(,
+```
+
+=== ID: 1472ce976331430e | TITLE: Untitled | ARTIST: Ilmari Karonen | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 12x15 ===
+```
+      ,.
+     J;`.
+    iyi.`.
+   j?7;. :
+  fclu:.` :
+ dE2Xvi;. `.
+JGL56bhx;.';
+4KPY^f:l"`-;
+  """l:;-""
+     `; \
+itz  .' ;
+    /'.'
+   f .'
+   `. \
+    `-'
+```
+
+=== ID: 2d75a6f18728cc4c | TITLE: Untitled | ARTIST: Anil K Narayanan | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 28x16 ===
+```
+           ____
+       _.-'78o `"`--._
+   ,o888o.  .o888o,   ''-.
+ ,88888P  `78888P..______.]
+/_..__..----""        __.'
+`-._       /""| _..-''
+    "`-----\  `\
+            |   ;.-""--..
+            | ,8o.  o88. `.
+            `;888P  `788P  :
+      .o""-.|`-._         ./
+     J88 _.-/    ";"-P----'
+     `--'\`|     /  /
+         | /     |  |
+         \|     /   |akn
+          `-----`---'
+```
+
+=== ID: 53d60d25fb5dca84 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 21x16 ===
+```
+         ,-.
+       ,'   `.
+     ,'       `.
+   ,'           `.
+ ,'               `.
+'___________________`
+         : :
+         : :
+         ` `
+          \ \
+           . .
+           ; ;
+          . .
+         . .
+         ; :
+        .   . mh
+```
+
+=== ID: 4b4b6bbcc84e04a3 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 14x16 ===
+```
+     _.._
+   .'    `.
+ .'        `.
+.____________.
+  `""`  `""'
+      `  `
+       :  :
+       :  :
+       ;  ;
+      .  .
+     '  .
+    '  .
+   .  .
+   ;  :
+  .    .
+ '      ' mh
+```
+
+=== ID: 6701ba8107e6ba49 | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 22x20 ===
+```
+         .8.
+         888
+         888l
+        j8888.
+       .888888.
+      .88888888.
+    .d8888888888b.
+  .d88888888888888b.
+ .888888888888888888b.
+.888888888888888888888
+8888888888888888888888
+888P""""""""""""""4888
+`P'     .    .     `q'
+ `-..____:  :____..-'
+         :  :
+         :  :
+         :  :
+         :  :
+         :  :
+       \(/\\)\/ mh
+```
+
+=== ID: 42c657f5990bb0fb | TITLE: Untitled | ARTIST: Maija Haavisto | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 22x20 ===
+```
+         .8.
+         888
+         888l
+        j`488.
+       .  d888.
+      .88888888.
+    .d88888P'`48b.
+  .d8P""488b  d888b.
+ .888    88888888888b.
+.8888b..d88888888' `88
+88888888888888888. ,88
+888P""""""""""""""4888
+`P'     .    .     `q'
+ `-..____:  :____..-'
+         :  :
+         :  :
+         :  :
+         :  :
+         :  :
+       \(/\\)\/ mh
+```
+
+=== ID: ff4fb666fbb1b311 | TITLE: Untitled | ARTIST: lgbeard | CATEGORY: plants | SUBCATEGORY: mushroom | SIZE: 37x25 ===
+```
+          .
+        ('
+        '|
+        |'
+       [::]
+       [::]   _......_
+       [::].-'      _.-`.
+       [:.'    .-. '-._.-`.
+       [/ /\   |  \        `-..
+       / / |   `-.'      .-.   `-.
+      /  `-'            (   `.    `.
+     |           /\      `-._/      \
+     '    .'\   /  `.           _.-'|
+    /    /  /   \_.-'        _.':;:/
+  .'     \_/             _.-':;_.-'
+ /   .-.             _.-' \;.-'
+/   (   \       _..-'     |
+\    `._/  _..-'    .--.  |
+ `-.....-'/  _ _  .'    '.|
+          | |_|_| |      | \  (o)
+     (o)  | |_|_| |      | | (\'/)
+    (\'/)/  ''''' |     o|  \;:;
+     :;  |        |      |  |/)
+ LGB  ;: `-.._    /__..--'\.' ;:
+          :;  `--' :;   :;
+```
+
+=== ID: 7f329032cf28ad5e | TITLE: Untitled | ARTIST: Ilmari Karonen | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 15x8 ===
+```
+     \      ,
+     l\   ,/
+._   `|] /j
+ `\\, \|f7 _,/'
+   "`=,k/,x-'
+    ,z/fY-=-
+  -'" .y \
+      '   \itz
+```
+
+=== ID: 2c38e02a80124aea | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 28x8 ===
+```
+                      (
+                     (  ) (
+                      )    )
+         |||||||     (  ( (
+        ( O   O )        )
+ ____oOO___(_)___OOo____(
+(_______________________)
+           JOINT
+```
+
+=== ID: c03f2851b571868e | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 35x9 ===
+```
+   ,;;;;;;;;;;;.
+ ,;;;;;;;;;`````)
+,;;;;;;;;'    (@)               ,',
+;;;;;;;;')       \               ,
+;;;;;;;;_}       _)            ',
+;;;;;;'        _;_______________
+`;;;;;        ;_.---------------'
+  `;;;         (
+    `;.        )
+```
+
+=== ID: 81365f90934b1144 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 18x9 ===
+```
+        /\
+ |\    /  \    /|
+ | \   \  /   / |
+ |  |  \  /  |  |
+  \  \ \  / /  /
+|\__\ \\  // /__/|
+ \___--    --___/
+     /_/||\_\
+        ||
+```
+
+=== ID: abd5d06a2a9d7bf4 | TITLE: Untitled | ARTIST: Stanislaw Ciszewski | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 12x9 ===
+```
+    .===. (
+    |   |  )
+    |   | (
+    |   | )
+    |   \*/
+  ,'    //.
+ :~~~~~//~~;
+  `.  // .'
+sc`-------'
+```
+
+=== ID: a470488e7210a045 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 17x13 ===
+```
+        W
+       WWW
+       WWW
+      WWWWW
+W     WWWWW     W
+WWW   WWWWW   WWW
+ WWW  WWWWW  WWW
+  WWW  WWW  WWW
+   WWW WWW WWW
+     WWWWWWW
+  WWWW  |  WWWW
+        |
+        |
+```
+
+=== ID: 4dc63f842f2d2968 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 37x14 ===
+```
+                 |
+                 |.|
+                 |.|
+                |\./|
+                |\./|
+.               |\./|               .
+ \^.\          |\\.//|          /.^/
+  \--.|\       |\\.//|       /|.--/
+    \--.| \    |\\.//|    / |.--/
+     \---.|\    |\./|    /|.---/
+        \--.|\  |\./|  /|.--/
+           \ .\  |.|  /. /
+ _ -_^_^_^_-  \ \\ // /  -_^_^_^_- _
+   - -/_/_/- ^ ^  |  ^ ^ -\_\_\- -
+```
+
+=== ID: b26d806613e3954f | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 16x15 ===
+```
+      #~~
+     )#(
+    ( # ) BONG
+     ___
+    |   |
+    |   |
+    |   |
+    |   |
+    |   |
+___ |   |
+\  \|   |
+ \  |   |
+ /-------\
+(_________)
+ \_______/  BONG
+```
+
+=== ID: 0a023c9082b9bd38 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 37x16 ===
+```
+                  |
+                 |.|
+                 |.|
+                |\./|
+                |\./|
+.               |\./|               .
+ \^.\          |\\.//|          /.^/
+  \--.|\       |\\.//|       /|.--/
+    \--.| \    |\\.//|    / |.--/
+     \---.|\    |\./|    /|.---/
+        \--.|\  |\./|  /|.--/
+           \ .\  |.|  /. /
+ _ -_^_^_^_-  \ \\ // /  -_^_^_^_- _
+   - -/_/_/- ^_^/| |\^_^ -\_\_\- -
+             /_ / | \ _\
+                  |
+```
+
+=== ID: 3b688acb23457134 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 35x16 ===
+```
+                 |
+                |.|
+               |\./|
+               |\./|
+.              |\./|              .
+\^.\          |\\.//|          /.^/
+ \--.|\       |\\.//|       /|.--/
+   \--.| \    |\\.//|    / |.--/
+    \---.|\    |\./|    /|.---/
+       \--.|\  |\./|  /|.--/
+          \ .\  |.|  /. /
+_ -_^_^_^_-  \ \\ // /  -_^_^_^_- _
+  - -/_/_/- ^ ^  |  ^ ^ -\_\_\- -
+            /-./ | \.-\
+           /-/   |   \-\
+          ;|`         '|;
+```
+
+=== ID: b1b657e69112f702 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: marijuana | SIZE: 19x26 ===
+```
+  .,;
+  ';,.'      ';.,'
+          ;,.;'
+
+      ;.,:   '.,;,
+   ',.  .',;;.',;
+ ____________
+ \oooooooooo/
+  \________/
+  {________}
+   \______/
+    ',__,'
+     |oo|
+     |oo|    _____
+     |==|   / ___()
+     |==|  / /
+     |oo| / /
+     |oo|/ /
+     |==/ /
+     |='./
+     |oo|
+     |==|
+     |__|
+   ,'____',
+ /"________"\
+/____________\
+```
+
+=== ID: c7ef39d8193e27c9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 5x3 ===
+```
+  |
+(_|_)
+  |
+```
+
+=== ID: 6745602196530028 | TITLE: Untitled | ARTIST: Asik aka Asia Mazur (asioleck) | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 11x4 ===
+```
+ _\_\/
+-( / )-
+  \_/
+  @@@  Asik
+```
+
+=== ID: 8b26be35cb185504 | TITLE: Untitled | ARTIST: Michele Cerulli | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 12x7 ===
+```
+    o
+.oo.Oo.
+   O.
+    Ooo'
+ ___O___
+ \     /
+  \___/   mc
+```
+
+=== ID: ef65a0dff80530a6 | TITLE: Untitled | ARTIST: Martin Atkins | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 15x8 ===
+```
+  _  _
+ | || | _
+-| || || |
+ | || || |-
+  \_  || |
+    |  _/
+   -| | \
+    |_|-    mga
+```
+
+=== ID: db75038cf1ecf9d1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 12x8 ===
+```
+    ,*-.
+    |  |
+,.  |  |
+| |_|  | ,.
+`---.  |_| |
+    |  .--`
+    |  |
+    |  | kra
+```
+
+=== ID: a9e719493bb2306a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 25x9 ===
+```
+      _
+     / \        _
+   , | | ,     / \
+  ((_| |_))  , | | ,
+  `--, ,--` ((_| |_))
+     | |    `--, ,--`
+ ^^^^| |^^^^^^^| |^^^^^^^
+    `"""`      | |
+jgs           `"""`
+```
+
+=== ID: eccbef4d427a03c7 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 15x12 ===
+```
+       w
+      /'\
+      |`|
+   _  |'|  _
+  /.\ |`| /,\
+  |'(_|.|_).|
+  \.'`.'`.`'/
+   `--.'.--'
+      |.|
+      |`|
+jgs   |.|
+ `'`'`'`'`'`'`'
+```
+
+=== ID: df4a2580cad3c78a | TITLE: Untitled | ARTIST: Birgit Nietsch | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 19x14 ===
+```
+           *-*,
+       ,*\/|`| \
+       \'  | |'| *,
+        \ `| | |/ )
+         | |'| , /
+         |'| |, /
+       __|_|_|_|__
+      [___________]
+       |         |
+       |         |
+       |         |
+       |_________|
+
+Birgit Nietsch
+```
+
+=== ID: 55f8a3afc49c64c9 | TITLE: Untitled | ARTIST: Martin Atkins | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 16x14 ===
+```
+        _    _
+       | |  | |
+      -| |  | |-
+  _    | |- | |
+-| |   | |  | |-
+ |.|  -| ||/  |
+ | |-  |  ___/
+-|.|   | | |
+ |  \_|| |
+  \____  |
+   |   | |-
+       | |
+      -| | mga
+       |_|
+```
+
+=== ID: 7ac91f9323892990 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 17x14 ===
+```
+      /|\
+     |||||
+     |||||
+ /\  |||||
+|||| |||||
+|||| |||||  /\
+|||| ||||| ||||
+ \|`-'|||| ||||
+  \__ |||| ||||
+     ||||`-'|||
+     |||| ___/
+     |||||
+     |||||
+-----------------
+```
+
+=== ID: 46cf03755be68830 | TITLE: Cactus | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 21x16 ===
+```
+        #%:.
+ #%=   ###%=:
+##%=   |##%::
+##%=   ###%=:
+ #%%=  |##%=:
+ ##%== ###%=:    ===
+  ##%%=!##%=:    ====
+   ###%%##%=   :====
+    ######%=: .:====
+      ####%%=======
+       ###%%%===:
+       |%#%%=:=:
+       ####%=:
+       |##%%:
+-------####%:---=
+       |%#%%:
+```
+
+=== ID: 1c5a23a36e4114f4 | TITLE: Untitled | ARTIST: Faux_Pseudo | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 32x16 ===
+```
+                         x@x
+                         /\ /\
+                         | | X
+                         x X x@
+                         X | |
+   _x_x__x_____x         | X x
+  x  / x | x x  \        x x X
+ x  x x| x |x x  x       X @ |
+ |  | |x | || |  |       | X x
+ |  x || x x| |  x       x x X
+__\__x_x_|_x_x__/__      @ | x
+\                 /      X X X
+ `---------------'      _|___|_
+  |        :F_P:|      \       /
+  \_____________/       |:F_P:|
+                        `_____'
+```
+
+=== ID: 4b9c275b8e177f06 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 19x17 ===
+```
+      ,`""',
+      ;' ` ;
+      ;`,',;
+      ;' ` ;
+ ,,,  ;`,',;
+;,` ; ;' ` ;   ,',
+;`,'; ;`,',;  ;,' ;
+;',`; ;` ' ; ;`'`';
+;` '',''` `,',`',;
+ `''`'; ', ;`'`'
+      ;' `';
+      ;` ' ;
+      ;' `';
+      ;` ' ;
+      ; ',';
+      ;,' ';
+  dwb\|/\|/;\|/
+```
+
+=== ID: 78580ec8ae7c9655 | TITLE: Untitled | ARTIST: Donovan Baker | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 19x17 ===
+```
+      ,`""',
+      ;' ` ;
+      ;`,',;
+      ;' ` ;
+ ,,,  ;`,',;
+;,` ; ;' ` ;   ,',
+;`,'; ;`,',;  ;,' ;
+;',`; ;` ' ; ;`'`';
+;` '',''` `,',`',;
+ `''`'; ', ;`'`'
+      ;' `';
+      ;` ' ;
+      ;' `';
+      ;` ' ;
+      ; ',';
+      ;,' ';
+  dwb\|/\|/;\|/
+```
+
+=== ID: 11d2a7b268fe804f | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 34x21 ===
+```
+                /||\
+                ||||
+                ||||
+                |||| /|\
+           /|\  |||| |||
+           |||  |||| |||
+           |||  |||| |||
+           |||  |||| d||
+           |||  |||||||/
+           ||b._||||~~'
+           \||||||||
+            `~~~||||
+                ||||
+                ||||
+~~~~~~~~~~~~~~~~||||~~~~~~~~~~~~~~
+  \/..__..--  . |||| \/  .  ..
+\/         \/ \/    \/
+        .  \/              \/    .
+. \/             .   \/     .
+   __...--..__..__       .     \/
+\/  .   .    \/     \/    __..--..
+```
+
+=== ID: eb39f4d89aa010e2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 20x22 ===
+```
+        |_|_|
+  \_|||;;_/
+     \d||%||%:b/
+\d~|dO%|i::b/
+  ._H||dSf|||%::H_.
+  ._H@|dLF|}|;::H_.
+._H||dXFt||;.:H_.
+._?|{|P|||/;:.P_.
+ ._Hy||t|||;:H_.
+   ._?|x||T|;i:P_.
+    ._H||i||;:H_.
+    ._H|"|||;:H_.
+ .=================.
+ |;;|#H#|;;;;;;;;: |
+ .=================.
+  |;|#H#|;;;;;;;: |
+   |;|#H#|;;;;;: |
+   |;|#H#|;;;;;: |
+    |;|#H#|;;;: |
+    |;|#H#|;;;: |
+     |;|#H#|;: |
+      =========
+```
+
+=== ID: 3c0142641335a74f | TITLE: cactus cowboy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: cactus | SIZE: 32x41 ===
+```
+              _   _
+             / '-' \
+            ;       ;
+         /'-|       |-'\
+        |   |_______K   |
+        \   '-------'   /
+         '.___.....___.'
+            | ;  : ;|
+           _|;__;__.|_
+          |     Y     |    .--.
+ .--.      \__.'^'.__/    /;   \
+/   ;\      |_  ;  _|     |  ' |
+| ;  |      { `"""` }     |;   |
+|'   |      {       }     | ;  |
+|  ; |      {       }     |    |
+|;   |      ;`-.__.'|     |:  ;|
+| ;  \      |;  ;   |_____/ ;  |
+|   '.'-----'      ' -_   .'   /
+\  '.   - _  ' ;  ;  _  -    .'
+ '.   -     - ;  ;   .------`
+   `--------.      ;|
+        jgs |;  ,   |
+            |     ; |
+            |. ;    |
+            | :    :|
+            |   .   |
+            |;   ;  |
+            |;  ,   |
+            |     ; |
+            |. ;    |
+            | :    :|
+            |   .   |
+            |;   ;  |
+            |;  ,   |
+            |     ; |
+            |     ; |
+            |. ;    |
+            | :    :|
+            |   .   |
+            |;   ;  |
+            `"-----"`
+```
+
+=== ID: 1a72b2026ee7e35b | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: leaf | SIZE: 7x7 ===
+```
+   |
+ .'|'.
+/.'|\ \
+| /|'.|
+ \ |\/
+  \|/
+   `
+```
+
+=== ID: 598cfdcdfe0aed93 | TITLE: Maple leaf | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: leaf | SIZE: 15x8 ===
+```
+     .\^/.
+   . |`|/| .
+   |\|\|'|/|
+.--'-\`|/-''--.
+ \`-._\|./.-'/
+  >`-._|/.-'<
+ '~|/~~|~~\|~'
+       |
+```
+
+=== ID: a17a0b01be5bc646 | TITLE: Untitled | ARTIST: unknown | CATEGORY: plants | SUBCATEGORY: leaf | SIZE: 15x8 ===
+```
+       |
+  _|\__|__/|_
+ `>.-' |\'-.<`
+ /.-' /|'\'-.\
+'--.-/.|\-..--'
+   |/|/|.|\|
+   ' |.|\| '
+     '/.\'
+```
+
+=== ID: 061c41889fde938e | TITLE: Untitled | ARTIST: Andrew Hood (Andy, Flookster) | CATEGORY: plants | SUBCATEGORY: leaf | SIZE: 20x8 ===
+```
+`-.        _.-'
+ \ `,    .'/.'
+  \`.`. :.-'.-= .-'/
+   `-.:/o  .'-'/ .'
+      o\o / ._/.'
+        \| /o|\`.
+    AsH  |'o `.`.'.
+               `--'
+```
+
+=== ID: a039026dc6980c6b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: plants | SUBCATEGORY: leaf | SIZE: 40x21 ===
+```
+        ,
+        }`-.   ,          ,
+        \ \ '-' \      .-'{
+        _} .  | ,`\   /  ' ;    .-;\
+       {    \ |    | / `/  '-.,/ ; |
+       { -- -.  '  '`-, .--._.' ;  \__
+        \     \ | '  /  |`.    ;    _,`\
+         '. '-     ' `_- '.`;  ; ,-`_.-'
+     ,--.  \    `   /` '--'  `;.` (`  _
+  .--.\  '._) '-. \ \ `-.    ;     `-';|
+  '. -. '         __ '.  ;  ;     _,-' /
+   { __'.\  ' '-,/; `-'   ';`.- `   .-'
+    '-.  `-._'  | `;     ;`'   .-'`
+      <_ -'   ` .\  `;  ;     (_.'`\
+      _.;-"``"'-._'. `:;  ___, _.-' |
+  .-'\'. '.` \ \_,_`\ ;##`   `';  _.'
+ /_'._\ \  \__;#####./###.      \`
+ \.' .'`/"`/ (#######)###::.. _.'
+  '.' .'  ; , |:.  `|()##`"""`
+jgs `'-../__/_\::   /O()()o
+             ()'._.'`()()'
+```
+

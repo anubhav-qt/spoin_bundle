@@ -1,0 +1,1616 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: TELEVISION
+# Total artworks in category fitting <=40 cols: 88
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: b480e13c6a6bda86 | TITLE: Barney | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: barney | SIZE: 27x21 ===
+```
+          _.-"""-._
+         /  _   _  \
+        /  (9) (9)  \
+       /_,         ,_\
+       | \         / |
+_      \  \._____./  /  __
+\`\     \   \___/   / _|  \
+ \ `\   /\         /\ \   /
+  |  `\/ /`'-----'`\ \/  /
+  |_|\/ /           \   /
+  /    /|           |\_/
+  \___/ |           | \
+   \ .  |           |  \
+    \|  |           |  |
+     |  `.         .'  |
+     \    `-.___.-'    /
+     `\       |       /'
+   jgs `\     |     /'
+    .-.-.`\   |   /'.-.-.
+   (,(,(,`^   |   ^`,),),)
+    '-'-'-----`-----'-'-'
+```
+
+=== ID: 757f73e7b57a4095 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: gumby-and-pokey | SIZE: 36x10 ===
+```
+           ,
+    /| .-'`|       .--.
+    \\ |o o|      ( -, \
+     \\| - |      .'o \|
+      \     \    (_.,  '.________.-.
+       |   |\\       \           \ |
+       | . | \|       \  ______  /_/
+       ; | ;          |||     |||
+      /  |  \         |||     |||
+jgs  /___|___\       //_|    //_|
+```
+
+=== ID: afac6a42e9a12da6 | TITLE: Pokey | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: gumby-and-pokey | SIZE: 32x14 ===
+```
+                         ____
+                      .-' _..`.
+                     /  .'_.'.'
+                    | .' (.)`.
+                    ;'   ,_   `.
+    .--.__________.'    ;  `.;-'
+   |  ./               /
+   |  |               /
+   `..'`-._  _____, ..'
+        / | |     | |\ \
+       / /| |     | | \ \
+      / / | |     | |  \ \
+jgs  /_/  |_|     |_|   \_\
+    |__\  |__\    |__\  |__\
+```
+
+=== ID: 24f9244d525108a2 | TITLE: Gumby | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: gumby-and-pokey | SIZE: 21x19 ===
+```
+            _.-,
+        __.'   |   .,
+      ,'_   _  | :` ;
+      |'_` '_`|' : ,'
+      |(o) (o)|  ; ;
+      `|  A  |'  ; ;
+    _..| `-' |..'.'
+  .'.--.     .--'
+.'.'   |     |
+| :    |     |
+: |    |     |
+`.`.   ;     :
+  `'   Y  .  Y
+       |  |  |
+       |  |  |
+       ;  |  :
+      /   |   \
+jgs  ;    |    :
+    /_____|_____\
+```
+
+=== ID: 0568e206b4d8e07f | TITLE: Dexter | ARTIST: John Stachowicz | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 18x6 ===
+```
+      @%%%<
+     ()()-b
+.     <   |
+ \   \_C7_|_
+ 8]J=|_:|_|\3
+     /_/_n|    jjs
+```
+
+=== ID: 70929b1f2d410920 | TITLE: Grampa | ARTIST: John Stachowicz | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 16x6 ===
+```
+     ~%%
+    /~.:\
+   ()()-D
+   {={__/\
+8rJ~|_:|_L3
+ |  /_/_n|   jjs
+```
+
+=== ID: f421fd95f7f4fdec | TITLE: Mandark | ARTIST: John Stachowicz | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 12x10 ===
+```
+   _.---._
+  /       \
+ /    ~~~~ \
+ ! _|\/|___|
+ \/   _  _/
+  \--( )( )
+  (C      >
+    \    _\
+     \  /
+jjs   ||
+```
+
+=== ID: 69072bd6d6d700ac | TITLE: Major Glory | ARTIST: John Stachowicz | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 20x11 ===
+```
+     ___         ___
+     \=3|  r=>  |E=/
+       |\__||___/|
+       |\  _  _  |
+       | \(O\/O)/|
+       |  \    / |
+       |   \__/  |
+       |    ___  |
+        \   \__|  \
+         \        /
+   jjs    \___\__/
+```
+
+=== ID: e19095e581c1b386 | TITLE: Dee Dee | ARTIST: John Stachowicz | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 20x13 ===
+```
+      ,     ,
+      )\    )\
+     (  )---- )
+       /)(o^(o\
+      C   c__> )
+       '._  .-'
+      ____||_  O0o
+    n//  /__\\/u
+    O0o  //\\
+        //  \\
+        \\   \\
+       __\\   \\___
+jjs   (C__/    \__>)
+```
+
+=== ID: f214c1d2b5b3e53c | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 39x17 ===
+```
+       ,-.                    .'\ _
+      ,'   \                 .'   (_)
+     J     '-._ /\         .'     (,_)
+    /  _  /   ,'# )_       _\_     (_)
+   /  '_Y'   /_.,'  \     (  _')     \
+   | _ /   ,'\/  .   |    '.  __)     \
+   |'.Y   / # ) --'  /  _.-'  __)    .'
+_._\,'  ,'__,'      /  _\    / \   .'
+  ,'-_ /           _.-' _\  /   \.'
+ '    (_       _.-' _.-'  \/
+        \  _.-' _.-' '-.     ./
+         -'  .-'        '-.-'/
+         |   \o     _.-'####/
+         |    \o_.-' \#####/
+         |_.-#\       \###/
+         ######\       \/'
+         # #####`-.
+```
+
+=== ID: 7d7618f72d5e3d1c | TITLE: Dee Dee | ARTIST: John Stachowicz | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 18x24 ===
+```
+       _______
+  ____/___3___\__
+ /_  //\___/_ \\_\
+   )// ) --^-\ \\
+    \\/ (O)(O)\//
+     \\    >  |/
+      \\ <__> /
+       \\  __/
+        \||/
+         ||
+        /  \
+       /____\
+        ||\\
+        || \\
+        ||  \\
+        ||  //
+        ||_//
+        / _/
+       (_//
+        ||
+        ||
+       /|\
+jjs    |\)
+       \_/
+```
+
+=== ID: 96025e8253c427cf | TITLE: Dee Dee | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: dexters-laboratory | SIZE: 33x35 ===
+```
+                         _
+                      ,-´ `-.
+                     /       '-.
+                    (        ,-´"
+  ,""-.              \     ,/
+ /     `.           __>---<
+/_       \___---"""",. \   \
+V "-.__../   ),"`\ /_ \ `-._)
+         \  / \ #/ \"_/ ,/ ,J
+          \/ \.`´ ^  _,´/ /
+         ("   \`---""  / /
+          `-.  \ ___  / /
+             `. `-.,>´ /
+               `.     /
+                 `.  (
+                   )_|
+                   |_|
+                .--´ `--.
+                 "--.--"
+                  /|||\
+                  |||||
+                 / ||| \
+                 | ||| |
+            _.---´ ||| `---._
+           (_.---  |||  ---._)
+            (.-'  /|||\  '-.)
+             ""´`.)|||(.´`""
+                   |||
+                   |||
+                   |T|
+                ___|T|___
+            .--´ _J T L_ `--.
+         .-´L--"´   |   `"--J`-.
+        /     __.--´ `--.__     \
+        \_.--´             `--._/
+```
+
+=== ID: f46e44613f36454f | TITLE: Tommy | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: rugrats | SIZE: 26x16 ===
+```
+         .'"'"''.
+       .' _   _  '.
+      _: |.| |.|  :_
+     (.' '-')'-'  '.)
+     : --._____.-- :
+      '.... - ....`
+      ..__.:_:..__.._
+    .'               '.
+   .'--:.-        -.___:
+  _' .' \.._._____/'. '._
+ (.-,' .'--------:_  :.-.'
+    .'''.     == .''.
+    '.  '..      :   :,,,
+snd  :  .'.___..''.. ' .'
+    .' .'          '_.'
+   ',.'
+```
+
+=== ID: b36e0109e3e5da79 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: rugrats | SIZE: 30x22 ===
+```
+      ', ':.:.  : .;'
+  ':::.::.:::::::::
+   .::::::;:::;:::::::::..
+  .:  ::___';'___ :::'
+     .=[[.]|=|[.]|;'):;
+    :  '--- ..---'  '. '
+   ,: '-._________.- :
+     :-._ '-UU.-'_.-;;.
+         '--. .-'
+      __.--='='=---._
+    .'     _ __      `-._
+  .'        :-_:        //
+  \\__.-.   '--'-   '._|/ '._
+ .''--' _\_      ___:    '.  :
+ :  /  /   `'--'`    \    :;.'
+:' :  /               '.
+'..' :         _      .'
+     |  ____  / \   __ \
+      ``|__|`'   '-|__|'
+        :  '.     .'  ='._
+  snd .' = .'     ''-.____:
+      :___.'
+```
+
+=== ID: 05fd5e76aa5a36e8 | TITLE: Constitution Class: USS Enterprise  NCC1701 | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: star-trek | SIZE: 40x7 ===
+```
+__________________           __
+\_________________|)____.---'--`---.____
+              ||    \----.________.----/
+              ||     / /    `--'
+            __||____/ /_
+           |___         \
+               `--------'
+```
+
+=== ID: 708ba9c60a66291e | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: star-trek | SIZE: 28x14 ===
+```
+           ______
+        _-' .   .`-_
+    |/ /  .. . '   .\ \|
+   |/ /            ..\ \|
+ \|/ |: .   ._|_ .. . | \|/
+  \/ |   _|_ .| . .:  | \/
+ \ / |.   |  .  .    .| \ /
+  \||| .  . .  _|_   .|||/
+ \__| \  . :.  .|.  ./ |__/
+   __| \_  .    .. _/ |__
+    __|  `-______-'  |__
+       -,____  ____,-
+         ---'  `---
+UNITED FEDERATION OF PLANETS
+```
+
+=== ID: ab2e908684e55cf3 | TITLE: Scooby Doo | ARTIST: lgbeard | CATEGORY: television | SUBCATEGORY: other | SIZE: 31x16 ===
+```
+                      |\ /|
+                      |  OO)_..
+                      /  .  '.'
+                      | ( '_.'
+                      \  `-.'
+        .             /`-._|
+      .''          _.' `-._|
+     ((      __..-'-_)     '
+      ''..-'   ,'          |
+       `.  `--'      ()    '
+       /      .--.  <.   .'
+       |     '   )`- | | |
+        `.  / .-`    | | |
+          ) | |_     | | |
+  LGB/ .-'  ..__)  _.' ' `-.
+Jill.S '._.'      '._.-^---'
+```
+
+=== ID: 562dfed550cb25dc | TITLE: Buffy | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: other | SIZE: 20x22 ===
+```
+         _,--.
+        (.-'-.\
+        /|a,a|)\
+        )\ _ /|\
+       _//'-(_<_\
+      /-__  / .-.\
+       { r    '. '.
+       //__ _.--'  >
+      / {_.'.-----'
+      '- .-'      \
+        (    \     )
+         '.   '.--'
+           '.   \/
+          /  '.  \
+         /    /\_.7
+         |   / _)  \
+         /  / /__/-'
+        /  )
+        |  /
+        |_/
+snd  _.'  (
+    '---'-'
+```
+
+=== ID: ba6331ae9dc92522 | TITLE: Teletubbies | ARTIST: Maija Haavisto | CATEGORY: television | SUBCATEGORY: other | SIZE: 31x25 ===
+```
+            .-"-.
+           : /"\ :
+           `.`-'.'
+             | |
+          _..| |.._
+     _  ."   ___   ".  _
+    : `: .-""   ""-. :' :
+    `  : : ()   () : :  '
+     `.` `   ___   ' '.'
+        `-`._____.'-'
+        .-"       "-.
+      ."             ".
+    .'  .^         `.  `.
+  ."  .".'          `".  "
+ `   ' .    _______  ` ".  "._
+`_.-'      :       :  `  "._  )
+      .    :       :   .    `"
+      .    '-------'
+       .                '
+        .       _      :
+        :     .' `.    :
+        :    .     .   :
+        :   .          :
+        :___.       .__:
+       (____)       (___) mh
+```
+
+=== ID: 436b4147d81882cc | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 14x7 ===
+```
+    (o)(o)
+  w"      "w
+ W  -====-  W
+  "w      w"
+ w""""""""""w
+W            W
+Cookie Monster
+```
+
+=== ID: 7876126b21eac862 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 20x8 ===
+```
+               ...
+             ."o o".
+   oo        "  O  "
+ w"()"w      "-===-"
+W -==- W      "..."
+ "wwww"      ."   ".
+w"    "w     "     "
+     Elmo & Grover
+```
+
+=== ID: fc60a60c5bf1b61b | TITLE: Cookie monster | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 28x8 ===
+```
+               _  _
+             _/0\/ \_
+    .-.   .-` \_/\0/ '-.
+   /:::\ / ,_________,  \
+  /\:::/ \  '. (:::/  `'-;
+  \ `-'`\ '._ `"'"'\__    \
+   `'-.  \   `)-=-=(  `,   |
+jgs    \  `-"`      `"-`   /
+```
+
+=== ID: 104261edaf53780d | TITLE: Elmo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 17x8 ===
+```
+         .@@.
+        / () \
+      _ \'--'/ _
+     { '-`""`-' }
+      `"{    }"`
+       _/ /\ \_
+jgs  {`  /  \  `}
+      `"`    `"`
+```
+
+=== ID: f29c0e0e96bc27bb | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 16x10 ===
+```
+     wwwwww
+   w"ww  ww"w
+  W   o""o   W
+  W  ______  W
+  "w \_\/_/ w"
+ ww""wwwwww""ww
+  ||||||||||||
+  ||||||||||||
+  ||||||||||||
+Oscar the Grouch
+```
+
+=== ID: 53e55c8a107678e1 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 23x10 ===
+```
+   WW
+  /__\
+ | oo |      _WWWWW_
+(|_()_|)    /  o o  \
+  \__/    (|  __O__  |)
+ /|\/|\     \ \___/ /
+||||||||    /-------\
+||||||||   |=========|
+||||||||   |=========|
+    Bert & Ernie
+```
+
+=== ID: 1eb97596a0e8d55b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 32x10 ===
+```
+                       \WWW/
+                       /   \
+                      /wwwww\
+                    _|  o_o  |_
+       \WWWWWWW/   (_   / \   _)
+     _.'` o_o `'._   |  \_/  |
+    (_    (_)    _)  : ~~~~~ :
+      '.'-...-'.'     \_____/
+       (`'---'`)      [     ]
+jgs     `"""""`       `"""""`
+```
+
+=== ID: 7a5b51251ef9f730 | TITLE: Cookie monster | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 24x10 ===
+```
+            _  _
+me want    (.)(')
+more...   / ___, \  .-.
+    .-. _ \ '--' / (:::)
+   (:::{ '-`--=-`-' }"`
+    `-' `"/      \"`
+          \      /
+         _/  /\  \_
+  jgs   {   /  \   }
+         `"`    `"`
+```
+
+=== ID: 16a7238c69b8add0 | TITLE: Elmo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 18x10 ===
+```
+         _  _
+        (o)(o)
+       /  ()  \
+     _ \ '--' / _
+    { '-`'"'"`-' }
+     `"/      \"`
+       \      /
+      _/  /\  \_
+jgs  {   /  \   }
+      `"`    `"`
+```
+
+=== ID: a9bcd6ddbb7f263f | TITLE: Elmo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 20x10 ===
+```
+           _  _
+hehehehe  (.)(.)
+       \ /  ()  \
+       _ \ '--' / _
+      { '-`""""`-' }
+       `"/      \"`
+         \      /
+        _/  /\  \_
+ jgs   {   /  \   }
+        `"`    `"`
+```
+
+=== ID: f83bd5ea8df018a8 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 18x11 ===
+```
+    .wwwwwwww.
+  .w"  "WW"  "w.
+ ."   /\  /\   ".
+|\     o  o     /|
+ \|  ___\/___  |/
+ / \ \_v__v_/ / \
+/ | \________/ | \
+>  \   WWWW   /  <
+\   \   ""   /   /
+ \   \      /   /
+    The Count
+```
+
+=== ID: 00ede1d73b61f1e4 | TITLE: Elmo (face) | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 33x11 ===
+```
+            .--. .--.
+       _..-:  o :  o :-.._
+   .-''    `.__.:.__.'    ``-.
+ .'          .'   `.          `.
+:  '.        :     :        .'  ;
+:    :-..__  `.___.'  __..-;    ;
+`.    `.   ''-------''   .'    ,'
+  `.    `.             .'    .'
+    `._   `-._     _.-'   _.'
+jgs    `-._   '"'"'   _.-'
+           ``-------''
+```
+
+=== ID: 015fea17f4415b6f | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 31x18 ===
+```
+              (&#1074;)
+               |
+            ,,.--.,,
+     ,-,   /     |  \ ,,,,
+   ,' ,-,|/_____/__,-'_,  ",
+   |  (,/------'     '-,"-, |
+,,-'-,-/,-'o',.-.,      '-','
+ \    / '-,-.( o '        \
+ (   (    '.' '-'         |
+  \   "",------;:'       /
+  /    \ "-..-"      ,.-'-.,
+ /      '-,,,.--'''''       \
+ |    ,.-''-;,,;-'''-.       '.
+ '-.-'::::: /|(""'-.,_;---''--;
+   |.',   ,'_,.'             .'
+   |'-,'''('          __,.-''|
+   \   '-' '/   /|   /  tlp3 |
+            ''-' '-''
+```
+
+=== ID: 1b6e81e0eed81fa3 | TITLE: Elmo | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 34x26 ===
+```
+         __   __
+       .'  '.'  `.
+    _.-|  o | o  |-._
+  .~   `.__.'.__.'^  ~.
+.~     ^  /   \  ^     ~.
+\-._^   ^|     |    ^_.-/
+`\  `-._  \___/ ^_.-' /'
+  `\_   `--...--'   /'
+     `-.._______..-'      /\  /\
+        __/   \__         | |/ /_
+      .'^   ^    `.      .'   `__\
+    .'    ^     ^  `.__.'^ .\ \
+   .' ^ .    ^   .    ^  .'  \/
+  /    /        ^ \'.__.'
+ |  ^ /|   ^      |
+  \   \|^      ^  |
+   `\^ |        ^ |
+     `~|    ^     |
+       |  ^     ^ |
+       \^         /
+        `.    ^ .'
+   jgs   : ^    ;
+ .-~~~~~~   |  ^ ~~~~~~-.
+/   ^     ^ |    ^       \
+\^     ^   / \  ^     ^  /
+ `~~~~~~~~'   `~~~~~~~~~'
+```
+
+=== ID: 40f776b7d070ab2c | TITLE: Oscar the Grouch | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 33x28 ===
+```
+               ____
+   ___________//__\\__________
+  /___________________________\
+  I___I___I___I___I___I___I___I
+        < ,wWWWWwwWWWWw, >
+       <  WW( 0 )( 0 )WW  >
+      <      '-'  '-'      >
+     <    ,._.--""--._.,    >
+     <   ' \   .--.   / `   >
+      <     './__\_\.'     >
+    ___<.-.____________.-.>___
+   (___/   \__________/   \___)
+    |  \,_,/          \,_,/  |
+  .-|/^\ /^\ /^\ /^\ /^\ /^\ |-.
+ / (|/\| | | | | | | | | | /\|) \
+ '.___/| | | | | | | | | | \___.'
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+    || | | | | | | | | | | | |
+jgs |\_/ \_/ \_/ \_/ \_/ \_/ |
+    |                        |
+    `""""""""""""""""""""""""`
+```
+
+=== ID: c8362d8adb3a20fb | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: futurama | SIZE: 8x7 ===
+```
+   T
+ .-"-.
+|  ___|
+| (.\/.)
+|  ,,,'
+| '###
+ '----'
+```
+
+=== ID: 66731cfd4b97fd98 | TITLE: Untitled | ARTIST: Silver Saks | CATEGORY: television | SUBCATEGORY: futurama | SIZE: 32x18 ===
+```
+      _
+     ( )
+      H
+      H
+     _H_
+  .-'-.-'-.
+ /         \
+|           |
+|   .-------'._
+|  / /  '.' '. \
+|  \ \ @   @ / /
+|   '---------'
+|    _______|
+|  .'-+-+-+|
+|  '.-+-+-+|         Silver Saks
+|    """""" |
+'-.__   __.-'
+     """
+```
+
+=== ID: 2fc02c7aeb4664a8 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: television | SUBCATEGORY: futurama | SIZE: 36x19 ===
+```
+  _________________________________
+ |.--------_--_------------_--__--.|
+ ||    /\ |_)|_)|   /\ | |(_ |_   ||
+ ;;`,_/``\|__|__|__/``\|_| _)|__ ,:|
+((_(-,-----------.-.----------.-.)`)
+ \__ )        ,'     `.        \ _/
+ :  :        |_________|       :  :
+ |-'|       ,'-.-.--.-.`.      |`-|
+ |_.|      (( (*  )(*  )))     |._|
+ |  |       `.-`-'--`-'.'      |  |
+ |-'|        | ,-.-.-. |       |._|
+ |  |        |(|-|-|-|)|       |  |
+ :,':        |_`-'-'-'_|       ;`.;
+  \  \     ,'           `.    /._/
+   \/ `._ /_______________\_,'  /
+    \  / :   ___________   : \,'
+     `.| |  |           |  |,'
+       `.|  |           |  |
+         |  | SSt       |  |
+```
+
+=== ID: 10b305695be8fb93 | TITLE: Untitled | ARTIST: Marco Kirschke (aka (c) NamelessOne) | CATEGORY: television | SUBCATEGORY: futurama | SIZE: 29x24 ===
+```
+                ()
+                JL
+                ||
+                LJ
+          _,--"""""""---.
+        ,'               `.
+       /                   \
+      J                     L
+      F                     L
+     J                      J
+     |                      J
+  ___L______________        J
+ /,---------------. "".     J
+JJ   /     \/      |  J     J
+LL  J      J       |   L    J
+JJ  J #    J #     |   L    |
+ \\__`.___,_`.____,'   F    |
+  ""-.---------....___/     |
+     |_T--+---+--.,._       |
+       |--|----\---\-`.     |
+       |__|____J___J_ F     F
+      _|__|____|___|_/      L
+     |                      L
+     |____________________M-K
+```
+
+=== ID: f369243b5594ae68 | TITLE: Fry | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: futurama | SIZE: 38x27 ===
+```
+    .  ."|
+   /| /  |  _.----._
+  . |/  |.-"        ".  /|
+ /                    \/ |__
+|           _.-"""/        /
+|       _.-"     /."|     /
+ ".__.-"         "  |     \
+    |              |       |
+    /_      _.._   | ___  /
+  ."  ""-.-"    ". |/.-.\/
+ |    0  |    0  |     / |
+ \      /\_     _/    "_/
+  "._ _/   "---"       |
+  /"""                 |
+  \__.--                |_
+    )          .        | ".
+   /        _.-"\        |  ".
+  /     _.-"             |    ".
+ (_ _.-|                  |     |"-._.
+   "    "--.             .J     _.-'
+           /\        _.-" | _.-'
+          /  \__..--"   _.-'
+         /   |      _.-'
+        /| /\|  _.-'
+       / |/ _.-'
+      /|_.-'
+    _.-'
+```
+
+=== ID: 6338b2e2af239b76 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 30x10 ===
+```
+            __
+           /  \     ,    ,
+ _._     _ |oo| _  / \__/ \
+_||||   ((/ () \))   /  \
+|||||/|  ('====')    |oo|
+ \____/  _`\  /'_    /  \
+ /   /.-' /\<>/\ `\.( () )_._
+ |    `  /  \/  \  /`'--'////)
+  \__,-'`|  |.  |\/ |/^^\|"\"`
+     jgs |  |.  | \___/\___/
+```
+
+=== ID: 4d435e881938eeed | TITLE: Gromit | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 25x12 ===
+```
+   ____           ____
+ .'    '.       .'    '.
+/     _  \_____/  _     \
+|    / \         / \    |
+`.__/  /  __  __ \  \__.`
+       | /  \/  \|
+       | \_o/\_o/|
+       /         \
+      |    ___    |
+      |   /   \   |
+       \  \___/  / ahds
+        '._____.'  ~~~~
+```
+
+=== ID: 176a1e3d8397eb11 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 26x12 ===
+```
+ .-""-.            .-""-.
+/    ,.`.  ____  .' _    \
+\   /  \ `"    "' ,' \   /
+ `-'    Y        Y    `-'
+        |  _  _  |
+        | (O)(O) |
+        /   __   \
+       |   /# \   |
+       |   \__/   |
+        \        /
+         `.____.'
+         --"  "--     hjw
+```
+
+=== ID: 3b4966cb2dbf8f58 | TITLE: Shaun of 'Wallace & Gromit: A Close Shave' | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 31x15 ===
+```
+    ."'=-,     ,.,.,_
+   (_____ )."=`      `"=,
+  ./_ _  \`\             `;..
+ / (o(o) |\=\              ; `;
+(_/|     | \ |             ;`"`
+   |     |  `             ;
+   \ ..  /`,_          _.'
+    `---'   `#"#""'"#'#^
+             # #    # #
+             # #    # #
+             # #    # #
+             # #    # #
+             # #    # #
+       jgs  /#|#\  /#|#\
+            `"`"`  `"`"`
+```
+
+=== ID: e81980e674d112b9 | TITLE: Moon-Robot of 'Wallace & Gromit: A Grand Day Out' | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 33x17 ===
+```
+ |||
+\'''-/
+ \__/      o
+  |         )
+  |         |
+  |     ____|_____
+  o    |----------|
+   `\  | [:I] (@) |
+     `\|----------|
+       |()()()()()|\
+       | .------. | \       /|__
+       | |  --  | |  o-----[  ---
+       | '------' |         `\""`
+       |----------|
+        \_ _.._ _/
+        (_)(  )(_)
+    jgs     ""
+```
+
+=== ID: cc1587cd26d12061 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 26x18 ===
+```
+           .--.
+         .'    `.
+        :  _  _  ;
+      .-|  _  _  |-.
+     ((_| (O)(O) |_))
+      `-|  .--.  |-'
+      .-' (    ) `-.
+     / .-._`--'_.-. \
+    ( (n   uuuu   n) )
+     `.`"=nnnnnn="'.'
+       `-.______.-'
+       __/\|  |/\__
+    .='w/\ \__/ /\w`=.
+  .-\ww(( \/88\/ ))ww/-.
+ /  |www\\ \88/ //www|  \
+|   |wwww\\/88\//wwww|   |
+|   |wwwww\\88//wwwww|   |
+|   /wwwwww\\//wwwwww\hjw|
+```
+
+=== ID: bc9cab31bcbd9286 | TITLE: Untitled | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 40x19 ===
+```
+           _
+         .' '.
+         |0 0|
+        (|_()|)  __ __
+        (<nUn>) /_/[[U]
+      ____\_/____  \_ /
+     / \H\ Y /H/ \/  |      ___   ___
+    /   |H\|/HH|     |     '--.\_/.-.|
+   /   _/HHHHHH\_   /         /00 \
+  /   /|HHHHHHHH|\_/         /    /
+ |___/  \HHHHHH/            (()  /|_
+ |  ]   /      \       ___  /'--'   \
+  \\\' /        \      \_/>\||    |\ \
+      /    /\    |        \__/    _/ /
+      |   |  \    \          |  [[ _/
+      |   |   |   |          \  __ )\
+      |___|   |___|           | || |\\
+    .-'   |   |   '-.        _| || | \\
+snd \___,_]   [_,___/       (__(___/  \|
+```
+
+=== ID: cb215f6dd0de2912 | TITLE: Shaun the Sheep | ARTIST: Sara Wallen (Very Small Monster) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 20x19 ===
+```
+      ,-.-.-.-,
+     (         )
+     (         )
+      |#'#'#'#|
+     /##(o|o)##\
+    /#A#######A#\
+   (#/|#######|\#)
+    "_J#######L_"
+sjw ( F#'###'#J )
+   (  '*#####*'  )
+  (    .     .    )
+ (     |#| |#|     )
+ (  _  |#| |#|  _  )
+ ( /#\ |#| |#| /#\ )
+ ( |#| |#| |#| |#| )
+  (|#| |#| |#| |#|)
+   |#| |#| |#| |#|
+  /##'/##\ /##\'##\
+  '--''--' '--''--'
+```
+
+=== ID: 601352ee1789bbc9 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 34x24 ===
+```
+         _   _  _
+       _( \ ( \( \
+      (_ \_\|__|__|
+        \-|_|__|__|
+        | OO     |
+        |_,      |
+       /   )     |
+      C~~~~       |
+        /          |
+       |            \_
+    _~(   ____        `---,_
+  _~  (  /    \     \,      ``---\
+/`    / /      \     \`~__     _ /
+\_ ~`( (        |     |   `````
+  `  ( |        |     |
+     ( |        )     |
+      | \      /      |
+       \ \____/       /
+        \            /
+         `~________~`
+           | | | |
+           | |,| |
+          /   /   )
+         (___(____)
+```
+
+=== ID: b26dd7ea366b4160 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 32x25 ===
+```
+           __
+          ( ))
+         (_)|_)
+        (_)  \                 _
+         |___|                //
+         |oo |               //
+         /\  |              //
+         \/  |          ___//
+         |   |         /\ //
+         |   |        /  \' \
+        /     \      /    \__\
+       /  __   \    /     /_ /
+      /  /  \   \   \    // \
+     /  /    \   \   \../|   \
+   ,'  /      \ . `----\  \__/
+  /  ,|        | |      \  / /
+ /  /||        | |__.--' \/_/
+|  / | \      /  |
+| |   \ `.__.'  /
+ \|    \       /
+        |.___.|
+        | | | |
+        | | | |    snark^dec97
+     ,--' `.| `---.
+     `-----''-----'
+```
+
+=== ID: 5652416e97b0c52b | TITLE: 'Feathers' McGraw -- Plotting Penguin of 'Wallace & Gromit: The Wrong Trousers' | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 26x26 ===
+```
+          _   _
+         ( \ / )
+        __\ Y /,-')
+       (__     .-'
+          |   (
+          [___]
+          |oo |
+        ,' \  |
+       <___/  |
+          |   |
+          |   |
+          |   |
+          |   |
+      _,-/_._  \,_
+_.-"^`  //   \    `^"-.,__
+\     ,//     \          /
+ `\,-":;       ;  \-.,_/'
+      ||       |   ;
+      ||       ;   |
+      :\      /    ;
+       \`----'    /
+        `._____.-'
+          | | |
+        __| | |__
+  jgs  /    |    \
+       `""""`""""`
+```
+
+=== ID: 0936356ad9038b56 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: wallace-and-gromit | SIZE: 35x29 ===
+```
+     ud$RMk.          ..u..
+    d$RM88$Rx       .@#MM$$$s.
+   @RM8$$$$$$i      $MXH8$$$$5x
+  d$RM$$$$$$$$k  .-'``"$$$$$$$X!
+ :$$M$$$$$$$$$$$`      ":;$$$$M!
+ $$$M"   #$$$$P         $;$$$$M!!
+@$*"      ?$$P   /@ /@  $`$$$$M:
+           "9~   \/ \/  |
+            B.          |
+           :" -...x~~ ...
+           f   ^P   .@$$$$u
+          :   r"   e$$$$$$$&
+          |  @-    $$$$$$$$$
+          | Xf     $$$$$$$$$
+          : 9      ^*$$$$$$ :
+           \$         "**"  ;
+            $              :
+            "o            ,
+             $$c.      _.-
+             $##?=+---"
+             :      |
+           .f        `---..
+        :-^                "~-.
+     +`                        "
+    f                           :
+   z                            |
+   ~    !                 `      i
+  @     ;                 :.     i
+ :     :>                  :      |
+```
+
+=== ID: 441106c56c5a8817 | TITLE: Bronica ETR / ETR-si Waist Level Finder | ARTIST: lgbeard | CATEGORY: television | SUBCATEGORY: galaxy-quest | SIZE: 36x30 ===
+```
+     _______________________
+  .'|.=====================.|'.
+ /  ||.-------------------.||  \
+ |  ||| _________________ |||  |
+ |  ||||_________________||||  |
+ |  ||||'.             .'||||  |
+ |  ||||  '._________.'  ||||  |
+=|  ||||   /         \   ||||  |=
+ |  ||||  /           \  ||||  |
+ |  |||| /             \ ||||  |
+ |  ||||/___.-------.___\||||  |
+ |  |||_______ ___ _______|||  |
+ |  |||       |   |       |||  |
+ |  ||'======='---'======='||  |
+ |  ||  ______             ||  |
+ |  ||.'      '.  _   .''. ||  |
+ |  |||        | (_) |    |||  |
+ |  ||'.______.'      '..' ||  |
+ |  ||=====================||  |
+ |  || .-----------------. ||  |
+ |  || |   o .'''''. o   | ||  |
+ |  || |  o /_.(_)._\ o  | ||  |
+ |  || | o /(_) _ (_)\ o | ||  |
+=|  || | o( :_ (_) _: )o | ||  |=
+ |  || | o \(_) _ (_)/ o | ||  |
+ |  || |  o \ '(_)' / o  | ||  |
+ |  || |   o '.....' o   | ||  |
+ |  || '-----------------' ||  |
+ \  |'====================='|  /
+  '.|_______________________|.'  LGB
+```
+
+=== ID: d9c760beb9370995 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: looney-tunes | SIZE: 14x9 ===
+```
+     .-=-.)
+    /_ _  \
+    \@ @  /
+    (_> _)
+      `)(_
+      /((_`)_,
+      \__(/-"
+     __|||__
+jgs ((__|__))
+```
+
+=== ID: d5f255011983b806 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: looney-tunes | SIZE: 14x9 ===
+```
+     .-=-.)
+    /_ _  \
+    \@ @  /
+    (_= _)
+      `)(_
+      /((_`)_,
+      \__(/-"
+     __|||__
+jgs ((__|__))
+```
+
+=== ID: 6c11209d4d28ad02 | TITLE: Daffy | ARTIST: BluePard | CATEGORY: television | SUBCATEGORY: looney-tunes | SIZE: 18x11 ===
+```
+  ,
+  ,;;,.
+  ;;;;;;
+  ;; ;; ;
+ _;; o;o;
+/ __`` ` \
+`.\ \    `-...--.
+  .\,\      ./---'
+   .\)'.___.'
+    .\_.-
+     ---'  BP
+```
+
+=== ID: bc7bcf2dc3285801 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: x-files | SIZE: 28x9 ===
+```
+             @@@@@@   @@@@@@
+               @@       @@
+                      @@
+                   @@@
+T  H  E  (X)  F  I  L  E  S
+                   @@@
+                 @@   @@
+                @@      @@
+              @@@@@@  @@@@@@
+```
+
+=== ID: 51710a2963061ff0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: x-files | SIZE: 22x10 ===
+```
+     ___    ___
+    (_ _)  (_ _)
+      \\    //
+       \\  //
+        \\//
+THE      ||      FILES
+        //\\
+       //  \\
+     _//    \\_
+    (___)  (___)
+```
+
+=== ID: 664cdb0a0b3cad43 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: x-files | SIZE: 11x10 ===
+```
+__       __
+\ \     / /
+ \ \   / /
+  \ \_/ /
+   \   /
+ F I)L(E S
+   / _ \
+  / / \ \
+ / /   \ \
+/_/     \_\
+```
+
+=== ID: 72bef05625864a8f | TITLE: Untitled | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: television | SUBCATEGORY: x-files | SIZE: 39x23 ===
+```
+   ....._________    _____.........__
+ .'              :  :                :
+ `.__..--.   :~--'   ~-.       __....'
+         `-. `.         :   .-~
+           :. `.        :  :
+            `._:      .'  :
+               ..     :  :
+              :  `  _:  '
+               -. ~~  .'
+                 :   :
+                .'  :
+               .' _ `.
+              .' : `.`.
+             :  .'  : `.
+            ; .'    : `.
+          .'  :       : `-.
+          ,   ;       :    :
+         ;   :        `.   :
+        :   .'          :   :
+        ;   :          '.    :
+ _.---''    '---.   .---'     `.__.--.
+:                :  :                 :
+'..__.___.___....'   -.___.-.___..DrS.'
+```
+
+=== ID: b7a7cf6b64e3f3a5 | TITLE: Untitled | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: television | SUBCATEGORY: babylon-5 | SIZE: 16x4 ===
+```
+   |^^^^|
+B A`B_Y=L O N
+   .-.) )
+   `.__.'    DrS
+```
+
+=== ID: 4c2fd376023a3057 | TITLE: Untitled | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: television | SUBCATEGORY: babylon-5 | SIZE: 19x5 ===
+```
+      .-----.
+      |_.---'
+B  A  B_^Y^^L  O  N
+      ( (_) )
+      `.___.'   DrS
+```
+
+=== ID: e6a20c077e214761 | TITLE: Untitled | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: television | SUBCATEGORY: babylon-5 | SIZE: 13x5 ===
+```
+.-----.
+|_.---'
+ _^|^'.
+( (_) )
+`.___.'   DrS
+```
+
+=== ID: 3d2cdb75c94ebfa2 | TITLE: Babylon 5 Shield | ARTIST: Tony Cucchiara | CATEGORY: television | SUBCATEGORY: babylon-5 | SIZE: 28x16 ===
+```
+.-------------------------.
+|`.                       |A
+|  `.       /\         *  |M
+|    `.     ||            |C
+|      `. Sssssss      *  |:
+|        `|||             |9
+|          ``ss.       *  |8
+|  *           `b         |
+|        `s.__.s'         |
+|  *      *_||_*`.        |
+|           ||    `.      |
+|  *         |      `.    |
+|            *        `.  |
+|                       `.|
+`...                   ...'
+    ``````.......''''''
+```
+
+=== ID: 704224db0e100776 | TITLE: Untitled | ARTIST: Tony Cucchiara | CATEGORY: television | SUBCATEGORY: babylon-5 | SIZE: 29x16 ===
+```
+ .-------------------------.
+L|`.                       |A
+e|  `.       /\         *  |M
+s|    `.     ||            |C
+t|      `. Sssssss      *  |:
+e|        `|||             |9
+r|          `` ss.      *  |8
+ |  *           `b         |
+ |        `s.__.s'         |
+ |  *      *_||_*`.        |
+ |           ||    `.      |
+ |  *         |      `.    |
+ |            *        `.  |
+ |                       `.|
+ `...                   ...'
+     ``````.......''''''
+```
+
+=== ID: 84c502c0f3d5ca22 | TITLE: Ojo, the small bear | ARTIST: Donovan Baker | CATEGORY: television | SUBCATEGORY: bear-in-the-big-blue-house | SIZE: 34x6 ===
+```
+;"",,,,,"";
+ ". o o ."
+ :  (O)  :  - Where's my Snowbear?
+  ",`-',"
+,---"""---.
+| |`````| |dwb
+```
+
+=== ID: 0f9637fe9a9e24cf | TITLE: Tutter, the mouse | ARTIST: Donovan Baker | CATEGORY: television | SUBCATEGORY: bear-in-the-big-blue-house | SIZE: 35x8 ===
+```
+ __           __
+(  `.       ,`  )
+ `.__\_ _ _/__,'
+    ;(*) (*);    - Thank you, Bear!
+    ;  \ /  ;
+     ;  o  ;
+ ,---'.`-','---.
+ |  |  `"'  |  |dwb
+```
+
+=== ID: e66c42e0137f8ed1 | TITLE: K-9 | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 12x6 ===
+```
+ \      oo
+  \____|\mm
+  //_//\ \_\
+ /K-9/  \/_/
+/___/_____\
+-----------
+```
+
+=== ID: 7e97757e16857b6a | TITLE: Dalek | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 32x13 ===
+```
+                    Exterminate!
+                   /
+              ___
+      D>=G==='   '.
+            |======|
+            |======|
+        )--/]IIIIII]
+           |_______|
+           C O O O D
+          C O  O  O D
+         C  O  O  O  D
+         C__O__O__O__D
+snd     [_____________]
+```
+
+=== ID: a9ce571258745d67 | TITLE: Dalek | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 34x18 ===
+```
+            (\. -- ./)
+        O-0)))--|     \
+          |____________|
+           -|--|--|--|-
+           _T~_T~_T~_T_
+          |____________|
+          |_o_|____|_o_|
+       .-~/  :  |   %  \
+.-..-~   /  :   |  %:   \
+`-'     /   :   | %  :   \
+       /   :    |#   :    \
+      /    :    |     :    \
+     /    :     |     :     \
+ . -/     :     |      :     \- .
+|\  ~-.  :      |      :   .-~  /|
+\ ~-.   ~ - .  _|_  . - ~   .-~ /
+  ~-.  ~ -  . _ _ _ .  - ~  .-~
+       ~ -  . _ _ _ .  - ~
+```
+
+=== ID: b6eb0fc9cbfff47a | TITLE: Tardis | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 19x18 ===
+```
+        ___
+_______(_@_)_______
+| POLICE      BOX |
+|_________________|
+ | _____ | _____ |
+ | |###| | |###| |
+ | |###| | |###| |
+ | _____ | _____ |
+ | || || | || || |
+ | ||_|| | ||_|| |
+ | _____ |$_____ |
+ | || || | || || |
+ | ||_|| | ||_|| |
+ | _____ | _____ |
+ | || || | || || |
+ | ||_|| | ||_|| |
+ |       |       |
+ *****************
+```
+
+=== ID: 2ae9fa60088d9c6f | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 19x18 ===
+```
+        ___
+_______(_@_)_______
+| POLICE      BOX |
+|_________________|
+ | _____ | _____ |
+ | |###| | |###| |
+ | |###| | |###| |
+ | _____ | _____ |
+ | || || | || || |
+ | ||_|| | ||_|| |
+ | _____ |$_____ |
+ | || || | || || |
+ | ||_|| | ||_|| |
+ | _____ | _____ |
+ | || || | || || |
+ | ||_|| | ||_|| |
+ |       |       |
+ *****************
+```
+
+=== ID: 9cdf01dd347171fa | TITLE: Dalek | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 34x19 ===
+```
+      _n____n__
+     /         \---||--<
+    /___________\
+    _|____|____|_
+    _|____|____|_
+     |    |    |
+    --------------
+    | || || || ||\
+    | || || || || \++++++++------<
+    ===============
+    |   |  |  |   |
+   (| O | O| O| O |)
+   |   |   |   |   |
+  (| O | O | O | O |)
+   |   |   |   |    |
+ (| O |  O | O  | O |)
+  |   |    |    |    |
+ (| O |  O |  O |  O |)
+ ======================
+```
+
+=== ID: e5c17dc16fa321a5 | TITLE: Sonic Screwdriver | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 11x23 ===
+```
+      .-.
+    .-| |-.
+   '._| |#|
+      :-;
+      /_\
+     |  '|
+     |...|
+     |___;
+      |=H
+      |_H_
+     /   H
+     |   H
+     |___:
+     /   \
+     |===|
+     |   H
+     |   H
+     |   H
+     |   H
+     |   H
+     |   H
+snd  |===H
+     '---'
+```
+
+=== ID: a0ca31006026c78b | TITLE: Dr Who: The fourth Doctor, played by Tom Baker | ARTIST: Shanaka Dias | CATEGORY: television | SUBCATEGORY: doctor-who | SIZE: 26x23 ===
+```
+         .---.
+        |   '.|  __
+        | ___.--'  )
+      _.-'_` _%%%_/
+   .-'%%% a: a %%%
+       %%  L   %%_
+       _%\'=' |  /-.__
+    .-' / )--' #/     '\
+   /'  /  /---'(    :   \
+  /   |  /( /|##|  \     |
+ /   ||# | / | /|   \    \
+ |   ||##| I \/ |   |   _|
+ |   ||: | o  |#|   |  / |
+ |   ||  / I  |:/  /   |/
+ |   ||  | o   /  /    /
+ |   \|  | I  |. /    /
+  \  /|##| o  |.|    /
+   \/ \::|/\_ /  ---'|
+    \ |\ |    |     :\
+    | |  /     \...' |
+    | |# |/\    \    |
+    | | :|  |    |   |
+snd | |  |  |    |   |
+```
+
+=== ID: d8c0497c39cd2f1b | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 7x5 ===
+```
+ .oo__
+: -=~))
+.`--'.
+:    :
+Gonzo
+```
+
+=== ID: 7dab8ffbd8d5206d | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 11x6 ===
+```
+   _www_
+  /-o-o-\
+(|   -   |)
+  \ -=- /
+  /`---'\
+  Scooter
+```
+
+=== ID: 0492ed176e340f8c | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 8x7 ===
+```
+ (+)(+)
+/      \
+\ -==- /
+ \    /
+<\/\/\/>
+/      \
+ Kermit
+```
+
+=== ID: 896ae5d3ce2527b3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 16x7 ===
+```
+    ..----..
+  .': o  o :`.
+ .':   ()   :`.
+.' :-======-: `.
+`-' `.    .' `-'
+   .'      `.
+      Rowlf
+```
+
+=== ID: 4860f23291402640 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 18x8 ===
+```
+    .)\()()/(.
+  .((()(())())).
+ ((()(``oo'')()))
+((()) )(..)( (()))
+(())). `==' .((())
+`()))'`----'`((()'
+    '        `
+    Miss Piggy
+```
+
+=== ID: aab13286f589ed37 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 9x8 ===
+```
+  wWWWw
+  |o o|
+  | O |
+  |(")|
+ / \X/ \
+|   V   |
+|   |   |
+  Beaker
+```
+
+=== ID: dab1bb58423c27ba | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 16x9 ===
+```
+       __
+    (+)  (+)
+   /        \
+   \  -==-  /
+    \      /
+   </\/\/\/\>
+   /        \
+
+K  E  R  M  I  T
+```
+
+=== ID: b41ea1c60d96ca3c | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 19x9 ===
+```
+    ___
+  _(___)_
+ ()'   `()
+ .' o o `.
+ :  _O_  :
+ `. \_/ .'
+  .`---'.
+.' ()o() `.
+:   ( \   :  Fozzie
+```
+
+=== ID: cab4b02754b0b6ba | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 38x11 ===
+```
+   .-..--..-.         .-. _    _ .-.
+  ( o_)  (_o )       {( )/      \( )}
+   :'      `:         \  (o)  (o)  /
+::( ________ )::::::::{     ()     }::
+:::\\  \/  //:::::::::{ `---'`---' }::
+::::\`.__.'/:::::::::::\ \      / /:::
+:::::`----':::::::::::::`.`----'.'::::
+-===:`----':===-        /:--()--:\
+    /,'  `.\               / O\
+   /        \             / O  \
+      Kermit              Fozzie
+```
+
+=== ID: e6b8c7be80055ae4 | TITLE: Untitled | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 12x13 ===
+```
+   . -- .
+  (      )
+ ( (/oo\) )
+  ( \`'/ )
+   ( \/ )
+  (      )
+ (        )
+(          )
+ (        )
+   ` -- '
+    =  =
+    =  =
+  Big Bird
+```
+
+=== ID: 5d54788f6ffdee8c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 29x13 ===
+```
+       .---.     .---.
+      ( -o- )---( -o- )
+      ;-...-`   `-...-;
+     /                 \
+    /                   \
+   | /_               _\ |
+   \`'.`'"--.....--"'`.'`/
+    \  '.   `._.`   .'  /
+ _.-''.  `-.,,_,,.-`  .''-._
+`--._  `'-.,_____,.-'`  _.--`
+jgs  /                 \
+    /.-'`\   .'.   /`'-.\
+   `      '.'   '.'
+```
+
+=== ID: d7eac8dd70f5abf9 | TITLE: Miss Piggy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 33x15 ===
+```
+          __         __
+         /  '.     .'  \
+        | |`\ \   / /`| |
+         \.--' '-' '--./
+        .'  .-'"'"'-.  '.
+       / .-((((   ))))-. \
+     .' / =/_o/___\o_\= \ '.
+   .'  /    .-'   '-.    \  '.
+  /   /    /         \    \   \
+ /   |     \  \   /  /     |   \
+|    \    /-`.__.__.`-\    /    |
+ \    \  `    \.-./    `  /    /
+  \    '-._  , '-' ,  _.-'    /
+   '.   /()`'-'-=-'-'`()\   .'
+jgs  `/`\ '()()()()()() /`\`
+```
+
+=== ID: 7f169546fbffe4d0 | TITLE: Miss Piggy | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: muppets | SIZE: 33x15 ===
+```
+          __         __
+         /  '.     .'  \
+        | |`\ \,,,/ /`| |
+         \.;;;;;-;;;;;./
+        .;;;;-'"'"'-;;;;,
+       ;;.-((((   ))))-.;;
+     ,;;/ =/_o/___\o_\= \;;,
+   ,;;;/    .-'   '-.    \;;;,
+ ,;;;;/    /         \    \;;;;,
+,;;;;|     \  \   /  /     |;;;;,
+;;;;;\    /-`.__.__.`-\    /;;;;;
+ ;;;;;\  `    \.-./    `  /;;;;;
+  ;;;;;;-._  , '-' ,  _.-;;;;;;
+   ';;;;/()`'-'-=-'-'`()\;;;;'
+jgs  `/`\ '()()()()()() /`\`
+```
+
+=== ID: 133421de8f710b27 | TITLE: Untitled | ARTIST: Horroroso | CATEGORY: television | SUBCATEGORY: pinky-and-the-brain | SIZE: 29x11 ===
+```
+                         _
+  ,-.      __,---.__   ,',`\
+ / `.`. ,-'         `-/ /   )
+(    `,'             _ \   ;
+ \  _( _           ,'  )/  :
+  \ `-( `-.      ,'    /  /
+   \   \ __`.___/_,-( /_,'
+    `--'`,\_o,(_)o_,',
+ -hrr-  (    /`-'\    )
+         `--:\,m//`--'
+             `--'
+```
+

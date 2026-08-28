@@ -1200,10 +1200,10 @@ async def test_match_topics_batches_every_query_in_one_call() -> None:
 @pytest.mark.parametrize(
     ("card_type", "expected_phrase"),
     [
-        ("ascii", "STICKMAN ASCII COMIC SCENE"),
+        ("ascii", "ASCII SCENE (MANDATORY)"),
         ("comparison", "MYTH VS FACT / COMPARISON"),
         ("code", "CODE / SYNTAX / CONFIGURATION"),
-        ("diagram", "DOMAIN-SPECIALIZED DIAGRAM"),
+        ("diagram", "DIAGRAM, WRITTEN IN MERMAID"),
         ("prose", "CONCEPTUAL PROSE & MENTAL MODELS"),
     ],
 )

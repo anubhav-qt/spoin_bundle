@@ -103,3 +103,5 @@ useful than the decision itself.
 | [0064](0064-mobile-shell-tab-bar.md) | Mobile shell, take two -- an edge-to-edge tab bar and a Browse sheet | Accepted (supersedes 0063; amends 0013, 0015) |
 | [0065](0065-quota-governor-fairness-accounting-and-terminal-states.md) | Quota governor spreads load least-spent-first, refunds refused calls, learns its own rpm, and names why it stopped | Accepted (amends 0028, 0058, 0056) |
 | [0066](0066-redraw-over-budget-ascii-art.md) | Over-budget ASCII art is redrawn, then rejected with its card -- never silently dropped | Accepted (amends 0042, 0059) |
+| [0067](0067-mermaid-diagrams-and-form-free-ascii.md) | Diagrams are written as mermaid and rendered client-side; ASCII scenes lose the stickman requirement | Accepted (amends 0042, 0017) |
+| [0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md) | Curated ASCII art reference library and worked few-shot generator standards | Accepted (amends 0042, 0067) |

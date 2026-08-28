@@ -6,6 +6,7 @@
 - **Supersedes:** [ADR-0021](0021-ascii-scene-library.md)'s catalog-based approach (the
   library was never authored -- see Context)
 - **Resolves:** [docs/tasks/0006](../tasks/0006-curated-hero-cards.md)
+- **Amended by:** [ADR-0067](0067-mermaid-diagrams-and-form-free-ascii.md) -- the stickman requirement below is removed; an ASCII scene may take any form, and diagram cards moved to mermaid entirely.
 
 ## Context
 

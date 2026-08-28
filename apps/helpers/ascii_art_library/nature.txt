@@ -1,0 +1,844 @@
+# ASCII ART ARCHIVE REFERENCE LIBRARY - CATEGORY: NATURE
+# Total artworks in category fitting <=40 cols: 46
+# Format: Header followed by triple-backtick fenced ASCII art
+
+=== ID: 834b367754f983e2 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: rains | SIZE: 15x6 ===
+```
+      __   _
+    _(  )_( )_
+   (_   _    _)
+  / /(_) (__)
+ / / / / / /
+/ / / / / /
+```
+
+=== ID: f418265b3f5ac799 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: rains | SIZE: 35x11 ===
+```
+                    *
+
+             *  _|_
+             .-' * '-. *
+            /       * \
+         *  ^^^^^|^^^^^
+             .~. |  .~.
+            / ^ \| / ^ \
+           (|   |J/|   |)
+           '\   /`"\   /`
+ -- '' -'-'  ^`^    ^`^  -- '' -'-'
+```
+
+=== ID: 4dd8a3a7464006b6 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: rains | SIZE: 33x22 ===
+```
+                r
+               ain
+               rai
+              nrain
+             rainrai
+            nrainrain
+           ainrainrain
+          rainrainrainr
+         ainrainrainrain
+        rainrainrainrainr
+      ainrainrainrainrainra
+    inra nrainrainrainrainrai
+  nrain  inrainrainrainrainrain
+ rain   nrainrainrainrainrainrai
+nrai   inrainrainrainrainrainrain
+rai   inrainrainrainrainrainrainr
+rain   nrainrainrainrainrainrainr
+ rainr  nrainrainrainrainrainrai
+  nrain ainrainrainrainrainrain
+    rainrainrainrainrainrainr
+      rainranirainrainrainr
+           ainrainrain
+```
+
+=== ID: 55434b6577cce877 | TITLE: Rain | ARTIST: Lukasz Tyrala | CATEGORY: nature | SUBCATEGORY: rains | SIZE: 34x24 ===
+```
+      |       |        |       | |
+ ' |   |   |     '  |      '
+              |           |     |
+ '     |  _,..--I--..,_ |
+   / _.-`` _,-`   `-,_ ``-._ \ lt.
+     `-,_,_,.,_   _,.,_._,-`
+|  | '   '     `Y` __ '     '
+  '|        ,-. I /  \       |  |
+ |    |    /   )I \  /     '   |
+'  '      /   / I_.""._
+|  |    ,l  .'..`      `.   ' |  |
+ |     / | /   \        l
+      /, '"  .  \      ||   |   |
+ |  ' ||      |"|      ||   |
+'     ||      | |      ||       |
+|     \|      | '.____,'/  |  |
+   |   |      |  |    |F   '    |
+ | '   |      |  | |\ |     ' |
+       |      |  | || |      |
+|  |   |      |  | || |    |    |
+       |      |  | || |      |
+ ' |   '.____,'  \_||_/   |    |
+         |/\|    [_][_]      |
+""""""""""""""""""""""""""""""""""
+```
+
+=== ID: 51698ec362968203 | TITLE: Untitled | ARTIST: Brian T. Odom | CATEGORY: nature | SUBCATEGORY: rainbow | SIZE: 21x6 ===
+```
+     _.-""""`-._
+   ,' _-""""`-_ `.
+  / ,'.-'"""`-.`. \
+ | / / ,'"""`. \ \ |
+| | | | ,'"`. | | | |
+| | | | |   | | | | |
+```
+
+=== ID: f5d401a4a843e1ab | TITLE: Half rainbow | ARTIST: Brian T. Odom | CATEGORY: nature | SUBCATEGORY: rainbow | SIZE: 13x6 ===
+```
+      _.-""""
+    ,' _-""""
+   / ,'.-'"""
+  | / / ,'"""
+ | | | | ,'"`
+ | | | | |
+```
+
+=== ID: 9a6efe87f8202ff5 | TITLE: Untitled | ARTIST: Prudence | CATEGORY: nature | SUBCATEGORY: beach | SIZE: 25x8 ===
+```
+                   ____
+                  (_  _)
+        .  .       / /
+     .`_._'_..    / /
+     \   o   /   / /
+  Pru \ /   /  _/ /_
+`. ~. `\___/'./~.' /.~'`.
+.`'`.`.'`'`.~.`'~.`'`.~`
+```
+
+=== ID: 7b62b6825bfb0489 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: beach | SIZE: 34x9 ===
+```
+          |
+        \ _ /
+      -= (_) =-
+        /   \         _\/_
+          |           //o\  _\/_
+   _____ _ __ __ ____ _ | __/o\\ _
+ =-=-_-__=_-= _=_=-=_,-'|"'""-|-,_
+  =- _=-=- -_=-=_,-"          |
+jgs =- =- -=.--"
+```
+
+=== ID: 8c7ac73e8b2b5d1c | TITLE: Untitled | ARTIST: David Dahlberg | CATEGORY: nature | SUBCATEGORY: camping | SIZE: 10x5 ===
+```
+   .(
+  /%/\
+ (%(%))
+.-'..`-.
+`-'.'`-'dd
+```
+
+=== ID: a93d8e13010704e4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: camping | SIZE: 27x8 ===
+```
+        ______
+jgs    /     /\
+      /     /  \
+     /_____/----\_    (
+    "     "          ).
+   _ ___          o (:') o
+  (@))_))        o ~/~~\~ o
+                  o  o  o
+```
+
+=== ID: 84ebc5ced8504923 | TITLE: Untitled | ARTIST: Jens Reissenweber (Reißenweber) | CATEGORY: nature | SUBCATEGORY: camping | SIZE: 36x11 ===
+```
+           (                 ,&&&.
+            )                .,.&&
+           (  (              \=__/
+               )             ,'-'.
+         (    (  ,,      _.__|/ /|
+          ) /\ -((------((_|___/ |
+        (  // | (`'      ((  `'--|
+      _ -.;_/ \\--._      \\ \-._/.
+     (_;-// | \ \-'.\    <_,\_\`--'|
+     ( `.__ _  ___,')      <_,-'__,'
+jrei  `'(_ )_)(_)_)'
+```
+
+=== ID: 6897214ba5cfe3e0 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: camping | SIZE: 32x29 ===
+```
+    .=-^"" -==....
+ .r"           .z$r   *Backpack*
+.E...        .*" ^F
+$   ^"%4.  z"     F
+F       ^%e"      F
+F        4" .=""r F
+F        J  "   F F
+F        F 4  " F F
+b        F 4*"""%4"
+4.       F d     4
+ b. '    F *     J
+ P"=-  -*F 4  .^ $
+ L       F  ""   P
+ $\..    b.    .zF
+ F   """"P"""""" F
+ F       "   F   F
+ %   .   r   %   F
+ ^=4.....C..-    F
+    '.     b     F
+     L     '     F
+     '.     L    F
+      *. %  '    "
+    ...$eeee***e.
+  z$$$$$$$"     ".
+ .$$$$$$$$       b
+ 4$$$$$$$$       F
+  *$$$$$$$c     ."
+   "**$$$$$e.  ."
+        """"""     Gilo94'
+```
+
+=== ID: 6f2b1ad74d1c2436 | TITLE: Untitled | ARTIST: Kevin Kreamer | CATEGORY: nature | SUBCATEGORY: tornado | SIZE: 12x8 ===
+```
+--_-_-_-_---
+   -_-_-_
+    -_-_-
+     -__-
+    _-_
+   _-
+   -_
+    _-_
+```
+
+=== ID: b8c87497195a4699 | TITLE: Untitled | ARTIST: Jeremy | CATEGORY: nature | SUBCATEGORY: tornado | SIZE: 37x15 ===
+```
+   ((  "####@@!!$$    ))
+       `#####@@!$$`  ))
+    ((  '####@!!$:
+   ((  ,####@!!$:   ))
+       .###@!!$:
+       `##@@!$:
+        `#@!!$
+  !@#    `#@!$:       @#$
+   #$     `#@!$:       !@!
+            '@!$:
+        '`\   "!$: /`'
+           '\  '!: /'
+             "\ : /"
+  -."-/\\\-."//.-"/:`\."-.JrS"."-=_\\
+" -."-.\\"-."//.-".`-."_\\-.".-\".-//
+```
+
+=== ID: 6350e30d8dcb8732 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: tornado | SIZE: 20x17 ===
+```
+:,"~;~:.":~`;'",~:,:
+ :',.`.;,`.'",`.;`:
+ :';,r,`;."`;'.,~::
+  :~:,"~:.`~:,"~::
+  :"~:,~.",',~:",:
+   :":."~:",g.,~:
+   :'`,";.;'.,~::
+    :,"~,~-.":~:
+    :';,",`;."`:
+     :":."~",`:
+     :."',~:",:
+      :`,";.':
+      :~-.":~:
+       :,"`;:
+       :.`~::
+        :",:
+        ::::
+```
+
+=== ID: 207d906637f6c6ef | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: snows | SIZE: 34x21 ===
+```
+                ()
+                /\
+               //\\
+              <<  >>
+          ()   \\//   ()
+()._____   /\   \\   /\   _____.()
+   \.--.\ //\\ //\\ //\\ /.--./
+    \\__\\/__\//__\//__\\/__//
+     '--/\\--//\--//\--/\\--'
+        \\\\///\\//\\\////
+    ()-= >>\\< <\\> >\\<< =-()
+        ////\\\//\\///\\\\
+     .--\\/--\//--\//--\//--.
+    //""/\\""//\""//\""//\""\\
+   /'--'/ \\// \\// \\// \'--'\
+ ()`"""`   \/   //   \/   `""""`()
+          ()   //\\   ()
+              <<  >>
+        jgs    \\//
+                \/
+                ()
+```
+
+=== ID: 0f4c2ad67153ca10 | TITLE: Untitled | ARTIST: Veronica Karlsson | CATEGORY: nature | SUBCATEGORY: snows | SIZE: 39x70 ===
+```
+                          |
+                          |
+                        __|__   *click*
+                        ))|((
+                      .'/ | \`.
+                     / |  |  | \
+                     `-`--'--'-'
+                   '             `
+
+                '                   `
+
+
+    *  |||||  *
+    | ||u u|| |  *yaaaaAAAAAAAAAaaawn!*
+     \||\O/||/
+     |`-- --'|
+     |(.) (.)|
+      |) . (|
+      (  v  )
+       \ | /
+       ( | )
+       '- -`
+
+       |||||
+      ||. .||
+     |||\=/|||
+     |.-- --.|
+     /(_)_(_)\
+     \ )_._( /
+     '(`._.')`
+       \ | /
+       ( | )
+       '- -`
+
+
+       |||||
+      ||. .||
+     |||\=/|||
+     |.--_--.|
+     /( ) ( )\
+     \ )   ( /
+     '(_____)`
+       \ | /
+       (_|_)
+       '- -`
+
+        .--.
+       /___ \.-.
+       |. .|/`-'
+      __\=/__
+    .'  \:/  `.
+   / /(  :  )\ \
+   \_\(  :  )/_/
+    (_(__:__)_)
+      \  |  /
+      |__|__|
+     (___V___)
+
+
+       .--.
+   .-./ ___\      ||
+   `-'\|. .|      ||
+      __\=/__    .-.
+    .'  \:/  `. /\/|
+   / /(  :  )\ V /||
+   \_\(  :  ) `-' ||
+    (_(__:__)   __||___
+      \  |  /  /      /
+      |__|__| (      (
+     (___V___) \______\
+```
+
+=== ID: 9f94006d23bba026 | TITLE: Star | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 9x7 ===
+```
+    |
+  \ | /
+   \*/
+--**O**--
+   /*\
+  / | \
+    |
+```
+
+=== ID: 94cdb53c3fce2dd4 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 14x7 ===
+```
+        .
+      \ | /
+    '-.;;;.-'
+   -==;;;;;==-
+    .-';;;'-.
+      / | \
+jgs     '
+```
+
+=== ID: a8788171bc535c64 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 20x9 ===
+```
+          '
+        \  ,  /
+    ' ,___/_\___, '
+       \ /o.o\ /
+   -=   > \_/ <   =-
+       /_\___/_\
+    . `   \ /   ` .
+jgs     /  `  \
+           .
+```
+
+=== ID: da03e1a903408030 | TITLE: Untitled | ARTIST: Philip Powell | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 31x9 ===
+```
+           |
+     \     |     /
+       \       /
+         ,d8b,           .,
+ (')-")_ 88888 ---   ;';'  ';'.
+('-  (. ')98P'      ';.,;    ,;
+ '-.(PjP)'     \       '.';.'
+           |     \
+           |
+```
+
+=== ID: e6c8e642ae56b03c | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 21x9 ===
+```
+      ;   :   ;
+   .   \_,!,_/   ,
+    `.,'     `.,'
+     /         \
+~ -- :         : -- ~
+     \         /
+    ,'`._   _.'`.
+   '   / `!` \   `
+      ;   :   ;  hjw
+```
+
+=== ID: 3a98b6be86a874e5 | TITLE: Untitled | ARTIST: Sebastian Stoecker | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 19x10 ===
+```
+   ,    /),
+  (( -.((_))  _,)
+  ,\`.'_  _`-','
+  `.> <> <>  (,-
+ ,',    |     `._,)
+((  )   |,   (`--'
+ `'( ) _--_,-.\ SSt
+    /,' \( )  `'
+   ((    `\
+    `
+```
+
+=== ID: 9094dfb024bfe769 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 21x11 ===
+```
+          |
+          |   .
+   `.  *  |     .'
+     `. ._|_* .'  .
+   . * .'   `.  *
+-------|     |-------
+   .  *`.___.' *  .
+      .'  |* `.  *
+    .' *  |  . `.
+        . |
+          | jgs
+```
+
+=== ID: fdc68737e199075b | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 26x12 ===
+```
+            :
+   `.       ;        .'
+     `.  .-'''-.   .'
+       ;'  __   _;'
+      /   '_    _`\
+     |  _( a (  a  |
+'''''| (_)    >    |``````
+      \    \    / /
+       `.   `--'.'
+      .' `-,,,-' `.
+    .'      :      `.  hjw
+            :
+```
+
+=== ID: d6c372f1d8308722 | TITLE: Untitled | ARTIST: Blazej Kozlowski | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 28x12 ===
+```
+           .    |     .
+            \   |    /
+        `.   \  '   /   .'
+          `. .-*""*-. .'
+      "*-._ /.*"  "*.\ _.-*"
+           : <o>  <o> ; ____
+      """"':    ..    ;
+      _.-*" \ `.__.' / "*-._
+          .' `-.__.-' `.
+bug     .'   /   .  \   `.
+            /    |   \
+           '     |    `
+```
+
+=== ID: fa4826277d48ef8c | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 23x13 ===
+```
+            .
+            .
+            |
+      '.  _..._  .'
+        .'     '.
+   '-. /         \ .-'
+  _ _  ; L I F E ;  _ _
+       \         /
+    .-' '._   _.' '-.
+       .   ```   .
+jgs   '     |     '
+            '
+            '
+```
+
+=== ID: f79b9ca0bb261bf5 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 33x13 ===
+```
+                |
+                |
+      `.        |        .'
+        `.    .---.    .'
+           .~       ~.
+          /   O   O   \
+-- -- -- (             ) -- -- --
+          \    `-'    /
+           ~.       .~
+        .'    ~---~    `.
+      .'        |        `.
+                |
+                |
+```
+
+=== ID: a8a16b23dc6f2c2d | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 21x14 ===
+```
+          |
+     \    |    /
+ `.   \   |   /   .'
+   `.  \  |  /  .'
+`-.  `. \d8b/ .'  .-'
+   `-. do0o88b .-'
+<~~~~ 8o0O0o888 ~~~~>
+<~~~~ 8o00o8888 ~~~~>
+   _-' qoo888p '-_
+,-'  ,' /q8p\ `.  `-.
+   ,'  /  |  \  `.
+ ,'   /   |   \   `.
+     /    |    \
+          |
+```
+
+=== ID: 6ad404cd35de7558 | TITLE: Untitled | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 30x15 ===
+```
+        \     (      /
+   `.    \     )    /    .'
+     `.   \   (    /   .'
+       `.  .-''''-.  .'
+ `~._    .'/_    _\`.    _.~'
+     `~ /  / \  / \  \ ~'
+_ _ _ _|  _\O/  \O/_  |_ _ _ _
+       | (_)  /\  (_) |
+    _.~ \  \      /  / ~._
+ .~'     `. `.__.' .'     `~.
+       .'  `-,,,,-'  `.
+     .'   /    )   \   `.
+   .'    /    (     \    `.
+        /      )     \     hjw
+              (
+```
+
+=== ID: 4dc104dc12495ca5 | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 27x15 ===
+```
+             .
+         .   :   .
+     '.   .  :  .   .'
+  ._   '._.-'''-._.'   _.
+    '-..'         '..-'
+ --._ /.==.     .==.\ _.--
+     ;/_o__\   /_o__\;
+-----|`     ) (     `|-----
+    _: \_) (\_/) (_/ ;_
+ --'  \  '._.=._.'  /  '--
+   _.-''.  '._.'  .''-._
+  '    .''-.(_).-''.    '
+ jgs .'   '  :  '   '.
+        '    :   '
+             '
+```
+
+=== ID: 17c989223ac4aa28 | TITLE: Untitled | ARTIST: Philip Kaulfuss | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 33x16 ===
+```
+Philip Kaulfuss
+              .     :     .
+            .  :    |    :  .
+             .  |   |   |  ,
+              \  |     |  /
+          .     ,-'"""`-.     .
+            "- /  __ __  \ -"
+              |==|  I  |==|
+        - --- | _`--^--'_ | --- -
+              |'`.     ,'`|
+            _- \  "---"  / -_
+          .     `-.___,-'     .
+              /  |     |  \
+            .'  |   |   |  `.
+               :    |    :
+              .     :     .
+```
+
+=== ID: 1ff31a8b2247062b | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: sun | SIZE: 36x20 ===
+```
+           '
+          .      '      .
+    .      .     :     .      .
+     '.        ______       .'
+       '  _.-"`      `"-._ '
+        .'                '.
+ `'--. /                    \ .--'`
+      /                      \
+     ;                        ;
+- -- |                        | -- -
+     |     _.                 |
+     ;    /__`A   ,_          ;
+ .-'  \   |= |;._.}{__       /  '-.
+    _.-""-|.' # '. `  `.-"{}<._
+          / 1938  \     \  x   `"
+     ----/         \_.-'|--X----
+     -=_ |         |    |- X.  =_
+    - __ |_________|_.-'|_X-X##
+    jgs `'-._|_|;:;_.-'` '::.  `"-
+     .:;.      .:.   ::.     '::.
+```
+
+=== ID: 6f810800a0e3de1b | TITLE: Lazy summer days in the hammock | ARTIST: Veronica Karlsson | CATEGORY: nature | SUBCATEGORY: other | SIZE: 40x18 ===
+```
+          ______ ___
+        _(_____  )__)_
+       (________  ____)       @@@
+         (________)        @@@@@@@@
+                        @@@@@@@@@@@@@
+         @@@@@       @@@@@@@@@@@@@@@@@@
+       @@@@@@@@        @@@@@@@@@@@@@@@
+      @@@@@@@@@@@       @@@@@@@@@@@@@@@
+     @@@@@@@@@@@        @@@@@@@@@@@@@@@
+       @@@@@@@@@          @@@@@@@@@@@
+         @@@@@              @@@@@@@
+          ||\._            _./| |
+          || \ `-.______.-' / | |
+          ||  \            /  | |
+          ||   `-._    _.-'   | |
+          ||       `--'       | |
+VK        ||                  | |
+    /|\\|\|| /|||/\\|/||/|\\\/| |\\||//|
+```
+
+=== ID: 4e1b0f0276f3133b | TITLE: Untitled | ARTIST: Peter Marquardt (last future, lastfuture) | CATEGORY: nature | SUBCATEGORY: mountains | SIZE: 31x10 ===
+```
+             o\
+   _________/__\__________
+  |                  - (  |
+ ,'-.                 . `-|
+(____".       ,-.    '   ||
+  |          /\,-\   ,-.  |
+  |      ,-./     \ /'.-\ |
+  |     /-.,\      /     \|
+  |    /     \    ,-.     \
+  |___/_______\__/___\_____\ lf
+```
+
+=== ID: 8fb615da52134ebd | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: clouds | SIZE: 12x4 ===
+```
+   __   _
+ _(  )_( )_
+(_   _    _)
+  (_) (__)
+```
+
+=== ID: 646553c514b66a11 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: clouds | SIZE: 29x6 ===
+```
+          .-~~~-.
+  .- ~ ~-(       )_ _
+ /                     ~ -.
+|                           \
+ \                         .'
+   ~- . _____________ . -~
+```
+
+=== ID: f94d838f4cf3c6ba | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: clouds | SIZE: 29x7 ===
+```
+          .-~~~-.
+  .- ~ ~-(       )_ _
+ /                    ~ -.
+|                          ',
+ \                         .'
+   ~- ._ ,. ,.,.,., ,.. -~
+           '       '
+```
+
+=== ID: 19140ee3972824d9 | TITLE: Untitled | ARTIST: Phil Leith | CATEGORY: nature | SUBCATEGORY: lightning | SIZE: 17x8 ===
+```
+( (    _-_-_-_- -
+ ( (   )- - -
+  ( ( ) )
+ (_(___)_)
+    _<
+   / /\
+_____\ _________
+    Phil Leith
+```
+
+=== ID: 7128da70af2db61d | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: lightning | SIZE: 18x13 ===
+```
+     _, .--.
+    (  / (  '-.
+jgs .-=-.    ) -.
+   /   (  .' .   \
+   \ ( ' ,_) ) \_/
+    (_ , /\  ,_/
+      '--\ `\--`
+         _\ _\
+         `\ \
+          _\_\
+          `\\
+            \\
+        -.'.`\.'.-
+```
+
+=== ID: 46dab63f86d3ebdc | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: lightning | SIZE: 33x13 ===
+```
+    ___(                        )
+   (                          _)
+  (_                       __))
+    ((                _____)
+      (_________)----'
+         _/  /
+        /  _/
+      _/  /
+     / __/
+   _/ /
+  /__/
+ //
+/'
+```
+
+=== ID: 8c87ddf921b0dbb3 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: lightning | SIZE: 21x26 ===
+```
+             zeeeeee-
+            z$$$$$$"
+           d$$$$$$"
+          d$$$$$P
+         d$$$$$P
+        $$$$$$"
+      .$$$$$$"
+     .$$$$$$"
+    4$$$$$$$$$$$$$"
+   z$$$$$$$$$$$$$"
+   """""""3$$$$$"
+         z$$$$P
+        d$$$$"
+      .$$$$$"
+     z$$$$$"
+    z$$$$P
+   d$$$$$$$$$$"
+  *******$$$"
+       .$$$"
+      .$$"
+     4$P"
+    z$"
+   zP
+  z"
+ /    Gilo94'
+^
+```
+
+=== ID: affee9db0cfe46cd | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: lightning | SIZE: 27x34 ===
+```
+                 .eeeeeeeee
+                .$$$$$$$$P"
+               .$$$$$$$$P
+              z$$$$$$$$P
+             z$$$$$$$$"
+            z$$$$$$$$"
+           d$$$$$$$$"
+          d$$$$$$$$"
+        .d$$$$$$$P
+       .$$$$$$$$P
+      .$$$$$$$$$.........
+     .$$$$$$$$$$$$$$$$$$"
+    z$$$$$$$$$$$$$$$$$P"
+   -**********$$$$$$$P
+             d$$$$$$"
+           .d$$$$$$"
+          .$$$$$$P"
+         z$$$$$$P
+        d$$$$$$"
+      .d$$$$$$"
+     .$$$$$$$"
+    z$$$$$$$beeeeee
+   d$$$$$$$$$$$$$*
+  ^""""""""$$$$$"
+          d$$$*
+         d$$$"
+        d$$*
+       d$P"
+     .$$"
+    .$P"
+   .$"
+  .P"
+ ."     Gilo94'
+/"
+```
+
+=== ID: 7f42b2c8a6a38612 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: deserts | SIZE: 34x21 ===
+```
+                /||\
+                ||||
+                ||||
+                |||| /|\
+           /|\  |||| |||
+           |||  |||| |||
+           |||  |||| |||
+           |||  |||| d||
+           |||  |||||||/
+           ||b._||||~~'
+           \||||||||
+            `~~~||||
+                ||||
+                ||||
+~~~~~~~~~~~~~~~~||||~~~~~~~~~~~~~~
+  \/..__..--  . |||| \/  .  ..
+\/         \/ \/    \/
+        .  \/              \/    .
+. \/             .   \/     .
+   __...--..__..__       .     \/
+\/  .   .    \/     \/    __..--..
+```
+
+=== ID: 46b985bce5703139 | TITLE: Untitled | ARTIST: unknown | CATEGORY: nature | SUBCATEGORY: islands | SIZE: 20x10 ===
+```
+     __ |
+     __\|,-
+     ,-`=--.
+      /=8\
+       =
+       =
+       =
+       =
+~..:::::::::::::..~~
+~~~~~~~~~~~~~~~~~~~~
+```
+
+=== ID: c7edb6646e49207a | TITLE: Untitled | ARTIST: Joan G. Stark (Spunk) | CATEGORY: nature | SUBCATEGORY: islands | SIZE: 32x18 ===
+```
+          _
+         /_'. _
+       _   \ / '-.
+      < ``-.;),--'`
+       '--.</()`--.
+         / |/-/`'._\
+         |/ |=|
+            |_|
+       ~`   |-| ~~      ~
+   ~~  ~~ __|=|__   ~~
+ ~~   .-'`  |_|  ``""-._   ~~
+  ~~.'      |=|    O    '-.  ~
+    |      `"""`  <|\      \   ~
+~   \              |\      | ~~
+ jgs '-.__.--._    |/   .-'
+          ~~   `--...-'`    ~~
+  ~~         ~          ~
+         ~~         ~~     ~
+```
+

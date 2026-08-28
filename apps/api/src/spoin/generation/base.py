@@ -17,10 +17,24 @@ changing chain code.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
 from spoin.domain.enums import CardType, Difficulty
+
+
+def _sanitize_null_bytes(val: Any) -> Any:
+    if isinstance(val, str):
+        return val.replace("\x00", "")
+    if isinstance(val, dict):
+        return {
+            (k.replace("\x00", "") if isinstance(k, str) else k): _sanitize_null_bytes(v)
+            for k, v in val.items()
+        }
+    if isinstance(val, list):
+        return [_sanitize_null_bytes(item) for item in val]
+    return val
 
 
 class CardDraft(BaseModel):

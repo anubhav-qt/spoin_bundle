@@ -317,6 +317,19 @@ class _GateItem:
 CARD_PROMPT_VERSION = 3
 
 
+def _clean_null_bytes(val: Any) -> Any:
+    if isinstance(val, str):
+        return val.replace("\x00", "")
+    if isinstance(val, dict):
+        return {
+            (k.replace("\x00", "") if isinstance(k, str) else k): _clean_null_bytes(v)
+            for k, v in val.items()
+        }
+    if isinstance(val, list):
+        return [_clean_null_bytes(item) for item in val]
+    return val
+
+
 def _rejected_card(
     *,
     topic_id: str,
@@ -332,12 +345,12 @@ def _rejected_card(
         topic_id=uuid.UUID(topic_id),
         subtopic_id=uuid.UUID(subtopic_id),
         requested_difficulty=draft.difficulty,
-        title=draft.title[:120],
-        canonical_title=draft.canonical_title[:160],
-        summary=draft.summary,
-        body=draft.body,
+        title=_clean_null_bytes(draft.title[:120]),
+        canonical_title=_clean_null_bytes(draft.canonical_title[:160]),
+        summary=_clean_null_bytes(draft.summary),
+        body=_clean_null_bytes(draft.body),
         stage=stage,
-        reason=reason,
+        reason=_clean_null_bytes(reason),
         gen_meta={
             "backend": backend,
             "generated_at": generated_at,

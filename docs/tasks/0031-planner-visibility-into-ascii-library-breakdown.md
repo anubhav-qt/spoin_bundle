@@ -30,7 +30,7 @@ A written breakdown — most likely a block added to `PLAN_SYSTEM`'s ASCII guida
 (the same `## SHAPE` section that currently just says "ascii: an idea a small, funny
 drawn scene would genuinely dramatize... whatever form makes the joke land") — that
 gives the planner a genuine sense of the library's SHAPE, not its full inventory
-(2,532 entries obviously can't be pasted in). Concretely:
+(2,487 entries obviously can't be pasted in). Concretely:
 
 1. **The category/subcategory breakdown**, so the planner knows what's actually deep
    vs. thin. A rough starting point from the two curated files as they stand today
@@ -57,7 +57,7 @@ gives the planner a genuine sense of the library's SHAPE, not its full inventory
   this — a static, hand-written (or generated-once-and-pasted) summary block is
   simpler, cheaper, and the library doesn't change fast enough to need a live lookup
   baked into every planning call.
-- **Not the full library.** Same reasoning as Task 0029's retrieval design — 2,532
+- **Not the full library.** Same reasoning as Task 0029's retrieval design — 2,487
   entries doesn't fit a prompt budget, and the planner doesn't need every entry, only
   a sense of where the mass is.
 - **Regenerate the numbers after Task 0030**, not before — building this against

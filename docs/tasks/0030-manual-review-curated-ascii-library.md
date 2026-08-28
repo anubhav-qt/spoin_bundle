@@ -1,5 +1,8 @@
 # Task 0030: Manually review every entry in the curated ASCII library
 
+**Tooling + instructions:** [`apps/helpers/curation/README.md`](../../apps/helpers/curation/README.md)
+**Progress:** entries 0-188 of 0-2486 reviewed (`apps/helpers/curation/decisions/0000-0188.tsv`).
+
 **Owner:** Anubhav (needs human judgment — clarity and "is this actually funny/legible"
 are not things to automate this pass)
 **Blocked on:** nothing — can start immediately, independent of
@@ -7,8 +10,8 @@ are not things to automate this pass)
 
 ## The problem
 
-`apps/helpers/use_for_gags.txt` (927 entries) and
-`apps/helpers/use_for_informative_visualization.txt` (1,605 entries) — 2,532 pieces
+`apps/helpers/use_for_gags.txt` (888 entries) and
+`apps/helpers/use_for_informative_visualization.txt` (1,599 entries) — 2,487 pieces
 total — were curated and titled in one large batch (`apps/helpers/curate_spoin_art.py`,
 `apps/helpers/scrape_ascii_art.py`, see the commit that added them). Every entry
 satisfies the mechanical constraint (≤40 monospace columns), and `apps/helpers/
@@ -26,7 +29,11 @@ pass.
 
 ## What "manually verify" means here
 
-For every one of the 2,532 entries, two things need a human eye, not a script:
+For every one of the 2,487 entries, two things need a human eye, not a script:
+
+(Both files' own header comments claim 927 / 1,605 / 2,532. Those numbers are wrong —
+a real parse finds 888 + 1,599 = 2,487. `apply.py` rewrites the headers with the true
+post-curation counts, so the discrepancy fixes itself once the review lands.)
 
 1. **Does the art itself actually render as the thing the title claims?** — alignment
    intact (no broken ears, no drifted panels), recognizable at a glance, not just

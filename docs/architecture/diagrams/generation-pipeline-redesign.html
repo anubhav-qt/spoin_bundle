@@ -1,0 +1,421 @@
+<title>Generation Pipeline Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --bg:#f4f3ef; --surface:#ffffff; --surface-2:#eeece5; --nested:#f6f4ee;
+    --fg:#22252b; --muted:#6b6f78; --border:#d2d1ca; --hair:#e4e2db;
+    --thinker:#a1520a; --generator:#0b6e7c; --reject:#ac2337; --feedback:#59409f;
+    --delta:#2f7d4f; --forward:#3c3f46;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#131418; --surface:#1e2027; --surface-2:#181a20; --nested:#1a1c23;
+      --fg:#e6e7ea; --muted:#969aa4; --border:#343740; --hair:#292c34;
+      --thinker:#f0a952; --generator:#41c7d6; --reject:#f2788b; --feedback:#b6a1f0;
+      --delta:#63cf94; --forward:#c8cad0;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#131418; --surface:#1e2027; --surface-2:#181a20; --nested:#1a1c23;
+    --fg:#e6e7ea; --muted:#969aa4; --border:#343740; --hair:#292c34;
+    --thinker:#f0a952; --generator:#41c7d6; --reject:#f2788b; --feedback:#b6a1f0;
+    --delta:#63cf94; --forward:#c8cad0;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--fg);
+    font-family:"IBM Plex Sans",system-ui,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px; margin:0 auto; padding:56px 24px 96px}
+  header.page{border-bottom:1px solid var(--border); padding-bottom:28px; margin-bottom:32px}
+  h1{font-family:"Archivo",sans-serif; font-weight:700; letter-spacing:-.02em;
+    font-size:clamp(1.7rem,1.2rem+2vw,2.5rem); margin:0 0 12px; text-wrap:balance}
+  .lede{max-width:70ch; margin:0 0 6px}
+  .sub{max-width:80ch; color:var(--muted); font-size:.92rem; margin:10px 0 0}
+  h2{font-family:"Archivo",sans-serif; font-weight:600; letter-spacing:-.01em; font-size:1.15rem; margin:44px 0 6px}
+  h2 .n{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-weight:500; font-size:.8em; margin-right:.6em}
+  figure{margin:0}
+  figure svg{display:block; width:100%; height:auto; background:var(--surface);
+    border:1px solid var(--border); border-radius:14px}
+  .scroll{overflow-x:auto}
+  figcaption{color:var(--muted); font-size:.85rem; margin-top:10px; max-width:78ch}
+
+  .legend{display:flex; flex-wrap:wrap; gap:10px 22px; margin:18px 0 8px; padding:16px 18px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+    font-family:"IBM Plex Mono",monospace; font-size:.78rem}
+  .legend div{display:flex; align-items:center; gap:9px}
+  .sw{width:26px; height:0; border-top-width:2.5px; border-top-style:solid; flex:none}
+  .sw.fwd{border-color:var(--forward)}
+  .sw.rej{border-color:var(--reject)}
+  .sw.fb{border-color:var(--feedback); border-top-style:dashed}
+  .chip{width:13px; height:13px; border-radius:3px; flex:none}
+  .chip.th{background:var(--thinker)} .chip.ge{background:var(--generator)}
+  .chip.lo{background:var(--border)}
+  .chip.de{background:transparent; border:2px dashed var(--delta)}
+
+  .svg text{font-family:"IBM Plex Mono",monospace; fill:var(--fg)}
+  .cont{fill:var(--surface-2); stroke:var(--border); stroke-width:1}
+  .nested{fill:var(--nested); stroke:var(--hair); stroke-width:1}
+  .dbox{fill:var(--nested); stroke:var(--delta); stroke-width:1.4; stroke-dasharray:5 3}
+  .row{fill:var(--surface); stroke:var(--hair); stroke-width:1}
+  .band{fill:var(--surface); stroke:var(--border); stroke-width:1; stroke-dasharray:4 3}
+  .annot{fill:none; stroke:var(--border); stroke-width:1; stroke-dasharray:5 4}
+  .callout{fill:var(--surface-2); stroke:var(--reject); stroke-width:1.4}
+  .sink{fill:var(--surface-2); stroke:var(--reject); stroke-width:1.2}
+
+  .h{font-weight:700; font-size:12px; fill:var(--fg)}
+  .t{font-size:10px; fill:var(--fg)}
+  .note{font-size:9.5px; fill:var(--muted)}
+  .mini{font-size:9px; fill:var(--muted)}
+  .elabel{font-size:9.5px; fill:var(--muted); font-weight:600}
+
+  .s-th{fill:var(--thinker)} .s-ge{fill:var(--generator)}
+  .s-lo{fill:var(--border)} .s-rj{fill:var(--reject)} .s-fb{fill:var(--feedback)}
+  .tg-th{fill:var(--thinker); font-weight:700}
+  .tg-ge{fill:var(--generator); font-weight:700}
+  .tg-lo{fill:var(--muted); font-weight:700}
+  .tg-de{fill:var(--delta); font-weight:700}
+
+  .e-fwd{stroke:var(--forward); stroke-width:1.6; fill:none}
+  .e-rej{stroke:var(--reject); stroke-width:1.5; fill:none}
+  .e-fb{stroke:var(--feedback); stroke-width:1.5; fill:none; stroke-dasharray:5 4}
+  .mk-fwd{fill:var(--forward)} .mk-rej{fill:var(--reject)} .mk-fb{fill:var(--feedback)}
+  .qbracket{stroke:var(--reject); stroke-width:1.4; fill:none; stroke-dasharray:3 3}
+
+  table.fp{border-collapse:collapse; width:100%; font-size:.82rem; margin-top:4px}
+  table.fp th,table.fp td{border:1px solid var(--border); padding:7px 10px; text-align:left; vertical-align:top}
+  table.fp th{background:var(--surface-2); font-weight:600}
+  table.fp td:first-child{font-family:"IBM Plex Mono",monospace; font-size:.92em}
+  .pill{font-family:"IBM Plex Mono",monospace; font-size:.82em; padding:1px 6px; border-radius:5px; white-space:nowrap}
+  .pill.th{background:color-mix(in srgb,var(--thinker) 20%,transparent); color:var(--thinker)}
+  .pill.ge{background:color-mix(in srgb,var(--generator) 20%,transparent); color:var(--generator)}
+  .pill.none{color:var(--muted)}
+  .tag-moved{color:var(--delta); font-weight:700; font-family:"IBM Plex Mono",monospace; font-size:.8em}
+
+  a{color:var(--feedback)}
+  .foot{margin-top:40px; padding-top:22px; border-top:1px solid var(--border); color:var(--muted); font-size:.82rem; max-width:82ch}
+  .foot code{font-family:"IBM Plex Mono",monospace; color:var(--fg)}
+</style>
+
+<div class="wrap">
+<header class="page">
+  <h1>Generation Pipeline Redesign</h1>
+  <p class="lede">Same pipeline shape, re&#8209;pooled to pull THINKER calls out wherever a
+  GENERATOR&#8209;pool loop with explicit feedback can stand in for a one&#8209;shot strong&#8209;model
+  judgment.</p>
+  <p class="sub"><strong>The bet:</strong> weak model + a specific, applied correction + iteration &asymp;
+  strong model in one shot &mdash; everywhere except the one place a wrong verdict silently ships bad
+  content with no downstream check: <strong>gate pass&nbsp;2</strong>. That stays THINKER. Decisions
+  taken: curriculum verifier runs on GENERATOR; <strong>gate pass&nbsp;1 stays THINKER for the first
+  gate pass and drops to GENERATOR only for the redraft loop</strong> (the Run&nbsp;6 anomaly &mdash;
+  THINKER out&#8209;spent GENERATOR because it ran the corrector <em>and</em> the verifier every round);
+  all moves land together.</p>
+</header>
+
+<div class="legend" aria-hidden="true">
+  <div><span class="sw fwd"></span>forward path</div>
+  <div><span class="sw rej"></span>rejection &rarr; rejected_card</div>
+  <div><span class="sw fb"></span>feedback / redraft loop</div>
+  <div><span class="chip th"></span>THINKER&nbsp;RPD&nbsp;20</div>
+  <div><span class="chip ge"></span>GENERATOR&nbsp;RPD&nbsp;500</div>
+  <div><span class="chip lo"></span>LOCAL&nbsp;&mdash;&nbsp;no LLM</div>
+  <div><span class="chip de"></span>changed / new vs today</div>
+</div>
+
+<h2><span class="n">Fig 1</span>What moves off the THINKER pool</h2>
+<figure>
+<table class="fp">
+  <thead><tr><th>Pipeline call</th><th>Today</th><th>Target</th><th></th></tr></thead>
+  <tbody>
+    <tr><td>generate_curriculum <span class="note">(cold synthesis)</span></td>
+      <td><span class="pill th">THINKER &times;1</span></td>
+      <td><span class="pill th">THINKER &times;1</span></td><td class="note">unchanged &mdash; once per topic</td></tr>
+    <tr><td>verify_curriculum + revise_curriculum</td>
+      <td><span class="pill none">&mdash; (did not exist)</span></td>
+      <td><span class="pill ge">GENERATOR loop</span></td><td><span class="tag-moved">NEW</span> <span class="note">verify + revise until accepted</span></td></tr>
+    <tr><td>plan_cards / generate_cards / hero / ASCII redraw</td>
+      <td><span class="pill ge">GENERATOR</span></td>
+      <td><span class="pill ge">GENERATOR</span></td><td class="note">unchanged</td></tr>
+    <tr><td>gate pass 1 &mdash; correct_cards</td>
+      <td><span class="pill th">THINKER / round</span></td>
+      <td><span class="pill th">THINKER &times;1</span> then <span class="pill ge">GENERATOR / round</span></td><td><span class="tag-moved">SPLIT</span> <span class="note">strong first fix, cheap re-application</span></td></tr>
+    <tr><td>gate pass 2 &mdash; verify_cards</td>
+      <td><span class="pill th">THINKER / round</span></td>
+      <td><span class="pill th">THINKER / attempt</span></td><td><span class="tag-moved">+ suggested_fix</span> <span class="note">now also authors the fix</span></td></tr>
+    <tr><td>generate_questions</td>
+      <td><span class="pill ge">GENERATOR</span></td>
+      <td><span class="pill ge">GENERATOR</span></td><td class="note">unchanged (ADR-0029)</td></tr>
+    <tr><td>verify_questions + regenerate</td>
+      <td><span class="pill none">&mdash; (never built)</span></td>
+      <td><span class="pill ge">GENERATOR loop</span></td><td><span class="tag-moved">NEW</span> <span class="note">closed-book vs the topic corpus</span></td></tr>
+  </tbody>
+</table>
+<figcaption style="margin-top:14px">
+<strong>THINKER load per topic.</strong>
+Today &asymp; <code>1&nbsp;+&nbsp;2&nbsp;&times;&nbsp;(tiers&nbsp;&times;&nbsp;gate&nbsp;rounds)</code> &mdash; corrector <em>and</em> verifier, every round.
+This change &asymp; <code>1&nbsp;+&nbsp;tiers&nbsp;+&nbsp;(tiers&nbsp;&times;&nbsp;verification&nbsp;attempts)</code> &mdash; one THINKER correction on the first gate pass per tier, then verifier only.
+For 3 redraft rounds that is <strong>2R=6 &rarr; R+1=4</strong> THINKER calls per tier; the curriculum and
+question loops add <strong>zero</strong>.
+<strong>Why not drop pass&nbsp;1 entirely to GENERATOR (R):</strong> the first correction runs on the
+rawest drafts and does the most work &mdash; keeping it strong holds the first <code>verify_cards</code>
+reject rate down, so the loop is shorter. Only the near&#8209;mechanical re&#8209;application of an
+explicit <code>suggested_fix</code> drops to GENERATOR.
+</figcaption>
+</figure>
+
+<h2><span class="n">Fig 2</span>Target pipeline &mdash; deltas outlined in green</h2>
+<figure>
+<div class="scroll">
+<svg class="svg" viewBox="0 0 960 1900" role="img" aria-label="The redesigned generation pipeline. generate_curriculum still runs once on THINKER, then a new GENERATOR verify-and-revise loop runs until the curriculum is accepted before subtopics commit. generate_subtopic_cards is unchanged and uses only GENERATOR. In the gate, pass 1 correct_cards runs on THINKER for the first gate pass of a batch and on GENERATOR for every redraft-loop re-correction; the local structural check and local embedding near-duplicate check are unchanged; pass 2 verify_cards stays on THINKER and now also emits a specific suggested_fix per rejected card, or marks it unfixable. _redraft_until_bar gains two modes: a correction loop that applies the suggested_fix on GENERATOR and re-verifies once on THINKER, and the existing redraft loop that drafts new cards on GENERATOR. generate_questions gains a new GENERATOR-only verify-and-regenerate loop. Cards then questions are committed in separate steps and the job is marked done. Any THINKER or GENERATOR call can still raise QuotaExhaustedError.">
+  <defs>
+    <marker id="mf2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-fwd" d="M0 0L10 5L0 10z"/></marker>
+    <marker id="mr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-rej" d="M0 0L10 5L0 10z"/></marker>
+    <marker id="mb2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-fb" d="M0 0L10 5L0 10z"/></marker>
+  </defs>
+
+  <!-- topic accepted -->
+  <rect class="annot" x="250" y="16" width="380" height="44" rx="9"/>
+  <text class="t" x="270" y="36">topic accepted &mdash; ADR-0025 matcher miss</text>
+  <text class="note" x="270" y="51">new Topic row (no curriculum) &rarr; GenerationJob enqueued</text>
+  <line class="e-fwd" x1="440" y1="60" x2="440" y2="74" marker-end="url(#mf2)"/>
+
+  <rect class="band" x="250" y="74" width="380" height="32" rx="9"/>
+  <text class="t" x="270" y="94">START &mdash; Send fan-out: one branch per topic_id</text>
+  <line class="e-fwd" x1="440" y1="106" x2="440" y2="120" marker-end="url(#mf2)"/>
+
+  <!-- C1 -->
+  <rect class="cont" x="250" y="120" width="380" height="250" rx="10"/>
+  <text class="h" x="266" y="141">resolve_and_plan_topic</text>
+  <rect class="row" x="264" y="148" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="148" width="4" height="24"/>
+  <text class="t" x="276" y="164">curriculum_generated_at IS NULL ?  <tspan class="tg-lo">LOCAL</tspan></text>
+  <rect class="row" x="264" y="176" width="352" height="26" rx="6"/><rect class="s-th" x="264" y="176" width="4" height="26"/>
+  <text class="t" x="276" y="193">yes &rarr; generate_curriculum()  <tspan class="tg-th">THINKER</tspan> <tspan class="mini">cold synthesis, once</tspan></text>
+
+  <!-- NEW curriculum verify/revise loop -->
+  <rect class="dbox" x="264" y="208" width="352" height="98" rx="8"/>
+  <text class="h" x="276" y="226" font-size="11px">curriculum verify / revise loop  <tspan class="tg-de">NEW</tspan></text>
+  <rect class="row" x="278" y="232" width="286" height="30" rx="5"/><rect class="s-ge" x="278" y="232" width="4" height="30"/>
+  <text class="t" x="290" y="245">verify_curriculum()  <tspan class="tg-ge">GEN</tspan></text>
+  <text class="note" x="290" y="257">coverage &middot; tier coherence &middot; non-overlap &middot; budget</text>
+  <rect class="row" x="278" y="268" width="286" height="30" rx="5"/><rect class="s-ge" x="278" y="268" width="4" height="30"/>
+  <text class="t" x="290" y="281">rejected &rarr; revise_curriculum()  <tspan class="tg-ge">GEN</tspan></text>
+  <text class="note" x="290" y="293">full curriculum + every issue reason threaded back</text>
+  <path class="e-fb" d="M574,283 C598,283 598,247 574,247" marker-end="url(#mb2)"/>
+  <text class="mini" x="512" y="304">loop until verified</text>
+
+  <rect class="row" x="264" y="312" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="312" width="4" height="24"/>
+  <text class="t" x="276" y="328">converged &rarr; persist Subtopic rows &middot; commit  &middot;ADR-0031</text>
+  <rect class="row" x="264" y="340" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="340" width="4" height="24"/>
+  <text class="t" x="276" y="356">no &rarr; load existing Subtopic rows</text>
+  <line class="e-fwd" x1="440" y1="370" x2="440" y2="384" marker-end="url(#mf2)"/>
+
+  <rect class="band" x="250" y="384" width="380" height="32" rx="9"/>
+  <text class="t" x="270" y="404">Send &mdash; one branch per subtopic GROUP <tspan class="note">(tiers low&rarr;high)</tspan></text>
+  <line class="e-fwd" x1="440" y1="416" x2="440" y2="430" marker-end="url(#mf2)"/>
+
+  <!-- C2 (unchanged) -->
+  <rect class="cont" x="250" y="430" width="380" height="452" rx="10"/>
+  <text class="h" x="266" y="451">generate_subtopic_cards &mdash; per subtopic-tier</text>
+  <text class="note" x="266" y="465">unchanged &mdash; nothing in this node was ever THINKER</text>
+  <rect class="row" x="264" y="472" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="472" width="4" height="24"/>
+  <text class="t" x="276" y="488">deficit  want = target_cards &minus; existing_count  <tspan class="tg-lo">LOCAL</tspan></text>
+  <rect class="row" x="264" y="500" width="352" height="24" rx="6"/><rect class="s-ge" x="264" y="500" width="4" height="24"/>
+  <text class="t" x="276" y="516">plan_cards() &mdash; pre-processing gate &middot;ADR-0059 <tspan class="tg-ge">PLAN&rarr;GEN</tspan></text>
+  <rect x="264" y="528" width="352" height="18" rx="5" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="note" x="276" y="541">empty / failed &rarr; writer runs unplanned (fallback kept)</text>
+  <rect class="row" x="264" y="550" width="352" height="24" rx="6"/><rect class="s-ge" x="264" y="550" width="4" height="24"/>
+  <text class="t" x="276" y="566">hero: generate_cards(want_hero=True) &middot;ADR-0042 <tspan class="tg-ge">GEN</tspan></text>
+  <rect x="264" y="578" width="352" height="30" rx="5" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="note" x="276" y="591">0 returned &rarr; no hero this run; retried later only</text>
+  <text class="note" x="276" y="603">while has_hero = false &and; existing_count = 0</text>
+  <rect class="row" x="264" y="614" width="352" height="24" rx="6"/><rect class="s-ge" x="264" y="614" width="4" height="24"/>
+  <text class="t" x="276" y="630">generate_cards() &mdash; batched rounds by card_type &middot;ADR-0005 <tspan class="tg-ge">GEN</tspan></text>
+
+  <rect class="nested" x="264" y="644" width="352" height="184" rx="8"/>
+  <text class="h" x="276" y="662" font-size="11px">ASCII redraw loop  &middot;ADR-0066</text>
+  <rect class="row" x="276" y="668" width="328" height="22" rx="5"/><rect class="s-lo" x="276" y="668" width="4" height="22"/>
+  <text class="t" x="288" y="683">width check &le; 40 columns  <tspan class="tg-lo">LOCAL</tspan></text>
+  <rect class="row" x="276" y="694" width="328" height="22" rx="5"/><rect class="s-ge" x="276" y="694" width="4" height="22"/>
+  <text class="t" x="288" y="709">over budget &rarr; 1 batched redraw call  <tspan class="tg-ge">GEN</tspan></text>
+  <rect class="row" x="276" y="720" width="328" height="22" rx="5"/><rect class="s-ge" x="276" y="720" width="4" height="22"/>
+  <text class="t" x="288" y="735">still over &rarr; escalated 2nd redraw  <tspan class="tg-ge">GEN</tspan></text>
+  <rect class="row" x="276" y="746" width="328" height="38" rx="5"/><rect class="s-rj" x="276" y="746" width="4" height="38"/>
+  <text class="t" x="288" y="761">still over after last attempt &rarr;</text>
+  <text class="t" x="288" y="775">whole card dropped &rarr; failures <tspan class="note">(redraft refills)</tspan></text>
+  <text class="mini" x="288" y="802">redraw attempts = Settings.ascii_redraw_attempts (2)</text>
+
+  <rect class="row" x="264" y="838" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="838" width="4" height="24"/>
+  <text class="t" x="276" y="854">a round returning 0 usable items stops the rounds</text>
+  <line class="e-fwd" x1="440" y1="882" x2="440" y2="896" marker-end="url(#mf2)"/>
+
+  <!-- C3 gate -->
+  <rect class="cont" x="250" y="896" width="380" height="330" rx="10"/>
+  <text class="h" x="266" y="917">gate &middot; _process_gate_item &mdash; two-pass  &middot;ADR-0030 / 0031 <tspan class="tg-de">amended</tspan></text>
+  <text class="note" x="266" y="931">per subtopic-tier &middot; concurrent (asyncio.gather)</text>
+
+  <rect class="row" x="264" y="938" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="938" width="4" height="24"/>
+  <text class="t" x="276" y="954">structural check &mdash; passes_minimal_gate()  <tspan class="tg-lo">LOCAL</tspan></text>
+
+  <rect class="row" x="264" y="966" width="352" height="44" rx="6"/><rect class="s-th" x="264" y="966" width="4" height="22"/><rect class="s-ge" x="264" y="988" width="4" height="22"/>
+  <text class="t" x="276" y="982">pass 1 &mdash; correct_cards()  <tspan class="tg-th">THINKER</tspan> 1st pass &middot; <tspan class="tg-ge">GEN</tspan> redraft  <tspan class="tg-de">SPLIT</tspan></text>
+  <text class="note" x="276" y="995">1st gate pass: full THINKER correction on the raw drafts</text>
+  <text class="note" x="276" y="1006">redraft rounds: GENERATOR applies verify_cards&rsquo; suggested_fix</text>
+
+  <rect class="row" x="264" y="1014" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="1014" width="4" height="24"/>
+  <text class="t" x="276" y="1030">recompute content_embedding from corrected body  <tspan class="tg-lo">LOCAL</tspan></text>
+
+  <rect class="row" x="264" y="1042" width="352" height="34" rx="6"/><rect class="s-lo" x="264" y="1042" width="4" height="34"/>
+  <text class="t" x="276" y="1058">near-duplicate &mdash; corpus + intra-batch cosine  <tspan class="tg-lo">LOCAL</tspan></text>
+  <text class="note" x="276" y="1071">on local embeddings &middot; threshold 0.9</text>
+
+  <rect class="row" x="264" y="1080" width="352" height="48" rx="6"/><rect class="s-th" x="264" y="1080" width="4" height="48"/>
+  <text class="t" x="276" y="1096">pass 2 &mdash; verify_cards()  <tspan class="tg-th">THINKER</tspan>  <tspan class="tg-de">+ suggested_fix</tspan></text>
+  <text class="note" x="276" y="1109">difficulty RE-RATED &middot; factual accept / reject &middot; per reject:</text>
+  <text class="note" x="276" y="1121">one specific applicable fix, OR &ldquo;unfixable &rarr; regenerate&rdquo;</text>
+
+  <rect class="row" x="264" y="1132" width="352" height="24" rx="6"/><rect class="s-lo" x="264" y="1132" width="4" height="24"/>
+  <text class="t" x="276" y="1148">accepted &rarr; Card (ACTIVE) + CardStats &middot; commit</text>
+  <line class="e-fwd" x1="440" y1="1226" x2="440" y2="1240" marker-end="url(#mf2)"/>
+
+  <!-- tight correction loop pass2 -> pass1 -->
+  <path class="e-fb" d="M616,1104 C664,1104 664,988 620,988" marker-end="url(#mb2)"/>
+  <text class="elabel" x="638" y="1052" transform="rotate(90 638 1052)" fill="var(--feedback)">reject + suggested_fix &rarr; apply [GEN] &rarr; re-verify [THINKER]</text>
+
+  <!-- C4 redraft -->
+  <rect class="cont" x="250" y="1240" width="380" height="196" rx="10"/>
+  <text class="h" x="266" y="1261">_redraft_until_bar &mdash; two modes  &middot;ADR-0057 <tspan class="tg-de">amended</tspan></text>
+  <rect class="row" x="264" y="1268" width="352" height="36" rx="6"/><rect class="s-fb" x="264" y="1268" width="4" height="36"/>
+  <text class="t" x="276" y="1283">A &middot; correction loop &mdash; reject carries a suggested_fix:</text>
+  <text class="note" x="276" y="1296">correct_cards [GEN] applies it &rarr; re-verify [THINKER] &middot; no new drafting</text>
+  <rect class="row" x="264" y="1308" width="352" height="36" rx="6"/><rect class="s-fb" x="264" y="1308" width="4" height="36"/>
+  <text class="t" x="276" y="1323">B &middot; redraft loop &mdash; unfixable / ASCII-dropped / tier under bar:</text>
+  <text class="note" x="276" y="1336">plan_cards + generate_cards [GEN] &rarr; full gate again</text>
+  <rect class="row" x="264" y="1348" width="352" height="22" rx="6"/><rect class="s-lo" x="264" y="1348" width="4" height="22"/>
+  <text class="t" x="276" y="1363">loop until first_pass 0.9  <tspan class="note">(later pass &rarr; 100%)</tspan></text>
+  <rect class="row" x="264" y="1374" width="352" height="34" rx="6"/><rect class="s-rj" x="264" y="1374" width="4" height="34"/>
+  <text class="t" x="276" y="1390">stuck guard &mdash; 5 consecutive rounds:</text>
+  <text class="note" x="276" y="1402">gate rejects all &rarr; REJECTED  &middot;  no verdict &rarr; FAILED  (apart)</text>
+  <line class="e-fwd" x1="440" y1="1436" x2="440" y2="1450" marker-end="url(#mf2)"/>
+
+  <!-- C5 questions -->
+  <rect class="cont" x="250" y="1450" width="380" height="228" rx="10"/>
+  <text class="h" x="266" y="1471">generate_questions  &middot;ADR-0029  <tspan class="tg-de">+ verify loop</tspan></text>
+  <rect class="row" x="264" y="1478" width="352" height="34" rx="6"/><rect class="s-ge" x="264" y="1478" width="4" height="34"/>
+  <text class="t" x="276" y="1493">generate_questions() per accepted card  <tspan class="tg-ge">GEN</tspan></text>
+  <text class="note" x="276" y="1506">+ backfill: active cards still missing a Question  &middot;ADR-0031</text>
+
+  <rect class="dbox" x="264" y="1518" width="352" height="140" rx="8"/>
+  <text class="h" x="276" y="1536" font-size="11px">verify_questions loop &mdash; GENERATOR only  <tspan class="tg-de">NEW</tspan></text>
+  <rect class="row" x="278" y="1542" width="324" height="46" rx="5"/><rect class="s-ge" x="278" y="1542" width="4" height="46"/>
+  <text class="t" x="290" y="1557">verify_questions()  <tspan class="tg-ge">GEN</tspan> &mdash; closed-book vs the source</text>
+  <text class="note" x="290" y="1570">card + existing stems: one defensible answer &middot; distractors</text>
+  <text class="note" x="290" y="1581">wrong &middot; answerable from the card &middot; not a duplicate stem</text>
+  <rect class="row" x="278" y="1594" width="324" height="30" rx="5"/><rect class="s-ge" x="278" y="1594" width="4" height="30"/>
+  <text class="t" x="290" y="1607">rejected &rarr; regenerate that question [GEN] + feedback</text>
+  <text class="note" x="290" y="1619">re-verify &middot; same REJECTED / FAILED split as the card gate</text>
+  <path class="e-fb" d="M602,1609 C624,1609 624,1565 602,1565" marker-end="url(#mb2)"/>
+  <text class="mini" x="288" y="1650">no THINKER &mdash; the topic corpus is the only source of truth</text>
+  <line class="e-fwd" x1="440" y1="1678" x2="440" y2="1692" marker-end="url(#mf2)"/>
+
+  <!-- C6 persist -->
+  <rect class="cont" x="250" y="1692" width="380" height="52" rx="10"/>
+  <rect class="s-lo" x="250" y="1692" width="5" height="52"/>
+  <text class="t" x="270" y="1713">persist &mdash; Card rows committed, THEN Question rows committed</text>
+  <text class="note" x="270" y="1731">separate commits; backfill (ADR-0031) recovers a crash between the two</text>
+  <line class="e-fwd" x1="440" y1="1744" x2="440" y2="1758" marker-end="url(#mf2)"/>
+
+  <!-- C7 -->
+  <rect class="cont" x="250" y="1758" width="380" height="52" rx="10"/>
+  <rect class="s-lo" x="250" y="1758" width="5" height="52"/>
+  <text class="t" x="270" y="1779">gate_and_persist &mdash; graph fan-in</text>
+  <text class="note" x="270" y="1797">aggregate item_reports &rarr; per-topic report; mark job done</text>
+
+  <!-- ===== REJECTION SINK ===== -->
+  <rect class="sink" x="672" y="936" width="272" height="212" rx="10"/>
+  <text class="h" x="686" y="958" fill="var(--reject)">rejected_card rows</text>
+  <text class="note" x="686" y="973">persisted &middot; never a Card &middot; not in existing_count</text>
+  <text class="t" x="686" y="1000">stage = STRUCTURAL</text>
+  <text class="mini" x="686" y="1014">failed passes_minimal_gate()</text>
+  <text class="t" x="686" y="1042">stage = NEAR_DUPLICATE</text>
+  <text class="mini" x="686" y="1056">cosine &ge; card_duplicate_threshold</text>
+  <text class="t" x="686" y="1084">stage = VERIFICATION</text>
+  <text class="mini" x="686" y="1098">reason + suggested_fix (or &ldquo;regenerate&rdquo;)</text>
+  <text class="mini" x="686" y="1112">&rarr; drives loop A or loop B in _redraft_until_bar</text>
+
+  <polyline class="e-rej" points="616,950 644,950 644,996 672,996" marker-end="url(#mr2)"/>
+  <text class="elabel" x="620" y="945">reject</text>
+  <polyline class="e-rej" points="616,1058 652,1058 652,1038 672,1038" marker-end="url(#mr2)"/>
+  <text class="elabel" x="620" y="1053">reject</text>
+  <polyline class="e-rej" points="616,1100 660,1100 660,1080 672,1080" marker-end="url(#mr2)"/>
+  <text class="elabel" x="620" y="1095">reject</text>
+
+  <!-- ascii drop -> redraft loop B -->
+  <polyline class="e-rej" points="616,760 636,760 636,1326 630,1326" marker-end="url(#mr2)"/>
+  <text class="elabel" x="640" y="1060" transform="rotate(90 640 1060)">card dropped pre-gate &rarr; redraft loop B refills the slot</text>
+
+  <!-- ===== FEEDBACK LANES ===== -->
+  <!-- loop B: redraft -> writer -->
+  <polyline class="e-fb" points="250,1330 150,1330 150,626 250,626" marker-end="url(#mb2)"/>
+  <text class="elabel" x="140" y="1000" transform="rotate(-90 140 1000)" fill="var(--feedback)">loop B: re-plan &middot; re-write with rejection feedback</text>
+  <!-- loop B: redraft -> gate -->
+  <polyline class="e-fb" points="250,1290 196,1290 196,908 250,908" marker-end="url(#mb2)"/>
+  <text class="elabel" x="186" y="740" transform="rotate(-90 186 740)" fill="var(--feedback)">re-enter gate</text>
+  <!-- rejected_card -> writer lane (merges into loop B's x=150 lane) -->
+  <polyline class="e-fb" points="672,1148 672,1232 150,1232"/>
+  <text class="elabel" x="300" y="1228" fill="var(--feedback)">rejected_card &rarr; avoid_bodies + rejection_feedback (ADR-0030 / 31)</text>
+
+  <!-- ===== QUOTA ===== -->
+  <path class="qbracket" d="M198,188 L24,188 L24,1520"/>
+  <path class="qbracket" d="M264,189 L24,189 M278,1080 L24,1080" opacity="0.7"/>
+  <path class="qbracket" d="M278,247 L24,247 M264,516 L24,516 M264,982 L24,982 M278,1557 L24,1557" opacity="0.4"/>
+  <text class="elabel" x="17" y="850" transform="rotate(-90 17 850)" fill="var(--reject)">any THINKER / GENERATOR call may raise QuotaExhaustedError</text>
+  <path class="e-rej" d="M24,1520 L24,1712 L38,1712" marker-end="url(#mr2)"/>
+
+  <rect class="callout" x="40" y="1700" width="820" height="150" rx="10"/>
+  <text class="h" x="58" y="1724" fill="var(--reject)">Quota exhaustion &mdash; unchanged (ADR-0065), and now with fewer THINKER touchpoints</text>
+  <text class="t" x="58" y="1746">QuotaExhaustedError is abstract. Its subclasses still mean different things:</text>
+  <text class="t" x="58" y="1766">&bull; DailyQuotaExhaustedError &nbsp; &bull; AllCellsThrottledError &nbsp; &bull; AllModelsUnavailableError</text>
+  <text class="note" x="58" y="1786">worker requeues the job as pending on all three &middot; subclass &rarr; GenerationJob.last_error</text>
+  <text class="note" x="58" y="1802">THINKER touchpoints after this redesign: generate_curriculum (once) &middot; correct_cards (first gate pass only) &middot; verify_cards (every pass)</text>
+</svg>
+</div>
+<figcaption>Green dashed outlines mark what changed. The gate keeps its two&#8209;pass shape. Pass&nbsp;1
+runs a full THINKER correction on the raw drafts the first time a batch is gated, then drops to
+GENERATOR for every redraft round &mdash; where the job is only to apply the specific
+<code>suggested_fix</code> that pass&nbsp;2 (still the only rejecter, still THINKER) now authors. So a
+hallucinated or stale fact is routed through the strong model once for the fix and once per
+verification, never through a per&#8209;round corrector as well. Loop&nbsp;A converges &ldquo;fixable&rdquo;
+rejects cheaply; loop&nbsp;B (the existing ADR&#8209;0057 redraft) handles unfixable cards, ASCII
+drops, and quantity shortfall. Question verification is new and stays entirely on GENERATOR because
+it is a closed&#8209;book check against the card it came from.</figcaption>
+</figure>
+
+<h2>Open threads before this is buildable</h2>
+<ul>
+  <li><strong>New <code>ContentGenerator</code> methods</strong> &mdash; <code>verify_curriculum</code>,
+    <code>revise_curriculum</code>, <code>verify_questions</code>, each batched (ADR&#8209;0005).
+    <code>correct_cards</code> is called with the THINKER governor on a batch&rsquo;s first gate pass and
+    the GENERATOR governor on every redraft round &mdash; the call site chooses, the method is
+    pool&#8209;agnostic. <code>verify_cards</code>&rsquo; output schema gains <code>suggested_fix</code>
+    and an <code>unfixable</code> flag.</li>
+  <li><strong>The curriculum verifier&rsquo;s rubric</strong> is the whole ballgame &mdash; coverage
+    completeness, tier coherence, subtopic non&#8209;overlap. Budget arithmetic stays a code check
+    (trusted for taste, not constraints).</li>
+  <li><strong>Loop A vs loop B routing</strong> &mdash; <code>verify_cards</code> must reliably tell
+    &ldquo;change the 1953 date to 1955&rdquo; (loop A) from &ldquo;the premise is wrong, scrap it&rdquo;
+    (loop B). A vague fix instruction is what makes the lite corrector fumble.</li>
+  <li><strong>Convergence guards</strong> &mdash; reuse <code>_redraft_until_bar</code>&rsquo;s existing
+    pattern (N consecutive unproductive rounds, REJECTED vs FAILED counted apart) for both new loops;
+    no blind round caps.</li>
+  <li><strong>ADR trail</strong> &mdash; amends 0007 (curriculum SPOF mitigation now &ldquo;strong model
+    for the first pass&rdquo;), 0028/0029 (pool assignment), 0030 (pass&nbsp;1 pool + verifier authors
+    fixes), 0031 (feedback loop extends to curriculum and questions), 0059 (planner role expands).
+    Likely one new ADR for the re&#8209;pooling plus amendments to those.</li>
+</ul>
+
+<p class="foot">Baseline this modifies: the current pipeline in
+<a href="generation-pipeline.html">generation-pipeline.html</a> (same directory).
+No code changed yet &mdash; this is the target design for review, not a built state.</p>
+</div>

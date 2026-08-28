@@ -8,6 +8,13 @@
 > generation), and [ADR-0024](../adr/0024-langgraph-for-card-generation-pipeline.md) (why
 > LangGraph, and what it does and doesn't own). Read those for *why*; this doc is *what
 > exists and how to run it*.
+>
+> Diagrams (theme-aware HTML, open in a browser):
+> [`diagrams/generation-pipeline.html`](diagrams/generation-pipeline.html) -- every step,
+> model tier, rejection path and feedback loop of the pipeline **as it stands today**;
+> [`diagrams/generation-pipeline-redesign.html`](diagrams/generation-pipeline-redesign.html)
+> -- a **proposed** re-pooling that pulls THINKER calls out in favour of GENERATOR feedback
+> loops (target design, not built).
 
 ## What's actually built
 

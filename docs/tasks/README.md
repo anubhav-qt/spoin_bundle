@@ -36,7 +36,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0026](0026-few-shot-examples-from-manual-review.md) | Add worked good/bad examples to the card prompts, from hand review of v2 cards (ADR-0059) | unassigned |
 | [0028](0028-responsive-right-rail-and-controls.md) | The right rail's own restructure from the responsive redesign (ADR-0064's deferred half) | unassigned -- items 1-2 shipped on `responsive-mobile-shell`; density pass + Popular/For You toggle left |
 | [0029](0029-mermaid-shape-budget-and-curated-ascii-library.md) | Deterministic mermaid shape budget (node count/label length) | unassigned -- curated-library retrieval half shipped, see doc |
-| [0030](0030-manual-review-curated-ascii-library.md) | Manually review all 2,532 curated ASCII library entries for art clarity and title accuracy before retrieval leans on them | Anubhav |
+| [0030](0030-manual-review-curated-ascii-library.md) | Manually review all 2,487 curated ASCII library entries for art clarity and title accuracy before retrieval leans on them | Anubhav |
 | [0031](0031-planner-visibility-into-ascii-library-breakdown.md) | Give the card planner a category/example breakdown of the curated ASCII library, so `asset_direction` is written with a sense of what's actually available | unassigned -- blocked on 0030 |
 | [0032](0032-batch-topic-requests.md) | Let a user request several custom topics in one submission (a `+` to add rows, each with an optional description), sent to the server as one batched call instead of one at a time | unassigned |
 
@@ -56,3 +56,5 @@ Tasks 0016-0021 are one sequence, gated on 0016. Read
 | [0010](0010-one-shot-pipeline-redesign.md) | Redesign the generation pipeline for one-shot completion (ADR-0026) | Done -- 2026-08-17 |
 | [0008](0008-wire-generation-job-worker.md) | Wire `apps/worker` to the generation pipeline | Done -- 2026-08-17 |
 | [0027](0027-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Reverted, then superseded -- see ADR-0063 / [ADR-0064](../adr/0064-mobile-shell-tab-bar.md) / task 0028 |
+
+**Handoff brief:** [`docs/handoff/v3-generation-readiness.md`](../handoff/v3-generation-readiness.md) sequences tasks 0029-0032 plus the corpus backup, embedder fix and prompt-version bump into the order they have to happen for a real generation run.

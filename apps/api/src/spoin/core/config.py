@@ -81,7 +81,7 @@ class Settings(BaseSettings):
     #: `gemini-3.0-flash` never existed as a stable name (only the `-preview`
     #: suffixed one does).
     gemini_thinking_ladder: str = (
-        "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,"
+        "gemini-3.6-flash:20:5,gemini-3.7-flash:20:5,"
         "gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5"
     )
     #: Same shape, for `generate_cards` AND `generate_questions` (ADR-0029) —
@@ -96,7 +96,7 @@ class Settings(BaseSettings):
     #: nothing raises, so `_invoke_with_retry` never gets a chance to rotate to
     #: the next (key, model) cell, and the request never resolves. Bounds a
     #: single attempt so a stall degrades the same way a 429/503 already does.
-    gemini_request_timeout_seconds: float = 60.0
+    gemini_request_timeout_seconds: float = 180.0
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
 

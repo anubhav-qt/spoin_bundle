@@ -48,15 +48,14 @@ uses a normal markdown pipe table, which already renders as a real `<table>`; AS
 tables drawn from dashes and pipes are out for the same reason ASCII diagrams are.
 
 **3. ASCII scenes have no required form.** The stickman requirement is removed
-everywhere — planning, card generation, hero cards, curriculum, quality review. A scene
-may be characters, a checklist, a before/after pair, a timeline whose ordering is the
-joke, a tiny hash-bar chart, an object misbehaving, or pure typography. Faces are one
-option among many. `ASCII_INSTRUCTIONS` now teaches this through seven worked examples
-drawn from seven live topics (Gym, Gilgamesh, German, PostgreSQL, Financial Literacy,
-10m Air Pistol, How Everyday Things Work), each a *different shape* of joke, each
-annotated with what it is doing and why. The two hard rules (40 columns, works
-stand-alone as a collapsed-card preview) are unchanged and still enforced outside the
-model per CLAUDE.md's "trusted for taste, never for constraints".
+everywhere — planning, card generation, hero cards, curriculum, quality review. (Note:
+Amended by [ADR-0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md):
+the curated reference library and generated ASCII visual scenes are strictly pictorial
+artworks; text-only flowcharts, plain checklists, and pure typography are excluded).
+The two hard rules (40 columns, works stand-alone as a collapsed-card preview) are
+unchanged and still enforced outside the model per CLAUDE.md's "trusted for taste, never
+for constraints".
+
 
 **4. One block per card, and it is the full one.** `resolveHero` in `Card.tsx` picks a
 single lead visual, renders it once at the top in both the collapsed and expanded

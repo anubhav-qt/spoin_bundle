@@ -87,10 +87,10 @@ export function MermaidBlock({ source }: { source: string }) {
         const mermaid = (await import("mermaid")).default;
         mermaid.initialize({
           startOnLoad: false,
-          // Generated content: never let a diagram inject markup into the
-          // feed. "strict" also disables click handlers and inline HTML in
-          // labels, neither of which a learning card has any use for.
-          securityLevel: "strict",
+          // "antiscript" cleans input using DOMPurify without creating
+          // sandboxed iframes that get blocked by browser CORS/security
+          // restrictions when accessing over local network/mobile HTTP.
+          securityLevel: "antiscript",
           theme: "base",
           themeVariables: themeVariables(el),
           flowchart: { htmlLabels: false, useMaxWidth: true },
@@ -99,7 +99,8 @@ export function MermaidBlock({ source }: { source: string }) {
         });
         const { svg: rendered } = await mermaid.render(`spoin-mmd-${renderSeq++}`, source);
         if (live) setSvg(rendered);
-      } catch {
+      } catch (err) {
+        console.error("Mermaid render error:", err);
         // Malformed diagram source — fall through to the raw-source box below.
         if (live) setFailed(true);
       }

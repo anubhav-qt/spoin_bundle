@@ -72,17 +72,14 @@ the deployed copy, since `apps/api/Dockerfile` never `COPY`s the sibling
 after any edit to the `apps/helpers/` originals (see
 [Task 0030](../tasks/0030-manual-review-curated-ascii-library.md)).
 
-**Open conflict with §2, not resolved by this note:** §2 above states ASCII cards
+**Conflict with §2 resolved (2026-08-28):** §2 above states ASCII cards
 "must strictly contain pictorial artworks" and that non-pictorial forms are
-"strictly prohibited." [ADR-0067](0067-mermaid-diagrams-and-form-free-ascii.md)'s
-own decision #3 — accepted the same day — explicitly removes any required form,
-including several worked examples that are NOT pictorial (a checklist with no
-characters, pure typography with no drawing at all). The prompt actually shipped
-(`ASCII_INSTRUCTIONS` in `cards.py`) follows ADR-0067, not this section. Whether §2
-should be narrowed to "pictorial preferred, not required" or ADR-0067's form-free
-decision should be walked back is a real open question this note is flagging, not
-answering — resolve it explicitly rather than leaving two accepted ADRs disagreeing
-about the same prompt.
+"strictly prohibited." Per project owner decision, §2 strictly pictorial
+requirement is authoritative for the curated reference library and visual
+generations. All curated assets in `apps/helpers/` and runtime reference data
+must be pictorial visual artworks. Non-pictorial entries (e.g. text-only
+checklists, pure typography) are excluded.
+
 
 The "22 Mermaids / 12 graduation caps / 4 Dilbert" keep/delete review and the
 per-example fixes named in `apps/helpers/TODO_GENERATOR_PROMPTS.md` are curation work

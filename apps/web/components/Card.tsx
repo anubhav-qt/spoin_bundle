@@ -352,13 +352,24 @@ export function Card({
     if (el === null) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setFocused(entry.intersectionRatio > 0.6),
-      { threshold: [0, 0.25, 0.5, 0.6, 0.75, 1] },
+      ([entry]) => {
+        // An expanded card or hero card is in active reading mode — it must
+        // NOT turn dull/scale down while the reader is scrolling through its
+        // body, even if the top or bottom of the card is scrolled past.
+        // It stays focused as long as it intersects the viewport.
+        // Collapsed cards require at least 30% visibility to claim focus.
+        if (expanded || isHero) {
+          setFocused(entry.isIntersecting);
+        } else {
+          setFocused(entry.intersectionRatio > 0.3);
+        }
+      },
+      { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.75, 1] },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [expanded, isHero]);
 
   // Tap genuinely empty space — outside every card, not just this one — to
   // close it, and Escape too.
@@ -381,72 +392,63 @@ export function Card({
   useEffect(() => {
     if (!expanded || isHero) return;
 
-    let start: { x: number; y: number; at: number; target: HTMLElement } | null = null;
+    let downX = 0;
+    let downY = 0;
+    let downTime = 0;
 
-    const outsideEveryCard = (target: HTMLElement): boolean => {
-      const el = article.current;
-      return el !== null && !el.contains(target) && target.closest(".card") === null;
+    const onPointerDown = (e: PointerEvent) => {
+      // Only primary mouse button or touch.
+      if (e.button !== 0) return;
+      downX = e.clientX;
+      downY = e.clientY;
+      downTime = performance.now();
     };
 
-    const onPointerDown = (event: PointerEvent) => {
-      start = {
-        x: event.clientX,
-        y: event.clientY,
-        at: event.timeStamp,
-        target: event.target as HTMLElement,
-      };
-    };
+    const onPointerUp = (e: PointerEvent) => {
+      if (downTime === 0) return;
+      const elapsed = performance.now() - downTime;
+      downTime = 0;
+      // Too slow to be a tap — likely the end of a scroll gesture.
+      if (elapsed > TAP_MAX_MS) return;
+      const dx = e.clientX - downX;
+      const dy = e.clientY - downY;
+      // Pointer moved too far — a drag/flick, not a tap in place.
+      if (dx * dx + dy * dy > TAP_SLOP_PX * TAP_SLOP_PX) return;
 
-    const onPointerUp = (event: PointerEvent) => {
-      const began = start;
-      start = null;
-      if (began === null) return;
-      if (Math.hypot(event.clientX - began.x, event.clientY - began.y) > TAP_SLOP_PX) return;
-      if (event.timeStamp - began.at > TAP_MAX_MS) return;
-      if (!outsideEveryCard(began.target)) return;
-      if (!outsideEveryCard(event.target as HTMLElement)) return;
+      const target = e.target as HTMLElement | null;
+      if (target === null) return;
+      // Tapped inside ANY card or interactive UI (modals, dropdowns, actions)? Leave it alone.
+      if (target.closest(".card, .modal-panel, .popover, .action, .topic-discovery-modal") !== null) {
+        return;
+      }
       collapse();
     };
 
-    // A gesture the browser took over (a scroll, a pull-to-refresh) fires
-    // pointercancel instead of pointerup — drop the candidate tap outright
-    // rather than leaving it armed for the next unrelated pointerup.
-    const onPointerCancel = () => {
-      start = null;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") collapse();
     };
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") collapse();
-    };
-
-    document.addEventListener("pointerdown", onPointerDown, true);
-    document.addEventListener("pointerup", onPointerUp, true);
-    document.addEventListener("pointercancel", onPointerCancel, true);
-    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("pointerdown", onPointerDown, { capture: true });
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      document.removeEventListener("pointerdown", onPointerDown, true);
-      document.removeEventListener("pointerup", onPointerUp, true);
-      document.removeEventListener("pointercancel", onPointerCancel, true);
-      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointerdown", onPointerDown, { capture: true });
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [expanded, isHero, collapse]);
 
-  // Dwell accrues only while expanded, the tab is visible, AND the card is
-  // actually the one in view (`focused`, from the intersection observer
-  // above) — scrolling on to the next card while this one stays expanded
-  // must stop the clock, or a card gets silently marked read seconds after
-  // the reader has moved past it. The completion check is scheduled for the
-  // remaining time (threshold minus what's already accumulated) rather than
-  // a flat 8s-from-mount timeout, so pausing and resuming across several
-  // scroll-past/scroll-back cycles still adds up correctly instead of either
-  // firing early or never re-arming.
+  // Card dwell timer: accumulates time spent visible in the viewport, records
+  // an engagement `dwell` event on unmount/visibility loss, and marks the card
+  // seen once it has been read for DWELL_COMPLETE_MS continuously (ADR-0011).
   useEffect(() => {
-    // Hero cards are only marked seen by the explicit "mark as read" action
-    // (see the explicit_complete handler below) — never by dwell time, since
-    // they start pre-expanded and would otherwise self-mark within seconds
-    // of appearing, before the reader has actually read anything.
+    // Dwell timer ONLY runs when the card is expanded by the user (and not hero).
+    // Unopened cards must NEVER be auto-marked as read.
     if (!expanded || isHero) return;
+
+    const el = node.current;
+    if (el === null) return;
 
     const timer = dwell.current;
     let completeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -591,7 +593,7 @@ export function Card({
       ref={node}
       className="node"
       data-read={seen}
-      layout
+      layout="position"
       exit={{ x: "100%", opacity: 0, transition: { duration: 0.22 } }}
       transition={{ layout: { duration: 0.22, ease: [0.16, 1, 0.3, 1] } }}
     >
@@ -903,14 +905,19 @@ function normalizeText(source: string): string {
  *  WHICH archetype a card is; this never overrides it. */
 const DIAGRAM_LANG_TAGS = new Set(["diagram", "text", "ascii", "table", ""]);
 const DIAGRAM_CHARS_RE = /[─│┌└┐┘├┤┬┴┼→▶►]|-->|==>|──>|\+[-+]+\+|\|.*\|/;
+const MERMAID_KEYWORDS_RE = /^\s*(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|quadrantChart|requirementDiagram|gitGraph|mindmap|timeline|sankey-beta|xychart-beta|block-beta)\b/m;
 
-function isMermaidFence(lang: string): boolean {
-  return lang.toLowerCase() === "mermaid";
+function isMermaidFence(lang: string, content?: string): boolean {
+  const normalized = lang.toLowerCase();
+  if (normalized === "mermaid" || normalized === "flowchart") return true;
+  if (content && MERMAID_KEYWORDS_RE.test(content)) return true;
+  return false;
 }
 
 function isDiagramFence(lang: string, content: string): boolean {
   const normalized = lang.toLowerCase();
-  if (normalized === "diagram" || normalized === "mermaid") return true;
+  if (normalized === "diagram" || normalized === "mermaid" || normalized === "flowchart") return true;
+  if (MERMAID_KEYWORDS_RE.test(content)) return true;
   if (!DIAGRAM_LANG_TAGS.has(normalized)) return false;
   return DIAGRAM_CHARS_RE.test(content);
 }
@@ -1632,7 +1639,7 @@ function DiagramBlock({ lang, content }: { lang: string; content: string }) {
 
   // A mermaid fence is a diagram whose layout the CLIENT owns, so it skips
   // the monospace box entirely rather than rendering its source as art.
-  if (isMermaidFence(lang)) {
+  if (isMermaidFence(lang, content)) {
     return (
       <div className="diagram-block diagram-block-mermaid">
         <div className="diagram-block-head">

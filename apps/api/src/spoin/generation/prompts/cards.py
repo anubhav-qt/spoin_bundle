@@ -32,9 +32,9 @@ nothing else genuinely fits. Do not force a shape onto an idea that doesn't want
 things happen — request flow, a pipeline, a feedback loop, a timeline, a causal chain.
    - comparison: a specific, commonly-held WRONG belief worth correcting. \
 Only when a real misconception exists — an invented one is worse than none.
-   - ascii: an idea a small, funny drawn scene would genuinely dramatize \
--- characters, a checklist, a before/after, a timeline, a tiny chart, \
-whatever form makes the joke land.
+   - ascii: an idea a small drawn scene or physical metaphor would genuinely dramatize. \
+     * RATIO: At least 70% of planned ascii cards MUST be humorous gags, comedic reactions, funny characters, or silly physical metaphors (e.g. panic, celebration, confusion, struggle, absurdity, relatable character moments). At most 30% should be informative visualizations (e.g. computer hardware, real-world tools, gadgets, technical objects). \
+     * ASSET DIRECTION GUIDELINE: When writing asset_direction for an ascii card, do NOT copy-paste an exact verbatim title from the reference library catalog. Instead, write a natural, generalized description of the visual scene, action, emotion, or metaphor (e.g. "a confused developer looking at tangled wires" or "a nervous cat balancing on a tightrope"). This generalized description allows downstream semantic retrieval to provide an unbiased top-10 candidate pool from which the card writer can pick the best visual. ONLY specify a specific exact entity if the card genuinely requires a known fictional or pop-culture character (e.g. "Yoda dispensing cryptic wisdom" or "Sherlock Holmes examining a clue with a magnifying glass").
 
 For each entry give:
 - canonical_title: the literal, descriptive name of the idea. Never playful, \
@@ -44,7 +44,7 @@ the name the concept is findable by.
 - asset_direction: what the card's non-prose element should actually SHOW. \
 Be concrete and specific to the idea: for diagram, name the actual boxes and \
 what flows between them; for code, name the language and what the snippet \
-demonstrates; for ascii, describe the gag, the form it takes, and what makes it land; for \
+demonstrates; for ascii, describe the gag, action, character, or visual metaphor in generalized terms; for \
 comparison, state the specific myth and the specific fact that corrects it. \
 Leave EMPTY for prose.
 - content_direction: the angle this card takes, in a sentence or two — what it \
@@ -71,6 +71,8 @@ that clearly wants a different shape should get that shape):
 Already covered in this subtopic — plan around these, never re-plan one of them:
 {existing_titles_block}
 {avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
+
+
 
 ASCII_INSTRUCTIONS = r"""\
 Whenever a concept has a physical, spatial, or visual gag that would make it

@@ -105,3 +105,4 @@ useful than the decision itself.
 | [0066](0066-redraw-over-budget-ascii-art.md) | Over-budget ASCII art is redrawn, then rejected with its card -- never silently dropped | Accepted (amends 0042, 0059) |
 | [0067](0067-mermaid-diagrams-and-form-free-ascii.md) | Diagrams are written as mermaid and rendered client-side; ASCII scenes lose the stickman requirement | Accepted (amends 0042, 0017) |
 | [0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md) | Curated ASCII art reference library and worked few-shot generator standards | Accepted (amends 0042, 0067) |
+| [0069](0069-mermaid-rendering-and-card-focus-guards.md) | Client-side Mermaid rendering resilience, and card focus/dwell guards | Accepted (amends 0067, 0017) |

@@ -423,13 +423,17 @@ _ASCII_CANDIDATE_COUNT = 10
 def _format_ascii_candidates(candidates: list[AsciiLibraryEntry]) -> str:
     if not candidates:
         return ""
-    blocks = [f'  ["{c.title}"]\n  ```\n{c.art}\n  ```' for c in candidates]
+    blocks = [
+        f'  [Candidate {n}: "{c.title}"]\n  ```\n{c.art}\n  ```'
+        for n, c in enumerate(candidates, start=1)
+    ]
     return (
-        "\n  Curated reference pieces that may fit this scene (from a hand-verified "
-        f"library, all ≤{_ASCII_MAX_WIDTH} columns) -- ADAPT one if it genuinely suits "
-        "the idea (retitle it, add a label or a speech callout, trim what doesn't "
-        "apply), or draw an original scene if none of these fit better. These are "
-        "candidates, not a requirement to pick one:\n" + "\n".join(blocks)
+        "\n  Curated reference pieces for this card's ASCII art (from the hand-verified library, all ≤40 columns):\n"
+        "  - EQUAL SIGNIFICANCE: All 10 candidates below are presented without preference or ranking order — choose whichever ONE artwork you think best suits this card.\n"
+        "  - MANDATORY BASE: You MUST choose and use ONE of these 10 candidate artworks ONLY as the visual base for your ascii_art (do not invent an ASCII drawing from scratch).\n"
+        "  - ADAPTATION ALLOWED: You are allowed to trim or delete unneeded lines/elements, and add text captions, labels, speech callouts, or simple symbols/emojis around or within the drawing to dramatize the card's concept.\n"
+        "  - HARD WIDTH CONSTRAINT: Every line of the final ascii_art must strictly be <= 40 monospace characters.\n"
+        + "\n".join(blocks)
     )
 
 

@@ -53,3 +53,38 @@ Generator models scan the curated reference library in two passes:
 ## Revisit When
 
 - Model visual-spatial reasoning reaches a level where unconstrained zero-shot ASCII synthesis achieves $100\%$ structural fidelity and zero column overflow without reference anchors.
+
+## Implementation note (Task 0029, added after this ADR was accepted)
+
+§3's "two-pass scanning" is realized as **retrieval, not literal scanning** — pasting
+either curated file's full contents into a prompt (888 / 1,599 entries) does not fit
+any prompt budget. `spoin.content.ascii_library` embeds every entry's TITLE once per
+process (local, never-quota'd — the same `get_embedder()` every other similarity
+feature in the codebase uses) and, for each `ascii`-typed planned card, embeds that
+card's own `asset_direction` and returns the top-10 nearest titles by cosine
+similarity. Those ten — title and art both — are shown in that card's own brief in
+`generate_cards`'s user prompt, alongside an instruction to adapt one if it fits or
+draw original art if none does (never a forced pick, per CLAUDE.md's "trusted for
+taste, never for constraints" — the same posture ADR-0067 already took). The two
+curated files are duplicated into `apps/api/src/spoin/content/ascii_library_data/` as
+the deployed copy, since `apps/api/Dockerfile` never `COPY`s the sibling
+`apps/helpers/` tooling directory into the image; that copy needs a manual re-sync
+after any edit to the `apps/helpers/` originals (see
+[Task 0030](../tasks/0030-manual-review-curated-ascii-library.md)).
+
+**Open conflict with §2, not resolved by this note:** §2 above states ASCII cards
+"must strictly contain pictorial artworks" and that non-pictorial forms are
+"strictly prohibited." [ADR-0067](0067-mermaid-diagrams-and-form-free-ascii.md)'s
+own decision #3 — accepted the same day — explicitly removes any required form,
+including several worked examples that are NOT pictorial (a checklist with no
+characters, pure typography with no drawing at all). The prompt actually shipped
+(`ASCII_INSTRUCTIONS` in `cards.py`) follows ADR-0067, not this section. Whether §2
+should be narrowed to "pictorial preferred, not required" or ADR-0067's form-free
+decision should be walked back is a real open question this note is flagging, not
+answering — resolve it explicitly rather than leaving two accepted ADRs disagreeing
+about the same prompt.
+
+The "22 Mermaids / 12 graduation caps / 4 Dilbert" keep/delete review and the
+per-example fixes named in `apps/helpers/TODO_GENERATOR_PROMPTS.md` are curation work
+on the library's content, tracked as [Task 0030](../tasks/0030-manual-review-curated-ascii-library.md)
+rather than closed by this note.

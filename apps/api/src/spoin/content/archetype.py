@@ -20,8 +20,12 @@ import re
 _FENCE = re.compile(r"```([a-zA-Z0-9_-]*)\n(.*?)```", re.DOTALL)
 
 #: A fenced block explicitly tagged as a diagram, or one whose content is
-#: mostly box-drawing/arrow characters rather than a real language.
-_DIAGRAM_LANG_TAGS = {"diagram", "text", "ascii", ""}
+#: mostly box-drawing/arrow characters rather than a real language. `mermaid`
+#: is a diagram lang tag on its own terms (ADR-0067) -- it must never fall
+#: into the "real language, therefore code" branch below, and it must count
+#: as `diagram` regardless of whether its body happens to contain `-->`
+#: (`sequenceDiagram`'s `->>`, `timeline`, `stateDiagram-v2` don't).
+_DIAGRAM_LANG_TAGS = {"diagram", "text", "ascii", "mermaid", ""}
 _DIAGRAM_CHARS = re.compile(r"[─│┌└┐┘├┤┬┴┼→▶►]|-->|==>|──>")
 
 _COMPARISON_MARKERS = ("❌", "✅")
@@ -38,7 +42,7 @@ def classify_archetype(body: str) -> list[str]:
         lang = lang.lower()
         if lang not in _DIAGRAM_LANG_TAGS:
             has_code = True
-        elif _DIAGRAM_CHARS.search(content) or lang == "diagram":
+        elif lang in ("diagram", "mermaid") or _DIAGRAM_CHARS.search(content):
             has_diagram = True
         elif content.strip():
             # A fenced block with no language tag and no diagram characters —

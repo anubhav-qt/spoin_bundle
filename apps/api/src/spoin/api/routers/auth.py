@@ -21,6 +21,7 @@ from spoin.api.deps import OptionalUserDep, SessionDep, SettingsDep, UserDep
 from spoin.api.schemas import (
     GoogleAuthIn,
     LoginIn,
+    PreferencesOut,
     RefreshIn,
     RegisterIn,
     TokenOut,
@@ -31,6 +32,7 @@ from spoin.auth.passwords import hash_password, verify_password
 from spoin.auth.rate_limit import login_rate_limiter, register_rate_limiter
 from spoin.auth.tokens import create_token_pair, decode_token
 from spoin.domain.models import User
+from spoin.profile.preferences import PreferencesService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -39,7 +41,7 @@ def _client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def _user_out(user: User) -> UserOut:
+def _user_out(user: User, preferences: PreferencesOut | None = None) -> UserOut:
     """`UserOut` has declared age/gender/avatar_icon/has_avatar_image since the
     profile feature landed, but this builder never populated them, so every
     field defaulted to None/False. `/auth/me` is the only user payload the web
@@ -63,6 +65,7 @@ def _user_out(user: User) -> UserOut:
         avatar_icon=user.avatar_icon,
         has_avatar_image=user.has_avatar_image,
         daily_card_goal=user.daily_card_goal,
+        preferences=preferences,
     )
 
 
@@ -247,4 +250,7 @@ async def get_me(session: SessionDep, user_id: UserDep) -> UserOut:
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    return _user_out(user)
+    # Embedded here (not a separate request) so the client can reconcile its
+    # pre-paint `localStorage` cache against the server on load — ADR-0070.
+    preferences = await PreferencesService(session).get(user_id)
+    return _user_out(user, preferences)

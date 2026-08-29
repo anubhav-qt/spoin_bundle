@@ -20,6 +20,7 @@ from spoin.domain.models.engagement import (
     UserTopicCycle,
     UserTopicDifficultyProgress,
 )
+from spoin.domain.models.preferences import UserFont, UserPreference
 from spoin.domain.models.quiz import (
     GenerationJob,
     Question,
@@ -59,6 +60,8 @@ __all__ = [
     "TopicEdge",
     "User",
     "UserCardState",
+    "UserFont",
+    "UserPreference",
     "UserQuestionSeen",
     "UserSeenBitmap",
     "UserSessionTopicSignal",

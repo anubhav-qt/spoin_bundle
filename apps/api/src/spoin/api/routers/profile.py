@@ -1,16 +1,24 @@
-from fastapi import APIRouter, HTTPException, UploadFile
+from typing import Annotated
+from uuid import UUID
+
+from fastapi import APIRouter, Form, HTTPException, UploadFile, status
 from fastapi.responses import Response
 
 from spoin.api.deps import SessionDep, UserDep
 from spoin.api.schemas import (
     DailyGoalOut,
+    ImportedFontOut,
+    PreferencesOut,
+    PreferencesUpdateIn,
     ProfileExportOut,
     ProfileStatsOut,
     UserOut,
     UserProfileUpdateIn,
 )
 from spoin.domain.models import User
+from spoin.profile.fonts import read_validated_font
 from spoin.profile.images import read_validated_image
+from spoin.profile.preferences import PreferencesService
 from spoin.profile.service import ProfileService
 
 router = APIRouter(prefix="/profile", tags=["profile"])
@@ -67,6 +75,72 @@ async def get_avatar_image(user_id: UserDep, session: SessionDep) -> Response:
     except LookupError:
         raise HTTPException(status_code=404, detail="No avatar image found") from None
     return Response(content=data, media_type=media_type)
+
+
+@router.get("/me/preferences", response_model=PreferencesOut)
+async def get_preferences(user_id: UserDep, session: SessionDep) -> PreferencesOut:
+    """Palette, saved themes, font, and imported-font metadata (ADR-0070).
+
+    Also embedded on `/auth/me` for the pre-paint reconcile; this standalone
+    read exists for the mobile client and for a manual refetch.
+    """
+    return await PreferencesService(session).get(user_id)
+
+
+@router.put("/me/preferences", response_model=PreferencesOut)
+async def put_preferences(
+    body: PreferencesUpdateIn, user_id: UserDep, session: SessionDep
+) -> PreferencesOut:
+    """Whole-object replace of palette + saved themes + font. A `custom:<id>`
+    palette must be present in `custom_palettes`, and an `import:<id>` font must
+    be one the caller owns — both checked server-side (422 otherwise)."""
+    return await PreferencesService(session).update(user_id, body)
+
+
+@router.get("/me/fonts", response_model=list[ImportedFontOut])
+async def list_fonts(user_id: UserDep, session: SessionDep) -> list[ImportedFontOut]:
+    """Metadata for this user's imported fonts — no bytes."""
+    return await PreferencesService(session).list_fonts(user_id)
+
+
+@router.post("/me/fonts", response_model=ImportedFontOut, status_code=status.HTTP_201_CREATED)
+async def upload_font(
+    user_id: UserDep,
+    session: SessionDep,
+    file: UploadFile,
+    name: Annotated[str, Form(min_length=1, max_length=80)],
+) -> ImportedFontOut:
+    """Import a font file. Format is sniffed from magic bytes (never the
+    multipart part's declared type), size is capped at 2MB and the body is
+    abandoned at the limit — see `profile/fonts.py`, same shape as avatars."""
+    validated = await read_validated_font(file)
+    return await PreferencesService(session).add_font(user_id, name.strip(), validated)
+
+
+@router.get("/me/fonts/{font_id}")
+async def get_font(font_id: UUID, user_id: UserDep, session: SessionDep) -> Response:
+    """The raw font bytes for a client `@font-face` `src`. Scoped to the caller
+    in the query — a stranger's id 404s, no distinction leaked. Immutable by id,
+    so it caches hard."""
+    try:
+        data, media_type = await PreferencesService(session).load_font_bytes(user_id, font_id)
+    except LookupError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Font not found") from None
+    return Response(
+        content=data,
+        media_type=media_type,
+        headers={"Cache-Control": "private, max-age=31536000, immutable"},
+    )
+
+
+@router.delete("/me/fonts/{font_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_font(font_id: UUID, user_id: UserDep, session: SessionDep) -> None:
+    """Remove an imported font. If it was the active font, the server resets the
+    choice to the default in the same transaction."""
+    try:
+        await PreferencesService(session).delete_font(user_id, font_id)
+    except LookupError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Font not found") from None
 
 
 @router.get("/me/export", response_model=ProfileExportOut)

@@ -388,6 +388,57 @@ class RefreshIn(BaseModel):
     refresh_token: str
 
 
+# ---------------------------------------------------- appearance preferences --
+# ADR-0070: the palette, the user's saved themes and the font choice live on a
+# `user_preference` row now, not `localStorage`. `localStorage` stays as a
+# pre-paint cache the client reconciles against these values. Imported fonts get
+# their own `user_font` table and are served by their own endpoint — never
+# inlined here.
+
+_HEX_COLOR = r"^#[0-9a-fA-F]{6}$"
+
+
+class CustomPalette(BaseModel):
+    """One user-saved theme: the four colours everything else derives from
+    (`globals.css` `[data-palette="custom"]` `color-mix` rules), a name, and a
+    client-generated id referenced as `custom:<id>` from `PreferencesOut.palette`."""
+
+    id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    name: str = Field(min_length=1, max_length=40)
+    bg: str = Field(pattern=_HEX_COLOR)
+    fg: str = Field(pattern=_HEX_COLOR)
+    accent: str = Field(pattern=_HEX_COLOR)
+    accent2: str = Field(pattern=_HEX_COLOR)
+
+
+class ImportedFontOut(BaseModel):
+    """Metadata only. The bytes are served by `GET /profile/me/fonts/{id}`, never
+    inlined here or on the `/auth/me` payload (ADR-0045's "not for anything
+    large" caution)."""
+
+    id: UUID
+    name: str
+    format: str
+    byte_size: int
+
+
+class PreferencesOut(BaseModel):
+    palette: str
+    custom_palettes: list[CustomPalette]
+    font: str
+    imported_fonts: list[ImportedFontOut]
+
+
+class PreferencesUpdateIn(BaseModel):
+    """Whole-object replace, not PATCH — the client always holds the full picture.
+    A font is added or removed through its own endpoints; this only points
+    `font` at one that already exists."""
+
+    palette: str = Field(min_length=1, max_length=64)
+    custom_palettes: list[CustomPalette] = Field(max_length=50)
+    font: str = Field(min_length=1, max_length=64)
+
+
 class UserOut(BaseModel):
     id: UUID
     #: None for a guest — see `User.is_guest` (domain/models/topic.py).
@@ -404,6 +455,12 @@ class UserOut(BaseModel):
     #: navigation, so Settings can render its current value with no request of
     #: its own, and PATCH /profile/me stays the single write path.
     daily_card_goal: int = 10
+    #: Palette + saved themes + font (ADR-0070). Populated ONLY on `/auth/me` —
+    #: the one payload `AuthProvider` reads on load, where the client needs it to
+    #: reconcile its pre-paint `localStorage` cache. Left `None` on the other
+    #: `UserOut` responses (profile PATCH, avatar) so those stay cheap; the
+    #: client never reads `preferences` off them.
+    preferences: PreferencesOut | None = None
 
 
 class OnboardingTopicChoice(BaseModel):

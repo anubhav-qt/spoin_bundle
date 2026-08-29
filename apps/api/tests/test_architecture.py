@@ -123,3 +123,50 @@ def test_pool_thresholds_have_a_gap() -> None:
     from spoin.core.config import Settings
 
     assert Settings().pool_thresholds_are_sane
+
+
+def test_imported_font_reads_are_scoped_to_the_owner() -> None:
+    """ADR-0070: `user_font` is the first per-user binary the API serves. Every
+    function in `profile/preferences.py` that touches `UserFont` must also
+    constrain it by `UserFont.user_id` — a stranger's font id is a 404, never a
+    served blob. Enforced here as well as by the router dependency, the same
+    twice-enforced shape as hard rule 1.
+    """
+
+    path = SRC / "profile" / "preferences.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+
+    def _queries_user_font(node: ast.AST) -> bool:
+        """A `select(UserFont ...)` call — a read. Constructing `UserFont(...)`
+        to insert a row is not one, and does not need an owner filter."""
+        for n in ast.walk(node):
+            if (
+                isinstance(n, ast.Call)
+                and isinstance(n.func, ast.Name)
+                and n.func.id in {"select", "delete", "update"}
+                and any(isinstance(a, ast.Name) and a.id == "UserFont" for a in n.args)
+            ):
+                return True
+        return False
+
+    def _filters_by_owner(node: ast.AST) -> bool:
+        return any(
+            isinstance(n, ast.Attribute)
+            and n.attr == "user_id"
+            and isinstance(n.value, ast.Name)
+            and n.value.id == "UserFont"
+            for n in ast.walk(node)
+        )
+
+    offenders = [
+        fn.name
+        for fn in ast.walk(tree)
+        if isinstance(fn, ast.AsyncFunctionDef | ast.FunctionDef)
+        and _queries_user_font(fn)
+        and not _filters_by_owner(fn)
+    ]
+    assert not offenders, (
+        f"{offenders} in profile/preferences.py query UserFont without a "
+        "UserFont.user_id filter — an imported font must never be readable by "
+        "another user (ADR-0070)."
+    )

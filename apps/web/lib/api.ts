@@ -213,6 +213,49 @@ export interface User {
   /** Cards-per-day target. Rides on this payload rather than a separate
    *  preferences fetch — see UserOut in api/schemas.py. */
   daily_card_goal?: number;
+  /** Palette, saved themes, font, and imported-font metadata (ADR-0070).
+   *  Populated ONLY on `/auth/me` — the payload AuthProvider reads on load,
+   *  where the client reconciles its pre-paint `localStorage` cache against
+   *  the server. Absent on PATCH /profile/me and avatar responses. */
+  preferences?: Preferences;
+}
+
+/** One user-saved theme (ADR-0070). The four colours everything else derives
+ *  from via `globals.css`'s `[data-palette="custom"]` `color-mix` rules, plus a
+ *  name and a client-generated id referenced as `custom:<id>`. */
+export interface CustomPalette {
+  id: string;
+  name: string;
+  bg: string;
+  fg: string;
+  accent: string;
+  accent2: string;
+}
+
+/** Metadata for an imported font. The bytes are fetched separately from
+ *  `GET /profile/me/fonts/{id}` and registered as an `@font-face` client-side. */
+export interface ImportedFont {
+  id: string;
+  name: string;
+  format: string;
+  byte_size: number;
+}
+
+export interface Preferences {
+  /** A built-in palette key (`notebook`…) or `custom:<id>`. */
+  palette: string;
+  custom_palettes: CustomPalette[];
+  /** A built-in font key (`literata`…) or `import:<id>`. */
+  font: string;
+  imported_fonts: ImportedFont[];
+}
+
+/** Whole-object replace (PUT), not PATCH — the client always holds the full
+ *  picture. Adding/removing a font goes through its own endpoints. */
+export interface PreferencesUpdate {
+  palette: string;
+  custom_palettes: CustomPalette[];
+  font: string;
 }
 
 export interface Progress {
@@ -595,10 +638,64 @@ export const api = {
     return response.json() as Promise<User>;
   },
   
-  deleteAvatar: () => 
+  deleteAvatar: () =>
     request<User>("/profile/me/avatar", {
       method: "DELETE",
     }),
+
+  // --- Appearance preferences (ADR-0070) ---
+  /** Palette + saved themes + font + imported-font metadata. Also embedded on
+   *  `/auth/me`; this standalone read is for a manual refetch. */
+  getPreferences: () => request<Preferences>("/profile/me/preferences"),
+
+  /** Whole-object replace. A `custom:<id>` palette must be present in
+   *  `custom_palettes` and an `import:<id>` font must be one the caller owns —
+   *  both are validated server-side (422 otherwise). */
+  updatePreferences: (body: PreferencesUpdate) =>
+    request<Preferences>("/profile/me/preferences", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  /** Import a font file. Format is sniffed from magic bytes server-side (not
+   *  the multipart type), size capped at 2MB. Returns the new row's metadata. */
+  uploadFont: async (file: File, name: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("name", name);
+    const token = localStorage.getItem("spoin_access_token");
+    const response = await fetch(`${getBaseUrl()}/profile/me/fonts`, {
+      method: "POST",
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData,
+    });
+    if (!response.ok) {
+      const detail = await response
+        .json()
+        .then((body: { detail?: string }) => body.detail)
+        .catch(() => undefined);
+      throw new ApiError(response.status, detail ?? "POST /profile/me/fonts failed");
+    }
+    return response.json() as Promise<ImportedFont>;
+  },
+
+  deleteFont: (id: string) =>
+    request<void>(`/profile/me/fonts/${id}`, { method: "DELETE" }),
+
+  /** The font bytes as an object URL, for a client `@font-face` `src`. Same
+   *  reason as `avatarObjectUrl`: the endpoint is behind a Bearer token, so a
+   *  bare `url()` would 401. The caller owns the returned URL and should
+   *  `revokeObjectURL` it when the font is removed. */
+  fontObjectUrl: async (id: string) => {
+    const token = localStorage.getItem("spoin_access_token");
+    const response = await fetch(`${getBaseUrl()}/profile/me/fonts/${id}`, {
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    });
+    if (!response.ok) {
+      throw new ApiError(response.status, "Could not load font file");
+    }
+    return URL.createObjectURL(await response.blob());
+  },
 
   /** The user's own data as JSON (Settings -> Data & Privacy). Serving-layer
    *  read only — no generation. */

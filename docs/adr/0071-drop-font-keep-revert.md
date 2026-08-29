@@ -1,6 +1,6 @@
 # ADR-0071: Drop the font picker's Keep/Revert step — click and it's saved
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0037](0037-site-wide-font-picker.md) (retires its live-preview/Keep-Revert decision)

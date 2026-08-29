@@ -1,6 +1,6 @@
 # ADR-0070: Appearance preferences move to the server, with `localStorage` demoted to a pre-paint cache
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0045](0045-settings-surface-and-user-preferences.md) (reverses its

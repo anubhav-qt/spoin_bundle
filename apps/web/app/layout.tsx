@@ -16,28 +16,44 @@ import "./globals.css";
 import "katex/dist/katex.min.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { GenerationTrackerProvider } from "@/components/GenerationTrackerProvider";
+import { PreferencesSync } from "@/components/PreferencesSync";
 
 /**
- * Applies the persisted palette before first paint. Without this, the page
- * would flash the default `notebook` palette and then jump to whatever the
- * user picked last (ADR-0013 / docs/tasks/0002) once React hydrates and
- * ThemePicker's own effect runs. `beforeInteractive` is Next's supported way
- * to run a script this early — a hand-written `<head>` isn't, under the app
- * router's metadata API.
+ * Applies the persisted palette before first paint from the `localStorage`
+ * cache. Without this, the page would flash the default `notebook` palette and
+ * then jump to whatever the user picked last once React hydrates. Since
+ * ADR-0070 the source of truth is the server — `lib/preferences.ts` reconciles
+ * this cached value against `/auth/me` once auth resolves — but the cache is
+ * what makes the first paint correct. `beforeInteractive` is Next's supported
+ * way to run a script this early.
+ *
+ * Handles both palette forms: `custom:<id>` (ADR-0070 — look the id up in the
+ * `spoin-custom-palettes` list) and the legacy bare `custom` + a
+ * `spoin-custom-colors` object (pre-ADR-0070; `lib/preferences.ts` migrates it
+ * on first load, but a not-yet-migrated cache must still paint right).
  */
 const APPLY_PALETTE_SCRIPT = `
 (function () {
   try {
     var palette = localStorage.getItem("spoin-palette");
-    if (palette) document.body.setAttribute("data-palette", palette);
-    if (palette === "custom") {
-      var colors = JSON.parse(localStorage.getItem("spoin-custom-colors") || "null");
-      if (colors) {
-        document.body.style.setProperty("--bg", colors.bg);
-        document.body.style.setProperty("--fg", colors.fg);
-        document.body.style.setProperty("--accent", colors.accent);
-        document.body.style.setProperty("--accent-2", colors.accent2);
-      }
+    if (!palette) return;
+    var colors = null;
+    if (palette.indexOf("custom:") === 0) {
+      var id = palette.slice(7);
+      var list = JSON.parse(localStorage.getItem("spoin-custom-palettes") || "[]");
+      for (var i = 0; i < list.length; i++) { if (list[i].id === id) { colors = list[i]; break; } }
+      document.body.setAttribute("data-palette", "custom");
+    } else if (palette === "custom") {
+      colors = JSON.parse(localStorage.getItem("spoin-custom-colors") || "null");
+      document.body.setAttribute("data-palette", "custom");
+    } else {
+      document.body.setAttribute("data-palette", palette);
+    }
+    if (colors) {
+      document.body.style.setProperty("--bg", colors.bg);
+      document.body.style.setProperty("--fg", colors.fg);
+      document.body.style.setProperty("--accent", colors.accent);
+      document.body.style.setProperty("--accent-2", colors.accent2);
     }
   } catch (e) {}
 })();
@@ -125,21 +141,23 @@ const courierPrime = Courier_Prime({
 const comfortaa = Comfortaa({ subsets: ["latin"], variable: "--font-comfortaa", display: "swap" });
 
 /**
- * The 46 extra faces behind CustomFontModal's "More fonts" list (ADR-0038:
- * over 50 faces total, counting the 5 presets + 5 original extras above).
- * Loaded as one Google Fonts CSS2 stylesheet request rather than 46
- * next/font/google imports -- next/font validates the requested `weight`
- * array against each family's actually-published static cuts at build time
- * and hard-fails the whole app if one is wrong; the CSS2 API is tolerant of
- * a requested weight a family doesn't ship (it just omits it), which is the
- * right trade for a long, rarely-audited list like this one. Referenced by
- * literal family name in each `[data-font="…"]` rule in globals.css, not by
- * a `--font-*` custom property -- there's no local @font-face to point at.
+ * The extra faces loaded as one Google Fonts CSS2 stylesheet request rather
+ * than one `next/font/google` import each -- `next/font` validates the requested
+ * `weight` array against each family's actually-published static cuts at build
+ * time and hard-fails the whole app if one is wrong; the CSS2 API is tolerant
+ * of a requested weight a family doesn't ship (it just omits it), the right
+ * trade for a long, rarely-audited list. Referenced by literal family name in
+ * each `[data-font="…"]` rule in `globals.css`, not by a `--font-*` property.
+ *
+ * Post-ADR-0070 the font picker (F5) exposes ~13 of these by name in its
+ * 20-face grid; the rest stay wired so a reader's persisted `spoin-font` from
+ * before the rework still resolves. Trimming the unused ones is a follow-up.
  */
 const EXTRA_GOOGLE_FONTS_HREF =
   "https://fonts.googleapis.com/css2?" +
   [
     "family=Merriweather:wght@400;700",
+    "family=Newsreader:wght@400;600",
     "family=Playfair+Display:wght@400;700",
     "family=Lora:wght@400;700",
     "family=Crimson+Text:wght@400;700",
@@ -228,17 +246,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           hydrates, so client and server markup legitimately differ on those
           two attributes. This is the standard fix for that pattern. */}
       <body suppressHydrationWarning>
-        {/* The 46-face "more fonts" catalog (CustomFontModal) -- one batched
-            stylesheet request rather than 46 individual next/font/google
-            imports. The 10 faces above stay self-hosted per-family (the fast
-            path: 5 presets + the 5 original extras); this covers only the
-            expanded list a reader opts into from the "More fonts" modal.
-            Next hoists <link> tags into <head> on every page regardless of
-            whether that modal is ever opened, so this does cost one request
-            up front -- accepted as the simplest correct thing given how
-            rarely this list changes; revisit with a dynamically-injected
-            <link> on modal-open only if that request becomes a real
-            first-paint cost. */}
+        {/* The batched-CSS2 face catalog -- one stylesheet request rather than
+            one next/font/google import each. The 10 faces above stay
+            self-hosted per-family (the fast path); this backs the rest of the
+            font picker's 20-face grid plus the still-wired legacy keys. Next
+            hoists <link> into <head> on every page, so this costs one request
+            up front -- accepted given how rarely the list changes; revisit
+            with a dynamically-injected <link> if it becomes a first-paint
+            cost, or trim it to just the picker's 20. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href={EXTRA_GOOGLE_FONTS_HREF} />
@@ -252,6 +267,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {APPLY_FONT_SCRIPT}
         </Script>
         <AuthProvider>
+          <PreferencesSync />
           <GenerationTrackerProvider>{children}</GenerationTrackerProvider>
         </AuthProvider>
       </body>

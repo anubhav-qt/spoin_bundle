@@ -83,19 +83,22 @@
   .act svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .act-edit { bottom: -5px; right: -5px; }
   .act-del { top: -5px; right: -5px; }
-  .pill-add {
-    display: flex; align-items: center; justify-content: center; background: var(--bg-3); color: var(--fg-2);
-  }
-  .pill-add svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* -- font grid: 5 rows fixed (5*38 + 4*6); upload row sits above it -- */
-  .font-add-row { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
-  .font-upload {
+  /* -- "create your own theme" / "upload a font": a dedicated row above the
+     scroll grid, hairline below, so the trigger never scrolls out of reach
+     once a reader has many saved themes / imported fonts. Identical pattern
+     on both dropdowns. -- */
+  .add-row { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .add-trigger {
     display: flex; align-items: center; gap: 8px; width: 100%; height: 38px; padding: 0 10px;
     border-radius: 10px; border: 2px dashed var(--line-strong); background: transparent;
     color: var(--fg-2); font-family: var(--font-sans); font-size: 12.5px; cursor: pointer;
+    transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
   }
-  .font-upload svg { width: 16px; height: 16px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .add-trigger:hover { border-color: var(--accent); color: var(--fg); }
+  .add-trigger svg { width: 16px; height: 16px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* -- font grid: 5 rows fixed (5*38 + 4*6); upload row (.add-row above) sits above it -- */
   .import-row {
     display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 8px;
     border-radius: 8px; background: var(--bg-3);
@@ -172,19 +175,26 @@ saved themes and imported fonts scroll past the fixed edge rather than growing t
   <div class="board">
     <p class="board-note">F4 · theme dropdown — 3 rows, scrolls</p>
     <div class="menu">
+      <div class="add-row">
+        <button class="add-trigger" type="button">
+          <svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="12" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22c-5 0-9-4-9-9a9 9 0 1 1 9 9c-1.1 0-1.8-.9-1.8-2 0-1 .8-1.8 1.8-1.8h1.2a2.8 2.8 0 0 0 2.8-2.8"/></svg>
+          Create your own theme
+        </button>
+      </div>
       <div class="theme-scroll">
         <div class="grid" id="theme-grid"></div>
       </div>
     </div>
-    <p class="caption">11 presets fill the 3-row window exactly; the <b>+</b> tile and any saved themes
-      scroll. Hover a saved swatch for a pencil (edit, bottom-right) and × (delete, top-right).</p>
+    <p class="caption">"Create your own theme" is its own row above the grid — same pattern as "Upload a
+      font" — so it stays reachable no matter how many saved themes are scrolled past. Opens the edit
+      modal for a new theme. Hover a saved swatch for a pencil (edit, bottom-right) and × (delete, top-right).</p>
   </div>
 
   <div class="board">
     <p class="board-note">F5 · font dropdown — 5 rows, scrolls</p>
     <div class="menu">
-      <div class="font-add-row">
-        <button class="font-upload" type="button">
+      <div class="add-row">
+        <button class="add-trigger" type="button">
           <svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="M8 7l4-4 4 4"/><path d="M4.5 15v3.5A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5V15"/></svg>
           Upload a font
         </button>
@@ -294,12 +304,6 @@ saved themes and imported fonts scroll past the fixed edge rather than growing t
         : '');
     tg.appendChild(b);
   });
-  var add = document.createElement("button");
-  add.type = "button";
-  add.className = "pill pill-add";
-  add.title = "New theme";
-  add.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
-  tg.appendChild(add);
 
   var fg = document.getElementById("font-grid");
   FONTS.forEach(function (f, i) {

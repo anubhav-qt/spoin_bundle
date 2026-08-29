@@ -1,8 +1,14 @@
 # ADR-0037: Implement ADR-0023's font picker, site-wide, with live-preview/revert
 
-- **Status:** Accepted
+- **Status:** Accepted (Keep/Revert retired — see note)
 - **Date:** 2026-08-18
 - **Deciders:** Anubhav
+
+> **The Keep/Revert step is retired by [ADR-0071](0071-drop-font-keep-revert.md)
+> (2026-08-30).** Selecting a font now persists immediately, matching `ThemePicker` —
+> this ADR's "Revisit when" bullet 2, taken. The self-hosting-via-`next/font/google` and
+> `--font-sans`-scope decisions here still stand; [ADR-0070](0070-server-side-appearance-preferences.md)
+> additionally moves the persisted value from `localStorage` to the server.
 
 ## Context
 

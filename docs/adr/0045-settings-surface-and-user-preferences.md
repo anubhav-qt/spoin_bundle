@@ -1,8 +1,17 @@
 # ADR-0045: A Settings surface, with preferences on the user row and no parallel system
 
-- **Status:** Accepted
+- **Status:** Accepted (partially superseded — see note)
 - **Date:** 2026-08-21
 - **Deciders:** mayanks0ni
+
+> **Partially superseded by [ADR-0070](0070-server-side-appearance-preferences.md)
+> (2026-08-30).** The "rendering preferences stay client-side" half of the Decision no
+> longer holds for the **palette** and the **font**: F4/F5 turn those into user-authored
+> content (named saved themes, an imported font file), which moves to the server with
+> `localStorage` demoted to a pre-paint cache. ADR-0070 is the case this ADR's "Revisit
+> when" anticipated ("both pre-paint *and* cross-device"). Everything else here stands —
+> `daily_card_goal` on `app_user`, reduced-motion in `localStorage`, no `/preferences`
+> router, the export endpoint, the four unbuilt sections.
 
 ## Context
 

@@ -106,3 +106,5 @@ useful than the decision itself.
 | [0067](0067-mermaid-diagrams-and-form-free-ascii.md) | Diagrams are written as mermaid and rendered client-side; ASCII scenes lose the stickman requirement | Accepted (amends 0042, 0017) |
 | [0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md) | Curated ASCII art reference library and worked few-shot generator standards | Accepted (amends 0042, 0067) |
 | [0069](0069-mermaid-rendering-and-card-focus-guards.md) | Client-side Mermaid rendering resilience, and card focus/dwell guards | Accepted (amends 0067, 0017) |
+| [0070](0070-server-side-appearance-preferences.md) | Palette + font move to the server; `localStorage` demoted to a pre-paint cache; saved themes and imported fonts | Proposed (amends 0045; builds on 0012, 0023, 0037, 0033) |
+| [0071](0071-drop-font-keep-revert.md) | Font picker drops Keep/Revert -- selecting a font saves it, like the theme picker | Proposed (amends 0037) |

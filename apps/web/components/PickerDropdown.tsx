@@ -32,20 +32,22 @@ interface Props {
 }
 
 export function PickerDropdown({ label, value, align = "left", onOpenChange, children }: Props) {
-  const [open, setInternalOpen] = useState(false);
-  const setOpen = useCallback(
-    (next: boolean | ((prev: boolean) => boolean)) => {
-      setInternalOpen((prev) => {
-        const value = typeof next === "function" ? next(prev) : next;
-        if (value !== prev) onOpenChange?.(value);
-        return value;
-      });
-    },
-    [onOpenChange],
-  );
+  const [open, setOpen] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Fire `onOpenChange` on the open↔closed transition, from an effect rather
+  // than inside the state updater — the callback runs `setState` in a *parent*
+  // (a picker resetting its transient sub-state), which React forbids during
+  // another component's render phase.
+  const prevOpen = useRef(open);
+  useEffect(() => {
+    if (prevOpen.current !== open) {
+      prevOpen.current = open;
+      onOpenChange?.(open);
+    }
+  }, [open, onOpenChange]);
 
   const measure = useCallback(() => {
     if (triggerRef.current) setRect(triggerRef.current.getBoundingClientRect());

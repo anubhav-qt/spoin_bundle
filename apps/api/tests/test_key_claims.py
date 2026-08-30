@@ -23,6 +23,7 @@ from spoin.generation.quota import (
     KeyClaimRegistry,
     LadderRung,
     QuotaGovernor,
+    _ClaimWait,
     _day_start,
 )
 
@@ -164,8 +165,14 @@ async def test_a_busy_grid_waits_instead_of_spending_the_reserve(session: AsyncS
 
     result = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=mine)
 
-    assert isinstance(result, float)
-    assert result > 0
+    assert isinstance(result, _ClaimWait)
+    assert result.seconds > 0
+    # The reason, not just the duration: with the other key held and nothing
+    # throttled, waiting on a RELEASE is the only thing that can help.
+    assert result.other_claims == 1
+    assert result.free_keys == 0
+    assert result.throttled_cells == 0
+    assert result.waiting_on_a_key
 
 
 @pytest.mark.asyncio
@@ -218,7 +225,7 @@ async def test_releasing_a_claim_hands_its_key_back(session: AsyncSession) -> No
         await governor.acquire_for_claim_with_session(session, now=_NOW, claim=holder), tuple
     )
     assert isinstance(
-        await governor.acquire_for_claim_with_session(session, now=_NOW, claim=waiter), float
+        await governor.acquire_for_claim_with_session(session, now=_NOW, claim=waiter), _ClaimWait
     )
 
     await governor.claims.release(holder)
@@ -257,3 +264,35 @@ async def test_an_unclaimed_acquire_is_unchanged(session: AsyncSession) -> None:
 
     assert {first, second} == {(0, "model-a"), (1, "model-a")}
     assert third[1] == "model-b"
+
+
+@pytest.mark.asyncio
+async def test_a_throttled_wait_is_not_reported_as_a_contended_one(
+    session: AsyncSession,
+) -> None:
+    """Contention and throttling are different facts and must not share a
+    message. Here the pool is the OPPOSITE of busy -- one key, unclaimed, and
+    the reason there is no cell is that its minute is full.
+
+    The log line this pins used to assert "every key is claimed" on every
+    fall-through, which sent the reader looking for a key shortage when the
+    real answer was to wait ~40 seconds. Same shape as CLAUDE.md's "a failed
+    outcome and a rejected outcome are never the same number".
+    """
+
+    governor = _governor(keys=1, ladder=_ladder(("model-a", 20, 1)))
+    claim = KeyClaim()
+
+    assert isinstance(
+        await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim), tuple
+    )
+    result = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+
+    assert isinstance(result, _ClaimWait)
+    # ONE cell, counted once, even though the scan visits it several times.
+    assert result.throttled_cells == 1
+    # Nothing is contending: the only key is this claim's own, which is neither
+    # something to wait for nor somewhere to move to.
+    assert result.other_claims == 0
+    assert result.free_keys == 0
+    assert not result.waiting_on_a_key

@@ -272,6 +272,41 @@ class KeyClaimRegistry:
 
 
 @dataclass(frozen=True)
+class _ClaimWait:
+    """Why a claim-aware acquire found nothing, and for how long to wait.
+
+    The three causes are kept apart rather than reported as one "no cell
+    available": a key held by another subtopic group, a cell inside its own
+    rpm minute, and a cell parked by a provider cooldown are different facts
+    with different fixes -- more keys, more time, and a provider problem
+    respectively. Collapsing them is how a throttled run gets read as a
+    contended one and answered by buying keys that were never the constraint.
+    """
+
+    seconds: float
+    #: Keys held by a DIFFERENT unit of work. Excludes this claim's own key,
+    #: which is never something it could be waiting for.
+    other_claims: int
+    #: Keys held by nobody -- what this claim could move onto if their cells had
+    #: room. Non-zero here with no grant means those cells were throttled or
+    #: spent, NOT that the pool was busy.
+    free_keys: int
+    #: DISTINCT cells with daily budget but no window right now. Counted per
+    #: cell, not per visit: the scan can look at one cell several times over
+    #: (own preferred rungs, then the free-key sweep, then the deferred rung),
+    #: and "3 cells throttled" when one cell was checked three times is the
+    #: same species of untrue as the message this field exists to fix.
+    throttled_cells: int
+
+    @property
+    def waiting_on_a_key(self) -> bool:
+        """True when nothing but another unit finishing can help. With no
+        throttled cell seen, no deadline exists to wait out -- only a release."""
+
+        return self.throttled_cells == 0
+
+
+@dataclass(frozen=True)
 class _CellAttempt:
     """What `_try_take_cell` found. `exhausted` means this cell's DAY is gone,
     so it must not count toward "somewhere still has room"; `wait_s` means the
@@ -429,12 +464,23 @@ class QuotaGovernor:
                 )
             if isinstance(outcome, tuple):
                 return outcome
+            # Reports what was OBSERVED, never a diagnosis: an earlier version of
+            # this line asserted "every key is claimed" on every fall-through,
+            # including the common case where keys were free and their cells were
+            # simply inside their own minute. A log that names the wrong cause
+            # sends the reader to buy keys for a throttling problem.
             logger.info(
-                "quota: every key is claimed and none of this claim's own cells have room -- "
-                "waiting up to %.1fs for a key to be released",
-                outcome,
+                "quota: no cell for this claim right now -- %d key(s) held by other work, "
+                "%d unclaimed, %d cell(s) with budget but no window; waiting up to %.1fs %s",
+                outcome.other_claims,
+                outcome.free_keys,
+                outcome.throttled_cells,
+                outcome.seconds,
+                "for a key to be released"
+                if outcome.waiting_on_a_key
+                else "for a key or the earliest window",
             )
-            await self.claims.wait_for_release(max_wait_s=outcome)
+            await self.claims.wait_for_release(max_wait_s=outcome.seconds)
             now = datetime.now(UTC)
 
     async def acquire_for_claim_with_session(
@@ -444,7 +490,7 @@ class QuotaGovernor:
         now: datetime,
         claim: KeyClaim,
         exclude_models: frozenset[str] = frozenset(),
-    ) -> tuple[int, str] | float:
+    ) -> tuple[int, str] | _ClaimWait:
         """One pass of ADR-0074's ladder on a caller-supplied session, with no
         waiting -- a granted cell, or the seconds a real `acquire()` would wait.
 
@@ -466,7 +512,7 @@ class QuotaGovernor:
         now: datetime,
         exclude_models: frozenset[str],
         claim: KeyClaim,
-    ) -> tuple[int, str] | float:
+    ) -> tuple[int, str] | _ClaimWait:
         """ADR-0074's ladder for a unit of work that owns a key. Returns either
         a granted cell or how long to wait before asking again.
 
@@ -516,13 +562,14 @@ class QuotaGovernor:
         preferred, deferred = (
             (ordinary[:-1], ordinary[-1:]) if len(ordinary) > 1 else (ordinary, [])
         )
-        waits: list[float] = []
+        #: Keyed by CELL so a cell seen twice counts once -- see `_ClaimWait`.
+        waits: dict[tuple[int, str], float] = {}
 
         async def take(key_index: int, rungs: list[LadderRung]) -> tuple[int, str] | None:
             for rung in rungs:
                 attempt = await self._try_take_cell(session, day, key_index, rung, now=now)
                 if attempt.wait_s is not None:
-                    waits.append(attempt.wait_s)
+                    waits[(key_index, rung.model)] = attempt.wait_s
                 if attempt.granted:
                     claims.bind(claim, key_index)
                     return key_index, rung.model
@@ -588,8 +635,20 @@ class QuotaGovernor:
         # cooldown, or inside its own minute. `waits` only covers cells this
         # scan actually looked at -- a key held by someone else is never
         # examined, so its release has no deadline to offer and the cap is what
-        # bounds the wait instead.
-        return max(0.5, min(min(waits) + 0.2 if waits else 5.0, 60.0))
+        # bounds the wait instead. Which of the three it was travels with the
+        # duration; see `_ClaimWait` for why that is not one fact.
+        # Both counts EXCLUDE this claim's own key: it is neither something to
+        # wait for nor somewhere to move to, and counting it as "free" is what
+        # made an earlier version of the log read "1 free" about a key that had
+        # just refused the call.
+        unowned = sum(1 for key in range(self.key_count) if claims.is_free(key))
+        held_by_me = 1 if claim.key_index is not None else 0
+        return _ClaimWait(
+            seconds=max(0.5, min(min(waits.values()) + 0.2 if waits else 5.0, 60.0)),
+            other_claims=self.key_count - unowned - held_by_me,
+            free_keys=unowned,
+            throttled_cells=len(waits),
+        )
 
     async def _any_daily_room(
         self, session: AsyncSession, day: datetime, rungs: list[LadderRung]

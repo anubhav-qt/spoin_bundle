@@ -1,0 +1,17 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 380, "h": 220, "title": "Bead on the real o" },
+    { "file": "Ring.dc.html", "x": 480, "y": 0, "w": 380, "h": 220, "title": "Arc on the real o" },
+    { "file": "Wave.dc.html", "x": 960, "y": 0, "w": 380, "h": 220, "title": "Wave (fallback)" }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -170,
+      "w": 900,
+      "text": "F12 branded loader. The first two keep the wordmark's OWN 'o' (live text, wordmark font) and lock a spinning overlay to that glyph — no substituted circle. Each has Fit-to-glyph tweaks (radius / vertical centre) to seat the bead or arc exactly on the o, plus a Theme tweak across 5 palettes. All pure CSS, paint before hydration, and freeze on a held pose under prefers-reduced-motion. Wave is the fallback if the overlay can't be made to sit right. Pick one → it becomes Main and is committed to docs/design/mockups/."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

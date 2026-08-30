@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; }
+    a { color: var(--accent); } a:hover { color: var(--accent-2); }
+
+    .stage {
+      --bg:#edf0ea; --bg-2:#e2e7de; --bg-3:#d6ddd1;
+      --fg:#262a22; --fg-2:#565f51; --fg-3:#838c7d;
+      --accent:#c1442b; --accent-2:#a83a24; --line:rgba(38,42,34,0.14);
+      width: 380px; height: 220px;
+      background: var(--bg); color: var(--fg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+    }
+    [data-palette="twilight"] .stage { --bg:#12141a; --bg-2:#191c24; --bg-3:#22262f; --fg:#e8eaf0; --fg-2:#a8adba; --fg-3:#6e7484; --accent:#7c9eff; --accent-2:#ff9d7c; --line:rgba(232,234,240,0.12); }
+    [data-palette="cyanotype"] .stage { --bg:#e8f0f7; --bg-2:#dce8f2; --bg-3:#cddfec; --fg:#1e3448; --fg-2:#4c6478; --fg-3:#7891a3; --accent:#3f7ea3; --accent-2:#2f6486; --line:rgba(30,52,72,0.12); }
+    [data-palette="phosphor"] .stage { --bg:#0b0b0c; --bg-2:#141415; --bg-3:#1e1e1f; --fg:#e6e6e7; --fg-2:#a3a3a5; --fg-3:#6c6c6f; --accent:#f4f4f5; --accent-2:#d4d4d6; --line:rgba(230,230,231,0.12); }
+    [data-palette="scope"] .stage { --bg:#0d1116; --bg-2:#141b22; --bg-3:#1c2730; --fg:#e3ecf2; --fg-2:#98adbb; --fg-3:#5e7180; --accent:#38c6d9; --accent-2:#e8a33d; --line:rgba(227,236,242,0.12); }
+
+    .caption { font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--fg-3); text-align: center; line-height: 1.6; }
+    .caption b { color: var(--fg-2); }
+
+    /* ---- ARC ON THE REAL o : same idea as the bead, but the overlay is
+            a spinning quarter-ring hugging the glyph -- the o shows
+            through its transparent centre, unchanged. `--arc-d` /
+            `--o-cy` (tweak chips) seat the ring on the glyph. ---- */
+    .loader { font-size: 40px; font-weight: 700; letter-spacing: -0.01em; line-height: 1; color: var(--fg); }
+    .o-wrap { position: relative; display: inline-block; }
+    .arc {
+      position: absolute; left: 50%; top: calc(50% + var(--o-cy, 2px));
+      width: var(--arc-d, 22px); height: var(--arc-d, 22px);
+      margin-left: calc(var(--arc-d, 22px) / -2);
+      margin-top: calc(var(--arc-d, 22px) / -2);
+      border: 2.5px solid transparent;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: arcspin 0.85s linear infinite;
+    }
+    @keyframes arcspin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .arc { animation: none; transform: rotate(120deg); }
+    }
+  </style>
+</helmet>
+<div data-palette="{{palette}}" style="--arc-d: {{arcD}}px; --o-cy: {{centerY}}px">
+  <div class="stage">
+    <div class="loader" role="img" aria-label="Loading">sp<span class="o-wrap">o<span class="arc" aria-hidden="true"></span></span>in</div>
+    <div class="caption">Arc on the real o &middot; <b>a quarter-ring spins around the wordmark&rsquo;s own o</b><br>reduced motion &rarr; arc held at ~120&deg;</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"palette":{"editor":"enum","default":"notebook","options":["notebook","twilight","cyanotype","phosphor","scope"],"section":"Theme"},"arcD":{"editor":"range","default":22,"min":14,"max":30,"step":0.5,"unit":"px","section":"Fit to glyph"},"centerY":{"editor":"range","default":2,"min":-4,"max":8,"step":0.5,"unit":"px","section":"Fit to glyph"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      palette: this.props.palette ?? "notebook",
+      arcD: this.props.arcD ?? 22,
+      centerY: this.props.centerY ?? 2,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -640,6 +640,52 @@ async def test_redraft_loop_improves_on_a_single_round(
         assert active <= subtopic.target_cards
 
 
+async def test_a_redrafted_tier_gets_exactly_one_question_pass(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """ADR-0074's question phase runs once per subtopic-TIER, not once per item
+    report -- and `_redraft_until_bar` emits one report per round, so a tier
+    that needed several rounds arrives at the fan-in named several times.
+
+    Two ways that goes wrong if the reports are not merged first, both silent:
+    the tier's questions get generated repeatedly (concurrent passes racing for
+    the same unquestioned cards, and real quota spent on every extra one), and
+    the run's report counts the same questions once per round. This generator
+    rejects half of every batch, which is what forces the redraft rounds the
+    bug needs.
+
+    The report figure and the row count must agree exactly -- that equality is
+    the assertion; `> 0` alone would pass with the double-count in place.
+    """
+
+    report = await _plan_and_generate(
+        session, settings, "Sedimentary Rocks", generator=_FractionRejectGenerator(reject_every=2)
+    )
+    topic_report = report["topics"][0]
+    topic_id = uuid.UUID(topic_report["topic_id"])  # type: ignore[arg-type]
+
+    subtopic_ids = (
+        (await session.execute(select(Subtopic.id).where(Subtopic.topic_id == topic_id)))
+        .scalars()
+        .all()
+    )
+    questions = (
+        (await session.execute(select(Question).where(Question.subtopic_id.in_(subtopic_ids))))
+        .scalars()
+        .all()
+    )
+
+    assert topic_report["questions_accepted"] > 0
+    assert len(questions) == topic_report["questions_accepted"]
+    # One question per card at most: a second pass over the same tier would
+    # have written more questions than there are cards to ask about.
+    cards = (
+        (await session.execute(select(Card.id).where(Card.topic_id == topic_id))).scalars().all()
+    )
+    assert len({question.card_id for question in questions}) == len(questions)
+    assert len(questions) <= len(cards)
+
+
 async def test_redraft_loop_stuck_guard_stops_on_persistent_rejection(
     session: AsyncSession, settings: Settings
 ) -> None:

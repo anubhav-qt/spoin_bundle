@@ -55,8 +55,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from contextvars import ContextVar
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import delete, func, insert, literal, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -176,6 +177,130 @@ def _day_start(now: datetime) -> datetime:
 
 
 @dataclass
+class KeyClaim:
+    """One unit of work's ownership of an API key (ADR-0074).
+
+    `key_index` starts unbound: the first `acquire()` made under this claim
+    binds it to whichever free key is least spent, so the choice uses the same
+    ledger query that orders keys everywhere else rather than a second, weaker
+    notion of "least used" kept in memory. It can move -- step 3 of the ADR's
+    ladder re-claims a different key when the held one has no room on any
+    preferred rung -- which is why this is a mutable handle and not just an int.
+    """
+
+    key_index: int | None = None
+
+
+class KeyClaimRegistry:
+    """Which keys are currently owned, shared by BOTH pools of one generator.
+
+    A KEY is the unit of ownership, not a `(key, model)` cell: the thinking and
+    generator pools are separate `QuotaGovernor`s over the same physical keys,
+    so a claim invisible to the other pool would let one group's card writing
+    contend with another group's judging on the same project -- exactly the
+    concurrency ADR-0074 exists to remove.
+
+    In-process only, deliberately. The claim bounds concurrency *within* one
+    generation run, and ADR-0073 already means one run at a time; the
+    cross-process story stays what it has always been -- `_try_reserve_rpm`'s
+    atomic reservation and the shared ledger (ADR-0058). A DB-backed claim would
+    add a lock nothing currently needs and a crash-recovery problem (a claim
+    outliving the process that took it) for a case that does not arise.
+    """
+
+    def __init__(self, key_count: int) -> None:
+        if key_count < 1:
+            raise ValueError("KeyClaimRegistry needs at least one key")
+        self._key_count = key_count
+        self._claimed: dict[int, KeyClaim] = {}
+        self._released = asyncio.Condition()
+
+    @property
+    def key_count(self) -> int:
+        return self._key_count
+
+    def is_free(self, key_index: int, *, claim: KeyClaim | None = None) -> bool:
+        """True when `key_index` is unowned, or owned by `claim` itself."""
+
+        holder = self._claimed.get(key_index)
+        return holder is None or holder is claim
+
+    def free_keys(self, *, claim: KeyClaim | None = None) -> list[int]:
+        return [k for k in range(self._key_count) if self.is_free(k, claim=claim)]
+
+    def bind(self, claim: KeyClaim, key_index: int) -> None:
+        """Move `claim` onto `key_index`, releasing whatever it held before.
+
+        Raises if the key is already owned by someone else: a caller reaching
+        this with a contended key means the scan that chose it read a stale
+        free-list, and silently sharing the key is the one outcome this whole
+        design exists to prevent.
+        """
+
+        if not self.is_free(key_index, claim=claim):
+            raise RuntimeError(f"key {key_index} is already claimed")
+        previous = claim.key_index
+        if previous is not None and self._claimed.get(previous) is claim:
+            del self._claimed[previous]
+        self._claimed[key_index] = claim
+        claim.key_index = key_index
+
+    async def release(self, claim: KeyClaim) -> None:
+        held = claim.key_index
+        claim.key_index = None
+        if held is None or self._claimed.get(held) is not claim:
+            return
+        del self._claimed[held]
+        async with self._released:
+            self._released.notify_all()
+
+    async def wait_for_release(self, *, max_wait_s: float) -> None:
+        """Block until some key is released, or `timeout` elapses.
+
+        The cap is not a safety net over a lost wakeup -- it is how a
+        caller that is ALSO waiting on an rpm window gets to re-check that
+        window. A group can be waiting for two different things at once (no
+        free key, and its own key's minute not yet over), and only one of them
+        produces an event.
+        """
+
+        async with self._released:
+            try:
+                await asyncio.wait_for(self._released.wait(), max_wait_s)
+            except TimeoutError:
+                return
+
+
+@dataclass(frozen=True)
+class _CellAttempt:
+    """What `_try_take_cell` found. `exhausted` means this cell's DAY is gone,
+    so it must not count toward "somewhere still has room"; `wait_s` means the
+    cell has budget but no window right now, and says when it might."""
+
+    granted: bool = False
+    exhausted: bool = False
+    wait_s: float | None = None
+
+
+#: The key claim in force for the current task (ADR-0074), or None outside any
+#: claimed scope. A `ContextVar` rather than a `ContentGenerator` argument on
+#: purpose: which key a call runs on is a quota concern, and threading it
+#: through `generate_cards`/`correct_cards`/`generate_questions` would put a
+#: backend-specific parameter on the one interface the whole codebase shares --
+#: `fake` has no keys to claim, and the pipeline should not know that `gemini`
+#: does. asyncio copies the context into every task it creates, so a claim set
+#: at the top of a LangGraph branch is inherited by every call that branch makes,
+#: including the ones it fans out with `asyncio.gather`, and by nothing else.
+CURRENT_KEY_CLAIM: ContextVar[KeyClaim | None] = ContextVar("spoin_current_key_claim", default=None)
+
+
+#: `acquire()` uses this internally to say "no cell right now, and the reason is
+#: contention rather than exhaustion" -- the caller should wait for a key to be
+#: released and try again. Never returned to callers outside this module.
+_WAIT_FOR_KEY = "wait-for-key"
+
+
+@dataclass
 class QuotaGovernor:
     """One instance per pool (e.g. "thinking" vs "cards") per
     `GeminiContentGenerator`. `acquire(now=...)` returns `(key_index, model)`
@@ -193,6 +318,15 @@ class QuotaGovernor:
 
     key_count: int
     ladder: list[LadderRung]
+    #: How many rungs at the END of `ladder` are a RESERVE (ADR-0074): reached
+    #: only when no key anywhere has daily room on an ordinary rung, never to
+    #: work around keys merely being claimed. Only meaningful on a claim-aware
+    #: acquire; an unclaimed call walks the whole ladder as it always has.
+    reserve_rungs: int = 0
+    #: Shared with this generator's OTHER pool -- a key is claimed for a unit of
+    #: work across both. `None` disables claim-aware acquisition entirely, which
+    #: is what every test and the `fake` backend get.
+    claims: KeyClaimRegistry | None = None
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
     #: (key_index, model) -> a lock serializing the actual network calls on
     #: that ONE cell. `acquire()` grants a cell and returns immediately, so
@@ -233,13 +367,246 @@ class QuotaGovernor:
             raise ValueError("QuotaGovernor needs at least one key")
         if not self.ladder:
             raise ValueError("QuotaGovernor needs at least one ladder rung")
+        if self.reserve_rungs < 0:
+            raise ValueError(f"reserve_rungs cannot be negative, got {self.reserve_rungs}")
+        # A ladder that is ALL reserve has no ordinary rung to exhaust, so the
+        # reserve's own entry condition could never be met and the pool would
+        # refuse every call while holding full quota. Clamped rather than
+        # rejected: the reserve is a request about a ladder whose length is
+        # configured separately (and shortened for real -- a retired model id,
+        # a test pool of one), so a ladder too short to hold one is a ladder
+        # without a reserve, not a broken configuration.
+        keepable = max(0, len(self.ladder) - 1)
+        if self.reserve_rungs > keepable:
+            logger.warning(
+                "quota: reserve_rungs=%d but the ladder has only %d rung(s) -- holding %d back "
+                "so at least one ordinary rung remains",
+                self.reserve_rungs,
+                len(self.ladder),
+                keepable,
+            )
+            self.reserve_rungs = keepable
+
+    @property
+    def _ordinary_rungs(self) -> list[LadderRung]:
+        return self.ladder[: len(self.ladder) - self.reserve_rungs]
+
+    @property
+    def _reserve_ladder(self) -> list[LadderRung]:
+        return self.ladder[len(self.ladder) - self.reserve_rungs :] if self.reserve_rungs else []
 
     async def acquire(
-        self, *, now: datetime, exclude_models: frozenset[str] = frozenset()
+        self,
+        *,
+        now: datetime,
+        exclude_models: frozenset[str] = frozenset(),
+        claim: KeyClaim | None = None,
     ) -> tuple[int, str]:
-        async with self._lock, session_scope() as session:
-            await self.prune_request_window(session, now=now)
-            return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
+        """A cell to make the next call on.
+
+        With no `claim` this is the original per-call scan: best model first,
+        least-spent key within it (ADR-0028/0065). With one, it is ADR-0074's
+        own-key-first order, and a call that finds every key claimed WAITS for
+        one to free rather than sharing.
+
+        That wait happens outside `self._lock`, unlike the rpm wait inside
+        `_acquire_locked`. It has to: the event this caller is waiting for is
+        another unit of work releasing a key, and releasing happens on the far
+        side of that unit's own `acquire()` calls. Holding the pool lock across
+        it would make the waiter block the only thing that could wake it.
+        """
+
+        if claim is None or self.claims is None:
+            async with self._lock, session_scope() as session:
+                await self.prune_request_window(session, now=now)
+                return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
+
+        while True:
+            async with self._lock, session_scope() as session:
+                await self.prune_request_window(session, now=now)
+                outcome = await self._acquire_for_claim(
+                    session, now=now, exclude_models=exclude_models, claim=claim
+                )
+            if isinstance(outcome, tuple):
+                return outcome
+            logger.info(
+                "quota: every key is claimed and none of this claim's own cells have room -- "
+                "waiting up to %.1fs for a key to be released",
+                outcome,
+            )
+            await self.claims.wait_for_release(max_wait_s=outcome)
+            now = datetime.now(UTC)
+
+    async def acquire_for_claim_with_session(
+        self,
+        session: AsyncSession,
+        *,
+        now: datetime,
+        claim: KeyClaim,
+        exclude_models: frozenset[str] = frozenset(),
+    ) -> tuple[int, str] | float:
+        """One pass of ADR-0074's ladder on a caller-supplied session, with no
+        waiting -- a granted cell, or the seconds a real `acquire()` would wait.
+
+        Exists for the same reason the other `_with_session` variants do (the
+        fixture session IS the isolation boundary), plus one of its own: the
+        wait outcome is a decision worth asserting on, and it is invisible from
+        `acquire()`, which loops until it turns into a grant.
+        """
+
+        async with self._lock:
+            return await self._acquire_for_claim(
+                session, now=now, exclude_models=exclude_models, claim=claim
+            )
+
+    async def _acquire_for_claim(
+        self,
+        session: AsyncSession,
+        *,
+        now: datetime,
+        exclude_models: frozenset[str],
+        claim: KeyClaim,
+    ) -> tuple[int, str] | float:
+        """ADR-0074's ladder for a unit of work that owns a key. Returns either
+        a granted cell or how long to wait before asking again.
+
+        The order, for a claim holding key X:
+
+        1. X's preferred rungs -- every ordinary rung but the last.
+        2. Any UNCLAIMED key's preferred rungs, least-spent first. The claim
+           moves to that key; this is what stops a group stranding itself on a
+           key whose strong models are spent.
+        3. X's last ordinary rung.
+        4. Any unclaimed key, all ordinary rungs.
+        5. The reserve -- ONLY if no key anywhere still has daily room on an
+           ordinary rung. A reserve rung is for a spent day, never for a busy
+           one.
+        6. Otherwise wait: room exists somewhere, it is just claimed or
+           throttled right now.
+
+        Steps 1 and 3 deliberately prefer X's *second* model over another key's
+        best one. Keeping a unit of work on one key for its whole run is the
+        entire point of the claim -- one caller per key means no cell can be
+        raced, which is what makes an rpm violation structurally impossible
+        rather than merely counted.
+        """
+
+        # Bound to a local because the nested scans below close over it --
+        # mypy will not carry an attribute's narrowing into a closure.
+        claims = self.claims
+        assert claims is not None
+        day = _day_start(now)
+        unavailable = await self._unavailable_models(session, now=now)
+
+        def usable(rungs: list[LadderRung]) -> list[LadderRung]:
+            return [
+                rung
+                for rung in rungs
+                if rung.model not in exclude_models and rung.model not in unavailable
+            ]
+
+        ordinary = usable(self._ordinary_rungs)
+        reserve = usable(self._reserve_ladder)
+        if not ordinary and not reserve:
+            raise AllModelsUnavailableError(
+                f"All {len(self.ladder)} model(s) unavailable -- provider outage, not quota; "
+                f"the day's ledger was never consulted"
+            )
+
+        preferred, deferred = (
+            (ordinary[:-1], ordinary[-1:]) if len(ordinary) > 1 else (ordinary, [])
+        )
+        waits: list[float] = []
+
+        async def take(key_index: int, rungs: list[LadderRung]) -> tuple[int, str] | None:
+            for rung in rungs:
+                attempt = await self._try_take_cell(session, day, key_index, rung, now=now)
+                if attempt.wait_s is not None:
+                    waits.append(attempt.wait_s)
+                if attempt.granted:
+                    claims.bind(claim, key_index)
+                    return key_index, rung.model
+            return None
+
+        async def take_free(rungs: list[LadderRung]) -> tuple[int, str] | None:
+            #: Model-major, least-spent key within each rung -- the same order an
+            #: unclaimed acquire uses, restricted to keys nobody owns.
+            for rung in rungs:
+                spent = await self._rung_spend(session, day, rung.model)
+                for key_index in sorted(
+                    claims.free_keys(claim=claim), key=lambda k: (spent.get(k, 0), k)
+                ):
+                    granted = await take(key_index, [rung])
+                    if granted is not None:
+                        return granted
+            return None
+
+        if claim.key_index is not None:
+            granted = await take(claim.key_index, preferred)
+            if granted is not None:
+                return granted
+
+        granted = await take_free(preferred)
+        if granted is not None:
+            return granted
+
+        if claim.key_index is not None and deferred:
+            granted = await take(claim.key_index, deferred)
+            if granted is not None:
+                return granted
+
+        granted = await take_free(ordinary)
+        if granted is not None:
+            return granted
+
+        if not await self._any_daily_room(session, day, ordinary):
+            if not reserve:
+                raise DailyQuotaExhaustedError(
+                    f"All {self.key_count} key(s) exhausted across {len(ordinary)} "
+                    f"ordinary model(s) for {day.date()}, and no reserve rung is configured"
+                )
+            logger.warning(
+                "quota: no key has daily room on any ordinary rung -- falling back to the "
+                "reserve ladder (%s). The day's thinking budget is spent, not merely busy.",
+                ", ".join(rung.model for rung in reserve),
+            )
+            if claim.key_index is not None:
+                granted = await take(claim.key_index, reserve)
+                if granted is not None:
+                    return granted
+            granted = await take_free(reserve)
+            if granted is not None:
+                return granted
+            if not await self._any_daily_room(session, day, reserve):
+                raise DailyQuotaExhaustedError(
+                    f"All {self.key_count} key(s) exhausted across "
+                    f"{len(ordinary) + len(reserve)} model(s) for {day.date()}, "
+                    f"reserve included"
+                )
+
+        # Somewhere has budget; it is claimed by another unit of work, in a
+        # cooldown, or inside its own minute. `waits` only covers cells this
+        # scan actually looked at -- a key held by someone else is never
+        # examined, so its release has no deadline to offer and the cap is what
+        # bounds the wait instead.
+        return max(0.5, min(min(waits) + 0.2 if waits else 5.0, 60.0))
+
+    async def _any_daily_room(
+        self, session: AsyncSession, day: datetime, rungs: list[LadderRung]
+    ) -> bool:
+        """Whether ANY key still has daily budget on any of `rungs` -- including
+        keys another unit of work currently holds.
+
+        Claimed-but-unspent is the whole distinction the reserve turns on: that
+        key's budget is real, it is simply busy, and waiting a few seconds for
+        it is right where spending the weakest model on the same call is wrong.
+        """
+
+        for rung in rungs:
+            spent = await self._rung_spend(session, day, rung.model)
+            if any(spent.get(key_index, 0) < rung.rpd for key_index in range(self.key_count)):
+                return True
+        return False
 
     async def acquire_with_session(
         self, session: AsyncSession, *, now: datetime, exclude_models: frozenset[str] = frozenset()
@@ -507,83 +874,14 @@ class QuotaGovernor:
                 # deterministic for a given ledger state.
                 spent = await self._rung_spend(session, day, rung.model)
                 for key_index in sorted(range(self.key_count), key=lambda k: (spent.get(k, 0), k)):
-                    # Rows are read, never created, on the way past: a cell only
-                    # gets a ledger row once it is actually GRANTED. That keeps
-                    # "a row exists" meaning "this cell was used" rather than
-                    # "this cell was looked at" -- the property that made it
-                    # possible to prove, from the ledger alone, that the scan
-                    # above never reached key 10.
-                    ledger = await self._existing_ledger_row(session, day, key_index, rung.model)
-                    if ledger is not None and ledger.requests_spent >= rung.rpd:
-                        logger.debug(
-                            "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
-                            key_index,
-                            rung.model,
-                            day.date(),
-                            ledger.requests_spent,
-                            rung.rpd,
-                        )
+                    attempt = await self._try_take_cell(session, day, key_index, rung, now=now)
+                    if attempt.exhausted:
                         continue
-
                     has_unexhausted_cell = True
-
-                    if (
-                        ledger is not None
-                        and ledger.cooldown_until is not None
-                        and now < ledger.cooldown_until
-                    ):
-                        wait_cd = (ledger.cooldown_until - now).total_seconds()
-                        candidate_wait_times.append(wait_cd)
-                        logger.debug(
-                            "quota: key %d model %s is in a rate-limit cooldown (%.1fs "
-                            "remaining), trying next",
-                            key_index,
-                            rung.model,
-                            wait_cd,
-                        )
-                        continue
-
-                    # Claims the RPM slot as part of the same check -- see
-                    # `_try_reserve_rpm` for why those cannot be two statements.
-                    if not await self._try_reserve_rpm(session, key_index, rung, now=now):
-                        earliest = await self._earliest_send_in_window(
-                            session, key_index, rung.model, now=now
-                        )
-                        if earliest is not None:
-                            wait_rpm = (
-                                earliest + timedelta(seconds=_RPM_WINDOW_SECONDS) - now
-                            ).total_seconds()
-                            if wait_rpm > 0:
-                                candidate_wait_times.append(wait_rpm)
-                        logger.debug(
-                            "quota: key %d model %s at RPM ceiling (%d/min), trying next",
-                            key_index,
-                            rung.model,
-                            self.effective_rpm(key_index, rung.model),
-                        )
-                        continue
-
-                    if ledger is None:
-                        ledger = await self._ledger_row(session, day, key_index, rung.model)
-                    ledger.requests_spent += 1
-                    if ledger.requests_spent >= rung.rpd:
-                        ledger.exhausted_at = now
-                        logger.info(
-                            "quota: key %d model %s just hit its RPD ceiling (%d/day) for %s",
-                            key_index,
-                            rung.model,
-                            rung.rpd,
-                            day.date(),
-                        )
-                    await session.flush()
-                    logger.info(
-                        "quota: acquired key=%d model=%s (%d/%d spent today)",
-                        key_index,
-                        rung.model,
-                        ledger.requests_spent,
-                        rung.rpd,
-                    )
-                    return key_index, rung.model
+                    if attempt.granted:
+                        return key_index, rung.model
+                    if attempt.wait_s is not None:
+                        candidate_wait_times.append(attempt.wait_s)
 
             if not has_unexhausted_cell:
                 # Two genuinely different endings, told apart by whether any
@@ -825,6 +1123,90 @@ class QuotaGovernor:
             reservation.sent_at = now
             reservation.confirmed = True
         await session.flush()
+
+    async def _try_take_cell(
+        self,
+        session: AsyncSession,
+        day: datetime,
+        key_index: int,
+        rung: LadderRung,
+        *,
+        now: datetime,
+    ) -> _CellAttempt:
+        """Take one (key, model) cell if it has room, reporting why if not.
+
+        Extracted so the ladder-order scan (`_acquire_locked`) and the
+        claim-order scan (`_acquire_for_claim`, ADR-0074) enforce quota through
+        the same code rather than two implementations free to drift apart -- the
+        order they visit cells in differs, what makes a cell takeable does not.
+
+        Rows are read, never created, on the way past: a cell only gets a ledger
+        row once it is actually GRANTED. That keeps "a row exists" meaning "this
+        cell was used" rather than "this cell was looked at" -- the property that
+        made it possible to prove, from the ledger alone, that a first-fit scan
+        never reached key 10 (ADR-0065).
+        """
+
+        ledger = await self._existing_ledger_row(session, day, key_index, rung.model)
+        if ledger is not None and ledger.requests_spent >= rung.rpd:
+            logger.debug(
+                "quota: key %d model %s already exhausted for %s (%d/%d), trying next",
+                key_index,
+                rung.model,
+                day.date(),
+                ledger.requests_spent,
+                rung.rpd,
+            )
+            return _CellAttempt(exhausted=True)
+
+        if ledger is not None and ledger.cooldown_until is not None and now < ledger.cooldown_until:
+            wait_cd = (ledger.cooldown_until - now).total_seconds()
+            logger.debug(
+                "quota: key %d model %s is in a rate-limit cooldown (%.1fs remaining), trying next",
+                key_index,
+                rung.model,
+                wait_cd,
+            )
+            return _CellAttempt(wait_s=wait_cd)
+
+        # Claims the RPM slot as part of the same check -- see
+        # `_try_reserve_rpm` for why those cannot be two statements.
+        if not await self._try_reserve_rpm(session, key_index, rung, now=now):
+            earliest = await self._earliest_send_in_window(session, key_index, rung.model, now=now)
+            wait_rpm: float | None = None
+            if earliest is not None:
+                pending = (earliest + timedelta(seconds=_RPM_WINDOW_SECONDS) - now).total_seconds()
+                if pending > 0:
+                    wait_rpm = pending
+            logger.debug(
+                "quota: key %d model %s at RPM ceiling (%d/min), trying next",
+                key_index,
+                rung.model,
+                self.effective_rpm(key_index, rung.model),
+            )
+            return _CellAttempt(wait_s=wait_rpm)
+
+        if ledger is None:
+            ledger = await self._ledger_row(session, day, key_index, rung.model)
+        ledger.requests_spent += 1
+        if ledger.requests_spent >= rung.rpd:
+            ledger.exhausted_at = now
+            logger.info(
+                "quota: key %d model %s just hit its RPD ceiling (%d/day) for %s",
+                key_index,
+                rung.model,
+                rung.rpd,
+                day.date(),
+            )
+        await session.flush()
+        logger.info(
+            "quota: acquired key=%d model=%s (%d/%d spent today)",
+            key_index,
+            rung.model,
+            ledger.requests_spent,
+            rung.rpd,
+        )
+        return _CellAttempt(granted=True)
 
     async def _try_reserve_rpm(
         self, session: AsyncSession, key_index: int, rung: LadderRung, *, now: datetime

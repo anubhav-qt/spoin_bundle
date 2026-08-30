@@ -48,6 +48,7 @@ from spoin.generation.pipeline.persistence import (
     _reuse_or_create_subtopic,
     _seed_progress,
     _update_subtopic_progress,
+    load_cards_missing_questions,
 )
 from spoin.generation.pipeline.state import (
     _NO_DIFFICULTY_EXAMPLES,
@@ -65,6 +66,7 @@ from spoin.generation.pipeline.state import (
     _rejected_card,
     _Runtime,
     _runtime,
+    is_technical_topic,
     logger,
 )
 
@@ -335,6 +337,16 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 
     runtime = _runtime(config)
     job = state["subtopic_group_job"]
+    # ADR-0074: this whole branch -- planning, every draft round, both gate
+    # passes, every redraft -- runs on ONE key, claimed here and released when
+    # the branch returns or raises. With one caller per key no cell can be
+    # raced, so the group's own calls cannot push a cell past its rpm; the
+    # ceiling on how many branches run at once is simply the key count.
+    async with runtime.generator.claimed_key_scope():
+        return await _generate_subtopic_cards(runtime, job)
+
+
+async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) -> dict[str, object]:
     batch_size = runtime.settings.generation_batch_size
     #: A tier with sibling tiers gets real calibration from `builds_on`
     #: instead of the generic catalog (ADR-0030) -- see this function's
@@ -350,9 +362,13 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     #: never enters the redraft loop, it has nothing left to close).
     tier_meta: dict[str, dict[str, object]] = {}
 
+    #: `code` is excluded for non-technical topics -- the curriculum prompt
+    #: already tells the planner "code quota MUST BE 0" for non-CS/non-technical
+    #: topics, but the planner is trusted for taste, not constraints (CLAUDE.md).
+    topic_is_technical = is_technical_topic(job["topic_name"])
     all_card_types = [
         CardType.PROSE.value,
-        CardType.CODE.value,
+        *([] if not topic_is_technical else [CardType.CODE.value]),
         CardType.DIAGRAM.value,
         CardType.COMPARISON.value,
         CardType.ASCII.value,
@@ -373,6 +389,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                     is_standalone=is_standalone,
                     cards_missing_questions=tier["cards_missing_questions"],
                     existing_question_stems=tier["existing_question_stems"],
+                    target_questions=tier["target_questions"],
                 )
             )
             # Nothing generated THIS run for this tier, so it contributes no
@@ -506,7 +523,10 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 ct
                 for ct in all_card_types
                 if tier_quotas.get(ct, 0) > 0
-                and sum(1 for d in drafts if _card_matches_type(d, ct)) < tier_quotas[ct]
+                and sum(
+                    1 for d in drafts if _card_matches_type(d, ct, topic_name=job["topic_name"])
+                )
+                < tier_quotas[ct]
             ]
 
             if unfilled_types:
@@ -514,11 +534,18 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 chosen_type = max(
                     unfilled_types,
                     key=lambda ct: (
-                        tier_quotas[ct] - sum(1 for d in drafts if _card_matches_type(d, ct))
+                        tier_quotas[ct]
+                        - sum(
+                            1
+                            for d in drafts
+                            if _card_matches_type(d, ct, topic_name=job["topic_name"])
+                        )
                     ),
                 )
                 unmet = tier_quotas[chosen_type] - sum(
-                    1 for d in drafts if _card_matches_type(d, chosen_type)
+                    1
+                    for d in drafts
+                    if _card_matches_type(d, chosen_type, topic_name=job["topic_name"])
                 )
                 request_count = min(batch_size, remaining, max(1, unmet))
             else:
@@ -582,6 +609,7 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
                 is_standalone=is_standalone,
                 cards_missing_questions=tier["cards_missing_questions"],
                 existing_question_stems=tier["existing_question_stems"],
+                target_questions=tier["target_questions"],
             )
         )
         lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
@@ -831,6 +859,7 @@ async def _redraft_until_bar(
                     # backfill here.
                     cards_missing_questions=[],
                     existing_question_stems=existing_question_stems,
+                    target_questions=tier["target_questions"],
                 )
             )
 
@@ -1268,8 +1297,7 @@ async def _process_gate_item(
         # whatever `_seed_progress` wrote -- same reasoning as
         # `EngagementService._bump_progress`: a real, cheap read beats a
         # running total that can drift out of sync with the table it
-        # describes. `questions_target` becomes exactly this count: every
-        # active card gets exactly one question, backfill included.
+        # describes.
         cards_done = await runtime.session.scalar(
             select(func.count())
             .select_from(Card)
@@ -1283,7 +1311,7 @@ async def _process_gate_item(
             uuid.UUID(item.topic_id),
             item.subtopic_id,
             cards_done=cards_done or 0,
-            questions_target=cards_done or 0,
+            questions_target=item.target_questions,
         )
         await runtime.session.commit()
 
@@ -1319,6 +1347,44 @@ async def _process_gate_item(
         item.generator_failure_count,
     )
 
+    return {
+        "topic_id": item.topic_id,
+        "subtopic_id": item.subtopic_id,
+        "difficulty": item.difficulty,
+        "accepted": len(new_cards),
+        "rejected": total_rejected,
+        "failed": total_failed,
+        #: Questions are NOT written here any more (ADR-0074) -- they run as one
+        #: topic-wide phase after every group has cleared its card bar. The ids
+        #: travel so that phase can still tell a card drafted THIS run from one
+        #: it is merely backfilling, which is what `is_backfill` turns on.
+        "new_card_ids": [str(card.id) for card in new_cards],
+    }
+
+
+async def _run_question_phase(
+    runtime: _Runtime,
+    *,
+    topic_id: str,
+    subtopic_id: str,
+    difficulty: str,
+    new_cards: list[tuple[uuid.UUID, str, str]],
+    backfill_cards: list[tuple[uuid.UUID, str, str]],
+    existing_question_stems: list[str],
+    target_questions: int,
+    generated_at: str,
+    backend: str,
+) -> tuple[int, int]:
+    """One subtopic-tier's questions, written from cards that are already
+    persisted and already past the gate. Returns (accepted, rejected).
+
+    Runs in the topic-wide question phase (ADR-0074), not alongside the cards
+    it asks about. That ordering is the point: by the time this is called, the
+    tier's card set is final -- redraft rounds included -- so the question
+    budget is spent against what the subtopic actually ended up containing
+    rather than against a first round that a later round then added to.
+    """
+
     questions_accepted = 0
     questions_rejected = 0
     # Question generation runs on cards accepted THIS run plus any existing
@@ -1330,18 +1396,29 @@ async def _process_gate_item(
     # brand-new content or already-accepted cards that just lack a question,
     # and those two cases genuinely call for different framing (see
     # `generate_questions`'s docstring in base.py).
-    new_cards_for_questions: list[tuple[uuid.UUID, str, str]] = [
-        (card.id, card.title, card.body) for card in new_cards
-    ]
-    backfill_cards_for_questions: list[tuple[uuid.UUID, str, str]] = [
-        (uuid.UUID(entry["card_id"]), entry["title"], entry["body"])
-        for entry in item.existing_cards_missing_questions
-    ]
+    # Question budget: only generate enough questions to reach this tier's
+    # `target_questions` ceiling -- the dynamic budget calibrated so the
+    # whole topic stays within the 200-300 band (see `_load_subtopic_plans`).
+    existing_question_count = len(existing_question_stems)
+    questions_budget = max(0, target_questions - existing_question_count)
+    new_cards_for_questions: list[tuple[uuid.UUID, str, str]] = list(new_cards)
+    backfill_cards_for_questions: list[tuple[uuid.UUID, str, str]] = list(backfill_cards)
+    # Cap total cards sent to question generation to the remaining budget.
+    total_question_candidates = new_cards_for_questions + backfill_cards_for_questions
+    if questions_budget <= 0:
+        new_cards_for_questions = []
+        backfill_cards_for_questions = []
+    elif len(total_question_candidates) > questions_budget:
+        # Prioritize new cards (this run's output) over backfill.
+        capped = total_question_candidates[:questions_budget]
+        new_count = min(len(new_cards_for_questions), questions_budget)
+        new_cards_for_questions = capped[:new_count]
+        backfill_cards_for_questions = capped[new_count:]
     all_question_drafts: list[tuple[Any, uuid.UUID]] = []
     all_question_failures: list[str] = []
     # Grows across the two calls below so the SECOND call also avoids
     # repeating whatever the FIRST just wrote, not just prior runs' stems.
-    running_existing_stems = list(item.existing_question_stems)
+    running_existing_stems = list(existing_question_stems)
     for cards_batch, is_backfill in (
         (new_cards_for_questions, False),
         (backfill_cards_for_questions, True),
@@ -1350,9 +1427,9 @@ async def _process_gate_item(
             continue
         _, _, _, question_drafts, question_failures = await _generate_questions_for_group(
             runtime,
-            topic_id=item.topic_id,
-            subtopic_id=item.subtopic_id,
-            difficulty=item.difficulty,
+            topic_id=topic_id,
+            subtopic_id=subtopic_id,
+            difficulty=difficulty,
             cards=cards_batch,
             existing_stems=running_existing_stems,
             is_backfill=is_backfill,
@@ -1364,12 +1441,12 @@ async def _process_gate_item(
         ]
 
     if all_question_drafts or all_question_failures:
-        parsed_difficulty = Difficulty(item.difficulty)
+        parsed_difficulty = Difficulty(difficulty)
         stems = [draft.stem for draft, _card_id in all_question_drafts]
         embeddings = await runtime.embedder.aembed(stems) if stems else []
         new_questions = [
             Question(
-                subtopic_id=uuid.UUID(item.subtopic_id),
+                subtopic_id=uuid.UUID(subtopic_id),
                 card_id=card_id,
                 difficulty=parsed_difficulty,
                 kind=QuestionKind.MCQ if draft.options is not None else QuestionKind.FREE_TEXT,
@@ -1397,12 +1474,12 @@ async def _process_gate_item(
             questions_done = await runtime.session.scalar(
                 select(func.count())
                 .select_from(Question)
-                .where(Question.subtopic_id == uuid.UUID(item.subtopic_id))
+                .where(Question.subtopic_id == uuid.UUID(subtopic_id))
             )
             await _update_subtopic_progress(
                 runtime,
-                uuid.UUID(item.topic_id),
-                item.subtopic_id,
+                uuid.UUID(topic_id),
+                subtopic_id,
                 questions_done=questions_done or 0,
             )
             await runtime.session.commit()
@@ -1411,22 +1488,13 @@ async def _process_gate_item(
         if all_question_failures:
             logger.info(
                 "subtopic %s [%s]: %d question failure(s): %s",
-                item.subtopic_id,
-                item.difficulty,
+                subtopic_id,
+                difficulty,
                 len(all_question_failures),
                 "; ".join(all_question_failures),
             )
 
-    return {
-        "topic_id": item.topic_id,
-        "subtopic_id": item.subtopic_id,
-        "difficulty": item.difficulty,
-        "accepted": len(new_cards),
-        "rejected": total_rejected,
-        "failed": total_failed,
-        "questions_accepted": questions_accepted,
-        "questions_rejected": questions_rejected,
-    }
+    return questions_accepted, questions_rejected
 
 
 async def _gate_and_persist_results(
@@ -1485,6 +1553,7 @@ async def _gate_and_persist_results(
                 generator_failure_count=len(result["generator_failures"]),
                 existing_cards_missing_questions=result["cards_missing_questions"],
                 existing_question_stems=result["existing_question_stems"],
+                target_questions=result["target_questions"],
             )
         )
 
@@ -1514,21 +1583,130 @@ async def _gate_and_persist_results(
     )
 
 
+async def _run_topic_question_phase(
+    runtime: _Runtime,
+    state: PipelineState,
+    item_reports: list[dict[str, object]],
+) -> dict[str, tuple[int, int]]:
+    """Every subtopic-tier's questions, after every topic in this run has
+    finished its cards (ADR-0074). Returns (accepted, rejected) per topic_id,
+    for the caller's report.
+
+    **One unit per subtopic-TIER, not per item report.** `_redraft_until_bar`
+    appends a fresh report for every redraft round, so a tier that took four
+    rounds to clear its bar arrives here as four reports naming the same tier.
+    Running the phase once per report would generate questions for that tier
+    repeatedly -- the later runs racing the earlier ones for the same
+    unquestioned cards -- and count the same questions four times in the run's
+    report. The rounds are merged back into one tier first, which is also what
+    makes the phase see the tier's FULL card set, redrafts included, rather
+    than only its first round's.
+
+    Each tier is its own claimed-key unit, concurrent with the others -- the
+    same bound as the card phase, K tiers at once for K keys. Question
+    generation is a generator-pool call (flash-lite, 500/cell, ADR-0029), so
+    unlike the card phase this one is nowhere near its quota ceiling; the claim
+    is here for the rpm guarantee, not the daily budget.
+
+    Card and stem inputs are re-read from the database rather than carried
+    through graph state. They have to be: the plan that state holds was built
+    before any of this run's cards existed, and seeing the finished tier is the
+    whole reason questions moved here.
+    """
+
+    if not item_reports:
+        return {}
+
+    targets: dict[tuple[str, str], int] = {}
+    for plan in state.get("topic_plans", []):
+        for subtopic in plan["subtopics"]:
+            targets[(subtopic["subtopic_id"], subtopic["difficulty"])] = subtopic[
+                "target_questions"
+            ]
+
+    merged: dict[tuple[str, str, str], list[str]] = {}
+    for report in item_reports:
+        key = (
+            cast(str, report["topic_id"]),
+            cast(str, report["subtopic_id"]),
+            cast(str, report["difficulty"]),
+        )
+        merged.setdefault(key, []).extend(cast(list[str], report["new_card_ids"]))
+
+    generated_at = datetime.now(UTC).isoformat()
+    backend = runtime.settings.generator
+
+    async def one_tier(
+        key: tuple[str, str, str], card_ids: list[str]
+    ) -> tuple[str, tuple[int, int]]:
+        topic_id, subtopic_id, difficulty = key
+        new_ids = {uuid.UUID(card_id) for card_id in card_ids}
+        async with runtime.session_lock:
+            unquestioned = await load_cards_missing_questions(
+                runtime.session, subtopic_id=uuid.UUID(subtopic_id)
+            )
+            existing_stems = await _current_question_stems(
+                runtime.session,
+                subtopic_id=uuid.UUID(subtopic_id),
+                max_existing_question_stems=runtime.settings.max_existing_question_stems,
+            )
+        #: `is_backfill` has to stay accurate per CALL (base.py's contract), so
+        #: the two groups stay apart instead of merging into one list of "cards
+        #: without questions": a card this run drafted minutes ago is not the
+        #: already-proven content the backfill framing describes.
+        new_cards = [entry for entry in unquestioned if entry[0] in new_ids]
+        backfill_cards = [entry for entry in unquestioned if entry[0] not in new_ids]
+        async with runtime.generator.claimed_key_scope():
+            counts = await _run_question_phase(
+                runtime,
+                topic_id=topic_id,
+                subtopic_id=subtopic_id,
+                difficulty=difficulty,
+                new_cards=new_cards,
+                backfill_cards=backfill_cards,
+                existing_question_stems=existing_stems,
+                target_questions=targets.get((subtopic_id, difficulty), 0),
+                generated_at=generated_at,
+                backend=backend,
+            )
+        return topic_id, counts
+
+    logger.info(
+        "questions: every topic's cards are done -- starting the question phase for %d "
+        "subtopic-tier(s) (from %d item report(s))",
+        len(merged),
+        len(item_reports),
+    )
+    per_tier = await asyncio.gather(*(one_tier(key, ids) for key, ids in merged.items()))
+
+    totals: dict[str, tuple[int, int]] = {}
+    for topic_id, (accepted, rejected) in per_tier:
+        prev_accepted, prev_rejected = totals.get(topic_id, (0, 0))
+        totals[topic_id] = (prev_accepted + accepted, prev_rejected + rejected)
+    return totals
+
+
 async def gate_and_persist(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> dict[str, object]:
-    """Final, lightweight step: every group's cards/questions are ALREADY
-    persisted by the time this runs (`generate_subtopic_cards` does that
-    itself now, via `_gate_and_persist_results`, per ADR-0026 -- see its
-    docstring). This node only aggregates `item_reports` into the run's final
-    per-topic report and marks each topic's `GenerationJob.progress` done.
-    Still a fan-in (every group/topic branch merges here) -- that's correct
-    for THIS purpose, since the final report and "done" marking genuinely do
-    need everything finished, unlike the card/question writes themselves.
+    """The fan-in. Every group's CARDS are already persisted by the time this
+    runs (`generate_subtopic_cards` does that itself, per ADR-0026/0041 -- see
+    its docstring), and that stays true. What this node now owns, beyond
+    aggregating the report and marking each topic's `GenerationJob.progress`
+    done, is the topic's **question phase** (ADR-0074).
+
+    Questions used to be written per group, next to that group's cards. They
+    run here instead, once every group has cleared its card bar, so a tier's
+    question budget is spent against the card set the subtopic actually ended
+    up with rather than against whichever cards happened to survive its first
+    gate round. A fan-in is the right shape for exactly the same reason the
+    final report is: this genuinely does need every branch finished, unlike the
+    card writes themselves.
     """
 
     runtime = _runtime(config)
     item_reports = state.get("item_reports", [])
+    question_totals = await _run_topic_question_phase(runtime, state, item_reports)
 
     reports_by_topic: dict[str, list[dict[str, object]]] = {}
     totals_by_topic: dict[str, tuple[int, int, int, int, int]] = {}
@@ -1543,15 +1721,19 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
                 "failed": report["failed"],
             }
         )
-        prev_accepted, prev_rejected, prev_failed, prev_q_accepted, prev_q_rejected = (
-            totals_by_topic.get(topic_id, (0, 0, 0, 0, 0))
+        prev_accepted, prev_rejected, prev_failed, _, _ = totals_by_topic.get(
+            topic_id, (0, 0, 0, 0, 0)
         )
+        # Question counts are NOT folded per report: `_redraft_until_bar`
+        # emits one report per round, and the question phase runs once per
+        # TIER, so its totals arrive already summed per topic.
+        q_accepted, q_rejected = question_totals.get(topic_id, (0, 0))
         totals_by_topic[topic_id] = (
             prev_accepted + cast(int, report["accepted"]),
             prev_rejected + cast(int, report["rejected"]),
             prev_failed + cast(int, report["failed"]),
-            prev_q_accepted + cast(int, report["questions_accepted"]),
-            prev_q_rejected + cast(int, report["questions_rejected"]),
+            q_accepted,
+            q_rejected,
         )
 
     topic_reports: list[dict[str, object]] = []

@@ -17,6 +17,8 @@ changing chain code.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
@@ -371,6 +373,24 @@ class BatchResult[T](BaseModel):
 
 class ContentGenerator(ABC):
     """The only interface the rest of the codebase knows about."""
+
+    @asynccontextmanager
+    async def claimed_key_scope(self) -> AsyncIterator[None]:
+        """Mark a unit of work that should run on ONE API key start to finish
+        (ADR-0074) -- in practice one subtopic group's whole card run.
+
+        Not abstract, and a no-op by default: a backend without per-key quota
+        has nothing to claim, and the pipeline must not have to know which kind
+        it is talking to. `GeminiContentGenerator` overrides it; `fake` and any
+        future local backend inherit this and are unaffected.
+
+        Deliberately NOT a parameter on the generation methods. Every one of
+        those takes a collection because the free tier meters requests
+        (ADR-0005), and which key a request runs on is a quota concern that has
+        no business appearing in an interface about content.
+        """
+
+        yield
 
     @abstractmethod
     async def generate_curriculum(

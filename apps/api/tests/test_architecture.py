@@ -170,3 +170,61 @@ def test_imported_font_reads_are_scoped_to_the_owner() -> None:
         "UserFont.user_id filter — an imported font must never be readable by "
         "another user (ADR-0070)."
     )
+
+
+def test_the_generation_pipeline_holds_no_global_concurrency_cap() -> None:
+    """ADR-0047 removed a global `asyncio.Semaphore(5)` that had been throttling
+    a 33-key pool down to five calls at a time, and ADR-0074 committed to not
+    bringing one back: what bounds concurrency now is key OWNERSHIP -- one
+    subtopic group, one key -- which scales with the pool instead of capping it.
+
+    The failure this guards against is not a bad decision, it is an easy
+    reflex. A semaphore is the obvious thing to reach for the next time a run
+    looks like it is calling too fast, and the last one survived unnoticed for
+    long enough to make a three-topic run take 2.8 hours with the keys 90% idle.
+    If a future change genuinely needs a cap, it needs an ADR superseding those
+    two, and deleting this test is the visible cost of not writing one.
+    """
+
+    pipeline = SRC / "generation" / "pipeline"
+    offenders = []
+    for path in sorted(pipeline.glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Attribute) and node.attr in ("Semaphore", "BoundedSemaphore"):
+                offenders.append(f"{path.name}:{node.lineno}")
+    assert not offenders, (
+        "the generation pipeline reintroduced a global concurrency semaphore at "
+        f"{', '.join(offenders)} -- see ADR-0047 and ADR-0074"
+    )
+
+
+def test_questions_are_written_by_the_topic_wide_phase_only() -> None:
+    """ADR-0074: a subtopic group's branch writes cards and stops. Questions run
+    once, at the fan-in, when every group has finished its cards -- so a tier's
+    question budget is spent against the card set it actually ended up with
+    rather than against whichever cards survived its first gate round.
+
+    Checked structurally rather than by reading, because the drift is silent:
+    moving question generation back into the per-group path would still pass
+    every other test in the suite and simply produce questions for a partial
+    tier, repeatedly, once per redraft round.
+    """
+
+    nodes = SRC / "generation" / "pipeline" / "nodes.py"
+    tree = ast.parse(nodes.read_text(encoding="utf-8"))
+    # Top-level definitions only: the phase's own nested helper is part of it,
+    # and walking every scope would report the inner name as a second caller.
+    callers = {
+        node.name
+        for node in tree.body
+        if isinstance(node, ast.AsyncFunctionDef)
+        for inner in ast.walk(node)
+        if isinstance(inner, ast.Call)
+        and isinstance(inner.func, ast.Name)
+        and inner.func.id == "_run_question_phase"
+    }
+    assert callers == {"_run_topic_question_phase"}, (
+        f"_run_question_phase is called from {sorted(callers)} -- ADR-0074 puts it behind the "
+        "topic-wide fan-in phase only"
+    )

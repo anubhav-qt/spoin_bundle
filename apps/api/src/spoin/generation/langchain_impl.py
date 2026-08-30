@@ -70,6 +70,8 @@ import asyncio
 import logging
 import re
 import time
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, TypeVar
@@ -102,8 +104,11 @@ from spoin.generation.base import (
     TopicNameVerdict,
 )
 from spoin.generation.quota import (
+    CURRENT_KEY_CLAIM,
     AllCellsThrottledError,
     DailyQuotaExhaustedError,
+    KeyClaim,
+    KeyClaimRegistry,
     QuotaExhaustedError,
     QuotaGovernor,
     parse_ladder,
@@ -428,12 +433,18 @@ def _format_ascii_candidates(candidates: list[AsciiLibraryEntry]) -> str:
         for n, c in enumerate(candidates, start=1)
     ]
     return (
-        "\n  Curated reference pieces for this card's ASCII art (from the hand-verified library, all ≤40 columns):\n"
-        "  - EQUAL SIGNIFICANCE: All 10 candidates below are presented without preference or ranking order — choose whichever ONE artwork you think best suits this card.\n"
-        "  - MANDATORY BASE: You MUST choose and use ONE of these 10 candidate artworks ONLY as the visual base for your ascii_art (do not invent an ASCII drawing from scratch).\n"
-        "  - ADAPTATION ALLOWED: You are allowed to trim or delete unneeded lines/elements, and add text captions, labels, speech callouts, or simple symbols/emojis around or within the drawing to dramatize the card's concept.\n"
-        "  - HARD WIDTH CONSTRAINT: Every line of the final ascii_art must strictly be <= 40 monospace characters.\n"
-        + "\n".join(blocks)
+        "\n  Curated reference pieces for this card's ASCII art"
+        " (from the hand-verified library, all ≤40 columns):\n"
+        "  - EQUAL SIGNIFICANCE: All 10 candidates below are presented without preference"
+        " or ranking order — choose whichever ONE artwork you think best suits this card.\n"
+        "  - MANDATORY BASE: You MUST choose and use ONE of these 10 candidate artworks"
+        " ONLY as the visual base for your ascii_art (do not invent an ASCII drawing from"
+        " scratch).\n"
+        "  - ADAPTATION ALLOWED: You are allowed to trim or delete unneeded lines/elements,"
+        " and add text captions, labels, speech callouts, or simple symbols/emojis around or"
+        " within the drawing to dramatize the card's concept.\n"
+        "  - HARD WIDTH CONSTRAINT: Every line of the final ascii_art must strictly be"
+        " <= 40 monospace characters.\n" + "\n".join(blocks)
     )
 
 
@@ -795,17 +806,56 @@ class GeminiContentGenerator(ContentGenerator):
         self._keys = keys
         self._request_timeout_s = settings.gemini_request_timeout_seconds
         self._ascii_redraw_attempts = settings.ascii_redraw_attempts
+        #: ONE registry across BOTH pools (ADR-0074): the pools are separate
+        #: ladders over the same physical keys, so a claim only one of them
+        #: could see would let another group's judging land on the key this
+        #: group is writing cards with.
+        self._claims = KeyClaimRegistry(len(keys))
         self._thinking = QuotaGovernor(
-            key_count=len(keys), ladder=parse_ladder(settings.gemini_thinking_ladder)
+            key_count=len(keys),
+            ladder=parse_ladder(settings.gemini_thinking_ladder),
+            reserve_rungs=settings.gemini_thinking_reserve_rungs,
+            claims=self._claims,
         )
+        #: No reserve on the generator pool. The reserve exists because a weak
+        #: model doing curriculum or judging degrades the corpus (ADR-0008), and
+        #: because thinking RPD is small (20/cell). Card and question writing is
+        #: 500/cell and independently gated afterwards -- there is nothing to
+        #: hold back and nothing that would notice.
         self._generator = QuotaGovernor(
-            key_count=len(keys), ladder=parse_ladder(settings.gemini_generator_ladder)
+            key_count=len(keys),
+            ladder=parse_ladder(settings.gemini_generator_ladder),
+            claims=self._claims,
         )
         self._clients: dict[tuple[int, str], ChatGoogleGenerativeAI] = {}
         #: (id(pool), model) -> the running recovery-probe task for that
         #: model, if any -- keeps a stalled model from spawning a second probe
         #: on every subsequent timeout while the first one is still running.
         self._active_probes: dict[tuple[int, str], asyncio.Task[None]] = {}
+
+    @asynccontextmanager
+    async def claimed_key_scope(self) -> AsyncIterator[None]:
+        """ADR-0074: everything called inside this block runs on ONE key.
+
+        The claim starts UNBOUND. Binding it here would need a key chosen
+        without consulting the ledger, and the ordering that matters --
+        least-spent first -- already lives in `acquire()`; the first call made
+        inside the scope binds it there instead, using the same query every
+        other key choice uses.
+
+        The claim is released even when the body raises, which is what keeps a
+        failed subtopic group from parking a key for the rest of the run. Both
+        pools share `self._claims`, so releasing frees the key for thinking and
+        generator work alike.
+        """
+
+        claim = KeyClaim()
+        token = CURRENT_KEY_CLAIM.set(claim)
+        try:
+            yield
+        finally:
+            CURRENT_KEY_CLAIM.reset(token)
+            await self._claims.release(claim)
 
     def _client(self, key_index: int, model: str) -> ChatGoogleGenerativeAI:
         cache_key = (key_index, model)
@@ -932,7 +982,9 @@ class GeminiContentGenerator(ContentGenerator):
             attempt = cells_burned + 1
             try:
                 key_index, model = await pool.acquire(
-                    now=datetime.now(UTC), exclude_models=frozenset(unavailable_models)
+                    now=datetime.now(UTC),
+                    exclude_models=frozenset(unavailable_models),
+                    claim=CURRENT_KEY_CLAIM.get(),
                 )
             except QuotaExhaustedError:
                 # Every remaining rung was excluded as overloaded, not actually

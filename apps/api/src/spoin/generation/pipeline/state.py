@@ -61,13 +61,94 @@ def _min_cards(target_cards: int, fraction: float) -> int:
     return max(1, round(target_cards * fraction))
 
 
-def _card_matches_type(draft: CardDraft, card_type: str) -> bool:
-    """Matches a generated draft to a predetermined card type."""
+#: Canonical name fragments that identify a topic as technical enough to carry
+#: `code` archetype cards. Matched case-insensitively against the topic's
+#: `canonical_name`. The curriculum prompt already tells the planner "code
+#: quota MUST BE 0" for non-CS topics, but the planner is trusted for taste,
+#: never for constraints (CLAUDE.md) — this is the enforcement layer.
+_TECHNICAL_DOMAIN_MARKERS: tuple[str, ...] = (
+    "computer science",
+    "programming",
+    "software",
+    "python",
+    "javascript",
+    "typescript",
+    "java ",  # trailing space avoids matching "Japanese"
+    "c++",
+    "rust",
+    "golang",
+    "ruby",
+    "sql",
+    "database",
+    "postgresql",
+    "mysql",
+    "mongodb",
+    "redis",
+    "docker",
+    "kubernetes",
+    "devops",
+    "linux",
+    "bash",
+    "shell",
+    "cli",
+    "api",
+    "web development",
+    "frontend",
+    "backend",
+    "machine learning",
+    "data science",
+    "data engineering",
+    "algorithms",
+    "data structures",
+    "operating system",
+    "networking",
+    "cybersecurity",
+    "cloud computing",
+    "system design",
+    "react",
+    "angular",
+    "vue",
+    "node.js",
+    "django",
+    "flask",
+    "fastapi",
+    "html",
+    "css",
+    "git",
+)
+
+
+def is_technical_topic(topic_name: str) -> bool:
+    """True when `topic_name` belongs to a domain where code archetype cards
+    (fenced code blocks with a language tag) are topically appropriate.
+
+    The check is deliberately broad and false-positive-tolerant: a technical
+    topic that slips through still has the curriculum prompt's own "code
+    quota MUST BE 0" instruction as a second layer, so the only real cost
+    of a false positive is one wasted instruction the planner already obeys.
+    A false NEGATIVE — a spiritual topic classified as technical — lets code
+    cards through for a topic they make no sense for, which is the bug this
+    guard exists to prevent."""
+
+    lowered = topic_name.lower()
+    return any(marker in lowered for marker in _TECHNICAL_DOMAIN_MARKERS)
+
+
+def _card_matches_type(draft: CardDraft, card_type: str, *, topic_name: str | None = None) -> bool:
+    """Matches a generated draft to a predetermined card type.
+
+    When `topic_name` is provided and the topic is non-technical,
+    a `code` card type never matches — the planner should not have
+    assigned it, but the planner is trusted for taste, not constraints
+    (CLAUDE.md), so this is the enforcement layer."""
+
+    if card_type == CardType.CODE.value:
+        if topic_name is not None and not is_technical_topic(topic_name):
+            return False
+        return "code" in classify_archetype(draft.body)
     if card_type == CardType.ASCII.value:
         return draft.visual_id is not None or bool(draft.visual_slots)
     tags = classify_archetype(draft.body)
-    if card_type == CardType.CODE.value:
-        return "code" in tags
     if card_type == CardType.DIAGRAM.value:
         return "diagram" in tags
     if card_type == CardType.COMPARISON.value:
@@ -145,6 +226,10 @@ class SubtopicPlan(TypedDict):
     #: together with `existing_count == 0`, to decide whether to issue the
     #: one-time hero call before its normal rounds.
     has_hero: bool
+    #: Dynamic question budget for THIS subtopic-tier, calibrated in
+    #: `_load_subtopic_plans` so the topic's total question count stays
+    #: within the 200-300 band regardless of how many subtopics it has.
+    target_questions: int
 
 
 class SubtopicGroupPlan(TypedDict):
@@ -190,6 +275,8 @@ class SubtopicCardsResult(TypedDict):
     #: Passed straight through from `SubtopicPlan`, same reasoning as
     #: `cards_missing_questions` above.
     existing_question_stems: list[str]
+    #: Passed straight through from `SubtopicPlan`.
+    target_questions: int
 
 
 class PipelineState(TypedDict, total=False):
@@ -208,13 +295,23 @@ class PipelineState(TypedDict, total=False):
     topic_plans: Annotated[list[TopicPlanResult], operator.add]
     #: Only set on a per-branch Send invocation (inner fan-out).
     subtopic_group_job: SubtopicGroupPlan
-    #: One dict per subtopic-tier gated THIS run (topic_id, subtopic_id,
-    #: difficulty, accepted/rejected/failed, questions_accepted/rejected) --
-    #: written by `generate_subtopic_cards` itself now (it gates+persists its
-    #: own group immediately, ADR-0026), not by a separate global writer node.
-    #: `gate_and_persist` only reads this to build the final per-topic report
-    #: and mark topics done; every card/question this run wrote is already
-    #: committed by the time it runs.
+    #: One dict per subtopic-tier gating ROUND this run (topic_id, subtopic_id,
+    #: difficulty, accepted/rejected/failed, new_card_ids) -- written by
+    #: `generate_subtopic_cards` itself (it gates+persists its own group
+    #: immediately, ADR-0026), not by a separate global writer node.
+    #:
+    #: Per ROUND, not per tier: `_redraft_until_bar` appends a fresh entry for
+    #: every redraft round, so one tier can appear here many times over. Anything
+    #: that must happen once per TIER has to merge by
+    #: (topic_id, subtopic_id, difficulty) first -- see
+    #: `_run_topic_question_phase`, which does exactly that and whose regression
+    #: test exists because doing it per entry silently generated a tier's
+    #: questions once per round.
+    #:
+    #: Question counts are NOT here: questions are written by the topic-wide
+    #: phase at the fan-in (ADR-0074), which reports its own totals. `new_card_ids`
+    #: is what that phase uses to tell a card drafted THIS run from one it is
+    #: merely backfilling.
     item_reports: Annotated[list[dict[str, object]], operator.add]
     report: dict[str, object]
 
@@ -282,6 +379,8 @@ class _GateItem:
     #: `SubtopicPlan.existing_question_stems`) -- shown to `generate_questions`
     #: so it doesn't repeat a question angle already asked.
     existing_question_stems: list[str] = field(default_factory=list)
+    #: Dynamic question budget for this tier (see `SubtopicPlan.target_questions`).
+    target_questions: int = 0
     #: Filled in by later phases.
     corrected: list[CardDraft] = field(default_factory=list)
     correction_failure_count: int = 0
@@ -322,7 +421,6 @@ class _GateItem:
 #: structurally-invalid mermaid) are now enforced deterministically server-side.
 #: v4 content should not be pooled with v3 when judging quality.
 CARD_PROMPT_VERSION = 4
-
 
 
 def _clean_null_bytes(val: Any) -> Any:

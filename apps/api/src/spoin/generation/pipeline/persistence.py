@@ -206,17 +206,9 @@ async def _load_subtopic_plans(
                 .limit(max_verification_feedback_bodies)
             )
         ).all()
-        missing_question_cards = (
-            await session.execute(
-                select(Card.id, Card.title, Card.body)
-                .outerjoin(Question, Question.card_id == Card.id)
-                .where(
-                    Card.subtopic_id == subtopic.id,
-                    Card.status == CardStatus.ACTIVE,
-                    Question.id.is_(None),
-                )
-            )
-        ).all()
+        missing_question_cards = await load_cards_missing_questions(
+            session, subtopic_id=subtopic.id
+        )
         existing_question_stems = await _current_question_stems(
             session,
             subtopic_id=subtopic.id,
@@ -258,9 +250,55 @@ async def _load_subtopic_plans(
                 ],
                 existing_question_stems=list(existing_question_stems),
                 has_hero=has_hero,
+                # Placeholder -- overwritten by the budget pass below.
+                target_questions=0,
             )
         )
+
+    # Dynamic question budget: spread 200-300 questions across all subtopic-
+    # tiers proportional to each tier's `target_cards`. This caps the total
+    # regardless of how many subtopics the curriculum produced, without
+    # starving any single tier (floor of 1 per tier).
+    topic_question_min = 200
+    topic_question_max = 300
+    total_target_cards = sum(p["target_cards"] for p in plans)
+    if total_target_cards > 0 and plans:
+        # Choose a budget: clamp the sum of target_cards to the 200-300 band.
+        topic_question_budget = max(topic_question_min, min(topic_question_max, total_target_cards))
+        for plan in plans:
+            plan["target_questions"] = max(
+                1,
+                round(topic_question_budget * plan["target_cards"] / total_target_cards),
+            )
     return plans
+
+
+async def load_cards_missing_questions(
+    session: AsyncSession, *, subtopic_id: uuid.UUID
+) -> list[tuple[uuid.UUID, str, str]]:
+    """Active cards under one subtopic-tier that have no `Question` row yet.
+
+    Called twice for different reasons, which is why it is shared rather than
+    inlined: once by `_load_subtopic_plans` at the start of a run (a prior run
+    persisted cards and was interrupted before writing their questions), and
+    once by the topic-wide question phase (ADR-0074), where after the card phase
+    this is simply "everything that needs a question" -- cards written moments
+    ago and older stragglers alike, told apart by the caller from the ids the
+    card phase reported.
+    """
+
+    rows = (
+        await session.execute(
+            select(Card.id, Card.title, Card.body)
+            .outerjoin(Question, Question.card_id == Card.id)
+            .where(
+                Card.subtopic_id == subtopic_id,
+                Card.status == CardStatus.ACTIVE,
+                Question.id.is_(None),
+            )
+        )
+    ).all()
+    return [(card_id, title, body) for card_id, title, body in rows]
 
 
 async def _current_question_stems(
@@ -369,7 +407,7 @@ async def _seed_progress(
                 "difficulty": sp["difficulty"],
                 "cards_target": sp["target_cards"],
                 "cards_done": sp["existing_count"],
-                "questions_target": None,
+                "questions_target": sp["target_questions"],
                 "questions_done": sp["existing_count"] - len(sp["cards_missing_questions"]),
             }
             for sp in subtopic_plans

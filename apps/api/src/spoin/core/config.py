@@ -84,6 +84,21 @@ class Settings(BaseSettings):
         "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,"
         "gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5"
     )
+    #: How many rungs at the END of `gemini_thinking_ladder` are held back as a
+    #: RESERVE (ADR-0074). A reserve rung is never used to work around keys being
+    #: BUSY -- a subtopic group that finds every key claimed waits for one to free
+    #: instead. It is reached only when no key anywhere has daily room on any
+    #: ordinary rung, i.e. when the day's real thinking budget is gone.
+    #:
+    #: The two waits are nothing alike and must not collapse into one: waiting out
+    #: a claim or an rpm window resolves in seconds, waiting out RPD resolves at
+    #: midnight UTC. Spending the weakest model on ordinary contention wastes the
+    #: reserve; refusing to spend it on genuine exhaustion stalls a run for hours.
+    #:
+    #: These calls are the ones with a real consequence if the model is weak
+    #: (curriculum, judging, grading -- ADR-0008), which is why the weakest rung is
+    #: a last resort rather than an ordinary fallback. 0 disables the reserve.
+    gemini_thinking_reserve_rungs: int = 1
     #: Same shape, for `generate_cards` AND `generate_questions` (ADR-0029) —
     #: both are high-VOLUME, taste-shaped calls (one per card/question), so
     #: they share the cheap high-volume "lite" ladder instead of competing
@@ -99,13 +114,6 @@ class Settings(BaseSettings):
     gemini_request_timeout_seconds: float = 180.0
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
-
-    #: Caps requests in flight at once across an ENTIRE generation run, regardless
-    #: of how many subtopics (or topics) fan out concurrently — without this, a
-    #: topic with 20 subtopics dispatches 20 simultaneous calls, blowing through
-    #: every ladder rung's RPM and turning key/model exhaustion into a burst of
-    #: simultaneous failures instead of a predictable, one-at-a-time rotation.
-    max_concurrent_generation_calls: int = 5
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.

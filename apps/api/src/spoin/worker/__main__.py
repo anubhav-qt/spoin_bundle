@@ -17,7 +17,9 @@ in the order they were requested — the whole batch a user adds from the app
 generates one after another, not all at once. One job's exception marks only
 that job `failed`/`pending` and the loop moves to the next; failure isolation is
 per-job either way. The pipeline's own LangGraph concurrency (ADR-0024) still
-fans out WITHIN a single topic's run, bounded by `max_concurrent_generation_calls`.
+fans out WITHIN a single topic's run, bounded since ADR-0074 by how many API
+keys there are: a subtopic group claims one key for its whole card run, so at
+most one group per key is ever in flight.
 """
 
 from __future__ import annotations

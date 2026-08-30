@@ -316,46 +316,6 @@ export interface TopicBatchResult {
   results: TopicBatchItemResult[];
 }
 
-/** One `(key, model)` cell's daily state (B4, ADR-0003 §6 / ADR-0058). A
- *  configured cell with no ledger row today still appears, `requests_spent: 0`. */
-export interface QuotaCell {
-  backend: string;
-  key_index: number;
-  model: string;
-  /** "thinking" | "generator" | "other" (a ledger row for a model no longer
-   *  in a configured ladder). */
-  pool: string;
-  requests_spent: number;
-  /** The ladder rung's RPD; null if the model isn't in a current ladder. */
-  daily_ceiling: number | null;
-  /** Set once `requests_spent` hit the ceiling; never reset. */
-  exhausted_at: string | null;
-  /** A per-minute 429 parked this cell until this time — transient, daily
-   *  budget still has room. Distinct from `exhausted_at`. */
-  cooldown_until: string | null;
-}
-
-export interface ParkedModel {
-  model: string;
-  excluded_at: string;
-  expires_at: string;
-  reason: string;
-}
-
-/** `GET /admin/quota`. ADR-0065's three terminal conditions stay SEPARATE
- *  counts (`cells_daily_exhausted` / `cells_minute_throttled` / `models_parked`)
- *  — never fold them into one "exhausted". */
-export interface QuotaStatus {
-  day: string;
-  generated_at: string;
-  cells: QuotaCell[];
-  parked_models: ParkedModel[];
-  cells_total: number;
-  cells_daily_exhausted: number;
-  cells_minute_throttled: number;
-  models_parked: number;
-}
-
 export interface TopicStats {
   topic_id: string;
   current_difficulty: Difficulty;
@@ -803,11 +763,6 @@ export const api = {
     }
     return URL.createObjectURL(await response.blob());
   },
-
-  // -- Admin (B4) --
-  /** Today's quota-governor state. `env`-gated on the API (404 in production
-   *  until task 0035's admin-role gate lands). */
-  adminQuota: () => request<QuotaStatus>("/admin/quota"),
 };
 
 export interface UserProfileUpdateIn {

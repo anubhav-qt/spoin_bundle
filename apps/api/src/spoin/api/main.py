@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from spoin.api.middleware import RequestContextMiddleware
-from spoin.api.routers import admin, auth, dev, engagement, feed, notes, profile, quiz, topics
+from spoin.api.routers import auth, dev, engagement, feed, notes, profile, quiz, topics
 from spoin.api.routers.feed import cards_router
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine
@@ -70,15 +70,14 @@ def create_app() -> FastAPI:
     app.include_router(notes.router)
     app.include_router(profile.router)
 
-    # `/dev/*` mutates a user's whole state on one call; `/admin/*` exposes
-    # quota spend, the key count and the model ladder. Neither has a role check
-    # (there is no admin role yet), so both are gated to non-production on the
+    # `/dev/*` mutates a user's whole state on one call and has no role check
+    # (there is no admin role yet), so it is gated to non-production on the
     # `env` switch that already gates the JWT-secret validator below -- rather
-    # than inventing a second flag. Promoting `/admin/*` to a real surface is
-    # docs/tasks/0035, not a config flip.
+    # than inventing a second flag. (The B4 `/admin/quota` read surface that
+    # used to mount here was archived to docs/archive/b4-quota-panel/ -- the
+    # quota tables are inspected directly with SQL instead.)
     if settings.env != "production":
         app.include_router(dev.router)
-        app.include_router(admin.router)
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, Any]:

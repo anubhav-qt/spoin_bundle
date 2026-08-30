@@ -1,14 +1,23 @@
 # Task 0035: A real admin-role gate for `/admin/*` (and `/dev/*`)
 
 **Owner:** unassigned
-**Blocked on:** nothing (but low priority until there's a reason to run `/admin/*` in production)
+**Blocked on:** nothing (but low priority until there's a reason to run an
+admin surface in production; B14's repair queue makes that more likely than
+B4's quota view did)
 
 ## The problem
 
-`GET /admin/quota` (B4, `feat/v1-finish-line`) and `/dev/reset` are both mounted
-only when `settings.env != "production"` (`api/main.py`). That gate is a
-placeholder: it works because nobody needs these in production *yet*, not
-because non-production access is the right boundary.
+> **Update (session 6):** B4's `GET /admin/quota` read surface was archived to
+> `docs/archive/b4-quota-panel/` — the quota tables are inspected with SQL
+> instead, so that endpoint is no longer a driver here. `/dev/reset` still is,
+> and **B14's card-repair admin surface** (`feat/v1-finish-line`) is the new
+> one: it has destructive actions (delete a card, enqueue a regeneration) and
+> is gated the same placeholder way.
+
+`/dev/reset` and B14's repair-admin endpoints are mounted only when
+`settings.env != "production"` (`api/main.py`). That gate is a placeholder: it
+works because nobody needs these in production *yet*, not because
+non-production access is the right boundary.
 
 There is no admin/role concept in the system. `deps.py` resolves a JWT to a
 `UUID`; every authenticated user is equal. So the moment `/admin/quota` needs to

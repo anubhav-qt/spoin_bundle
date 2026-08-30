@@ -1,7 +1,19 @@
-# Task 0034: Unify SavedView / NotesView / LikedView behind one shared shell (F6 rework)
+# Task 0034: Extract one shared `CollectionView` from SavedView / NotesView / LikedView
 
 **Owner:** unassigned
-**Blocked on:** a `/design` pass and a superseding ADR (see below)
+**Blocked on:** nothing
+
+## Status (2026-08-30, `feat/v1-finish-line`)
+
+**The visual unification is done.** [ADR-0072](../adr/0072-revisit-drops-its-bespoke-grid.md)
++ the `SavedView.tsx` rewrite dropped "Revisit"'s bespoke tile grid / overlay; it
+now renders the same vertical `Card` list as Liked and Notes (shared
+`.collection-*` chrome, new `.collection-list` class, same undo wiring). The
+three views are near-identical React now.
+
+**What's left is the code-dedup:** collapse the three near-mirror components into
+one `CollectionView` parameterised by `{scope, eyebrow, title, emptyState,
+engagementKind, store, initialProp, unProp}`. And the dead-CSS sweep below.
 
 ## The problem
 
@@ -17,26 +29,21 @@ The **"Saved" → "Revisit" rename half of F6 shipped** on `feat/v1-finish-line`
 (commit `1b2cbf7`) — nav label + view eyebrow, copy only. This task is the rework half
 only.
 
-## Why it isn't just "do it"
+## Why it's now unblocked
 
-[ADR-0046](../adr/0046-one-collection-surface.md) already considered extracting shared
-React components (`<CollectionHeader>`, `<CollectionControls>`) and **rejected it "for
-now"**: the three pages genuinely differ in *what* they put in the masthead and
-controls and only agree on *how it looks*, so it shared the `.collection-*` **CSS
-layer** instead. Its "Revisit when" names the trigger: *"The masthead/controls props
-stop differing per page — that is the signal to promote the CSS layer into shared
-components."*
+[ADR-0046](../adr/0046-one-collection-surface.md) rejected extracting shared React
+components "for now" because the three pages differed in *what* they put in the
+masthead/controls. [ADR-0072](../adr/0072-revisit-drops-its-bespoke-grid.md) removed
+the last structural difference (Saved's grid), so the trigger ADR-0046 named —
+*"the masthead/controls props stop differing per page"* — is met. No further
+`/design` pass or ADR is needed; this is now a straight refactor.
 
-So this task must:
+## Also: the dead-CSS sweep
 
-1. Establish that the convergence trigger is actually met (or accept that it isn't and
-   do a lighter drift-cleanup instead — dedupe helpers, align the undo wiring, fix the
-   remaining `"SAVED CARDS"` / `"Search saved cards…"` microcopy — without a shared
-   component).
-2. Go through `/design` for the unified view and get owner confirmation (Phase 2.5 of
-   the v1 plan lists "the unified collection view (F6)" explicitly).
-3. Get a **superseding/amending ADR** (next free number) that points back to ADR-0046
-   and that ADR-0046 points forward to.
+`ADR-0072` left `.saved-tile*` / `.saved-overlay*` / `.saved-grid` /
+`.saved-skeleton*` in `globals.css` — nothing renders those class names any more.
+Remove them here (and fold `.liked-view-list` / `.notes-view-list` into
+`.collection-list`).
 
 ## Constraints carried from F6's plan entry
 

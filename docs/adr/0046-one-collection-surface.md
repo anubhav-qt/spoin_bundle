@@ -116,7 +116,11 @@ pages were compared at once.
 ## Revisit when
 
 - The masthead/controls props stop differing per page — that is the signal to promote the
-  CSS layer into shared components.
+  CSS layer into shared components. **Update 2026-08-30 ([ADR-0072](0072-revisit-drops-its-bespoke-grid.md)):**
+  "Saved" (now "Revisit") dropped its bespoke tile grid + overlay and renders the same
+  vertical `Card` list as Liked and Notes, so the three now differ only in copy and
+  engagement kind. The component extraction this bullet anticipates is
+  [task 0034](../tasks/0034-collectionview-rework-saved-notes-liked.md).
 - A fifth page needs a collection surface *and* wants to differ structurally. Two pages
   wanting out is a sign the layer has over-generalised.
 - CSS modules or Tailwind arrive for another reason. Then this layer is the first thing

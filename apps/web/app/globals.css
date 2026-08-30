@@ -8884,4 +8884,26 @@ body[data-reduced-motion="1"] *::after {
   text-align: right;
 }
 
+/* ============================================================================
+   Shared collection list — the vertical reading list behind Liked / Notes /
+   Revisit (F6, ADR-0072). `.liked-view-list` / `.notes-view-list` are the
+   older byte-identical copies; task 0034 folds them into this. */
+
+.collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.collection-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  animation: collection-pulse 1.6s ease-in-out infinite;
+}
+
 

@@ -303,12 +303,6 @@ class Settings(BaseSettings):
     #: is a client-side courtesy only — this value is the authority.
     custom_topic_max_words: int = 5
 
-    #: Most topics one `POST /topics/batch` submission may carry (task 0032).
-    #: Bounds a single submission's fan-out; the per-user running total is a
-    #: separate axis (task 0024). The web form's `+` row cap mirrors this as a
-    #: courtesy — this value is the authority, enforced server-side.
-    custom_topic_batch_max: int = 5
-
     # -- quiz (ADR-0009, entry tier amended by ADR-0027) -------------------------
     quiz_mcq_count: int = 9
     quiz_free_text_count: int = 1

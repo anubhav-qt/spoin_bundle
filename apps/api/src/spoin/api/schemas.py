@@ -67,8 +67,8 @@ class TopicBatchIn(BaseModel):
     `POST /topics` calls would spend N times the quota (ADR-0005: the free tier
     meters requests, not tokens)."""
 
-    #: 1..`custom_topic_batch_max` entries. A batch of one is valid -- this is
-    #: the form the CLI entrypoint already uses (`generate_topics.py`).
+    #: One or more entries. No upper bound -- a deliberate per-submission or
+    #: per-user limit is task 0024's separate concern, not baked in here.
     items: list[TopicRequestIn] = Field(min_length=1)
 
 

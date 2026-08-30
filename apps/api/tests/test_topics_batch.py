@@ -111,13 +111,14 @@ async def test_batch_word_count_rejected_in_code(session: AsyncSession) -> None:
     assert "words or fewer" in (out.results[0].detail or "")
 
 
-async def test_batch_over_the_cap_is_422(session: AsyncSession) -> None:
+async def test_batch_has_no_upper_bound(session: AsyncSession) -> None:
     user_id = await _make_user(session)
 
-    payload = TopicBatchIn(items=[TopicRequestIn(name=f"Topic {i}") for i in range(6)])
-    with pytest.raises(HTTPException) as exc_info:
-        await request_topics_batch(payload, session, user_id)
-    assert exc_info.value.status_code == 422
+    payload = TopicBatchIn(items=[TopicRequestIn(name=f"Distinct Topic {i}") for i in range(8)])
+    out = await request_topics_batch(payload, session, user_id)
+
+    assert len(out.results) == 8
+    assert all(r.status == "generating" for r in out.results)
 
 
 async def test_batch_rejected_for_a_guest(session: AsyncSession) -> None:

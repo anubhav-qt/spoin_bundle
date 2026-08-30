@@ -926,11 +926,6 @@ class TopicsService:
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN, detail="Sign up to request a custom topic"
             )
-        if len(items) > settings.custom_topic_batch_max:
-            raise HTTPException(
-                status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=f"Add at most {settings.custom_topic_batch_max} topics at once",
-            )
 
         outcomes: dict[int, BatchTopicOutcome] = {}
 

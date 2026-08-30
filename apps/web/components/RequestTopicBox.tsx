@@ -4,12 +4,13 @@
  * Request one or more topics by name, rather than picking from Discover.
  *
  * B2/B8 (task 0032): the box is a list of rows — a name plus an optional 1–2
- * sentence description each, `+` up to `MAX_ROWS` — and one submit that sends
- * the whole list as ONE batched call (`POST /topics/batch`). N sequential
- * `POST /topics` calls would spend N times the quota (ADR-0005: the free tier
- * meters requests). ADR-0025's matcher decides per row whether a name
+ * sentence description each, `+` to add more with no fixed cap — and one submit
+ * that sends the whole list as ONE batched call (`POST /topics/batch`). N
+ * sequential `POST /topics` calls would spend N times the quota (ADR-0005: the
+ * free tier meters requests). ADR-0025's matcher decides per row whether a name
  * canonicalises onto an existing topic or mints a new one; the caller never
- * chooses which.
+ * chooses which. The topics that result then generate one at a time, in the
+ * order added (ADR-0073).
  *
  * A batch can partly fail — a rejected name, an already-followed topic and a
  * freshly-minted one all from the same call — so after submit each row shows
@@ -36,10 +37,6 @@ interface Props {
    *  RightRail's docstring on the same prop. */
   onTopicRemoved: (topicId: string) => void;
 }
-
-/** Client courtesy mirror of `Settings.custom_topic_batch_max` — the server is
- *  the authority and 422s a longer list. */
-const MAX_ROWS = 5;
 
 interface Row {
   name: string;
@@ -84,7 +81,7 @@ export function RequestTopicBox({ onFollowed, onTopicRemoved }: Props) {
     setRows((cur) => cur.map((r, i) => (i === index ? { ...r, ...patch } : r)));
   };
   const addRow = () => {
-    setRows((cur) => (cur.length >= MAX_ROWS ? cur : [...cur, { name: "", description: "" }]));
+    setRows((cur) => [...cur, { name: "", description: "" }]);
   };
   const removeRow = (index: number) => {
     setRows((cur) => (cur.length <= 1 ? cur : cur.filter((_, i) => i !== index)));
@@ -142,9 +139,7 @@ export function RequestTopicBox({ onFollowed, onTopicRemoved }: Props) {
       <div className="discover-head">
         <h3 className="discover-title mono">Request topics</h3>
         {!results && rows.length > 1 ? (
-          <span className="request-topic-count mono">
-            {rows.length} / {MAX_ROWS}
-          </span>
+          <span className="request-topic-count mono">{rows.length}</span>
         ) : null}
       </div>
 
@@ -234,19 +229,17 @@ export function RequestTopicBox({ onFollowed, onTopicRemoved }: Props) {
             </div>
           ))}
 
-          {rows.length < MAX_ROWS ? (
-            <button
-              type="button"
-              className="request-topic-add"
-              disabled={submitting}
-              onClick={addRow}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Add another
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className="request-topic-add"
+            disabled={submitting}
+            onClick={addRow}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Add another
+          </button>
 
           <button
             type="submit"

@@ -14,12 +14,21 @@ clear + one commit. `api.requestTopics(entries)` is in `lib/api.ts`. 7 tests in
 `tests/test_topics_batch.py`; `make test` green.
 
 **Frontend shipped** — commit `3c699fb`, design-reviewed on a canvas first.
-`RequestTopicBox.tsx` is now a list of `{name, description?}` rows (`+` up to 5,
-per-row remove, one batched submit), with per-row outcome reporting after
+`RequestTopicBox.tsx` is now a list of `{name, description?}` rows (`+` to add
+more, per-row remove, one batched submit), with per-row outcome reporting after
 submit (generating / subscribed / already-following / rejected+reason). The
 rewrite preserves the F9 `onFollowed(topic, hasCards?)` contract, so it
 supersedes the file's uncommitted Wave-1 diff rather than colliding with it.
 CSS is `.request-topic-*` in `globals.css`. Verified live.
+
+**No per-submission cap.** The "5 is a defensible starting point" line above was
+implemented as a `custom_topic_batch_max` setting + a 422; the owner had it
+removed (there's no technical reason for a hard limit, and a deliberate
+per-user/per-submission limit is task 0024's separate concern). `+ Add another`
+is always available; the server accepts any non-empty list.
+
+**Generation order:** the topics from a batch generate **one at a time, in the
+order added** — the worker runs jobs sequentially now ([ADR-0073](../adr/0073-worker-runs-generation-jobs-sequentially.md)).
 
 **This task is DONE.** Nothing left.
 

@@ -46,8 +46,9 @@ match_and_create_topics()    ADR-0025. Cheap, no card generation. Embeds every i
 
 run_generation_pipeline()    ADR-0026. Takes topic_ids that ALREADY exist. One-shot:
                               curriculum (if not already generated) -> cards, per
-                              subtopic per difficulty tier -> questions, generated from
-                              the cards just written. Idempotent per topic -- calling it
+                              subtopic per difficulty tier -> then, once every
+                              subtopic's cards are done, questions for the whole
+                              topic (ADR-0074). Idempotent per topic -- calling it
                               again for an already-finished topic has nothing left to do.
 ```
 
@@ -98,18 +99,21 @@ generate_subtopic_cards
     actual card BODIES as `builds_on` context, so it can genuinely build on
     them rather than just avoid repeating titles. Groups with one tier (the
     common case) are unaffected -- nothing to sequence.
-  - gates+persists its OWN group's cards and questions itself, right here,
-    before returning (ADR-0041) -- runs the two-pass quality gate (ADR-0030):
+  - claims ONE key for this whole branch (ADR-0074) and holds it until the
+    branch returns -- planning, every draft round, both gate passes, every
+    redraft. At most one group per key is in flight, which is the entire
+    concurrency bound.
+  - gates+persists its OWN group's cards itself, right here, before returning
+    (ADR-0041) -- runs the two-pass quality gate (ADR-0030):
     a structural check (generation/gate.py), pass 1 correction and pass 2
     verification (both thinking-pool LLM calls, concurrent across this
     group's subtopic-tiers), and near-duplicate detection (local embeddings,
     sequential, between the two passes) -- every draft becomes exactly one of
     an active `Card` or a `rejected_card` row. Accepted cards get embedded,
-    archetype-derived, and bootstrap `CardStats`. THEN generates questions
-    FROM the cards just persisted, per subtopic/difficulty, and persists
-    those too (Question rows) -- all before this branch returns, so a card
-    goes live in the feed as soon as ITS OWN group is done, not held back for
-    every other group/topic in the run.
+    archetype-derived, and bootstrap `CardStats`. A card goes live in the feed
+    as soon as ITS OWN group is done, not held back for every other
+    group/topic in the run. Questions are NOT written here since ADR-0074 --
+    see `gate_and_persist` below.
   - the first draft-and-gate round above is NOT the end of a tier's work: the
     gate rejects some fraction of every batch, so drafting a tier to its full
     `target_cards` exactly once and gating once routinely lands under target
@@ -125,7 +129,8 @@ generate_subtopic_cards
     are hardest to place, and the redraft's plan_cards() call is the only one
     that sees the tier's fresh rejection context before choosing what to
     attempt next.
-  - everything persisted here -- cards, questions, AND rejected drafts --
+  - everything persisted here -- cards and rejected drafts, and questions in
+    the phase below --
     carries `gen_meta.prompt_version` (ADR-0059), recording which generation
     of the prompts produced it. This is NOT `Card.version`, which is
     family-scoped regeneration lineage and unrelated. Content written before
@@ -135,17 +140,31 @@ generate_subtopic_cards
   | fan-in (every branch's item_reports merge, across every topic in the run)
   v
 gate_and_persist
-  - everything is ALREADY persisted by this point. Final, lightweight step:
-    aggregates every group's item_reports into the run's per-topic report,
+  - every CARD is already persisted by this point. This node owns the topic's
+    QUESTION phase (ADR-0074): now that every group has cleared its card bar,
+    one concurrent unit per subtopic-tier -- each claiming a key exactly like a
+    card branch does -- writes that tier's questions from its FINISHED card
+    set. Questions used to run per group, alongside that group's cards; they
+    run here so a tier's question budget is spent against what the subtopic
+    actually ended up containing, rather than against whichever cards survived
+    its first gate round only for a redraft round to add more afterwards.
+  - then aggregates every group's item_reports into the run's per-topic report
     and marks each topic's GenerationJob done. Fan-in is correct HERE (unlike
-    for the actual writes) since the final report and "done" flag genuinely
-    do need every group finished.
+    for the card writes) since the questions, the final report and the "done"
+    flag genuinely do need every group finished.
 ```
 
-Every real generator call (curriculum, topic matching, card generation, question
-generation) goes through a shared `asyncio.Semaphore` (`SPOIN_MAX_CONCURRENT_GENERATION_CALLS`)
--- without it, a run with several topics times many subtopics each would fire dozens of
-simultaneous calls, well past any ladder rung's per-minute limit (ADR-0028).
+**Concurrency is bounded by the KEY POOL, not by a semaphore**
+([ADR-0074](../adr/0074-key-per-subtopic-scheduling.md)). There used to be a shared
+`asyncio.Semaphore` here; [ADR-0047](../adr/0047-removal-of-legacy-concurrency-semaphore.md)
+deleted it after measuring a 33-key pool being throttled to five calls at a time, and
+ADR-0074 replaced the *idea* of a global cap with key ownership: a subtopic group claims
+one key when its branch starts and holds it for the whole of its card work -- `plan_cards`,
+every draft round, both gate passes, every redraft -- releasing it when the group clears
+its bar. At most K groups run at once for K keys, and group K+1 waits for a claim rather
+than starting on a shared key. One caller per key is what makes an rpm violation
+structurally impossible rather than merely counted; `tests/test_architecture.py` fails if
+a semaphore ever comes back.
 
 ## Worker: per-job isolation, not graph-level fan-out
 
@@ -208,8 +227,14 @@ which one is behind the interface.
 
 **Redesigned in [ADR-0028](../adr/0028-key-model-quota-ladder.md), pool assignment amended
 in [ADR-0029](../adr/0029-questions-join-generator-pool.md)** -- read those for the full
-reasoning; this is the short version. `generation/quota.py`'s `QuotaGovernor` tracks a grid
-of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits are per *project*
+reasoning; this is the short version. **Since [ADR-0074](../adr/0074-key-per-subtopic-scheduling.md) the governor is also
+the key ALLOCATOR**: a subtopic group claims a key (`claimed_key_scope()`, one
+`KeyClaimRegistry` shared by both pools) and `acquire()` then walks that key's own rungs
+first -- 3.7, then 3.6, then, only once no unclaimed key has room, 3.5. The weakest rung
+(`gemini_thinking_reserve_rungs`) is held back as a reserve: it is reached when no key
+anywhere has daily room on an ordinary rung, never merely because every key is busy --
+contention waits, exhaustion descends. `generation/quota.py`'s `QuotaGovernor` tracks a
+grid of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits are per *project*
 (so each `SPOIN_GEMINI_API_KEYS` entry only helps if it's a genuinely separate project) and
 per *model* independently (so exhausting one model's daily quota doesn't touch another's).
 `GeminiContentGenerator` holds TWO governors -- a "thinking" pool (curriculum, topic

@@ -110,3 +110,4 @@ useful than the decision itself.
 | [0071](0071-drop-font-keep-revert.md) | Font picker drops Keep/Revert -- selecting a font saves it, like the theme picker | Accepted (amends 0037) |
 | [0072](0072-revisit-drops-its-bespoke-grid.md) | "Revisit" (formerly Saved) drops its tile grid + overlay and renders the same vertical Card list as Liked and Notes | Accepted (amends 0046) |
 | [0073](0073-worker-runs-generation-jobs-sequentially.md) | The worker runs claimed generation jobs one at a time, in request order, instead of `asyncio.gather` | Accepted (amends 0026's implied concurrency) |
+| [0074](0074-key-per-subtopic-scheduling.md) | One key per subtopic group for its whole card run (parallelism = key count, own-key-first ladder, weakest rung held as a reserve); questions move to a topic-wide phase | Accepted (amends 0028, 0065; reframes 0040, 0047) |

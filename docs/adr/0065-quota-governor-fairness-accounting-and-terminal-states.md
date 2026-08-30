@@ -3,6 +3,10 @@
 - **Status:** Accepted
 - **Date:** 2026-08-28
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- least-spent-first
+  now orders KEY CLAIMS (one per subtopic group, held across that group's whole card
+  run) rather than individual calls. The refund, learned-rpm and terminal-state
+  machinery in this ADR is unchanged and still load-bearing.
 - **Amends:** [ADR-0028](0028-key-model-quota-ladder.md) (key ordering within a rung),
   [ADR-0058](0058-per-minute-vs-per-day-429.md) (reverses its deliberate throttle
   over-count; extends its shared-state posture to model availability),

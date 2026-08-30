@@ -3,6 +3,9 @@
 - **Status:** Accepted
 - **Date:** 2026-08-20
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- per-group
+  gate+persist for CARDS is unchanged and still the point of this ADR. Question
+  generation moves out of the per-group path to a topic-wide phase at the fan-in.
 - **Fixes a drift from:** [ADR-0026](0026-one-shot-generation-to-completion.md), whose own
   Decision section already states "cards persist and go live in the feed as soon as their
   subtopic/tier's batch completes" — the graph wiring never actually implemented that.

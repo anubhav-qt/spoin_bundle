@@ -11,6 +11,10 @@
   [ADR-0024](0024-langgraph-for-card-generation-pipeline.md) (the graph gains a questions
   node and an ordering dependency between difficulty tiers; cross-topic concurrency and
   per-job failure isolation move to the worker, not the graph)
+- **Amended by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- question
+  generation no longer runs per subtopic group alongside that group's cards; it
+  moves to a topic-wide phase after every group has cleared its card bar. Cards
+  still persist and go live per group exactly as this ADR requires.
 - **Fixed by:** [ADR-0041](0041-per-group-gate-and-persist.md) -- this ADR's own Decision
   section already says cards should persist as soon as their subtopic/tier's batch
   completes, but the actual graph wiring implemented a global fan-in barrier instead. ADR-

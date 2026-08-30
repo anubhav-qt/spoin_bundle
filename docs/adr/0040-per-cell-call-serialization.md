@@ -3,6 +3,11 @@
 - **Status:** Accepted
 - **Date:** 2026-08-19
 - **Deciders:** Anubhav
+- **Reframed by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- NOT superseded.
+  One key per subtopic group makes same-cell contention rare, so `cell_lock` is
+  usually uncontended; it is still required for the multi-tier gate fan-out and for
+  two processes reaching the same cell. Do not delete it as "no longer needed".
+  That ADR also keeps this one's `note_request_sent` send-time re-stamp explicitly.
 - **Revisit condition met from:** [ADR-0028](0028-key-model-quota-ladder.md) — "A second
   process... needs to share a key concurrently" was the anticipated trigger; what actually
   hit was concurrency *within* one process, a gap that ADR didn't cover.

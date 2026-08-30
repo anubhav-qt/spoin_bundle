@@ -1,5 +1,15 @@
 # ADR-0047: Removal of Legacy Concurrency Semaphore in Generation Pipeline
 
+- **Status:** Accepted
+- **Reframed by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- NOT reversed.
+  That ADR does not reintroduce a global semaphore; it gives each subtopic group
+  ownership of one KEY, so parallelism still scales with the key pool exactly as this
+  ADR wanted. It does knowingly give back some of the utilization won here (a claimed
+  key can idle), because ADR-0073 capped demand at one topic per worker pass and
+  predictability became worth more than packing. The dead
+  `max_concurrent_generation_calls` setting this ADR's removal left behind in
+  `core/config.py` -- read by nothing since -- is deleted there.
+
 ## Context
 
 During early development of the generation pipeline ([ADR-0024](0024-langgraph-for-card-generation-pipeline.md), [ADR-0026](0026-one-shot-generation-to-completion.md)), the system did not yet have a multi-key, per-model quota governor. To prevent a single API key from triggering rate limits (429s), an outer global semaphore (`runtime.semaphore = asyncio.Semaphore(settings.max_concurrent_generation_calls)`, default `5`) was wrapped around every generator, gate, and question generation call in `pipeline/nodes.py`.

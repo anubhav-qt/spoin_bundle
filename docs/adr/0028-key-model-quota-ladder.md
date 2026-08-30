@@ -8,6 +8,11 @@
 - **Resolves:** [ADR-0008](0008-local-gpu-generation.md)'s open question on cloud model choice
   (the *rotation mechanism*, not the specific model ids -- those are still a first draft, see
   that ADR's updated "Open question" section)
+- **Amended by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- the grid is
+  unchanged, but it is no longer walked per CALL. A subtopic group claims one key
+  for its whole card run and walks that key's own rungs first (3.7, then 3.6, then
+  -- only once no unclaimed key has room -- 3.5), and the weakest rung is held back
+  as a reserve rather than being an ordinary fallback.
 - **Amended by:** [ADR-0029](0029-questions-join-generator-pool.md) -- `generate_questions`
   moved from the thinking pool to the (renamed) generator pool, below. The table's
   "questions in thinking" row and its reasoning are superseded; the rest of this ADR

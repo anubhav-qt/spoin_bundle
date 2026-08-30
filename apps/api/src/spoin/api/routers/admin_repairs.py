@@ -36,8 +36,14 @@ async def delete_card(card_id: UUID, session: SessionDep, user_id: UserDep) -> R
 
 @router.post("/{card_id}/dismiss", response_model=RepairEnqueuedOut)
 async def dismiss_repair(card_id: UUID, session: SessionDep, user_id: UserDep) -> RepairEnqueuedOut:
-    """Clear a resolved (done/failed) repair's before/after entry from the queue."""
+    """Accept the repair and clear its before/after entry from the queue."""
     return await ModerationService(session).dismiss(card_id)
+
+
+@router.post("/{card_id}/revert", response_model=RepairEnqueuedOut)
+async def revert_repair(card_id: UUID, session: SessionDep, user_id: UserDep) -> RepairEnqueuedOut:
+    """Undo a landed repair: restore the original version, supersede the repaired one."""
+    return await ModerationService(session).revert(card_id)
 
 
 @router.post("/{card_id}/fix", response_model=RepairEnqueuedOut)

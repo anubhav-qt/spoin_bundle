@@ -39,10 +39,17 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import katex from "katex";
 
-import { api, type ArchetypeTag, type Card as CardModel, type Difficulty } from "@/lib/api";
+import {
+  api,
+  type ArchetypeTag,
+  type Card as CardModel,
+  type CardReportReason,
+  type Difficulty,
+} from "@/lib/api";
 import { DwellTimer, engagement } from "@/lib/engagement";
 import { bookmarkedStore, likedStore } from "@/lib/engagementState";
 import { invalidate } from "@/lib/refresh";
+import { AskPanel } from "./AskPanel";
 import { HeroTutorialOverlay } from "./HeroTutorialOverlay";
 import { MermaidBlock } from "./MermaidBlock";
 import {
@@ -51,6 +58,7 @@ import {
   CloseIcon,
   CopyIcon,
   ExpandIcon,
+  FlagIcon,
   HeartIcon,
   LinkIcon,
   NoteIcon,
@@ -58,6 +66,15 @@ import {
   ShareIcon,
   SparkIcon,
 } from "./icons";
+
+/** B14 / ADR-0076: the five report reasons, in picker order. */
+const REPORT_REASONS: { value: CardReportReason; label: string }[] = [
+  { value: "art", label: "Bad art" },
+  { value: "diagram", label: "Broken diagram" },
+  { value: "code_block", label: "Code block shouldn’t be here" },
+  { value: "formatting", label: "Formatting is broken" },
+  { value: "other", label: "Something else" },
+];
 
 /** ADR-0035. Per-browser, matching ThemePicker's `spoin-palette` precedent —
  *  presentation-only state, no product consequence if lost or duplicated
@@ -183,6 +200,13 @@ export function Card({
   const [copiedImage, setCopiedImage] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const shareWrapRef = useRef<HTMLDivElement>(null);
+  const reportWrapRef = useRef<HTMLDivElement>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState<CardReportReason | null>(null);
+  const [reportNote, setReportNote] = useState("");
+  const [reportBusy, setReportBusy] = useState(false);
+  const [reported, setReported] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
   // ADR-0035: only the very first hero card mounted while the flag is unset
   // shows the tutorial — read once at mount, not reactively, so it can't
   // flip back on for a second hero card later in the same session. Claims
@@ -231,6 +255,45 @@ export function Card({
       document.removeEventListener("keydown", onKey);
     };
   }, [shareOpen]);
+
+  useEffect(() => {
+    if (!reportOpen) return;
+    const onPointer = (e: PointerEvent) => {
+      if (reportWrapRef.current && !reportWrapRef.current.contains(e.target as Node)) {
+        setReportOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setReportOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [reportOpen]);
+
+  const submitReport = async () => {
+    if (!reportReason || reportBusy) return;
+    setReportBusy(true);
+    try {
+      await api.reportCard(card.id, {
+        reason: reportReason,
+        note: reportNote.trim() || null,
+      });
+      // Flagged, and it stays flagged for the rest of this session: the icon
+      // keeps its filled/accent state and re-opening just shows the
+      // acknowledgement, not another form. (Persisting across reloads needs a
+      // `reported_by_me` flag on the card payload — not yet.)
+      setReported(true);
+      setTimeout(() => setReportOpen(false), 1400);
+    } catch {
+      // Keep the popover open; a transient failure just lets them retry.
+    } finally {
+      setReportBusy(false);
+    }
+  };
 
   const copyCardImage = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -727,10 +790,80 @@ export function Card({
               <NoteIcon />
             </button>
 
+            <div className="share-action-wrap" ref={reportWrapRef}>
+              <button
+                className="action"
+                data-on={reportOpen || reported}
+                aria-label="Report this card"
+                aria-expanded={reportOpen}
+                onClick={(e) => act(e, () => setReportOpen((open) => !open))}
+                type="button"
+              >
+                <FlagIcon />
+              </button>
+              {reportOpen ? (
+                <div className="share-popover report-popover" onClick={(e) => e.stopPropagation()}>
+                  {reported ? (
+                    <div className="report-done">
+                      <CheckIcon />
+                      <span>Thanks — flagged for review.</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="report-popover-head">What’s wrong with this card?</div>
+                      {REPORT_REASONS.map((r) => (
+                        <button
+                          key={r.value}
+                          type="button"
+                          className="share-popover-item report-reason"
+                          data-picked={reportReason === r.value}
+                          onClick={() => setReportReason(r.value)}
+                        >
+                          <span className="report-dot" />
+                          <span className="share-popover-text">{r.label}</span>
+                        </button>
+                      ))}
+                      <textarea
+                        className="report-note"
+                        placeholder="What looks wrong? (optional)"
+                        value={reportNote}
+                        onChange={(e) => setReportNote(e.target.value)}
+                        rows={2}
+                      />
+                      <div className="report-actions">
+                        <button
+                          type="button"
+                          className="report-btn"
+                          onClick={() => setReportOpen(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          className="report-btn report-btn-primary"
+                          disabled={!reportReason || reportBusy}
+                          onClick={() => void submitReport()}
+                        >
+                          {reportBusy ? "…" : "Report"}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : null}
+            </div>
+
             <button
               className="action"
+              data-on={askOpen}
               aria-label="Ask AI"
-              onClick={(e) => act(e, () => engagement.record(card.id, "ask_ai"))}
+              aria-expanded={askOpen}
+              onClick={(e) =>
+                act(e, () => {
+                  setAskOpen((open) => !open);
+                  if (!askOpen) engagement.record(card.id, "ask_ai");
+                })
+              }
               type="button"
             >
               <SparkIcon />
@@ -844,6 +977,22 @@ export function Card({
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* AskAI panel — same always-mounted grid-rows reveal as the note
+              panel above, for the same Framer-layout reason. */}
+          <div
+            className="card-note card-ask"
+            data-open={askOpen}
+            inert={!askOpen}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AskPanel
+              topicId={card.topic_id}
+              cardId={card.id}
+              topicName={topicName}
+              active={askOpen}
+            />
           </div>
         </article>
       </div>

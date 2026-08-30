@@ -354,3 +354,12 @@ export function AvatarMark({ mark }: { mark: string }) {
     </svg>
   );
 }
+
+export function FlagIcon(_: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 21V4" />
+      <path d="M5 4h11l-2 4 2 4H5" />
+    </svg>
+  );
+}

@@ -763,7 +763,197 @@ export const api = {
     }
     return URL.createObjectURL(await response.blob());
   },
+
+  // -- Report a card (B14 / ADR-0076) --------------------------------------
+  /** Flag a live card as structurally broken. Idempotent per user+card. */
+  reportCard: (cardId: string, body: { reason: CardReportReason; note?: string | null }) =>
+    request<void>(`/cards/${cardId}/report`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  // -- AskAI (B12/13 / ADR-0077, revised) --------------------------------
+  ask: {
+    /** The active topic conversation's messages + today's turn budget. */
+    conversation: (topicId: string) =>
+      request<AskConversation>(`/topics/${topicId}/ask`),
+    /** Archive the active conversation; the next question opens a fresh one. */
+    reset: (topicId: string) =>
+      request<void>(`/topics/${topicId}/ask/reset`, { method: "POST" }),
+  },
+
+  // -- Admin: card repair queue (B14, dev-only) --------------------------
+  adminRepairs: {
+    list: () => request<RepairQueueItem[]>("/admin/repairs"),
+    delete: (cardId: string) =>
+      request<RepairEnqueued>(`/admin/repairs/${cardId}/delete`, { method: "POST" }),
+    dismiss: (cardId: string) =>
+      request<RepairEnqueued>(`/admin/repairs/${cardId}/dismiss`, { method: "POST" }),
+    revert: (cardId: string) =>
+      request<RepairEnqueued>(`/admin/repairs/${cardId}/revert`, { method: "POST" }),
+    fix: (cardId: string, image: Blob, guidance?: string) => {
+      const form = new FormData();
+      form.append("file", image, "card.png");
+      if (guidance && guidance.trim()) form.append("guidance", guidance.trim());
+      return requestForm<RepairEnqueued>(`/admin/repairs/${cardId}/fix`, form);
+    },
+    remake: (cardId: string, instructions: string, image?: Blob | null) => {
+      const form = new FormData();
+      form.append("instructions", instructions.trim());
+      if (image) form.append("file", image, "card.png");
+      return requestForm<RepairEnqueued>(`/admin/repairs/${cardId}/remake`, form);
+    },
+  },
 };
+
+// -- Report a card ------------------------------------------------------
+
+export type CardReportReason =
+  | "art"
+  | "diagram"
+  | "code_block"
+  | "formatting"
+  | "other";
+
+// -- AskAI conversation ----------------------------------------------
+
+export interface AskMessage {
+  role: "user" | "assistant";
+  content: string;
+  /** assistant rows only: false = a refused turn, `content` is the hint. */
+  on_topic: boolean;
+  created_at: string;
+}
+
+export interface AskConversation {
+  conversation_id: string | null;
+  messages: AskMessage[];
+  spent: number;
+  limit: number;
+}
+
+/** One SSE event from `POST /topics/{id}/ask`. */
+export type AskEvent =
+  | { event: "delta"; text: string }
+  | { event: "done" }
+  | { event: "off_topic"; hint: string }
+  | { event: "limit" }
+  | { event: "error"; cause: string };
+
+/** Stream an AskAI turn. Yields parsed SSE events until the stream closes.
+ *  A network/HTTP failure yields a single synthetic `error` event rather
+ *  than throwing, so the caller has one code path. */
+export async function* askStream(
+  topicId: string,
+  body: { question: string; card_id?: string | null },
+): AsyncGenerator<AskEvent> {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("spoin_access_token") : null;
+  let response: Response;
+  try {
+    response = await fetch(`${getBaseUrl()}/topics/${topicId}/ask`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+  } catch {
+    yield { event: "error", cause: "network" };
+    return;
+  }
+  if (!response.ok || !response.body) {
+    yield { event: "error", cause: `http_${response.status}` };
+    return;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let sep: number;
+    while ((sep = buf.indexOf("\n\n")) !== -1) {
+      const block = buf.slice(0, sep);
+      buf = buf.slice(sep + 2);
+      let ev = "";
+      let data = "";
+      for (const line of block.split("\n")) {
+        if (line.startsWith("event:")) ev = line.slice(6).trim();
+        else if (line.startsWith("data:")) data += line.slice(5).trim();
+      }
+      if (!ev) continue;
+      const payload = data ? JSON.parse(data) : {};
+      yield { event: ev, ...payload } as AskEvent;
+    }
+  }
+}
+
+async function requestForm<T>(path: string, form: FormData): Promise<T> {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("spoin_access_token") : null;
+  const response = await fetch(`${getBaseUrl()}${path}`, {
+    method: "POST",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: form,
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => ({}));
+    throw new ApiError(response.status, detail?.detail ?? `Request failed (${response.status})`);
+  }
+  return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+}
+
+// -- Admin: card repair queue -------------------------------------------
+
+export interface RepairCard {
+  card_id: string;
+  version: number;
+  title: string;
+  canonical_title: string;
+  summary: string;
+  body: string;
+  archetype: ArchetypeTag[];
+  visual_id: string | null;
+  visual_slots: Record<string, string> | null;
+}
+
+export interface RepairReport {
+  reason: CardReportReason;
+  note: string | null;
+  created_at: string;
+}
+
+export interface RepairAttempt {
+  mode: "fix" | "remake";
+  status: "pending" | "running" | "done" | "failed";
+  error: string | null;
+  created_at: string;
+}
+
+export interface RepairQueueItem {
+  card_id: string;
+  topic_id: string;
+  family_id: string;
+  difficulty: Difficulty;
+  before: RepairCard;
+  after: RepairCard | null;
+  report_count: number;
+  reports: RepairReport[];
+  latest_repair: RepairAttempt | null;
+  state: "open" | "resolved";
+}
+
+export interface RepairEnqueued {
+  card_id: string;
+  action: "deleted" | "fix_enqueued" | "remake_enqueued" | "dismissed" | "reverted";
+  job_id: string | null;
+}
 
 export interface UserProfileUpdateIn {
   display_name?: string | null;

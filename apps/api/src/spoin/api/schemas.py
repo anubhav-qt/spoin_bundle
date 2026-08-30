@@ -722,7 +722,7 @@ class RepairEnqueuedOut(BaseModel):
     """Result of an action on `/admin/repairs/{card_id}`."""
 
     card_id: UUID
-    action: Literal["deleted", "fix_enqueued", "remake_enqueued", "dismissed"]
+    action: Literal["deleted", "fix_enqueued", "remake_enqueued", "dismissed", "reverted"]
     job_id: UUID | None = None
 
 

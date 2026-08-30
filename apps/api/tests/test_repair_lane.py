@@ -238,6 +238,29 @@ async def test_resolved_fix_shows_before_and_after_until_dismissed(session: Asyn
     assert await svc.list_queue() == []
 
 
+async def test_revert_restores_the_original_and_supersedes_the_repaired(
+    session: AsyncSession,
+) -> None:
+    _user, card = await _card(session)
+    fam = card.family_id
+    await _enqueue_and_run(session, card, RepairMode.FIX, FakeContentGenerator(), guidance=None)
+    svc = ModerationService(session)
+
+    await svc.revert(card.id)
+    session.expire_all()
+
+    versions = (
+        (await session.execute(select(Card).where(Card.family_id == fam).order_by(Card.version)))
+        .scalars()
+        .all()
+    )
+    assert [(c.version, c.status) for c in versions] == [
+        (1, CardStatus.ACTIVE),
+        (2, CardStatus.SUPERSEDED),
+    ]
+    assert await svc.list_queue() == []
+
+
 async def test_fix_rejects_an_added_code_fence(session: AsyncSession) -> None:
     _user, card = await _card(session)
     await _enqueue_and_run(session, card, RepairMode.FIX, _AddsCodeFence(), guidance=None)

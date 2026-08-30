@@ -232,12 +232,46 @@ class ModerationService:
         return RepairEnqueuedOut(card_id=card_id, action="deleted")
 
     async def dismiss(self, card_id: UUID) -> RepairEnqueuedOut:
-        """Clear a resolved (done/failed) repair's before/after entry from the
-        queue. Reports are already resolved; this just hides the card."""
+        """Accept the repair: clear its before/after entry from the queue and
+        keep the new version live. Reports are already resolved."""
 
         await self._dismiss_repairs(card_id)
         await self._session.commit()
         return RepairEnqueuedOut(card_id=card_id, action="dismissed")
+
+    async def revert(self, card_id: UUID) -> RepairEnqueuedOut:
+        """Undo a landed repair: put the original version back ACTIVE and
+        supersede the repaired one. `card_id` is the ORIGINAL (`before`) card --
+        the same id every other repair action takes. The repaired row stays in
+        the DB (SUPERSEDED) so this is itself reversible."""
+
+        repair = await self._session.scalar(
+            select(CardRepair)
+            .where(
+                CardRepair.card_id == card_id,
+                CardRepair.status == RepairStatus.DONE,
+                CardRepair.result_card_id.is_not(None),
+            )
+            .order_by(CardRepair.created_at.desc())
+        )
+        if repair is None or repair.result_card_id is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND, detail="No landed repair to revert for this card"
+            )
+        before = await self._session.get(Card, card_id)
+        after = await self._session.get(Card, repair.result_card_id)
+        if before is None or after is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Repair cards missing")
+
+        # Flip the repaired row off first so the one-active-per-family partial
+        # unique index is never briefly violated.
+        after.status = CardStatus.SUPERSEDED
+        await self._session.flush()
+        before.status = CardStatus.ACTIVE
+        repair.error = "reverted by operator"
+        repair.dismissed_at = datetime.now(UTC)
+        await self._session.commit()
+        return RepairEnqueuedOut(card_id=card_id, action="reverted")
 
     async def enqueue_fix(
         self, card_id: UUID, *, image: bytes, guidance: str | None

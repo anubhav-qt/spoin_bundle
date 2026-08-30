@@ -86,17 +86,40 @@ dead, check `docker ps -a` before assuming something is broken.
 Notebook-palette tokens. The interaction design (scroll containers, hover affordances,
 inline font-naming row, no-popup layout) was confirmed and carries forward unchanged.
 
-**2026-08-30, session 2 — F4/F5 preset curation done and confirmed.** The illustrative
-placeholder lists are replaced with the real, final ones: **11 themes** (5 shipped +
-Daylight / Terracotta / Meadow / Fog / Ember / Amethyst — a high-contrast-light, a warm
-light, a green light, a minimal neutral, a warm dark, and a violet dark) and **20 fonts**
-(5 shipped + 15 across serif / slab / sans / rounded / display / mono). Every new theme
-was contrast-checked in a browser (`--fg` on `--bg` ≥ 12.7:1, `--accent` on `--bg` ≥
-4.9:1, WCAG AA body text); every font is a real Google Fonts family rendered at body-copy
-size. The canvas above is updated with these lists, and the committed source of truth is
-[`docs/design/mockups/appearance-pickers.html`](../design/mockups/appearance-pickers.html)
-(per CLAUDE.md — an artifact link is not a source of truth). **Next: build F4/F5 against
-the server-side `user_preference` store** (see F4's entry), then continue Phase 1 Wave 2.
+**2026-08-30, session 2 — F4/F5 curated AND built.** Branch `feat/v1-finish-line` (off
+`origin/main`, pushed). Commits: preset curation → ADR-0070/0071 → API → web → task 0033.
+
+- **Curation.** 11 themes (5 shipped + Daylight / Terracotta / Meadow / Fog / Ember /
+  Amethyst) and 20 fonts (5 shipped + 15 across serif / slab / sans / rounded / display /
+  mono). Every new theme contrast-checked in a browser (`--fg` on `--bg` ≥ 12.7:1,
+  `--accent` on `--bg` ≥ 4.9:1). Source of truth:
+  [`docs/design/mockups/appearance-pickers.html`](../design/mockups/appearance-pickers.html).
+  Theme dropdown gained a "Create your own theme" row mirroring "Upload a font".
+- **[ADR-0070](../adr/0070-server-side-appearance-preferences.md)** (amends 0045) —
+  palette + saved themes + font + imported fonts move to `user_preference` /
+  `user_font`, `localStorage` demoted to a pre-paint cache reconciled against `/auth/me`.
+  **[ADR-0071](../adr/0071-drop-font-keep-revert.md)** (amends 0037) — FontPicker drops
+  Keep/Revert. Both Accepted.
+- **API.** `GET/PUT /profile/me/preferences`, `GET/POST/GET{id}/DELETE{id}
+  /profile/me/fonts`; `preferences` on `/auth/me`. Per-user font scoping enforced twice
+  (dep + `test_architecture.py`). 13 new tests, `make check` green for touched files.
+  Migration `f0a1c2b3d4e5` (two additive tables) **applied** to the running DB
+  (`spoin_db_2` — note: `.env` points the stack there, not `spoin_db`; CLAUDE.md's
+  "`spoin_db` is the only database" is stale against the local `.env`). API smoke-tested:
+  defaults, PUT round-trip, `/auth/me` embed all working.
+- **Web.** `lib/preferences.ts` (client source of truth), `PreferencesSync` (reconcile),
+  rewritten `ThemePicker` / `FontPicker` / `CustomThemeModal`, `CustomFontModal` deleted,
+  6 palettes + Newsreader wired in `globals.css`, layout inline script learns
+  `custom:<id>` + migrates the legacy `custom` slot. `tsc --noEmit` clean; web container
+  compiles clean.
+- **Not yet done:** owner's manual frontend test pass (checklist handed over). The
+  Wave-1 working-tree changes (`generation/pipeline/*.py`, several `apps/web/components/*.tsx`,
+  `lib/refresh.ts`) are still uncommitted and untouched.
+- **Task [0033](../tasks/0033-grow-the-curated-ascii-library-over-time.md)** added — the
+  standing "keep growing the curated ASCII library" todo, after task 0030's verify pass.
+
+**Next:** owner tests F4/F5 in the browser; then continue Phase 1 Wave 2 (F6 rename, then
+its `CollectionView` rework) and Phase 2 Tier 1 (B2/B8, B4).
 
 **Uncommitted changes as of this log** (`git status` in `apps/web`, plus pre-existing
 unrelated changes already in the working tree before this session started — do not

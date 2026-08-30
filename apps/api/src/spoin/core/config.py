@@ -81,7 +81,7 @@ class Settings(BaseSettings):
     #: `gemini-3.0-flash` never existed as a stable name (only the `-preview`
     #: suffixed one does).
     gemini_thinking_ladder: str = (
-        "gemini-3.6-flash:20:5,gemini-3.7-flash:20:5,"
+        "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,"
         "gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5"
     )
     #: Same shape, for `generate_cards` AND `generate_questions` (ADR-0029) —

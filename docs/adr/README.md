@@ -109,3 +109,4 @@ useful than the decision itself.
 | [0070](0070-server-side-appearance-preferences.md) | Palette + font move to the server; `localStorage` demoted to a pre-paint cache; saved themes and imported fonts | Accepted (amends 0045; builds on 0012, 0023, 0037, 0033) |
 | [0071](0071-drop-font-keep-revert.md) | Font picker drops Keep/Revert -- selecting a font saves it, like the theme picker | Accepted (amends 0037) |
 | [0072](0072-revisit-drops-its-bespoke-grid.md) | "Revisit" (formerly Saved) drops its tile grid + overlay and renders the same vertical Card list as Liked and Notes | Accepted (amends 0046) |
+| [0073](0073-worker-runs-generation-jobs-sequentially.md) | The worker runs claimed generation jobs one at a time, in request order, instead of `asyncio.gather` | Accepted (amends 0026's implied concurrency) |

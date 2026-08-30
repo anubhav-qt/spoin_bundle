@@ -10,12 +10,14 @@ The same job functions run as a persistent loop once we are paying — a differe
 entrypoint over identical code, which is what "no accommodation may require a
 rewrite to undo" means in practice.
 
-**Per-job isolation (ADR-0026).** Each claimed job runs the one-shot pipeline
-(`run_generation_pipeline`, ADR-0026) in its OWN `asyncio` task with its OWN DB
-session, gathered together. One job's exception marks only that job `failed` —
-it never touches any other job in the same pass. Cross-job concurrency and
-failure isolation live here, in the worker; the pipeline's own LangGraph
-concurrency (ADR-0024) is scoped to a single topic's run.
+**Jobs run ONE AT A TIME (ADR-0073).** A pass claims a batch of pending jobs
+(`generation_batch_size`) but then runs them strictly sequentially, in
+priority-then-`created_at` order, each on its OWN DB session. So topics finish
+in the order they were requested — the whole batch a user adds from the app
+generates one after another, not all at once. One job's exception marks only
+that job `failed`/`pending` and the loop moves to the next; failure isolation is
+per-job either way. The pipeline's own LangGraph concurrency (ADR-0024) still
+fans out WITHIN a single topic's run, bounded by `max_concurrent_generation_calls`.
 """
 
 from __future__ import annotations
@@ -114,8 +116,8 @@ async def _run_job(
 
 
 async def run_once() -> int:
-    """Claim whatever is pending, highest priority first, and run every claimed
-    job concurrently with per-job isolation.
+    """Claim whatever is pending, highest priority first, then run the claimed
+    jobs ONE AT A TIME in that order (ADR-0073), with per-job isolation.
 
     Returns the number of jobs processed (attempted, not necessarily succeeded —
     see each job's own `status`/`last_error` for outcome).
@@ -164,9 +166,12 @@ async def run_once() -> int:
     generator = get_content_generator()
     embedder = get_embedder()
 
-    await asyncio.gather(
-        *(_run_job(job_id, topic_id, generator, embedder) for job_id, topic_id in claimed)
-    )
+    # Sequential, in claim order (ADR-0073): one topic finishes before the next
+    # starts, so a batch of topics added from the app generates in the order it
+    # was requested. `_run_job` swallows its own exceptions, so a failure just
+    # moves the loop on.
+    for job_id, topic_id in claimed:
+        await _run_job(job_id, topic_id, generator, embedder)
 
     logger.info("worker pass finished (%d job(s) processed)", len(claimed))
     return len(claimed)

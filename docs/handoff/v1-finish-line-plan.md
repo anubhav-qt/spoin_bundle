@@ -149,10 +149,20 @@ across the whole frontend as of the last check.
   leftover "SAVED CARDS" / "Search saved cards…" / "Removed from Saved" microcopy
   was entangled with the pre-existing uncommitted `SavedView.tsx` Wave-1 diff, so it
   goes to the rework (task 0034) which rewrites that file anyway.
-- **F6 rework — DEFERRED to [task 0034](../tasks/0034-collectionview-rework-saved-notes-liked.md)**
-  (owner call). It's the shared-React-component extraction ADR-0046 explicitly
-  *rejected* "for now"; needs a `/design` pass + an ADR superseding 0046. Not a
-  same-session inline job. Commit `b598ff3`.
+- **F6 rework shipped** — `be96077`. Owner's call: *"why do you need design for F6?
+  It's literally the same as Liked and Notes"* — right. No `/design` canvas; the
+  three collection views were already the same `.collection-*` shell, and Saved's
+  only real difference was a bespoke 2-col tile grid + card-overlay portal.
+  `SavedView.tsx` is now a near-mirror of `LikedView.tsx` (vertical `Card` list,
+  new `.collection-list` class, same undo wiring, bookmark semantics). ~150 lines
+  of component + ~200 of CSS deleted (the `.saved-tile*` CSS is dead now — task
+  0034 sweeps it). **[ADR-0072](../adr/0072-revisit-drops-its-bespoke-grid.md)**
+  (amends 0046) records it. This supersedes SavedView's uncommitted Wave-1 diff.
+  **[Task 0034](../tasks/0034-collectionview-rework-saved-notes-liked.md)** is now
+  just the shared-`CollectionView` extraction (unblocked — all three views
+  identical) + the dead-CSS sweep; no ADR/design gate left. Verified live in
+  Obsidian: card list matches Liked, empty state matches, unbookmark→undo works.
+  (`b598ff3` was the earlier "defer" doc commit, now superseded.)
 - **B2/B8 backend shipped** — `1f72fc6`. `POST /topics/batch` +
   `TopicsService.request_topics_batch`: one `validate_topic_names` + one
   `match_and_create_topics` call for the whole list, per-row outcomes
@@ -181,13 +191,21 @@ across the whole frontend as of the last check.
   stays dirty from these — expected. Note `test_technical_topic_guard.py` currently
   fails `ruff check` (unsorted imports) — it's the owner's, not this session's.
 
-**Branch state:** `feat/v1-finish-line`, commits `48b64ba` `1b2cbf7` `b598ff3`
-`1f72fc6` `4edfc60` `99d3fb9` on top of session 2. **Not pushed.**
+- **Design canvas for the two remaining frontends** — B2/B8's `RequestTopicBox`
+  rows form (name + optional description per row, `+` up to 5, one batched submit,
+  per-row outcome reporting) and B4's rendered quota panel (three ADR-0065 rollup
+  tiles kept separate, 198 cells as one row per model with a 33-square key strip,
+  parked models listed). Static mockups in the Obsidian theme, awaiting owner
+  sign-off before code: https://claude.ai/code/artifact/c85d9452-76bd-4264-a484-13c60eb3ed9f
 
-**Next:** the three deferred frontend pieces all wait on a `/design` pass + owner
-sign-off (Phase 2.5): B2/B8's `RequestTopicBox` rows UI, B4's quota panel, and the
-F6 `CollectionView` rework (task 0034, also needs an ADR). Then Phase 2 Tier 2 / the
-Cockroach sequence / B7 per the build order.
+**Branch state:** `feat/v1-finish-line`, on top of session 2:
+`48b64ba` `1b2cbf7` `b598ff3` `1f72fc6` `4edfc60` `99d3fb9` `a60e425` `be96077`
+(+ this log update). **Not pushed.**
+
+**Next:** owner signs off the design canvas, then B2/B8's rows UI + B4's panel get
+built (the `RequestTopicBox` one still wants the Wave-1 F9 change committed first
+to avoid entanglement). Task 0034 (shared `CollectionView`) is unblocked whenever.
+Then Phase 2 Tier 2 / the Cockroach sequence / B7 per the build order.
 
 ---
 

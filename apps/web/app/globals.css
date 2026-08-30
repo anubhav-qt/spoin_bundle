@@ -1896,15 +1896,18 @@ body.custom-cursor-active textarea {
 
 .app-grid {
   display: grid;
-  /* Side tracks are equal (350px) so the centre thread sits dead-centre in
-     the viewport; the left nav is narrower than its track and hugs the feed
-     (see `.rail-left` below), which trims its whitespace without moving the
-     thread. */
-  grid-template-columns: 350px minmax(0, 640px) 350px;
+  /* Equal FLEXIBLE side tracks (>=350px, growing to fill) so the centre thread
+     still sits dead-centre but the rails spread toward the viewport edges on a
+     wide screen instead of leaving a fixed ~260px void each side. The left nav
+     is narrower than its track and hugs the feed (see `.rail-left`), so its
+     slack pools on the far left where it reads as margin; `.rail-right` fills
+     its track, so the extra width there goes to the rail itself. Centre stays
+     capped at 640px — the feed's readable width doesn't change. */
+  grid-template-columns: minmax(350px, 1fr) minmax(0, 640px) minmax(350px, 1fr);
   justify-content: center;
   align-items: start;
   gap: 28px;
-  max-width: 1400px;
+  max-width: 1720px;
   margin: 0 auto;
   padding: 0 24px;
 }

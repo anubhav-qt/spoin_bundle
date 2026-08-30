@@ -16,6 +16,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { api, type User } from "@/lib/api";
+import { SpoinWave } from "./SpoinWave";
 
 const PUBLIC_PATHS = new Set(["/login", "/signup"]);
 const ONBOARDING_PATH = "/onboarding";
@@ -126,16 +127,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   // Public pages render immediately (no flash); protected pages block until
-  // the token is checked so they never render with a null user.
+  // the token is checked so they never render with a null user. A deep link
+  // straight to the feed lands here first — hold the SpoinWave until the
+  // whole authed page is ready, then swap it for the page in one paint.
   if (loading && !PUBLIC_PATHS.has(pathname)) {
-    return (
-      <div
-        className="auth-layout"
-        style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        <div className="auth-loader" style={{ transform: "scale(1.5)" }} />
-      </div>
-    );
+    return <SpoinWave variant="page" />;
   }
 
   return (

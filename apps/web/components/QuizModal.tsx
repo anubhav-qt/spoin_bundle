@@ -27,6 +27,7 @@ import {
 } from "@/lib/api";
 import { invalidate } from "@/lib/refresh";
 import { CheckIcon, CloseIcon } from "./icons";
+import { SpoinWave } from "./SpoinWave";
 
 interface Props {
   topicId: string;
@@ -166,7 +167,11 @@ export function QuizModal({ topicId, topicName, difficulty, onClose, onGraded }:
           </button>
         </div>
 
-        {phase === "loading" ? <p className="modal-loading mono">Loading questions…</p> : null}
+        {phase === "loading" ? (
+          <div className="modal-loading">
+            <SpoinWave variant="inline" caption="Loading questions…" />
+          </div>
+        ) : null}
 
         {phase === "blocked" ? (
           <div className="quiz-blocked">

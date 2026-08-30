@@ -26,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError, api, type Topic, type TopicBatchItemResult } from "@/lib/api";
 import { useGenerationTracker } from "./GenerationTrackerProvider";
 import { GenerationProgressPanel } from "./GenerationProgressPanel";
+import { SpoinWave } from "./SpoinWave";
 
 interface Props {
   /** `hasCards` (default true) is false for a freshly-minted topic
@@ -247,7 +248,7 @@ export function RequestTopicBox({ onFollowed, onTopicRemoved }: Props) {
             disabled={submitting || filled.length === 0}
           >
             {submitting ? (
-              <span className="btn-spinner" aria-hidden="true" />
+              <SpoinWave variant="inline" label="Adding topics" />
             ) : filled.length === 0 ? (
               "Add topics"
             ) : filled.length === 1 ? (

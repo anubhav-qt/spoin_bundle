@@ -4382,9 +4382,9 @@ body.custom-cursor-active textarea {
 }
 
 .modal-loading {
-  padding: 20px 0;
-  color: var(--fg-3);
-  font-size: 12px;
+  padding: 24px 0;
+  display: flex;
+  justify-content: center;
 }
 
 .modal-progress-row {
@@ -6060,32 +6060,98 @@ body.custom-cursor-active textarea {
   color: var(--accent-2);
 }
 
-.auth-loader {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--bg-3);
-  border-top-color: var(--bg);
-  border-radius: 50%;
-  animation: auth-spin 0.8s linear infinite;
+/* ── SpoinWave — the app's one loading indicator (F12) ────────────────
+   The "spoin" wordmark, each glyph on a staggered baseline wave, the "o"
+   in accent. Pure CSS; see components/SpoinWave.tsx. */
+.spoin-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
 }
 
-@keyframes auth-spin {
-  to {
-    transform: rotate(360deg);
+.spoin-wave-glyphs {
+  display: inline-flex;
+  letter-spacing: -0.01em;
+}
+
+.spoin-wave-glyphs > span {
+  display: inline-block;
+  animation: spoin-wave-bounce 1.15s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+/* the "o" */
+.spoin-wave-glyphs > span:nth-child(3) {
+  color: var(--accent);
+}
+
+.spoin-wave-cap {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--fg-3);
+}
+
+@keyframes spoin-wave-bounce {
+  0%,
+  62%,
+  100% {
+    transform: translateY(0);
+  }
+  28% {
+    transform: translateY(-0.22em);
   }
 }
 
-/* Generic inline button spinner -- currentColor so it drops into any button
-   (ghost, filled, whatever) without a per-button color override. */
-.btn-spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
-  border-top-color: currentColor;
-  border-radius: 50%;
-  animation: auth-spin 0.8s linear infinite;
+/* inline — drops into a button or a text line; every glyph inherits the
+   surrounding ink so it reads on a filled (accent / --fg) button. */
+.spoin-wave[data-variant="inline"] {
+  font-size: 14px;
+}
+.spoin-wave[data-variant="inline"] .spoin-wave-glyphs > span:nth-child(3) {
+  color: inherit;
+}
+
+/* page — the full-viewport blocking state (AuthProvider gate). */
+.page-loader {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.spoin-wave[data-variant="page"] {
+  font-size: 34px;
+  color: var(--fg);
+}
+
+/* Any button that swaps its label for the inline wave keeps enough width
+   that the swap doesn't make it jump — and centres the wave in it. */
+button:has(.spoin-wave[data-variant="inline"]) {
+  min-width: 7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spoin-wave-glyphs > span {
+    animation: none;
+    transform: none;
+  }
+  .spoin-wave[data-variant="page"] .spoin-wave-glyphs > span:nth-child(3) {
+    transform: scale(1.12);
+  }
+}
+body[data-reduced-motion="1"] .spoin-wave-glyphs > span {
+  animation: none;
+  transform: none;
 }
 
 .auth-divider {

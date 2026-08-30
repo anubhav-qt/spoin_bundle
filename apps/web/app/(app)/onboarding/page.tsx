@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { ApiError, api, type Difficulty, type TopicDiscover } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemePicker } from "@/components/ThemePicker";
+import { SpoinWave } from "@/components/SpoinWave";
 
 type Step = "topics" | "theme";
 
@@ -160,8 +161,7 @@ export default function OnboardingPage() {
               Back
             </button>
             <button type="button" className="auth-button" onClick={() => void handleSubmit()} disabled={loading}>
-              {loading && <span className="auth-loader" />}
-              {loading ? "Setting up..." : "Start exploring"}
+              {loading ? <SpoinWave variant="inline" label="Setting up" /> : "Start exploring"}
             </button>
           </div>
         </div>

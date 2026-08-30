@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ApiError, api, type AuthTokens } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { SpoinWave } from "@/components/SpoinWave";
 
 function storeTokens(tokens: AuthTokens) {
   localStorage.setItem("spoin_access_token", tokens.access_token);
@@ -184,14 +185,15 @@ export function AuthForm({ mode }: Props) {
               )}
 
               <button type="submit" className="auth-button" disabled={loading}>
-                {loading && <span className="auth-loader" />}
-                {loading
-                  ? "Working..."
-                  : claiming
-                    ? "Save progress"
-                    : mode === "login"
-                      ? "Sign In"
-                      : "Create Account"}
+                {loading ? (
+                  <SpoinWave variant="inline" label="Working" />
+                ) : claiming ? (
+                  "Save progress"
+                ) : mode === "login" ? (
+                  "Sign In"
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </form>
 

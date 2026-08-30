@@ -16,6 +16,7 @@ import { api, type Difficulty, type SubtopicProgress, type TopicStats } from "@/
 import { defaultTopicHue, NO_TOPIC_COLOR } from "@/lib/topicColor";
 import { CheckIcon, HeartIcon, BookmarkIcon, NoteIcon, ShareIcon } from "./icons";
 import { QuizModal } from "./QuizModal";
+import { SpoinWave } from "./SpoinWave";
 
 interface Props {
   topicId: string;
@@ -214,7 +215,9 @@ export function TopicStatsModal({
         ) : null}
 
         {stats === null ? (
-          <div className="modal-loading mono">Loading topic data…</div>
+          <div className="modal-loading">
+            <SpoinWave variant="inline" caption="Loading topic data…" />
+          </div>
         ) : (
           <div className="topic-stats-body">
             {/* Top Overview Cards */}
@@ -350,7 +353,9 @@ export function TopicStatsModal({
               </div>
 
               {subtopics === null ? (
-                <p className="modal-loading mono">Loading roadmap…</p>
+                <div className="modal-loading">
+                  <SpoinWave variant="inline" caption="Loading roadmap…" />
+                </div>
               ) : (
                 <div className="curriculum-tree-root">
                   {TIER_ORDER.map((tier, tierIdx) => {

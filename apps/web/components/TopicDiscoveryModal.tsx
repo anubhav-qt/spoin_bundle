@@ -19,6 +19,7 @@ import {
 import { GenerationProgressPanel } from "./GenerationProgressPanel";
 import { RequestTopicBox } from "./RequestTopicBox";
 import { TopicStatsModal } from "./TopicStatsModal";
+import { SpoinWave } from "./SpoinWave";
 
 interface Props {
   onFollowed: (topic: Topic) => void;
@@ -251,7 +252,9 @@ export function TopicDiscoveryModal({
           ) : view === "custom" ? (
             <div className="discover-grid-list">
               {customTopics === null ? (
-                <p className="modal-loading mono">Loading your requests…</p>
+                <div className="modal-loading">
+                  <SpoinWave variant="inline" caption="Loading your requests…" />
+                </div>
               ) : customTopics.length === 0 ? (
                 <div className="discover-empty-state mono">
                   <p>You haven't requested any custom topics yet</p>

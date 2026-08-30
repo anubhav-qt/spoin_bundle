@@ -41,6 +41,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0032](0032-batch-topic-requests.md) | Let a user request several custom topics in one submission (a `+` to add rows, each with an optional description), sent to the server as one batched call instead of one at a time | unassigned |
 | [0033](0033-grow-the-curated-ascii-library-over-time.md) | Standing task: after 0030's manual verification pass, keep adding new curated ASCII art in small gap-targeted batches as usage exposes coverage holes | Anubhav -- long-horizon, blocked on 0030 |
 | [0034](0034-collectionview-rework-saved-notes-liked.md) | Unify SavedView / NotesView / LikedView behind one shared shell (F6 rework half; rename half shipped on `feat/v1-finish-line`) | unassigned -- blocked on a `/design` pass + an ADR superseding 0046 |
+| [0035](0035-admin-role-and-production-admin-surface.md) | A real admin-role gate for `/admin/*` and `/dev/*`, so B4's quota view can run in production without an `env` special-case | unassigned |
 
 Tasks 0016-0021 are one sequence, gated on 0016. Read
 [ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and

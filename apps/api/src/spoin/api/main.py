@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from spoin.api.middleware import RequestContextMiddleware
-from spoin.api.routers import auth, dev, engagement, feed, notes, profile, quiz, topics
+from spoin.api.routers import admin, auth, dev, engagement, feed, notes, profile, quiz, topics
 from spoin.api.routers.feed import cards_router
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine
@@ -70,13 +70,15 @@ def create_app() -> FastAPI:
     app.include_router(notes.router)
     app.include_router(profile.router)
 
-    # `/dev/reset` wipes a user's entire progress, slates and subscriptions on
-    # one authenticated call. routers/dev.py's own docstring has always said to
-    # gate it before exposing the API publicly; it was mounted unconditionally.
-    # `env` already exists and already gates the JWT-secret validator below it,
-    # so this reuses the switch rather than inventing a second one.
+    # `/dev/*` mutates a user's whole state on one call; `/admin/*` exposes
+    # quota spend, the key count and the model ladder. Neither has a role check
+    # (there is no admin role yet), so both are gated to non-production on the
+    # `env` switch that already gates the JWT-secret validator below -- rather
+    # than inventing a second flag. Promoting `/admin/*` to a real surface is
+    # docs/tasks/0035, not a config flip.
     if settings.env != "production":
         app.include_router(dev.router)
+        app.include_router(admin.router)
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, Any]:

@@ -1,11 +1,11 @@
 """Dev-only convenience endpoints.
 
-**Not for production.** `/dev/reset` mutates a user's entire progress and
-subscription state on a single call gated by nothing but the placeholder
-`X-User-Id` auth every other endpoint already has (deps.py's own docstring
-flags that as needing real auth before anything is exposed publicly) — fine
-for repeatedly exercising a local demo account, not something a real
-deployment should expose. Gate or remove this router before that.
+**Not for production, and enforced there.** `/dev/reset` mutates a user's
+entire progress and subscription state on a single authenticated call — fine
+for exercising a local demo account, not something a real deployment should
+expose. `api/main.py` only mounts this router when `settings.env != "production"`
+(the same gate `/admin/*` sits behind); there is no per-user role check because
+there is no admin role yet (docs/tasks/0035).
 """
 
 from __future__ import annotations

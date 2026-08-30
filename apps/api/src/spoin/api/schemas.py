@@ -647,3 +647,66 @@ class ProfileExportOut(BaseModel):
     liked_cards: list[ExportedCardRefOut]
     saved_cards: list[ExportedCardRefOut]
     daily_activity: list[DailyActivityOut]
+
+
+# -- quota read surface (B4) -------------------------------------------------
+
+
+class QuotaCellOut(BaseModel):
+    """One `(key, model)` cell's DAILY state, from `quota_ledger`
+    (ADR-0003 §6 / ADR-0058). A configured cell with no ledger row today has
+    never been touched -- it still appears here with `requests_spent = 0`."""
+
+    #: `gemini:{key_index}:{model}` -- the cell's key in both quota tables.
+    backend: str
+    key_index: int
+    model: str
+    #: Which generator ladder the model sits on -- "thinking",
+    #: "generator", or "other" for a ledger row whose model is no longer in a
+    #: configured ladder (a retired model, a shrunk key set).
+    pool: str
+    requests_spent: int
+    #: The ladder rung's RPD for this model; null when the model isn't in a
+    #: current ladder.
+    daily_ceiling: int | None
+    #: Set the moment `requests_spent` reached the ceiling, never reset
+    #: (ADR-0003 §6) -- "which key ran out, and when".
+    exhausted_at: datetime | None
+    #: A per-minute 429 parked this cell until this time (ADR-0058). Distinct
+    #: from `exhausted_at`: transient, the daily budget still has room.
+    cooldown_until: datetime | None
+
+
+class ParkedModelOut(BaseModel):
+    """A model the provider stopped answering on, out of rotation until a probe
+    clears it or `expires_at` passes (ADR-0065). Keyed on the model, not a
+    cell -- an outage is the model's property, not one key's."""
+
+    model: str
+    excluded_at: datetime
+    expires_at: datetime
+    reason: str
+
+
+class QuotaStatusOut(BaseModel):
+    """Today's quota-governor state. ADR-0065's three terminal conditions are
+    kept as SEPARATE counts and never collapsed into one "exhausted" -- "the
+    daily budget is gone" (`DailyQuotaExhaustedError`), "every cell is
+    per-minute throttled" (`AllCellsThrottledError`) and "every model is
+    unavailable" (`AllModelsUnavailableError`) are different facts, and a
+    surface that ORs them recreates the misread the ADR exists to prevent."""
+
+    #: The ledger day (`_day_start` of now, UTC) these cells are for.
+    day: datetime
+    #: When this snapshot was read.
+    generated_at: datetime
+    cells: list[QuotaCellOut]
+    parked_models: list[ParkedModelOut]
+    #: Distinct rollups -- read them individually, not their disjunction.
+    cells_total: int
+    #: Cells with `exhausted_at` set (daily budget gone for that cell).
+    cells_daily_exhausted: int
+    #: Cells whose `cooldown_until` is still in the future (per-minute 429).
+    cells_minute_throttled: int
+    #: Rows in `model_unavailable` (provider outage parked the model).
+    models_parked: int

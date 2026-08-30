@@ -206,14 +206,26 @@ across the whole frontend as of the last check.
   640 (feed reading width unchanged), rails spread to the edges. On 1920: right
   void ~289→~130px, right rail +~140px usable width. Only the `>=1401` breakpoint
   changes.
+- **Two follow-ups from the owner after B2/B8 landed:**
+  - **Generation is sequential now** — `9b9520e` / **[ADR-0073](../adr/0073-worker-runs-generation-jobs-sequentially.md)**.
+    `run_once()` ran claimed jobs with `asyncio.gather`; it now runs them one at
+    a time in `priority DESC, created_at` order. So a batch of topics added from
+    the app generates in the order requested, one finishing before the next.
+    Tradeoff (in the ADR): a pass takes ~N× longer, bursts spill to later cron
+    passes; the fix if it bites is a *bounded* pool, not unbounded `gather`.
+  - **Batch cap removed** — `dede0cb`. `custom_topic_batch_max` (5) + its 422 +
+    the frontend `MAX_ROWS` guard were a defensive limit; the owner had them
+    pulled. `POST /topics/batch` takes any non-empty list; `+ Add another` is
+    always available. A deliberate ceiling stays task 0024's concern.
 
 **Branch state:** `feat/v1-finish-line`, on top of session 2 — session-3 commits:
 `48b64ba` `1b2cbf7` `b598ff3` `1f72fc6` `4edfc60` `99d3fb9` `a60e425` `be96077`
-`a75ad9a` `49a6c65` `3c699fb` `6134ee4` (+ this log). **Pushed.**
+`a75ad9a` `49a6c65` `3c699fb` `6134ee4` `9b9520e` `dede0cb` (+ this log). **Pushed.**
 
 **Session-3 net:** F4/F5 signed off + a follow-on fix; F6 done (rename `1b2cbf7` +
-rework `be96077` / ADR-0072); B2/B8 done (API + rows form); B4 done (API + panel);
-the shell right-gap fixed. New docs: ADR-0072, tasks 0034 / 0035; task 0032 closed.
+rework `be96077` / ADR-0072); B2/B8 done (API + rows form, then sequential
+generation + cap removed); B4 done (API + panel); the shell right-gap fixed. New
+docs: ADR-0072, ADR-0073, tasks 0034 / 0035; task 0032 closed.
 
 **Untouched:** the pre-existing Wave-1 working tree — `generation/pipeline/*.py`,
 `components/{AppShell,Card,Feed,GenerationProgressPanel,LikedView,NotesView,ProfileView}.tsx`,
@@ -228,7 +240,7 @@ B14 report-a-card repair lane → needs an ADR; B12/13 AskAI → needs an ADR), 
 the Cockroach sequence (tasks 0016→0021), then B7 study material. Task 0034
 (shared `CollectionView`) is unblocked and pickup-ready any time. Every new
 frontend still goes through `/design` + owner sign-off (Phase 2.5); every
-"Needs: an ADR" item gets one first, numbered from 0073.
+"Needs: an ADR" item gets one first, numbered from 0074.
 
 ---
 

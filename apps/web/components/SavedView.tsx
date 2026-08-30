@@ -319,7 +319,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
     return (
       <div className="collection-view saved-view">
         <div className="collection-header">
-          <p className="collection-eyebrow">SAVED</p>
+          <p className="collection-eyebrow">REVISIT</p>
           <p className="collection-title">Keep it here. Come back later.</p>
         </div>
         <div className="saved-skeleton-grid" aria-hidden="true">
@@ -340,7 +340,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
     return (
       <div className="collection-view saved-view">
         <div className="collection-header">
-          <p className="collection-eyebrow">SAVED</p>
+          <p className="collection-eyebrow">REVISIT</p>
         </div>
         <div className="collection-state">
           <p className="collection-state-head">COULDN&apos;T LOAD YOUR SHELF</p>
@@ -362,7 +362,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
     return (
       <div className="collection-view saved-view">
         <div className="collection-header">
-          <p className="collection-eyebrow">SAVED</p>
+          <p className="collection-eyebrow">REVISIT</p>
           <p className="collection-title">Keep it here. Come back later.</p>
         </div>
         <div className="collection-state">
@@ -410,7 +410,7 @@ export function SavedView({ topics, onNavigateHome }: Props) {
 
       {/* Header */}
       <div className="collection-header">
-        <p className="collection-eyebrow">SAVED</p>
+        <p className="collection-eyebrow">REVISIT</p>
         <p className="collection-title">Keep it here. Come back later.</p>
       </div>
 

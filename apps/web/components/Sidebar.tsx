@@ -115,7 +115,7 @@ export function Sidebar({ onReset, onRefresh, view, onNavigate }: Props) {
         <span className="nav-item-icon">
           <BookmarkIcon filled={view === "saved"} />
         </span>
-        <span className="nav-item-label">Saved</span>
+        <span className="nav-item-label">Revisit</span>
       </button>
 
       <button

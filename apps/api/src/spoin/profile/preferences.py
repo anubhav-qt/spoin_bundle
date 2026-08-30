@@ -43,9 +43,7 @@ class PreferencesService:
     async def _fonts(self, user_id: UUID) -> list[ImportedFontOut]:
         rows = (
             await self._session.execute(
-                select(UserFont)
-                .where(UserFont.user_id == user_id)
-                .order_by(UserFont.created_at)
+                select(UserFont).where(UserFont.user_id == user_id).order_by(UserFont.created_at)
             )
         ).scalars()
         return [
@@ -123,9 +121,7 @@ class PreferencesService:
         )
         self._session.add(row)
         await self._session.commit()
-        return ImportedFontOut(
-            id=row.id, name=row.name, format=row.format, byte_size=row.byte_size
-        )
+        return ImportedFontOut(id=row.id, name=row.name, format=row.format, byte_size=row.byte_size)
 
     async def list_fonts(self, user_id: UUID) -> list[ImportedFontOut]:
         return await self._fonts(user_id)
@@ -152,9 +148,7 @@ class PreferencesService:
 
         font = (
             await self._session.execute(
-                select(UserFont).where(
-                    UserFont.user_id == user_id, UserFont.id == font_id
-                )
+                select(UserFont).where(UserFont.user_id == user_id, UserFont.id == font_id)
             )
         ).scalar_one_or_none()
         if font is None:

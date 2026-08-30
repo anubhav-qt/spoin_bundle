@@ -96,5 +96,3 @@ def test_format_library_catalog_for_planner() -> None:
     assert "INFORMATIVE VISUALIZATIONS" in catalog
     assert "70%" in catalog
     assert "30%" in catalog
-
-

@@ -121,12 +121,13 @@ def format_library_catalog_for_planner() -> str:
     info_block = "\n".join(f"- {t}" for t in info)
     return (
         "\nAVAILABLE CURATED ASCII ART LIBRARY (USE TO GROUND YOUR ASCII CARD PLANS):\n"
-        f"--- GAGS & COMEDIC CHARACTER REACTIONS ({len(gags)} available — AT LEAST 70% OF PLANNED ASCII CARDS MUST BE FROM THIS CATEGORY) ---\n"
+        f"--- GAGS & COMEDIC CHARACTER REACTIONS ({len(gags)} available"
+        " — AT LEAST 70% OF PLANNED ASCII CARDS MUST BE FROM THIS CATEGORY) ---\n"
         f"{gags_block}\n\n"
-        f"--- INFORMATIVE VISUALIZATIONS & REAL-WORLD OBJECTS ({len(info)} available — AT MOST 30% OF PLANNED ASCII CARDS) ---\n"
+        f"--- INFORMATIVE VISUALIZATIONS & REAL-WORLD OBJECTS ({len(info)} available"
+        " — AT MOST 30% OF PLANNED ASCII CARDS) ---\n"
         f"{info_block}\n"
     )
-
 
 
 #: Populated once per process by `_library_index`, guarded by `_index_lock` so

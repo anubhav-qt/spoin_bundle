@@ -84,7 +84,12 @@ async def test_get_returns_defaults_when_no_row(session: AsyncSession) -> None:
 async def test_update_creates_the_row_and_round_trips_saved_themes(session: AsyncSession) -> None:
     user_id = await _user(session)
     theme = CustomPalette(
-        id="sunset", name="Sunset Desk", bg="#2b1d16", fg="#f2ede6", accent="#e08a3c", accent2="#c65b3f"
+        id="sunset",
+        name="Sunset Desk",
+        bg="#2b1d16",
+        fg="#f2ede6",
+        accent="#e08a3c",
+        accent2="#c65b3f",
     )
     service = PreferencesService(session)
 
@@ -100,7 +105,9 @@ async def test_update_creates_the_row_and_round_trips_saved_themes(session: Asyn
     assert (await service.get(user_id)).custom_palettes[0].name == "Sunset Desk"
 
 
-async def test_update_rejects_a_palette_pointer_with_no_matching_theme(session: AsyncSession) -> None:
+async def test_update_rejects_a_palette_pointer_with_no_matching_theme(
+    session: AsyncSession,
+) -> None:
     user_id = await _user(session)
     with pytest.raises(HTTPException) as exc:
         await PreferencesService(session).update(
@@ -166,9 +173,7 @@ async def test_deleting_the_active_font_resets_the_choice(session: AsyncSession)
     meta = await service.add_font(user_id, "Temp", await _validated())
     await service.update(
         user_id,
-        PreferencesUpdateIn(
-            palette="notebook", custom_palettes=[], font=f"import:{meta.id}"
-        ),
+        PreferencesUpdateIn(palette="notebook", custom_palettes=[], font=f"import:{meta.id}"),
     )
     assert (await service.get(user_id)).font == f"import:{meta.id}"
 

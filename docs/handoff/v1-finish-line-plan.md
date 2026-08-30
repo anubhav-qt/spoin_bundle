@@ -242,6 +242,71 @@ the Cockroach sequence (tasks 0016→0021), then B7 study material. Task 0034
 frontend still goes through `/design` + owner sign-off (Phase 2.5); every
 "Needs: an ADR" item gets one first, numbered from 0074.
 
+**2026-08-30, session 4 — ADR-0074: one key per subtopic group; questions move to
+a topic-wide phase.** Owner-driven design session; not on the Tier-2 list, it came
+out of the question "why would 20 subtopics firing concurrently cause RPM failure?".
+
+- **The answer was that it wouldn't, and the docs were lying about why.** ADR-0047
+  deleted the global semaphore long ago; `max_concurrent_generation_calls` survived
+  in `core/config.py` **read by nothing**, and `generation-pipeline.md` still claimed
+  every call went through it. Both fixed — setting deleted, doc rewritten.
+- **[ADR-0074](../adr/0074-key-per-subtopic-scheduling.md) (Accepted)** — a subtopic
+  group claims ONE key for its whole card run (plan, every draft round, both gate
+  passes, every redraft) and releases it at the end. **Parallelism = key count (33).**
+  A group never borrows a claimed key; group K+1 waits. One caller per key is what
+  makes an rpm violation structurally impossible rather than merely counted.
+  Amends 0028/0065, **reframes** 0040/0047 (both stay — the ADR has a "what survives"
+  section so a future session doesn't delete `cell_lock` as dead). Back-pointers
+  added in all six ADRs + the README row.
+- **Own-key-first ladder.** own 3.7 → own 3.6 → any unclaimed key's 3.7/3.6
+  (least-spent) → own 3.5 → re-check → wait. `gemini-3-flash-preview` is a
+  **reserve** (`gemini_thinking_reserve_rungs`, default 1): reached only when no key
+  anywhere has daily room on an ordinary rung. **Contention waits, exhaustion
+  descends** — the two waits are seconds vs. midnight UTC and must not collapse.
+- **Ladder order regression fixed.** `gemini_thinking_ladder` led with 3.7 from
+  ADR-0028 onward; commit `f2f63e5` (PR #17, the ASCII curation PR) silently flipped
+  it to 3.6-first with no reasoning anywhere. Restored, and recorded in ADR-0074's
+  Context so it doesn't flip back a third time.
+- **Questions moved to the fan-in.** `_process_gate_item` writes cards only;
+  `gate_and_persist` now runs a topic-wide question phase once every group clears its
+  card bar, one claimed-key unit per subtopic-tier. So a tier's question budget is
+  spent against its FINISHED card set, not its first gate round's survivors.
+- **A real bug found and fixed in my own change, with a regression test.**
+  `_redraft_until_bar` appends one item report **per round**, so a tier arrives at the
+  fan-in named many times. Running the question phase per report generated a tier's
+  questions once per round: measured live at **84 reports for 9 tiers → 653 questions
+  for 70 cards** (~580 wasted LLM calls per run) and an equally inflated report.
+  Reports are merged by (topic, subtopic, difficulty) first.
+  `test_a_redrafted_tier_gets_exactly_one_question_pass` was verified to FAIL against
+  the buggy version before being kept. **`PipelineState.item_reports` is per ROUND,
+  not per tier** — its docstring now says so; anything needing per-tier semantics must
+  merge first.
+- **Enforced twice, per CLAUDE.md.** Two new `test_architecture.py` rules: the
+  generation pipeline may not reintroduce a concurrency semaphore (ADR-0047/0074), and
+  `_run_question_phase` may only be called from the topic-wide phase. Plus
+  `tests/test_key_claims.py` (11 tests, real Postgres session): claim binds and stays,
+  own-second-rung beats another key's first, the claim moves off a dying key, busy grid
+  waits instead of spending the reserve, reserve opens on genuine exhaustion, two claims
+  never share a key, release hands the key back, short ladders clamp the reserve.
+- **`make check`:** `mypy --strict` green (86 files), **465 tests green**. Pre-existing
+  and NOT mine: `ruff check src tests` fails E501 in `content/ascii_library.py`,
+  `generation/prompts/cards.py`, `generation/langchain_impl.py` (5 prompt-string lines,
+  confirmed identical at HEAD), `tests/test_technical_topic_guard.py`; and
+  `prompts/cards.py` fails `ruff format --check`. **Note the container runs ruff 0.16.5
+  and the host had 0.16.0** — they format differently, so run lint through
+  `docker compose exec api`, not the host.
+- **Not done, deliberately:** the B4 `/admin/quota` panel doesn't yet show claims
+  (keys claimed / free / groups waiting) — ADR-0074 lists it under "Easier" but it is a
+  separate frontend change and would need `/design`. Nothing is committed; the owner
+  had not asked for a commit.
+- **Untouched as always:** the owner's Wave-1 working tree. Note this session edited
+  `pipeline/{nodes,persistence,state}.py`, which carry uncommitted Wave-1 changes —
+  edits were purely additive and the technical-topic-guard work is intact.
+
+**Next:** unchanged — Phase 2 Tier 2 (B6 → ADR amending 0034; B14 → ADR; B12/13 → ADR,
+numbered from 0075 now), then the Cockroach sequence, then B7. Task 0034 still
+pickup-ready.
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)

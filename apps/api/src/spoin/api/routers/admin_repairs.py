@@ -34,6 +34,12 @@ async def delete_card(card_id: UUID, session: SessionDep, user_id: UserDep) -> R
     return await ModerationService(session).delete_card(card_id)
 
 
+@router.post("/{card_id}/dismiss", response_model=RepairEnqueuedOut)
+async def dismiss_repair(card_id: UUID, session: SessionDep, user_id: UserDep) -> RepairEnqueuedOut:
+    """Clear a resolved (done/failed) repair's before/after entry from the queue."""
+    return await ModerationService(session).dismiss(card_id)
+
+
 @router.post("/{card_id}/fix", response_model=RepairEnqueuedOut)
 async def enqueue_fix(
     card_id: UUID,

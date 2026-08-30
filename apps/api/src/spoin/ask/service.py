@@ -1,40 +1,44 @@
-"""ADR-0077: the AskAI retrieval + streaming service.
+"""ADR-0077 (revised): the AskAI conversation service.
 
-`AskService.answer` is an async generator of `(event, payload)` pairs; the router
-serialises them as SSE. Events: `delta` (answer chunk), `done`, `off_topic`
-(with a `hint`), `limit` (daily cap), `error` (with an ADR-0065 `cause`).
+Topic-scoped, persistent. `AskService.answer` is an async generator of
+`(event, payload)` pairs the router serialises as SSE. Events: `delta`
+(assistant chunk), `done`, `off_topic` (with a `hint`), `limit` (daily cap),
+`error` (with an ADR-0065 `cause`).
 """
 
 from __future__ import annotations
 
-import re
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from spoin.api.schemas import AskConversationOut, AskMessageOut
 from spoin.core.config import Settings
 from spoin.domain.enums import CardStatus
-from spoin.domain.models import AskUsage, Card, CardQa, Subtopic, Topic
+from spoin.domain.models import (
+    AskConversation,
+    AskMessage,
+    AskUsage,
+    Card,
+    Subtopic,
+    Topic,
+)
 from spoin.embeddings import Embedder, HashEmbedder
-from spoin.generation.base import CardAnswerQuery, ContentGenerator
+from spoin.generation.base import AskTurnQuery, ContentGenerator
 from spoin.generation.quota import QuotaExhaustedError
 
 _OFF_TOPIC = "OFF_TOPIC"
-_SENTINEL_WINDOW = 24  # chars to buffer before deciding it is / isn't the sentinel
-_WS = re.compile(r"[^a-z0-9]+")
+_SENTINEL_WINDOW = 24
+#: A follow-up in an already-on-topic thread gets the floor relaxed by this
+#: factor -- "why?" is on-topic in context, off-topic in isolation.
+_FOLLOWUP_FLOOR_FACTOR = 0.5
 
 _Event = tuple[str, dict[str, object]]
-
-
-def normalize_question(raw: str) -> str:
-    """Lowercase, collapse non-alphanumerics to single spaces -- the `card_qa`
-    cache key. Same spirit as `normalize_topic_text`."""
-
-    return _WS.sub(" ", raw.strip().lower()).strip()[:500]
 
 
 def _utc_day(now: datetime) -> datetime:
@@ -61,70 +65,98 @@ class AskService:
         self._generator = generator
         self._embedder = embedder
 
-    async def answer(
-        self, user_id: UUID, card_id: UUID, question: str
-    ) -> AsyncIterator[_Event]:
-        card = await self._session.get(Card, card_id)
-        if card is None or card.status != CardStatus.ACTIVE:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No such card")
+    # -- reads ----------------------------------------------------------
 
-        qnorm = normalize_question(question)
-        if not qnorm:
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Empty question")
-
-        # 1. Cache -- costs nothing, counts nothing.
-        cached = await self._session.scalar(
-            select(CardQa).where(CardQa.card_id == card_id, CardQa.question_norm == qnorm)
+    async def get_conversation(self, user_id: UUID, topic_id: UUID) -> AskConversationOut:
+        convo = await self._active_conversation(user_id, topic_id)
+        messages: list[AskMessageOut] = []
+        if convo is not None:
+            rows = (
+                (
+                    await self._session.execute(
+                        select(AskMessage)
+                        .where(AskMessage.conversation_id == convo.id)
+                        .order_by(AskMessage.created_at)
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            messages = [
+                AskMessageOut(
+                    role=m.role, content=m.content, on_topic=m.on_topic, created_at=m.created_at
+                )
+                for m in rows
+            ]
+        return AskConversationOut(
+            conversation_id=convo.id if convo else None,
+            messages=messages,
+            spent=await self._spent_today(user_id),
+            limit=self._settings.ask_ai_daily_limit,
         )
-        if cached is not None:
-            if cached.on_topic:
-                yield ("delta", {"text": cached.answer})
-                yield ("done", {})
-            else:
-                yield ("off_topic", {"hint": cached.answer or self._hint(card)})
-            return
 
-        # 2. Daily cap.
+    async def reset(self, user_id: UUID, topic_id: UUID) -> None:
+        convo = await self._active_conversation(user_id, topic_id)
+        if convo is not None:
+            convo.status = "archived"
+            await self._session.commit()
+
+    # -- the turn -----------------------------------------------------
+
+    async def answer(
+        self, user_id: UUID, topic_id: UUID, question: str, card_id: UUID | None
+    ) -> AsyncIterator[_Event]:
+        topic = await self._session.get(Topic, topic_id)
+        if topic is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No such topic")
+
         now = datetime.now(UTC)
-        usage = await self._session.get(AskUsage, (_utc_day(now), user_id))
-        if usage is not None and usage.questions_spent >= self._settings.ask_ai_daily_limit:
+        if await self._spent_today(user_id) >= self._settings.ask_ai_daily_limit:
             yield ("limit", {})
             return
 
-        topic = await self._session.get(Topic, card.topic_id)
-        subtopic = await self._session.get(Subtopic, card.subtopic_id)
-        assert topic is not None and subtopic is not None
+        convo = await self._get_or_create_conversation(user_id, topic_id)
+        history = await self._history(convo.id)
 
-        # 3. Free embedding pre-check (skipped under the hash stand-in).
+        subtopics = await self._subtopics(topic_id)
+        current_card = await self._session.get(Card, card_id) if card_id else None
+        neighbours = await self._nearest_cards(topic_id, question)
+
+        # Embedding pre-check (skipped under the hash stand-in).
         if not isinstance(self._embedder, HashEmbedder):
             qvec = (await self._embedder.aembed([question]))[0]
-            refs = [
-                v
-                for v in (card.content_embedding, topic.embedding)
-                if v is not None
-            ]
-            best = max((_cosine(qvec, list(v)) for v in refs), default=1.0)
-            if best < self._settings.ask_ai_topic_similarity_floor:
-                await self._remember(card_id, qnorm, on_topic=False, answer=self._hint(card))
-                yield ("off_topic", {"hint": self._hint(card)})
+            refs = [topic.embedding, *(c.content_embedding for c in neighbours)]
+            best = max((_cosine(qvec, list(v)) for v in refs if v is not None), default=1.0)
+            floor = self._settings.ask_ai_topic_similarity_floor
+            if history and history[-1][0] == "assistant":
+                floor *= _FOLLOWUP_FLOOR_FACTOR
+            if best < floor:
+                hint = self._hint(topic)
+                await self._append(convo, "user", question, on_topic=True)
+                await self._append(convo, "assistant", hint, on_topic=False, commit=True)
+                yield ("off_topic", {"hint": hint})
                 return
 
-        context = await self._assemble_context(card, topic, subtopic)
-        query = CardAnswerQuery(
-            card_title=card.canonical_title,
+        context = self._assemble_context(topic, subtopics, neighbours, current_card)
+        query = AskTurnQuery(
             topic_name=topic.canonical_name,
+            subtopics=[s.title for s in subtopics],
+            current_card_title=current_card.canonical_title if current_card else None,
             context=context,
+            history=history,
             question=question,
         )
 
-        # 4. One streamed call. Watch the opening for the OFF_TOPIC sentinel.
+        # Persist the user turn now, so it survives a stream that dies mid-answer.
+        await self._append(convo, "user", question, on_topic=True, commit=True)
+
         buffer = ""
         decided = False
-        answer_parts: list[str] = []
+        parts: list[str] = []
         try:
-            async for chunk in self._generator.stream_card_answer(query):
+            async for chunk in self._generator.stream_topic_answer(query):
                 if decided:
-                    answer_parts.append(chunk)
+                    parts.append(chunk)
                     yield ("delta", {"text": chunk})
                     continue
                 buffer += chunk
@@ -132,15 +164,14 @@ class AskService:
                 if _OFF_TOPIC.startswith(stripped[: len(_OFF_TOPIC)]) and len(stripped) < len(
                     _OFF_TOPIC
                 ):
-                    continue  # still ambiguous, keep buffering
-                if stripped[: len(_OFF_TOPIC)] == _OFF_TOPIC and (
-                    len(stripped) <= _SENTINEL_WINDOW
-                ):
-                    await self._remember(card_id, qnorm, on_topic=False, answer=self._hint(card))
-                    yield ("off_topic", {"hint": self._hint(card)})
+                    continue
+                if stripped[: len(_OFF_TOPIC)] == _OFF_TOPIC and len(stripped) <= _SENTINEL_WINDOW:
+                    hint = self._hint(topic)
+                    await self._append(convo, "assistant", hint, on_topic=False, commit=True)
+                    yield ("off_topic", {"hint": hint})
                     return
                 decided = True
-                answer_parts.append(buffer)
+                parts.append(buffer)
                 yield ("delta", {"text": buffer})
         except QuotaExhaustedError as exc:
             yield ("error", {"cause": type(exc).__name__})
@@ -149,26 +180,83 @@ class AskService:
             yield ("error", {"cause": f"stream failed: {exc}"})
             return
 
-        answer = "".join(answer_parts).strip()
+        answer = "".join(parts).strip()
         if not answer:
             yield ("error", {"cause": "empty answer"})
             return
-        await self._remember(card_id, qnorm, on_topic=True, answer=answer)
+        await self._append(convo, "assistant", answer, on_topic=True)
+        convo.last_message_at = now
         await self._bump_usage(user_id, now)
+        await self._session.commit()
         yield ("done", {})
 
-    # -- internals ------------------------------------------------------
+    # -- internals --------------------------------------------------
 
-    def _hint(self, card: Card) -> str:
-        return f"That's outside this card. It covers: {card.canonical_title}."
+    def _hint(self, topic: Topic) -> str:
+        return f"That's outside this topic. It covers: {topic.canonical_name}."
 
-    async def _remember(
-        self, card_id: UUID, qnorm: str, *, on_topic: bool, answer: str
+    async def _active_conversation(self, user_id: UUID, topic_id: UUID) -> AskConversation | None:
+        convo: AskConversation | None = await self._session.scalar(
+            select(AskConversation).where(
+                AskConversation.user_id == user_id,
+                AskConversation.topic_id == topic_id,
+                AskConversation.status == "active",
+            )
+        )
+        return convo
+
+    async def _get_or_create_conversation(self, user_id: UUID, topic_id: UUID) -> AskConversation:
+        convo = await self._active_conversation(user_id, topic_id)
+        if convo is not None:
+            return convo
+        convo = AskConversation(user_id=user_id, topic_id=topic_id, status="active")
+        self._session.add(convo)
+        try:
+            await self._session.flush()
+        except IntegrityError:  # a concurrent first turn won the partial-unique index
+            await self._session.rollback()
+            existing = await self._active_conversation(user_id, topic_id)
+            assert existing is not None
+            return existing
+        return convo
+
+    async def _history(self, conversation_id: UUID) -> list[tuple[str, str]]:
+        rows = (
+            await self._session.execute(
+                select(AskMessage.role, AskMessage.content, AskMessage.on_topic)
+                .where(AskMessage.conversation_id == conversation_id)
+                .order_by(AskMessage.created_at)
+            )
+        ).all()
+        # Drop refused assistant turns from what the model sees -- the hint is
+        # UI copy, not part of the dialogue.
+        return [(role, content) for role, content, on_topic in rows if on_topic]
+
+    async def _append(
+        self,
+        convo: AskConversation,
+        role: str,
+        content: str,
+        *,
+        on_topic: bool,
+        commit: bool = False,
     ) -> None:
         self._session.add(
-            CardQa(card_id=card_id, question_norm=qnorm, answer=answer, on_topic=on_topic)
+            AskMessage(conversation_id=convo.id, role=role, content=content, on_topic=on_topic)
         )
-        await self._session.commit()
+        if commit:
+            await self._session.commit()
+        else:
+            await self._session.flush()
+
+    async def _spent_today(self, user_id: UUID) -> int:
+        return (
+            await self._session.scalar(
+                select(func.coalesce(AskUsage.questions_spent, 0)).where(
+                    AskUsage.day == _utc_day(datetime.now(UTC)), AskUsage.user_id == user_id
+                )
+            )
+        ) or 0
 
     async def _bump_usage(self, user_id: UUID, now: datetime) -> None:
         day = _utc_day(now)
@@ -177,84 +265,61 @@ class AskService:
             self._session.add(AskUsage(day=day, user_id=user_id, questions_spent=1))
         else:
             usage.questions_spent += 1
-        await self._session.commit()
 
-    async def _assemble_context(self, card: Card, topic: Topic, subtopic: Subtopic) -> str:
-        siblings = (
+    async def _subtopics(self, topic_id: UUID) -> list[Subtopic]:
+        return list(
             (
                 await self._session.execute(
-                    select(Subtopic.title)
-                    .where(Subtopic.topic_id == topic.id, Subtopic.id != subtopic.id)
+                    select(Subtopic)
+                    .where(Subtopic.topic_id == topic_id)
                     .order_by(Subtopic.position)
-                    .limit(12)
                 )
             )
             .scalars()
             .all()
         )
-        adjacent = (
-            (
-                await self._session.execute(
-                    select(Subtopic.title, Subtopic.difficulty).where(
-                        Subtopic.subtopic_group_id == subtopic.subtopic_group_id,
-                        Subtopic.id != subtopic.id,
-                    )
-                )
+
+    async def _nearest_cards(self, topic_id: UUID, question: str) -> list[Card]:
+        if isinstance(self._embedder, HashEmbedder):
+            stmt = (
+                select(Card)
+                .where(Card.topic_id == topic_id, Card.status == CardStatus.ACTIVE)
+                .order_by(Card.created_at.desc())
+                .limit(self._settings.ask_ai_context_neighbours)
             )
-            .all()
-        )
-
-        neighbours: list[tuple[str, str]] = []
-        if card.content_embedding is not None:
-            rows = (
-                await self._session.execute(
-                    select(Card.canonical_title, Card.body)
-                    .where(
-                        Card.topic_id == topic.id,
-                        Card.status == CardStatus.ACTIVE,
-                        Card.id != card.id,
-                    )
-                    .order_by(Card.content_embedding.cosine_distance(card.content_embedding))
-                    .limit(self._settings.ask_ai_context_neighbours)
+        else:
+            qvec = (await self._embedder.aembed([question]))[0]
+            stmt = (
+                select(Card)
+                .where(
+                    Card.topic_id == topic_id,
+                    Card.status == CardStatus.ACTIVE,
+                    Card.content_embedding.is_not(None),
                 )
-            ).all()
-            neighbours = [(t, b) for t, b in rows]
+                .order_by(Card.content_embedding.cosine_distance(qvec))
+                .limit(self._settings.ask_ai_context_neighbours)
+            )
+        return list((await self._session.execute(stmt)).scalars().all())
 
-        parts = [
-            f"TOPIC: {topic.canonical_name}",
-            f"  {topic.description or ''}".rstrip(),
-            f"SUBTOPIC: {subtopic.title}",
-            f"  {subtopic.description}",
-            "",
-            f"THIS CARD: {card.canonical_title}",
-            card.body,
-        ]
-        if card.visual_slots and card.visual_slots.get("alt"):
-            parts.append(f"(the card also shows a diagram: {card.visual_slots['alt']})")
-        if adjacent:
-            parts.append("")
-            parts.append("SAME CONCEPT AT OTHER LEVELS:")
-            parts += [f"  - {t} ({d})" for t, d in adjacent]
-        if siblings:
-            parts.append("")
-            parts.append("OTHER SUBTOPICS IN THIS TOPIC:")
-            parts += [f"  - {t}" for t in siblings]
+    def _assemble_context(
+        self,
+        topic: Topic,
+        subtopics: list[Subtopic],
+        neighbours: list[Card],
+        current_card: Card | None,
+    ) -> str:
+        parts = [f"TOPIC: {topic.canonical_name}", f"  {topic.description or ''}".rstrip(), ""]
+        parts.append("SUBTOPICS:")
+        parts += [f"  - {s.title}: {s.description}" for s in subtopics]
+        if current_card is not None:
+            parts += [
+                "",
+                f"THE CARD THE LEARNER IS ON: {current_card.canonical_title}",
+                current_card.body,
+            ]
         if neighbours:
-            parts.append("")
-            parts.append("RELATED CARDS:")
-            for t, b in neighbours:
-                parts.append(f"  - {t}: {b[:280].strip()}")
+            parts += ["", "RELEVANT CARDS FROM THIS TOPIC:"]
+            for c in neighbours:
+                parts.append(f"  ## {c.canonical_title}")
+                parts.append(f"  {c.body[:600].strip()}")
         return "\n".join(parts)
-
-
-async def question_count_today(session: AsyncSession, user_id: UUID) -> int:
-    """Read-only helper for the client to show remaining budget."""
-
-    day = _utc_day(datetime.now(UTC))
-    return (
-        await session.scalar(
-            select(func.coalesce(AskUsage.questions_spent, 0)).where(
-                AskUsage.day == day, AskUsage.user_id == user_id
-            )
-        )
-    ) or 0

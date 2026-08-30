@@ -682,15 +682,12 @@ class RepairAttemptOut(BaseModel):
     created_at: datetime
 
 
-class RepairQueueItemOut(BaseModel):
-    """One reported card awaiting operator triage. Carries enough of the card to
-    judge it without a second fetch, plus every unresolved report."""
+class RepairCardOut(BaseModel):
+    """A card's renderable fields -- used for both the reported (before) card
+    and, once a repair lands, the new (after) version (ADR-0076)."""
 
     card_id: UUID
-    topic_id: UUID
-    family_id: UUID
     version: int
-    difficulty: Difficulty
     title: str
     canonical_title: str
     summary: str
@@ -698,14 +695,50 @@ class RepairQueueItemOut(BaseModel):
     archetype: list[str]
     visual_id: str | None
     visual_slots: dict[str, str] | None
+
+
+class RepairQueueItemOut(BaseModel):
+    """One entry in the operator queue. While reports are open it carries the
+    reported card and its reports; once a fix/remake lands, `after` is the new
+    version and the entry stays (with a before/after toggle) until dismissed."""
+
+    card_id: UUID
+    topic_id: UUID
+    family_id: UUID
+    difficulty: Difficulty
+    #: The reported card (or, if it was already superseded, that version).
+    before: RepairCardOut
+    #: The repaired/remade version, once one exists.
+    after: RepairCardOut | None
     report_count: int
     reports: list[RepairReportOut]
     latest_repair: RepairAttemptOut | None
+    #: "open" -- reports awaiting triage; "resolved" -- a repair landed, shown
+    #: with the before/after toggle until dismissed.
+    state: Literal["open", "resolved"]
 
 
 class RepairEnqueuedOut(BaseModel):
-    """Result of `delete` / `fix` / `remake` on `/admin/repairs/{card_id}`."""
+    """Result of an action on `/admin/repairs/{card_id}`."""
 
     card_id: UUID
-    action: Literal["deleted", "fix_enqueued", "remake_enqueued"]
+    action: Literal["deleted", "fix_enqueued", "remake_enqueued", "dismissed"]
     job_id: UUID | None = None
+
+
+# -- AskAI conversation (ADR-0077, revised) -------------------------------
+
+
+class AskMessageOut(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+    #: assistant rows only: false = a refused turn, `content` is the hint.
+    on_topic: bool
+    created_at: datetime
+
+
+class AskConversationOut(BaseModel):
+    conversation_id: UUID | None
+    messages: list[AskMessageOut]
+    spent: int
+    limit: int

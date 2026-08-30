@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600;7..72,700&display=swap">
+  <style>
+    :root{
+      --bg:#edf0ea; --bg-2:#e2e7de; --bg-3:#d6ddd1;
+      --fg:#262a22; --fg-2:#565f51; --fg-3:#838c7d;
+      --accent:#c1442b; --accent-2:#a83a24;
+      --line:rgba(38,42,34,.14); --line-strong:rgba(38,42,34,.26);
+      --shadow:rgba(38,42,34,.16);
+      --font:"Literata",ui-serif,Georgia,serif;
+      --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);
+      -webkit-font-smoothing:antialiased}
+    a{color:var(--accent)} a:hover{color:var(--accent-2)}
+    .wrap{padding:40px 44px 56px;max-width:1180px;margin:0 auto}
+    h2.sec{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--fg-3);margin:0 0 6px}
+    p.lede{margin:0 0 30px;color:var(--fg-2);font-size:14.5px;max-width:60ch;line-height:1.6}
+    .row{display:flex;gap:56px;flex-wrap:wrap;align-items:flex-start}
+    .col{flex:1 1 320px;min-width:300px}
+    .cap{font-size:12px;font-weight:600;color:var(--fg-3);letter-spacing:.02em;margin:0 0 12px}
+
+    /* --- a real card, trimmed to the action row --- */
+    .card{position:relative;background:var(--bg-2);border:1px solid var(--line);
+      border-radius:14px;padding:14px 15px 12px}
+    .card-title{font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.3;
+      margin:0 0 5px}
+    .card-summary{margin:0 0 10px;font-size:14px;line-height:1.5;color:var(--fg-2)}
+    .card-actions{display:flex;align-items:center;gap:8px;margin-top:10px}
+    .action{width:28px;height:28px;flex:0 0 auto;display:inline-flex;align-items:center;
+      justify-content:center;border-radius:50%;border:1px solid var(--line);
+      background:transparent;color:var(--fg-3)}
+    .action svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;
+      stroke-linecap:round;stroke-linejoin:round}
+    .action.on{border-color:var(--accent);color:var(--accent)}
+    .action.on svg{fill:currentColor}
+    .action.flag{border-color:var(--accent);color:var(--accent)}
+    .action-spacer{flex:1}
+    .action-gotit{width:auto;padding:0 12px;border-radius:999px;font-family:var(--font);
+      font-size:12px;font-weight:600;height:28px;border-color:var(--line-strong);
+      color:var(--fg-3)}
+
+    /* --- report popover, same chrome as .share-popover --- */
+    .pop-anchor{position:relative;display:inline-flex}
+    .pop{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+      z-index:40;width:248px;padding:10px;border-radius:12px;background:var(--bg-2);
+      border:1px solid var(--line-strong);box-shadow:0 8px 24px var(--shadow)}
+    .pop-h{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--fg-3);margin:2px 2px 8px}
+    .pop-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;
+      border-radius:8px;border:none;background:transparent;color:var(--fg);
+      font-family:var(--font);font-size:12.5px;font-weight:500;text-align:left;cursor:pointer}
+    .pop-item:hover{background:var(--bg-3);color:var(--accent)}
+    .pop-item.pick{background:var(--bg-3);color:var(--accent);
+      box-shadow:inset 0 0 0 1px var(--accent)}
+    .pop-item .dot{width:14px;height:14px;flex:0 0 auto;border-radius:50%;
+      border:1px solid var(--line-strong)}
+    .pop-item.pick .dot{border-color:var(--accent);background:var(--accent);
+      box-shadow:inset 0 0 0 2px var(--bg-2)}
+    .pop-note{width:100%;margin:8px 0 0;padding:7px 9px;border-radius:8px;
+      border:1px solid var(--line);background:var(--bg);color:var(--fg);
+      font-family:var(--font);font-size:12px;resize:none;min-height:46px}
+    .pop-note::placeholder{color:var(--fg-3)}
+    .pop-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:9px}
+    .btn{font-family:var(--font);font-size:12px;font-weight:600;border-radius:999px;
+      padding:6px 14px;cursor:pointer;border:1px solid var(--line-strong);
+      background:transparent;color:var(--fg-2)}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+    .btn:disabled{opacity:.4}
+    .pop-done{display:flex;align-items:center;gap:8px;padding:14px 12px;color:var(--fg-2);
+      font-size:12.5px}
+    .pop-done svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:1.8;
+      stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+
+    .stage{background:var(--bg);border:1px dashed var(--line-strong);border-radius:14px;
+      padding:56px 28px 26px;margin-bottom:14px;display:flex;justify-content:center}
+    .note{font-size:11.5px;color:var(--fg-3);line-height:1.5;margin:2px 0 0}
+  </style>
+</helmet>
+<div class="wrap">
+  <h2 class="sec">B14 · ADR-0076</h2>
+  <div style="font-size:22px;font-weight:700;margin:0 0 4px">Report a card</div>
+  <p class="lede">A flag control in the card action row, next to Ask AI. One tap opens a
+    reason picker in the same popover chrome as Share. The note is optional; re-reporting
+    the same card just updates the row.</p>
+
+  <div class="row">
+    <div class="col">
+      <p class="cap">1 · Action row — flag added between Note and Share</p>
+      <div class="stage" style="padding-top:26px">
+        <div class="card" style="width:340px">
+          <div class="card-title">Why meanders migrate downstream</div>
+          <div class="card-summary">Erosion on the outer bank, deposition on the inner —
+            the bend crawls.</div>
+          <div class="card-actions">
+            <button class="action" title="Like"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+            <button class="action" title="Save"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg></button>
+            <button class="action" title="Note"><svg viewBox="0 0 24 24"><path d="M4 4h16v12l-4 4H4z"/><path d="M15 20v-4h4"/></svg></button>
+            <button class="action flag" title="Report"><svg viewBox="0 0 24 24"><path d="M4 21V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg></button>
+            <button class="action" title="Ask AI"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9 8.6 8.6 0 0 0 1.4 4.7L3 21l4.5-1.3A9 9 0 1 0 12 3z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg></button>
+            <button class="action" title="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+            <span class="action-spacer"></span>
+            <button class="action-gotit">Got it</button>
+          </div>
+        </div>
+      </div>
+      <p class="note">Flag icon uses <span style="font-family:var(--mono)">--accent</span>
+        border+ink (like a toggled action) so it reads as “flaggable”, not destructive.</p>
+    </div>
+
+    <div class="col">
+      <p class="cap">2 · Popover open — reason picked, note optional</p>
+      <div class="stage">
+        <div class="pop-anchor">
+          <button class="action flag"><svg viewBox="0 0 24 24"><path d="M4 21V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg></button>
+          <div class="pop">
+            <div class="pop-h">What’s wrong with this card?</div>
+            <button class="pop-item"><span class="dot"></span>Bad art</button>
+            <button class="pop-item pick"><span class="dot"></span>Broken diagram</button>
+            <button class="pop-item"><span class="dot"></span>Code block shouldn’t be here</button>
+            <button class="pop-item"><span class="dot"></span>Formatting is broken</button>
+            <button class="pop-item"><span class="dot"></span>Something else</button>
+            <textarea class="pop-note" placeholder="What looks wrong? (optional)">The arrows in the flow diagram point the wrong way.</textarea>
+            <div class="pop-actions">
+              <button class="btn">Cancel</button>
+              <button class="btn primary">Report</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note">Before a reason is picked, <b>Report</b> is disabled. Chrome, radius,
+        shadow and enter-animation are the existing <span style="font-family:var(--mono)">.share-popover</span>.</p>
+    </div>
+
+    <div class="col">
+      <p class="cap">3 · After submit — quiet confirmation, then closes</p>
+      <div class="stage">
+        <div class="pop-anchor">
+          <button class="action flag"><svg viewBox="0 0 24 24"><path d="M4 21V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg></button>
+          <div class="pop">
+            <div class="pop-done">
+              <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+              Thanks — flagged for review.
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note">Auto-dismisses after ~1.4s. No toast, no feed disruption — the report
+        is a moderation signal, not an engagement event.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1180,"height":760}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>

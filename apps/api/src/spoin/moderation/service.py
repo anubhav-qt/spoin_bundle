@@ -17,12 +17,41 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.api.schemas import (
     RepairAttemptOut,
+    RepairCardOut,
     RepairEnqueuedOut,
     RepairQueueItemOut,
     RepairReportOut,
 )
 from spoin.domain.enums import CardReportReason, CardStatus, RepairMode, RepairStatus
 from spoin.domain.models import Card, CardRepair, CardReport, GenerationJob
+
+_TERMINAL_REPAIR = (RepairStatus.DONE, RepairStatus.FAILED)
+
+
+def _repair_card_out(card: Card) -> RepairCardOut:
+    return RepairCardOut(
+        card_id=card.id,
+        version=card.version,
+        title=card.title,
+        canonical_title=card.canonical_title,
+        summary=card.summary,
+        body=card.body,
+        archetype=card.archetype,
+        visual_id=card.visual_id,
+        visual_slots=card.visual_slots,
+    )
+
+
+def _attempt_out(repair: CardRepair | None) -> RepairAttemptOut | None:
+    if repair is None:
+        return None
+    return RepairAttemptOut(
+        mode=repair.mode,
+        status=repair.status,
+        error=repair.error,
+        created_at=repair.created_at,
+    )
+
 
 #: Repair work yields to a real user waiting on a new topic (ADR-0076). Below
 #: the default generate-job priority of 0.
@@ -78,95 +107,137 @@ class ModerationService:
     # -- operator --------------------------------------------------------
 
     async def list_queue(self) -> list[RepairQueueItemOut]:
-        """Cards with at least one unresolved report, newest report first, each
-        with its full text (so the operator judges without a second fetch), all
-        its unresolved reports, and its latest `card_repair` attempt if any."""
+        """Two kinds of entry, newest activity first:
 
-        card_ids = (
-            await self._session.execute(
-                select(CardReport.card_id, func.max(CardReport.created_at).label("latest"))
-                .where(CardReport.resolved_at.is_(None))
-                .group_by(CardReport.card_id)
-                .order_by(func.max(CardReport.created_at).desc())
+        - `state="open"` -- a card with unresolved reports awaiting triage.
+        - `state="resolved"` -- a fix/remake has landed (or failed) and the
+          entry stays, showing before/after, until the operator dismisses it.
+        """
+
+        open_ids = [
+            r.card_id
+            for r in (
+                await self._session.execute(
+                    select(CardReport.card_id, func.max(CardReport.created_at).label("t"))
+                    .where(CardReport.resolved_at.is_(None))
+                    .group_by(CardReport.card_id)
+                    .order_by(func.max(CardReport.created_at).desc())
+                )
+            ).all()
+        ]
+        resolved_stmt = (
+            select(CardRepair)
+            .where(
+                CardRepair.status.in_(_TERMINAL_REPAIR),
+                CardRepair.dismissed_at.is_(None),
             )
-        ).all()
-        if not card_ids:
-            return []
+            .order_by(CardRepair.created_at.desc())
+        )
+        if open_ids:
+            resolved_stmt = resolved_stmt.where(CardRepair.card_id.not_in(open_ids))
+        resolved_repairs = list((await self._session.execute(resolved_stmt)).scalars().all())
 
-        ids = [row.card_id for row in card_ids]
+        want = (
+            set(open_ids)
+            | {rp.card_id for rp in resolved_repairs}
+            | {rp.result_card_id for rp in resolved_repairs if rp.result_card_id}
+        )
         cards = {
             c.id: c
-            for c in (await self._session.execute(select(Card).where(Card.id.in_(ids)))).scalars()
+            for c in (await self._session.execute(select(Card).where(Card.id.in_(want)))).scalars()
         }
+
         reports_by_card: dict[UUID, list[CardReport]] = {}
-        for report in (
-            await self._session.execute(
-                select(CardReport)
-                .where(CardReport.card_id.in_(ids), CardReport.resolved_at.is_(None))
-                .order_by(CardReport.created_at)
-            )
-        ).scalars():
-            reports_by_card.setdefault(report.card_id, []).append(report)
+        if open_ids:
+            for rep in (
+                await self._session.execute(
+                    select(CardReport)
+                    .where(CardReport.card_id.in_(open_ids), CardReport.resolved_at.is_(None))
+                    .order_by(CardReport.created_at)
+                )
+            ).scalars():
+                reports_by_card.setdefault(rep.card_id, []).append(rep)
 
         latest_repair: dict[UUID, CardRepair] = {}
-        for repair in (
+        for rp in (
             await self._session.execute(
                 select(CardRepair)
-                .where(CardRepair.card_id.in_(ids))
+                .where(CardRepair.card_id.in_(want))
                 .order_by(CardRepair.created_at.desc())
             )
         ).scalars():
-            latest_repair.setdefault(repair.card_id, repair)
+            latest_repair.setdefault(rp.card_id, rp)
 
         out: list[RepairQueueItemOut] = []
-        for row in card_ids:
-            card = cards.get(row.card_id)
+        seen: set[UUID] = set()
+
+        for card_id in open_ids:
+            card = cards.get(card_id)
             if card is None:
                 continue
-            reports = reports_by_card.get(row.card_id, [])
-            latest = latest_repair.get(row.card_id)
+            seen.add(card_id)
+            latest = latest_repair.get(card_id)
+            reports = reports_by_card.get(card_id, [])
             out.append(
                 RepairQueueItemOut(
                     card_id=card.id,
                     topic_id=card.topic_id,
                     family_id=card.family_id,
-                    version=card.version,
                     difficulty=card.difficulty,
-                    title=card.title,
-                    canonical_title=card.canonical_title,
-                    summary=card.summary,
-                    body=card.body,
-                    archetype=card.archetype,
-                    visual_id=card.visual_id,
-                    visual_slots=card.visual_slots,
+                    before=_repair_card_out(card),
+                    after=None,
                     report_count=len(reports),
                     reports=[
                         RepairReportOut(reason=r.reason, note=r.note, created_at=r.created_at)
                         for r in reports
                     ],
-                    latest_repair=(
-                        RepairAttemptOut(
-                            mode=latest.mode,
-                            status=latest.status,
-                            error=latest.error,
-                            created_at=latest.created_at,
-                        )
-                        if latest is not None
-                        else None
-                    ),
+                    latest_repair=_attempt_out(latest),
+                    state="open",
+                )
+            )
+
+        for rp in resolved_repairs:
+            if rp.card_id in seen:
+                continue
+            before = cards.get(rp.card_id)
+            if before is None:
+                continue
+            seen.add(rp.card_id)
+            after = cards.get(rp.result_card_id) if rp.result_card_id else None
+            out.append(
+                RepairQueueItemOut(
+                    card_id=rp.card_id,
+                    topic_id=before.topic_id,
+                    family_id=before.family_id,
+                    difficulty=before.difficulty,
+                    before=_repair_card_out(before),
+                    after=_repair_card_out(after) if after is not None else None,
+                    report_count=0,
+                    reports=[],
+                    latest_repair=_attempt_out(rp),
+                    state="resolved",
                 )
             )
         return out
 
     async def delete_card(self, card_id: UUID) -> RepairEnqueuedOut:
-        """Pull the card from every feed (status -> RETIRED) and resolve its
-        reports. No LLM, no job."""
+        """Pull the card from every feed (status -> RETIRED), resolve its
+        reports, and clear any resolved repair from the queue. No LLM, no job."""
 
         card = await self._require_active_card(card_id)
         card.status = CardStatus.RETIRED
         await mark_card_reports_resolved(self._session, card_id)
+        await self._dismiss_repairs(card_id)
         await self._session.commit()
         return RepairEnqueuedOut(card_id=card_id, action="deleted")
+
+    async def dismiss(self, card_id: UUID) -> RepairEnqueuedOut:
+        """Clear a resolved (done/failed) repair's before/after entry from the
+        queue. Reports are already resolved; this just hides the card."""
+
+        await self._dismiss_repairs(card_id)
+        await self._session.commit()
+        return RepairEnqueuedOut(card_id=card_id, action="dismissed")
 
     async def enqueue_fix(
         self, card_id: UUID, *, image: bytes, guidance: str | None
@@ -181,6 +252,19 @@ class ModerationService:
         return RepairEnqueuedOut(card_id=card_id, action="remake_enqueued", job_id=job.id)
 
     # -- internals ------------------------------------------------------
+
+    async def _dismiss_repairs(self, card_id: UUID) -> None:
+        now = datetime.now(UTC)
+        for rp in (
+            await self._session.execute(
+                select(CardRepair).where(
+                    CardRepair.card_id == card_id,
+                    CardRepair.status.in_(_TERMINAL_REPAIR),
+                    CardRepair.dismissed_at.is_(None),
+                )
+            )
+        ).scalars():
+            rp.dismissed_at = now
 
     async def _require_active_card(self, card_id: UUID) -> Card:
         card = await self._session.get(Card, card_id)

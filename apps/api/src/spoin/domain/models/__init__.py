@@ -5,9 +5,10 @@ re-exported here silently never gets a migration. Add new models to `__all__`.
 """
 
 from spoin.domain.models.card import (
+    AskConversation,
+    AskMessage,
     AskUsage,
     Card,
-    CardQa,
     CardRepair,
     CardReport,
     CardStats,
@@ -48,12 +49,13 @@ from spoin.domain.models.topic import (
 )
 
 __all__ = [
+    "AskConversation",
+    "AskMessage",
     "AskUsage",
     "Card",
     "CardBookmark",
     "CardLike",
     "CardNote",
-    "CardQa",
     "CardRepair",
     "CardReport",
     "CardStats",

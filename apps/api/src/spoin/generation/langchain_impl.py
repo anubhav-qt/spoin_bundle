@@ -87,8 +87,8 @@ from spoin.core.config import Settings
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
 from spoin.generation.base import (
+    AskTurnQuery,
     BatchResult,
-    CardAnswerQuery,
     CardCorrectionQuery,
     CardCorrectionResult,
     CardDraft,
@@ -1903,25 +1903,30 @@ class GeminiContentGenerator(ContentGenerator):
                 failures.append(f"malformed repair result: {exc}")
         return BatchResult(items=results, failures=failures)
 
-    async def stream_card_answer(self, query: CardAnswerQuery) -> AsyncIterator[str]:
-        """ADR-0077. One streamed flash-lite call through the generator pool.
+    async def stream_topic_answer(self, query: AskTurnQuery) -> AsyncIterator[str]:
+        """ADR-0077 (revised). One streamed flash-lite call per conversation
+        turn, through the generator pool.
 
-        Simpler failover than `_invoke_with_retry`: a user-facing single call
-        that just needs to succeed or fail fast, not grind a whole grid. A few
-        fresh `acquire()`s (each self-paced, least-spent-first); if none serve,
-        raise -- the endpoint turns that into an `error` SSE event."""
+        Simpler failover than `_invoke_with_retry`: a user-facing call that
+        needs to succeed or fail fast, not grind a whole grid. A few fresh
+        `acquire()`s (each self-paced, least-spent-first); if none serve, raise
+        -- the endpoint turns that into an `error` SSE event."""
 
+        subtopic_lines = "\n".join(f"- {s}" for s in query.subtopics) or "- (none listed)"
         messages: list[tuple[str, Any]] = [
             (
                 "system",
                 prompts.ASK_SYSTEM.format(
-                    card_title=query.card_title,
                     topic_name=query.topic_name,
+                    subtopics=subtopic_lines,
+                    current_card=query.current_card_title or "(browsing the topic)",
                     context=query.context,
                 ),
             ),
-            ("human", query.question),
         ]
+        for role, text in query.history:
+            messages.append(("ai" if role == "assistant" else "human", text))
+        messages.append(("human", query.question))
 
         attempts = min(4, self._generator.key_count * len(self._generator.ladder))
         last_exc: Exception | None = None
@@ -1934,12 +1939,14 @@ class GeminiContentGenerator(ContentGenerator):
             try:
                 await self._generator.note_request_sent(key_index, model, now=datetime.now(UTC))
                 async for chunk in client.astream(messages):
-                    text = chunk.content
-                    if isinstance(text, list):
+                    raw: object = chunk.content
+                    if isinstance(raw, list):
                         text = "".join(
-                            part.get("text", "") if isinstance(part, dict) else str(part)
-                            for part in text
+                            str(part.get("text", "")) if isinstance(part, dict) else str(part)
+                            for part in raw
                         )
+                    else:
+                        text = str(raw)
                     if text:
                         yield text
                 return

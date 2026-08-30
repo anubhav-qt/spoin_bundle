@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600;7..72,700&display=swap">
+  <style>
+    :root{
+      --bg:#edf0ea; --bg-2:#e2e7de; --bg-3:#d6ddd1;
+      --fg:#262a22; --fg-2:#565f51; --fg-3:#838c7d;
+      --accent:#c1442b; --accent-2:#a83a24; --accent-syntax:#2f6b78;
+      --line:rgba(38,42,34,.14); --line-strong:rgba(38,42,34,.26);
+      --shadow:rgba(38,42,34,.16);
+      --font:"Literata",ui-serif,Georgia,serif;
+      --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);
+      -webkit-font-smoothing:antialiased}
+    .wrap{padding:36px 40px 56px;max-width:1080px;margin:0 auto}
+    .top{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+    .h1{font-size:20px;font-weight:700;margin:0}
+    .devtag{font-family:var(--mono);font-size:10px;color:var(--fg-3);border:1px solid var(--line);
+      border-radius:999px;padding:2px 8px}
+    p.lede{margin:0 0 24px;color:var(--fg-3);font-size:12.5px;font-family:var(--mono)}
+
+    .entry{border:1px solid var(--line-strong);border-radius:14px;background:var(--bg-2);
+      padding:16px;margin-bottom:16px;display:grid;grid-template-columns:1fr 300px;gap:18px}
+    /* left: the real card render */
+    .card{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+    .card-title{font-size:16px;font-weight:700;line-height:1.3;margin:0 0 5px}
+    .card-summary{margin:0 0 9px;font-size:13px;line-height:1.5;color:var(--fg-2)}
+    .card-body{border-top:1px solid var(--line);padding-top:10px;font-size:13px;
+      line-height:1.62;color:var(--fg)}
+    .art{margin-top:9px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;
+      background:var(--bg-2);font-family:var(--mono);font-size:11px;line-height:1.35;
+      white-space:pre;color:var(--fg-2);overflow-x:auto}
+    .art .bust{color:var(--accent)}
+    .art-cap{font-family:var(--font);font-size:10.5px;color:var(--fg-3);margin-top:5px}
+
+    /* right: report panel */
+    .side{display:flex;flex-direction:column;gap:12px}
+    .side-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;
+      letter-spacing:.07em;text-transform:uppercase;color:var(--fg-3)}
+    .count{font-family:var(--mono);font-size:10px;background:var(--accent);color:var(--bg);
+      border-radius:999px;padding:1px 7px}
+    .rep{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg)}
+    .rep-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+    .reason{font-size:11px;font-weight:600;color:var(--accent);font-family:var(--mono);
+      letter-spacing:.03em}
+    .when{font-size:10px;color:var(--fg-3);font-family:var(--mono)}
+    .rep-note{font-size:12px;line-height:1.45;color:var(--fg-2)}
+    .rep-none{font-size:11px;color:var(--fg-3);font-style:italic}
+
+    .status{display:flex;gap:7px;align-items:flex-start;border:1px solid var(--line);
+      border-radius:9px;padding:8px 10px;font-size:11.5px;line-height:1.45;color:var(--fg-2)}
+    .status svg{width:13px;height:13px;flex:0 0 auto;margin-top:2px;fill:none;stroke-width:1.8;
+      stroke-linecap:round;stroke-linejoin:round}
+    .status.run{border-color:var(--accent-syntax)}
+    .status.run svg{stroke:var(--accent-syntax)}
+    .status.fail svg{stroke:var(--accent)}
+    .spin{animation:spin 1.1s linear infinite;transform-origin:center}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* actions */
+    .acts{display:flex;gap:8px;flex-wrap:wrap}
+    .abtn{font-family:var(--font);font-size:12px;font-weight:600;border-radius:999px;
+      padding:7px 14px;cursor:pointer;border:1px solid var(--line-strong);
+      background:transparent;color:var(--fg-2)}
+    .abtn.on{border-color:var(--accent);color:var(--accent)}
+    .abtn.danger{border-color:var(--accent);color:var(--accent)}
+    .abtn.danger:hover{background:var(--accent);color:var(--bg)}
+    .abtn:disabled{opacity:.4}
+    .form{grid-column:1 / -1;border-top:1px solid var(--line);padding-top:14px;margin-top:2px}
+    .form-lbl{font-size:11px;font-weight:600;color:var(--fg-3);letter-spacing:.04em;
+      text-transform:uppercase;margin:0 0 6px;display:flex;gap:6px;align-items:center}
+    .req{color:var(--accent);font-family:var(--mono);font-size:10px}
+    .form textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;
+      padding:9px 11px;font-family:var(--font);font-size:12.5px;color:var(--fg);
+      resize:vertical;min-height:64px;line-height:1.5}
+    .form textarea::placeholder{color:var(--fg-3)}
+    .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .hint{font-size:11px;color:var(--fg-3)}
+    .submit{font-family:var(--font);font-size:12px;font-weight:600;border-radius:999px;
+      padding:7px 16px;background:var(--accent);border:1px solid var(--accent);color:var(--bg);
+      cursor:pointer}
+    .submit:disabled{opacity:.4;background:transparent;border-color:var(--line-strong);color:var(--fg-3)}
+    .queued{grid-column:1 / -1;border-top:1px solid var(--line);margin-top:2px;padding-top:12px;
+      display:flex;gap:8px;align-items:center;font-size:12px;color:var(--fg-2)}
+    .queued svg{width:14px;height:14px;stroke:var(--accent-syntax);fill:none;stroke-width:1.8}
+    .note{font-size:11.5px;color:var(--fg-3);line-height:1.5;margin:14px 2px 0}
+  </style>
+</helmet>
+<div class="wrap">
+  <div class="top">
+    <h1 class="h1">Repair queue</h1>
+    <span class="devtag">/admin/repairs · dev only</span>
+  </div>
+  <p class="lede">2 cards flagged · newest report first</p>
+
+  <!-- entry 1: fix form open -->
+  <div class="entry">
+    <div>
+      <div class="card">
+        <div class="card-title">How a load balancer picks a backend</div>
+        <div class="card-summary">Round-robin, least-connections, or a hash of the client
+          — each trades evenness for stickiness.</div>
+        <div class="card-body">A reverse proxy sits in front of N identical backends…
+          <div class="art"><span class="bust">client ──▶ [ LB ]──▶ backend-1
+                     └▶ backend-2 ────────────┐
+   backend-3 ◀── (overflow, mis-aligned) ─────┘</span></div>
+          <div class="art-cap">— no caption under the ASCII block —</div>
+        </div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="side-h">Reports <span class="count">2</span></div>
+      <div class="rep">
+        <div class="rep-top"><span class="reason">art</span><span class="when">4m ago</span></div>
+        <div class="rep-note">The diagram is misaligned — arrows don’t line up with the boxes.</div>
+      </div>
+      <div class="rep">
+        <div class="rep-top"><span class="reason">formatting</span><span class="when">1h ago</span></div>
+        <div class="rep-note rep-none">no note</div>
+      </div>
+      <div class="acts">
+        <button class="abtn on">Fix</button>
+        <button class="abtn">Remake</button>
+        <button class="abtn danger">Delete</button>
+      </div>
+    </div>
+    <div class="form">
+      <p class="form-lbl">Guidance for the repair <span class="hint">— optional</span></p>
+      <textarea placeholder="e.g. redraw the ASCII so arrows align; keep the three-backend example.">Realign the arrows to the boxes and add a one-line caption. Leave the prose as-is.</textarea>
+      <div class="form-actions">
+        <span class="hint">Renders this card to a PNG and sends it with the request.</span>
+        <button class="submit">Send fix</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- entry 2: a remake previously failed, remake form is required -->
+  <div class="entry">
+    <div>
+      <div class="card">
+        <div class="card-title">Big-O of a hash map lookup</div>
+        <div class="card-summary">O(1) average, O(n) worst — and why the worst case
+          almost never happens.</div>
+        <div class="card-body">A hash map stores entries in buckets indexed by
+          <code style="font-family:var(--mono);font-size:12px;background:var(--bg-2);
+          padding:1px 4px;border-radius:4px">hash(key) % n</code>…
+          <div class="art" style="color:var(--accent);font-family:var(--font)">```python
+def lookup(m, k):   # code fence on a concept card
+    return m[k]
+```</div>
+        </div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="side-h">Reports <span class="count">1</span></div>
+      <div class="rep">
+        <div class="rep-top"><span class="reason">code_block</span><span class="when">2d ago</span></div>
+        <div class="rep-note">This isn’t a coding card — the snippet doesn’t belong.</div>
+      </div>
+      <div class="status fail">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span>Last remake failed: <span style="font-family:var(--mono);font-size:10.5px">rejected by the quality gate — reads as intermediate, not beginner</span></span>
+      </div>
+      <div class="acts">
+        <button class="abtn">Fix</button>
+        <button class="abtn on">Remake</button>
+        <button class="abtn danger">Delete</button>
+      </div>
+    </div>
+    <div class="form">
+      <p class="form-lbl">What to make instead <span class="req">required</span></p>
+      <textarea placeholder="Describe the replacement card: what it should teach and how, at this difficulty.">Rewrite as a pure-prose beginner card: explain average vs worst case with the “everyone lands in a different bucket” intuition. No code block.</textarea>
+      <div class="form-actions">
+        <span class="hint">Regenerates from scratch through the full quality gate.</span>
+        <button class="submit">Send remake</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- entry 3 (collapsed): repair already queued -->
+  <div class="entry" style="grid-template-columns:1fr 300px">
+    <div>
+      <div class="card" style="opacity:.72">
+        <div class="card-title">TCP three-way handshake</div>
+        <div class="card-summary">SYN, SYN-ACK, ACK — and what each side knows after each step.</div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="side-h">Reports <span class="count">3</span></div>
+      <div class="status run">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path class="spin" d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>
+        <span>A fix is running — the card stays here until the worker resolves it.</span>
+      </div>
+      <div class="acts">
+        <button class="abtn" disabled>Fix</button>
+        <button class="abtn" disabled>Remake</button>
+        <button class="abtn danger" disabled>Delete</button>
+      </div>
+    </div>
+    <div class="queued">
+      <svg viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+      Repair queued 30s ago · one outstanding repair per card
+    </div>
+  </div>
+
+  <p class="note">Left column reuses the real <span style="font-family:var(--mono)">Card</span>
+    body renderer (ASCII, mermaid, markdown) so the operator judges the actual card. Delete
+    asks for confirmation. After Fix/Remake the entry drops into the “queued” state and
+    only leaves the list when the worker writes a new family version (or resolves it).</p>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1080,"height":1140}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>

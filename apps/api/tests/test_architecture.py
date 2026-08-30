@@ -102,10 +102,10 @@ def test_generation_interfaces_take_collections() -> None:
     assert hasattr(ContentGenerator, "verify_cards")
 
 
-def test_stream_card_answer_is_the_only_single_item_generation_method() -> None:
-    """ADR-0077: `stream_card_answer` is a deliberate, documented exception to
+def test_stream_topic_answer_is_the_only_single_item_generation_method() -> None:
+    """ADR-0077: `stream_topic_answer` is a deliberate, documented exception to
     ADR-0005's collection rule -- streaming forces one item, and a streamed
-    answer is exactly one request. Every OTHER LLM-facing method still takes a
+    turn is exactly one request. Every OTHER LLM-facing method still takes a
     collection. This pins the exception so a second single-item method can't
     slip in unnoticed."""
 
@@ -114,7 +114,7 @@ def test_stream_card_answer_is_the_only_single_item_generation_method() -> None:
     from spoin.generation.base import ContentGenerator
 
     # Not LLM calls: the key-claim context manager and the streaming exception.
-    allowed_non_collection = {"claimed_key_scope", "stream_card_answer"}
+    allowed_non_collection = {"claimed_key_scope", "stream_topic_answer"}
     offenders: list[str] = []
     for name, member in inspect.getmembers(ContentGenerator):
         if name.startswith("_") or not getattr(member, "__isabstractmethod__", False):

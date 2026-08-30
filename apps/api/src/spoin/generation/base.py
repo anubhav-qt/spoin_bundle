@@ -401,17 +401,23 @@ class CardRepairResult(BaseModel):
     note: str = ""
 
 
-class CardAnswerQuery(BaseModel):
-    """The single AskAI call's whole input (ADR-0077). `context` is assembled by
-    the server from the card, its subtopic/topic, sibling subtopics, adjacent
-    difficulties and the nearest cards -- the model gets nothing else, no search
-    tool, no other users' data. `question` is untrusted user text and MUST reach
-    the model as a delimited user turn, never concatenated into the system
-    prompt."""
+class AskTurnQuery(BaseModel):
+    """One AskAI conversation turn's whole input (ADR-0077, revised).
 
-    card_title: str
+    Scope is the TOPIC, not one card. `context` is assembled by the server from
+    the topic, its subtopics, and the nearest cards across the whole topic --
+    the model gets nothing else, no search tool, no other users' data, no other
+    topics (until the recommender adds them). `current_card_title` is a "reader
+    is here" hint only. `history` is the conversation so far, oldest first, as
+    `(role, text)` with role `"user"` / `"assistant"`. `question` and every
+    history entry are untrusted user text and MUST reach the model as delimited
+    turns, never concatenated into the system prompt."""
+
     topic_name: str
+    subtopics: list[str]
+    current_card_title: str | None
     context: str
+    history: list[tuple[str, str]]
     question: str
 
 
@@ -719,19 +725,21 @@ class ContentGenerator(ABC):
         (the operator's review is the gate)."""
 
     @abstractmethod
-    def stream_card_answer(self, query: CardAnswerQuery) -> AsyncIterator[str]:
-        """ADR-0077: answer one reader question about one card, streaming the
-        answer token by token.
+    def stream_topic_answer(self, query: AskTurnQuery) -> AsyncIterator[str]:
+        """ADR-0077 (revised): answer one turn of a persistent, topic-scoped
+        AskAI conversation, streaming the answer token by token.
 
         **The one sanctioned single-item, streaming method** -- an explicit,
         documented exception to ADR-0005's collection rule (`test_architecture.py`
         pins it as the only one). The rule exists because the free tier meters
-        *requests*; a streamed answer is exactly one request, and there is
-        nothing to batch (one user, one question, arriving at its own time).
+        *requests*; a streamed turn is exactly one request, and there is nothing
+        to batch (one user, one turn, at its own time).
 
-        Implementations build a system prompt scoped to the supplied `context`,
-        instructing the model to reply with exactly `OFF_TOPIC` and nothing else
-        when the question isn't answerable from it -- the caller watches the
-        stream's opening for that sentinel. `query.question` goes in a delimited
-        user turn, never the system prompt. Yields answer text chunks; raises the
-        usual quota errors if no cell can place the call."""
+        Implementations build a system prompt scoped to the supplied topic
+        `context` and `subtopics`, replay `history` as delimited user/assistant
+        turns, and instruct the model to reply with exactly `OFF_TOPIC` and
+        nothing else when the question isn't answerable from the topic's
+        material -- the caller watches the stream's opening for that sentinel.
+        `query.question` and `history` go in delimited turns, never the system
+        prompt. Yields answer text chunks; raises the usual quota errors if no
+        cell can place the call."""

@@ -4,11 +4,12 @@ ADR-0076 (report a card + operator repair lane) and ADR-0077 (AskAI):
 
 - `card_report`   -- a reader flagging a live card as structurally broken
 - `card_repair`   -- the operator's fix/remake instruction + audit trail
+  (incl. `dismissed_at` for the admin before/after view)
 - `generation_job.kind` / `.card_id` -- a second job kind ('repair') alongside
   'generate', coalesced on `card_id` instead of `topic_id`
 - `card_status` gains 'retired' -- an operator-pulled card
-- `card_qa`      -- cached AskAI exchanges
-- `ask_usage`    -- per-user per-UTC-day AskAI question counter
+- `ask_conversation` / `ask_message` -- a persistent topic-scoped AskAI thread
+- `ask_usage`    -- per-user per-UTC-day AskAI turn counter
 
 Revision ID: 07b6c1a3cb76
 Revises: f0a1c2b3d4e5
@@ -86,6 +87,7 @@ def upgrade() -> None:
         sa.Column("result_card_id", sa.UUID(), nullable=True),
         sa.Column("error", sa.Text(), nullable=True),
         sa.Column("resolved_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("dismissed_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column(
             "updated_at",
@@ -152,11 +154,51 @@ def upgrade() -> None:
 
     # -- AskAI ------------------------------------------------------------
     op.create_table(
-        "card_qa",
-        sa.Column("card_id", sa.UUID(), nullable=False),
-        sa.Column("question_norm", sa.String(length=500), nullable=False),
-        sa.Column("answer", sa.Text(), nullable=False),
-        sa.Column("on_topic", sa.Boolean(), nullable=False),
+        "ask_conversation",
+        sa.Column("user_id", sa.UUID(), nullable=False),
+        sa.Column("topic_id", sa.UUID(), nullable=False),
+        sa.Column("status", sa.String(length=16), nullable=False, server_default="active"),
+        sa.Column("last_message_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.ForeignKeyConstraint(
+            ["user_id"],
+            ["app_user.id"],
+            name=op.f("fk_ask_conversation_user_id_app_user"),
+            ondelete="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["topic_id"],
+            ["topic.id"],
+            name=op.f("fk_ask_conversation_topic_id_topic"),
+            ondelete="CASCADE",
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_ask_conversation")),
+    )
+    op.create_index(
+        "uq_ask_conversation_active",
+        "ask_conversation",
+        ["user_id", "topic_id"],
+        unique=True,
+        postgresql_where=sa.text("status = 'active'"),
+    )
+    op.create_table(
+        "ask_message",
+        sa.Column("conversation_id", sa.UUID(), nullable=False),
+        sa.Column("role", sa.String(length=16), nullable=False),
+        sa.Column("content", sa.Text(), nullable=False),
+        sa.Column("on_topic", sa.Boolean(), nullable=False, server_default=sa.text("true")),
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column(
             "created_at",
@@ -165,10 +207,15 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
-            ["card_id"], ["card.id"], name=op.f("fk_card_qa_card_id_card"), ondelete="CASCADE"
+            ["conversation_id"],
+            ["ask_conversation.id"],
+            name=op.f("fk_ask_message_conversation_id_ask_conversation"),
+            ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_card_qa")),
-        sa.UniqueConstraint("card_id", "question_norm", name="uq_card_qa_card_question"),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_ask_message")),
+    )
+    op.create_index(
+        "ix_ask_message_conversation", "ask_message", ["conversation_id", "created_at"]
     )
     op.create_table(
         "ask_usage",
@@ -187,7 +234,10 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("ask_usage")
-    op.drop_table("card_qa")
+    op.drop_index("ix_ask_message_conversation", table_name="ask_message")
+    op.drop_table("ask_message")
+    op.drop_index("uq_ask_conversation_active", table_name="ask_conversation")
+    op.drop_table("ask_conversation")
 
     op.drop_index("uq_generation_job_card_pending", table_name="generation_job")
     op.drop_index("uq_generation_job_topic_pending", table_name="generation_job")

@@ -332,40 +332,70 @@ class CardRepair(Base, UUIDPrimaryKey, Timestamps):
     #: gate rejection, or a call that never returned. Surfaced on the admin page.
     error: Mapped[str | None] = mapped_column(Text)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: Set when the operator dismisses a DONE/FAILED repair from the admin
+    #: before/after view (ADR-0076). A resolved repair stays on the page --
+    #: showing the new card with a before/after toggle -- until this is set.
+    dismissed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
-class CardQa(Base, UUIDPrimaryKey, CreatedAt):
-    """A cached AskAI exchange (ADR-0077). Unique on `(card_id,
-    question_norm)`; a hit replays `answer` with no LLM call. `on_topic=false`
-    rows are cached too, so a repeated off-topic question costs nothing to
-    re-refuse.
+class AskConversation(Base, UUIDPrimaryKey, Timestamps):
+    """One persistent AskAI thread, scoped to a topic (ADR-0077, revised).
+
+    Partial-unique on `(user_id, topic_id) WHERE status = 'active'`: at most one
+    live thread per topic per user. "Start over" archives the active one and a
+    fresh row is opened on the next question.
     """
 
-    __tablename__ = "card_qa"
+    __tablename__ = "ask_conversation"
     __table_args__ = (
-        UniqueConstraint("card_id", "question_norm", name="uq_card_qa_card_question"),
+        Index(
+            "uq_ask_conversation_active",
+            "user_id",
+            "topic_id",
+            unique=True,
+            postgresql_where=text("status = 'active'"),
+        ),
     )
 
-    card_id: Mapped[uuid.UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("card.id", ondelete="CASCADE"), nullable=False
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("app_user.id", ondelete="CASCADE"), nullable=False
     )
-    #: The question, lowercased with whitespace/punctuation collapsed
-    #: (`normalize_topic_text`-style) -- the cache key. The raw question is not
-    #: kept; it carries no value once normalised and is user free text.
-    question_norm: Mapped[str] = mapped_column(String(500), nullable=False)
-    answer: Mapped[str] = mapped_column(Text, nullable=False)
-    #: False when the retrieval context could not answer this (the embedding
-    #: gate or the `OFF_TOPIC` sentinel fired). The client renders the refusal
-    #: state; the model's own prose is never shown for these.
-    on_topic: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    topic_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), nullable=False
+    )
+    #: 'active' | 'archived'. A plain string like `generation_job.status` -- a
+    #: two-value set the app branches on, not worth a PG enum + migration.
+    status: Mapped[str] = mapped_column(String(16), default="active", nullable=False)
+    last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AskMessage(Base, UUIDPrimaryKey, CreatedAt):
+    """One turn in an `ask_conversation` (ADR-0077, revised)."""
+
+    __tablename__ = "ask_message"
+    __table_args__ = (Index("ix_ask_message_conversation", "conversation_id", "created_at"),)
+
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("ask_conversation.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    #: 'user' | 'assistant'. Plain string, same reasoning as
+    #: `AskConversation.status`.
+    role: Mapped[str] = mapped_column(String(16), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    #: Only meaningful on an `assistant` row: `false` when the turn was refused
+    #: (embedding gate or `OFF_TOPIC` sentinel). `content` then holds the
+    #: server-built hint, never the model's prose.
+    on_topic: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
 
 class AskUsage(Base):
-    """One row per user per UTC day, counting AskAI questions that reached the
-    provider (ADR-0077). A plain counter, deliberately NOT the quota governor:
-    the governor rations a shared provider budget, this rations one user against
-    everyone else. Cache hits, embedding-gate refusals and errors cost nothing
-    and are not counted here.
+    """One row per user per UTC day, counting AskAI assistant turns that reached
+    the provider (ADR-0077). A plain counter, deliberately NOT the quota
+    governor: the governor rations a shared provider budget, this rations one
+    user against everyone else. Gate refusals and errors cost nothing and are
+    not counted here.
     """
 
     __tablename__ = "ask_usage"

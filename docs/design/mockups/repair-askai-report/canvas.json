@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1180, "h": 760, "title": "Report a card" },
+    { "file": "AskAI.dc.html", "x": 1300, "y": 0, "w": 1240, "h": 1180, "title": "Ask AI panel" },
+    { "file": "AdminRepairs.dc.html", "x": 0, "y": 860, "w": 1080, "h": 1140, "title": "/admin/repairs" }
+  ],
+  "annotations": [
+    { "id": "intro", "x": 0, "y": -150, "w": 520, "text": "spoin v1 — B14 (report + repair) and B12/13 (AskAI). Palette + component chrome lifted from apps/web/app/globals.css (Notebook: cream #edf0ea, ink #262a22, terracotta #c1442b), Literata body. Static mockups — key states per surface." }
+  ],
+  "launch": { "view": "canvas" }
+}

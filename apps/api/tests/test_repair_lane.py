@@ -220,6 +220,24 @@ async def test_fix_mints_a_new_family_version_and_supersedes(session: AsyncSessi
     assert repair.result_card_id == versions[1].id
 
 
+async def test_resolved_fix_shows_before_and_after_until_dismissed(session: AsyncSession) -> None:
+    _user, card = await _card(session)
+    await _enqueue_and_run(session, card, RepairMode.FIX, FakeContentGenerator(), guidance=None)
+    session.expire_all()
+    svc = ModerationService(session)
+
+    queue = await svc.list_queue()
+    assert len(queue) == 1
+    item = queue[0]
+    assert item.state == "resolved"
+    assert item.before.version == 1
+    assert item.after is not None and item.after.version == 2
+    assert item.latest_repair is not None and item.latest_repair.status == RepairStatus.DONE
+
+    await svc.dismiss(card.id)
+    assert await svc.list_queue() == []
+
+
 async def test_fix_rejects_an_added_code_fence(session: AsyncSession) -> None:
     _user, card = await _card(session)
     await _enqueue_and_run(session, card, RepairMode.FIX, _AddsCodeFence(), guidance=None)

@@ -16,8 +16,8 @@ from collections.abc import AsyncIterator
 
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation.base import (
+    AskTurnQuery,
     BatchResult,
-    CardAnswerQuery,
     CardCorrectionQuery,
     CardCorrectionResult,
     CardDraft,
@@ -385,13 +385,14 @@ class FakeContentGenerator(ContentGenerator):
         ]
         return BatchResult(items=items)
 
-    async def stream_card_answer(self, query: CardAnswerQuery) -> AsyncIterator[str]:
-        # A deterministic non-streaming-shaped stream: two chunks, echoing the
-        # question so a test can assert the wiring end to end. `_stable_index`
-        # keeps it varying by question without randomness.
-        marker = _stable_index(query.card_title, query.question, modulo=1000)
+    async def stream_topic_answer(self, query: AskTurnQuery) -> AsyncIterator[str]:
+        # Deterministic two-chunk stream, echoing the topic + turn count so a
+        # test can assert the wiring end to end. `_stable_index` keeps it
+        # varying without randomness.
+        marker = _stable_index(query.topic_name, query.question, modulo=1000)
+        turn = len(query.history) // 2 + 1
         for chunk in (
-            f"Regarding '{query.card_title[:40]}': ",
+            f"On {query.topic_name} (turn {turn}): ",
             f"placeholder answer #{marker} drawn from the supplied context.",
         ):
             yield chunk

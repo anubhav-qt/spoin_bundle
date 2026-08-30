@@ -3,6 +3,25 @@
 **Owner:** unassigned
 **Blocked on:** nothing
 
+## Status (2026-08-30, `feat/v1-finish-line`)
+
+**Backend shipped** — commit `1f72fc6`. `POST /topics/batch`
+(`TopicsService.request_topics_batch`): one `validate_topic_names` + one
+`match_and_create_topics` call for the whole list, per-row outcomes
+(`generating` / `subscribed` / `already_subscribed` / `rejected` + `detail`),
+capped at `Settings.custom_topic_batch_max` (5), guest-gated, one `FeedPlan`
+clear + one commit. `api.requestTopics(entries)` is in `lib/api.ts`. 7 tests in
+`tests/test_topics_batch.py`; `make test` green.
+
+**Frontend still to build** — the `RequestTopicBox` rows UI described below. Two
+reasons it wasn't done in the same pass: (1) it's a visible redesign of a
+right-rail box, so per the v1 plan's Phase 2.5 it wants a `/design` pass +
+owner sign-off first; (2) `RequestTopicBox.tsx` carries an uncommitted Wave-1
+change (the F9 `onFollowed(topic, hasCards?)` signature) that a full rework
+would entangle with — that change should land first. The description-field and
+list-of-rows work is otherwise exactly as specified below, now that the
+`/topics/batch` endpoint and `api.requestTopics` exist.
+
 ## The problem
 
 `RequestTopicBox.tsx` is one text input, one "Add" button, one topic at a time. Behind

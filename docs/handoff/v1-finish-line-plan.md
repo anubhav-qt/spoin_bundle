@@ -327,6 +327,56 @@ model. Confirm against real reading before treating 1.2% as the new baseline.
 numbered from 0075 now), then the Cockroach sequence, then B7. Task 0034 still
 pickup-ready.
 
+**2026-08-30, session 5 — B6 embedding-based topic colours shipped (server-side).**
+Owner picked B6 first of the Tier-2 three.
+
+- **[ADR-0075](../adr/0075-embedding-derived-topic-accent-color.md) (Accepted, amends
+  0034).** The `null` default hue stops being a client-side positional computation.
+  With a real embedder, subscription now ranks a curated colour vocabulary by
+  embedding similarity to the topic, walks it best-first, and takes the first hue
+  ≥ `ACCENT_HUE_MIN_DISTANCE` (**25°**) from every hue the user's other topics use —
+  then **writes that 0-359 int into `UserTopic.accent_hue`**. Taste from embeddings,
+  distinctness from angle math (CLAUDE.md). Back-pointer added to ADR-0034's header +
+  README row.
+- **Degradation is total and deliberate.** `HashEmbedder` (fastembed absent — the
+  dev/test default) → assignment returns `None`, column stays null, client renders
+  `defaultTopicHue` exactly as before. This is why the existing suite's
+  `accent_hue is None` assumptions survive untouched. Missing/broken vocab file →
+  same positional fallback.
+- **No backfill.** Legacy `null` rows stay null and render via the unchanged client
+  default. `null` now means "no server-assigned hue" (pre-0075, or no-embedder), a
+  mixed population — documented on the field comment and in the ADR.
+- **New files:** `apps/api/src/spoin/topics/accent_color.py` (load + embed-and-cache
+  vocab, `assign_accent_hue`, Python ports of `hashTopicId` / `defaultTopicHue` kept
+  byte-identical to `lib/topicColor.ts` so server-side dedup of a legacy row agrees
+  with what the client paints), `accent_color_data/colors.json` (~250 `{name, hue}`,
+  Claude-curated in one pass — **owner to verify while testing**; tuning is standing
+  [task 0036](../tasks/0036-grow-and-tune-the-accent-color-vocabulary.md)),
+  `tests/test_accent_color.py` (10 tests: wheel arithmetic, hash parity, distance
+  filter, name-embed path, positional fallback, `HashEmbedder`→`None`).
+- **Wiring:** `_assign_new_subscription_hue` helper on `TopicsService`, called from
+  all four `UserTopic` creation sites (`subscribe`, `complete_onboarding`,
+  `request_topic`, `request_topics_batch`) — each dedups against the rows added
+  before it in the same transaction (autoflush). `set_color(hue=None)` now **re-runs
+  the assignment** instead of "reset to client default"; `-1` and explicit hues
+  unchanged. `subscribe` / `complete_onboarding` / `set_topic_color` routers gained a
+  `get_embedder()` arg. All four creation responses now carry the materialized
+  `accent_hue` so the client shows the right colour on the first paint, no
+  list-refetch swap.
+- **Client:** `lib/topicColor.ts` **not changed** — it already renders a concrete
+  `accent_hue`; the server just sends one now. Docstring updated to say so.
+- **`make test` green — 477 passed** (was 466; +10 accent-colour, +1 elsewhere).
+  `mypy --strict` green (87 files, was 86). `ruff check` + `ruff format --check` clean
+  through the container. Nothing committed yet — owner had not asked.
+- **Not done:** no live end-to-end run (that spends real quota and the owner drives
+  runs); the B4 `/admin/quota` panel still doesn't surface claims (unchanged from
+  session 4). The pre-existing Wave-1 working tree is still untouched — note this
+  session edited `topics/service.py`, which does **not** carry Wave-1 changes, so the
+  diff there is clean.
+
+**Next:** unchanged — B14 → ADR, B12/13 → ADR (from 0076 now), then the Cockroach
+sequence, then B7. Task 0034 still pickup-ready.
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)
@@ -635,7 +685,12 @@ shows up as a real problem in production, revisit it then. Nothing to build, no 
 
 ### Tier 2 — new subsystems
 
-**B6. Embedding-based topic colors.**
+**B6. Embedding-based topic colors. — SHIPPED (server-side) 2026-08-30, session 5.**
+[ADR-0075](../adr/0075-embedding-derived-topic-accent-color.md); see the session-5
+progress-log entry above. Built to the design below with two settled choices:
+`ACCENT_HUE_MIN_DISTANCE = 25°`, and the no-embedder path leaves `accent_hue` null
+(no positional value persisted). No live run yet. The rest of this section is the
+design as approved.
 
 Today the default hue is positional/hash-based: ten curated hues by subscription order,
 then `hash(topicId) % 360` (`lib/topicColor.ts`). The ask is to pick a color whose

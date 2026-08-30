@@ -163,25 +163,30 @@ across the whole frontend as of the last check.
   identical) + the dead-CSS sweep; no ADR/design gate left. Verified live in
   Obsidian: card list matches Liked, empty state matches, unbookmark→undo works.
   (`b598ff3` was the earlier "defer" doc commit, now superseded.)
-- **B2/B8 backend shipped** — `1f72fc6`. `POST /topics/batch` +
-  `TopicsService.request_topics_batch`: one `validate_topic_names` + one
-  `match_and_create_topics` call for the whole list, per-row outcomes
-  (`generating` / `subscribed` / `already_subscribed` / `rejected`+detail), capped
-  at `Settings.custom_topic_batch_max` (5), guest-gated. `api.requestTopics()` added.
-  7 tests. **Frontend rows UI still to build** — it's a visible rail redesign
-  (Phase 2.5 `/design` gate) and `RequestTopicBox.tsx` carries the uncommitted
-  Wave-1 F9 change that a rework would entangle with; that should land first. Noted
-  in [task 0032](../tasks/0032-batch-topic-requests.md).
-- **B4 shipped** — `99d3fb9`. `GET /admin/quota` → `read_quota_status`
-  (`generation/quota_report.py`, read-only): one cell per `(key, model)` with daily
-  spend / ceiling / `exhausted_at` / `cooldown_until`, plus `model_unavailable`
-  rows. ADR-0065's three conditions kept as **separate counts**
-  (`cells_daily_exhausted` / `cells_minute_throttled` / `models_parked`), never one
-  boolean. `env != "production"` gated like `/dev/*`; a real admin-role gate is
-  [task 0035](../tasks/0035-admin-role-and-production-admin-surface.md). `dev.py`'s
-  stale "placeholder auth / gate before exposing" docstring corrected. 4 tests;
-  smoke-tested against the live DB (198 cells: 33 keys × 6 models). **Panel is
-  frontend** → Phase 2.5 `/design` gate, not built.
+- **B2/B8 shipped, end to end** — `1f72fc6` (API) + `3c699fb` (web), design-reviewed
+  first. `POST /topics/batch` + `TopicsService.request_topics_batch`: one
+  `validate_topic_names` + one `match_and_create_topics` call for the whole list,
+  per-row outcomes (`generating` / `subscribed` / `already_subscribed` /
+  `rejected`+detail), capped at `Settings.custom_topic_batch_max` (5), guest-gated,
+  7 tests. `RequestTopicBox.tsx` is now a rows form — name + optional description
+  each, `+` up to 5, per-row remove, one batched submit, per-row outcome view
+  after. The rewrite keeps the F9 `onFollowed(topic, hasCards?)` contract so it
+  cleanly supersedes the file's uncommitted Wave-1 diff. **[Task 0032](../tasks/0032-batch-topic-requests.md)
+  is DONE.** Verified live (rows/add/remove/counters/disabled, guest 403, per-row
+  results via a stubbed batch response).
+- **B4 shipped, end to end** — `99d3fb9` (API) + `6134ee4` (web).
+  `GET /admin/quota` → `read_quota_status` (`generation/quota_report.py`,
+  read-only): one cell per `(key, model)` with daily spend / ceiling /
+  `exhausted_at` / `cooldown_until`, plus `model_unavailable` rows. ADR-0065's
+  three conditions kept as **separate counts** (`cells_daily_exhausted` /
+  `cells_minute_throttled` / `models_parked`), never one boolean. `env !=
+  "production"` gated like `/dev/*`; real admin-role gate is
+  [task 0035](../tasks/0035-admin-role-and-production-admin-surface.md). `dev.py`
+  docstring corrected. Frontend is a plain dev-only Next route
+  `apps/web/app/admin/quota/page.tsx` (no shell view, reached by URL): three
+  rollup tiles kept separate, per-pool model rows with a 33-square key strip
+  (shaded by spend, ringed if throttled, hatched if parked), parked-models list.
+  4 API tests; verified live against the running DB (198 cells, all zero today).
 - `make test` green (451). `mypy --strict` green (86 files). New API files pass
   `ruff` + `ruff format`. `packages/api-types/schema.d.ts` is gitignored (CI
   regenerates); regenerated locally to confirm it's clean.
@@ -191,21 +196,39 @@ across the whole frontend as of the last check.
   stays dirty from these — expected. Note `test_technical_topic_guard.py` currently
   fails `ruff check` (unsorted imports) — it's the owner's, not this session's.
 
-- **Design canvas for the two remaining frontends** — B2/B8's `RequestTopicBox`
-  rows form (name + optional description per row, `+` up to 5, one batched submit,
-  per-row outcome reporting) and B4's rendered quota panel (three ADR-0065 rollup
-  tiles kept separate, 198 cells as one row per model with a 33-square key strip,
-  parked models listed). Static mockups in the Obsidian theme, awaiting owner
-  sign-off before code: https://claude.ai/code/artifact/c85d9452-76bd-4264-a484-13c60eb3ed9f
+- **Design canvas** (owner-approved, built from) — B2/B8's rows form + B4's quota
+  panel, Obsidian theme:
+  https://claude.ai/code/artifact/c85d9452-76bd-4264-a484-13c60eb3ed9f
+- **Shell right-gap fix** — `49a6c65`. Owner: *"all screens have a visible gap on
+  the right"*. `.app-grid` was `350px | 640 | 350px`, `max-width: 1400` → a fixed
+  ~260px void each side on any wide screen. Side tracks are now
+  `minmax(350px, 1fr)`, max-width 1720: centre thread still centred & capped at
+  640 (feed reading width unchanged), rails spread to the edges. On 1920: right
+  void ~289→~130px, right rail +~140px usable width. Only the `>=1401` breakpoint
+  changes.
 
-**Branch state:** `feat/v1-finish-line`, on top of session 2:
+**Branch state:** `feat/v1-finish-line`, on top of session 2 — session-3 commits:
 `48b64ba` `1b2cbf7` `b598ff3` `1f72fc6` `4edfc60` `99d3fb9` `a60e425` `be96077`
-(+ this log update). **Not pushed.**
+`a75ad9a` `49a6c65` `3c699fb` `6134ee4` (+ this log). **Pushed.**
 
-**Next:** owner signs off the design canvas, then B2/B8's rows UI + B4's panel get
-built (the `RequestTopicBox` one still wants the Wave-1 F9 change committed first
-to avoid entanglement). Task 0034 (shared `CollectionView`) is unblocked whenever.
-Then Phase 2 Tier 2 / the Cockroach sequence / B7 per the build order.
+**Session-3 net:** F4/F5 signed off + a follow-on fix; F6 done (rename `1b2cbf7` +
+rework `be96077` / ADR-0072); B2/B8 done (API + rows form); B4 done (API + panel);
+the shell right-gap fixed. New docs: ADR-0072, tasks 0034 / 0035; task 0032 closed.
+
+**Untouched:** the pre-existing Wave-1 working tree — `generation/pipeline/*.py`,
+`components/{AppShell,Card,Feed,GenerationProgressPanel,LikedView,NotesView,ProfileView}.tsx`,
+`lib/refresh.ts`, `docs/notes/topic-queue.md`, `tests/test_technical_topic_guard.py`.
+`git status` stays dirty from these — expected, they predate this effort. Note the
+F6 rework (`SavedView.tsx`) and B2/B8 (`RequestTopicBox.tsx`) each superseded that
+file's Wave-1 diff by carrying the equivalent change; the rest of Wave-1 is still
+uncommitted and owner-owned.
+
+**Next:** Phase 2 Tier 2 (B6 embedding topic colors → needs an ADR amending 0034;
+B14 report-a-card repair lane → needs an ADR; B12/13 AskAI → needs an ADR), then
+the Cockroach sequence (tasks 0016→0021), then B7 study material. Task 0034
+(shared `CollectionView`) is unblocked and pickup-ready any time. Every new
+frontend still goes through `/design` + owner sign-off (Phase 2.5); every
+"Needs: an ADR" item gets one first, numbered from 0073.
 
 ---
 

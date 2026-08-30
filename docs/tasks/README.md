@@ -38,7 +38,6 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0029](0029-mermaid-shape-budget-and-curated-ascii-library.md) | Deterministic mermaid shape budget (node count/label length) | unassigned -- curated-library retrieval half shipped, see doc |
 | [0030](0030-manual-review-curated-ascii-library.md) | Manually review all 2,487 curated ASCII library entries for art clarity and title accuracy before retrieval leans on them | Anubhav |
 | [0031](0031-planner-visibility-into-ascii-library-breakdown.md) | Give the card planner a category/example breakdown of the curated ASCII library, so `asset_direction` is written with a sense of what's actually available | unassigned -- blocked on 0030 |
-| [0032](0032-batch-topic-requests.md) | Let a user request several custom topics in one submission (a `+` to add rows, each with an optional description), sent to the server as one batched call instead of one at a time | unassigned |
 | [0033](0033-grow-the-curated-ascii-library-over-time.md) | Standing task: after 0030's manual verification pass, keep adding new curated ASCII art in small gap-targeted batches as usage exposes coverage holes | Anubhav -- long-horizon, blocked on 0030 |
 | [0034](0034-collectionview-rework-saved-notes-liked.md) | Extract one shared `CollectionView` from the three now-identical collection views, and sweep the dead `.saved-*` grid CSS (F6 rename + visual unification shipped on `feat/v1-finish-line`; ADR-0072) | unassigned |
 | [0035](0035-admin-role-and-production-admin-surface.md) | A real admin-role gate for `/admin/*` and `/dev/*`, so B4's quota view can run in production without an `env` special-case | unassigned |
@@ -59,6 +58,7 @@ Tasks 0016-0021 are one sequence, gated on 0016. Read
 | [0010](0010-one-shot-pipeline-redesign.md) | Redesign the generation pipeline for one-shot completion (ADR-0026) | Done -- 2026-08-17 |
 | [0008](0008-wire-generation-job-worker.md) | Wire `apps/worker` to the generation pipeline | Done -- 2026-08-17 |
 | [0027](0027-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Reverted, then superseded -- see ADR-0063 / [ADR-0064](../adr/0064-mobile-shell-tab-bar.md) / task 0028 |
+| [0032](0032-batch-topic-requests.md) | Several custom topics in one batched submission, each with an optional description | Done -- 2026-08-30, `feat/v1-finish-line` (`1f72fc6` API + `3c699fb` web) |
 
 **v1 finish line:** [`docs/handoff/v1-finish-line-plan.md`](../handoff/v1-finish-line-plan.md)
 is the build/review/deploy plan for closing out v1 — the remaining frontend and backend

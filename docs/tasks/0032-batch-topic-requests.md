@@ -13,14 +13,15 @@ capped at `Settings.custom_topic_batch_max` (5), guest-gated, one `FeedPlan`
 clear + one commit. `api.requestTopics(entries)` is in `lib/api.ts`. 7 tests in
 `tests/test_topics_batch.py`; `make test` green.
 
-**Frontend still to build** — the `RequestTopicBox` rows UI described below. Two
-reasons it wasn't done in the same pass: (1) it's a visible redesign of a
-right-rail box, so per the v1 plan's Phase 2.5 it wants a `/design` pass +
-owner sign-off first; (2) `RequestTopicBox.tsx` carries an uncommitted Wave-1
-change (the F9 `onFollowed(topic, hasCards?)` signature) that a full rework
-would entangle with — that change should land first. The description-field and
-list-of-rows work is otherwise exactly as specified below, now that the
-`/topics/batch` endpoint and `api.requestTopics` exist.
+**Frontend shipped** — commit `3c699fb`, design-reviewed on a canvas first.
+`RequestTopicBox.tsx` is now a list of `{name, description?}` rows (`+` up to 5,
+per-row remove, one batched submit), with per-row outcome reporting after
+submit (generating / subscribed / already-following / rejected+reason). The
+rewrite preserves the F9 `onFollowed(topic, hasCards?)` contract, so it
+supersedes the file's uncommitted Wave-1 diff rather than colliding with it.
+CSS is `.request-topic-*` in `globals.css`. Verified live.
+
+**This task is DONE.** Nothing left.
 
 ## The problem
 

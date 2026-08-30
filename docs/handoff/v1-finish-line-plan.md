@@ -132,6 +132,63 @@ session, they predate it): `app/globals.css`, `components/AppShell.tsx`,
 has been committed yet — the user has not asked for a commit. `tsc --noEmit` is clean
 across the whole frontend as of the last check.
 
+**2026-08-30, session 3 — F4/F5 signed off; F6 rename + B2/B8 + B4 shipped.**
+
+- **F4/F5 polish verified.** The three `1618822` items hold — but the web
+  container was serving **stale JS** (pre-`1618822`), so the theme-modal-reopen bug
+  "reproduced" until `docker compose restart web`. Windows bind-mount HMR is
+  unreliable (session-1 already flagged this for CSS); it applies to `.tsx` too —
+  **restart the web container after any component edit before trusting the browser.**
+  Found + fixed a follow-on: `1618822`'s `onOpenChange` fired inside
+  `PickerDropdown`'s `setInternalOpen` updater → React "setState during render of
+  another component" on every dropdown open/close. Moved it to a transition-watching
+  effect — commit `48b64ba`. Console clean after.
+- **F6 rename shipped** — `1b2cbf7`. Sidebar label + the `SavedView` eyebrow (all 4
+  states) now say "Revisit". Copy only: `saved` view key / `RefreshScope` /
+  `card_bookmark` / `api.saved*` untouched; the card action is still "Save". The
+  leftover "SAVED CARDS" / "Search saved cards…" / "Removed from Saved" microcopy
+  was entangled with the pre-existing uncommitted `SavedView.tsx` Wave-1 diff, so it
+  goes to the rework (task 0034) which rewrites that file anyway.
+- **F6 rework — DEFERRED to [task 0034](../tasks/0034-collectionview-rework-saved-notes-liked.md)**
+  (owner call). It's the shared-React-component extraction ADR-0046 explicitly
+  *rejected* "for now"; needs a `/design` pass + an ADR superseding 0046. Not a
+  same-session inline job. Commit `b598ff3`.
+- **B2/B8 backend shipped** — `1f72fc6`. `POST /topics/batch` +
+  `TopicsService.request_topics_batch`: one `validate_topic_names` + one
+  `match_and_create_topics` call for the whole list, per-row outcomes
+  (`generating` / `subscribed` / `already_subscribed` / `rejected`+detail), capped
+  at `Settings.custom_topic_batch_max` (5), guest-gated. `api.requestTopics()` added.
+  7 tests. **Frontend rows UI still to build** — it's a visible rail redesign
+  (Phase 2.5 `/design` gate) and `RequestTopicBox.tsx` carries the uncommitted
+  Wave-1 F9 change that a rework would entangle with; that should land first. Noted
+  in [task 0032](../tasks/0032-batch-topic-requests.md).
+- **B4 shipped** — `99d3fb9`. `GET /admin/quota` → `read_quota_status`
+  (`generation/quota_report.py`, read-only): one cell per `(key, model)` with daily
+  spend / ceiling / `exhausted_at` / `cooldown_until`, plus `model_unavailable`
+  rows. ADR-0065's three conditions kept as **separate counts**
+  (`cells_daily_exhausted` / `cells_minute_throttled` / `models_parked`), never one
+  boolean. `env != "production"` gated like `/dev/*`; a real admin-role gate is
+  [task 0035](../tasks/0035-admin-role-and-production-admin-surface.md). `dev.py`'s
+  stale "placeholder auth / gate before exposing" docstring corrected. 4 tests;
+  smoke-tested against the live DB (198 cells: 33 keys × 6 models). **Panel is
+  frontend** → Phase 2.5 `/design` gate, not built.
+- `make test` green (451). `mypy --strict` green (86 files). New API files pass
+  `ruff` + `ruff format`. `packages/api-types/schema.d.ts` is gitignored (CI
+  regenerates); regenerated locally to confirm it's clean.
+- **Still untouched:** the pre-existing Wave-1 working tree
+  (`generation/pipeline/*.py`, `components/*.tsx`, `lib/refresh.ts`,
+  `docs/notes/topic-queue.md`, `tests/test_technical_topic_guard.py`). `git status`
+  stays dirty from these — expected. Note `test_technical_topic_guard.py` currently
+  fails `ruff check` (unsorted imports) — it's the owner's, not this session's.
+
+**Branch state:** `feat/v1-finish-line`, commits `48b64ba` `1b2cbf7` `b598ff3`
+`1f72fc6` `4edfc60` `99d3fb9` on top of session 2. **Not pushed.**
+
+**Next:** the three deferred frontend pieces all wait on a `/design` pass + owner
+sign-off (Phase 2.5): B2/B8's `RequestTopicBox` rows UI, B4's quota panel, and the
+F6 `CollectionView` rework (task 0034, also needs an ADR). Then Phase 2 Tier 2 / the
+Cockroach sequence / B7 per the build order.
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)

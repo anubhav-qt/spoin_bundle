@@ -202,33 +202,51 @@ class UserTopicProgress(Base, Timestamps):
 
 
 class GenerationJob(Base, UUIDPrimaryKey, Timestamps):
-    """A unit of generation work: run the one-shot pipeline (ADR-0026) for one
-    already-existing `topic_id` (minted by `match_and_create_topics`,
-    ADR-0025 -- a job's topic always exists before the job does).
+    """A unit of work the worker claims and runs (ADR-0026, ADR-0073).
 
-    The uniqueness key is `topic_id`. A topic only ever needs ONE generation
-    job in its lifetime (there is no recurring refill to coalesce, per
-    ADR-0026) -- this just collapses concurrent duplicate triggers for the
-    same topic into one row, the same way the old subtopic-keyed lock did for
-    the demand-driven refill model it replaced.
+    Two kinds (ADR-0076):
+
+    - `kind='generate'` (default) -- run the one-shot pipeline for one
+      already-existing `topic_id` (minted by `match_and_create_topics`,
+      ADR-0025 -- a job's topic always exists before the job does). A topic
+      only ever needs ONE such job in its lifetime, so it is coalesced on
+      `topic_id`.
+    - `kind='repair'` -- fix or remake a single reported `card_id` (ADR-0076).
+      Coalesced on `card_id`, so a topic can have any number of repairs in
+      flight for different cards while still holding at most one generate job.
     """
 
     __tablename__ = "generation_job"
     __table_args__ = (
-        # The coalescing lock. Partial-unique on the pending states, so one
-        # topic can have at most one outstanding job while completed history is
-        # retained.
+        # Coalescing lock for generate jobs: at most one outstanding per topic,
+        # completed history retained.
         Index(
             "uq_generation_job_topic_pending",
             "topic_id",
             unique=True,
-            postgresql_where=text("status IN ('pending', 'running')"),
+            postgresql_where=text("kind = 'generate' AND status IN ('pending', 'running')"),
+        ),
+        # Coalescing lock for repair jobs: at most one outstanding per card.
+        Index(
+            "uq_generation_job_card_pending",
+            "card_id",
+            unique=True,
+            postgresql_where=text("kind = 'repair' AND status IN ('pending', 'running')"),
         ),
         Index("ix_generation_job_status_priority", "status", "priority"),
     )
 
+    #: 'generate' | 'repair' (ADR-0076). A plain string, like `status` -- the
+    #: value set is small and the worker branches on it, not the database.
+    kind: Mapped[str] = mapped_column(String(16), default="generate", nullable=False)
+
     topic_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("topic.id", ondelete="CASCADE"), nullable=False
+    )
+    #: Set only for `kind='repair'` -- the card being fixed or remade. Null for
+    #: generate jobs.
+    card_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("card.id", ondelete="CASCADE")
     )
 
     status: Mapped[str] = mapped_column(String(16), default="pending", nullable=False)

@@ -40,6 +40,45 @@ class CardStatus(StrEnum):
     ACTIVE = "active"
     REJECTED = "rejected"
     SUPERSEDED = "superseded"
+    #: Was live, then pulled by an operator via the repair lane (ADR-0076) --
+    #: distinct from REJECTED ("the gate threw this draft out") and SUPERSEDED
+    #: ("a newer version in this family replaced it"). The feed's candidate
+    #: query already filters `status == ACTIVE`, so this drops the card with no
+    #: query change; the row and its engagement history stay for audit.
+    RETIRED = "retired"
+
+
+class CardReportReason(StrEnum):
+    """Why a reader flagged a card as structurally broken (ADR-0076). An enum,
+    not free text, so per-reason counts are a `GROUP BY` -- same argument as
+    `RejectionStage`. The reader's prose goes in `CardReport.note`."""
+
+    ART = "art"
+    DIAGRAM = "diagram"
+    CODE_BLOCK = "code_block"
+    FORMATTING = "formatting"
+    OTHER = "other"
+
+
+class RepairMode(StrEnum):
+    """What the operator asked for on a reported card (ADR-0076).
+
+    FIX  -- structure-only repair informed by the rendered image and optional
+            guidance; structural checks only, no meaning-lock (the operator's
+            review is the gate).
+    REMAKE -- regenerate the card from a required brief, through the full
+            quality gate like any generated card.
+    """
+
+    FIX = "fix"
+    REMAKE = "remake"
+
+
+class RepairStatus(StrEnum):
+    PENDING = "pending"
+    RUNNING = "running"
+    DONE = "done"
+    FAILED = "failed"
 
 
 class CardSource(StrEnum):

@@ -20,6 +20,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -30,8 +31,16 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from spoin.core.config import get_settings
-from spoin.domain.base import Base, CreatedAt, UUIDPrimaryKey, pg_enum
-from spoin.domain.enums import CardSource, CardStatus, Difficulty, RejectionStage
+from spoin.domain.base import Base, CreatedAt, Timestamps, UUIDPrimaryKey, pg_enum
+from spoin.domain.enums import (
+    CardReportReason,
+    CardSource,
+    CardStatus,
+    Difficulty,
+    RejectionStage,
+    RepairMode,
+    RepairStatus,
+)
 from spoin.domain.models.topic import Subtopic
 
 _EMBEDDING_DIM = get_settings().embedding_dim
@@ -246,3 +255,125 @@ class RejectedCard(Base, UUIDPrimaryKey, CreatedAt):
     gen_meta: Mapped[dict[str, object]] = mapped_column(
         JSONB().with_variant(JSON(), "sqlite"), default=dict, nullable=False
     )
+
+
+class CardReport(Base, UUIDPrimaryKey, CreatedAt):
+    """A reader flagging a live card as structurally broken (ADR-0076).
+
+    Unique per `(card_id, user_id)` -- one account reports a given card at most
+    once; a repeat report updates the existing row. Not an `EngagementEvent`: a
+    report is a moderation signal with its own lifecycle, never a ranking input.
+    """
+
+    __tablename__ = "card_report"
+    __table_args__ = (
+        UniqueConstraint("card_id", "user_id", name="uq_card_report_card_user"),
+        Index("ix_card_report_unresolved", "card_id", postgresql_where=text("resolved_at IS NULL")),
+    )
+
+    card_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("card.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("app_user.id", ondelete="CASCADE"), nullable=False
+    )
+    reason: Mapped[CardReportReason] = mapped_column(
+        pg_enum(CardReportReason, "card_report_reason"), nullable=False
+    )
+    #: The reader's own words on what looks wrong. Optional -- the reason enum
+    #: is the required part.
+    note: Mapped[str | None] = mapped_column(Text)
+    #: Set when the operator has acted on this card (delete / fix / remake), so
+    #: the admin queue query is `WHERE resolved_at IS NULL` -- reports for one
+    #: card are resolved together, by card, not individually.
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CardRepair(Base, UUIDPrimaryKey, Timestamps):
+    """The operator's instruction for a reported card, plus the audit trail
+    (ADR-0076). One row per repair attempt; `job` tracks its execution.
+
+    `mode=FIX`  -- `ContentGenerator.repair_card_structure` rewrites the visual/
+                   structural slots from the rendered image + `guidance`;
+                   structural checks only, then a new family version.
+    `mode=REMAKE` -- regenerate from `guidance` (required here) through the full
+                   quality gate, then a new family version.
+    """
+
+    __tablename__ = "card_repair"
+    __table_args__ = (Index("ix_card_repair_status", "status"),)
+
+    card_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("card.id", ondelete="CASCADE"), nullable=False
+    )
+    #: The `generation_job` row (`kind='repair'`) that runs this. Nullable only
+    #: for the instant between creating the repair and enqueuing the job.
+    job_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("generation_job.id", ondelete="SET NULL")
+    )
+    mode: Mapped[RepairMode] = mapped_column(pg_enum(RepairMode, "repair_mode"), nullable=False)
+    #: Operator free text. Optional for FIX (steer the structural repair),
+    #: REQUIRED for REMAKE (the brief for the new card) -- enforced at the API,
+    #: not the column.
+    guidance: Mapped[str | None] = mapped_column(Text)
+    #: The card rendered to PNG by the admin page (same `html-to-image` call as
+    #: the share button), sent to the FIX repair call as the visual reference.
+    #: Deferred like `User.avatar_image` -- a 2x card screenshot is well under a
+    #: megabyte, read once by the worker, never on a hot path. Null for REMAKE.
+    source_image: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
+    status: Mapped[RepairStatus] = mapped_column(
+        pg_enum(RepairStatus, "repair_status"), default=RepairStatus.PENDING, nullable=False
+    )
+    #: The new `card` row this repair produced, once it has one.
+    result_card_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("card.id", ondelete="SET NULL")
+    )
+    #: Why a FAILED repair failed -- a structural check that didn't pass, a
+    #: gate rejection, or a call that never returned. Surfaced on the admin page.
+    error: Mapped[str | None] = mapped_column(Text)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CardQa(Base, UUIDPrimaryKey, CreatedAt):
+    """A cached AskAI exchange (ADR-0077). Unique on `(card_id,
+    question_norm)`; a hit replays `answer` with no LLM call. `on_topic=false`
+    rows are cached too, so a repeated off-topic question costs nothing to
+    re-refuse.
+    """
+
+    __tablename__ = "card_qa"
+    __table_args__ = (
+        UniqueConstraint("card_id", "question_norm", name="uq_card_qa_card_question"),
+    )
+
+    card_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("card.id", ondelete="CASCADE"), nullable=False
+    )
+    #: The question, lowercased with whitespace/punctuation collapsed
+    #: (`normalize_topic_text`-style) -- the cache key. The raw question is not
+    #: kept; it carries no value once normalised and is user free text.
+    question_norm: Mapped[str] = mapped_column(String(500), nullable=False)
+    answer: Mapped[str] = mapped_column(Text, nullable=False)
+    #: False when the retrieval context could not answer this (the embedding
+    #: gate or the `OFF_TOPIC` sentinel fired). The client renders the refusal
+    #: state; the model's own prose is never shown for these.
+    on_topic: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class AskUsage(Base):
+    """One row per user per UTC day, counting AskAI questions that reached the
+    provider (ADR-0077). A plain counter, deliberately NOT the quota governor:
+    the governor rations a shared provider budget, this rations one user against
+    everyone else. Cache hits, embedding-gate refusals and errors cost nothing
+    and are not counted here.
+    """
+
+    __tablename__ = "ask_usage"
+
+    #: UTC day start -- matches `quota_ledger`'s day boundary, not ADR-0062's
+    #: reader-local day (that is a goal-ring display choice, not a rate limit).
+    day: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("app_user.id", ondelete="CASCADE"), primary_key=True
+    )
+    questions_spent: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

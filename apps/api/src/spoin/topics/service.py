@@ -44,6 +44,7 @@ from spoin.api.schemas import (
     TopicCurriculumOut,
     TopicDiscoverOut,
     TopicOut,
+    TopicRequestIn,
     TopicStatsOut,
 )
 from spoin.core.config import Settings
@@ -89,6 +90,20 @@ class RequestedTopic:
     #: "generating" when a brand-new topic was minted and a job enqueued;
     #: "subscribed" when the name canonicalized onto a topic that already exists.
     status: Literal["generating", "subscribed"]
+
+
+@dataclass(frozen=True)
+class BatchTopicOutcome:
+    """One row's result in a `request_topics_batch` call (task 0032). Index-matched
+    to the request so a partly-failed batch reports per row, not as one error."""
+
+    request_index: int
+    status: Literal["generating", "subscribed", "already_subscribed", "rejected"]
+    #: Populated for "generating" / "subscribed" -- the new subscription.
+    topic: TopicOut | None = None
+    #: Populated for "rejected" -- the word-count rule or the name validator's
+    #: specific objection, shown back on that row.
+    detail: str | None = None
 
 
 class TopicsService:
@@ -880,3 +895,151 @@ class TopicsService:
             ),
             status="generating" if is_new_topic else "subscribed",
         )
+
+    async def request_topics_batch(
+        self,
+        user_id: UUID,
+        *,
+        items: Sequence[TopicRequestIn],
+        generator: ContentGenerator,
+        embedder: Embedder,
+    ) -> list[BatchTopicOutcome]:
+        """The batched form of `request_topic` (task 0032, ADR-0025).
+
+        Every name is word-count-checked in code (a constraint, not taste),
+        then the survivors go through ONE `validate_topic_names` call and ONE
+        `match_and_create_topics` call -- two LLM requests for the whole batch,
+        not two per item (ADR-0005: the free tier meters requests). One
+        `FeedPlan` clear and one commit cover every row.
+
+        Partial success is the normal case: a name rejected by the validator,
+        a topic the user already follows, and a freshly-minted one can all
+        come back from the same call, each as its own `BatchTopicOutcome`.
+        """
+
+        settings = self._settings
+        session = self._session
+
+        user = await session.get(User, user_id)
+        assert user is not None
+        if user.is_guest:
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN, detail="Sign up to request a custom topic"
+            )
+        if len(items) > settings.custom_topic_batch_max:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Add at most {settings.custom_topic_batch_max} topics at once",
+            )
+
+        outcomes: dict[int, BatchTopicOutcome] = {}
+
+        # Code-level name checks. Rows that fail are rejected here and never
+        # reach an LLM call; `clean` holds the stripped name for the rest.
+        clean: dict[int, str] = {}
+        for index, item in enumerate(items):
+            name = item.name.strip()
+            if not name:
+                outcomes[index] = BatchTopicOutcome(
+                    index, "rejected", detail="Topic name is required"
+                )
+                continue
+            if len(name.split()) > settings.custom_topic_max_words:
+                outcomes[index] = BatchTopicOutcome(
+                    index,
+                    "rejected",
+                    detail=f"Keep it short -- {settings.custom_topic_max_words} words or fewer",
+                )
+                continue
+            clean[index] = name
+
+        # ONE name-validation call over every surviving row.
+        if clean:
+            verdicts = await generator.validate_topic_names(
+                [TopicNameQuery(request_index=i, name=n) for i, n in clean.items()]
+            )
+            verdict_by_index = {v.request_index: v for v in verdicts.items}
+            for index in list(clean):
+                verdict = verdict_by_index.get(index)
+                if verdict is not None and not verdict.acceptable:
+                    outcomes[index] = BatchTopicOutcome(
+                        index,
+                        "rejected",
+                        detail=verdict.reason or "That doesn't look like a learnable topic",
+                    )
+                    del clean[index]
+
+        # ONE match/create call over every validated row. `match_and_create_topics`
+        # returns outcomes in the order it was given the requests.
+        validated = list(clean)
+        if validated:
+            match_outcomes = await match_and_create_topics(
+                session,
+                generator,
+                embedder,
+                settings,
+                topic_requests=[
+                    TopicRequest(name=clean[i], description=(items[i].description or "").strip())
+                    for i in validated
+                ],
+            )
+
+            feed_plan_dirty = False
+            for index, match in zip(validated, match_outcomes, strict=True):
+                item = items[index]
+                topic_id = UUID(match["topic_id"])
+
+                existing = await session.scalar(
+                    select(UserTopic).where(
+                        UserTopic.user_id == user_id, UserTopic.topic_id == topic_id
+                    )
+                )
+                if existing is not None:
+                    # Already following the topic this name resolved to -- no
+                    # slot spent, no job. Any alias row the matcher just wrote
+                    # is still committed by the single commit below.
+                    outcomes[index] = BatchTopicOutcome(index, "already_subscribed")
+                    continue
+
+                topic = await session.get(Topic, topic_id)
+                assert topic is not None
+
+                user_topic = UserTopic(
+                    user_id=user_id,
+                    topic_id=topic_id,
+                    display_name=clean[index],
+                    is_custom=True,
+                )
+                session.add(user_topic)
+                topic.subscriber_count += 1
+                session.add(
+                    UserTopicProgress(
+                        user_id=user_id,
+                        topic_id=topic_id,
+                        current_difficulty=item.entry_difficulty,
+                        tier_unlocked=entry_tier_unlock(item.entry_difficulty),
+                    )
+                )
+
+                is_new_topic = not match["matched_existing"]
+                if is_new_topic:
+                    session.add(GenerationJob(topic_id=topic_id, status="pending"))
+                feed_plan_dirty = True
+
+                outcomes[index] = BatchTopicOutcome(
+                    index,
+                    "generating" if is_new_topic else "subscribed",
+                    topic=TopicOut(
+                        id=topic.id,
+                        display_name=user_topic.display_name,
+                        slug=topic.slug,
+                        is_custom=True,
+                        current_difficulty=item.entry_difficulty,
+                    ),
+                )
+
+            if feed_plan_dirty:
+                await session.execute(delete(FeedPlan).where(FeedPlan.user_id == user_id))
+
+        await session.commit()
+        return [outcomes[index] for index in range(len(items))]

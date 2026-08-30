@@ -17,6 +17,9 @@ from spoin.api.schemas import (
     GenerationProgressOut,
     OnboardingCompleteIn,
     ProgressOut,
+    TopicBatchIn,
+    TopicBatchItemOut,
+    TopicBatchOut,
     TopicColorIn,
     TopicCurriculumOut,
     TopicDiscoverOut,
@@ -51,6 +54,34 @@ async def request_topic(
         embedder=get_embedder(),
     )
     return TopicRequestOut(topic=requested.topic, status=requested.status)
+
+
+@router.post("/batch", response_model=TopicBatchOut, status_code=status.HTTP_201_CREATED)
+async def request_topics_batch(
+    payload: TopicBatchIn, session: SessionDep, user_id: UserDep
+) -> TopicBatchOut:
+    """Several custom topics in one submission (task 0032). Runs ADR-0025's
+    batched matcher once for the whole list; each row reports its own outcome,
+    so a batch where some rows are rejected is still a 201 with per-row detail,
+    not a failure for the whole call."""
+
+    outcomes = await _service(session).request_topics_batch(
+        user_id,
+        items=payload.items,
+        generator=get_content_generator(),
+        embedder=get_embedder(),
+    )
+    return TopicBatchOut(
+        results=[
+            TopicBatchItemOut(
+                request_index=o.request_index,
+                status=o.status,
+                topic=o.topic,
+                detail=o.detail,
+            )
+            for o in outcomes
+        ]
+    )
 
 
 @router.get("", response_model=list[TopicOut])

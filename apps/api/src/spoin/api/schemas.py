@@ -61,6 +61,39 @@ class TopicRequestOut(BaseModel):
     status: Literal["subscribed", "generating"]
 
 
+class TopicBatchIn(BaseModel):
+    """Several custom topics in one submission (task 0032). Every name goes
+    through ADR-0025's batched matcher in a SINGLE LLM call -- N sequential
+    `POST /topics` calls would spend N times the quota (ADR-0005: the free tier
+    meters requests, not tokens)."""
+
+    #: 1..`custom_topic_batch_max` entries. A batch of one is valid -- this is
+    #: the form the CLI entrypoint already uses (`generate_topics.py`).
+    items: list[TopicRequestIn] = Field(min_length=1)
+
+
+class TopicBatchItemOut(BaseModel):
+    """One row's own outcome. A batch where 4 of 5 succeed is a success with
+    one rejected row, never a failed call -- so each row reports independently
+    rather than collapsing into a single toast."""
+
+    #: Index into the request's `items`, so the client pairs each result with
+    #: the row that produced it (ADR-0025's `request_index` convention).
+    request_index: int
+    #: "generating" / "subscribed" -- as `TopicRequestOut.status`.
+    #: "already_subscribed" -- the name resolved to a topic the user already
+    #: follows; no slot spent, no job. "rejected" -- the name failed the
+    #: word-count rule or the name validator (`detail` carries the objection).
+    status: Literal["generating", "subscribed", "already_subscribed", "rejected"]
+    topic: TopicOut | None = None
+    #: Set only for "rejected" -- the specific reason, shown on that row.
+    detail: str | None = None
+
+
+class TopicBatchOut(BaseModel):
+    results: list[TopicBatchItemOut]
+
+
 class CardOut(BaseModel):
     id: UUID
     topic_id: UUID

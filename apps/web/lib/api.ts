@@ -291,6 +291,31 @@ export interface TopicRequestResult {
   status: "subscribed" | "generating";
 }
 
+export interface TopicBatchEntry {
+  name: string;
+  /** 1–2 sentences on what the reader wants from this topic — optional,
+   *  threaded to the curriculum/card prompts as context (task 0032). */
+  description?: string;
+  entryDifficulty?: Difficulty;
+}
+
+export interface TopicBatchItemResult {
+  /** Index into the submitted entries, so each result pairs back to its
+   *  row (ADR-0025's `request_index` convention). */
+  request_index: number;
+  /** "generating" / "subscribed" — as `TopicRequestResult.status`.
+   *  "already_subscribed" — the name resolved to a topic already followed;
+   *  nothing minted. "rejected" — failed the word-count rule or the name
+   *  validator; `detail` carries the reason for this row. */
+  status: "generating" | "subscribed" | "already_subscribed" | "rejected";
+  topic: Topic | null;
+  detail: string | null;
+}
+
+export interface TopicBatchResult {
+  results: TopicBatchItemResult[];
+}
+
 export interface TopicStats {
   topic_id: string;
   current_difficulty: Difficulty;
@@ -516,6 +541,21 @@ export const api = {
         name,
         description: description || undefined,
         entry_difficulty: entryDifficulty,
+      }),
+    }),
+
+  /** Several custom topics in one submission — ADR-0025's batched matcher runs
+   *  once for the whole list (task 0032). A partly-rejected batch still
+   *  resolves; read each row's `status`/`detail`, don't treat it as a failure. */
+  requestTopics: (entries: TopicBatchEntry[]) =>
+    request<TopicBatchResult>("/topics/batch", {
+      method: "POST",
+      body: JSON.stringify({
+        items: entries.map((e) => ({
+          name: e.name,
+          description: e.description || undefined,
+          entry_difficulty: e.entryDifficulty,
+        })),
       }),
     }),
 

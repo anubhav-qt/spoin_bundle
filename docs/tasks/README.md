@@ -39,7 +39,6 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0030](0030-manual-review-curated-ascii-library.md) | Manually review all 2,487 curated ASCII library entries for art clarity and title accuracy before retrieval leans on them | Anubhav |
 | [0031](0031-planner-visibility-into-ascii-library-breakdown.md) | Give the card planner a category/example breakdown of the curated ASCII library, so `asset_direction` is written with a sense of what's actually available | unassigned -- blocked on 0030 |
 | [0033](0033-grow-the-curated-ascii-library-over-time.md) | Standing task: after 0030's manual verification pass, keep adding new curated ASCII art in small gap-targeted batches as usage exposes coverage holes | Anubhav -- long-horizon, blocked on 0030 |
-| [0034](0034-collectionview-rework-saved-notes-liked.md) | Extract one shared `CollectionView` from the three now-identical collection views, and sweep the dead `.saved-*` grid CSS (F6 rename + visual unification shipped on `feat/v1-finish-line`; ADR-0072) | unassigned |
 | [0035](0035-admin-role-and-production-admin-surface.md) | A real admin-role gate for `/admin/*` and `/dev/*`, so B4's quota view can run in production without an `env` special-case | unassigned |
 | [0036](0036-grow-and-tune-the-accent-color-vocabulary.md) | Standing task: verify hues, widen domain coverage, and spot-check `accent_color_data/colors.json` against real embeddings (B6 / ADR-0075 shipped a first list) | Anubhav -- long-horizon |
 
@@ -51,6 +50,7 @@ Tasks 0016-0021 are one sequence, gated on 0016. Read
 
 | # | Task | Outcome |
 |---|---|---|
+| [0034](0034-collectionview-rework-saved-notes-liked.md) | Extract one shared `CollectionView` from Liked / Revisit / Notes, sweep the dead `.saved-*` grid CSS (ADR-0072) | Done -- 2026-08-31, `feat/v1-finish-line` (`3bf8373`) -- net -1441/+211 across the 3 views + globals.css, +CollectionView.tsx |
 | [0014](0014-unbounded-drafting-rounds.md) | Remove artificial drafting round constraints and allow unbounded completion | Done -- 2026-08-21 |
 | [0006](0006-curated-hero-cards.md) | A real curated `is_hero` flag, replacing the "first in station" heuristic | Done -- 2026-08-20, see ADR-0042 |
 | [0007](0007-rename-to-spoin.md) | Execute the Slocho → Spoin rename | Done -- 2026-08-17 |

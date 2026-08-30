@@ -3,6 +3,22 @@
 **Owner:** unassigned
 **Blocked on:** nothing
 
+## DONE — 2026-08-31, `feat/v1-finish-line` (`3bf8373`)
+
+`components/CollectionView.tsx` now owns the masthead, control bar, chip, rule,
+state block, footer, `rowsRef` + `offerUndo` wiring, `skipNextRefreshRef` guard
+and the server-authoritative `seen` merge. `LikedView` / `SavedView` /
+`NotesView` are each a ~90-line `CollectionConfig` — labels, empty-state copy,
+one `fetch`, and per-card props wired to shared `removeWithUndo` / `updateRow`
+helpers. Notes keeps its client-side filter/sort via `clientFilterSort` +
+`sortRow` + `searchExtra`. Dead `.saved-tile*` / `.saved-grid` / `.saved-overlay*`
+/ `.saved-skeleton*` CSS swept (~290 lines); `.liked-*` / `.notes-*` list +
+skeleton copies folded into `.collection-list` / `.collection-skeleton-*`. Net
+-1441/+211 across the three views + globals.css. Verified live: all three render
+with the right copy, and unlike / unbookmark / cleared-note each remove-with-undo
+correctly. Microcopy note: Revisit keeps "SAVED CARD(S)" / "Search saved cards…"
+(the *action* is still Save — F6); the undo label is "Removed from Revisit".
+
 ## Status (2026-08-30, `feat/v1-finish-line`)
 
 **The visual unification is done.** [ADR-0072](../adr/0072-revisit-drops-its-bespoke-grid.md)

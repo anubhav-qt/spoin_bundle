@@ -442,6 +442,43 @@ sequence, then B7. Task 0034 still pickup-ready.
 **Next:** Cockroach sequence (tasks 0016→0021, gated on the 0016 spike), then B7
 study material. Task 0034 (shared `CollectionView`) still pickup-ready.
 
+**2026-08-31, session 7 — report/mermaid/hero fixes, F12 loader, task 0034.**
+Branch `feat/v1-finish-line`, commits `3023b73` → `3bf8373`, all pushed.
+
+- **`3023b73`** — four fixes from manual testing of the B14 repair lane:
+  `submitReport` surfaces failures instead of an empty `catch` (a 404 = a
+  superseded card row a stale feed still holds → "reload" copy); `MermaidBlock`
+  pre-parses with `mermaid.parse({suppressErrors:true})` + logs at `warn` so a
+  handled diagram fallback no longer trips Next 15's error overlay;
+  `/admin/repairs` renders card bodies through the real `Markdown` (now exported
+  from `Card.tsx`); `resolveHero` — when `visual_slots.art` and the body's
+  leading fence are the same scene (`sameScene()`, ≥60% token overlap), lead
+  with the *fuller* copy and carry `alt` as a caption on any hero kind (fixes
+  cards that showed the abbreviated body twin and dropped the caption).
+- **F12 done** (`design(loader)` + **`b79a41d`**) — `components/SpoinWave.tsx`:
+  the "spoin" wordmark on a staggered baseline wave, `o` in accent, pure CSS,
+  reduced-motion freezes it flat. `variant="page"` (AuthProvider full-page
+  gate) / `variant="inline"` (buttons, modal loading lines — glyphs take
+  `currentColor`). Replaced `.auth-loader` / `.btn-spinner` / every
+  `.modal-loading` text line; deleted those + `@keyframes auth-spin`.
+  `button:has(.spoin-wave[data-variant="inline"])` gets `min-width: 7rem`.
+  `CardSkeleton` + `MermaidBlock`'s "drawing…" left (content placeholders).
+  `/design` concept sources in `docs/design/mockups/loader-concepts/` ("Wave"
+  chosen). **This closes Phase 1 Wave 3.**
+- **Task 0034 done** (**`3bf8373`**) — `CollectionView<TRow>` behind Liked /
+  Revisit / Notes; each is now a ~90-line config. Dead `.saved-tile*` CSS
+  swept. Net -1441/+211 + CollectionView.tsx. Verified live. See the task doc.
+- **Handoff filed:** `docs/handoff/next-mermaid-label-guard.md` — option-2
+  mermaid edge-label guard in generation + fixing card `0afd7193` (unquoted
+  parens in a `|…|` label; renders as a raw source box in the feed). Paste its
+  Prompt block to start that session.
+
+**Next:** the Cockroach sequence — task 0016 spike (go/no-go gate), then
+0017→0021 — is the critical path (B7's `material_chunk` and B9's cache both
+depend on it). It's a big self-contained investigation; give it its own
+session. Then B7 (needs ADR 0078). The mermaid-guard handoff above is a small
+warm-up if wanted first.
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)

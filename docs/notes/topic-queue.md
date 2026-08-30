@@ -42,13 +42,25 @@
 - [x] **CockroachDB** (492 cards, 292 questions across 35 subtopics) — Exit Code 0
   - *Database*: `spoin_db_2`
 
-### In Progress
-- [ ] **PostgreSQL**
+- [x] **PostgreSQL** (776 cards, 301 questions across 45 subtopics) — Exit Code 0
   - *Database*: `spoin_db_2`
 
+- [x] **Calculus** (743 cards, 294 questions across 34 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+
+- [x] **Study Abroad (Full Guide)** (681 cards, 309 questions across 32 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+
+- [x] **LangChain** (663 cards, 301 questions across 36 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+
+### In Progress
+- [ ] **The Epic of Gilgamesh** — 520 / 640 cards (81.2%), 0 / 280 questions
+  - *Database*: `spoin_db_2`
+  - Paused: Daily thinking ladder quota reached across all 33 keys. Ready to resume once UTC day resets.
+
 ### Next in Queue
-1. **Calculus**
-2. **Study Abroad (Full Guide)**
+1. **FastAPI**
 
 ---
 

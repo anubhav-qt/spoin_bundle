@@ -726,29 +726,13 @@ server is the wrong mechanism for this particular call.** Reasons:
 3. Stream the answer back; persist the exchange (`card_qa`) so a repeated question is a
    cache hit, not a second call.
 
-**Budget (decided 2026-08-30):** 33 keys × 2 flash-lite models × 500/day ≈ **33,000
-requests/day**, so AskAI does not need a tight throttle. The cap is **200 questions per
-user per day** — generous enough to be invisible in normal use, low enough that a single
-account cannot walk off with the day. It is still a per-user counter, not an absence of
-one: it is what makes one compromised or scripted account a bounded event. Implement it
-on the existing ledger machinery (a `(day, user)` row), not a new subsystem, and return a
-clear "you have hit today's limit" rather than a generic 429.
-
-**Generation gets a reserved floor (decided 2026-08-30).** AskAI and the pipeline draw
-from the same ladder, so a heavy AskAI day would otherwise spend quota the worker was
-going to use — and it would surface in the logs as plain quota exhaustion, indistinguish-
-able from a provider problem. AskAI stops at a configured share of the day (start at 40%,
-tunable); the remainder is always available to generation.
-
-Two implementation notes so this stays honest:
-
-- **Tag the consumer on the ledger.** Every request records whether it came from AskAI or
-  the pipeline. Without that, the floor is a number nobody can verify and the B4 panel
-  can't show you the split.
-- **AskAI hitting its share is its own terminal state**, not a `QuotaExhaustedError`. It
-  is the same distinction ADR-0065 draws between the three existing terminal states: "the
-  reader's feature is rationed" and "the day's budget is gone" are different facts and
-  must not collapse into one message or one log line.
+**Budget & Quota (decided 2026-08-30):** 33 keys × 2 flash-lite models × 500/day ≈ **33,000
+requests/day** across the generator ladder, so AskAI and the pipeline have ample capacity
+without needing any quota reservation or artificial partitioning between them.
+The cap is **200 questions per user per day** — generous enough to be invisible in normal use,
+low enough that a single account cannot walk off with the day. Implement it on the existing
+ledger machinery (a `(day, user)` row), not a new subsystem, and return a clear "you have hit
+today's limit" rather than a generic 429.
 
 **Keeping questions on the card's topic** — the part you asked to be thorough about.
 No single mechanism does this; four layers, cheapest first, and the last two are the ones

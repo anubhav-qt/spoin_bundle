@@ -53,10 +53,45 @@ export function subscribeRefresh(scope: RefreshScope, fn: Listener): () => void 
  *  mount — the view's own effect already owns the initial load; this only
  *  owns re-loading after the fact. `onRefresh` is read through a ref that's
  *  updated every render, so a stale closure (e.g. one capturing last
- *  render's filter/sort state) is never the one that actually runs. */
-export function useRefreshEffect(scope: RefreshScope, onRefresh: () => void): void {
+ *  render's filter/sort state) is never the one that actually runs.
+ *
+ *  `active` (default `true`) is whether this view is the one currently on
+ *  screen. Every collection view stays mounted for the whole session
+ *  (AppShell's `visited` set) so it can be invalidated while hidden — e.g.
+ *  liking a card in the Feed stales Liked while Liked isn't showing. Without
+ *  `active`, that invalidation ran the listener's full refetch/re-render
+ *  synchronously, in the same tick as the click that triggered it, for a
+ *  view nobody could see — that's what made a like visibly lag the Feed.
+ *  Passing `active={false}` defers the refresh: the scope is marked dirty
+ *  instead of refreshed immediately, and the deferred refresh runs the
+ *  moment `active` flips back to `true` (the user actually opens that view),
+ *  which is also the first time paying for it can be seen. */
+export function useRefreshEffect(scope: RefreshScope, onRefresh: () => void, active = true): void {
   const handler = useRef(onRefresh);
   handler.current = onRefresh;
+  const dirty = useRef(false);
 
-  useEffect(() => subscribeRefresh(scope, () => handler.current()), [scope]);
+  useEffect(
+    () =>
+      subscribeRefresh(scope, () => {
+        if (active) {
+          handler.current();
+        } else {
+          dirty.current = true;
+        }
+      }),
+    [scope, active],
+  );
+
+  // Catch up on whatever was missed while this view was hidden. Only fires
+  // on the false -> true edge (the effect below re-runs on every `active`
+  // change, but `dirty.current` is false unless the subscription above set
+  // it), so becoming active for the first time on a fresh mount is a no-op
+  // here -- the view's own load effect already owns that initial fetch.
+  useEffect(() => {
+    if (active && dirty.current) {
+      dirty.current = false;
+      handler.current();
+    }
+  }, [active]);
 }

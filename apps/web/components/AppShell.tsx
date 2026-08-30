@@ -194,11 +194,20 @@ export function AppShell() {
   // Called after a successful follow (from RequestTopicBox or
   // TopicDiscoveryModal), so the newly-subscribed topic shows up in the
   // filter/progress box without a full reload.
-  const onFollowed = useCallback(async (topic: Topic) => {
+  //
+  // `hasCards` (default true) is false only for `RequestTopicBox`'s
+  // `status === "generating"` branch -- a topic just minted server-side has
+  // no cards yet, so invalidating the feed now would discard the reader's
+  // scroll position to show nothing new (task F9). `GenerationProgressPanel`
+  // invalidates instead, the moment its poll observes that run reach
+  // `completed`. Every other caller (Discover, the discovery modal, a shared
+  // topic link) subscribes to a topic that already has cards, so it keeps
+  // invalidating immediately.
+  const onFollowed = useCallback(async (topic: Topic, hasCards = true) => {
     setTopics((current) => (current.some((t) => t.id === topic.id) ? current : [...current, topic]));
     const p = await api.progress(topic.id);
     setProgress((current) => ({ ...current, [topic.id]: toTopicProgress(p) }));
-    invalidate("feed");
+    if (hasCards) invalidate("feed");
   }, []);
 
   // TopicStatsModal's color picker (ADR-0034) calls this after a successful
@@ -319,26 +328,32 @@ export function AppShell() {
               mounted (hidden via the `hidden` attribute, never unmounted) so
               switching back to it never refetches on its own. */}
           <div hidden={view !== "feed"}>
-            <Feed key={resetCount} topics={topics} selected={selected} onCardSeen={onCardSeen} />
+            <Feed
+              key={resetCount}
+              topics={topics}
+              selected={selected}
+              onCardSeen={onCardSeen}
+              active={view === "feed"}
+            />
           </div>
           {visited.has("notes") ? (
             <div hidden={view !== "notes"}>
-              <NotesView topics={topics} onNavigateHome={() => setView("feed")} />
+              <NotesView topics={topics} onNavigateHome={() => setView("feed")} active={view === "notes"} />
             </div>
           ) : null}
           {visited.has("liked") ? (
             <div hidden={view !== "liked"}>
-              <LikedView topics={topics} onNavigateHome={() => setView("feed")} />
+              <LikedView topics={topics} onNavigateHome={() => setView("feed")} active={view === "liked"} />
             </div>
           ) : null}
           {visited.has("saved") ? (
             <div hidden={view !== "saved"}>
-              <SavedView topics={topics} onNavigateHome={() => setView("feed")} />
+              <SavedView topics={topics} onNavigateHome={() => setView("feed")} active={view === "saved"} />
             </div>
           ) : null}
           {visited.has("profile") ? (
             <div hidden={view !== "profile"}>
-              <ProfileView />
+              <ProfileView active={view === "profile"} />
             </div>
           ) : null}
           {visited.has("settings") ? (

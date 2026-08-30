@@ -46,9 +46,13 @@ interface Props {
   topics?: Topic[];
   /** Navigate back to the feed when the CTA is clicked in the empty state. */
   onNavigateHome?: () => void;
+  /** Whether this view is the one currently on screen — see
+   *  `useRefreshEffect`'s docstring on why an invalidation while hidden must
+   *  not run this view's refetch synchronously. */
+  active?: boolean;
 }
 
-export function NotesView({ topics = [], onNavigateHome }: Props) {
+export function NotesView({ topics = [], onNavigateHome, active = true }: Props) {
   const [rows, setRows] = useState<NoteWithCard[] | null>(null);
   const [error, setError] = useState(false);
   const [activeTopicId, setActiveTopicId] = useState<string | undefined>(undefined);
@@ -71,6 +75,15 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
   // (Card.tsx's own invalidate("notes") after a save/delete would otherwise
   // force a visible refetch flash on top of a change already reflected).
   const skipNextRefreshRef = useRef(false);
+
+  // Mirrors `rows` for `onNoteChange` to read synchronously (see LikedView's
+  // identical `rowsRef` for the full reasoning: `offerUndo` must run as a
+  // plain call in the event handler, not from inside a `setRows` updater, or
+  // React warns about updating `UndoToast` while rendering `NotesView`).
+  const rowsRef = useRef<NoteWithCard[] | null>(null);
+  useEffect(() => {
+    rowsRef.current = rows;
+  }, [rows]);
 
   // Build a lookup of topicId → accent_hue from the followed-topics list.
   const hueByTopicId = useMemo(
@@ -106,13 +119,17 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
   // from a card in the feed, say) — re-fetches without needing a remount.
   // Skipped once right after this view's own note change (see
   // skipNextRefreshRef above).
-  useRefreshEffect("notes", () => {
-    if (skipNextRefreshRef.current) {
-      skipNextRefreshRef.current = false;
-      return;
-    }
-    void load();
-  });
+  useRefreshEffect(
+    "notes",
+    () => {
+      if (skipNextRefreshRef.current) {
+        skipNextRefreshRef.current = false;
+        return;
+      }
+      void load();
+    },
+    active,
+  );
 
   // Derive unique topics present in the notes collection for the filter bar.
   const notesTopics = useMemo(() => {
@@ -176,27 +193,26 @@ export function NotesView({ topics = [], onNavigateHome }: Props) {
       // a card with no note content sitting in a "notes" view. Capture the
       // body before it's gone so undo can re-`PUT` the exact same text
       // (Card.tsx has already issued the DELETE by the time this fires).
-      setRows((current) => {
-        if (!current) return current;
-        const removed = current.find((row) => row.card.id === cardId);
-        if (!removed) return current;
+      const current = rowsRef.current;
+      if (!current) return;
+      const removed = current.find((row) => row.card.id === cardId);
+      if (!removed) return;
 
-        skipNextRefreshRef.current = true;
-        offerUndo({
-          label: "Note deleted",
-          onUndo: async () => {
-            await api.saveNote(removed.card.id, removed.note.body);
-            skipNextRefreshRef.current = true;
-            invalidate("notes");
-            setRows((cur) => {
-              if (!cur) return [removed];
-              if (cur.some((row) => row.card.id === removed.card.id)) return cur;
-              return [removed, ...cur];
-            });
-          },
-        });
+      skipNextRefreshRef.current = true;
+      setRows((cur) => (cur ? cur.filter((row) => row.card.id !== cardId) : cur));
 
-        return current.filter((row) => row.card.id !== cardId);
+      offerUndo({
+        label: "Note deleted",
+        onUndo: async () => {
+          await api.saveNote(removed.card.id, removed.note.body);
+          skipNextRefreshRef.current = true;
+          invalidate("notes");
+          setRows((cur) => {
+            if (!cur) return [removed];
+            if (cur.some((row) => row.card.id === removed.card.id)) return cur;
+            return [removed, ...cur];
+          });
+        },
       });
     } else {
       setRows((current) =>

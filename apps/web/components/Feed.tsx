@@ -48,9 +48,13 @@ interface Props {
   selected: string[];
   /** Called after a card is marked seen, so the caller can track session reads and refresh that topic's progress. */
   onCardSeen: (cardId: string, topicId: string) => void;
+  /** Whether this view is the one currently on screen — see
+   *  `useRefreshEffect`'s docstring on why an invalidation while hidden must
+   *  not run this view's refetch synchronously. */
+  active?: boolean;
 }
 
-export function Feed({ topics, selected, onCardSeen }: Props) {
+export function Feed({ topics, selected, onCardSeen, active = true }: Props) {
   const [cards, setCards] = useState<CardModel[]>([]);
   const [seen, setSeen] = useState<Set<string>>(new Set());
 
@@ -192,7 +196,7 @@ export function Feed({ topics, selected, onCardSeen }: Props) {
 
   // Manual refresh (the header control) or an invalidation elsewhere (dev
   // reset) — re-runs a fresh page-1 load without waiting for a remount.
-  useRefreshEffect("feed", () => void loadPage(true));
+  useRefreshEffect("feed", () => void loadPage(true), active);
 
   // -- infinite scroll -------------------------------------------------------
   // `loadingMore` is read via a ref, not a dependency: keeping it out of the

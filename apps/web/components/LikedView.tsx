@@ -38,13 +38,17 @@ const SORT_LABELS: Record<SortKey, string> = {
 };
 
 interface Props {
+  /** Whether this view is the one currently on screen — see
+   *  `useRefreshEffect`'s docstring on why an invalidation while hidden must
+   *  not run this view's refetch synchronously. */
+  active?: boolean;
   /** Followed topics, used to look up accent hues for topic filter chips. */
   topics: Topic[];
   /** Navigate back to the feed when the CTA is clicked in the empty state. */
   onNavigateHome: () => void;
 }
 
-export function LikedView({ topics, onNavigateHome }: Props) {
+export function LikedView({ topics, onNavigateHome, active = true }: Props) {
   const [rows, setRows] = useState<LikedCard[] | null>(null);
   const [error, setError] = useState(false);
   const [activeTopicId, setActiveTopicId] = useState<string | undefined>(undefined);
@@ -70,6 +74,18 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   // "liked" invalidation, so an invalidation from elsewhere (liking a card
   // in the feed while this view is mounted) still refetches normally.
   const skipNextRefreshRef = useRef(false);
+
+  // Mirrors `rows` for `handleUnliked` to read synchronously (see there) --
+  // kept separate from the `setRows` functional-updater form specifically so
+  // `offerUndo` (which itself calls `setState` on the unrelated `UndoToast`
+  // component) never runs from inside a `setRows` updater. Updaters can run
+  // during React's render phase, and calling `setEntry` from there for a
+  // different component throws "Cannot update a component while rendering a
+  // different component" (bug found verifying task F13).
+  const rowsRef = useRef<LikedCard[] | null>(null);
+  useEffect(() => {
+    rowsRef.current = rows;
+  }, [rows]);
 
   // Build a lookup of topicId → accent_hue from the followed-topics list.
   const hueByTopicId = useMemo(
@@ -109,13 +125,17 @@ export function LikedView({ topics, onNavigateHome }: Props) {
   // card anywhere in the app) — re-fetches the current filter/sort without
   // needing a remount. Skipped once right after this view's own unlike,
   // which already updated `rows` locally (see skipNextRefreshRef above).
-  useRefreshEffect("liked", () => {
-    if (skipNextRefreshRef.current) {
-      skipNextRefreshRef.current = false;
-      return;
-    }
-    void load(activeTopicId, sort);
-  });
+  useRefreshEffect(
+    "liked",
+    () => {
+      if (skipNextRefreshRef.current) {
+        skipNextRefreshRef.current = false;
+        return;
+      }
+      void load(activeTopicId, sort);
+    },
+    active,
+  );
 
   // Client-side search filter over the already-fetched rows.
   const visible = useMemo(() => {
@@ -147,31 +167,35 @@ export function LikedView({ topics, onNavigateHome }: Props) {
     // 5-second undo that re-likes and re-inserts the captured row. The
     // re-like is a fresh `card_like` row server-side (created_at resets) --
     // an accepted tradeoff of delete-now-undo-by-redo, see lib/undo.ts.
-    setRows((current) => {
-      if (!current) return current;
-      const removed = current.find((r) => r.card.id === cardId);
-      if (!removed) return current;
+    //
+    // Reads `rowsRef` rather than using `setRows`'s functional-updater form
+    // to find `removed` -- `offerUndo` has to run as a plain synchronous
+    // call in this event handler, not from inside a `setRows` updater (see
+    // `rowsRef`'s own comment).
+    const current = rowsRef.current;
+    if (!current) return;
+    const removed = current.find((r) => r.card.id === cardId);
+    if (!removed) return;
 
-      skipNextRefreshRef.current = true;
-      offerUndo({
-        label: "Removed from Liked",
-        onUndo: () => {
-          skipNextRefreshRef.current = true;
-          // Write through so a Card mounted elsewhere for this same card_id
-          // (e.g. the Feed) also flips back to liked -- see
-          // lib/engagementState.ts. Card's own click handler does this for
-          // a direct unlike; undo bypasses that handler entirely.
-          likedStore.set(removed.card.id, true);
-          engagement.record(removed.card.id, "like");
-          setRows((cur) => {
-            if (!cur) return [removed];
-            if (cur.some((r) => r.card.id === removed.card.id)) return cur;
-            return [removed, ...cur];
-          });
-        },
-      });
+    skipNextRefreshRef.current = true;
+    setRows((cur) => (cur ? cur.filter((r) => r.card.id !== cardId) : cur));
 
-      return current.filter((r) => r.card.id !== cardId);
+    offerUndo({
+      label: "Removed from Liked",
+      onUndo: () => {
+        skipNextRefreshRef.current = true;
+        // Write through so a Card mounted elsewhere for this same card_id
+        // (e.g. the Feed) also flips back to liked -- see
+        // lib/engagementState.ts. Card's own click handler does this for
+        // a direct unlike; undo bypasses that handler entirely.
+        likedStore.set(removed.card.id, true);
+        engagement.record(removed.card.id, "like");
+        setRows((cur) => {
+          if (!cur) return [removed];
+          if (cur.some((r) => r.card.id === removed.card.id)) return cur;
+          return [removed, ...cur];
+        });
+      },
     });
   }, []);
 

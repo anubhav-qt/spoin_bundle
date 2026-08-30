@@ -10,6 +10,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { ApiError, api, type Difficulty, type GenerationProgress } from "@/lib/api";
+import { invalidate } from "@/lib/refresh";
 
 const POLL_MS = 1000;
 
@@ -40,7 +41,17 @@ export function GenerationProgressPanel({
       try {
         const next = await api.generationProgress(topicId);
         if (cancelled) return;
-        setProgress(next);
+        setProgress((previous) => {
+          // This topic had no cards when AppShell's `onFollowed` skipped the
+          // feed invalidation for it (task F9) -- the first poll that
+          // observes the run reach `completed` is the moment cards actually
+          // exist, so that's when the feed is told it has something new.
+          // Gated on the previous status so a re-render doesn't re-fire it.
+          if (next.status === "completed" && previous?.status !== "completed") {
+            invalidate("feed");
+          }
+          return next;
+        });
         setPollError(false);
         if (next.status === "completed" || next.status === "failed") return;
       } catch {

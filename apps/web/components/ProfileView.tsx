@@ -267,7 +267,14 @@ function TrendStrip({
 
 // ─── Main view ────────────────────────────────────────────────────────────────
 
-export function ProfileView() {
+interface Props {
+  /** Whether this view is the one currently on screen — see
+   *  `useRefreshEffect`'s docstring on why an invalidation while hidden must
+   *  not run this view's refetch synchronously. */
+  active?: boolean;
+}
+
+export function ProfileView({ active = true }: Props) {
   const { user, applyUser, logout } = useAuth();
 
   const [stats, setStats] = useState<ProfileStatsOut | null>(null);
@@ -306,7 +313,7 @@ export function ProfileView() {
 
   // Manual refresh, or an invalidation from elsewhere (a quiz pass moving
   // the streak, say) — re-fetches the currently viewed month.
-  useRefreshEffect("profile", load);
+  useRefreshEffect("profile", load, active);
 
   // Selecting a day is scoped to the month it was selected in.
   useEffect(() => setSelectedDay(null), [year, month]);

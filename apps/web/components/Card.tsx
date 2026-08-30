@@ -1046,12 +1046,21 @@ function HeroVisual({ hero, alt }: { hero: HeroVisualBlock; alt: string | undefi
   return <CodeBlock lang={hero.lang} content={hero.content} />;
 }
 
-/** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art). */
+/** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art).
+ *  The one-sentence `alt` doubles as a visible caption underneath (task F3)
+ *  — shown only when the server actually sent one, not the generic
+ *  screen-reader fallback below, which would read as noise repeated on
+ *  every plain scene. `role="img"` means a screen reader announces the
+ *  `aria-label` instead of the `<pre>` content either way, so the caption
+ *  paragraph is never a duplicate announcement. */
 function AsciiArt({ art, alt }: { art: string; alt: string | undefined }) {
   return (
-    <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
-      <pre>{art}</pre>
-    </div>
+    <>
+      <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
+        <pre>{art}</pre>
+      </div>
+      {alt ? <p className="card-visual-caption">{alt}</p> : null}
+    </>
   );
 }
 

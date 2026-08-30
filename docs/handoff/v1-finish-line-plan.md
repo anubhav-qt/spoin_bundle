@@ -303,6 +303,26 @@ out of the question "why would 20 subtopics firing concurrently cause RPM failur
   `pipeline/{nodes,persistence,state}.py`, which carry uncommitted Wave-1 changes —
   edits were purely additive and the technical-topic-guard work is intact.
 
+**Run 7 (2026-08-30, post-ADR-0074) — the scheduler's first real run.** CockroachDB
+end to end: **18m 50s**, 492 cards, 292 questions, 35 tiers at 100%, exit 0 — against a
+30–50 min average before. Written up in
+[generation-pipeline-run-7-benchmark.md](../architecture/generation-pipeline-run-7-benchmark.md).
+Two findings worth carrying forward:
+
+- **A compose default silently outranked the code.** `docker-compose.yml` set
+  `SPOIN_GEMINI_THINKING_LADDER` with its own hardcoded 3.6-first default, on the `api`
+  service only — so `api` and `worker` resolved the same setting differently and the 3.7
+  restoration never took effect. Proof in the ledger: 141 requests on `gemini-3.6-flash`,
+  **zero** on `gemini-3.7-flash`, no `model_unavailable` row. Fixed, but **3.7-first is
+  still unproven — the next run is its first test.** Worth sweeping the other
+  `${VAR:-default}` entries in compose against their `Settings` fields.
+- **The concurrency ceiling was the curriculum, not the key pool.** 35 tiers collapse into
+  18 groups, and the group is the fan-out unit, so 16–18 keys in use out of 33 IS full
+  stretch. ADR-0074's "parallelism = key count" only binds at ≥33 groups.
+
+Also: 6 rejections out of 498 is a suspiciously low rate and ran on the unintended thinking
+model. Confirm against real reading before treating 1.2% as the new baseline.
+
 **Next:** unchanged — Phase 2 Tier 2 (B6 → ADR amending 0034; B14 → ADR; B12/13 → ADR,
 numbered from 0075 now), then the Cockroach sequence, then B7. Task 0034 still
 pickup-ready.

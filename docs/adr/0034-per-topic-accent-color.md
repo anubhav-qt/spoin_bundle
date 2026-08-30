@@ -1,6 +1,7 @@
 # ADR-0034: Per-topic accent color, composed with the active palette
 
-- **Status:** Accepted (amended by [ADR-0051](0051-topic-color-opt-out.md))
+- **Status:** Accepted (amended by [ADR-0051](0051-topic-color-opt-out.md),
+  [ADR-0075](0075-embedding-derived-topic-accent-color.md))
 - **Date:** 2026-08-18
 - **Deciders:** Anubhav
 
@@ -8,6 +9,15 @@
 > gains a third state, `-1` (`NO_TOPIC_COLOR`), meaning "opt out of topic color
 > entirely, render the plain palette accent" -- alongside `null` (default hue) and
 > `0-359` (a chosen hue) below. Same column, no migration.
+>
+> **Amended 2026-08-30 by [ADR-0075](0075-embedding-derived-topic-accent-color.md).**
+> The `null` default is no longer computed client-side from subscription order.
+> When a real embedder is available, subscription now picks a hue from a colour
+> vocabulary by embedding similarity to the topic, distance-filtered against the
+> user's other topics, and **writes it into `accent_hue`**. The client-side
+> `defaultTopicHue` (curated-10 then hash) stays as the renderer for `null` rows
+> (legacy, or created without an embedder) and as the server-side fallback when
+> the wheel is too crowded to place a distinct hue.
 
 ## Context
 

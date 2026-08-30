@@ -192,12 +192,18 @@ class UserTopic(Base, UUIDPrimaryKey, Timestamps):
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     is_custom: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     #: 0-359 hue angle, -1 to opt out of topic color entirely (ADR-0051,
-    #: render the plain palette accent instead), or null for "use the
-    #: deterministic default" (`hash(topic_id) % 360`, computed identically
-    #: on both sides so no write is needed just to have a default) -- see
-    #: ADR-0034. Per subscription, not on `Topic` itself: same
-    #: shared-entity/personal-label split as `display_name`, so two users can
-    #: color the same topic differently in their own feed.
+    #: render the plain palette accent instead), or null. Per subscription, not
+    #: on `Topic` itself: same shared-entity/personal-label split as
+    #: `display_name`, so two users can color the same topic differently.
+    #:
+    #: ADR-0075 changed how a fresh subscription gets its default. With a real
+    #: embedder, `topics/accent_color.assign_accent_hue` picks a hue from a
+    #: colour vocabulary by embedding similarity to the topic, distance-filtered
+    #: against the user's other topics, and writes that 0-359 value here at
+    #: subscribe time. `null` now means "no server-assigned hue" -- a
+    #: pre-ADR-0075 row, or one created without a real embedder -- and the client
+    #: renders `defaultTopicHue` (ADR-0034's curated-10-then-hash) for it, same
+    #: as it always has. No backfill; old rows stay null and render correctly.
     accent_hue: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     user: Mapped[User] = relationship(back_populates="topics")

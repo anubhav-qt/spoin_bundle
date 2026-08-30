@@ -66,6 +66,11 @@ from spoin.domain.models import (
 from spoin.embeddings import Embedder
 from spoin.generation.base import ContentGenerator, TopicNameQuery
 from spoin.generation.pipeline import TopicRequest, match_and_create_topics
+from spoin.topics.accent_color import (
+    NO_TOPIC_COLOR,
+    assign_accent_hue,
+    default_hue_positional,
+)
 
 #: Notes/shares have no mutable-state table (ADR-0015) — these are the only two
 #: kinds `/topics/{id}/stats` aggregates from the raw event log rather than a
@@ -621,12 +626,60 @@ class TopicsService:
 
     # -- writes --------------------------------------------------------------
 
-    async def set_color(self, user_id: UUID, topic_id: UUID, hue: int | None) -> TopicOut:
+    async def _assign_new_subscription_hue(
+        self, user_id: UUID, topic: Topic, embedder: Embedder
+    ) -> int | None:
+        """ADR-0075: an embedding-apt, distinct-from-this-user's-others accent
+        hue for a just-created (or being-reset) subscription. `None` when no real
+        embedder is available -- the caller leaves `accent_hue` null and the
+        client renders the positional default, exactly as before ADR-0075.
+
+        The `!= topic.id` filter means this is safe to call both for a brand-new
+        row and for `set_color`'s reset of an existing one. Autoflush makes rows
+        added earlier in the same transaction (a `complete_onboarding` /
+        `request_topics_batch` loop) visible here, so each pick dedups against
+        its predecessors in the batch.
+        """
+
+        rows = (
+            await self._session.execute(
+                select(UserTopic.topic_id, UserTopic.accent_hue)
+                .where(UserTopic.user_id == user_id, UserTopic.topic_id != topic.id)
+                .order_by(UserTopic.created_at)
+            )
+        ).all()
+
+        used: set[int] = set()
+        for index, (other_topic_id, accent_hue) in enumerate(rows):
+            if accent_hue == NO_TOPIC_COLOR:
+                continue
+            if accent_hue is not None:
+                used.add(accent_hue % 360)
+            else:
+                # Legacy row the client is still rendering via its own default;
+                # impute the same hue so we don't hand out a near-duplicate.
+                used.add(default_hue_positional(str(other_topic_id), index))
+
+        return await assign_accent_hue(
+            embedder,
+            topic_id=str(topic.id),
+            topic_name=topic.canonical_name,
+            topic_embedding=topic.embedding,
+            used_hues=used,
+            subscription_index=len(rows),
+        )
+
+    async def set_color(
+        self, user_id: UUID, topic_id: UUID, hue: int | None, embedder: Embedder
+    ) -> TopicOut:
         """ADR-0034: per-subscription accent hue, not a shared `Topic` property
-        -- two users may color the same topic differently. `hue=None` resets to
-        the deterministic default the client computes itself; `hue=-1` opts out
-        of topic color entirely (ADR-0051) -- stored as-is, no special-casing
-        needed here since the client owns both the default and the sentinel."""
+        -- two users may color the same topic differently. `hue=-1` opts out of
+        topic color entirely (ADR-0051), stored as-is.
+
+        `hue=None` is "reset": ADR-0075 re-runs the embedding assignment (this
+        topic excluded from the dedup set) and persists a fresh materialized hue,
+        rather than deferring to the client's positional default. With no real
+        embedder it stores `None`, and the client default applies as before."""
 
         user_topic = await self._session.scalar(
             select(UserTopic).where(UserTopic.user_id == user_id, UserTopic.topic_id == topic_id)
@@ -634,7 +687,6 @@ class TopicsService:
         if user_topic is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Not subscribed to this topic")
 
-        user_topic.accent_hue = hue
         progress = await self._session.scalar(
             select(UserTopicProgress).where(
                 UserTopicProgress.user_id == user_id,
@@ -643,6 +695,14 @@ class TopicsService:
         )
         topic = await self._session.get(Topic, topic_id)
         assert topic is not None
+
+        if hue is None:
+            user_topic.accent_hue = await self._assign_new_subscription_hue(
+                user_id, topic, embedder
+            )
+        else:
+            user_topic.accent_hue = hue
+
         await self._session.commit()
 
         return TopicOut(
@@ -655,7 +715,7 @@ class TopicsService:
         )
 
     async def subscribe(
-        self, user_id: UUID, topic_id: UUID, entry_difficulty: Difficulty
+        self, user_id: UUID, topic_id: UUID, entry_difficulty: Difficulty, embedder: Embedder
     ) -> TopicOut:
         topic = await self._session.get(Topic, topic_id)
         if topic is None:
@@ -676,6 +736,7 @@ class TopicsService:
             is_custom=False,
         )
         self._session.add(user_topic)
+        user_topic.accent_hue = await self._assign_new_subscription_hue(user_id, topic, embedder)
         topic.subscriber_count += 1
         self._session.add(
             UserTopicProgress(
@@ -694,6 +755,7 @@ class TopicsService:
             slug=topic.slug,
             is_custom=False,
             current_difficulty=entry_difficulty,
+            accent_hue=user_topic.accent_hue,
         )
 
     async def unsubscribe(self, user_id: UUID, topic_id: UUID) -> None:
@@ -724,12 +786,15 @@ class TopicsService:
         await self._session.commit()
 
     async def complete_onboarding(
-        self, user_id: UUID, choices: list[OnboardingTopicChoice]
+        self, user_id: UUID, choices: list[OnboardingTopicChoice], embedder: Embedder
     ) -> list[TopicOut]:
         """First-run setup: subscribe to the chosen topics, each at its own
         entry tier, then flip the gate the root route checks. Unknown IDs are
         skipped rather than failing the whole request -- onboarding should not
-        strand a user over one stale entry in the picker's list."""
+        strand a user over one stale entry in the picker's list.
+
+        Each row's ADR-0075 accent hue is assigned in sequence, so the second
+        topic dedups against the first, the third against both, and so on."""
 
         subscribed: list[TopicOut] = []
         for choice in choices:
@@ -752,6 +817,9 @@ class TopicsService:
                 is_custom=False,
             )
             self._session.add(user_topic)
+            user_topic.accent_hue = await self._assign_new_subscription_hue(
+                user_id, topic, embedder
+            )
             topic.subscriber_count += 1
             self._session.add(
                 UserTopicProgress(
@@ -768,6 +836,7 @@ class TopicsService:
                     slug=topic.slug,
                     is_custom=False,
                     current_difficulty=choice.entry_difficulty,
+                    accent_hue=user_topic.accent_hue,
                 )
             )
 
@@ -868,6 +937,7 @@ class TopicsService:
             user_id=user_id, topic_id=topic_id, display_name=name, is_custom=True
         )
         session.add(user_topic)
+        user_topic.accent_hue = await self._assign_new_subscription_hue(user_id, topic, embedder)
         topic.subscriber_count += 1
         session.add(
             UserTopicProgress(
@@ -892,6 +962,7 @@ class TopicsService:
                 slug=topic.slug,
                 is_custom=True,
                 current_difficulty=entry_difficulty,
+                accent_hue=user_topic.accent_hue,
             ),
             status="generating" if is_new_topic else "subscribed",
         )
@@ -1006,6 +1077,9 @@ class TopicsService:
                     is_custom=True,
                 )
                 session.add(user_topic)
+                user_topic.accent_hue = await self._assign_new_subscription_hue(
+                    user_id, topic, embedder
+                )
                 topic.subscriber_count += 1
                 session.add(
                     UserTopicProgress(
@@ -1030,6 +1104,7 @@ class TopicsService:
                         slug=topic.slug,
                         is_custom=True,
                         current_difficulty=item.entry_difficulty,
+                        accent_hue=user_topic.accent_hue,
                     ),
                 )
 

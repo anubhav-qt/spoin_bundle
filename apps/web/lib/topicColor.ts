@@ -11,6 +11,13 @@
  * different topics read as visibly different colors rather than converging
  * on similar-looking hues — that's what the curated set below is for.
  *
+ * ADR-0075: the server now usually sends a concrete `accent_hue` for a fresh
+ * subscription (an embedding-derived, distance-filtered hue picked from a colour
+ * vocabulary, materialized at subscribe time) where it used to send `null`.
+ * Nothing here changes — a concrete hue was always handled. `defaultTopicHue`
+ * below stays as the renderer for any `null` that still arrives: pre-ADR-0075
+ * rows, and rows created on a backend with no real embedder (dev/tests).
+ *
  * ADR-0051: a topic can also opt OUT of coloring entirely and just render
  * the palette's plain `--accent`, which is a third state distinct from "use
  * the default hue" (`accent_hue: null`) and "use this hue"

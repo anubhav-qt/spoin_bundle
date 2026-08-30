@@ -27,6 +27,7 @@ from spoin.domain.models import (
     UserTopic,
     UserTopicProgress,
 )
+from spoin.embeddings import HashEmbedder
 from spoin.topics.service import TopicsService, entry_tier_unlock
 
 # ------------------------------------------------------- pure: entry unlock --
@@ -216,8 +217,9 @@ async def test_set_color_stores_a_chosen_hue(
 ) -> None:
     user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
     service = TopicsService(session, service_settings)
+    embedder = HashEmbedder(service_settings.embedding_dim)
 
-    out = await service.set_color(user_id, topic_id, 200)
+    out = await service.set_color(user_id, topic_id, 200, embedder)
 
     assert out.accent_hue == 200
     user_topic = await session.scalar(
@@ -230,14 +232,17 @@ async def test_set_color_stores_a_chosen_hue(
 async def test_set_color_none_resets_to_the_deterministic_default(
     session: AsyncSession, service_settings: Settings
 ) -> None:
-    """`hue=None` clears any stored value -- the client, not the row, owns the
-    default (ADR-0034)."""
+    """`hue=None` is "reset" (ADR-0075: re-runs the embedding assignment). With
+    the `HashEmbedder` stand-in the assignment bails and the row goes back to
+    null, so the client's positional default applies -- the pre-ADR-0075
+    behaviour, unchanged where there is no real embedder."""
 
     user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
     service = TopicsService(session, service_settings)
-    await service.set_color(user_id, topic_id, 200)
+    embedder = HashEmbedder(service_settings.embedding_dim)
+    await service.set_color(user_id, topic_id, 200, embedder)
 
-    out = await service.set_color(user_id, topic_id, None)
+    out = await service.set_color(user_id, topic_id, None, embedder)
 
     assert out.accent_hue is None
 
@@ -251,8 +256,9 @@ async def test_set_color_sentinel_opts_out_of_topic_color(
 
     user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
     service = TopicsService(session, service_settings)
+    embedder = HashEmbedder(service_settings.embedding_dim)
 
-    out = await service.set_color(user_id, topic_id, -1)
+    out = await service.set_color(user_id, topic_id, -1, embedder)
 
     assert out.accent_hue == -1
 

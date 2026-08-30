@@ -110,7 +110,7 @@ async def cancel_generation(topic_id: UUID, session: SessionDep, user_id: UserDe
 async def set_topic_color(
     topic_id: UUID, payload: TopicColorIn, session: SessionDep, user_id: UserDep
 ) -> TopicOut:
-    return await _service(session).set_color(user_id, topic_id, payload.hue)
+    return await _service(session).set_color(user_id, topic_id, payload.hue, get_embedder())
 
 
 @router.get("/all", response_model=list[TopicDiscoverOut])
@@ -137,7 +137,7 @@ async def subscribe_topic(
     user_id: UserDep,
     entry_difficulty: Difficulty = Difficulty.BEGINNER,
 ) -> TopicOut:
-    return await _service(session).subscribe(user_id, topic_id, entry_difficulty)
+    return await _service(session).subscribe(user_id, topic_id, entry_difficulty, get_embedder())
 
 
 @router.delete("/{topic_id}/subscribe", status_code=status.HTTP_204_NO_CONTENT)
@@ -149,7 +149,7 @@ async def unsubscribe_topic(topic_id: UUID, session: SessionDep, user_id: UserDe
 async def complete_onboarding(
     payload: OnboardingCompleteIn, session: SessionDep, user_id: UserDep
 ) -> list[TopicOut]:
-    return await _service(session).complete_onboarding(user_id, payload.topics)
+    return await _service(session).complete_onboarding(user_id, payload.topics, get_embedder())
 
 
 @router.get("/{topic_id}/stats", response_model=TopicStatsOut)

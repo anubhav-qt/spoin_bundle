@@ -9130,4 +9130,247 @@ body[data-reduced-motion="1"] *::after {
   animation: collection-pulse 1.6s ease-in-out infinite;
 }
 
+/* ============================================================================
+   Admin — quota read surface (B4, /admin/quota). Dev-only, its own route. */
 
+.quota-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 28px 64px;
+}
+
+.quota-eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.quota-title {
+  margin: 6px 0 0;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.quota-meta {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.quota-rule {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 20px 0;
+}
+
+.quota-state {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+.quota-retry {
+  margin-top: 10px;
+  padding: 6px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.quota-rollups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quota-tile {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 16px 18px;
+  background: var(--bg-2);
+}
+
+.quota-tile[data-warn="true"] {
+  border-color: var(--line-strong);
+}
+
+.quota-tile-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.quota-tile-value {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 26px;
+  color: var(--fg);
+}
+
+.quota-tile[data-warn="true"] .quota-tile-value {
+  color: var(--accent);
+}
+
+.quota-tile-of {
+  color: var(--fg-3);
+  font-size: 0.62em;
+}
+
+.quota-tile-note {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.quota-pool {
+  margin-bottom: 22px;
+}
+
+.quota-pool-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.quota-pool-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.quota-models {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quota-model {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) 140px;
+  gap: 18px;
+  align-items: center;
+}
+
+.quota-model[data-parked="true"] {
+  opacity: 0.8;
+}
+
+.quota-model-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--fg);
+}
+
+.quota-model-sub {
+  flex-basis: 100%;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--fg-3);
+}
+
+.quota-parked-pill {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  padding: 1px 6px;
+}
+
+.quota-keystrip {
+  display: grid;
+  gap: 2px;
+}
+
+.quota-keycell {
+  aspect-ratio: 1;
+  border-radius: 1px;
+  background: var(--bg-3);
+}
+
+.quota-keycell[data-throttled="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.quota-keycell[data-parked="true"] {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--bg-3) 0 3px,
+    color-mix(in srgb, var(--fg) 8%, transparent) 3px 6px
+  );
+}
+
+.quota-model-total {
+  text-align: right;
+  font-size: 11px;
+  color: var(--fg-2);
+}
+
+.quota-model[data-parked="true"] .quota-model-total {
+  color: var(--fg-3);
+}
+
+.quota-parked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quota-parked-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--bg-2);
+}
+
+.quota-parked-model {
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.quota-parked-when {
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.quota-parked-reason {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--fg-2);
+}
+
+@media (max-width: 640px) {
+  .quota-rollups {
+    grid-template-columns: 1fr;
+  }
+  .quota-model {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .quota-model-total {
+    text-align: left;
+  }
+}

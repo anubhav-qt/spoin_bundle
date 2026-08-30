@@ -86,40 +86,17 @@ dead, check `docker ps -a` before assuming something is broken.
 Notebook-palette tokens. The interaction design (scroll containers, hover affordances,
 inline font-naming row, no-popup layout) was confirmed and carries forward unchanged.
 
-**2026-08-30, session 2 — F4/F5 curated AND built.** Branch `feat/v1-finish-line` (off
-`origin/main`, pushed). Commits: preset curation → ADR-0070/0071 → API → web → task 0033.
-
-- **Curation.** 11 themes (5 shipped + Daylight / Terracotta / Meadow / Fog / Ember /
-  Amethyst) and 20 fonts (5 shipped + 15 across serif / slab / sans / rounded / display /
-  mono). Every new theme contrast-checked in a browser (`--fg` on `--bg` ≥ 12.7:1,
-  `--accent` on `--bg` ≥ 4.9:1). Source of truth:
-  [`docs/design/mockups/appearance-pickers.html`](../design/mockups/appearance-pickers.html).
-  Theme dropdown gained a "Create your own theme" row mirroring "Upload a font".
-- **[ADR-0070](../adr/0070-server-side-appearance-preferences.md)** (amends 0045) —
-  palette + saved themes + font + imported fonts move to `user_preference` /
-  `user_font`, `localStorage` demoted to a pre-paint cache reconciled against `/auth/me`.
-  **[ADR-0071](../adr/0071-drop-font-keep-revert.md)** (amends 0037) — FontPicker drops
-  Keep/Revert. Both Accepted.
-- **API.** `GET/PUT /profile/me/preferences`, `GET/POST/GET{id}/DELETE{id}
-  /profile/me/fonts`; `preferences` on `/auth/me`. Per-user font scoping enforced twice
-  (dep + `test_architecture.py`). 13 new tests, `make check` green for touched files.
-  Migration `f0a1c2b3d4e5` (two additive tables) **applied** to the running DB
-  (`spoin_db_2` — note: `.env` points the stack there, not `spoin_db`; CLAUDE.md's
-  "`spoin_db` is the only database" is stale against the local `.env`). API smoke-tested:
-  defaults, PUT round-trip, `/auth/me` embed all working.
-- **Web.** `lib/preferences.ts` (client source of truth), `PreferencesSync` (reconcile),
-  rewritten `ThemePicker` / `FontPicker` / `CustomThemeModal`, `CustomFontModal` deleted,
-  6 palettes + Newsreader wired in `globals.css`, layout inline script learns
-  `custom:<id>` + migrates the legacy `custom` slot. `tsc --noEmit` clean; web container
-  compiles clean.
-- **Not yet done:** owner's manual frontend test pass (checklist handed over). The
-  Wave-1 working-tree changes (`generation/pipeline/*.py`, several `apps/web/components/*.tsx`,
-  `lib/refresh.ts`) are still uncommitted and untouched.
-- **Task [0033](../tasks/0033-grow-the-curated-ascii-library-over-time.md)** added — the
-  standing "keep growing the curated ASCII library" todo, after task 0030's verify pass.
-
-**Next:** owner tests F4/F5 in the browser; then continue Phase 1 Wave 2 (F6 rename, then
-its `CollectionView` rework) and Phase 2 Tier 1 (B2/B8, B4).
+**2026-08-30, session 2 — F4/F5 preset curation done and confirmed.** The illustrative
+placeholder lists are replaced with the real, final ones: **11 themes** (5 shipped +
+Daylight / Terracotta / Meadow / Fog / Ember / Amethyst — a high-contrast-light, a warm
+light, a green light, a minimal neutral, a warm dark, and a violet dark) and **20 fonts**
+(5 shipped + 15 across serif / slab / sans / rounded / display / mono). Every new theme
+was contrast-checked in a browser (`--fg` on `--bg` ≥ 12.7:1, `--accent` on `--bg` ≥
+4.9:1, WCAG AA body text); every font is a real Google Fonts family rendered at body-copy
+size. The canvas above is updated with these lists, and the committed source of truth is
+[`docs/design/mockups/appearance-pickers.html`](../design/mockups/appearance-pickers.html)
+(per CLAUDE.md — an artifact link is not a source of truth). **Next: build F4/F5 against
+the server-side `user_preference` store** (see F4's entry), then continue Phase 1 Wave 2.
 
 **Uncommitted changes as of this log** (`git status` in `apps/web`, plus pre-existing
 unrelated changes already in the working tree before this session started — do not
@@ -131,201 +108,6 @@ session, they predate it): `app/globals.css`, `components/AppShell.tsx`,
 `components/RequestTopicBox.tsx`, `components/SavedView.tsx`, `lib/refresh.ts`. Nothing
 has been committed yet — the user has not asked for a commit. `tsc --noEmit` is clean
 across the whole frontend as of the last check.
-
-**2026-08-30, session 3 — F4/F5 signed off; F6 rename + B2/B8 + B4 shipped.**
-
-- **F4/F5 polish verified.** The three `1618822` items hold — but the web
-  container was serving **stale JS** (pre-`1618822`), so the theme-modal-reopen bug
-  "reproduced" until `docker compose restart web`. Windows bind-mount HMR is
-  unreliable (session-1 already flagged this for CSS); it applies to `.tsx` too —
-  **restart the web container after any component edit before trusting the browser.**
-  Found + fixed a follow-on: `1618822`'s `onOpenChange` fired inside
-  `PickerDropdown`'s `setInternalOpen` updater → React "setState during render of
-  another component" on every dropdown open/close. Moved it to a transition-watching
-  effect — commit `48b64ba`. Console clean after.
-- **F6 rename shipped** — `1b2cbf7`. Sidebar label + the `SavedView` eyebrow (all 4
-  states) now say "Revisit". Copy only: `saved` view key / `RefreshScope` /
-  `card_bookmark` / `api.saved*` untouched; the card action is still "Save". The
-  leftover "SAVED CARDS" / "Search saved cards…" / "Removed from Saved" microcopy
-  was entangled with the pre-existing uncommitted `SavedView.tsx` Wave-1 diff, so it
-  goes to the rework (task 0034) which rewrites that file anyway.
-- **F6 rework shipped** — `be96077`. Owner's call: *"why do you need design for F6?
-  It's literally the same as Liked and Notes"* — right. No `/design` canvas; the
-  three collection views were already the same `.collection-*` shell, and Saved's
-  only real difference was a bespoke 2-col tile grid + card-overlay portal.
-  `SavedView.tsx` is now a near-mirror of `LikedView.tsx` (vertical `Card` list,
-  new `.collection-list` class, same undo wiring, bookmark semantics). ~150 lines
-  of component + ~200 of CSS deleted (the `.saved-tile*` CSS is dead now — task
-  0034 sweeps it). **[ADR-0072](../adr/0072-revisit-drops-its-bespoke-grid.md)**
-  (amends 0046) records it. This supersedes SavedView's uncommitted Wave-1 diff.
-  **[Task 0034](../tasks/0034-collectionview-rework-saved-notes-liked.md)** is now
-  just the shared-`CollectionView` extraction (unblocked — all three views
-  identical) + the dead-CSS sweep; no ADR/design gate left. Verified live in
-  Obsidian: card list matches Liked, empty state matches, unbookmark→undo works.
-  (`b598ff3` was the earlier "defer" doc commit, now superseded.)
-- **B2/B8 shipped, end to end** — `1f72fc6` (API) + `3c699fb` (web), design-reviewed
-  first. `POST /topics/batch` + `TopicsService.request_topics_batch`: one
-  `validate_topic_names` + one `match_and_create_topics` call for the whole list,
-  per-row outcomes (`generating` / `subscribed` / `already_subscribed` /
-  `rejected`+detail), capped at `Settings.custom_topic_batch_max` (5), guest-gated,
-  7 tests. `RequestTopicBox.tsx` is now a rows form — name + optional description
-  each, `+` up to 5, per-row remove, one batched submit, per-row outcome view
-  after. The rewrite keeps the F9 `onFollowed(topic, hasCards?)` contract so it
-  cleanly supersedes the file's uncommitted Wave-1 diff. **[Task 0032](../tasks/0032-batch-topic-requests.md)
-  is DONE.** Verified live (rows/add/remove/counters/disabled, guest 403, per-row
-  results via a stubbed batch response).
-- **B4 shipped, end to end** — `99d3fb9` (API) + `6134ee4` (web).
-  `GET /admin/quota` → `read_quota_status` (`generation/quota_report.py`,
-  read-only): one cell per `(key, model)` with daily spend / ceiling /
-  `exhausted_at` / `cooldown_until`, plus `model_unavailable` rows. ADR-0065's
-  three conditions kept as **separate counts** (`cells_daily_exhausted` /
-  `cells_minute_throttled` / `models_parked`), never one boolean. `env !=
-  "production"` gated like `/dev/*`; real admin-role gate is
-  [task 0035](../tasks/0035-admin-role-and-production-admin-surface.md). `dev.py`
-  docstring corrected. Frontend is a plain dev-only Next route
-  `apps/web/app/admin/quota/page.tsx` (no shell view, reached by URL): three
-  rollup tiles kept separate, per-pool model rows with a 33-square key strip
-  (shaded by spend, ringed if throttled, hatched if parked), parked-models list.
-  4 API tests; verified live against the running DB (198 cells, all zero today).
-- `make test` green (451). `mypy --strict` green (86 files). New API files pass
-  `ruff` + `ruff format`. `packages/api-types/schema.d.ts` is gitignored (CI
-  regenerates); regenerated locally to confirm it's clean.
-- **Still untouched:** the pre-existing Wave-1 working tree
-  (`generation/pipeline/*.py`, `components/*.tsx`, `lib/refresh.ts`,
-  `docs/notes/topic-queue.md`, `tests/test_technical_topic_guard.py`). `git status`
-  stays dirty from these — expected. Note `test_technical_topic_guard.py` currently
-  fails `ruff check` (unsorted imports) — it's the owner's, not this session's.
-
-- **Design canvas** (owner-approved, built from) — B2/B8's rows form + B4's quota
-  panel, Obsidian theme:
-  https://claude.ai/code/artifact/c85d9452-76bd-4264-a484-13c60eb3ed9f
-- **Shell right-gap fix** — `49a6c65`. Owner: *"all screens have a visible gap on
-  the right"*. `.app-grid` was `350px | 640 | 350px`, `max-width: 1400` → a fixed
-  ~260px void each side on any wide screen. Side tracks are now
-  `minmax(350px, 1fr)`, max-width 1720: centre thread still centred & capped at
-  640 (feed reading width unchanged), rails spread to the edges. On 1920: right
-  void ~289→~130px, right rail +~140px usable width. Only the `>=1401` breakpoint
-  changes.
-- **Two follow-ups from the owner after B2/B8 landed:**
-  - **Generation is sequential now** — `9b9520e` / **[ADR-0073](../adr/0073-worker-runs-generation-jobs-sequentially.md)**.
-    `run_once()` ran claimed jobs with `asyncio.gather`; it now runs them one at
-    a time in `priority DESC, created_at` order. So a batch of topics added from
-    the app generates in the order requested, one finishing before the next.
-    Tradeoff (in the ADR): a pass takes ~N× longer, bursts spill to later cron
-    passes; the fix if it bites is a *bounded* pool, not unbounded `gather`.
-  - **Batch cap removed** — `dede0cb`. `custom_topic_batch_max` (5) + its 422 +
-    the frontend `MAX_ROWS` guard were a defensive limit; the owner had them
-    pulled. `POST /topics/batch` takes any non-empty list; `+ Add another` is
-    always available. A deliberate ceiling stays task 0024's concern.
-
-**Branch state:** `feat/v1-finish-line`, on top of session 2 — session-3 commits:
-`48b64ba` `1b2cbf7` `b598ff3` `1f72fc6` `4edfc60` `99d3fb9` `a60e425` `be96077`
-`a75ad9a` `49a6c65` `3c699fb` `6134ee4` `9b9520e` `dede0cb` (+ this log). **Pushed.**
-
-**Session-3 net:** F4/F5 signed off + a follow-on fix; F6 done (rename `1b2cbf7` +
-rework `be96077` / ADR-0072); B2/B8 done (API + rows form, then sequential
-generation + cap removed); B4 done (API + panel); the shell right-gap fixed. New
-docs: ADR-0072, ADR-0073, tasks 0034 / 0035; task 0032 closed.
-
-**Untouched:** the pre-existing Wave-1 working tree — `generation/pipeline/*.py`,
-`components/{AppShell,Card,Feed,GenerationProgressPanel,LikedView,NotesView,ProfileView}.tsx`,
-`lib/refresh.ts`, `docs/notes/topic-queue.md`, `tests/test_technical_topic_guard.py`.
-`git status` stays dirty from these — expected, they predate this effort. Note the
-F6 rework (`SavedView.tsx`) and B2/B8 (`RequestTopicBox.tsx`) each superseded that
-file's Wave-1 diff by carrying the equivalent change; the rest of Wave-1 is still
-uncommitted and owner-owned.
-
-**Next:** Phase 2 Tier 2 (B6 embedding topic colors → needs an ADR amending 0034;
-B14 report-a-card repair lane → needs an ADR; B12/13 AskAI → needs an ADR), then
-the Cockroach sequence (tasks 0016→0021), then B7 study material. Task 0034
-(shared `CollectionView`) is unblocked and pickup-ready any time. Every new
-frontend still goes through `/design` + owner sign-off (Phase 2.5); every
-"Needs: an ADR" item gets one first, numbered from 0074.
-
-**2026-08-30, session 4 — ADR-0074: one key per subtopic group; questions move to
-a topic-wide phase.** Owner-driven design session; not on the Tier-2 list, it came
-out of the question "why would 20 subtopics firing concurrently cause RPM failure?".
-
-- **The answer was that it wouldn't, and the docs were lying about why.** ADR-0047
-  deleted the global semaphore long ago; `max_concurrent_generation_calls` survived
-  in `core/config.py` **read by nothing**, and `generation-pipeline.md` still claimed
-  every call went through it. Both fixed — setting deleted, doc rewritten.
-- **[ADR-0074](../adr/0074-key-per-subtopic-scheduling.md) (Accepted)** — a subtopic
-  group claims ONE key for its whole card run (plan, every draft round, both gate
-  passes, every redraft) and releases it at the end. **Parallelism = key count (33).**
-  A group never borrows a claimed key; group K+1 waits. One caller per key is what
-  makes an rpm violation structurally impossible rather than merely counted.
-  Amends 0028/0065, **reframes** 0040/0047 (both stay — the ADR has a "what survives"
-  section so a future session doesn't delete `cell_lock` as dead). Back-pointers
-  added in all six ADRs + the README row.
-- **Own-key-first ladder.** own 3.7 → own 3.6 → any unclaimed key's 3.7/3.6
-  (least-spent) → own 3.5 → re-check → wait. `gemini-3-flash-preview` is a
-  **reserve** (`gemini_thinking_reserve_rungs`, default 1): reached only when no key
-  anywhere has daily room on an ordinary rung. **Contention waits, exhaustion
-  descends** — the two waits are seconds vs. midnight UTC and must not collapse.
-- **Ladder order regression fixed.** `gemini_thinking_ladder` led with 3.7 from
-  ADR-0028 onward; commit `f2f63e5` (PR #17, the ASCII curation PR) silently flipped
-  it to 3.6-first with no reasoning anywhere. Restored, and recorded in ADR-0074's
-  Context so it doesn't flip back a third time.
-- **Questions moved to the fan-in.** `_process_gate_item` writes cards only;
-  `gate_and_persist` now runs a topic-wide question phase once every group clears its
-  card bar, one claimed-key unit per subtopic-tier. So a tier's question budget is
-  spent against its FINISHED card set, not its first gate round's survivors.
-- **A real bug found and fixed in my own change, with a regression test.**
-  `_redraft_until_bar` appends one item report **per round**, so a tier arrives at the
-  fan-in named many times. Running the question phase per report generated a tier's
-  questions once per round: measured live at **84 reports for 9 tiers → 653 questions
-  for 70 cards** (~580 wasted LLM calls per run) and an equally inflated report.
-  Reports are merged by (topic, subtopic, difficulty) first.
-  `test_a_redrafted_tier_gets_exactly_one_question_pass` was verified to FAIL against
-  the buggy version before being kept. **`PipelineState.item_reports` is per ROUND,
-  not per tier** — its docstring now says so; anything needing per-tier semantics must
-  merge first.
-- **Enforced twice, per CLAUDE.md.** Two new `test_architecture.py` rules: the
-  generation pipeline may not reintroduce a concurrency semaphore (ADR-0047/0074), and
-  `_run_question_phase` may only be called from the topic-wide phase. Plus
-  `tests/test_key_claims.py` (11 tests, real Postgres session): claim binds and stays,
-  own-second-rung beats another key's first, the claim moves off a dying key, busy grid
-  waits instead of spending the reserve, reserve opens on genuine exhaustion, two claims
-  never share a key, release hands the key back, short ladders clamp the reserve.
-- **`make check`:** `mypy --strict` green (86 files), **465 tests green**. Pre-existing
-  and NOT mine: `ruff check src tests` fails E501 in `content/ascii_library.py`,
-  `generation/prompts/cards.py`, `generation/langchain_impl.py` (5 prompt-string lines,
-  confirmed identical at HEAD), `tests/test_technical_topic_guard.py`; and
-  `prompts/cards.py` fails `ruff format --check`. **Note the container runs ruff 0.16.5
-  and the host had 0.16.0** — they format differently, so run lint through
-  `docker compose exec api`, not the host.
-- **Not done, deliberately:** the B4 `/admin/quota` panel doesn't yet show claims
-  (keys claimed / free / groups waiting) — ADR-0074 lists it under "Easier" but it is a
-  separate frontend change and would need `/design`. Nothing is committed; the owner
-  had not asked for a commit.
-- **Untouched as always:** the owner's Wave-1 working tree. Note this session edited
-  `pipeline/{nodes,persistence,state}.py`, which carry uncommitted Wave-1 changes —
-  edits were purely additive and the technical-topic-guard work is intact.
-
-**Run 7 (2026-08-30, post-ADR-0074) — the scheduler's first real run.** CockroachDB
-end to end: **18m 50s**, 492 cards, 292 questions, 35 tiers at 100%, exit 0 — against a
-30–50 min average before. Written up in
-[generation-pipeline-run-7-benchmark.md](../architecture/generation-pipeline-run-7-benchmark.md).
-Two findings worth carrying forward:
-
-- **A compose default silently outranked the code.** `docker-compose.yml` set
-  `SPOIN_GEMINI_THINKING_LADDER` with its own hardcoded 3.6-first default, on the `api`
-  service only — so `api` and `worker` resolved the same setting differently and the 3.7
-  restoration never took effect. Proof in the ledger: 141 requests on `gemini-3.6-flash`,
-  **zero** on `gemini-3.7-flash`, no `model_unavailable` row. Fixed, but **3.7-first is
-  still unproven — the next run is its first test.** Worth sweeping the other
-  `${VAR:-default}` entries in compose against their `Settings` fields.
-- **The concurrency ceiling was the curriculum, not the key pool.** 35 tiers collapse into
-  18 groups, and the group is the fan-out unit, so 16–18 keys in use out of 33 IS full
-  stretch. ADR-0074's "parallelism = key count" only binds at ≥33 groups.
-
-Also: 6 rejections out of 498 is a suspiciously low rate and ran on the unintended thinking
-model. Confirm against real reading before treating 1.2% as the new baseline.
-
-**Next:** unchanged — Phase 2 Tier 2 (B6 → ADR amending 0034; B14 → ADR; B12/13 → ADR,
-numbered from 0075 now), then the Cockroach sequence, then B7. Task 0034 still
-pickup-ready.
 
 ---
 
@@ -726,13 +508,29 @@ server is the wrong mechanism for this particular call.** Reasons:
 3. Stream the answer back; persist the exchange (`card_qa`) so a repeated question is a
    cache hit, not a second call.
 
-**Budget & Quota (decided 2026-08-30):** 33 keys × 2 flash-lite models × 500/day ≈ **33,000
-requests/day** across the generator ladder, so AskAI and the pipeline have ample capacity
-without needing any quota reservation or artificial partitioning between them.
-The cap is **200 questions per user per day** — generous enough to be invisible in normal use,
-low enough that a single account cannot walk off with the day. Implement it on the existing
-ledger machinery (a `(day, user)` row), not a new subsystem, and return a clear "you have hit
-today's limit" rather than a generic 429.
+**Budget (decided 2026-08-30):** 33 keys × 2 flash-lite models × 500/day ≈ **33,000
+requests/day**, so AskAI does not need a tight throttle. The cap is **200 questions per
+user per day** — generous enough to be invisible in normal use, low enough that a single
+account cannot walk off with the day. It is still a per-user counter, not an absence of
+one: it is what makes one compromised or scripted account a bounded event. Implement it
+on the existing ledger machinery (a `(day, user)` row), not a new subsystem, and return a
+clear "you have hit today's limit" rather than a generic 429.
+
+**Generation gets a reserved floor (decided 2026-08-30).** AskAI and the pipeline draw
+from the same ladder, so a heavy AskAI day would otherwise spend quota the worker was
+going to use — and it would surface in the logs as plain quota exhaustion, indistinguish-
+able from a provider problem. AskAI stops at a configured share of the day (start at 40%,
+tunable); the remainder is always available to generation.
+
+Two implementation notes so this stays honest:
+
+- **Tag the consumer on the ledger.** Every request records whether it came from AskAI or
+  the pipeline. Without that, the floor is a number nobody can verify and the B4 panel
+  can't show you the split.
+- **AskAI hitting its share is its own terminal state**, not a `QuotaExhaustedError`. It
+  is the same distinction ADR-0065 draws between the three existing terminal states: "the
+  reader's feature is rationed" and "the day's budget is gone" are different facts and
+  must not collapse into one message or one log line.
 
 **Keeping questions on the card's topic** — the part you asked to be thorough about.
 No single mechanism does this; four layers, cheapest first, and the last two are the ones

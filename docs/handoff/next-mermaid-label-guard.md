@@ -7,7 +7,7 @@ fresh session.
 
 ## Prompt
 
-> Continue spoin v1 work on branch `feat/v1-finish-line` (pushed, HEAD `b79a41d`).
+> Continue spoin v1 work on branch `feat/v1-finish-line` (pushed, HEAD `20f5583`).
 >
 > Read `CLAUDE.md` first, then the section below. Two linked tasks, then continue
 > down the v1 finish line.
@@ -83,15 +83,14 @@ fresh session.
 > ### Then: continue the v1 finish line
 >
 > Per `docs/handoff/v1-finish-line-plan.md` (read its "Session progress log" —
-> session 7 entry is current). Remaining, in plan order:
+> session 7 entry is current). Phase 1 (frontend) is closed; task 0034
+> (shared `CollectionView`) shipped in session 7. Remaining, in plan order:
 > 1. **Cockroach sequence** — task 0016 spike (go/no-go gate), then 0017→0021.
->    0016 is a big, self-contained investigation; consider giving it its own
->    session.
+>    0016 is a big, self-contained investigation; give it its own session. It
+>    is the critical path — B7's `material_chunk` and B9's cache both depend
+>    on it.
 > 2. **B7 bring-your-own study material** (XL) — needs an ADR (0078) + its own
 >    task sequence.
-> 3. **Task 0034** — extract one shared `CollectionView` from Saved/Notes/Liked
->    + sweep dead `.saved-tile*` CSS + fold in leftover F6 microcopy. No gate,
->    pickup-ready. Plan wants it done before Phase 3 review.
 >
 > ### Environment / process
 >
@@ -151,3 +150,8 @@ Commits on `feat/v1-finish-line` since `4103658`:
     `docs/design/mockups/loader-concepts/` (the 2.4MB seeded payload is
     gitignored; `.dc.html` + `canvas.json` are the record). "Wave" was chosen.
 - **F12 is done** — it was the last Wave-3 item.
+- **`3bf8373`** `refactor(web): one CollectionView behind Liked / Revisit /
+  Notes (task 0034)` — `components/CollectionView.tsx` owns the shared shell;
+  the three views are ~90-line configs. Dead `.saved-tile*` CSS swept. Net
+  -1441/+211 + CollectionView.tsx. Verified live (render + undo for all three).
+- **`20f5583`** `docs:` — closed task 0034, session-7 progress log.

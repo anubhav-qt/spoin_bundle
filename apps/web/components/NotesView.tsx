@@ -2,38 +2,23 @@
 
 /**
  * "All my notes" (docs/tasks/0004-notes-in-one-place.md, part 2) — every
- * `CardNote` this user has written, newest edit first, rendered as full
- * `Card`s with the note editor expanded by default so it reads as a study
- * view rather than a bare list of card titles.
+ * `CardNote` this user has written, rendered as full `Card`s with the note
+ * editor open. A config over the shared `CollectionView` (ADR-0046, task
+ * 0034).
  *
- * Modeled on the unified collection surface (ADR-0046) alongside LikedView
- * and SavedView — sharing the same typography, controls, filtering, sorting,
- * loading skeletons, and empty states.
+ * Unlike Liked / Revisit, Notes fetches once (`GET /notes`, no params) and
+ * filters + sorts client-side — its "recent"/"oldest" sort is by
+ * `note.updated_at`, and search also matches the note body. Clearing a note
+ * to empty deletes it, with a 5-second undo that re-`PUT`s the exact text.
  *
- * Seen-state here is presentation-only: this view isn't part of the feed's
- * progression path, so "Got it" toggles just flip the icon locally rather
- * than round-tripping through engagement/progress like the feed does.
+ * Seen-state is presentation-only here — this view isn't on the feed's
+ * progression path.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence } from "framer-motion";
-
 import { api, type NoteWithCard, type Topic } from "@/lib/api";
-import { engagement } from "@/lib/engagement";
-import { invalidate, useRefreshEffect } from "@/lib/refresh";
-import { explicitTopicHue, topicHue } from "@/lib/topicColor";
-import { offerUndo } from "@/lib/undo";
-import { Card } from "./Card";
-import { HomeIcon, NoteIcon } from "./icons";
-
-type SortKey = "recent" | "oldest" | "topic" | "difficulty";
-
-const SORT_LABELS: Record<SortKey, string> = {
-  recent: "RECENT",
-  oldest: "OLDEST",
-  topic: "TOPIC",
-  difficulty: "DIFFICULTY",
-};
+import { invalidate } from "@/lib/refresh";
+import { CollectionView, type CollectionConfig, type CollectionSortKey } from "./CollectionView";
+import { NoteIcon } from "./icons";
 
 const DIFFICULTY_RANK: Record<string, number> = {
   beginner: 1,
@@ -41,396 +26,89 @@ const DIFFICULTY_RANK: Record<string, number> = {
   advanced: 3,
 };
 
+function sortNotes(a: NoteWithCard, b: NoteWithCard, key: CollectionSortKey): number {
+  switch (key) {
+    case "recent":
+      return new Date(b.note.updated_at).getTime() - new Date(a.note.updated_at).getTime();
+    case "oldest":
+      return new Date(a.note.updated_at).getTime() - new Date(b.note.updated_at).getTime();
+    case "topic":
+      return a.topic_name.localeCompare(b.topic_name);
+    case "difficulty":
+      return (DIFFICULTY_RANK[a.card.difficulty] ?? 0) - (DIFFICULTY_RANK[b.card.difficulty] ?? 0);
+    default:
+      return 0;
+  }
+}
+
+const config: CollectionConfig<NoteWithCard> = {
+  scope: "notes",
+  eyebrow: "NOTES",
+  title: "Private. Only you can see these.",
+  searchPlaceholder: "Search notes…",
+  searchAriaLabel: "Search notes",
+  countNoun: ["NOTE", "NOTES"],
+  errorHead: "COULDN’T LOAD YOUR NOTES",
+  emptyGlyph: "✎",
+  emptyHead: "NO NOTES YET",
+  emptyBody: (
+    <>
+      Tap the note icon on any card
+      <br />
+      to jot down your thoughts.
+      <br />
+      They&apos;ll live here.
+    </>
+  ),
+  footerIcon: <NoteIcon />,
+  footerVerb: "written",
+  itemNoun: ["note", "notes"],
+  filteredEmptyNoun: "notes",
+
+  fetch: () => api.listNotes(),
+  card: (row) => row.card,
+  topicName: (row) => row.topic_name,
+
+  clientFilterSort: true,
+  searchExtra: (row, q) => row.note.body.toLowerCase().includes(q),
+  sortRow: sortNotes,
+
+  cardProps: (_row, { removeWithUndo, updateRow }) => ({
+    initialNoteOpen: true,
+    onNoteChange: (cardId, body) => {
+      if (body === null) {
+        // Cleared to empty — Card has already issued the DELETE. Drop the row
+        // and offer an undo that re-`PUT`s the captured text.
+        removeWithUndo(cardId, {
+          label: "Note deleted",
+          redo: async (removed) => {
+            await api.saveNote(removed.card.id, removed.note.body);
+            invalidate("notes");
+          },
+        });
+      } else {
+        updateRow(cardId, (r) => ({
+          ...r,
+          note: { ...r.note, body, updated_at: new Date().toISOString() },
+        }));
+      }
+    },
+  }),
+};
+
 interface Props {
-  /** Followed topics, used to look up accent hues for topic filter chips. */
   topics?: Topic[];
-  /** Navigate back to the feed when the CTA is clicked in the empty state. */
   onNavigateHome?: () => void;
-  /** Whether this view is the one currently on screen — see
-   *  `useRefreshEffect`'s docstring on why an invalidation while hidden must
-   *  not run this view's refetch synchronously. */
   active?: boolean;
 }
 
 export function NotesView({ topics = [], onNavigateHome, active = true }: Props) {
-  const [rows, setRows] = useState<NoteWithCard[] | null>(null);
-  const [error, setError] = useState(false);
-  const [activeTopicId, setActiveTopicId] = useState<string | undefined>(undefined);
-  const [sort, setSort] = useState<SortKey>("recent");
-  const [search, setSearch] = useState("");
-  const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
-  const handleSeen = useCallback((id: string) => {
-    setSeenIds((s) => (s.has(id) ? s : new Set(s).add(id)));
-  }, []);
-  const handleUnseen = useCallback((id: string) => {
-    setSeenIds((s) => {
-      if (!s.has(id)) return s;
-      const next = new Set(s);
-      next.delete(id);
-      return next;
-    });
-  }, []);
-  // Set right when this view's own note delete/undo already updated `rows`
-  // locally -- see LikedView's identical guard for the full reasoning
-  // (Card.tsx's own invalidate("notes") after a save/delete would otherwise
-  // force a visible refetch flash on top of a change already reflected).
-  const skipNextRefreshRef = useRef(false);
-
-  // Mirrors `rows` for `onNoteChange` to read synchronously (see LikedView's
-  // identical `rowsRef` for the full reasoning: `offerUndo` must run as a
-  // plain call in the event handler, not from inside a `setRows` updater, or
-  // React warns about updating `UndoToast` while rendering `NotesView`).
-  const rowsRef = useRef<NoteWithCard[] | null>(null);
-  useEffect(() => {
-    rowsRef.current = rows;
-  }, [rows]);
-
-  // Build a lookup of topicId → accent_hue from the followed-topics list.
-  const hueByTopicId = useMemo(
-    () => Object.fromEntries(topics.map((t) => [t.id, t.accent_hue])),
-    [topics],
-  );
-
-  const load = useCallback(async () => {
-    setError(false);
-    setRows(null);
-    try {
-      await engagement.whenIdle();
-      const data = await api.listNotes();
-      setRows(data);
-      // Server-authoritative seen state (ADR-0010) -- merged in rather than
-      // replacing local state so a card just marked read this session, whose
-      // write hasn't round-tripped yet, doesn't flicker back to unseen.
-      setSeenIds((prev) => {
-        const next = new Set(prev);
-        for (const row of data) if (row.card.seen) next.add(row.card.id);
-        return next;
-      });
-    } catch {
-      setError(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  // Manual refresh, or an invalidation from elsewhere (a note saved/deleted
-  // from a card in the feed, say) — re-fetches without needing a remount.
-  // Skipped once right after this view's own note change (see
-  // skipNextRefreshRef above).
-  useRefreshEffect(
-    "notes",
-    () => {
-      if (skipNextRefreshRef.current) {
-        skipNextRefreshRef.current = false;
-        return;
-      }
-      void load();
-    },
-    active,
-  );
-
-  // Derive unique topics present in the notes collection for the filter bar.
-  const notesTopics = useMemo(() => {
-    if (!rows) return [];
-    const seen = new Map<string, { id: string; name: string }>();
-    for (const r of rows) {
-      if (!seen.has(r.card.topic_id)) {
-        seen.set(r.card.topic_id, { id: r.card.topic_id, name: r.topic_name });
-      }
-    }
-    return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, [rows]);
-
-  // Client-side search and topic filtering
-  const filteredRows = useMemo(() => {
-    if (!rows) return [];
-    let list = rows;
-    if (activeTopicId) {
-      list = list.filter((r) => r.card.topic_id === activeTopicId);
-    }
-    const q = search.trim().toLowerCase();
-    if (q) {
-      list = list.filter(
-        (r) =>
-          r.note.body.toLowerCase().includes(q) ||
-          r.card.title.toLowerCase().includes(q) ||
-          r.card.summary.toLowerCase().includes(q) ||
-          r.topic_name.toLowerCase().includes(q),
-      );
-    }
-    return list;
-  }, [rows, activeTopicId, search]);
-
-  // Sorting
-  const visible = useMemo(() => {
-    const list = [...filteredRows];
-    switch (sort) {
-      case "recent":
-        return list.sort(
-          (a, b) => new Date(b.note.updated_at).getTime() - new Date(a.note.updated_at).getTime(),
-        );
-      case "oldest":
-        return list.sort(
-          (a, b) => new Date(a.note.updated_at).getTime() - new Date(b.note.updated_at).getTime(),
-        );
-      case "topic":
-        return list.sort((a, b) => a.topic_name.localeCompare(b.topic_name));
-      case "difficulty":
-        return list.sort(
-          (a, b) =>
-            (DIFFICULTY_RANK[a.card.difficulty] ?? 0) - (DIFFICULTY_RANK[b.card.difficulty] ?? 0),
-        );
-      default:
-        return list;
-    }
-  }, [filteredRows, sort]);
-
-  const onNoteChange = (cardId: string, body: string | null) => {
-    if (body === null) {
-      // A note cleared to empty deletes it — drop the row rather than leaving
-      // a card with no note content sitting in a "notes" view. Capture the
-      // body before it's gone so undo can re-`PUT` the exact same text
-      // (Card.tsx has already issued the DELETE by the time this fires).
-      const current = rowsRef.current;
-      if (!current) return;
-      const removed = current.find((row) => row.card.id === cardId);
-      if (!removed) return;
-
-      skipNextRefreshRef.current = true;
-      setRows((cur) => (cur ? cur.filter((row) => row.card.id !== cardId) : cur));
-
-      offerUndo({
-        label: "Note deleted",
-        onUndo: async () => {
-          await api.saveNote(removed.card.id, removed.note.body);
-          skipNextRefreshRef.current = true;
-          invalidate("notes");
-          setRows((cur) => {
-            if (!cur) return [removed];
-            if (cur.some((row) => row.card.id === removed.card.id)) return cur;
-            return [removed, ...cur];
-          });
-        },
-      });
-    } else {
-      setRows((current) =>
-        current?.map((row) =>
-          row.card.id === cardId
-            ? { ...row, note: { ...row.note, body, updated_at: new Date().toISOString() } }
-            : row,
-        ) ?? current,
-      );
-    }
-  };
-
-  const handleTopicFilter = (topicId: string | undefined) => {
-    setActiveTopicId(topicId);
-    setSearch("");
-  };
-
-  const handleSort = (key: SortKey) => {
-    setSort(key);
-  };
-
-  const totalNotes = rows?.length ?? 0;
-  const topicCount = notesTopics.length;
-
-  // --------------------------------------------------------------------------
-  // Loading state
-  // --------------------------------------------------------------------------
-  if (rows === null && !error) {
-    return (
-      <div className="collection-view notes-view">
-        <div className="collection-header">
-          <p className="collection-eyebrow">NOTES</p>
-          <p className="collection-title">Private. Only you can see these.</p>
-        </div>
-        <div className="notes-view-list">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="notes-skeleton" aria-hidden="true">
-              <div className="notes-skeleton-meta collection-skeleton-bar" />
-              <div className="notes-skeleton-title collection-skeleton-bar" />
-              <div className="notes-skeleton-body collection-skeleton-bar" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // Error state
-  // --------------------------------------------------------------------------
-  if (error) {
-    return (
-      <div className="collection-view notes-view">
-        <div className="collection-header">
-          <p className="collection-eyebrow">NOTES</p>
-        </div>
-        <div className="collection-state">
-          <p className="collection-state-head">COULDN&apos;T LOAD YOUR NOTES</p>
-          <p className="collection-state-body">Something went sideways.</p>
-          <button
-            type="button"
-            className="collection-action collection-cta"
-            onClick={() => void load()}
-          >
-            TRY AGAIN
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // Empty state (no notes at all, no active filter/search)
-  // --------------------------------------------------------------------------
-  if (totalNotes === 0 && !activeTopicId && !search) {
-    return (
-      <div className="collection-view notes-view">
-        <div className="collection-header">
-          <p className="collection-eyebrow">NOTES</p>
-          <p className="collection-title">Private. Only you can see these.</p>
-        </div>
-        <div className="collection-state">
-          <pre className="collection-state-ascii" aria-hidden="true">{`
-  ✎  ·  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·`}</pre>
-          <p className="collection-state-head">NO NOTES YET</p>
-          <p className="collection-state-body">
-            Tap the note icon on any card<br />
-            to jot down your thoughts.<br />
-            They&apos;ll live here.
-          </p>
-          {onNavigateHome && (
-            <button
-              type="button"
-              className="collection-action collection-cta"
-              onClick={onNavigateHome}
-            >
-              <span className="collection-action-icon"><HomeIcon /></span>
-              EXPLORE CARDS
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // Main view
-  // --------------------------------------------------------------------------
   return (
-    <div className="collection-view notes-view">
-      {/* Header */}
-      <div className="collection-header">
-        <p className="collection-eyebrow">NOTES</p>
-        <p className="collection-title">Private. Only you can see these.</p>
-      </div>
-
-      {/* Collection metadata */}
-      <p className="collection-meta">
-        {totalNotes === 1 ? "1 NOTE" : `${totalNotes} NOTES`}
-        {topicCount > 0 ? ` · ${topicCount} ${topicCount === 1 ? "TOPIC" : "TOPICS"}` : ""}
-      </p>
-
-      <hr className="collection-rule" />
-
-      {/* Search + Sort controls */}
-      <div className="collection-controls">
-        <input
-          id="notes-search"
-          type="search"
-          className="collection-search"
-          placeholder="Search notes…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label="Search notes"
-        />
-        <div className="collection-pill-row" role="group" aria-label="Sort order">
-          {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              className="collection-pill"
-              data-active={sort === key}
-              onClick={() => handleSort(key)}
-              aria-pressed={sort === key}
-            >
-              {SORT_LABELS[key]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Topic filter pills */}
-      {notesTopics.length > 1 ? (
-        <div className="collection-filters" role="group" aria-label="Filter by topic">
-          <button
-            type="button"
-            className="collection-chip"
-            data-selected={!activeTopicId}
-            onClick={() => handleTopicFilter(undefined)}
-          >
-            ALL
-          </button>
-          {notesTopics.map((t) => {
-            const hue = explicitTopicHue(hueByTopicId[t.id]);
-            return (
-              <button
-                key={t.id}
-                type="button"
-                className="collection-chip"
-                data-selected={activeTopicId === t.id}
-                onClick={() => handleTopicFilter(t.id)}
-                style={hue !== null ? ({ "--topic-hue": hue } as React.CSSProperties) : undefined}
-              >
-                {t.name.toUpperCase()}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
-
-      {/* Empty state for filtered/searched result */}
-      {visible.length === 0 ? (
-        <p className="collection-note">
-          {search ? `No notes match "${search}".` : "No notes in this topic."}
-        </p>
-      ) : null}
-
-      {/* Card list */}
-      <div className="notes-view-list">
-        <AnimatePresence initial={false}>
-          {visible.map((row) => (
-            <Card
-              key={row.card.id}
-              card={row.card}
-              topicName={row.topic_name}
-              accentHue={topicHue(row.card.topic_id, hueByTopicId[row.card.topic_id])}
-              seen={seenIds.has(row.card.id)}
-              onSeen={handleSeen}
-              onUnseen={handleUnseen}
-              isHero={false}
-              initialNoteOpen
-              onNoteChange={onNoteChange}
-            />
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {/* Note watermark at bottom — quiet editorial touch */}
-      {visible.length > 0 ? (
-        <div className="collection-footer" aria-hidden="true">
-          <span className="collection-footer-icon"><NoteIcon /></span>
-          <span className="collection-footer-label">
-            {visible.length} {visible.length === 1 ? "note" : "notes"} written
-          </span>
-        </div>
-      ) : null}
-    </div>
+    <CollectionView
+      config={config}
+      topics={topics}
+      onNavigateHome={onNavigateHome}
+      active={active}
+    />
   );
 }

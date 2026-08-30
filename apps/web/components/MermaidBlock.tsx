@@ -97,10 +97,22 @@ export function MermaidBlock({ source }: { source: string }) {
           sequence: { useMaxWidth: true },
           gantt: { useMaxWidth: true },
         });
+        // Parse first with errors suppressed: generated diagram source is not
+        // trusted to be valid mermaid (see the file docstring), and a failed
+        // parse here is an EXPECTED outcome, not an exception. Going straight
+        // to the fallback avoids `mermaid.render` throwing — which in Next dev
+        // surfaces its internal `console.error` as a red error overlay for a
+        // condition this component already handles.
+        const ok = await mermaid.parse(source, { suppressErrors: true });
+        if (!ok) {
+          console.warn("Mermaid source did not parse; showing raw diagram source.");
+          if (live) setFailed(true);
+          return;
+        }
         const { svg: rendered } = await mermaid.render(`spoin-mmd-${renderSeq++}`, source);
         if (live) setSvg(rendered);
       } catch (err) {
-        console.error("Mermaid render error:", err);
+        console.warn("Mermaid render fell back to raw source:", err);
         // Malformed diagram source — fall through to the raw-source box below.
         if (live) setFailed(true);
       }

@@ -40,6 +40,7 @@ import { motion } from "framer-motion";
 import katex from "katex";
 
 import {
+  ApiError,
   api,
   type ArchetypeTag,
   type Card as CardModel,
@@ -206,6 +207,7 @@ export function Card({
   const [reportNote, setReportNote] = useState("");
   const [reportBusy, setReportBusy] = useState(false);
   const [reported, setReported] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
   const [askOpen, setAskOpen] = useState(false);
   // ADR-0035: only the very first hero card mounted while the flag is unset
   // shows the tutorial — read once at mount, not reactively, so it can't
@@ -258,13 +260,17 @@ export function Card({
 
   useEffect(() => {
     if (!reportOpen) return;
+    const close = () => {
+      setReportOpen(false);
+      setReportError(null);
+    };
     const onPointer = (e: PointerEvent) => {
       if (reportWrapRef.current && !reportWrapRef.current.contains(e.target as Node)) {
-        setReportOpen(false);
+        close();
       }
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setReportOpen(false);
+      if (e.key === "Escape") close();
     };
     document.addEventListener("pointerdown", onPointer);
     document.addEventListener("keydown", onKey);
@@ -277,6 +283,7 @@ export function Card({
   const submitReport = async () => {
     if (!reportReason || reportBusy) return;
     setReportBusy(true);
+    setReportError(null);
     try {
       await api.reportCard(card.id, {
         reason: reportReason,
@@ -288,8 +295,15 @@ export function Card({
       // `reported_by_me` flag on the card payload — not yet.)
       setReported(true);
       setTimeout(() => setReportOpen(false), 1400);
-    } catch {
-      // Keep the popover open; a transient failure just lets them retry.
+    } catch (e) {
+      // Keep the popover open so they can retry — but say what went wrong.
+      // A 404 means this card row was superseded (a repair/revert landed)
+      // while the feed still held it, so the report has nowhere to attach.
+      setReportError(
+        e instanceof ApiError && e.status === 404
+          ? "This card was just updated — reload to report the current version."
+          : "Couldn’t send that report. Try again in a moment.",
+      );
     } finally {
       setReportBusy(false);
     }
@@ -796,7 +810,14 @@ export function Card({
                 data-on={reportOpen || reported}
                 aria-label="Report this card"
                 aria-expanded={reportOpen}
-                onClick={(e) => act(e, () => setReportOpen((open) => !open))}
+                onClick={(e) =>
+                  act(e, () =>
+                    setReportOpen((open) => {
+                      if (open) setReportError(null);
+                      return !open;
+                    }),
+                  )
+                }
                 type="button"
               >
                 <FlagIcon />
@@ -817,7 +838,10 @@ export function Card({
                           type="button"
                           className="share-popover-item report-reason"
                           data-picked={reportReason === r.value}
-                          onClick={() => setReportReason(r.value)}
+                          onClick={() => {
+                            setReportReason(r.value);
+                            setReportError(null);
+                          }}
                         >
                           <span className="report-dot" />
                           <span className="share-popover-text">{r.label}</span>
@@ -830,11 +854,19 @@ export function Card({
                         onChange={(e) => setReportNote(e.target.value)}
                         rows={2}
                       />
+                      {reportError ? (
+                        <div className="report-error" role="alert">
+                          {reportError}
+                        </div>
+                      ) : null}
                       <div className="report-actions">
                         <button
                           type="button"
                           className="report-btn"
-                          onClick={() => setReportOpen(false)}
+                          onClick={() => {
+                            setReportOpen(false);
+                            setReportError(null);
+                          }}
                         >
                           Cancel
                         </button>
@@ -1123,6 +1155,28 @@ function looseFenceKey(text: string): string {
   return text.replace(/\s+/g, "");
 }
 
+/** Non-whitespace character count — a cheap proxy for "how much of the scene
+ *  is actually drawn here", used to lead with the fuller of two copies. */
+function nonWhitespaceLength(text: string): number {
+  return text.replace(/\s+/g, "").length;
+}
+
+/** True when `visual_slots.art` and a body fence are the same drawing put
+ *  into two different generation slots. Compared as whitespace-split token
+ *  sets: the two copies routinely disagree on indentation, line breaks, and
+ *  the odd character (`*slap*!` vs `*stap*!`), but share almost every token.
+ *  A four-token floor on the smaller side stops a one-glyph art slot from
+ *  colliding with an unrelated code fence. */
+function sameScene(a: string, b: string): boolean {
+  const tok = (s: string) => new Set(s.split(/\s+/).filter(Boolean));
+  const ta = tok(a);
+  const tb = tok(b);
+  if (ta.size < 4 || tb.size < 4) return false;
+  let shared = 0;
+  for (const t of tb) if (ta.has(t)) shared++;
+  return shared / Math.min(ta.size, tb.size) >= 0.6;
+}
+
 /** `visual_slots.art` is meant to hold raw ASCII, but the generator
  *  intermittently leaves the ```lang fence it drew the scene inside. Left
  *  alone those backticks render as literal text at the top of the card — the
@@ -1136,10 +1190,11 @@ function stripFenceWrapper(art: string): string {
 
 /** The one visual block a card leads with. `skipKey` is what `Markdown`
  *  matches against so the body drops its own copy of the very same block. */
-type HeroVisualBlock =
+type HeroVisualBlock = { captioned?: boolean } & (
   | { kind: "ascii"; content: string; skipKey: string }
   | { kind: "diagram"; lang: string; content: string; skipKey: string }
-  | { kind: "code"; lang: string; content: string; skipKey: string };
+  | { kind: "code"; lang: string; content: string; skipKey: string }
+);
 
 /** Picks the single block that leads the card, and nothing else — a card
  *  carrying both a code fence and a diagram leads with its PRIMARY type only
@@ -1167,6 +1222,23 @@ function resolveHero(
         ? "diagram"
         : null;
 
+  // Same scene in both slots: the model routinely draws one picture into
+  // `visual_slots.art` AND into a body fence, one copy fuller than the other.
+  // Lead with whichever is more complete, carry the caption, and let the body
+  // drop its copy (`skipKey` targets the BODY fence either way). This replaces
+  // the blanket "body always outranks art" rule, which broke on the cards
+  // where the art slot held the full scene and the body held the short redraw.
+  const lead = firstFence(body);
+  if (art !== null && lead !== null && sameScene(art, lead.content)) {
+    const skipKey = fenceKey(lead.content);
+    if (nonWhitespaceLength(art) >= nonWhitespaceLength(lead.content)) {
+      return { kind: "ascii", content: art, skipKey, captioned: true };
+    }
+    return lead.kind === "diagram"
+      ? { kind: "diagram", lang: lead.lang, content: lead.content, skipKey, captioned: true }
+      : { kind: "code", lang: lead.lang, content: lead.content, skipKey, captioned: true };
+  }
+
   // Two reasons this falls through to ANY fence rather than stopping at
   // `kind`: an `art` slot present means the body fence is likely the fuller
   // twin of the same scene, worth preferring even off-kind; and a server/
@@ -1185,31 +1257,41 @@ function resolveHero(
       : { kind: "code", lang: fence.lang, content: fence.content, skipKey };
   }
 
-  if (art !== null) return { kind: "ascii", content: art, skipKey: fenceKey(art) };
+  if (art !== null) return { kind: "ascii", content: art, skipKey: fenceKey(art), captioned: true };
   return null;
 }
 
+/** `alt` is rendered as a visible caption under the lead visual (task F3) —
+ *  but only when the visual actually IS the `visual_slots` scene: the plain
+ *  `ascii` art, or a body fence resolved to be that same scene (`captioned`).
+ *  A body fence that merely happens to lead an unrelated card gets no caption,
+ *  since `alt` describes the art slot, not it. */
 function HeroVisual({ hero, alt }: { hero: HeroVisualBlock; alt: string | undefined }) {
-  if (hero.kind === "ascii") return <AsciiArt art={hero.content} alt={alt} />;
-  if (hero.kind === "diagram") return <DiagramBlock lang={hero.lang} content={hero.content} />;
-  return <CodeBlock lang={hero.lang} content={hero.content} />;
+  const visual =
+    hero.kind === "ascii" ? (
+      <AsciiArt art={hero.content} alt={alt} />
+    ) : hero.kind === "diagram" ? (
+      <DiagramBlock lang={hero.lang} content={hero.content} />
+    ) : (
+      <CodeBlock lang={hero.lang} content={hero.content} />
+    );
+  return (
+    <>
+      {visual}
+      {hero.captioned && alt ? <p className="card-visual-caption">{alt}</p> : null}
+    </>
+  );
 }
 
 /** Renders a card's ASCII scene (ADR-0021, or free-form model-drawn art).
- *  The one-sentence `alt` doubles as a visible caption underneath (task F3)
- *  — shown only when the server actually sent one, not the generic
- *  screen-reader fallback below, which would read as noise repeated on
- *  every plain scene. `role="img"` means a screen reader announces the
- *  `aria-label` instead of the `<pre>` content either way, so the caption
- *  paragraph is never a duplicate announcement. */
+ *  `role="img"` means a screen reader announces the `aria-label` rather than
+ *  the raw `<pre>` glyphs. The visible caption is `HeroVisual`'s job now, so
+ *  it can caption a same-scene diagram/code hero too, not just this branch. */
 function AsciiArt({ art, alt }: { art: string; alt: string | undefined }) {
   return (
-    <>
-      <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
-        <pre>{art}</pre>
-      </div>
-      {alt ? <p className="card-visual-caption">{alt}</p> : null}
-    </>
+    <div className="card-ascii" role="img" aria-label={alt || "A hand-drawn ASCII scene"}>
+      <pre>{art}</pre>
+    </div>
   );
 }
 
@@ -1283,7 +1365,7 @@ function InlineMath({ math }: { math: string }) {
  * first: a body that genuinely repeats the same block twice keeps its second
  * copy, since that is the author's content, not this component's duplication.
  */
-function Markdown({ source, skipFenceKey }: { source: string; skipFenceKey?: string | null }) {
+export function Markdown({ source, skipFenceKey }: { source: string; skipFenceKey?: string | null }) {
   const all = tokenize(source);
   const tokens: Token[] = [];
   let skipped = skipFenceKey === null || skipFenceKey === undefined;

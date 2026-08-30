@@ -9433,6 +9433,15 @@ body[data-reduced-motion="1"] *::after {
   color: var(--fg-3);
 }
 
+.report-error {
+  margin: 8px 0 0;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--accent);
+  font-weight: 500;
+}
+
 .report-actions {
   display: flex;
   justify-content: flex-end;

@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ApiError, api, type RepairCard, type RepairQueueItem } from "@/lib/api";
+import { Markdown } from "@/components/Card";
 
 const REASON_LABEL: Record<string, string> = {
   art: "art",
@@ -38,7 +39,9 @@ function CardRender({ card, innerRef }: { card: RepairCard; innerRef?: React.Ref
     <div className="card repairs-card" ref={innerRef}>
       <div className="card-title">{card.canonical_title}</div>
       <div className="card-summary">{card.summary}</div>
-      <div className="card-body repairs-card-body">{card.body}</div>
+      <div className="card-body repairs-card-body">
+        <Markdown source={card.body} />
+      </div>
       {art ? (
         <pre className="repairs-ascii">{art}</pre>
       ) : null}

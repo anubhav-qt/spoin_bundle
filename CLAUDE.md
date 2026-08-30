@@ -8,7 +8,14 @@ re-deriving context that already exists on disk.
 
 ## The database
 
-**`spoin_db` is the only database this project uses.** Read-only access — `SELECT`,
+**`spoin_db_2` is the live database** (the local `.env` points
+`SPOIN_DATABASE_URL` at it, and the running stack uses it). **`spoin_db` is the
+archived earlier copy** — do not point anything at it, migrate it, or read it expecting
+current data. Everything below that says "`spoin_db`" means the live DB, `spoin_db_2`;
+the name in the prose is stale and not worth a churny find-replace, but the rule is the
+same and applies to `spoin_db_2`.
+
+**The live database is the only one this project uses.** Read-only access — `SELECT`,
 inspecting a row, checking whether a migration applied — is fine and often necessary.
 **Anything else needs the project owner's explicit approval first, every time, agent
 sessions included.** That covers the obvious destructive operations (`alembic downgrade`,

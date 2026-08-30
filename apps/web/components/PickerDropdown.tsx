@@ -23,11 +23,26 @@ interface Props {
   /** Which edge of the trigger the popover hugs — "right" for controls near
    *  the rail's right edge so the popover opens inward. */
   align?: "left" | "right";
+  /** Fires whenever the popover opens or closes. Pickers use `open === false`
+   *  to reset any transient sub-state (a half-filled "name this theme" modal,
+   *  a pending font import) that would otherwise reappear on the next open —
+   *  the children unmount on close but the picker component stays mounted. */
+  onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
 }
 
-export function PickerDropdown({ label, value, align = "left", children }: Props) {
-  const [open, setOpen] = useState(false);
+export function PickerDropdown({ label, value, align = "left", onOpenChange, children }: Props) {
+  const [open, setInternalOpen] = useState(false);
+  const setOpen = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)) => {
+      setInternalOpen((prev) => {
+        const value = typeof next === "function" ? next(prev) : next;
+        if (value !== prev) onOpenChange?.(value);
+        return value;
+      });
+    },
+    [onOpenChange],
+  );
   const [rect, setRect] = useState<DOMRect | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);

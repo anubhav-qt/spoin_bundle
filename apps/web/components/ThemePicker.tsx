@@ -181,26 +181,43 @@ export function ThemePicker({ variant = "pills", onChoose }: Props) {
       >
         {grid}
       </div>
-
-      {editing !== null ? (
-        <CustomThemeModal
-          editId={editing === "new" ? null : editing}
-          onClose={() => setEditing(null)}
-        />
-      ) : null}
     </div>
   );
+
+  // The modal is a full-screen portal and must survive the dropdown closing
+  // behind it — so it lives OUTSIDE `body` (which unmounts on close). Without
+  // this, `editing` stayed set after a close and the modal reappeared on the
+  // next open.
+  const modal =
+    editing !== null ? (
+      <CustomThemeModal
+        editId={editing === "new" ? null : editing}
+        onClose={() => setEditing(null)}
+      />
+    ) : null;
 
   if (variant === "dropdown") {
     const label = prefs.palette.startsWith("custom:")
       ? prefs.customPalettes.find((p) => `custom:${p.id}` === prefs.palette)?.name ?? "Custom"
       : PALETTE_NAMES[prefs.palette] ?? "Notebook";
     return (
-      <PickerDropdown label="Theme" value={label}>
-        {body}
-      </PickerDropdown>
+      <>
+        <PickerDropdown
+          label="Theme"
+          value={label}
+          onOpenChange={(open) => !open && setEditing(null)}
+        >
+          {body}
+        </PickerDropdown>
+        {modal}
+      </>
     );
   }
 
-  return body;
+  return (
+    <>
+      {body}
+      {modal}
+    </>
+  );
 }

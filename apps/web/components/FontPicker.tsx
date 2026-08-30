@@ -93,6 +93,7 @@ export function FontPicker({ variant = "row" }: Props) {
             <path d="M4.5 15v3.5A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5V15" />
           </svg>
           Upload a font
+          <span className="appearance-add-hint mono">.woff2 · .ttf · .otf</span>
         </button>
 
         {pending ? (
@@ -192,7 +193,17 @@ export function FontPicker({ variant = "row" }: Props) {
       ? prefs.importedFonts.find((f) => `import:${f.id}` === prefs.font)?.name ?? "Imported"
       : FONT_NAMES[prefs.font] ?? "Literata";
     return (
-      <PickerDropdown label="Font" value={label} align="right">
+      <PickerDropdown
+        label="Font"
+        value={label}
+        align="right"
+        onOpenChange={(open) => {
+          if (!open) {
+            setPending(null);
+            setError(null);
+          }
+        }}
+      >
         {body}
       </PickerDropdown>
     );

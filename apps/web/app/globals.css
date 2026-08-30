@@ -2502,6 +2502,14 @@ body.custom-cursor-active textarea {
   stroke-linejoin: round;
 }
 
+/* Subtle "what file goes here" hint, right-aligned in the upload trigger. */
+.appearance-add-hint {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--fg-3);
+}
+
 .appearance-scroll {
   overflow-y: auto;
   overflow-x: hidden;

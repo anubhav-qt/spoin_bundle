@@ -377,6 +377,71 @@ Owner picked B6 first of the Tier-2 three.
 **Next:** unchanged — B14 → ADR, B12/13 → ADR (from 0076 now), then the Cockroach
 sequence, then B7. Task 0034 still pickup-ready.
 
+**2026-08-30/31, session 6 — B4 archived; B14 + B12/13 built end to end
+(ADR-0076, ADR-0077); migration APPLIED to the live DB.**
+
+- **B4 quota panel archived** (`96faf3b`). Owner: SQL is enough, don't maintain a
+  page. Whole surface (`routers/admin.py`, `quota_report.py`, the dev-only Next
+  route, 4 tests) moved verbatim to `docs/archive/b4-quota-panel/` with a README
+  (the equivalent SQL + restore steps). Schemas + `lib/api.ts` bits dropped.
+  Task 0035 re-pointed at B14's admin surface.
+
+- **[ADR-0076](../adr/0076-report-a-card-and-operator-repair-lane.md)** — report a
+  card + an **operator-triaged** repair lane (the plan's auto-repair-at-a-threshold
+  was replaced: owner reviews every structural rewrite). A report is a `card_report`
+  row; the owner picks delete / fix / remake per card on `/admin/repairs`. Fix runs
+  `ContentGenerator.repair_card_structure` (multimodal — the admin page renders the
+  card to a PNG client-side and uploads it) + deterministic **structural** checks
+  only (no meaning-lock); remake runs `plan→generate→correct→verify` through the
+  real gate. Both mint a new **card-family version** (`family_id`/`version`/
+  `SUPERSEDED` — first real user of that machinery), driven by a `kind='repair'`
+  `generation_job`. F3's in-body mermaid-diagram captions fold in here (the repair
+  output must caption every diagram). A resolved fix/remake stays on the admin page
+  as a **before/after** entry until *Keep new card* (dismiss) or *Revert to
+  original* (`POST /admin/repairs/{id}/revert` — restores v1 ACTIVE, supersedes v2).
+
+- **[ADR-0077](../adr/0077-askai-deterministic-single-call-retrieval.md)** — AskAI.
+  **Revised same session** after the first draft: scope is the **whole topic**, not
+  one card (and widens to connected topics once the recommender exists), and it is
+  a **persistent multi-turn conversation** (`ask_conversation` one-active-per-user+
+  topic, `ask_message` turns). `POST /topics/{id}/ask` streams SSE — first streaming
+  endpoint in the codebase. One flash-lite call per turn through the existing quota
+  pool (no reservation, per `d0b2a7b`); off-topic held out by a free local-embedding
+  pre-check + an `OFF_TOPIC` sentinel the server watches mid-stream; **200 turns/
+  user/day** on `ask_usage`. New single-item streaming interface method
+  `stream_topic_answer` — a documented ADR-0005 exception, pinned by
+  `test_architecture`. `card_qa` (the first-draft exchange cache) was dropped.
+
+- **Frontend** (`ebac9b4`): flag control + reason popover in the card action row
+  (session-locked once flagged — persisting across reloads needs a `reported_by_me`
+  field on the card payload); the Ask AI button opens `AskPanel` (a topic
+  conversation in the card's reveal area, same grid collapse as the note panel);
+  `apps/web/app/admin/repairs/page.tsx`. All matched to the Notebook palette /
+  `.share-popover` / `.card-note` vocabulary — the design canvas
+  ([80442d8a](https://claude.ai/code/artifact/80442d8a-45b4-482c-b2a2-33c7eb1da5e4))
+  is reference-only and its AskAI artboard still shows the pre-revision card-scoped
+  version.
+
+- **Migration `07b6c1a3cb76` APPLIED to `spoin_db_2`** (owner-approved, this once):
+  `card_report`, `card_repair`, `ask_conversation`, `ask_message`, `ask_usage`;
+  `generation_job.kind`/`.card_id`; `card_status` gains `retired`;
+  `card_repair.dismissed_at`. `alembic current` → `07b6c1a3cb76 (head)`.
+
+- **make check green — 496 tests, mypy 95 files, ruff clean; web `tsc --noEmit`
+  clean.** New ADRs 0075/0076/0077; task 0036. Nothing has had a **live end-to-end
+  run** (report → worker repair → new version; AskAI against a real Gemini key) —
+  owner is manual-testing the frontend.
+
+- **Carried forward:** the repair "fix" prompt over-reached once in testing (asked
+  to delete a signature from ASCII art, it redrew the whole scene) —
+  `REPAIR_SYSTEM` now has a "smallest change, keep everything not called out" golden
+  rule, but it is **unverified against a real model**. The B4 `/admin/quota` claims
+  view (ADR-0074's "easier" item) is still not built. `/admin/repairs` is still
+  `env`-gated only — any logged-in user can reach it (task 0035).
+
+**Next:** Cockroach sequence (tasks 0016→0021, gated on the 0016 spike), then B7
+study material. Task 0034 (shared `CollectionView`) still pickup-ready.
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)

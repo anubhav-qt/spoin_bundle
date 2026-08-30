@@ -354,6 +354,67 @@ class FreeTextGradeResult(BaseModel):
     justification: str
 
 
+class CardRepairQuery(BaseModel):
+    """One reported card to repair in place (ADR-0076, `mode=fix`). The rendered
+    card image is passed to the call as a separate multimodal part, not on this
+    model.
+
+    `reason_notes` and `operator_guidance` are BOTH untrusted free text -- the
+    reader's and the operator's words on what is wrong. Implementations present
+    them as DATA describing the defect, never as instructions to obey, the same
+    discipline `grade_free_text` documents.
+    """
+
+    index: int
+    topic_name: str
+    topic_description: str
+    reason_notes: list[str]
+    operator_guidance: str | None
+    title: str
+    canonical_title: str
+    summary: str
+    body: str
+    visual_id: str | None
+    visual_slots: dict[str, str] | None
+    #: The card rendered to PNG by the admin page. Passed to the multimodal
+    #: call as an image part; ignored by the fake generator. `None` only in
+    #: tests that stub the method.
+    image_png: bytes | None = None
+
+
+class CardRepairResult(BaseModel):
+    """The repaired card (ADR-0076). Structural slots may change freely; prose
+    may change only when `operator_guidance` asked for it. Every in-body
+    ```mermaid``` fence must be followed by a one-line caption in `body` itself
+    (markdown emphasis) -- this is where F3's diagram-caption half lands, so the
+    check is "does the output body caption its diagrams", not a new column.
+    """
+
+    index: int
+    title: str
+    canonical_title: str
+    summary: str
+    body: str
+    visual_slots: dict[str, str] | None = None
+    #: One line on what was changed and why -- shown on the admin page next to
+    #: the result, so a rushed approval at least sees the diff described.
+    note: str = ""
+
+
+class CardAnswerQuery(BaseModel):
+    """The single AskAI call's whole input (ADR-0077). `context` is assembled by
+    the server from the card, its subtopic/topic, sibling subtopics, adjacent
+    difficulties and the nearest cards -- the model gets nothing else, no search
+    tool, no other users' data. `question` is untrusted user text and MUST reach
+    the model as a delimited user turn, never concatenated into the system
+    prompt."""
+
+    card_title: str
+    topic_name: str
+    context: str
+    question: str
+
+
 class BatchResult[T](BaseModel):
     """Partial failure is the NORMAL case, not an exception (ADR-0005).
 
@@ -638,3 +699,39 @@ class ContentGenerator(ABC):
         the defence is structural (delimited, labeled data), not a prompt
         asking nicely. The caller independently re-checks the returned
         `justification` rather than trusting it outright."""
+
+    @abstractmethod
+    async def repair_card_structure(
+        self, queries: list[CardRepairQuery]
+    ) -> BatchResult[CardRepairResult]:
+        """ADR-0076, `mode=fix`: repair a reported card's structure from its
+        rendered image and the defect notes. Keeps the collection signature
+        (ADR-0005) even though today's caller passes one -- a future bulk-repair
+        pass is then free. The rendered image for `queries[i]` is passed as a
+        separate multimodal part, matched by `index`.
+
+        Structure (visual slots, fences, layout) may change freely. Prose may
+        change ONLY where `operator_guidance` asks -- with no guidance, the
+        model is told to keep every word and fix only the structure. Every
+        in-body ```mermaid``` fence in the output must carry a one-line caption
+        (F3). The caller then runs deterministic STRUCTURAL checks and, on pass,
+        mints a new card-family version -- it does NOT re-run the quality gate
+        (the operator's review is the gate)."""
+
+    @abstractmethod
+    def stream_card_answer(self, query: CardAnswerQuery) -> AsyncIterator[str]:
+        """ADR-0077: answer one reader question about one card, streaming the
+        answer token by token.
+
+        **The one sanctioned single-item, streaming method** -- an explicit,
+        documented exception to ADR-0005's collection rule (`test_architecture.py`
+        pins it as the only one). The rule exists because the free tier meters
+        *requests*; a streamed answer is exactly one request, and there is
+        nothing to batch (one user, one question, arriving at its own time).
+
+        Implementations build a system prompt scoped to the supplied `context`,
+        instructing the model to reply with exactly `OFF_TOPIC` and nothing else
+        when the question isn't answerable from it -- the caller watches the
+        stream's opening for that sentinel. `query.question` goes in a delimited
+        user turn, never the system prompt. Yields answer text chunks; raises the
+        usual quota errors if no cell can place the call."""

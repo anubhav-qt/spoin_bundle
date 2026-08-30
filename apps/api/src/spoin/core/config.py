@@ -331,6 +331,23 @@ class Settings(BaseSettings):
     #: so a pasted answer cannot blow the grading call's context window.
     quiz_free_text_answer_max_chars: int = 12_000
 
+    #: ADR-0077 (AskAI). Per-user daily question cap, on the `ask_usage` counter
+    #: -- the only limit; there is no quota reservation between AskAI and
+    #: generation (they share the flash-lite ladder, which is ample). Generous
+    #: enough to be invisible in normal use, low enough that one account cannot
+    #: walk off with the day.
+    ask_ai_daily_limit: int = 200
+    #: Below this max cosine similarity between the question and the
+    #: card/topic embeddings, AskAI refuses without spending an LLM call. An
+    #: UNCALIBRATED guess -- there is no real question data yet (a calibration
+    #: task, same shape as ADR-0001). Deliberately low so it only catches
+    #: plainly-off-topic questions; the system prompt + the `OFF_TOPIC` sentinel
+    #: are the finer gate. Ignored entirely under the `HashEmbedder` stand-in.
+    ask_ai_topic_similarity_floor: float = 0.18
+    #: How many nearest sibling cards (by `content_embedding`, within the topic)
+    #: to fold into the AskAI retrieval context.
+    ask_ai_context_neighbours: int = 4
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

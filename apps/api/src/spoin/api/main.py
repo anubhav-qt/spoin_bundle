@@ -16,7 +16,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from spoin.api.middleware import RequestContextMiddleware
-from spoin.api.routers import auth, dev, engagement, feed, notes, profile, quiz, topics
+from spoin.api.routers import (
+    admin_repairs,
+    ask,
+    auth,
+    dev,
+    engagement,
+    feed,
+    notes,
+    profile,
+    quiz,
+    reports,
+    topics,
+)
 from spoin.api.routers.feed import cards_router
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine
@@ -69,15 +81,19 @@ def create_app() -> FastAPI:
     app.include_router(engagement.router)
     app.include_router(notes.router)
     app.include_router(profile.router)
+    app.include_router(reports.router)
+    app.include_router(ask.router)
 
-    # `/dev/*` mutates a user's whole state on one call and has no role check
-    # (there is no admin role yet), so it is gated to non-production on the
-    # `env` switch that already gates the JWT-secret validator below -- rather
-    # than inventing a second flag. (The B4 `/admin/quota` read surface that
-    # used to mount here was archived to docs/archive/b4-quota-panel/ -- the
-    # quota tables are inspected directly with SQL instead.)
+    # `/dev/*` mutates a user's whole state on one call, and `/admin/repairs/*`
+    # (ADR-0076) can retire a card and spend LLM calls -- neither has a role
+    # check (there is no admin role yet), so both are gated to non-production on
+    # the `env` switch that already gates the JWT-secret validator below, rather
+    # than inventing a second flag. Task 0035 replaces this with a real gate.
+    # (The B4 `/admin/quota` read surface that used to mount here was archived
+    # to docs/archive/b4-quota-panel/ -- SQL is used instead.)
     if settings.env != "production":
         app.include_router(dev.router)
+        app.include_router(admin_repairs.router)
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, Any]:

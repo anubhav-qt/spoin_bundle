@@ -46,6 +46,7 @@ from spoin.generation.quota import (
     DailyQuotaExhaustedError,
     QuotaExhaustedError,
 )
+from spoin.generation.repair import run_card_repair
 
 logger = logging.getLogger("spoin.worker")
 
@@ -63,16 +64,35 @@ _QUOTA_PAUSE_CAUSE: dict[type[QuotaExhaustedError], str] = {
 async def _run_job(
     job_id: uuid.UUID,
     topic_id: uuid.UUID,
+    kind: str,
+    card_id: uuid.UUID | None,
     generator: ContentGenerator,
     embedder: Embedder,
 ) -> None:
     """One job, start to finish, on its own session throughout — including the
     status write-back, so a crash between generation and write-back can't leave
     a job silently stuck `running` forever (the next pass's claim query would
-    just never see it again; an operational concern for later, not solved here)."""
+    just never see it again; an operational concern for later, not solved here).
+
+    `kind='repair'` (ADR-0076) runs `run_card_repair` instead of the pipeline;
+    it owns the `CardRepair`/`Card` writes, this function only sets the
+    `GenerationJob` status, with the same quota-requeue / fail handling."""
 
     settings = get_settings()
     try:
+        if kind == "repair":
+            assert card_id is not None, "a repair job must carry a card_id"
+            await run_card_repair(job_id, card_id, generator, embedder)
+            async with session_scope() as session:
+                job = await session.get(GenerationJob, job_id)
+                assert job is not None
+                job.status = "completed"
+                job.completed_at = datetime.now(UTC)
+                job.attempts += 1
+                job.last_error = None
+            logger.info("repair job %s completed (card=%s)", job_id, card_id)
+            return
+
         async with session_scope() as session:
             report = await run_generation_pipeline(
                 session, generator, embedder, settings, topic_ids=[topic_id]
@@ -161,7 +181,7 @@ async def run_once() -> int:
 
         # Claim now, in this same transaction, so a crash before dispatch
         # doesn't leave these silently re-claimable as `pending` next pass.
-        claimed = [(job.id, job.topic_id) for job in pending]
+        claimed = [(job.id, job.topic_id, job.kind, job.card_id) for job in pending]
         for job in pending:
             job.status = "running"
 
@@ -172,8 +192,8 @@ async def run_once() -> int:
     # starts, so a batch of topics added from the app generates in the order it
     # was requested. `_run_job` swallows its own exceptions, so a failure just
     # moves the loop on.
-    for job_id, topic_id in claimed:
-        await _run_job(job_id, topic_id, generator, embedder)
+    for job_id, topic_id, kind, card_id in claimed:
+        await _run_job(job_id, topic_id, kind, card_id, generator, embedder)
 
     logger.info("worker pass finished (%d job(s) processed)", len(claimed))
     return len(claimed)

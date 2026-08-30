@@ -12,14 +12,18 @@ generated text is not flaky.
 from __future__ import annotations
 
 import hashlib
+from collections.abc import AsyncIterator
 
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation.base import (
     BatchResult,
+    CardAnswerQuery,
     CardCorrectionQuery,
     CardCorrectionResult,
     CardDraft,
     CardPlan,
+    CardRepairQuery,
+    CardRepairResult,
     CardVerificationQuery,
     CardVerificationResult,
     ContentGenerator,
@@ -360,3 +364,34 @@ class FakeContentGenerator(ContentGenerator):
                 )
             )
         return BatchResult(items=results)
+
+    async def repair_card_structure(
+        self, queries: list[CardRepairQuery]
+    ) -> BatchResult[CardRepairResult]:
+        # Echo the card back unchanged except for a marker in `note`. A test that
+        # wants a specific repaired body stubs this method; the default just has
+        # to be well-formed and deterministic.
+        items = [
+            CardRepairResult(
+                index=q.index,
+                title=q.title,
+                canonical_title=q.canonical_title,
+                summary=q.summary,
+                body=q.body,
+                visual_slots=q.visual_slots,
+                note="fake repair: returned the card unchanged",
+            )
+            for q in queries
+        ]
+        return BatchResult(items=items)
+
+    async def stream_card_answer(self, query: CardAnswerQuery) -> AsyncIterator[str]:
+        # A deterministic non-streaming-shaped stream: two chunks, echoing the
+        # question so a test can assert the wiring end to end. `_stable_index`
+        # keeps it varying by question without randomness.
+        marker = _stable_index(query.card_title, query.question, modulo=1000)
+        for chunk in (
+            f"Regarding '{query.card_title[:40]}': ",
+            f"placeholder answer #{marker} drawn from the supplied context.",
+        ):
+            yield chunk

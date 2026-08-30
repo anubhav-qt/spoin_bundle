@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from spoin.generation.prompts.ask import ASK_SYSTEM
 from spoin.generation.prompts.cards import (
     ASCII_INSTRUCTIONS,
     CARD_FIELDS_BLOCK,
@@ -36,6 +37,7 @@ from spoin.generation.prompts.quiz import (
     QUESTIONS_SYSTEM,
     QUESTIONS_USER,
 )
+from spoin.generation.prompts.repair import REPAIR_SYSTEM, REPAIR_USER
 from spoin.generation.prompts.topics import (
     TOPIC_BATCH_MATCH_SYSTEM,
     TOPIC_BATCH_MATCH_USER,
@@ -45,6 +47,7 @@ from spoin.generation.prompts.topics import (
 
 __all__ = [
     "ASCII_INSTRUCTIONS",
+    "ASK_SYSTEM",
     "CARDS_ASCII_REDRAW_SYSTEM",
     "CARDS_ASCII_REDRAW_USER",
     "CARDS_ASCII_SYSTEM",
@@ -68,6 +71,8 @@ __all__ = [
     "PLAN_USER",
     "QUESTIONS_SYSTEM",
     "QUESTIONS_USER",
+    "REPAIR_SYSTEM",
+    "REPAIR_USER",
     "TOPIC_BATCH_MATCH_SYSTEM",
     "TOPIC_BATCH_MATCH_USER",
     "TOPIC_NAME_VALIDATE_SYSTEM",

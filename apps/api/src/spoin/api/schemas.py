@@ -14,7 +14,13 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from spoin.domain.enums import Difficulty, EngagementKind
+from spoin.domain.enums import (
+    CardReportReason,
+    Difficulty,
+    EngagementKind,
+    RepairMode,
+    RepairStatus,
+)
 
 
 class TopicOut(BaseModel):
@@ -647,3 +653,59 @@ class ProfileExportOut(BaseModel):
     liked_cards: list[ExportedCardRefOut]
     saved_cards: list[ExportedCardRefOut]
     daily_activity: list[DailyActivityOut]
+
+
+# -- report a card + operator repair lane (ADR-0076) -----------------------
+
+
+class CardReportIn(BaseModel):
+    """`POST /cards/{id}/report`. The reason is required; the note is the
+    reader's own words on what looks broken."""
+
+    reason: CardReportReason
+    note: str | None = Field(None, max_length=2000)
+
+
+class RepairReportOut(BaseModel):
+    reason: CardReportReason
+    note: str | None
+    created_at: datetime
+
+
+class RepairAttemptOut(BaseModel):
+    """The latest `card_repair` row for a card, if one exists -- so the admin
+    page can show "a fix is running" / "the last remake failed: <error>"."""
+
+    mode: RepairMode
+    status: RepairStatus
+    error: str | None
+    created_at: datetime
+
+
+class RepairQueueItemOut(BaseModel):
+    """One reported card awaiting operator triage. Carries enough of the card to
+    judge it without a second fetch, plus every unresolved report."""
+
+    card_id: UUID
+    topic_id: UUID
+    family_id: UUID
+    version: int
+    difficulty: Difficulty
+    title: str
+    canonical_title: str
+    summary: str
+    body: str
+    archetype: list[str]
+    visual_id: str | None
+    visual_slots: dict[str, str] | None
+    report_count: int
+    reports: list[RepairReportOut]
+    latest_repair: RepairAttemptOut | None
+
+
+class RepairEnqueuedOut(BaseModel):
+    """Result of `delete` / `fix` / `remake` on `/admin/repairs/{card_id}`."""
+
+    card_id: UUID
+    action: Literal["deleted", "fix_enqueued", "remake_enqueued"]
+    job_id: UUID | None = None

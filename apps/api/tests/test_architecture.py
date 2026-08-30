@@ -102,6 +102,37 @@ def test_generation_interfaces_take_collections() -> None:
     assert hasattr(ContentGenerator, "verify_cards")
 
 
+def test_stream_card_answer_is_the_only_single_item_generation_method() -> None:
+    """ADR-0077: `stream_card_answer` is a deliberate, documented exception to
+    ADR-0005's collection rule -- streaming forces one item, and a streamed
+    answer is exactly one request. Every OTHER LLM-facing method still takes a
+    collection. This pins the exception so a second single-item method can't
+    slip in unnoticed."""
+
+    import inspect
+
+    from spoin.generation.base import ContentGenerator
+
+    # Not LLM calls: the key-claim context manager and the streaming exception.
+    allowed_non_collection = {"claimed_key_scope", "stream_card_answer"}
+    offenders: list[str] = []
+    for name, member in inspect.getmembers(ContentGenerator):
+        if name.startswith("_") or not getattr(member, "__isabstractmethod__", False):
+            continue
+        if name in allowed_non_collection:
+            continue
+        params = list(inspect.signature(member).parameters.values())[1:]  # drop self
+        takes_list = any(
+            "list[" in str(p.annotation) or "Sequence[" in str(p.annotation) for p in params
+        )
+        if not takes_list:
+            offenders.append(name)
+    assert not offenders, (
+        f"{offenders} take no collection param. ADR-0005: every LLM-facing method takes a "
+        "collection; the only sanctioned exception is stream_card_answer (ADR-0077)."
+    )
+
+
 def test_difficulty_mix_is_config_not_code() -> None:
     """content-model.md: the percentages will be tuned against engagement data,
     and tuning must not require a deploy."""

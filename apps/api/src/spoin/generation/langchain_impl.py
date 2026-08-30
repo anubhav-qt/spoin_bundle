@@ -67,6 +67,7 @@ already converts it to a `BatchResult` failure.
 from __future__ import annotations
 
 import asyncio
+import base64
 import logging
 import re
 import time
@@ -87,10 +88,13 @@ from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
 from spoin.generation.base import (
     BatchResult,
+    CardAnswerQuery,
     CardCorrectionQuery,
     CardCorrectionResult,
     CardDraft,
     CardPlan,
+    CardRepairQuery,
+    CardRepairResult,
     CardVerificationQuery,
     CardVerificationResult,
     ContentGenerator,
@@ -106,6 +110,7 @@ from spoin.generation.base import (
 from spoin.generation.quota import (
     CURRENT_KEY_CLAIM,
     AllCellsThrottledError,
+    AllModelsUnavailableError,
     DailyQuotaExhaustedError,
     KeyClaim,
     KeyClaimRegistry,
@@ -380,6 +385,23 @@ class _WireFreeTextGrade(_LenientWireModel):
 
 class _WireFreeTextGradeBatch(BaseModel):
     grades: list[_WireFreeTextGrade] = Field(default_factory=list)
+
+
+class _WireRepair(_LenientWireModel):
+    #: ADR-0076: one repaired card. `visual_slots` stays loose -- a dict or
+    #: null; `_LenientWireModel` handles the null-for-str coercion on the
+    #: string fields only.
+    index: int = -1
+    title: str = ""
+    canonical_title: str = ""
+    summary: str = ""
+    body: str = ""
+    visual_slots: dict[str, str] | None = None
+    note: str = ""
+
+
+class _WireRepairBatch(BaseModel):
+    cards: list[_WireRepair] = Field(default_factory=list)
 
 
 def _format_existing_titles(existing_titles: list[str]) -> str:
@@ -884,7 +906,7 @@ class GeminiContentGenerator(ContentGenerator):
     async def _invoke_with_backoff(
         self,
         structured: object,
-        prompt: list[tuple[str, str]],
+        prompt: list[tuple[str, Any]],
         *,
         pool: QuotaGovernor,
         key_index: int,
@@ -933,7 +955,7 @@ class GeminiContentGenerator(ContentGenerator):
         raise AssertionError("unreachable: loop always returns or raises on its last attempt")
 
     async def _invoke_with_retry(
-        self, pool: QuotaGovernor, schema: type[_SchemaT], prompt: list[tuple[str, str]]
+        self, pool: QuotaGovernor, schema: type[_SchemaT], prompt: list[tuple[str, Any]]
     ) -> _SchemaT:
         """Acquire a `(key, model)` cell from `pool` and call it; a REAL 429
         means our local ledger's belief disagreed with the provider's actual
@@ -1813,3 +1835,120 @@ class GeminiContentGenerator(ContentGenerator):
             except ValidationError as exc:
                 failures.append(f"malformed free-text grade: {exc}")
         return BatchResult(items=results, failures=failures)
+
+    async def repair_card_structure(
+        self, queries: list[CardRepairQuery]
+    ) -> BatchResult[CardRepairResult]:
+        """ADR-0076 `mode=fix`. One multimodal call: the card fields as text plus
+        each query's rendered PNG as an image part, matched back by `index`.
+        Runs on the generator ladder -- this is repair, not judgment."""
+
+        if not queries:
+            return BatchResult(items=[])
+
+        blocks = "\n\n---\n\n".join(
+            "card index {index}\n{block}".format(
+                index=q.index,
+                block=prompts.REPAIR_USER.format(
+                    title=q.title,
+                    canonical_title=q.canonical_title,
+                    summary=q.summary,
+                    topic_name=q.topic_name,
+                    topic_description=q.topic_description,
+                    visual_id=q.visual_id or "(none)",
+                    visual_slots=q.visual_slots or "(none)",
+                    body=q.body,
+                    reason_notes="\n".join(f"- {n}" for n in q.reason_notes) or "(none)",
+                    operator_guidance=q.operator_guidance or "(none -- keep all prose verbatim)",
+                ),
+            )
+            for q in queries
+        )
+        content: list[dict[str, Any]] = [{"type": "text", "text": blocks}]
+        for q in queries:
+            if q.image_png:
+                b64 = base64.b64encode(q.image_png).decode("ascii")
+                content.append(
+                    {"type": "text", "text": f"(image below: how card index {q.index} renders)"}
+                )
+                content.append({"type": "image_url", "image_url": f"data:image/png;base64,{b64}"})
+
+        prompt: list[tuple[str, Any]] = [
+            ("system", prompts.REPAIR_SYSTEM),
+            ("human", content),
+        ]
+        try:
+            wire = await self._invoke_with_retry(self._generator, _WireRepairBatch, prompt)
+        except QuotaExhaustedError:
+            raise
+        except Exception as exc:
+            return BatchResult(items=[], failures=[f"repair_card_structure call failed: {exc}"])
+
+        results: list[CardRepairResult] = []
+        failures: list[str] = []
+        for card in wire.cards:
+            try:
+                results.append(
+                    CardRepairResult(
+                        index=card.index,
+                        title=card.title,
+                        canonical_title=card.canonical_title,
+                        summary=card.summary,
+                        body=card.body,
+                        visual_slots=card.visual_slots,
+                        note=card.note,
+                    )
+                )
+            except ValidationError as exc:
+                failures.append(f"malformed repair result: {exc}")
+        return BatchResult(items=results, failures=failures)
+
+    async def stream_card_answer(self, query: CardAnswerQuery) -> AsyncIterator[str]:
+        """ADR-0077. One streamed flash-lite call through the generator pool.
+
+        Simpler failover than `_invoke_with_retry`: a user-facing single call
+        that just needs to succeed or fail fast, not grind a whole grid. A few
+        fresh `acquire()`s (each self-paced, least-spent-first); if none serve,
+        raise -- the endpoint turns that into an `error` SSE event."""
+
+        messages: list[tuple[str, Any]] = [
+            (
+                "system",
+                prompts.ASK_SYSTEM.format(
+                    card_title=query.card_title,
+                    topic_name=query.topic_name,
+                    context=query.context,
+                ),
+            ),
+            ("human", query.question),
+        ]
+
+        attempts = min(4, self._generator.key_count * len(self._generator.ladder))
+        last_exc: Exception | None = None
+        for _ in range(max(1, attempts)):
+            try:
+                key_index, model = await self._generator.acquire(now=datetime.now(UTC), claim=None)
+            except QuotaExhaustedError:
+                raise
+            client = self._client(key_index, model)
+            try:
+                await self._generator.note_request_sent(key_index, model, now=datetime.now(UTC))
+                async for chunk in client.astream(messages):
+                    text = chunk.content
+                    if isinstance(text, list):
+                        text = "".join(
+                            part.get("text", "") if isinstance(part, dict) else str(part)
+                            for part in text
+                        )
+                    if text:
+                        yield text
+                return
+            except (ClientError, ChatGoogleGenerativeAIError, ServerError) as exc:
+                # Don't touch the ledger for a one-shot user call -- just move to
+                # another cell. A persistent failure falls through to the raise.
+                last_exc = exc
+                logger.warning(
+                    "askai stream: cell key=%d model=%s failed: %s", key_index, model, exc
+                )
+                continue
+        raise AllModelsUnavailableError(f"no cell could serve the AskAI stream: {last_exc}")

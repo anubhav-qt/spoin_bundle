@@ -1,6 +1,22 @@
 # Task 0019: A transaction retry boundary for CockroachDB's `40001` errors
 
-**Owner:** unassigned — **blocked on [task 0016](0016-cockroachdb-spike.md) returning go**
+**Owner:** unassigned — unblocked, [task 0016](0016-cockroachdb-spike.md) returned GO.
+
+> **Scope updates from the 0016 spike (2026-08-31):**
+> - **Isolation level is decided: keep `SERIALIZABLE`** (CockroachDB default),
+>   build the retry boundary. Owner call. Step 1 below is settled, not open.
+> - **The worker job-claim is a separate, specified fix — not part of the retry
+>   boundary.** The spike found `FOR UPDATE SKIP LOCKED` on CockroachDB can skip a
+>   freshly-committed, unlocked row (write-intent resolution window). The claim
+>   transaction is short (`SELECT … FOR UPDATE`, set `status='running'`, `COMMIT`;
+>   generation runs in later transactions), so the fix is: **drop `SKIP LOCKED`,
+>   use plain `FOR UPDATE`** on `worker/__main__.py:172` and `quota.py:1177`. A
+>   second overlapping pass then blocks ~milliseconds and reads the rows as
+>   `running` — no double-claim, no skipped row. Do this as step 0, with its own
+>   two-concurrent-claimers test; it does not need the retry loop.
+> - The retry boundary itself (the rest of this task) is for the **request**
+>   write paths — `engagement/service.py` upserts, `ensure_unlock_latched` — under
+>   real user contention.
 
 ## The problem
 
@@ -32,13 +48,19 @@ verification counter made.
 
 ## What to do
 
-1. **Settle the isolation level jointly with [task 0017](0017-sql-portability-fixes.md)
-   step 4.** `READ COMMITTED` sharply reduces how often `40001` reaches the client and
-   is what `worker/__main__.py`'s existing comment already assumes; `SERIALIZABLE` is
-   the CockroachDB default and gives stronger guarantees. This task's size depends
-   heavily on the answer, so answer it first. Whichever wins gets an ADR-worthy
-   paragraph explaining why — put it in ADR-0048's record or a new ADR if the reasoning
-   is substantial.
+0. **Fix the worker job-claim first (see the scope note above): plain `FOR UPDATE`,
+   not `SKIP LOCKED`,** on `worker/__main__.py:172` and `quota.py:1177`. Update the
+   `worker/__main__.py` comment that currently explains the `SKIP LOCKED` +
+   `READ COMMITTED` reasoning — it no longer describes the code. Test with two
+   concurrent `run_once()` claimers against the real CockroachDB node: neither
+   double-claims, and every pending job is eventually claimed by exactly one.
+
+1. ~~Settle the isolation level~~ **Settled: keep `SERIALIZABLE`** (CockroachDB
+   default). Rationale for ADR-0048's record: `READ COMMITTED` would mask `40001`
+   rather than remove the contention, and Spoin's write volume is low enough that
+   a bounded retry at one boundary is cheaper than reasoning about the weaker
+   guarantee everywhere. The `worker/__main__.py` comment that assumed
+   `READ COMMITTED` is fixed in step 0.
 2. **Put the retry in one place: `core/db.py`.** `session_scope()` already owns the
    commit/rollback boundary for workers and scripts, and `get_session()` owns it for
    requests. A retry decorator scattered across services would be both duplicated and
@@ -90,6 +112,7 @@ verification counter made.
 
 ## Timebox
 
-Medium. Small if `READ COMMITTED` wins and the dialect already handles the loop;
-larger if `SERIALIZABLE` is kept and step 3's quota-safety audit turns up several
-transactions that need restructuring.
+Medium. `SERIALIZABLE` is kept (decided), so the size is driven by step 3's
+quota-safety audit — how many transactions bundle an LLM call with database work
+and need the retryable part split out. Step 0 (worker claim) is small and
+independent; it can ship on its own first.

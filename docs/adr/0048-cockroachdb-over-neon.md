@@ -69,10 +69,11 @@ ADR-0003's original answer: pay for Neon. Do not force this through.
 > residue is scoped into tasks 0017–0019 (see 0016's hand-back for the classified
 > list). Two rows of the compatibility table below were **wrong** and are corrected
 > inline. The real ongoing cost is unchanged from what this ADR predicted:
-> `SERIALIZABLE` + `40001` retries (task 0019) — and the spike found `FOR UPDATE
-> SKIP LOCKED` can *skip a freshly-committed unlocked row* in the write-intent
-> resolution window, which makes 0019 bigger than a retry decorator (it must also
-> revisit the worker's job claim).
+> `SERIALIZABLE` + a bounded `40001` retry boundary for the request write paths
+> (task 0019). The spike also found `FOR UPDATE SKIP LOCKED` can *skip a
+> freshly-committed unlocked row* in the write-intent window — but the
+> worker/quota claim transactions are short-lived, so the fix is just to drop
+> `SKIP LOCKED` for plain `FOR UPDATE` (task 0019 step 0), not a redesign.
 
 ### What this decision is *not*
 
@@ -92,7 +93,7 @@ CockroachDB is Postgres-wire-compatible, not Postgres. What we actually depend o
 | Vector *indexes* | L2 only; cosine is not index-accelerated | Moot — we have no vector index today |
 | `DISTINCT ON` | Supported | `topics/service.py:184` |
 | `INSERT ... ON CONFLICT` | Supported | 12 call sites across `engagement`, `feed`, `notes` |
-| `FOR UPDATE SKIP LOCKED` | Supported, BUT **spike found (task 0016)** it can skip a freshly-committed unlocked row in the write-intent resolution window, and over-locks `LIMIT n` without a covering index. Worker claim needs rework — task 0019 | `worker/__main__.py:125` |
+| `FOR UPDATE SKIP LOCKED` | Supported, BUT **spike found (task 0016)** it can skip a freshly-committed unlocked row in the write-intent resolution window. **Resolution:** the worker/quota claim transactions are short (lock → set `running` → commit in ms), so drop `SKIP LOCKED` for plain `FOR UPDATE` — a second pass blocks ms, then no-ops. Task 0019 step 0 | `worker/__main__.py:125`, `quota.py:1177` |
 | Enums, `JSONB`, arrays, `BYTEA` | Supported. **Spike-confirmed** — plus `DISTINCT ON`, `ON CONFLICT`, partial/filtered UNIQUE indexes with `IN` predicates | throughout `domain/models/` |
 | `asyncpg` async driver | Preliminary support via `sqlalchemy-cockroachdb` (`>=2.0.4,<2.1` — the dialect **caps SQLAlchemy `<2.1`**). **Spike-confirmed** the full query set runs | `core/db.py` |
 | Serialization failures (`40001`) | **New failure mode** — the app must retry; Postgres never required this | every write path |

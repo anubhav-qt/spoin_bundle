@@ -218,11 +218,26 @@ surfaced (notes ordering), or test-infrastructure cost (DDL speed).
      `ix_generation_job_status_priority (status, priority)` (the `created_at`
      tiebreak is uncovered → small residual band); `quota_request`
      (`quota.py:1177`, filters `confirmed IS false`, unindexed) does not.
-   - → **task 0019** owns the fix (retry / claim-verify / plain `FOR UPDATE`
-     that blocks instead of skips). This is bigger than "wrap `40001` in a
-     retry" — 0019 must also address the claim itself. **task 0017 step 2** was
-     already told to resolve the `worker/__main__.py` `SKIP LOCKED` first; that
-     stands, coordinated with 0019.
+   - **Fix (decided with the owner this session): drop `SKIP LOCKED`, use plain
+     `FOR UPDATE`.** One line. The reasoning: the claim transaction is *short* —
+     `SELECT ... FOR UPDATE`, set `status='running'`, `COMMIT` — it ends in
+     milliseconds, and generation runs in *separate* transactions after it
+     (`worker/__main__.py`'s `session_scope()` block closes before `_run_job`
+     is called). So with plain `FOR UPDATE`, a second overlapping pass blocks
+     for those few milliseconds, then reads the rows as `status='running'` and
+     its `WHERE status='pending'` returns nothing new. No double-claim (the
+     property `SKIP LOCKED` was protecting), and no skipped-valid-row failure
+     mode — plain `FOR UPDATE` *waits* for the write intent to resolve and then
+     locks the row, which is exactly the behaviour we want. The `LIMIT`
+     over-locking is a non-issue here precisely because the lock is held for
+     milliseconds, not for the length of a generation run.
+   - The `quota_request` claim (`quota.py:1177`) is the same short-transaction
+     shape; give it the same treatment (plain `FOR UPDATE`, or add the
+     `confirmed` column to `ix_quota_request_backend_sent_at`).
+   - → **task 0019** for the mechanical change + the contention test. This is
+     *not* bigger than a retry decorator after all — the retry boundary in 0019
+     is for the *request* write paths (engagement upserts under real user
+     load), not the worker claim.
 2. **`ORDER BY` tie-break differs — latent app bug the port surfaced.**
    `notes/service.py:upsert` does `on_conflict_do_update(set_={"body": body})` and
    never sets `updated_at`; SQLAlchemy's `onupdate=func.now()` does **not** fire
@@ -256,9 +271,12 @@ surfaced (notes ordering), or test-infrastructure cost (DDL speed).
   (the spike ran it in the `test` container with `alembic/` mounted); (c) confirm
   the async-DDL "waiting for job(s)" behaviour does not bite multi-statement
   migrations under load.
-- **0019:** now explicitly includes redesigning the worker job-claim (item 1
-  above), not just a `40001` decorator. Two concurrent claimers against the real
-  CockroachDB node is the test.
+- **0019:** the worker job-claim fix is now *specified*, not open — drop
+  `SKIP LOCKED` for plain `FOR UPDATE` on both `worker/__main__.py:172` and
+  `quota.py:1177` (reasoning in semantics item 1 above). The `40001` retry
+  boundary in `core/db.py` is still 0019's main body, but it's for the request
+  write paths (`engagement`, `ensure_unlock_latched`), not the worker. Two
+  concurrent claimers against the real CockroachDB node is still the test.
 
 ## Teardown
 

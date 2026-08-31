@@ -499,10 +499,12 @@ warm-up if wanted first.
   vector` is a harmless no-op on v26.2 (ADR-0048's "known blocker" was stale).
   Residue scoped into 0017–0019 — full classified list in
   [`docs/tasks/0016-cockroachdb-spike.md`](../tasks/0016-cockroachdb-spike.md)'s
-  hand-back. Headline finding for 0019: `FOR UPDATE SKIP LOCKED` can skip a
-  freshly-committed unlocked row (write-intent window), so the worker job-claim
-  needs rework, not just a `40001` retry. Isolation level: **keep SERIALIZABLE**,
-  build the retry boundary (owner call). Full-suite on CockroachDB: 474/501,
+  hand-back. Headline finding: `FOR UPDATE SKIP LOCKED` can skip a
+  freshly-committed unlocked row (write-intent window) — but the worker/quota
+  claim txns are short-lived, so the fix is just **drop `SKIP LOCKED`, use plain
+  `FOR UPDATE`** (0019 step 0, one line). Isolation level: **keep SERIALIZABLE**,
+  bounded retry boundary for the request write paths only (owner calls). Full
+  suite on CockroachDB: 474/501,
   every failure explained (17 = one feed `COALESCE` line, ~9 = the SKIP LOCKED
   flake, 1 = a latent `notes` upsert bug).
 - **Not yet committed:** the 0016 hand-back doc edits + ADR-0048 corrections +

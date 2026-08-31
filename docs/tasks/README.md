@@ -23,10 +23,9 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0012](0012-question-generation-failure-visibility.md) | Diagnose silent question-generation failures for specific subtopics | mostly resolved, see doc |
 | [0013](0013-card-preview-swap-not-animated.md) | Collapsed-state preview swaps instantly while the body around it animates | unassigned |
 | [0015](0015-topic-mastery-and-retention-mode.md) | Topic mastery message + retention/spaced-repetition mode once a topic is fully read | unassigned |
-| [0016](0016-cockroachdb-spike.md) | CockroachDB viability spike -- **go/no-go gate for ADR-0048** | unassigned |
-| [0017](0017-sql-portability-fixes.md) | Fix the Postgres-only SQL the spike found | blocked on 0016 |
-| [0018](0018-alembic-on-cockroachdb.md) | Make the Alembic chain apply cleanly on CockroachDB | blocked on 0016 |
-| [0019](0019-transaction-retry-boundary.md) | A transaction retry boundary for CockroachDB's `40001` errors | blocked on 0016 |
+| [0017](0017-sql-portability-fixes.md) | Fix the Postgres-only SQL the spike found | unassigned -- unblocked, 0016 returned GO |
+| [0018](0018-alembic-on-cockroachdb.md) | Make the Alembic chain apply cleanly on CockroachDB | unassigned -- unblocked; smaller than written, see 0016 hand-back |
+| [0019](0019-transaction-retry-boundary.md) | A transaction retry boundary for CockroachDB's `40001` errors + worker job-claim redesign | unassigned -- unblocked; scope grew, see 0016 hand-back |
 | [0020](0020-corpus-migration-and-parity.md) | Move the live corpus to CockroachDB, and prove nothing was lost | blocked on 0017-0019 |
 | [0021](0021-cockroachdb-cutover.md) | Cut over to CockroachDB Basic, and instrument both meters | blocked on 0020 |
 | [0022](0022-slug-collision-skips-alias.md) | Slug-collision fallback in topic matching skips alias recording (ADR-0025) | unassigned |
@@ -42,7 +41,9 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0035](0035-admin-role-and-production-admin-surface.md) | A real admin-role gate for `/admin/*` and `/dev/*`, so B4's quota view can run in production without an `env` special-case | unassigned |
 | [0036](0036-grow-and-tune-the-accent-color-vocabulary.md) | Standing task: verify hues, widen domain coverage, and spot-check `accent_color_data/colors.json` against real embeddings (B6 / ADR-0075 shipped a first list) | Anubhav -- long-horizon |
 
-Tasks 0016-0021 are one sequence, gated on 0016. Read
+Tasks 0016-0021 are one sequence. **0016 returned GO (2026-08-31)** — see its
+hand-back for the classified findings that scope 0017-0019. 0017-0019 can run in
+parallel; 0020 is gated on all three, 0021 on 0020. Read
 [ADR-0048](../adr/0048-cockroachdb-over-neon.md) before starting any of them, and
 [ADR-0049](../adr/0049-no-message-broker-in-v1.md) before proposing to add Kafka to it.
 
@@ -50,6 +51,7 @@ Tasks 0016-0021 are one sequence, gated on 0016. Read
 
 | # | Task | Outcome |
 |---|---|---|
+| [0016](0016-cockroachdb-spike.md) | CockroachDB viability spike -- go/no-go gate for ADR-0048 | **GO** -- 2026-08-31, `feat/v1-finish-line`. Full findings + scope for 0017-0019 in the doc's hand-back. Harness (compose `crdb` service + `cockroachdb` pyproject extra) committed. |
 | [0034](0034-collectionview-rework-saved-notes-liked.md) | Extract one shared `CollectionView` from Liked / Revisit / Notes, sweep the dead `.saved-*` grid CSS (ADR-0072) | Done -- 2026-08-31, `feat/v1-finish-line` (`3bf8373`) -- net -1441/+211 across the 3 views + globals.css, +CollectionView.tsx |
 | [0014](0014-unbounded-drafting-rounds.md) | Remove artificial drafting round constraints and allow unbounded completion | Done -- 2026-08-21 |
 | [0006](0006-curated-hero-cards.md) | A real curated `is_hero` flag, replacing the "first in station" heuristic | Done -- 2026-08-20, see ADR-0042 |

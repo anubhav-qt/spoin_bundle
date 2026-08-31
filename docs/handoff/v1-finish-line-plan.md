@@ -479,6 +479,40 @@ depend on it). It's a big self-contained investigation; give it its own
 session. Then B7 (needs ADR 0078). The mermaid-guard handoff above is a small
 warm-up if wanted first.
 
+**2026-08-31, session 8 — mermaid edge-label guard + card `0afd7193`; task
+0016 (CockroachDB spike) → GO.** Branch `feat/v1-finish-line`.
+
+- **`46acf34`** — mermaid edge-label guard (handoff task A). `_mermaid_structural_issue`
+  now rejects a `|…|` flowchart label with unquoted `()[]{}`; double-quoted
+  labels pass; `CAM[(Camera2D State)]`-style cylinder nodes untouched (never
+  between pipes). Matching rule in `CARDS_DIAGRAM_SYSTEM`. 5 new tests;
+  `make check` green (501 pass).
+- **`52478c9`** — card `0afd7193` `body` fixed in `spoin_db_2` (owner-approved
+  live-DB `UPDATE`): the two edge labels wrapped in double quotes, nothing else.
+  Re-SELECT confirmed; diagram parses.
+- **Task 0016 (CockroachDB spike) → GO.** Stood a `cockroachdb:latest-v26.2`
+  (v26.2.6, the version Basic serves) node up under a new `crdb` compose profile;
+  `sqlalchemy-cockroachdb>=2.0.4,<2.1` added as an optional extra
+  (`chore(spike)` `bc5c2b1`). Full 23-migration Alembic chain applies clean
+  base→head, 39 tables matching live Postgres. `VECTOR(384)`/`<=>` native
+  (`pgvector.sqlalchemy.Vector` stays — models untouched). `CREATE EXTENSION
+  vector` is a harmless no-op on v26.2 (ADR-0048's "known blocker" was stale).
+  Residue scoped into 0017–0019 — full classified list in
+  [`docs/tasks/0016-cockroachdb-spike.md`](../tasks/0016-cockroachdb-spike.md)'s
+  hand-back. Headline finding for 0019: `FOR UPDATE SKIP LOCKED` can skip a
+  freshly-committed unlocked row (write-intent window), so the worker job-claim
+  needs rework, not just a `40001` retry. Isolation level: **keep SERIALIZABLE**,
+  build the retry boundary (owner call). Full-suite on CockroachDB: 474/501,
+  every failure explained (17 = one feed `COALESCE` line, ~9 = the SKIP LOCKED
+  flake, 1 = a latent `notes` upsert bug).
+- **Not yet committed:** the 0016 hand-back doc edits + ADR-0048 corrections +
+  this log entry (this commit). The `crdb` container/volume are disposable —
+  `docker compose --profile crdb down -v`.
+
+**Next:** 0017 / 0018 / 0019 (now unblocked, can run in parallel), then 0020 →
+0021. Or B7 (needs ADR 0078). See the 0016 hand-back for how much each shrank
+or grew.
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)

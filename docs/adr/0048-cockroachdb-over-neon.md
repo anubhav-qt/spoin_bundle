@@ -61,6 +61,19 @@ toggle, and the migration is paid for once, now, at 46 MB, rather than later at
 at all.** If the dialect, vector, or migration story fails there, the fallback is
 ADR-0003's original answer: pay for Neon. Do not force this through.
 
+> **Spike outcome (2026-08-31): GO.** Task 0016 stood a CockroachDB v26.2.6 node
+> up locally, ran the suite and isolated probes against it, and returned **go**.
+> The dialect connects, `VECTOR(384)`/`<=>` work natively (`pgvector.sqlalchemy.Vector`
+> stays — models untouched), and the **full 23-migration Alembic chain applies
+> clean base → head**, producing a schema identical to the live Postgres DB. The
+> residue is scoped into tasks 0017–0019 (see 0016's hand-back for the classified
+> list). Two rows of the compatibility table below were **wrong** and are corrected
+> inline. The real ongoing cost is unchanged from what this ADR predicted:
+> `SERIALIZABLE` + `40001` retries (task 0019) — and the spike found `FOR UPDATE
+> SKIP LOCKED` can *skip a freshly-committed unlocked row* in the write-intent
+> resolution window, which makes 0019 bigger than a retry decorator (it must also
+> revisit the worker's job claim).
+
 ### What this decision is *not*
 
 It is **not** an adoption of the event-streaming half of the proposal it came from.
@@ -74,14 +87,14 @@ CockroachDB is Postgres-wire-compatible, not Postgres. What we actually depend o
 
 | Dependency | Status on CockroachDB | Where |
 | --- | --- | --- |
-| `VECTOR(384)`, `<=>` cosine distance | Supported natively; pgvector-compatible syntax | `dedup.py`, `topic_match.py` |
-| `CREATE EXTENSION vector` | **Not supported** — the type is built in, no extension exists | `f49f90af49c0_initial_schema.py:27` |
+| `VECTOR(384)`, `<=>` cosine distance | Supported natively; pgvector-compatible syntax. **Spike-confirmed** — `<->`/`<#>` too | `dedup.py`, `topic_match.py` |
+| `CREATE EXTENSION vector` | ~~**Not supported**~~ **CORRECTED (task 0016): a no-op that SUCCEEDS on v26.2** — CockroachDB accepts `CREATE EXTENSION <anything>` as a compatibility shim. The line does not fail; a dialect guard is optional cleanup, not a blocker | `f49f90af49c0_initial_schema.py:27` |
 | Vector *indexes* | L2 only; cosine is not index-accelerated | Moot — we have no vector index today |
 | `DISTINCT ON` | Supported | `topics/service.py:184` |
 | `INSERT ... ON CONFLICT` | Supported | 12 call sites across `engagement`, `feed`, `notes` |
-| `FOR UPDATE SKIP LOCKED` | Supported, with a multiple-column-families caveat under `SERIALIZABLE` | `worker/__main__.py:125` |
-| Enums, `JSONB`, arrays, `BYTEA` | Supported | throughout `domain/models/` |
-| `asyncpg` async driver | Preliminary support via `sqlalchemy-cockroachdb` | `core/db.py` |
+| `FOR UPDATE SKIP LOCKED` | Supported, BUT **spike found (task 0016)** it can skip a freshly-committed unlocked row in the write-intent resolution window, and over-locks `LIMIT n` without a covering index. Worker claim needs rework — task 0019 | `worker/__main__.py:125` |
+| Enums, `JSONB`, arrays, `BYTEA` | Supported. **Spike-confirmed** — plus `DISTINCT ON`, `ON CONFLICT`, partial/filtered UNIQUE indexes with `IN` predicates | throughout `domain/models/` |
+| `asyncpg` async driver | Preliminary support via `sqlalchemy-cockroachdb` (`>=2.0.4,<2.1` — the dialect **caps SQLAlchemy `<2.1`**). **Spike-confirmed** the full query set runs | `core/db.py` |
 | Serialization failures (`40001`) | **New failure mode** — the app must retry; Postgres never required this | every write path |
 
 The last row is the real cost of this ADR, and the reason task 0019 exists as its own

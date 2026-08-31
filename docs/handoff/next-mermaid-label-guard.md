@@ -3,6 +3,18 @@
 **Written:** 2026-08-31 (end of session 7) — paste the "Prompt" block below into a
 fresh session.
 
+**STATUS: DONE (session 8).**
+- Task A — `46acf34` `feat(generation): reject unquoted punctuation in mermaid
+  edge labels`. `_mermaid_structural_issue` now flags a `|…|` flowchart label
+  with an unquoted `()[]{}`; double-quoted labels pass; `CAM[(Camera2D State)]`
+  and other bracketed node shapes untouched (they never sit between pipes).
+  Matching rule added to `CARDS_DIAGRAM_SYSTEM`. 5 new tests in
+  `test_langchain_impl_ascii_mermaid.py`; `make check` green (501 pass).
+- Task B — `52478c9` (empty commit, DB write recorded). Owner-approved direct
+  `UPDATE` on card `0afd7193` `body` in `spoin_db_2`: the two edge labels
+  `Screen Pixels (e.g., 500, 300)` / `World Coordinates (e.g., 1250, -420)`
+  wrapped in double quotes, nothing else. Re-SELECT confirmed; diagram parses.
+
 ---
 
 ## Prompt

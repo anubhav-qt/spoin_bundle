@@ -160,16 +160,22 @@ async def run_once() -> int:
                     # tomorrow rather than everyone starving equally.
                     .order_by(GenerationJob.priority.desc(), GenerationJob.created_at)
                     .limit(settings.generation_batch_size)
-                    # Two passes that overlap -- `--watch` running long enough
-                    # to lap itself, a cron pass landing on top of a slow one,
-                    # or a second replica -- both read the same `pending` rows
-                    # under READ COMMITTED and both dispatch them. That is
-                    # duplicate generation billed twice against the quota
-                    # ADR-0028 exists to protect. SKIP LOCKED makes a concurrent
-                    # pass step over rows this one has already taken rather than
-                    # block on them, so the second pass picks up the next batch
-                    # instead of waiting or double-claiming.
-                    .with_for_update(skip_locked=True)
+                    # Two passes that overlap -- `--watch` lapping itself, a cron
+                    # pass landing on a slow one, or a second replica -- must not
+                    # both dispatch the same `pending` rows: that is duplicate
+                    # generation billed twice against the quota ADR-0028 protects.
+                    # Plain `FOR UPDATE` (not SKIP LOCKED): this claim txn is
+                    # short -- lock the rows, set `status='running'`, commit; the
+                    # generation itself runs in separate txns after this `with`
+                    # block closes. So a second overlapping pass blocks for those
+                    # few milliseconds, then its own `WHERE status='pending'`
+                    # re-reads and finds these rows `running` -- nothing new to
+                    # claim, no double-dispatch. SKIP LOCKED was dropped because
+                    # on CockroachDB it also skips a freshly-committed, unlocked
+                    # row whose write intent has not yet resolved (0016 spike),
+                    # silently under-claiming; plain `FOR UPDATE` waits for that
+                    # intent instead. Standard on Postgres too.
+                    .with_for_update()
                 )
             )
             .scalars()

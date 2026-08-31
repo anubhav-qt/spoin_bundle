@@ -1,6 +1,25 @@
 # Task 0019: A transaction retry boundary for CockroachDB's `40001` errors
 
 **Owner:** unassigned — unblocked, [task 0016](0016-cockroachdb-spike.md) returned GO.
+**Step 0 (worker/quota claim) shipped in session 9 (2026-08-31);** the retry
+boundary proper (steps 1–6) is still open.
+
+## Step 0 — DONE (session 9)
+
+`worker/__main__.py`'s `run_once()` claim and `quota.py`'s
+`note_request_sent_with_session` reservation claim both dropped
+`.with_for_update(skip_locked=True)` for plain `.with_for_update()`. The stale
+`SKIP LOCKED` / `READ COMMITTED` comment block in `worker/__main__.py` was
+rewritten to describe the short-claim-txn reasoning. New test
+`test_worker.py::test_two_concurrent_passes_never_double_claim_a_job` runs two
+`run_once()` passes concurrently against the real DB (batch size = half the
+queue depth, `_run_job` stubbed to a bare status write) and asserts every job
+is claimed by exactly one pass, none twice. Green on Postgres; `make check`
+green (502). On CockroachDB it may `skip` (the stock conftest's per-test
+`create_all` races crdb's async schema-change jobs — task 0021's fixture
+rework), so the plain-`FOR UPDATE` claim was verified against crdb directly by
+a standalone script: 5× two-concurrent-`run_once()`, clean 3/3 partition every
+run, no double-claim.
 
 > **Scope updates from the 0016 spike (2026-08-31):**
 > - **Isolation level is decided: keep `SERIALIZABLE`** (CockroachDB default),

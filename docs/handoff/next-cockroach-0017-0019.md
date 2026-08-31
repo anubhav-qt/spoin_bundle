@@ -3,6 +3,13 @@
 **Written:** 2026-08-31 (end of session 8). Paste the "Prompt" block into a fresh
 session. Branch `feat/v1-finish-line`, pushed, HEAD `4e809e2`.
 
+> **DONE in session 9 (2026-08-31):** task 0017 (SQL + semantics buckets) and
+> task 0019 step 0 (worker/quota claim → plain `FOR UPDATE`). See the session-9
+> entry in [`v1-finish-line-plan.md`](v1-finish-line-plan.md) and the hand-back
+> sections in tasks 0017 / 0019. The `conftest.py` DDL-perf rework was deferred
+> to task 0021. **Still open from this handoff: task 0018** (Alembic — now
+> mostly verification, see the 0016 hand-back).
+
 ---
 
 ## Prompt

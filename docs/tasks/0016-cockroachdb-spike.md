@@ -256,12 +256,16 @@ surfaced (notes ordering), or test-infrastructure cost (DDL speed).
 
 ## Notes for the follow-up tasks
 
-- **0017:** the SQL bucket has exactly one item (feed COALESCE). The semantics
-  bucket has items 2 and 3 above, plus coordinating item 1 with 0019. The DDL
-  performance / `conftest.py` rework is either 0017 or a new task — call it.
-  Isolation level: **keep `SERIALIZABLE`** (CockroachDB default) and build the
-  retry boundary, rather than dropping to `READ COMMITTED` — decided with the
-  owner this session.
+- **0017: DONE (session 9)** — SQL + semantics buckets shipped. Feed COALESCE
+  fixed via a shared `_coverage_need_expr()` helper with an explicit
+  `cast(..., Float)`. Notes upsert `updated_at` fixed with
+  **`func.statement_timestamp()`** — plain `func.now()` (this doc's original
+  suggestion) is the transaction timestamp and still left the ordering test
+  tied on CockroachDB. FK-in-one-flush confirmed a non-issue by grep; comment
+  left at `nodes.py`. `DISTINCT ON` docstring corrected. `conftest.py` DDL-perf
+  rework **deferred to task 0021** (only matters once routine crdb CI is wired,
+  which is the cutover). See 0017's "Hand-back (session 9)" for detail.
+  Isolation level: **keep `SERIALIZABLE`**, decided with the owner this session.
 - **0018:** its "19 migrations" / "the first one will fail" framing is stale —
   there are **23** migrations and the chain **already applies clean base → head**
   on v26.2, extension line included. 0018 shrinks to: (a) decide whether to add a
@@ -271,12 +275,20 @@ surfaced (notes ordering), or test-infrastructure cost (DDL speed).
   (the spike ran it in the `test` container with `alembic/` mounted); (c) confirm
   the async-DDL "waiting for job(s)" behaviour does not bite multi-statement
   migrations under load.
-- **0019:** the worker job-claim fix is now *specified*, not open — drop
-  `SKIP LOCKED` for plain `FOR UPDATE` on both `worker/__main__.py:172` and
-  `quota.py:1177` (reasoning in semantics item 1 above). The `40001` retry
-  boundary in `core/db.py` is still 0019's main body, but it's for the request
-  write paths (`engagement`, `ensure_unlock_latched`), not the worker. Two
-  concurrent claimers against the real CockroachDB node is still the test.
+- **0019: step 0 DONE (session 9)** — `SKIP LOCKED` dropped for plain
+  `FOR UPDATE` on both `worker/__main__.py` (`run_once` claim) and `quota.py`
+  (`note_request_sent_with_session` reservation claim); stale comment rewritten;
+  `test_two_concurrent_passes_never_double_claim_a_job` added (two concurrent
+  `run_once()` against the real DB, `_run_job` stubbed). Green on Postgres;
+  verified against CockroachDB by a standalone script (5× clean partition) since
+  the stock conftest `skip`s on crdb. The `40001` retry boundary in `core/db.py`
+  — 0019's main body — is still open, and is for the request write paths
+  (`engagement`, `ensure_unlock_latched`), not the worker. **The generation
+  pipeline's own concurrent commits (`_process_gate_item`'s `asyncio.gather` +
+  `session.commit()`) raise `40001` on crdb** — surfaced this session as
+  `test_worker` / feed-fixture failures whenever a test drives real generation.
+  That is 0019 main-body territory (or a pipeline-local retry); noted here so
+  it's not re-discovered.
 
 ## Teardown
 

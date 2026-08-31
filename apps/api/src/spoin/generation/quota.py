@@ -1174,7 +1174,16 @@ class QuotaGovernor:
             .where(QuotaRequest.backend == backend, QuotaRequest.confirmed.is_(False))
             .order_by(QuotaRequest.sent_at)
             .limit(1)
-            .with_for_update(skip_locked=True)
+            # Plain `FOR UPDATE`, not SKIP LOCKED: same short-transaction claim
+            # shape as the worker's job claim (`worker/__main__.py`) -- lock the
+            # one oldest unconfirmed reservation, flip `confirmed`, flush. A
+            # concurrent confirm on the same backend blocks briefly, then re-reads
+            # and picks the next unconfirmed row. SKIP LOCKED was dropped because
+            # on CockroachDB it can skip a freshly-committed, unlocked row (0016
+            # spike); with `LIMIT 1` on an unindexed `confirmed` predicate it can
+            # also over-lock the scan. Neither matters here -- the lock is held
+            # for microseconds.
+            .with_for_update()
         )
         if reservation is None:
             session.add(QuotaRequest(backend=backend, sent_at=now, confirmed=True))

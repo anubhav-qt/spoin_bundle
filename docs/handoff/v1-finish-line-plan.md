@@ -515,6 +515,64 @@ warm-up if wanted first.
 0021. Or B7 (needs ADR 0078). See the 0016 hand-back for how much each shrank
 or grew.
 
+**2026-08-31, session 9 — CockroachDB portability: task 0017 (SQL + semantics)
+DONE, task 0019 step 0 DONE.** Branch `feat/v1-finish-line`. The two small
+independent fixes from the 0016 spike's residue. `make check` green (502 on
+Postgres, +1 new test); every touched file also re-run against the `crdb` node.
+
+- **0019 step 0 — worker/quota claim → plain `FOR UPDATE`.**
+  `worker/__main__.py`'s `run_once()` claim and `quota.py`'s
+  `note_request_sent_with_session` reservation claim both dropped
+  `.with_for_update(skip_locked=True)` for `.with_for_update()`. The stale
+  `SKIP LOCKED` / `READ COMMITTED` comment block in the worker was rewritten to
+  the actual reasoning (short claim txn: lock → `status='running'` → commit;
+  generation runs in later txns, so an overlapping pass blocks ~ms then re-reads
+  the rows as `running`). New test
+  `test_worker.py::test_two_concurrent_passes_never_double_claim_a_job` — two
+  `run_once()` passes concurrent against the real DB, batch size = half the
+  queue depth, `_run_job` stubbed to a bare status write, asserts every job
+  claimed by exactly one pass. Green on Postgres. On crdb the stock conftest's
+  per-test schema build is racy so it may `skip` there — the plain-`FOR UPDATE`
+  claim was verified against CockroachDB directly by a standalone script (5×
+  two-concurrent-`run_once()`, clean 3/3 partition every time).
+- **0017 SQL — feed `COALESCE`.** Extracted `feed/service.py::_coverage_need_expr()`.
+  The fix is casting **each division operand** to `Float`
+  (`cast(seen, Float) / cast(nullif(total, 0), Float)`) — an *outer*
+  `cast(1.0 - …, Float)` does **not** work because CockroachDB evaluates the
+  division first and rejects `<float> / <decimal>` outright (it had broken the
+  entire feed read path on crdb). Called from `_eligible_cards` and
+  `_all_active_cards`; the two byte-identical copies are gone. Dropped the
+  now-dead `Decimal` import + `float | Decimal` annotation. Confirmed on crdb by
+  the feed/session-share tests that run under the stock conftest (0 failures;
+  was ~17).
+- **0017 semantics — notes upsert `updated_at`.** `notes/service.py::upsert`'s
+  `on_conflict_do_update` now sets `updated_at` — with **`func.statement_timestamp()`**,
+  not `func.now()`. The spike's suggested `func.now()` is the *transaction*
+  timestamp, constant across a txn, so three upserts in one test transaction
+  still tied and `test_list_for_user_orders_newest_edit_first` still failed on
+  crdb. `statement_timestamp()` advances per statement on both dialects. Green
+  on both.
+- **0017 semantics — FK-in-one-flush.** Grep confirmed every parent→child
+  insert in `apps/api/src` already flushes the parent first; left a comment at
+  the canonical site (`generation/pipeline/nodes.py`'s card→`CardStats` flush)
+  so nobody collapses it. No code change.
+- **0017 — `DISTINCT ON` docstring** in `topics/service.py::_latest_jobs_by_topic`
+  corrected (the spike confirmed it runs on CockroachDB; it's no longer a
+  portability compromise).
+- **0017 — `conftest.py` DDL-perf rework: deferred to task 0021.** It only pays
+  off for routine crdb CI, which the cutover wires; landing a suite-wide
+  test-infra rewrite now risks a green suite for no benefit yet. The spike
+  already proved the pattern. Recorded in 0016 + 0017 hand-backs.
+- **Docs:** 0016 hand-back follow-up notes updated; 0017 gained a "Hand-back
+  (session 9)" section; 0019 gained a "Step 0 — DONE" section. `crdb` container
+  torn down + normal stack restored at end of session.
+- **Still open in the Cockroach sequence:** 0018 (Alembic — now mostly
+  verification), 0019's `40001` retry boundary proper (request write paths),
+  0020 → 0021.
+
+**Next:** 0018, then 0019's retry boundary, then 0020 → 0021. Or B7 (needs ADR
+0078).
+
 ---
 
 ## Phase 0 — What is already built (read before starting anything)

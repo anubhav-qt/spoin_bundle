@@ -1285,6 +1285,13 @@ async def _process_gate_item(
     async with runtime.session_lock:
         runtime.session.add_all(rejected_rows)
         runtime.session.add_all(new_cards)
+        # Parent flushed before the child (`CardStats.card_id` FK) is added, not
+        # as an optimisation: on CockroachDB, adding a parent and an FK child in
+        # the same flush raises ForeignKeyViolationError because the child's FK
+        # check does not see the not-yet-flushed parent (0016 spike). Every
+        # parent→child insert in this codebase already flushes the parent first
+        # (`_reuse_or_create_subtopic`, `_create_deep_dive_stubs`, the seed
+        # scripts); keep it that way — do not collapse these two flushes into one.
         await runtime.session.flush()
         for card in new_cards:
             runtime.session.add(CardStats(card_id=card.id))

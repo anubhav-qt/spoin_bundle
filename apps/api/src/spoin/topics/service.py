@@ -190,9 +190,10 @@ class TopicsService:
     async def _latest_jobs_by_topic(self, topic_ids: list[UUID]) -> dict[UUID, GenerationJob]:
         """Most recent job per topic, in one round trip.
 
-        `DISTINCT ON` rather than a window function: Postgres-only, but this
-        codebase is Postgres-only by design (pgvector), and it reads as exactly
-        what it does.
+        `DISTINCT ON` rather than a window function: it reads as exactly what it
+        does. Originally justified as "Postgres-only, but so is this codebase" --
+        the 0016 CockroachDB spike confirmed `DISTINCT ON` runs there too, so it
+        is no longer a portability compromise, just the clearer query.
         """
 
         if not topic_ids:

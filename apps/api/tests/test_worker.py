@@ -8,6 +8,7 @@ fixture uses, and read results back through the fixture's own session.
 
 from __future__ import annotations
 
+import asyncio
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -238,3 +239,76 @@ async def test_coalescing_lock_prevents_duplicate_pending_jobs_for_same_topic(
     session.add(GenerationJob(topic_id=topic.id, status="pending"))
     with pytest.raises(IntegrityError):
         await session.flush()
+
+
+async def test_two_concurrent_passes_never_double_claim_a_job(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch, settings: Settings
+) -> None:
+    """The job claim uses plain `FOR UPDATE` (not `SKIP LOCKED`) — task 0019
+    step 0. Two overlapping `run_once()` passes must partition the pending
+    queue: every job claimed by exactly one pass, none dispatched twice.
+
+    Batch size is half the queue depth, so between them the two passes drain it
+    exactly. The second pass's `SELECT ... FOR UPDATE` blocks on the rows the
+    first has locked, then re-reads and sees them `running` — so it claims the
+    still-`pending` remainder instead of skipping rows or double-claiming.
+    Runs against the real database because the lock behaviour *is* the subject
+    (CLAUDE.md).
+
+    `_run_job` is stubbed to a bare status write: the claim query and its
+    `status='running'` commit are what step 0 changed, and the real generation
+    pipeline's own concurrent commits raise `40001` on CockroachDB until 0019's
+    retry boundary lands — a separate concern that would only add noise here.
+
+    On CockroachDB the stock `conftest.py` per-test schema build is racy
+    (task 0021's fixture rework), so this may `skip` there rather than run; the
+    plain-`FOR UPDATE` claim was verified against CockroachDB directly in the
+    session-9 spike (5x two-concurrent-`run_once()`, clean partition every time).
+    """
+
+    monkeypatch.setattr(settings, "generation_batch_size", 3)
+
+    async def _fake_run_job(job_id, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+        async with worker_module.session_scope() as db:
+            job = await db.get(GenerationJob, job_id)
+            assert job is not None
+            job.status = "completed"
+            job.attempts += 1
+
+    monkeypatch.setattr(worker_module, "_run_job", _fake_run_job)
+
+    topics = [Topic(slug=f"conc-{i}", canonical_name=f"Concurrent {i}") for i in range(6)]
+    session.add_all(topics)
+    await session.flush()
+    jobs = [GenerationJob(topic_id=t.id, status="pending") for t in topics]
+    session.add_all(jobs)
+    await session.commit()
+
+    processed = await asyncio.gather(worker_module.run_once(), worker_module.run_once())
+
+    # Every job attempted exactly once, across the two passes combined.
+    assert sum(processed) == len(jobs)
+
+    from sqlalchemy import select
+
+    # `run_once` mutated these rows on its own connections; the fixture session
+    # holds `expire_on_commit=False` copies in its identity map, so
+    # `populate_existing` forces this query to overwrite them with DB state.
+    rows = (
+        (
+            await session.execute(
+                select(GenerationJob)
+                .where(GenerationJob.topic_id.in_([t.id for t in topics]))
+                .execution_options(populate_existing=True)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert len(rows) == len(jobs)
+    # `attempts` is bumped once per dispatch in `_run_job`; a double-claim would
+    # show as 2 (or a job left `running` by the losing pass).
+    assert sorted(j.status for j in rows) == ["completed"] * len(jobs), [
+        (j.status, j.attempts, j.last_error) for j in rows
+    ]
+    assert all(j.attempts == 1 for j in rows)

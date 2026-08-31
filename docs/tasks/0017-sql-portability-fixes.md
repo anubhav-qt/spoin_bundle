@@ -81,3 +81,74 @@ back to the database.
 Unknown by construction — scoped by task 0016's output. If that list is long enough
 that this looks like more than a couple of sessions, that itself is a signal worth
 taking back to ADR-0048 before continuing.
+
+---
+
+# Hand-back (session 9, 2026-08-31) — SQL + semantics buckets DONE
+
+Worked the 0016 hand-back's SQL and semantics buckets. All shipped on branch
+`feat/v1-finish-line`; `make check` green (Postgres); each touched file also
+re-run against the `crdb` node.
+
+1. **SQL — feed `COALESCE` (fixed).** Extracted `feed/service.py::_coverage_need_expr()`
+   — the `1 - seen/total` coverage-need expression. The fix that works is
+   casting **each division operand** to `Float`
+   (`cast(seen, Float) / cast(nullif(total, 0), Float)`), not wrapping the
+   whole `1.0 - …` in an outer cast: CockroachDB evaluates the division before
+   the outer cast and rejects the `/` operator itself on `<float> / <decimal>`
+   (SQLAlchemy renders the `nullif` divisor as `CAST(... AS NUMERIC)`). Verified
+   the outer-cast-only version still failed on crdb before landing the
+   operand-cast version. Called from both `_eligible_cards` (~L471) and
+   `_all_active_cards` (~L645); the two byte-identical inline copies are gone.
+   The `_eligible_cards` return annotation dropped `float | Decimal` → `float`
+   and the now-unused `Decimal` import went with it; the stale "comes back as
+   Decimal" comment was rewritten. `test_feed_service.py` +
+   `test_session_shares.py` green on Postgres; the tests that run on crdb (the
+   rest `skip` on the stock conftest's racy per-test schema build — see item 4)
+   are green there too, 0 COALESCE failures (was ~17).
+2. **Semantics — notes upsert `updated_at` (fixed).** `notes/service.py::upsert`'s
+   `on_conflict_do_update` now sets `updated_at` explicitly — using
+   **`func.statement_timestamp()`, not `func.now()`**. `now()` is the
+   transaction timestamp and is constant across a transaction, so the spike's
+   suggested `func.now()` still left `test_list_for_user_orders_newest_edit_first`
+   tied (and it failed on crdb even with that change — three upserts in one test
+   transaction). `statement_timestamp()` advances per statement on both dialects.
+   Green on both.
+3. **Semantics — FK-in-one-flush (note only, no code change).** Grepped every
+   `session.add(` / `flush()` pair in `apps/api/src`: every parent→child insert
+   already flushes the parent first (`_reuse_or_create_subtopic`,
+   `_create_deep_dive_stubs`, `nodes.py`'s card→CardStats, `topic_match.py`,
+   `repair.py`, the seed scripts). Left a comment at the canonical site —
+   `generation/pipeline/nodes.py`'s card/`CardStats` flush — explaining why the
+   two flushes must not be collapsed on CockroachDB.
+4. **DDL perf — `conftest.py` rework: DEFERRED to task 0021.** Not landed this
+   session. Rationale: the session-scoped-schema + `DELETE`-per-test fixture
+   only pays off for *routine* CI against CockroachDB, and that is wired in the
+   0021 cutover, not before. Landing a suite-wide test-infra rewrite now adds
+   regression risk to a green suite that several in-flight tasks depend on, for
+   zero benefit until 0021. The spike already proved the pattern (501/501 on
+   both DBs, full suite ~6.5 min vs >1 h). 0021 should build it properly there:
+   session-scoped build, `DELETE FROM` in FK-safe order (never `TRUNCATE` —
+   non-transactional on crdb), fresh short-lived engine per test, clean
+   `pytest.skip` with no DB, identical results on Postgres.
+
+   **Note the cost of deferring, seen this session:** with the stock conftest,
+   individual test files against crdb intermittently `skip` mid-run with
+   `Database unavailable: relation "..." does not exist` — `Base.metadata.create_all`
+   racing CockroachDB's async schema-change jobs. So crdb verification this
+   session was per-file (some tests run, some skip) plus a standalone script
+   for the worker-claim contention check (schema built once, outside pytest).
+   The feed COALESCE fix is confirmed on crdb by the feed/session-share tests
+   that *did* run; nothing crdb-side failed once the operand-cast landed.
+5. **`DISTINCT ON` docstring (fixed).** `topics/service.py::_latest_jobs_by_topic`
+   no longer claims `DISTINCT ON` is a Postgres-only compromise — the spike
+   confirmed it runs on CockroachDB; the docstring now says so.
+
+**Nothing found unfixable.** No ADR-0048 "Revisit when" material surfaced.
+
+**Isolation level:** unchanged — `SERIALIZABLE` kept, per the 0016 decision.
+Step 4 of this doc's original "what to do" (settle isolation) was already
+resolved with the owner during the spike; recorded in 0019.
+
+The worker/quota `SKIP LOCKED` → `FOR UPDATE` change (this doc's original step 2)
+shipped as **task 0019 step 0** in the same session — see that doc.

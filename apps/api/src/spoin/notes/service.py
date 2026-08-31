@@ -10,7 +10,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -42,7 +42,20 @@ class NotesService:
             .values(user_id=user_id, card_id=card_id, body=body)
             .on_conflict_do_update(
                 index_elements=["user_id", "card_id"],
-                set_={"body": body},
+                # `updated_at` must be set explicitly: SQLAlchemy's
+                # `onupdate=func.now()` does NOT fire for
+                # `on_conflict_do_update()`, so without this an edited note keeps
+                # its original timestamp and `list_for_user`'s
+                # `ORDER BY updated_at DESC` has nothing to sort on.
+                #
+                # `statement_timestamp()`, not `now()`: `now()` is the
+                # transaction timestamp and is constant for every statement in a
+                # transaction, so two edits in one transaction would still tie
+                # (Postgres and CockroachDB then break the tie in opposite
+                # orders -- task 0017). `statement_timestamp()` advances per
+                # statement on both dialects, so each edit gets a distinct,
+                # monotonically increasing `updated_at`.
+                set_={"body": body, "updated_at": func.statement_timestamp()},
             )
             .returning(CardNote)
         )

@@ -19,10 +19,9 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import Float, Select, and_, cast, delete, func, or_, select
+from sqlalchemy import ColumnElement, Float, Select, and_, cast, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -74,6 +73,37 @@ class FeedPage:
     #: per (topic, stratum) and there is no point paying that on the hot path for
     #: a value that is discarded.
     starved: list[tuple[UUID, Difficulty]]
+
+
+def _coverage_need_expr() -> ColumnElement[float]:
+    """`coverage_need = 1 - seen/total` for a (user, subtopic), as FLOAT.
+
+    NULLIF guards a subtopic with no cards yet; COALESCE makes an untouched
+    subtopic maximally needy (1.0) rather than NULL — a subtopic the user has
+    never opened is exactly what should surface.
+
+    The explicit `cast(..., Float)` on **both** division operands is
+    load-bearing, not cosmetic. Left to itself SQLAlchemy renders the divisor
+    `nullif(...)` as `CAST(... AS NUMERIC)` (its `/`-operator type coercion when
+    the other operand is Float), so the division is `<float> / <decimal>`.
+    Postgres evaluates that silently; CockroachDB refuses the `/` operator
+    itself — `unsupported binary operator: <float> / <decimal>` — which broke
+    the entire feed read path on CockroachDB (task 0017). Wrapping the whole
+    `1.0 - …` in an outer cast does NOT help: the division is evaluated before
+    the outer cast. Casting each operand to FLOAT makes the division
+    `<float> / <float>` on every dialect, so both COALESCE arms are FLOAT and
+    the column comes back as `float` rather than `Decimal`.
+
+    Both `_eligible_cards` and `_all_active_cards` build the identical
+    expression; it lives here so the type fix stays in one place.
+    """
+
+    return func.coalesce(
+        1.0
+        - cast(UserSubtopicProgress.seen_count, Float)
+        / cast(func.nullif(UserSubtopicProgress.total_count, 0), Float),
+        1.0,
+    )
 
 
 class FeedService:
@@ -434,13 +464,12 @@ class FeedService:
         return previous
 
     # ------------------------------------------------------------ candidates --
-    # The last column (`coverage_need`) comes back as Decimal, not float: Postgres
-    # promotes the division to numeric. `_candidates` converts it. Annotated
-    # honestly rather than cast in SQL, since a cast would only hide what the
-    # driver actually hands back.
+    # The `coverage_need` column is `_coverage_need_expr()` — cast to FLOAT in
+    # SQL so it is portable across Postgres and CockroachDB (see that helper).
+    # `_candidates` still wraps it in `float(...)` defensively.
     def _eligible_cards(
         self, user_id: UUID, topic_id: UUID, difficulty: Difficulty
-    ) -> Select[tuple[UUID, UUID, datetime, float, float | Decimal, list[str], int]]:
+    ) -> Select[tuple[UUID, UUID, datetime, float, float, list[str], int]]:
         """Eligible = UNSEEN, or DEFERRED in an earlier cycle.
 
         SEEN never returns — it counts toward the 80% gate. DEFERRED comes back
@@ -464,16 +493,7 @@ class FeedService:
                 Card.subtopic_id,
                 Card.created_at,
                 func.coalesce(CardStats.quality, 0.0),
-                # coverage_need = 1 - seen/total. NULLIF guards a subtopic with no
-                # cards yet, and COALESCE makes an untouched subtopic maximally
-                # needy rather than NULL — which is the behaviour we want, since a
-                # subtopic the user has never opened is exactly what should surface.
-                func.coalesce(
-                    1.0
-                    - cast(UserSubtopicProgress.seen_count, Float)
-                    / func.nullif(UserSubtopicProgress.total_count, 0),
-                    1.0,
-                ),
+                _coverage_need_expr(),
                 Card.archetype,
                 Subtopic.position,
             )
@@ -642,12 +662,7 @@ class FeedService:
                 Card.subtopic_id,
                 Card.created_at,
                 func.coalesce(CardStats.quality, 0.0),
-                func.coalesce(
-                    1.0
-                    - cast(UserSubtopicProgress.seen_count, Float)
-                    / func.nullif(UserSubtopicProgress.total_count, 0),
-                    1.0,
-                ),
+                _coverage_need_expr(),
                 Card.archetype,
                 Subtopic.position,
             )

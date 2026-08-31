@@ -393,6 +393,11 @@ SHAPE (this matters as much as the content):
   widest row. Beyond that a diagram stops teaching and starts needing its own diagram.
 - Keep node labels SHORT — a few words. A long label stretches its row and \
   flattens the whole diagram into a strip. Detail belongs in the prose, not in a box.
+- EDGE LABELS: if a label on an arrow contains ANY punctuation — parens, commas, \
+  colons, brackets — wrap the whole label in double quotes, e.g. \
+  `A -->|"Screen Pixels (e.g. 500, 300)"| B`, never `A -->|Screen Pixels (e.g. 500, 300)| B`. \
+  An unquoted `(`, `)`, `[`, `]`, `{`, or `}` in an edge label is invalid mermaid and \
+  fails the entire diagram.
 
 Use the diagram type the material actually wants:
   * flow / architecture / causal chain    -> flowchart TD

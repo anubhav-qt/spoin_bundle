@@ -132,3 +132,50 @@ def test_unbalanced_brackets_is_an_issue() -> None:
     issue = _mermaid_structural_issue(source)
     assert issue is not None
     assert "unbalanced" in issue
+
+
+def test_unquoted_parens_in_edge_label_is_an_issue() -> None:
+    # The exact shape card `0afd7193` shipped with: balanced parens (so the
+    # bracket-count check passes) but unquoted inside a `|…|` edge label.
+    source = (
+        "flowchart TD\n"
+        "  MP[GetMousePosition] -->|Screen Pixels (e.g., 500, 300)| CST[GetScreenToWorld2D]\n"
+        "  CST --> GE[Game Entities]"
+    )
+    issue = _mermaid_structural_issue(source)
+    assert issue is not None
+    assert "edge label" in issue
+    assert "Screen Pixels (e.g., 500, 300)" in issue
+
+
+def test_unquoted_brackets_in_edge_label_is_an_issue() -> None:
+    source = "flowchart TD\n  A[Start] -->|writes arr[0]| B[Done]"
+    issue = _mermaid_structural_issue(source)
+    assert issue is not None
+    assert "edge label" in issue
+
+
+def test_quoted_parens_in_edge_label_is_accepted() -> None:
+    source = (
+        "flowchart TD\n"
+        '  MP[GetMousePosition] -->|"Screen Pixels (e.g., 500, 300)"| CST[GetScreenToWorld2D]\n'
+        "  CST --> GE[Game Entities]"
+    )
+    assert _mermaid_structural_issue(source) is None
+
+
+def test_plain_edge_label_without_punctuation_is_accepted() -> None:
+    source = "flowchart TD\n  A[Client] -->|sends request| B[Server]\n  B -->|responds| A"
+    assert _mermaid_structural_issue(source) is None
+
+
+def test_cylinder_node_shape_is_not_falsely_rejected() -> None:
+    # `[(...)]` is a legitimate mermaid node shape (a cylinder / datastore).
+    # Only `|…(…)…|` edge labels are the problem -- a node whose bracket run
+    # happens to contain `(` sits between `[` and `]`, never between pipes.
+    source = (
+        "flowchart TD\n"
+        "  CAM[(Camera2D State)] --> CST[GetScreenToWorld2D]\n"
+        "  CST --> GE[Game Entities]"
+    )
+    assert _mermaid_structural_issue(source) is None

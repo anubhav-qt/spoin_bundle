@@ -702,6 +702,16 @@ _MERMAID_DIAGRAM_TYPES = (
 #: nothing connecting them, not validate the exact arrow grammar per type.
 _MERMAID_EDGE_RE = re.compile(r"-{1,3}>|->>|--x|--o|:::|\.\.>|:")
 
+#: A pipe-delimited edge label in a flowchart/graph (`A -->|label| B`). Mermaid's
+#: grammar rejects an unquoted `(`, `)`, `[`, `]`, `{`, or `}` inside one, and a
+#: single bad label fails the whole diagram -- card `0afd7193` shipped this way
+#: before this check existed (`-->|Screen Pixels (e.g., 500, 300)|`). A label
+#: wrapped in double quotes (`|"… (…)"|`) is valid, so only the unquoted case is
+#: flagged; `[(…)]` and other bracketed NODE shapes are untouched because they
+#: never sit between pipes.
+_MERMAID_PIPE_LABEL_RE = re.compile(r"\|([^|\n]*)\|")
+_MERMAID_LABEL_PUNCT_RE = re.compile(r"[()\[\]{}]")
+
 
 def _mermaid_structural_issue(source: str) -> str | None:
     """Returns a short reason string if `source` fails the light structural
@@ -727,6 +737,16 @@ def _mermaid_structural_issue(source: str) -> str | None:
     closes = source.count("]") + source.count(")") + source.count("}")
     if opens != closes:
         return f"unbalanced brackets ({opens} opening vs {closes} closing)"
+
+    for label in _MERMAID_PIPE_LABEL_RE.findall(source):
+        stripped = label.strip()
+        if len(stripped) >= 2 and stripped[0] == '"' and stripped[-1] == '"':
+            continue
+        if _MERMAID_LABEL_PUNCT_RE.search(stripped):
+            return (
+                f"edge label {stripped!r} has unquoted parens/brackets -- "
+                "wrap the label in double quotes"
+            )
 
     return None
 

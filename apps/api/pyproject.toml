@@ -49,6 +49,16 @@ generation = [
     "langgraph>=0.6",
 ]
 
+# Task 0016 / ADR-0048: CockroachDB viability spike. Kept as its own extra --
+# not in the default install -- while the spike answers whether the stack runs
+# on CockroachDB at all. `sqlalchemy-cockroachdb` 2.0.4 hard-pins
+# `SQLAlchemy<2.1,>=2.0.47`; adopting the dialect therefore caps SQLAlchemy at
+# <2.1 (we currently floor at >=2.0.36 with no ceiling). The driver stays
+# asyncpg -- the dialect does not bundle one.
+cockroachdb = [
+    "sqlalchemy-cockroachdb>=2.0.4,<2.1",
+]
+
 dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.24",

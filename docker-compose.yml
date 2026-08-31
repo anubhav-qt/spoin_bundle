@@ -124,6 +124,29 @@ services:
       - web-node-modules:/app/node_modules
     command: ["npm", "run", "dev"]
 
+  # CockroachDB spike harness (task 0016, ADR-0048). Opt-in only:
+  #     docker compose --profile crdb up -d crdb
+  # It does NOT start with a plain `docker compose up` -- Postgres (`db`) stays
+  # the working local database for the whole spike (CLAUDE.md; task 0016 step 1).
+  # Its own volume, never shared with `db`. Version pinned to what CockroachDB
+  # Basic actually serves today (v26.2, the latest Regular release -- Basic does
+  # not run Innovation releases), not `:latest`, so the spike can't validate a
+  # feature the cloud tier can't use. DB Console: http://localhost:8080.
+  crdb:
+    profiles: ["crdb"]
+    image: cockroachdb/cockroach:latest-v26.2
+    command: ["start-single-node", "--insecure"]
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    volumes:
+      - crdb-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "cockroach", "sql", "--insecure", "-e", "SELECT 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
   # Its own database, because the test fixtures drop and recreate every table.
   # Sharing `spoin_db` would silently wipe it every time anyone ran the suite
   # -- and `spoin_db` is the one dev database this project keeps (see the
@@ -189,3 +212,4 @@ services:
 volumes:
   db-data:
   web-node-modules:
+  crdb-data:

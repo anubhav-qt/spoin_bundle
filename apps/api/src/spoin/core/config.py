@@ -131,6 +131,11 @@ class Settings(BaseSettings):
     #: lease, so this only affects how densely the worker packs the FIRST pass
     #: that touches a brand-new topic.
     default_topic_key_budget: int = 8
+    #: ADR-0081: how many topics' curricula the worker generates concurrently in
+    #: its pre-admission curriculum phase. One thinking-pool call per topic;
+    #: kept small so the phase doesn't itself stampede the thinking rungs before
+    #: card generation even starts.
+    curriculum_concurrency: int = 4
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.

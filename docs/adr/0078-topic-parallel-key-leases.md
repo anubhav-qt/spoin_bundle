@@ -3,6 +3,10 @@
 - **Status:** Accepted
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0081](0081-curriculum-as-a-worker-phase.md) -- the worker
+  now generates a fresh topic's curriculum in a phase before admission, so
+  `topic_tier_width` is real at lease time and the provisional
+  `default_topic_key_budget` is a fallback, not the fresh-topic norm.
 
 - **Supersedes:** [ADR-0073](0073-worker-runs-generation-jobs-sequentially.md)'s
   strictly-sequential job loop. The worker runs the admitted jobs concurrently

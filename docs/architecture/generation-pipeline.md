@@ -188,12 +188,16 @@ queue so `sum(N) <= pool_size` before a pass runs, and leaves the overflow `pend
 
 ## Worker: per-job isolation, not graph-level fan-out
 
-`apps/worker`'s `run_once()` claims pending `GenerationJob` rows, **admits as many as the
-key pool can hold at once** ([ADR-0078](../adr/0078-topic-parallel-key-leases.md) --
-`sum(N) <= pool_size`, `N` = a topic's widest tier; a topic with no curriculum yet gets a
-provisional `default_topic_key_budget`), marks only the admitted rows `running` in that
-same transaction, then fires one `asyncio` task per admitted job -- **each with its own DB
-session** -- gathered together. Unadmitted rows stay `pending` for the next pass. One job's
+`apps/worker`'s `run_once()` runs in phases ([ADR-0081](../adr/0081-curriculum-as-a-worker-phase.md)):
+**(1)** claim pending `GenerationJob` rows and mark them `running` (so an overlapping pass
+can't re-dispatch them); **(2)** the **curriculum phase** -- `generate_curriculum` +
+persist for every claimed fresh topic, bounded by `curriculum_concurrency`, so each
+topic's real tier width is known before it is leased; **(3)** **admit as many as the key
+pool can hold at once** ([ADR-0078](../adr/0078-topic-parallel-key-leases.md) --
+`sum(N) <= pool_size`, `N` = a topic's widest tier; a topic still without a curriculum
+after phase 2 falls back to a provisional `default_topic_key_budget`), demoting whatever
+doesn't fit back to `pending`; **(4)** fire one `asyncio` task per admitted job -- **each
+with its own DB session** -- gathered together. One job's
 exception marks only that job `failed`; it never touches any other job in the same pass
 (ADR-0026). This is a different concurrency layer from the graph's own `Send` fan-out
 above: the graph owns concurrency *within* one topic's run (subtopics, tiers) against that

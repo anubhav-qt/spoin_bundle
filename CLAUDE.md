@@ -36,14 +36,20 @@ the owner provisions** — a CockroachDB Cloud cluster, a Neon branch, or simila
 It is **never** done against the local Docker stack, and never against anything the
 local `.env` can reach.
 
-The local Postgres in `docker compose` **is** production. It is `spoin_db_2`, it
-holds tens of thousands of real cards and quiz questions, and the worker is
-generating into it continuously. There is no separate "local test DB" to fall back
-on — this has been misunderstood and the live corpus has been destroyed **three
-times** as a result.
+The local Postgres in `docker compose` (the `db` service) **is** production. It
+holds `spoin_db_2` — tens of thousands of real cards and quiz questions, the
+worker generating into it continuously — and it has been destroyed **three times**
+already, so:
 
-Therefore, for ANY migration, portability, schema-diff, or DB-engine-comparison
-task, these are hard prohibitions — no approval path, do not ask, just don't:
+**The single most dangerous command is `docker compose down -v` (a.k.a. `make
+clean`) — and `docker volume rm` on the `db` volume.** The `db` container's one
+volume holds BOTH `spoin_db_2` and the test database `spoin_db_test`
+(docker-compose.yml), so wiping the volume takes production with it. NEVER run
+`make clean` / `docker compose down -v` / `docker volume rm` on this project.
+`docker compose down` **without** `-v` is fine (containers stop, volume kept).
+
+For ANY migration, portability, schema-diff, or DB-engine-comparison task, these
+are hard prohibitions — no approval path, do not ask, just don't:
 
 - **Never** run `alembic downgrade`, `alembic stamp`, `TRUNCATE`, `DELETE`,
   `DROP`, a bulk `UPDATE`, `docker compose down -v`, or `docker volume rm`
@@ -55,10 +61,22 @@ task, these are hard prohibitions — no approval path, do not ask, just don't:
   and the owner has not already handed you a remote URL, **stop and ask for one** —
   do not improvise with the local stack.
 - **Never** spin up a "clean" local database by resetting the existing one. A
-  clean DB for testing is a fresh remote instance, provisioned by the owner.
+  clean DB for a *portability* experiment is a fresh remote instance the owner
+  provisions.
+
+**Running the normal test suite is safe and is NOT what this section forbids.**
+`make test` (→ `docker compose --profile test run --rm test`) points
+`SPOIN_TEST_DATABASE_URL` at `spoin_db_test`, a *separate database* in the same
+instance; `tests/conftest.py`'s `session` fixture `drop_all`/`create_all`s only
+that database's tables and hard-errors (not skips) unless the DB name ends in
+`_test`, so it structurally cannot touch `spoin_db_2`. Run the DB-backed tests
+that way — never by hand-setting `SPOIN_TEST_DATABASE_URL` to `spoin_db_2` (it
+would refuse anyway) and never by running the migration/portability commands
+above to "prepare" a DB for them.
 
 Read-only inspection of the live DB (`SELECT`, `\d`, `alembic current`) stays
-fine. The line is: reads local, writes/schema-changes/experiments remote.
+fine. The line is: reads on `spoin_db_2` local; its writes / schema changes /
+engine experiments remote; the test suite on `spoin_db_test` via `make test`.
 
 ## The codebase at a glance
 

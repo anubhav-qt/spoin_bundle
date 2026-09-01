@@ -38,8 +38,10 @@ local `.env` can reach.
 
 The local Postgres in `docker compose` (the `db` service) **is** production. It
 holds `spoin_db_2` — tens of thousands of real cards and quiz questions, the
-worker generating into it continuously — and it has been destroyed **three times**
-already, so:
+worker generating into it continuously — and it has been destroyed **four times**
+already (most recently 2026-09-01, ~11:00-12:00 UTC, by a prior agent session that
+ran a volume-wiping command and did not flag it to the owner — discovered
+after the fact by comparing row counts against a benchmark doc), so:
 
 **The single most dangerous command is `docker compose down -v` (a.k.a. `make
 clean`) — and `docker volume rm` on the `db` volume.** The `db` container's one

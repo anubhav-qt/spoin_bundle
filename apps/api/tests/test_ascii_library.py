@@ -18,10 +18,12 @@ from spoin.content.ascii_library import AsciiLibraryEntry, load_library, top_can
 
 def test_library_loads_real_curated_entries() -> None:
     library = load_library()
-    # Matches the counts documented in ADR-0068 / apps/helpers/README.md
-    # (888 + 1599 = 2,487) -- a large drop here would mean the packaged copy
-    # under content/ascii_library_data/ has drifted from the curation source.
-    assert len(library) > 2000
+    # ADR-0079: gags only -- `use_for_informative_visualization.txt` is no
+    # longer loaded, so this is just the hand-curated gag file (~248 entries
+    # after the 2026-09-01 quality pass). A large drop below this floor means
+    # the packaged copy under content/ascii_library_data/ has drifted from the
+    # curation source.
+    assert len(library) > 200
     assert all(isinstance(e, AsciiLibraryEntry) for e in library)
 
 
@@ -78,21 +80,9 @@ async def test_top_candidates_zero_k_returns_empty() -> None:
     assert await top_candidates("anything", k=0) == []
 
 
-def test_library_titles_by_source() -> None:
-    from spoin.content.ascii_library import get_library_titles_by_source
-
-    by_source = get_library_titles_by_source()
-    assert "gags" in by_source
-    assert "info" in by_source
-    assert len(by_source["gags"]) > 800
-    assert len(by_source["info"]) > 1400
-
-
-def test_format_library_catalog_for_planner() -> None:
-    from spoin.content.ascii_library import format_library_catalog_for_planner
-
-    catalog = format_library_catalog_for_planner()
-    assert "GAGS & COMEDIC CHARACTER REACTIONS" in catalog
-    assert "INFORMATIVE VISUALIZATIONS" in catalog
-    assert "70%" in catalog
-    assert "30%" in catalog
+def test_library_is_gags_only() -> None:
+    # ADR-0079: the informative-visualisation file is no longer a source, so
+    # every entry comes from the single curated gag file. `AsciiLibraryEntry`
+    # dropped its `source` field with that change -- this is the regression
+    # guard that it stays one pool.
+    assert not hasattr(AsciiLibraryEntry("x", "t", "c", "s", "a"), "source")

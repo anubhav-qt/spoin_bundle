@@ -5,6 +5,13 @@
 the manual review, not before. A breakdown built from unreviewed entries teaches the
 planner to reach for content that might get fixed or deleted out from under it.
 
+> **Scope narrowed by [ADR-0079](../adr/0079-ascii-library-is-gags-only.md) (2026-09-01):**
+> the library is now gags-only — `use_for_informative_visualization.txt` is no longer
+> loaded. The `use_for_gags.txt` breakdown below is stale (that file was curated down to
+> ~248 entries the same day); re-run the numbers against the current file. Everything
+> this task says about an "informative" half is moot. The core idea — the planner
+> writing a better `asset_direction` because it knows the gag pool's shape — still holds.
+
 ## The problem
 
 [Task 0029](0029-mermaid-shape-budget-and-curated-ascii-library.md)'s retrieval finds

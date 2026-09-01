@@ -36,12 +36,17 @@ from importlib import resources
 
 from spoin.embeddings import get_embedder
 
-#: `apps/helpers/`'s two curated files, copied into the package so the
-#: library ships with the built image (`apps/api/Dockerfile` only `COPY`s
-#: `src`, never the sibling `apps/helpers/` tooling directory). This copy is
-#: the deployed source of truth; `apps/helpers/*.txt` is where curation edits
-#: happen (Task 0030) and gets synced here afterward -- see that task's note.
-_LIBRARY_FILES = ("use_for_gags.txt", "use_for_informative_visualization.txt")
+#: `apps/helpers/`'s curated file, copied into the package so the library ships
+#: with the built image (`apps/api/Dockerfile` only `COPY`s `src`, never the
+#: sibling `apps/helpers/` tooling directory). This copy is the deployed source
+#: of truth; `apps/helpers/use_for_gags.txt` is where curation edits happen
+#: (Task 0030) and gets synced here afterward -- see that task's note.
+#:
+#: ADR-0079: gags only. `use_for_informative_visualization.txt` still sits next
+#: to this one on disk but is deliberately NOT loaded -- every ASCII card is a
+#: comedic scene now, so an "informative visualisation" candidate pool has
+#: nothing to feed. Re-add the filename here to bring it back.
+_LIBRARY_FILES = ("use_for_gags.txt",)
 
 #: `=== ID: art_52_5 | TITLE: Boxer fighter stance ... | ARTIST: unknown |
 #:  CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 7x1 ===` followed by a
@@ -64,14 +69,13 @@ class AsciiLibraryEntry:
     category: str
     subcategory: str
     art: str
-    source: str = "gags"
 
 
 @lru_cache
 def load_library() -> tuple[AsciiLibraryEntry, ...]:
-    """Parses both curated files once per process. Missing files (a dev
+    """Parses the curated gag file once per process. A missing file (a dev
     checkout that hasn't pulled the data, or a build that genuinely omitted
-    it) degrade to an empty library rather than crashing generation -- the
+    it) degrades to an empty library rather than crashing generation -- the
     pre-retrieval behavior (the model draws its own scene, unaided) is a
     correct fallback, not a broken one."""
 
@@ -82,7 +86,6 @@ def load_library() -> tuple[AsciiLibraryEntry, ...]:
         if not target.is_file():
             continue
         text = target.read_text(encoding="utf-8")
-        source = "gags" if "gags" in filename else "info"
         for match in _ENTRY_RE.finditer(text):
             entries.append(
                 AsciiLibraryEntry(
@@ -91,43 +94,9 @@ def load_library() -> tuple[AsciiLibraryEntry, ...]:
                     category=match.group("category").strip(),
                     subcategory=match.group("subcategory").strip(),
                     art=match.group("art").rstrip("\n"),
-                    source=source,
                 )
             )
     return tuple(entries)
-
-
-@lru_cache
-def get_library_titles_by_source() -> dict[str, list[str]]:
-    """Returns all library artwork titles grouped by source ('gags' vs 'info')."""
-    library = load_library()
-    gags: list[str] = []
-    info: list[str] = []
-    for e in library:
-        if e.source == "gags":
-            gags.append(e.title)
-        else:
-            info.append(e.title)
-    return {"gags": gags, "info": info}
-
-
-@lru_cache
-def format_library_catalog_for_planner() -> str:
-    """Formats the full catalog of curated reference library concepts for the card planner."""
-    by_source = get_library_titles_by_source()
-    gags = by_source.get("gags", [])
-    info = by_source.get("info", [])
-    gags_block = "\n".join(f"- {t}" for t in gags)
-    info_block = "\n".join(f"- {t}" for t in info)
-    return (
-        "\nAVAILABLE CURATED ASCII ART LIBRARY (USE TO GROUND YOUR ASCII CARD PLANS):\n"
-        f"--- GAGS & COMEDIC CHARACTER REACTIONS ({len(gags)} available"
-        " — AT LEAST 70% OF PLANNED ASCII CARDS MUST BE FROM THIS CATEGORY) ---\n"
-        f"{gags_block}\n\n"
-        f"--- INFORMATIVE VISUALIZATIONS & REAL-WORLD OBJECTS ({len(info)} available"
-        " — AT MOST 30% OF PLANNED ASCII CARDS) ---\n"
-        f"{info_block}\n"
-    )
 
 
 #: Populated once per process by `_library_index`, guarded by `_index_lock` so

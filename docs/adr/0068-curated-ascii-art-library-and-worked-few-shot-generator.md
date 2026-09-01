@@ -3,6 +3,10 @@
 - **Status:** Accepted
 - **Date:** 2026-08-28
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0079](0079-ascii-library-is-gags-only.md) -- point 1's
+  `use_for_informative_visualization.txt` is no longer a runtime source and the
+  "70% gags / 30% informative" planner ratio is gone; every ASCII card is a gag.
+  Point 2 and the 40-column invariant stand.
 - **Amends:** [ADR-0042](0042-freeform-ascii-and-real-hero-mechanism.md) (the free-form ASCII generation), [ADR-0067](0067-mermaid-diagrams-and-form-free-ascii.md) (diagram & ASCII scene scope)
 - **Related:** [ADR-0021](0021-ascii-scene-library.md), [ADR-0059](0059-card-planning-pass-and-prompt-versioning.md), [docs/tasks/0026](../tasks/0026-few-shot-examples-from-manual-review.md)
 

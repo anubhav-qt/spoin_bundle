@@ -104,7 +104,7 @@ useful than the decision itself.
 | [0065](0065-quota-governor-fairness-accounting-and-terminal-states.md) | Quota governor spreads load least-spent-first, refunds refused calls, learns its own rpm, and names why it stopped | Accepted (amends 0028, 0058, 0056) |
 | [0066](0066-redraw-over-budget-ascii-art.md) | Over-budget ASCII art is redrawn, then rejected with its card -- never silently dropped | Accepted (amends 0042, 0059) |
 | [0067](0067-mermaid-diagrams-and-form-free-ascii.md) | Diagrams are written as mermaid and rendered client-side; ASCII scenes lose the stickman requirement | Accepted (amends 0042, 0017) |
-| [0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md) | Curated ASCII art reference library and worked few-shot generator standards | Accepted (amends 0042, 0067) |
+| [0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md) | Curated ASCII art reference library and worked few-shot generator standards | Accepted (amended by 0079; amends 0042, 0067) |
 | [0069](0069-mermaid-rendering-and-card-focus-guards.md) | Client-side Mermaid rendering resilience, and card focus/dwell guards | Accepted (amends 0067, 0017) |
 | [0070](0070-server-side-appearance-preferences.md) | Palette + font move to the server; `localStorage` demoted to a pre-paint cache; saved themes and imported fonts | Accepted (amends 0045; builds on 0012, 0023, 0037, 0033) |
 | [0071](0071-drop-font-keep-revert.md) | Font picker drops Keep/Revert -- selecting a font saves it, like the theme picker | Accepted (amends 0037) |
@@ -115,3 +115,4 @@ useful than the decision itself.
 | [0076](0076-report-a-card-and-operator-repair-lane.md) | Readers report a structurally-broken card; the owner triages each on an admin page (delete / fix / remake); fix & remake run as `kind='repair'` generation jobs that mint a new family version | Accepted |
 | [0077](0077-askai-deterministic-single-call-retrieval.md) | AskAI is a topic-scoped, persistent, streamed conversation over deterministic retrieval; one flash-lite call per turn, off-topic held out by a free embedding gate + an `OFF_TOPIC` sentinel; 200 turns/user/day, no quota reservation | Accepted (revised same-session) |
 | [0078](0078-topic-parallel-key-leases.md) | Many topics generate at once; each takes a key lease of `N` = its widest difficulty tier; the worker packs the queue so `sum(N) <= pool_size`; a spent group borrows a shared-reserve key per call | Accepted (supersedes 0073; amends 0074, 0028, 0065) |
+| [0079](0079-ascii-library-is-gags-only.md) | The ASCII art library is gags-only; every ASCII card is a joke, and the informative-visualisation file is no longer loaded | Accepted (amends 0068) |

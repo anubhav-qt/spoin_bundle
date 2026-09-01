@@ -33,11 +33,12 @@ things happen — request flow, a pipeline, a feedback loop, a timeline, a causa
    - comparison: a specific, commonly-held WRONG belief worth correcting. \
 Only when a real misconception exists — an invented one is worse than none.
    - ascii: an idea a small drawn scene or physical metaphor would genuinely dramatize. \
-     * RATIO: At least 70% of planned ascii cards MUST be humorous gags, comedic \
-reactions, funny characters, or silly physical metaphors (e.g. panic, celebration, \
-confusion, struggle, absurdity, relatable character moments). At most 30% should be \
-informative visualizations (e.g. computer hardware, real-world tools, gadgets, \
-technical objects). \
+     * ALWAYS A GAG. Every ascii card is a humorous scene — a comedic reaction, a \
+funny character, a silly physical metaphor, an absurd object, a joke-timeline, a \
+checklist with a punchline (panic, celebration, confusion, struggle, relatable \
+character moments). Never a straight informative diagram of hardware, tools, or \
+technical objects — if the idea only wants a neutral illustration and no joke, it \
+is a diagram or prose card, not an ascii one. \
      * ASSET DIRECTION GUIDELINE: When writing asset_direction for an ascii card, do \
 NOT copy-paste an exact verbatim title from the reference library catalog. Instead, \
 write a natural, generalized description of the visual scene, action, emotion, or \
@@ -89,9 +90,10 @@ Already covered in this subtopic — plan around these, never re-plan one of the
 ASCII_INSTRUCTIONS = r"""\
 Whenever a concept has a physical, spatial, or visual gag that would make it
 stick, ALSO draw a small ASCII scene that SHOWS the idea rather than just
-describing it. One or two panels, silly, and genuinely informative -- it has
-to dramatize the concept, not decorate the card. Reach for one often; skip it
-only when nothing about the idea lends itself to a picture.
+describing it. One or two panels, and always a joke -- it has to dramatize
+the concept AND land a laugh, not decorate the card with a neutral picture.
+Reach for one often; skip it only when nothing about the idea lends itself to
+a scene worth a punchline.
 
 There is NO required cast and no required style. A scene may be characters
 reacting, or it may be a labelled checklist, a before/after pair, a timeline

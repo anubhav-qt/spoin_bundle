@@ -135,7 +135,18 @@ class Settings(BaseSettings):
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.
     generation_batch_size: int = 10
+    #: Gate pass 1 (`correct_cards`, ADR-0030). Kept moderate because correction
+    #: rewrites whole card BODIES -- its output scales with the batch, so a large
+    #: chunk risks the model's output-token cap (truncation fails the whole call)
+    #: and dilutes edit quality. This is the pass that most needs "small task".
     judge_batch_size: int = 20
+    #: Gate pass 2 (`verify_cards`, ADR-0030). Larger than `judge_batch_size`
+    #: because verification returns only `{index, accepted, confirmed_difficulty,
+    #: reason}` per card -- tiny output, so the only real limit is index-drift,
+    #: not truncation. Bigger chunks here mean fewer thinking-pool calls per tier
+    #: (the scarce rung: rpd 20 / rpm 5), which is where gate rate-limiting bites.
+    #: ~40 is the ceiling before the model stops genuinely re-rating difficulty.
+    verification_batch_size: int = 40
     question_batch_size: int = 25
 
     #: Local-dev-only persistent loop (`python -m spoin.worker --watch`,

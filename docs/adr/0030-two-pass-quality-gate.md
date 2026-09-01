@@ -37,9 +37,13 @@ what it genuinely can't. This ADR adopts that.
 
 ## Decision
 
-**The gate becomes two passes over the same batch (~`judge_batch_size`, currently 20 cards),
-both against the thinking pool -- never the generator pool, regardless of which pool actually
-wrote the card (ADR-0008's rule: judgment always gets the strongest available model).**
+**The gate becomes two passes over the same batch, both against the thinking pool -- never
+the generator pool, regardless of which pool actually wrote the card (ADR-0008's rule:
+judgment always gets the strongest available model).** Pass 1 (`correct_cards`) batches
+`judge_batch_size` (20) -- it rewrites whole bodies, so its output scales with the chunk
+and a big one risks the output-token cap. Pass 2 (`verify_cards`) batches
+`verification_batch_size` (40) -- a verdict is a few tokens per card, so the larger chunk
+is safe and halves the thinking-pool calls this pass costs per tier (the scarce rung).
 
 ### Pass 1 -- correction
 

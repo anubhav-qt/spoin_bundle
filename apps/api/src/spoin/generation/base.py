@@ -757,8 +757,8 @@ class ContentGenerator(ABC):
         every input index gets a result, edited or not. `difficulty_examples`
         is the same three-tier calibration set described on `generate_cards`.
 
-        `~judge_batch_size` cards per request, same batching principle as
-        `generate_cards`.
+        `~judge_batch_size` cards per request -- kept moderate because this pass
+        rewrites whole bodies, so its output scales with the batch.
         """
 
     @abstractmethod
@@ -771,7 +771,12 @@ class ContentGenerator(ABC):
         """Quality gate pass 2 (ADR-0030): the corrected cards, now WITH their
         requested difficulty visible, get a final accept/reject and a
         confirmed difficulty rating. This is the terminal check — a card that
-        fails here is a real rejection, not an edit."""
+        fails here is a real rejection, not an edit.
+
+        `~verification_batch_size` cards per request -- larger than pass 1 (the
+        output is a few tokens per card), which cuts thinking-pool calls per
+        tier.
+        """
 
     @abstractmethod
     async def generate_questions(

@@ -1181,7 +1181,10 @@ async def _verify_subtopic_drafts(
     (subtopic_id, accepted[(draft, embedding, confirmed_difficulty)],
     rejected[(draft, reason)], failures)."""
 
-    batch_size = runtime.settings.judge_batch_size
+    # Larger chunks than pass 1 (`verification_batch_size` vs `judge_batch_size`)
+    # -- a verdict per card is a few tokens, so this pass isn't truncation-bound,
+    # and fewer calls here is a direct cut to thinking-pool rate pressure.
+    batch_size = runtime.settings.verification_batch_size
     accepted: list[tuple[CardDraft, list[float], Difficulty]] = []
     rejected: list[tuple[CardDraft, str]] = []
     failures: list[str] = []

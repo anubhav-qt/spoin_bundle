@@ -365,9 +365,10 @@ The subtlety that makes or breaks this check, unchanged from the original design
 What changed: rather than one reject-only judge call, difficulty is confirmed in **pass 2**
 (`verify_cards`) -- pass 1 never sees the requested difficulty, so it can't anchor an edit
 toward it; pass 2 sees it and gives a final, independent `confirmed_difficulty`, stored on
-`Card.judged_difficulty` alongside the requested `Card.difficulty`. Both passes batch ~20
-cards per request (`judge_batch_size`), same batching principle as
-[ADR-0005](../adr/0005-batch-llm-calls.md) -- affordable to run on everything.
+`Card.judged_difficulty` alongside the requested `Card.difficulty`. Pass 1 batches
+`judge_batch_size` (20, capped low because it rewrites whole bodies); pass 2 batches
+`verification_batch_size` (40, safe because a verdict is a few tokens) -- same batching
+principle as [ADR-0005](../adr/0005-batch-llm-calls.md), affordable to run on everything.
 
 Both the card writer (`generate_cards`) and both gate passes also accept
 `difficulty_examples` -- a few example bodies per tier, hand-curated (not yet authored, see

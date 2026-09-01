@@ -41,10 +41,16 @@ Three things are wrong with that shape:
 
 ## Decision
 
-**Add an ASCII fetcher: one call per subtopic-tier, right after `_plan_tier_cards`,
-over that tier's `ascii`-typed plans.** It runs on the generator (cheap) ladder,
-same as the planner. New `ContentGenerator.fetch_ascii_scenes` — a batch method
+**Add an ASCII fetcher: one call per subtopic-tier on the FIRST pass, right after
+`_plan_tier_cards`, over that tier's `ascii`-typed plans.** It runs on the
+generator (cheap) ladder, same as the planner. New
+`ContentGenerator.fetch_ascii_scenes` — a batch method
 ([ADR-0005](0005-batch-llm-calls.md)).
+
+**Redraft rounds do NOT fetch.** A redraft's new cards get fresh briefs
+(ADR-0059) but their ascii scenes free-draw (`ASCII_INSTRUCTIONS`) — re-running
+retrieval to place one or two scenes against an already-thinned per-topic pool is
+not worth the call.
 
 ### What it receives, per `ascii` plan
 
@@ -138,13 +144,13 @@ written after this; earlier versions unchanged.
   `RejectedCard` row carries the `src_id`). Deliberate — the scene was spent on
   an attempt — but a tier with heavy attrition loses pool faster than it lands
   cards. Revisitable.
-- **One extra generator-ladder call per tier with ≥1 ascii plan**, redraft
-  rounds included. Same magnitude and ladder as the planner; the thinking pool
-  is untouched. The curriculum prompt's ascii floor was raised from "at least
-  2-3" to "at least 4-5" per subtopic tier in the same change, so nearly every
-  tier now triggers a fetcher call and a 20-25 card tier carries ~8-12 ascii
-  plans — a fetcher call there is ~15-18k input tokens, still trivial against
-  the model's context.
+- **One extra generator-ladder call per tier's first pass** with ≥1 ascii plan
+  (redraft rounds excluded). Same magnitude and ladder as the planner; the
+  thinking pool is untouched. The curriculum prompt's ascii floor was raised
+  from "at least 2-3" to "at least 4-5" per subtopic tier in the same change, so
+  nearly every first pass triggers a fetcher call and a 20-25 card tier carries
+  ~8-12 ascii plans — a fetcher call there is ~15-18k input tokens, still
+  trivial against the model's context.
 - **`visual_slots["src_id"]` is load-bearing for dedup now.** Pre-ADR-0080 cards
   have none and are simply absent from the used set — correct, they drew
   original art and burned no library id.

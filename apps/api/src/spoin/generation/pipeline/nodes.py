@@ -966,16 +966,11 @@ async def _redraft_until_bar(
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
             )
-            # ADR-0080: fetch curated scenes for this redraft's ascii briefs
-            # too, against a pool now missing whatever earlier rounds used.
-            await _fetch_ascii_for_plans(
-                runtime,
-                topic_id=tier["topic_id"],
-                topic_name=topic_name,
-                subtopic_title=tier["title"],
-                difficulty=difficulty,
-                plan_pool=round_plans,
-            )
+            # ADR-0080: the fetcher does NOT run on redraft rounds. A redraft
+            # card's asset_direction is new but small in number, and re-running
+            # retrieval to shave one or two scenes off an already-thin pool is
+            # not worth the call -- redraft ascii cards free-draw (the writer's
+            # ASCII_INSTRUCTIONS fallback). Only the first pass fetches.
             result = await runtime.generator.generate_cards(
                 topic_name=topic_name,
                 subtopic_title=tier["title"],

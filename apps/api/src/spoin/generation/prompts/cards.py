@@ -22,7 +22,11 @@ entry's brief at a time and cannot tell that two entries are secretly the same \
 idea in different words — if two of your entries overlap, that becomes two \
 near-duplicate cards, and one of them gets thrown away. Make them differ in \
 SUBSTANCE: a different mechanism, a different failure mode, a different \
-tradeoff — not a different phrasing of one idea.
+tradeoff — not a different phrasing of one idea. Spread the entries across the \
+whole subtopic's scope, not clustered on its most interesting corner. Before \
+you finalize, reread your entries as a SET: if any two could be answered by the \
+same explanation, merge them or re-scope one — that is the near-duplicate you \
+are here to prevent.
 
 2. SHAPE — decide, per card, which form actually teaches that idea best:
    - prose: conceptual intuition, mental models, analogies. The default when \

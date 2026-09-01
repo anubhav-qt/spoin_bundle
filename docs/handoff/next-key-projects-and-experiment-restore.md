@@ -75,6 +75,60 @@ block below into a fresh session.
 
 ---
 
+## RESULTS — 2026-09-01 session (both jobs actioned)
+
+### Job 2 (restore) — done by the session that wrote this handoff
+`config.py` `GEMINI_KEY_POOL_SIZE` back to 119, `.env` back to the full list,
+worker container down, Backend `pending` / Rust + Geeta `held`. Then a later
+session **removed `GEMINI_KEY_POOL_SIZE` and its exactness validator entirely** as
+part of reverting ADR-0078 (see below), so `.env` no longer has to be an exact
+length.
+
+### Separate but same session — pipeline reverted to the Run 8 regime
+Commit `424142e` on `main` (pushed): reverted **ADR-0078** (topic-parallel key
+leases) and **ADR-0081** (curriculum pre-admission phase); back to the ADR-0073
+sequential single-topic worker + ADR-0074 per-subtopic-group keys that Run 8 ran
+unattended. Kept ADR-0079/0080 (ascii), the bigger batches (gen 15 / q 35), the
+gate pass-2 split, the mermaid guard, the repair lane. ADR-0078/0081 kept as
+tombstones. `make check` green.
+
+### Job 1 (key→project audit) — behavioural probe run, no gcloud/mapping was available
+Throwaway probe: `…/4aed9d94-…/scratchpad/key_cluster_probe.py` (subcommands
+`A` solo-ceiling burst, `B` group-contention, `analyze`; `--model` overridable).
+Method that worked: fire **25 concurrent calls** at one key (sequential drip was
+~12 s/call — hours). Free-tier flash-lite per-project ceiling ≈ **16 req/min**.
+A shared per-minute bucket can't refill 0→16 in the 6 s inter-key gap, so a
+sequential tight-gap A-scan already proves *non*-sharing where every key reads 16.
+
+**Scanned keys 0–85** (the suspect set; last 33 taken as known-good per owner):
+
+| Set | Original indices | Verdict |
+|---|---|---|
+| Dead — HTTP 401 "service account deleted or disabled" | 17, 18, 19, 20, 21 | **Removed from `.env`** |
+| Distinct healthy projects (clean ~16 ceiling, non-sharing) | 0–16, 22–35, 37, 38, 73, 78, 85 — 36 keys | Keep |
+| Shared-project block | 36, 39–72, 74–77, 79–84 — 45 keys | **Staged out of `.env`** (commented `# SPOIN_GEMINI_API_KEYS_STAGED=` line) |
+
+Phase-A `n_ok` histogram was cleanly bimodal: `{16: 36, ~0: 45}`, nothing between.
+The 45 were per-day-exhausted on **both** `gemini-3.5-flash-lite` **and**
+`gemini-3.1-flash-lite` after only ~400 cards — impossible for 45 independent
+projects (that volume ≈ 50–130 req each; the 500/day cap is only reached if
+concentrated into **~4–10 real projects**). The only keys with scraps left sat at
+original idx 46/56/66/76 — evenly 10 apart → keys likely minted ~10 per project.
+
+**`.env` now: 69-key working pool** (36 distinct + 33 known-good). Backups in
+scratchpad: `.env.backup.full` (119), `.env.backup.pre-deadkey-removal` (119),
+`.env.backup.pre-stageout` (114). `.env` is gitignored.
+
+### Job 1 — still open: exact shared-project count + prune to representatives
+Phase B (concurrent group bursts to cluster keys by shared per-minute bucket)
+**needs per-minute headroom**, which the 45 have on no tested model right now.
+Do after Google's RPD reset (~00:00 PT): re-run `key_cluster_probe.py B
+--indices <the 45, reindexed>` , get the clusters, keep ~1 key per cluster from
+the staged list, delete the rest. Also worth: the owner's `gcloud` path from the
+original prompt would give the exact mapping directly and cheaply.
+
+---
+
 ## Why (context, don't re-derive)
 
 - The 119-key run collapsed: ~350 `(key,model)` cells hit provider rate limits,

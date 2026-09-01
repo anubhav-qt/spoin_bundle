@@ -3,6 +3,13 @@
 **Written:** 2026-08-31 (end of session 8). Paste the "Prompt" block into a fresh
 session. Branch `feat/v1-finish-line`, pushed, HEAD `4e809e2`.
 
+> **⚠ STRICT — read CLAUDE.md "The database" → STRICT subsection before touching
+> anything here.** All CockroachDB/Neon testing is done on a **remote throwaway
+> DB the owner provisions**, never the local Docker stack (which IS production,
+> `spoin_db_2`, and has been wiped 3×). No `alembic downgrade`, no migration
+> "just to see it apply" against the live DB, no repointing `SPOIN_DATABASE_URL`.
+> Need a DB to experiment on? Stop and ask the owner for a remote URL.
+
 > **DONE in session 9 (2026-08-31):** task 0017 (SQL + semantics buckets) and
 > task 0019 step 0 (worker/quota claim → plain `FOR UPDATE`). See the session-9
 > entry in [`v1-finish-line-plan.md`](v1-finish-line-plan.md) and the hand-back

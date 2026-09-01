@@ -2,6 +2,11 @@
 
 **Owner:** unassigned — **blocked on [task 0016](0016-cockroachdb-spike.md) returning go**
 
+> **⚠ STRICT (CLAUDE.md "The database" → STRICT subsection):** verify SQL against
+> CockroachDB on a **remote throwaway DB the owner provisions**, never the local
+> Docker stack — it IS production (`spoin_db_2`), wiped 3× already. Reads on the
+> live DB are fine; migrations/schema experiments are remote-only.
+
 ## The problem
 
 The codebase was written against Postgres and says so out loud —

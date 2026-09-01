@@ -4,6 +4,11 @@
 **Step 0 (worker/quota claim) shipped in session 9 (2026-08-31);** the retry
 boundary proper (steps 1–6) is still open.
 
+> **⚠ STRICT (CLAUDE.md "The database" → STRICT subsection):** exercise `40001`
+> retry behaviour against CockroachDB on a **remote throwaway DB the owner
+> provisions**, never the local Docker stack — it IS production (`spoin_db_2`),
+> wiped 3× already. Migrations/schema experiments are remote-only.
+
 ## Step 0 — DONE (session 9)
 
 `worker/__main__.py`'s `run_once()` claim and `quota.py`'s

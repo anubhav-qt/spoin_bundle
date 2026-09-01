@@ -5,6 +5,12 @@
 **This task is a go/no-go gate.** [ADR-0048](../adr/0048-cockroachdb-over-neon.md) is
 explicitly conditional on it. Tasks 0017–0021 do not start until this one says yes.
 
+> **⚠ STRICT (CLAUDE.md "The database" → STRICT subsection):** the spike and every
+> follow-up run against CockroachDB on a **remote throwaway DB the owner
+> provisions** — never the local Docker stack, which IS production (`spoin_db_2`)
+> and has been wiped 3× already by exactly this kind of work. No `docker compose
+> down -v`, no migration against a live URL, no repointing `SPOIN_DATABASE_URL`.
+
 ## The problem
 
 ADR-0048 decided to move the corpus database from Neon to CockroachDB Basic for the

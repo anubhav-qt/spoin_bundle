@@ -48,3 +48,6 @@ docs/design/mockups/**/spoin-*.html
 
 # 14MB build artifact — belongs to the content-bundle build, not the repo (see ADR-0078 revert)
 spoin-content-bundle.json.gz
+
+# Neon backup runtime log — not source
+scripts/neon_backup.log

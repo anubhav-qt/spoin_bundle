@@ -14,10 +14,16 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
-from spoin.domain.enums import CardStatus, RejectionStage
+from spoin.domain.enums import CardStatus, Difficulty, RejectionStage
 from spoin.domain.models import Card, Question, RejectedCard, Subtopic, Topic, TopicAlias
 from spoin.embeddings import HashEmbedder
-from spoin.generation.base import BatchResult, CardVerificationResult, ContentGenerator
+from spoin.generation.base import (
+    AsciiFetchQuery,
+    AsciiFetchResult,
+    BatchResult,
+    CardVerificationResult,
+    ContentGenerator,
+)
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.pipeline import (
     TopicRequest,
@@ -534,6 +540,73 @@ async def test_subtopic_card_type_quotas_and_diverse_archetypes(
     assert has_code, "Expected generated cards to include code cards"
     assert has_comparison, "Expected generated cards to include comparison cards"
     assert has_diagram, "Expected generated cards to include diagram cards"
+
+
+class _FixedSceneGenerator(FakeContentGenerator):
+    """`fetch_ascii_scenes` always picks the SAME curated id (ADR-0080), so a
+    test can assert the PIPELINE -- not the model -- enforces one-use-per-topic."""
+
+    async def fetch_ascii_scenes(
+        self,
+        queries: list[AsciiFetchQuery],
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        difficulty: Difficulty,
+        exclude_ids: frozenset[str],
+    ) -> BatchResult[AsciiFetchResult]:
+        items: list[AsciiFetchResult] = []
+        for q in queries:
+            if "art_shared" in exclude_ids:
+                items.append(AsciiFetchResult(index=q.index, matched=False))
+            else:
+                items.append(
+                    AsciiFetchResult(
+                        index=q.index,
+                        matched=True,
+                        src_id="art_shared",
+                        label="shared-scene",
+                        art="  o\n /|\\\n / \\",
+                        alt="a shared placeholder scene",
+                    )
+                )
+        return BatchResult(items=items)
+
+
+async def test_ascii_fetcher_scene_is_single_use_within_a_topic(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """ADR-0080: even when the fetcher would pick the same curated scene for
+    every ascii card, at most one active card in the topic carries it -- the
+    rest fall back to a writer-drawn scene -- and `topic_used_ascii_ids` reads
+    exactly that one id back for the next pass."""
+
+    from spoin.generation.pipeline.persistence import topic_used_ascii_ids
+
+    report = await _plan_and_generate(
+        session, settings, "Operating Systems", generator=_FixedSceneGenerator()
+    )
+    (topic_report,) = report["topics"]
+    topic_id = uuid.UUID(topic_report["topic_id"])  # type: ignore[arg-type]
+
+    cards = (
+        (
+            await session.execute(
+                select(Card).where(
+                    Card.topic_id == topic_id, Card.status == CardStatus.ACTIVE
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    shared = [c for c in cards if (c.visual_slots or {}).get("src_id") == "art_shared"]
+    assert len(shared) <= 1, "a curated scene must be used at most once per topic"
+
+    used = await topic_used_ascii_ids(session, topic_id)
+    assert used <= {"art_shared"}
+    if shared:
+        assert used == {"art_shared"}
 
 
 async def _active_count(session: AsyncSession, subtopic_id: uuid.UUID) -> int:

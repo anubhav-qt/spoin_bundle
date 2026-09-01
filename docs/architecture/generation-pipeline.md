@@ -167,49 +167,29 @@ gate_and_persist
 ```
 
 **Concurrency is bounded by the KEY POOL, not by a semaphore**
-([ADR-0074](../adr/0074-key-per-subtopic-scheduling.md),
-[ADR-0078](../adr/0078-topic-parallel-key-leases.md)). There used to be a shared
+([ADR-0074](../adr/0074-key-per-subtopic-scheduling.md)). There used to be a shared
 `asyncio.Semaphore` here; [ADR-0047](../adr/0047-removal-of-legacy-concurrency-semaphore.md)
 deleted it after measuring a 33-key pool being throttled to five calls at a time, and
 ADR-0074 replaced the *idea* of a global cap with key ownership: a subtopic group claims
 one key when its branch starts and holds it for the whole of its card work -- `plan_cards`,
 every draft round, both gate passes, every redraft -- releasing it when the group clears
-its bar. One caller per key is what makes an rpm violation structurally impossible rather
-than merely counted; `tests/test_architecture.py` fails if a semaphore ever comes back.
-
-**Since [ADR-0078](../adr/0078-topic-parallel-key-leases.md) many topics run at once**, so
-the pool is divided into per-topic **leases**: a topic takes `N` keys for its whole run,
-`N` = the most subtopics in any one of its difficulty tiers (the widest it can fan out).
-A subtopic group then claims its one key *from its topic's lease*; group K+1 waits when the
-lease's keys are all held by siblings. When a group's key is spent on the strong models it
-**borrows a key from the shared reserve** (keys in no lease) for that one call rather than
-dropping a rung on the key it holds -- see ADR-0078's ladder. The worker packs the pending
-queue so `sum(N) <= pool_size` before a pass runs, and leaves the overflow `pending`.
+its bar. At most K groups run at once for K keys, and group K+1 waits for a claim rather
+than starting on a shared key. One caller per key is what makes an rpm violation
+structurally impossible rather than merely counted; `tests/test_architecture.py` fails if
+a semaphore ever comes back.
 
 ## Worker: per-job isolation, not graph-level fan-out
 
-`apps/worker`'s `run_once()` runs in phases ([ADR-0081](../adr/0081-curriculum-as-a-worker-phase.md)):
-**(1)** claim pending `GenerationJob` rows and mark them `running` (so an overlapping pass
-can't re-dispatch them); **(2)** the **curriculum phase** -- `generate_curriculum` +
-persist for every claimed fresh topic, bounded by `curriculum_concurrency`, so each
-topic's real tier width is known before it is leased; **(3)** **admit as many as the key
-pool can hold at once** ([ADR-0078](../adr/0078-topic-parallel-key-leases.md) --
-`sum(N) <= pool_size`, `N` = a topic's widest tier; a topic still without a curriculum
-after phase 2 falls back to a provisional `default_topic_key_budget`), demoting whatever
-doesn't fit back to `pending`; **(4)** fire one `asyncio` task per admitted job -- **each
-with its own DB session** -- gathered together. One job's
-exception marks only that job `failed`; it never touches any other job in the same pass
-(ADR-0026). This is a different concurrency layer from the graph's own `Send` fan-out
-above: the graph owns concurrency *within* one topic's run (subtopics, tiers) against that
-topic's key lease; the worker owns concurrency *across* jobs.
+`apps/worker`'s `run_once()` claims pending `GenerationJob` rows, marks them `running` in
+that same transaction, then fires one `asyncio` task per job -- **each with its own DB
+session** -- gathered together. One job's exception marks only that job `failed`; it never
+touches any other job in the same pass (ADR-0026). This is a different concurrency layer
+from the graph's own `Send` fan-out above: the graph still owns concurrency *within* one
+topic's run (subtopics, tiers); the worker owns concurrency *across* jobs.
 
-`run_generation_pipeline` accepts a list of topic_ids plus a `key_budgets` map (the CLI
-hands it several at once sharing one session, and no budgets -- each topic then leases at
-`default_topic_key_budget`); the worker calls it with a single-item list per job, passing
-that job's admitted budget.
-
-ADR-0073 briefly made this loop strictly sequential (one topic finished before the next
-started); ADR-0078 restored the concurrent `gather` with the admission step in front.
+`run_generation_pipeline` still accepts a list of topic_ids (the CLI can hand it several
+at once, sharing one session -- fine for a manual run where isolation doesn't matter); the
+worker just always calls it with a single-item list, once per job.
 
 ## Subtopic reuse: prevention, not detection
 

@@ -106,7 +106,9 @@ def test_finalize_ascii_fields_carries_src_id() -> None:
 async def test_fake_generate_cards_attaches_fetched_scene() -> None:
     gen = FakeContentGenerator()
     plan = _ascii_plan(
-        FetchedAsciiScene(src_id="art_99", label="barbell-nap", art="  o  zzz", alt="a napping barbell")
+        FetchedAsciiScene(
+            src_id="art_99", label="barbell-nap", art="  o  zzz", alt="a napping barbell"
+        )
     )
     result = await gen.generate_cards(
         topic_name="Gym",

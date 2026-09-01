@@ -1,6 +1,12 @@
 # ADR-0081: Curriculum runs as a worker phase, before key-budget admission
 
-- **Status:** Accepted
+- **Status:** Reverted 2026-09-01 (same day), together with
+  [ADR-0078](0078-topic-parallel-key-leases.md). This ADR existed only to fix
+  ADR-0078's fresh-topic over-admission; with topic-parallel admission gone
+  there is no key-budget step for a pre-admission curriculum phase to feed, so
+  the worker is back to resolving a topic's curriculum inline at the start of
+  its (sequential) run. The idempotent `persistence.ensure_curriculum` helper
+  this ADR extracted was folded back into `resolve_and_plan_topic`.
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0078](0078-topic-parallel-key-leases.md) -- the key-budget

@@ -160,48 +160,6 @@ async def test_independent_topics_in_one_run_do_not_cross_contaminate(
         assert topic_report["accepted"] > 0
 
 
-class _LeaseRecordingGenerator(FakeContentGenerator):
-    """Wraps a real `KeyClaimRegistry` so the pipeline's ADR-0078 lease calls
-    can be asserted -- how big a lease each topic asked for, and that every
-    lease is handed back."""
-
-    def __init__(self, pool_size: int) -> None:
-        super().__init__()
-        from spoin.generation.quota import KeyClaimRegistry
-
-        self._registry = KeyClaimRegistry(pool_size)
-        self.leased_wants: list[int] = []
-        self.released = 0
-
-    async def lease_topic_keys(self, want):  # type: ignore[no-untyped-def]
-        self.leased_wants.append(want)
-        return self._registry.lease_topic(want)
-
-    async def adjust_topic_lease(self, lease, want):  # type: ignore[no-untyped-def]
-        await self._registry.adjust_lease(lease, want)
-
-    async def release_topic_keys(self, lease):  # type: ignore[no-untyped-def]
-        self.released += 1
-        await self._registry.release_topic(lease)
-
-
-async def test_a_run_leases_keys_per_topic_and_releases_them_all(
-    session: AsyncSession, settings: Settings
-) -> None:
-    """ADR-0078: each topic takes a key lease sized to its widest difficulty
-    tier, and the run hands every lease back (so the next worker pass sees a
-    free pool)."""
-
-    gen = _LeaseRecordingGenerator(pool_size=64)
-    await _plan_and_generate(session, settings, "Photosynthesis", "Roman Aqueducts", generator=gen)
-
-    # One lease request per topic, each a positive tier width, and all released.
-    assert len(gen.leased_wants) == 2
-    assert all(want >= 1 for want in gen.leased_wants)
-    assert gen.released == len(gen.leased_wants)
-    assert gen._registry.reserve_keys() == list(range(64))  # nothing still held
-
-
 async def test_min_cards_derived_from_fraction_setting(
     session: AsyncSession, settings: Settings
 ) -> None:
@@ -592,9 +550,7 @@ async def test_ascii_fetcher_scene_is_single_use_within_a_topic(
     cards = (
         (
             await session.execute(
-                select(Card).where(
-                    Card.topic_id == topic_id, Card.status == CardStatus.ACTIVE
-                )
+                select(Card).where(Card.topic_id == topic_id, Card.status == CardStatus.ACTIVE)
             )
         )
         .scalars()

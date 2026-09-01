@@ -12,13 +12,11 @@ Nothing here calls a model. Nodes decide *what* to persist; this module knows
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime
 from typing import cast
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from spoin.core.config import Settings
 from spoin.domain.enums import CardStatus, Difficulty, QuestionStatus, RejectionStage, TopicEdgeKind
 from spoin.domain.models import (
     Card,
@@ -31,14 +29,7 @@ from spoin.domain.models import (
     TopicEdge,
 )
 from spoin.embeddings import normalize_topic_text
-from spoin.generation.base import ContentGenerator, CurriculumDraft
-from spoin.generation.pipeline.state import (
-    SubtopicPlan,
-    _existing_title_tag,
-    _min_cards,
-    _Runtime,
-    _slugify,
-)
+from spoin.generation.pipeline.state import SubtopicPlan, _existing_title_tag, _Runtime, _slugify
 
 
 async def _find_top_topic_candidates(
@@ -152,94 +143,6 @@ async def _reuse_or_create_subtopic(
     return subtopic, False
 
 
-async def ensure_curriculum(
-    session: AsyncSession,
-    generator: ContentGenerator,
-    settings: Settings,
-    topic: Topic,
-) -> CurriculumDraft | None:
-    """Generate and persist `topic`'s curriculum if it has none, and COMMIT it.
-
-    Idempotent: returns `None` immediately when `topic.curriculum_generated_at`
-    is already set. Extracted from `resolve_and_plan_topic` (ADR-0081) so the
-    worker can run it as a phase BEFORE key-budget admission -- once the
-    subtopic rows exist, `topic_tier_width` returns a real number and the topic
-    gets a real key lease instead of the provisional `default_topic_key_budget`.
-
-    The caller owns concurrency control: `resolve_and_plan_topic` holds
-    `topic_plan_lock` around this (its session is shared across `Send` branches);
-    the worker's curriculum phase calls it once per topic on that topic's own
-    session, so no lock is needed there.
-    """
-
-    if topic.curriculum_generated_at is not None:
-        return None
-
-    existing_hints = await _existing_subtopic_hints(session, topic.id)
-    draft = await generator.generate_curriculum(
-        topic.canonical_name, topic.description or "", existing_hints or None
-    )
-    topic.is_survey = draft.is_survey
-    await _create_deep_dive_stubs(session, parent=topic, names=draft.deep_dive_topics)
-    for group in draft.subtopics:
-        tier_rows = [
-            (
-                *(
-                    await _reuse_or_create_subtopic(
-                        session,
-                        topic_id=topic.id,
-                        title=group.title,
-                        difficulty=tier.difficulty,
-                    )
-                ),
-                tier,
-            )
-            for tier in group.tiers
-        ]
-        # A new group adopts an EXISTING subtopic's group id if any of its tiers
-        # reused one -- keeps that concept's prior tier siblings connected to the
-        # new tiers landing alongside it. A reused row's OWN group id is never
-        # overwritten.
-        group_id = next((row[0].subtopic_group_id for row in tier_rows if row[1]), uuid.uuid4())
-        for subtopic, reused, tier in tier_rows:
-            if not reused:
-                subtopic.subtopic_group_id = group_id
-            subtopic.description = tier.description
-            subtopic.target_cards = tier.target_cards
-            subtopic.card_type_quotas = tier.card_type_quotas or None
-            subtopic.min_cards = _min_cards(tier.target_cards, settings.min_cards_fraction)
-            subtopic.position = group.position
-    topic.curriculum_generated_at = datetime.now(UTC)
-    await session.flush()
-    await session.commit()
-    return draft
-
-
-async def topic_tier_width(session: AsyncSession, topic_id: uuid.UUID) -> int | None:
-    """The topic's key budget (ADR-0078): the largest number of subtopics in any
-    one difficulty tier -- the widest a single tier can ever fan out, and
-    therefore how many keys the topic can actually keep busy at once.
-
-    `None` when the topic has no curriculum yet (no subtopic rows): the caller
-    falls back to `settings.default_topic_key_budget` and the real width is
-    computed once `resolve_and_plan_topic` has persisted the curriculum.
-    """
-
-    rows = (
-        (
-            await session.execute(
-                select(func.count())
-                .select_from(Subtopic)
-                .where(Subtopic.topic_id == topic_id)
-                .group_by(Subtopic.difficulty)
-            )
-        )
-        .scalars()
-        .all()
-    )
-    return max(rows) if rows else None
-
-
 async def topic_used_ascii_ids(session: AsyncSession, topic_id: uuid.UUID) -> set[str]:
     """Every curated-library entry id already used by an ASCII card in this
     topic (ADR-0080), from active cards (`Card.visual_slots['src_id']`) and from
@@ -250,22 +153,30 @@ async def topic_used_ascii_ids(session: AsyncSession, topic_id: uuid.UUID) -> se
     """
 
     active = (
-        await session.execute(
-            select(Card.visual_slots["src_id"].astext).where(
-                Card.topic_id == topic_id,
-                Card.status == CardStatus.ACTIVE,
-                Card.visual_slots["src_id"].astext.is_not(None),
+        (
+            await session.execute(
+                select(Card.visual_slots["src_id"].astext).where(
+                    Card.topic_id == topic_id,
+                    Card.status == CardStatus.ACTIVE,
+                    Card.visual_slots["src_id"].astext.is_not(None),
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     rejected = (
-        await session.execute(
-            select(RejectedCard.gen_meta["src_id"].astext).where(
-                RejectedCard.topic_id == topic_id,
-                RejectedCard.gen_meta["src_id"].astext.is_not(None),
+        (
+            await session.execute(
+                select(RejectedCard.gen_meta["src_id"].astext).where(
+                    RejectedCard.topic_id == topic_id,
+                    RejectedCard.gen_meta["src_id"].astext.is_not(None),
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return {value for value in (*active, *rejected) if value}
 
 

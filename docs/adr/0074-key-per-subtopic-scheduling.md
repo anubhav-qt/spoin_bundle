@@ -1,18 +1,8 @@
 # ADR-0074: One key per subtopic group, and questions after the topic's cards
 
-- **Status:** Accepted (amended by [ADR-0078](0078-topic-parallel-key-leases.md))
+- **Status:** Accepted
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
-
-> **Amended by [ADR-0078](0078-topic-parallel-key-leases.md) (2026-09-01).**
-> Many topics now run at once, so the pool is split into per-topic LEASES rather
-> than a run having all of it. A subtopic group still claims exactly one key for
-> its whole card run and one caller per key still holds -- but the key comes from
-> its topic's lease, and the fallback when it is spent on the strong models is
-> the SHARED RESERVE (keys in no lease), borrowed per call, not "any unclaimed
-> key". The lease-less path (topic matching, the recovery probe) is unchanged
-> from this ADR. Question generation still runs after the whole topic's cards
-> (section 4), now on the topic's lease.
 
 - **Amends:** [ADR-0028](0028-key-model-quota-ladder.md) (the ladder is now walked
   own-key-first, not model-major-across-keys for every call) and

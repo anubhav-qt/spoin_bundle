@@ -45,3 +45,6 @@ desktop.ini
 
 # Claude Design seeded canvas payloads (~2MB editor bundle; re-seed from the .dc.html working files)
 docs/design/mockups/**/spoin-*.html
+
+# 14MB build artifact — belongs to the content-bundle build, not the repo (see ADR-0078 revert)
+spoin-content-bundle.json.gz

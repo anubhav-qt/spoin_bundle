@@ -84,7 +84,6 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from spoin.content.ascii_library import AsciiLibraryEntry, top_candidates
 from spoin.core.config import Settings
-from spoin.core.db import session_scope
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
 from spoin.generation.base import (
@@ -119,8 +118,6 @@ from spoin.generation.quota import (
     KeyClaimRegistry,
     QuotaExhaustedError,
     QuotaGovernor,
-    TopicKeyLease,
-    key_spend_today,
     parse_ladder,
 )
 
@@ -485,9 +482,7 @@ def _format_fetch_candidates(query: AsciiFetchQuery, candidates: list[AsciiLibra
         head.append("candidates: (none available — return matched=false)")
         return "\n".join(head)
     head.append("candidates:")
-    blocks = [
-        f'  [ID: {c.id}] "{c.title}"\n  ```\n{c.art}\n  ```' for c in candidates
-    ]
+    blocks = [f'  [ID: {c.id}] "{c.title}"\n  ```\n{c.art}\n  ```' for c in candidates]
     return "\n".join(head) + "\n" + "\n".join(blocks)
 
 
@@ -901,7 +896,7 @@ class GeminiContentGenerator(ContentGenerator):
         self._active_probes: dict[tuple[int, str], asyncio.Task[None]] = {}
 
     @asynccontextmanager
-    async def claimed_key_scope(self, *, lease: TopicKeyLease | None = None) -> AsyncIterator[None]:
+    async def claimed_key_scope(self) -> AsyncIterator[None]:
         """ADR-0074: everything called inside this block runs on ONE key.
 
         The claim starts UNBOUND. Binding it here would need a key chosen
@@ -910,55 +905,19 @@ class GeminiContentGenerator(ContentGenerator):
         inside the scope binds it there instead, using the same query every
         other key choice uses.
 
-        With `lease` (ADR-0078) the home key is bound only from that topic's
-        assigned keys, and the fallback for a spent key is the shared reserve
-        rather than any unclaimed key. Without it, the claim ranges over the
-        whole pool exactly as ADR-0074 described.
-
         The claim is released even when the body raises, which is what keeps a
         failed subtopic group from parking a key for the rest of the run. Both
         pools share `self._claims`, so releasing frees the key for thinking and
         generator work alike.
         """
 
-        claim = KeyClaim(lease=lease)
+        claim = KeyClaim()
         token = CURRENT_KEY_CLAIM.set(claim)
         try:
             yield
         finally:
             CURRENT_KEY_CLAIM.reset(token)
             await self._claims.release(claim)
-
-    async def _coldest_keys_first(self) -> list[int]:
-        """Today's key indices ordered least-spent first (ADR-0078 + ADR-0065),
-        summed across both pools' cells. This is what stops a day's worth of
-        worker passes leasing keys 0..N every time and leaving the rest -- the
-        reserve included -- cold. Its own short session, same reason
-        `QuotaGovernor.acquire` opens one."""
-
-        async with session_scope() as session:
-            spent = await key_spend_today(session, key_count=len(self._keys), now=datetime.now(UTC))
-        return sorted(range(len(self._keys)), key=lambda k: (spent.get(k, 0), k))
-
-    async def lease_topic_keys(self, want: int) -> TopicKeyLease:
-        """Reserve up to `want` keys from the pool for a whole topic run
-        (ADR-0078), coldest first so per-day usage stays even across passes. May
-        return fewer when the pool is tight -- the caller logs the shortfall and
-        runs anyway. Pair every call with `release_topic_keys` in a `finally`."""
-
-        return self._claims.lease_topic(want, prefer=await self._coldest_keys_first())
-
-    async def adjust_topic_lease(self, lease: TopicKeyLease, want: int) -> None:
-        """Grow or shrink a lease once a fresh topic's real tier width is known
-        (ADR-0078). Best-effort -- see `KeyClaimRegistry.adjust_lease`; growth
-        also takes the coldest keys first."""
-
-        await self._claims.adjust_lease(lease, want, prefer=await self._coldest_keys_first())
-
-    async def release_topic_keys(self, lease: TopicKeyLease) -> None:
-        """Return a topic lease's keys to the pool (ADR-0078)."""
-
-        await self._claims.release_topic(lease)
 
     def _client(self, key_index: int, model: str) -> ChatGoogleGenerativeAI:
         cache_key = (key_index, model)
@@ -1535,9 +1494,7 @@ class GeminiContentGenerator(ContentGenerator):
         except QuotaExhaustedError:
             raise
         except Exception as exc:
-            return BatchResult(
-                items=[], failures=[f"fetch_ascii_scenes call failed: {exc}"]
-            )
+            return BatchResult(items=[], failures=[f"fetch_ascii_scenes call failed: {exc}"])
 
         valid_indices = {q.index for q in queries}
         by_index: dict[int, _WireAsciiFetch] = {}

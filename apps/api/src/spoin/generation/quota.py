@@ -176,55 +176,6 @@ def _day_start(now: datetime) -> datetime:
     return now.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
-async def key_spend_today(
-    session: AsyncSession, *, key_count: int, now: datetime
-) -> dict[int, int]:
-    """`key_index -> total requests spent today` across EVERY cell of that key
-    (both pools' ladders write into the same `QuotaLedger`). Used to lease the
-    coldest keys first (ADR-0078) so per-day usage doesn't pile onto low-index
-    keys pass after pass. A key with no rows is absent, which reads as 0 -- an
-    untouched key is the coldest there is."""
-
-    rows = await session.execute(
-        select(QuotaLedger.backend, QuotaLedger.requests_spent).where(
-            QuotaLedger.day == _day_start(now)
-        )
-    )
-    totals: dict[int, int] = {}
-    for backend, spent in rows.all():
-        # backend is "gemini:{key_index}:{model}"
-        parts = backend.split(":")
-        if len(parts) < 3 or not parts[1].isdigit():
-            continue
-        key_index = int(parts[1])
-        if 0 <= key_index < key_count:
-            totals[key_index] = totals.get(key_index, 0) + spent
-    return totals
-
-
-@dataclass
-class TopicKeyLease:
-    """One TOPIC's slice of the key pool for the whole of its generation run
-    (ADR-0078).
-
-    ADR-0074 made the subtopic GROUP the unit of key ownership and let the run
-    have the entire pool. ADR-0078 runs many topics at once instead: each is
-    assigned `key_indices` -- as many keys as its widest difficulty tier has
-    subtopics -- and its subtopic branches only ever bind a key from THIS set.
-    Keys the packer did not hand to any lease are the shared RESERVE
-    (`KeyClaimRegistry.reserve_keys`), borrowed per call when a branch's own key
-    is spent on the top models.
-
-    Mutable: `adjust` grows or shrinks the set after a fresh topic's curriculum
-    lands and its real tier width is known.
-    """
-
-    #: Stable id for log lines -- the lease is otherwise identified only by
-    #: which keys it holds, which changes.
-    lease_id: int
-    key_indices: set[int] = field(default_factory=set)
-
-
 @dataclass
 class KeyClaim:
     """One unit of work's ownership of an API key (ADR-0074).
@@ -235,16 +186,9 @@ class KeyClaim:
     notion of "least used" kept in memory. It can move -- step 3 of the ADR's
     ladder re-claims a different key when the held one has no room on any
     preferred rung -- which is why this is a mutable handle and not just an int.
-
-    `lease` (ADR-0078) restricts where the home key may be bound: with a lease
-    set, the binding scan only considers `lease.key_indices`, and the fallback
-    scan considers the shared reserve rather than "any unclaimed key". `None`
-    keeps ADR-0074's whole-pool behaviour -- the path every test and the `fake`
-    backend take.
     """
 
     key_index: int | None = None
-    lease: TopicKeyLease | None = None
 
 
 class KeyClaimRegistry:
@@ -269,11 +213,6 @@ class KeyClaimRegistry:
             raise ValueError("KeyClaimRegistry needs at least one key")
         self._key_count = key_count
         self._claimed: dict[int, KeyClaim] = {}
-        #: key_index -> the TOPIC lease that holds it (ADR-0078). A leased key is
-        #: not available to another lease or to the reserve; it IS available for
-        #: that lease's own subtopic `KeyClaim`s to bind.
-        self._leased: dict[int, TopicKeyLease] = {}
-        self._next_lease_id = 0
         self._released = asyncio.Condition()
 
     @property
@@ -288,110 +227,6 @@ class KeyClaimRegistry:
 
     def free_keys(self, *, claim: KeyClaim | None = None) -> list[int]:
         return [k for k in range(self._key_count) if self.is_free(k, claim=claim)]
-
-    def _leasable(self, key_index: int) -> bool:
-        """A key no topic lease holds and no subtopic claim has bound -- the
-        packer may hand it to a new lease, or it counts toward the reserve."""
-
-        return key_index not in self._leased and self._claimed.get(key_index) is None
-
-    def _leasable_in_order(self, prefer: list[int] | None) -> list[int]:
-        """Leasable keys, coldest first when the caller supplies a `prefer`
-        order (ADR-0078 + ADR-0065): a topic run leases keys for the day, so
-        first-fit from key 0 would burn low-index keys down pass after pass
-        while the reserve stays untouched -- the exact skew ADR-0065 removed
-        from the per-call scan. `prefer` is a ledger-derived least-spent-first
-        ordering from `GeminiContentGenerator`; keys it omits (or `None`
-        entirely, i.e. a backend with no ledger) fall back to index order."""
-
-        leasable = {k for k in range(self._key_count) if self._leasable(k)}
-        if not prefer:
-            return sorted(leasable)
-        ordered = [k for k in prefer if k in leasable]
-        ordered += [k for k in sorted(leasable) if k not in set(ordered)]
-        return ordered
-
-    def lease_topic(self, want: int, *, prefer: list[int] | None = None) -> TopicKeyLease:
-        """Hand a topic up to `want` currently-leasable keys for its whole run
-        (ADR-0078), coldest first per `prefer`. Takes fewer -- possibly zero --
-        when the pool is that tight; the caller logs the shortfall and runs
-        anyway (a lease with a few keys still makes progress, and `adjust_lease`
-        can grow it later)."""
-
-        self._next_lease_id += 1
-        lease = TopicKeyLease(lease_id=self._next_lease_id)
-        for key_index in self._leasable_in_order(prefer)[: max(0, want)]:
-            self._leased[key_index] = lease
-            lease.key_indices.add(key_index)
-        return lease
-
-    async def adjust_lease(
-        self, lease: TopicKeyLease, want: int, *, prefer: list[int] | None = None
-    ) -> None:
-        """Grow or shrink a lease to `want` keys, best-effort (ADR-0078) --
-        called once a fresh topic's curriculum reveals its real tier width.
-
-        Growth takes leasable keys coldest first (`prefer`, same as
-        `lease_topic`). Shrink only returns keys no subtopic claim is mid-call
-        on, so a running branch is never yanked off its key; the surplus that
-        can't be released stays until the run ends.
-        """
-
-        want = max(0, want)
-        current = len(lease.key_indices)
-        if want > current:
-            for key_index in self._leasable_in_order(prefer)[: want - current]:
-                self._leased[key_index] = lease
-                lease.key_indices.add(key_index)
-        elif want < current:
-            removable = sorted(k for k in lease.key_indices if self._claimed.get(k) is None)
-            for key_index in removable[: current - want]:
-                del self._leased[key_index]
-                lease.key_indices.discard(key_index)
-            async with self._released:
-                self._released.notify_all()
-
-    async def release_topic(self, lease: TopicKeyLease) -> None:
-        """Return every key the lease holds to the pool (ADR-0078). Also drops
-        any still-bound subtopic claim on those keys -- a crash mid-branch must
-        not leave a key owned by a claim whose scope has gone."""
-
-        for key_index in list(lease.key_indices):
-            self._leased.pop(key_index, None)
-            holder = self._claimed.get(key_index)
-            if holder is not None and holder.lease is lease:
-                del self._claimed[key_index]
-                holder.key_index = None
-        lease.key_indices.clear()
-        async with self._released:
-            self._released.notify_all()
-
-    def reserve_keys(self) -> list[int]:
-        """The shared reserve (ADR-0078): keys in no topic lease and bound by no
-        subtopic claim. A branch borrows one of these per call when its own key
-        is spent on the preferred rungs, and returns it immediately."""
-
-        return [k for k in range(self._key_count) if self._leasable(k)]
-
-    def home_free_keys(self, claim: KeyClaim) -> list[int]:
-        """Keys `claim` may bind as its home key. With a lease, that is the
-        lease's own keys not currently bound by a sibling; without one, it is
-        the whole unclaimed pool (ADR-0074's original behaviour)."""
-
-        lease = claim.lease
-        if lease is None:
-            return self.free_keys(claim=claim)
-        return [
-            k
-            for k in sorted(lease.key_indices)
-            if self._claimed.get(k) is None or self._claimed.get(k) is claim
-        ]
-
-    def other_holders(self, keys: set[int], claim: KeyClaim) -> int:
-        """How many of `keys` are bound by a claim OTHER than `claim` -- the
-        sibling subtopic branches this one is waiting on for a home key."""
-
-        return sum(1 for k in keys if (h := self._claimed.get(k)) is not None and h is not claim)
 
     def bind(self, claim: KeyClaim, key_index: int) -> None:
         """Move `claim` onto `key_index`, releasing whatever it held before.
@@ -678,44 +513,34 @@ class QuotaGovernor:
         exclude_models: frozenset[str],
         claim: KeyClaim,
     ) -> tuple[int, str] | _ClaimWait:
-        """The ladder for a unit of work that owns a key. Returns either a
-        granted cell or how long to wait before asking again.
+        """ADR-0074's ladder for a unit of work that owns a key. Returns either
+        a granted cell or how long to wait before asking again.
 
         The order, for a claim holding key X:
 
         1. X's preferred rungs -- every ordinary rung but the last.
-        2. The FALLBACK pool's preferred rungs, least-spent first.
+        2. Any UNCLAIMED key's preferred rungs, least-spent first. The claim
+           moves to that key; this is what stops a group stranding itself on a
+           key whose strong models are spent.
         3. X's last ordinary rung.
-        4. The fallback pool, all ordinary rungs.
-        5. The reserve rung -- ONLY if no key anywhere still has daily room on
-           an ordinary rung. A reserve rung is for a spent day, never a busy one.
-        6. Otherwise wait: room exists somewhere, it is just owned or throttled
-           right now.
+        4. Any unclaimed key, all ordinary rungs.
+        5. The reserve -- ONLY if no key anywhere still has daily room on an
+           ordinary rung. A reserve rung is for a spent day, never for a busy
+           one.
+        6. Otherwise wait: room exists somewhere, it is just claimed or
+           throttled right now.
 
-        What the "fallback pool" is depends on the claim (ADR-0078):
-
-        * **No lease** (`claim.lease is None`) -- ADR-0074's original behaviour:
-          the fallback pool is every UNCLAIMED key, and a grant there *moves*
-          the claim onto that key (`bind`). Every test and the `fake` backend
-          take this path.
-        * **Lease set** -- the claim's home key is bound once from the topic's
-          own `lease.key_indices` and never moves. The fallback pool is the
-          SHARED RESERVE (`reserve_keys()`) -- keys in no lease at all -- and a
-          grant there is a per-call BORROW: the reserve key is used for this one
-          call and `bind` is not touched, so the claim is back on X next call.
-          Another topic's leased key is never a fallback, and neither is a
-          sibling subtopic's key.
-
-        Steps 1 and 3 deliberately prefer X's *second* model over the fallback
-        pool's best one. Keeping a unit of work on one key is the entire point
-        of the claim -- one caller per key means no cell can be raced.
+        Steps 1 and 3 deliberately prefer X's *second* model over another key's
+        best one. Keeping a unit of work on one key for its whole run is the
+        entire point of the claim -- one caller per key means no cell can be
+        raced, which is what makes an rpm violation structurally impossible
+        rather than merely counted.
         """
 
         # Bound to a local because the nested scans below close over it --
         # mypy will not carry an attribute's narrowing into a closure.
         claims = self.claims
         assert claims is not None
-        leased = claim.lease is not None
         day = _day_start(now)
         unavailable = await self._unavailable_models(session, now=now)
 
@@ -740,85 +565,48 @@ class QuotaGovernor:
         #: Keyed by CELL so a cell seen twice counts once -- see `_ClaimWait`.
         waits: dict[tuple[int, str], float] = {}
 
-        async def try_cell(
-            key_index: int, rung: LadderRung, *, bind: bool
-        ) -> tuple[int, str] | None:
-            attempt = await self._try_take_cell(session, day, key_index, rung, now=now)
-            if attempt.wait_s is not None:
-                waits[(key_index, rung.model)] = attempt.wait_s
-            if attempt.granted:
-                if bind:
-                    claims.bind(claim, key_index)
-                return key_index, rung.model
-            return None
-
-        async def take_own(rungs: list[LadderRung]) -> tuple[int, str] | None:
-            if claim.key_index is None:
-                return None
+        async def take(key_index: int, rungs: list[LadderRung]) -> tuple[int, str] | None:
             for rung in rungs:
-                got = await try_cell(claim.key_index, rung, bind=False)
-                if got is not None:
-                    return got
+                attempt = await self._try_take_cell(session, day, key_index, rung, now=now)
+                if attempt.wait_s is not None:
+                    waits[(key_index, rung.model)] = attempt.wait_s
+                if attempt.granted:
+                    claims.bind(claim, key_index)
+                    return key_index, rung.model
             return None
 
-        async def take_home(rungs: list[LadderRung]) -> tuple[int, str] | None:
-            """Bind X for the first time, from the lease's own keys (or, with no
-            lease, the whole unclaimed pool -- which is where ADR-0074's initial
-            bind always happened)."""
-
+        async def take_free(rungs: list[LadderRung]) -> tuple[int, str] | None:
+            #: Model-major, least-spent key within each rung -- the same order an
+            #: unclaimed acquire uses, restricted to keys nobody owns.
             for rung in rungs:
                 spent = await self._rung_spend(session, day, rung.model)
                 for key_index in sorted(
-                    claims.home_free_keys(claim), key=lambda k: (spent.get(k, 0), k)
+                    claims.free_keys(claim=claim), key=lambda k: (spent.get(k, 0), k)
                 ):
-                    got = await try_cell(key_index, rung, bind=True)
-                    if got is not None:
-                        return got
+                    granted = await take(key_index, [rung])
+                    if granted is not None:
+                        return granted
             return None
 
-        async def take_fallback(rungs: list[LadderRung]) -> tuple[int, str] | None:
-            candidates = claims.reserve_keys() if leased else claims.free_keys(claim=claim)
-            for rung in rungs:
-                spent = await self._rung_spend(session, day, rung.model)
-                for key_index in sorted(candidates, key=lambda k: (spent.get(k, 0), k)):
-                    got = await try_cell(key_index, rung, bind=not leased)
-                    if got is not None:
-                        return got
-            return None
-
-        # A leased claim binds its home key explicitly and only from its own
-        # lease; a lease-less one lets step 2's fallback do the first bind, exactly
-        # as ADR-0074 did.
-        home_blocked = False
-        if leased and claim.key_index is None:
-            granted = await take_home(preferred) or await take_home(deferred)
-            if granted is not None:
-                return granted
-            # Still no home key. The reserve is for a spent key mid-run, never
-            # for a first bind -- a subtopic branch with no key yet waits for a
-            # sibling to release one (ADR-0074's "group K+1 waits"), UNLESS the
-            # day's ordinary budget is genuinely gone, in which case the
-            # reserve-rung logic below is the right escalation.
-            home_blocked = await self._any_daily_room(session, day, ordinary)
-
-        if not home_blocked:
-            granted = await take_own(preferred)
+        if claim.key_index is not None:
+            granted = await take(claim.key_index, preferred)
             if granted is not None:
                 return granted
 
-            granted = await take_fallback(preferred)
+        granted = await take_free(preferred)
+        if granted is not None:
+            return granted
+
+        if claim.key_index is not None and deferred:
+            granted = await take(claim.key_index, deferred)
             if granted is not None:
                 return granted
 
-            granted = await take_own(deferred)
-            if granted is not None:
-                return granted
+        granted = await take_free(ordinary)
+        if granted is not None:
+            return granted
 
-            granted = await take_fallback(ordinary)
-            if granted is not None:
-                return granted
-
-        if not home_blocked and not await self._any_daily_room(session, day, ordinary):
+        if not await self._any_daily_room(session, day, ordinary):
             if not reserve:
                 raise DailyQuotaExhaustedError(
                     f"All {self.key_count} key(s) exhausted across {len(ordinary)} "
@@ -829,10 +617,11 @@ class QuotaGovernor:
                 "reserve ladder (%s). The day's thinking budget is spent, not merely busy.",
                 ", ".join(rung.model for rung in reserve),
             )
-            granted = await take_own(reserve)
-            if granted is not None:
-                return granted
-            granted = await take_fallback(reserve)
+            if claim.key_index is not None:
+                granted = await take(claim.key_index, reserve)
+                if granted is not None:
+                    return granted
+            granted = await take_free(reserve)
             if granted is not None:
                 return granted
             if not await self._any_daily_room(session, day, reserve):
@@ -842,29 +631,22 @@ class QuotaGovernor:
                     f"reserve included"
                 )
 
-        # Somewhere has budget; it is owned by another unit of work, in a
+        # Somewhere has budget; it is claimed by another unit of work, in a
         # cooldown, or inside its own minute. `waits` only covers cells this
         # scan actually looked at -- a key held by someone else is never
         # examined, so its release has no deadline to offer and the cap is what
         # bounds the wait instead. Which of the three it was travels with the
         # duration; see `_ClaimWait` for why that is not one fact.
-        if leased:
-            lease = claim.lease
-            assert lease is not None
-            free_count = len(claims.reserve_keys())
-            other_count = claims.other_holders(lease.key_indices, claim)
-        else:
-            # EXCLUDE this claim's own key: it is neither something to wait for
-            # nor somewhere to move to, and counting it as "free" is what made an
-            # earlier version of the log read "1 free" about a key that had just
-            # refused the call.
-            free_count = sum(1 for key in range(self.key_count) if claims.is_free(key))
-            held_by_me = 1 if claim.key_index is not None else 0
-            other_count = self.key_count - free_count - held_by_me
+        # Both counts EXCLUDE this claim's own key: it is neither something to
+        # wait for nor somewhere to move to, and counting it as "free" is what
+        # made an earlier version of the log read "1 free" about a key that had
+        # just refused the call.
+        unowned = sum(1 for key in range(self.key_count) if claims.is_free(key))
+        held_by_me = 1 if claim.key_index is not None else 0
         return _ClaimWait(
             seconds=max(0.5, min(min(waits.values()) + 0.2 if waits else 5.0, 60.0)),
-            other_claims=other_count,
-            free_keys=free_count,
+            other_claims=self.key_count - unowned - held_by_me,
+            free_keys=unowned,
             throttled_cells=len(waits),
         )
 

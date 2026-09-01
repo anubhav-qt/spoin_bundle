@@ -156,31 +156,6 @@ def test_pool_thresholds_have_a_gap() -> None:
     assert Settings().pool_thresholds_are_sane
 
 
-def test_gemini_key_pool_size_is_enforced_exactly() -> None:
-    """ADR-0078: the queue packer divides `GEMINI_KEY_POOL_SIZE` keys between
-    concurrent topics, so a short list is silent capacity loss. `Settings` must
-    reject it at construction when the real backend is selected -- and must NOT
-    care for `fake`/`local`, which have no key pool."""
-
-    import pytest
-
-    from spoin.core.config import GEMINI_KEY_POOL_SIZE, Settings
-
-    keys = ",".join(f"k{i}" for i in range(GEMINI_KEY_POOL_SIZE))
-    ok = Settings(_env_file=None, generator="gemini", gemini_api_keys=keys)  # type: ignore[call-arg]
-    assert ok.gemini_pool_size == GEMINI_KEY_POOL_SIZE
-
-    with pytest.raises(ValueError, match="GEMINI_KEY_POOL_SIZE"):
-        Settings(  # type: ignore[call-arg]
-            _env_file=None,
-            generator="gemini",
-            gemini_api_keys=",".join(f"k{i}" for i in range(GEMINI_KEY_POOL_SIZE - 1)),
-        )
-
-    # `fake` never touches a key -- a short (or empty) list is fine.
-    assert Settings(_env_file=None, generator="fake", gemini_api_keys="k0,k1").gemini_pool_size == 2  # type: ignore[call-arg]
-
-
 def test_imported_font_reads_are_scoped_to_the_owner() -> None:
     """ADR-0070: `user_font` is the first per-user binary the API serves. Every
     function in `profile/preferences.py` that touches `UserFont` must also

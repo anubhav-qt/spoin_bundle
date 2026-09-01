@@ -10,29 +10,16 @@ The same job functions run as a persistent loop once we are paying — a differe
 entrypoint over identical code, which is what "no accommodation may require a
 rewrite to undo" means in practice.
 
-**Jobs run CONCURRENTLY, packed by key budget (ADR-0078, supersedes ADR-0073).**
-A pass claims a batch of pending jobs (`generation_batch_size`) in
-priority-then-`created_at` order and marks them `running`, then (ADR-0081)
-**generates a curriculum for every claimed fresh topic** -- bounded by
-`curriculum_concurrency` -- so admission sees a real `N` instead of a guess.
-Only THEN does it admit them in claim order while their key demand fits the
-pool: each topic wants `N` keys, where `N` is the most subtopics in any one of
-its difficulty tiers (a topic still without a curriculum -- its phase hit quota
--- falls back to the provisional `settings.default_topic_key_budget`).
-Admission stops adding a job once `sum(N) > pool_size`, skipping past one that
-would overflow to try smaller ones behind it; jobs left unadmitted are demoted
-back to `pending` for the next pass. The
-admitted set runs together via `asyncio.gather`, each job on its OWN DB session,
-one shared `ContentGenerator` so a single `KeyClaimRegistry` governs every
-lease plus the shared reserve. One job's exception marks only that job
-`failed`/`pending`; failure isolation is per-job. Within a run the pipeline's
-LangGraph concurrency (ADR-0024) fans out per subtopic group, each claiming a
-key from its topic's lease (ADR-0074 + ADR-0078).
-
-ADR-0073's strictly-sequential loop was chosen so progress panels finished in
-request order; the owner has since asked for topic-level parallelism against a
-100+ key pool, which this restores (the pre-ADR-0073 `gather` shape, now with
-key-budget admission in front of it).
+**Jobs run ONE AT A TIME (ADR-0073).** A pass claims a batch of pending jobs
+(`generation_batch_size`) but then runs them strictly sequentially, in
+priority-then-`created_at` order, each on its OWN DB session. So topics finish
+in the order they were requested — the whole batch a user adds from the app
+generates one after another, not all at once. One job's exception marks only
+that job `failed`/`pending` and the loop moves to the next; failure isolation is
+per-job either way. The pipeline's own LangGraph concurrency (ADR-0024) still
+fans out WITHIN a single topic's run, bounded since ADR-0074 by how many API
+keys there are: a subtopic group claims one key for its whole card run, so at
+most one group per key is ever in flight.
 """
 
 from __future__ import annotations
@@ -45,16 +32,14 @@ from datetime import UTC, datetime
 from typing import Any, cast
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from spoin.core.config import Settings, get_settings
+from spoin.core.config import get_settings
 from spoin.core.db import get_engine, session_scope
-from spoin.domain.models import GenerationJob, Topic
+from spoin.domain.models import GenerationJob
 from spoin.embeddings import Embedder, get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline import run_generation_pipeline
-from spoin.generation.pipeline.persistence import ensure_curriculum, topic_tier_width
 from spoin.generation.quota import (
     AllCellsThrottledError,
     AllModelsUnavailableError,
@@ -83,7 +68,6 @@ async def _run_job(
     card_id: uuid.UUID | None,
     generator: ContentGenerator,
     embedder: Embedder,
-    key_budget: int = 1,
 ) -> None:
     """One job, start to finish, on its own session throughout — including the
     status write-back, so a crash between generation and write-back can't leave
@@ -111,12 +95,7 @@ async def _run_job(
 
         async with session_scope() as session:
             report = await run_generation_pipeline(
-                session,
-                generator,
-                embedder,
-                settings,
-                topic_ids=[topic_id],
-                key_budgets={topic_id: key_budget},
+                session, generator, embedder, settings, topic_ids=[topic_id]
             )
             job = await session.get(GenerationJob, job_id)
             assert job is not None
@@ -158,123 +137,44 @@ async def _run_job(
                 job.last_error = str(exc)[:2000]
 
 
-async def _admit_by_key_budget(
-    session: AsyncSession,
-    pending: list[GenerationJob],
-    *,
-    pool_size: int,
-    default_budget: int,
-) -> list[tuple[GenerationJob, int]]:
-    """ADR-0078's queue packer: walk `pending` in claim order and admit each job
-    while the running sum of key demand fits `pool_size`, skipping past one that
-    would overflow so smaller jobs behind it still get a turn.
-
-    `pool_size < 1` (no real key pool -- the `fake` backend, most tests) means
-    "no packing": admit everything with a nominal budget of 1.
-
-    Repair jobs (ADR-0076) take no key lease, so they always admit and cost 0.
-    """
-
-    admitted: list[tuple[GenerationJob, int]] = []
-    if pool_size < 1:
-        return [(job, 1) for job in pending]
-
-    running = 0
-    for job in pending:
-        if job.kind == "repair":
-            admitted.append((job, 0))
-            continue
-        width = await topic_tier_width(session, job.topic_id)
-        want = max(1, min(pool_size, width if width is not None else default_budget))
-        if running + want > pool_size:
-            logger.info(
-                "worker: job %s (topic=%s) wants %d key(s), %d/%d already committed -- "
-                "deferring to the next pass",
-                job.id,
-                job.topic_id,
-                want,
-                running,
-                pool_size,
-            )
-            continue
-        running += want
-        admitted.append((job, want))
-    return admitted
-
-
-async def _ensure_curricula(
-    generator: ContentGenerator, settings: Settings, topic_ids: list[uuid.UUID]
-) -> None:
-    """ADR-0081 curriculum phase: give every fresh topic a curriculum BEFORE
-    key-budget admission, so `topic_tier_width` returns a real number when the
-    topic is leased rather than the provisional `default_topic_key_budget` --
-    which over-admits (many topics fit at budget 8) and then starves leases when
-    the real widths land. One thinking-pool call per topic, bounded by
-    `curriculum_concurrency`. A per-topic failure (quota, malformed response) is
-    logged and left: that topic then admits at the provisional budget, exactly
-    the pre-ADR-0081 path, and `resolve_and_plan_topic` still generates its
-    curriculum inline as the fallback."""
-
-    if not topic_ids:
-        return
-    sem = asyncio.Semaphore(max(1, settings.curriculum_concurrency))
-
-    async def _one(topic_id: uuid.UUID) -> None:
-        async with sem, session_scope() as session:
-            topic = await session.get(Topic, topic_id)
-            if topic is None or topic.curriculum_generated_at is not None:
-                return
-            try:
-                draft = await ensure_curriculum(session, generator, settings, topic)
-            except QuotaExhaustedError as exc:
-                logger.info(
-                    "curriculum phase: topic %s deferred to inline generation -- %s", topic_id, exc
-                )
-                return
-            except Exception:
-                logger.exception(
-                    "curriculum phase: topic %s failed -- falls back to inline", topic_id
-                )
-                return
-            if draft is not None:
-                logger.info(
-                    "curriculum phase: topic %s -- %d subtopic group(s)",
-                    topic_id,
-                    len(draft.subtopics),
-                )
-
-    await asyncio.gather(*(_one(topic_id) for topic_id in topic_ids))
-
-
 async def run_once() -> int:
-    """Claim pending jobs (highest priority first), generate any missing
-    curricula (ADR-0081), admit as many as the key pool holds (ADR-0078), then
-    run the admitted set concurrently with per-job isolation.
+    """Claim whatever is pending, highest priority first, then run the claimed
+    jobs ONE AT A TIME in that order (ADR-0073), with per-job isolation.
 
-    Returns the number of jobs dispatched (attempted, not necessarily succeeded —
+    Returns the number of jobs processed (attempted, not necessarily succeeded —
     see each job's own `status`/`last_error` for outcome).
     """
 
     settings = get_settings()
     logger.info("worker pass starting (generator=%s)", settings.generator)
 
-    # --- Phase 1: claim, mark running, commit -------------------------------
-    # Marked `running` (not just `FOR UPDATE`-locked) so an overlapping pass --
-    # `--watch` lapping itself, a cron pass landing on a slow one, a second
-    # replica -- cannot re-dispatch these while the curriculum phase runs. Plain
-    # `FOR UPDATE`, not SKIP LOCKED: on CockroachDB SKIP LOCKED also skips a
-    # freshly-committed row whose write intent hasn't resolved (0016 spike),
-    # silently under-claiming. A crash between here and phase 3 leaves these
-    # `running` (an operational concern for later, same as `_run_job`'s note);
-    # the window is now the curriculum phase's duration, not milliseconds.
     async with session_scope() as session:
         pending = (
             (
                 await session.execute(
                     select(GenerationJob)
                     .where(GenerationJob.status == "pending")
+                    # Prioritised, not FIFO (ADR-0003 §6): a demand-triggered fill
+                    # (a real user is waiting) outranks speculative background
+                    # work. When quota runs out, low-priority work waits for
+                    # tomorrow rather than everyone starving equally.
                     .order_by(GenerationJob.priority.desc(), GenerationJob.created_at)
                     .limit(settings.generation_batch_size)
+                    # Two passes that overlap -- `--watch` lapping itself, a cron
+                    # pass landing on a slow one, or a second replica -- must not
+                    # both dispatch the same `pending` rows: that is duplicate
+                    # generation billed twice against the quota ADR-0028 protects.
+                    # Plain `FOR UPDATE` (not SKIP LOCKED): this claim txn is
+                    # short -- lock the rows, set `status='running'`, commit; the
+                    # generation itself runs in separate txns after this `with`
+                    # block closes. So a second overlapping pass blocks for those
+                    # few milliseconds, then its own `WHERE status='pending'`
+                    # re-reads and finds these rows `running` -- nothing new to
+                    # claim, no double-dispatch. SKIP LOCKED was dropped because
+                    # on CockroachDB it also skips a freshly-committed, unlocked
+                    # row whose write intent has not yet resolved (0016 spike),
+                    # silently under-claiming; plain `FOR UPDATE` waits for that
+                    # intent instead. Standard on Postgres too.
                     .with_for_update()
                 )
             )
@@ -284,64 +184,22 @@ async def run_once() -> int:
         if not pending:
             logger.info("nothing to do")
             return 0
-        claimed_rows = [(job.id, job.topic_id, job.kind, job.card_id) for job in pending]
+
+        # Claim now, in this same transaction, so a crash before dispatch
+        # doesn't leave these silently re-claimable as `pending` next pass.
+        claimed = [(job.id, job.topic_id, job.kind, job.card_id) for job in pending]
         for job in pending:
             job.status = "running"
 
     generator = get_content_generator()
-
-    # --- Phase 2: curriculum for every fresh non-repair topic (ADR-0081) ----
-    await _ensure_curricula(
-        generator,
-        settings,
-        [topic_id for _job_id, topic_id, kind, _card_id in claimed_rows if kind != "repair"],
-    )
-
-    # --- Phase 3: admit by key budget, now that real tier widths are known --
-    # Whatever doesn't fit is demoted back to `pending` for the next pass (it
-    # was only `running` to hold it through phase 2). Re-fetched in the same
-    # claim order so `_admit_by_key_budget`'s walk is unchanged (ADR-0078).
-    async with session_scope() as session:
-        rows = (
-            (
-                await session.execute(
-                    select(GenerationJob)
-                    .where(GenerationJob.id.in_([job_id for job_id, *_ in claimed_rows]))
-                    .order_by(GenerationJob.priority.desc(), GenerationJob.created_at)
-                )
-            )
-            .scalars()
-            .all()
-        )
-        admitted = await _admit_by_key_budget(
-            session,
-            list(rows),
-            pool_size=settings.gemini_pool_size,
-            default_budget=settings.default_topic_key_budget,
-        )
-        admitted_ids = {job.id for job, _budget in admitted}
-        for job in rows:
-            if job.id not in admitted_ids:
-                job.status = "pending"
-        claimed = [
-            (job.id, job.topic_id, job.kind, job.card_id, budget) for job, budget in admitted
-        ]
-
-    if not claimed:
-        logger.info("worker: nothing fits the key pool this pass -- all deferred")
-        return 0
-
     embedder = get_embedder()
 
-    # Concurrent, in claim order (ADR-0078): the admitted topics all generate
-    # together, each on its own session and its own key lease. `_run_job`
-    # swallows its own exceptions, so one failure never aborts the gather.
-    await asyncio.gather(
-        *(
-            _run_job(job_id, topic_id, kind, card_id, generator, embedder, budget)
-            for job_id, topic_id, kind, card_id, budget in claimed
-        )
-    )
+    # Sequential, in claim order (ADR-0073): one topic finishes before the next
+    # starts, so a batch of topics added from the app generates in the order it
+    # was requested. `_run_job` swallows its own exceptions, so a failure just
+    # moves the loop on.
+    for job_id, topic_id, kind, card_id in claimed:
+        await _run_job(job_id, topic_id, kind, card_id, generator, embedder)
 
     logger.info("worker pass finished (%d job(s) processed)", len(claimed))
     return len(claimed)

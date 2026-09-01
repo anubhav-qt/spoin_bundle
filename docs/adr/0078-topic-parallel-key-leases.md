@@ -1,6 +1,20 @@
 # ADR-0078: Parallelize topics, one key lease each, with a shared reserve
 
-- **Status:** Accepted
+- **Status:** Reverted 2026-09-01 (same day). The code was rolled back to the
+  [ADR-0073](0073-worker-runs-generation-jobs-sequentially.md) sequential loop +
+  [ADR-0074](0074-key-per-subtopic-scheduling.md) in-topic scheduling that
+  [Run 8](../architecture/generation-pipeline-run-8-benchmark.md) proved
+  walk-away-safe. **Why:** running many topics at once multiplied per-minute
+  pressure on the Gemini free-tier RPM ceilings — with a large key pool, ~40+
+  concurrent subtopic-group branches burst the thinking rungs (rpm 5 / rpd 20)
+  into sustained 429 storms and per-day exhaustion, and the run stopped being
+  something you could start and leave. ADR-0081 was added the same day to patch
+  the fresh-topic over-admission hole this opened; it is reverted with this one.
+  The follow-on idea worth keeping from here: a **global in-flight LLM-call
+  semaphore** sized to real aggregate RPM, so concurrency is a bounded queue
+  rather than an unbounded fan-out — see
+  [the key-projects handoff](../handoff/next-key-projects-and-experiment-restore.md).
+- **Superseded-by (history):** rolled back to ADR-0073 / ADR-0074.
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
 - **Amended by:** [ADR-0081](0081-curriculum-as-a-worker-phase.md) -- the worker

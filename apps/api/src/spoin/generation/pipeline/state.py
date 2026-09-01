@@ -29,7 +29,6 @@ from spoin.domain.enums import CardType, Difficulty, RejectionStage
 from spoin.domain.models import RejectedCard
 from spoin.embeddings import Embedder
 from spoin.generation.base import CardDraft, ContentGenerator
-from spoin.generation.quota import TopicKeyLease
 
 logger = logging.getLogger("spoin.generation.pipeline")
 
@@ -280,25 +279,11 @@ class SubtopicCardsResult(TypedDict):
     target_questions: int
 
 
-class TopicJob(TypedDict):
-    """The outer fan-out's per-branch payload."""
-
-    topic_id: str
-    #: This topic's key-lease size for the run (ADR-0078) -- the worker's
-    #: allocation, or `settings.default_topic_key_budget` when it couldn't know
-    #: the tier width yet. `resolve_and_plan_topic` corrects it post-curriculum.
-    key_budget: int
-
-
 class PipelineState(TypedDict, total=False):
     #: Already-existing Topic ids (ADR-0025 decided that upstream).
     topic_ids: list[str]
-    #: topic_id -> key-lease size for the run (ADR-0078). Set once in
-    #: `run_generation_pipeline`; `fan_out_topics` copies each entry into the
-    #: matching `TopicJob`.
-    topic_key_budgets: dict[str, int]
     #: Only set on a per-branch Send invocation (outer fan-out).
-    topic_job: TopicJob
+    topic_job: dict[str, str]
     #: Globally accumulated across every topic branch -- used by gate_and_persist
     #: to build the final per-topic report. NOTE: this is also the only way
     #: `resolve_and_plan_topic` gets its own subtopics to a downstream fan-out --
@@ -341,14 +326,6 @@ class _Runtime:
     embedder: Embedder
     settings: Settings
     batch_id: uuid.UUID
-    #: topic_id -> the key lease that topic holds for this run (ADR-0078).
-    #: Populated by `resolve_and_plan_topic` once curriculum exists, read by the
-    #: subtopic-group branches and the question phase to scope their key claims,
-    #: and released in `gate_and_persist` / `run_generation_pipeline`'s finally.
-    #: A `Send`-spawned branch does not inherit the parent node's contextvars, so
-    #: the lease can't ride `CURRENT_KEY_CLAIM` -- it lives here on the shared
-    #: runtime instead, keyed by topic.
-    topic_leases: dict[str, TopicKeyLease] = field(default_factory=dict)
     topic_plan_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     #: topic_id -> curated-library entry ids already used by the ASCII fetcher
     #: for this topic (ADR-0080). Seeded from `topic_used_ascii_ids` on the first

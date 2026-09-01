@@ -1,17 +1,8 @@
 # ADR-0073: The worker runs generation jobs one at a time
 
-- **Status:** Superseded by [ADR-0078](0078-topic-parallel-key-leases.md)
+- **Status:** Accepted
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
-
-> **Superseded by [ADR-0078](0078-topic-parallel-key-leases.md) (2026-09-01).**
-> The owner asked for topic-level parallelism against a 100+ key pool. The worker
-> again runs its admitted jobs concurrently (`asyncio.gather`, the pre-this-ADR
-> shape), with a key-budget admission step in front: a topic is admitted while
-> `sum(N keys) <= pool_size`, where `N` is its widest difficulty tier. Per-job
-> session isolation and the quota-requeue path below are unchanged. The
-> "Alternatives considered" here (bounded pool, one-job-per-pass) informed
-> ADR-0078's packer.
 - **Amends:** the "per-job isolation" note in
   [`apps/api/src/spoin/worker/__main__.py`](../../apps/api/src/spoin/worker/__main__.py)
   and the concurrency implied by [ADR-0026](0026-one-shot-generation-to-completion.md) (one-shot

@@ -228,53 +228,6 @@ async def test_run_once_returns_zero_when_nothing_pending(session: AsyncSession)
     assert await worker_module.run_once() == 0
 
 
-async def test_run_once_defers_jobs_that_overrun_the_key_pool(
-    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """ADR-0078: a pass admits topics in claim order while their key demand fits
-    the pool, and leaves the overflow `pending` for the next pass. Here the pool
-    holds 3 keys and each topic wants 2, so only the first fits."""
-
-    pool_settings = Settings(  # type: ignore[call-arg]
-        _env_file=None, gemini_api_keys="k1,k2,k3", default_topic_key_budget=2
-    )
-    monkeypatch.setattr(worker_module, "get_settings", lambda: pool_settings)
-
-    async def _fixed_width(_session: AsyncSession, _topic_id: object) -> int:
-        return 2
-
-    monkeypatch.setattr(worker_module, "topic_tier_width", _fixed_width)
-
-    first = Topic(slug="pack-first", canonical_name="Pack First")
-    session.add(first)
-    await session.flush()
-    first_job = GenerationJob(topic_id=first.id, status="pending")
-    session.add(first_job)
-    await session.commit()
-
-    second = Topic(slug="pack-second", canonical_name="Pack Second")
-    session.add(second)
-    await session.flush()
-    second_job = GenerationJob(topic_id=second.id, status="pending")
-    session.add(second_job)
-    await session.commit()
-
-    processed = await worker_module.run_once()
-    assert processed == 1
-
-    await session.refresh(first_job)
-    await session.refresh(second_job)
-    assert first_job.status == "completed"
-    # Deferred, not touched at all -- still claimable next pass.
-    assert second_job.status == "pending"
-    assert second_job.attempts == 0
-
-    # Next pass, with the pool now free, drains it.
-    assert await worker_module.run_once() == 1
-    await session.refresh(second_job)
-    assert second_job.status == "completed"
-
-
 async def test_coalescing_lock_prevents_duplicate_pending_jobs_for_same_topic(
     session: AsyncSession,
 ) -> None:

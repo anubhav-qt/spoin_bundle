@@ -24,6 +24,7 @@ from typing import Any
 from pydantic import BaseModel, Field, model_validator
 
 from spoin.domain.enums import CardType, Difficulty
+from spoin.generation.quota import TopicKeyLease
 
 
 def _sanitize_null_bytes(val: Any) -> Any:
@@ -442,9 +443,12 @@ class ContentGenerator(ABC):
     """The only interface the rest of the codebase knows about."""
 
     @asynccontextmanager
-    async def claimed_key_scope(self) -> AsyncIterator[None]:
+    async def claimed_key_scope(self, *, lease: TopicKeyLease | None = None) -> AsyncIterator[None]:
         """Mark a unit of work that should run on ONE API key start to finish
-        (ADR-0074) -- in practice one subtopic group's whole card run.
+        (ADR-0074) -- in practice one subtopic branch's whole card run.
+
+        `lease` (ADR-0078) confines the key choice to one topic's assigned
+        slice of the pool; `None` keeps ADR-0074's whole-pool behaviour.
 
         Not abstract, and a no-op by default: a backend without per-key quota
         has nothing to claim, and the pipeline must not have to know which kind
@@ -458,6 +462,24 @@ class ContentGenerator(ABC):
         """
 
         yield
+
+    async def lease_topic_keys(self, want: int) -> TopicKeyLease:
+        """Reserve a topic's slice of the key pool for its whole run (ADR-0078).
+        A no-op empty lease by default -- see `claimed_key_scope`."""
+
+        return TopicKeyLease(lease_id=0)
+
+    async def adjust_topic_lease(self, lease: TopicKeyLease, want: int) -> None:
+        """Resize a lease once a fresh topic's real tier width is known
+        (ADR-0078). No-op by default -- an empty lease has nothing to resize."""
+
+        return None
+
+    async def release_topic_keys(self, lease: TopicKeyLease) -> None:
+        """Return a topic lease's keys to the pool (ADR-0078). No-op by default
+        -- an empty lease holds no keys."""
+
+        return None
 
     @abstractmethod
     async def generate_curriculum(

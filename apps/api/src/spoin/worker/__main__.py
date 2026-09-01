@@ -10,16 +10,25 @@ The same job functions run as a persistent loop once we are paying — a differe
 entrypoint over identical code, which is what "no accommodation may require a
 rewrite to undo" means in practice.
 
-**Jobs run ONE AT A TIME (ADR-0073).** A pass claims a batch of pending jobs
-(`generation_batch_size`) but then runs them strictly sequentially, in
-priority-then-`created_at` order, each on its OWN DB session. So topics finish
-in the order they were requested — the whole batch a user adds from the app
-generates one after another, not all at once. One job's exception marks only
-that job `failed`/`pending` and the loop moves to the next; failure isolation is
-per-job either way. The pipeline's own LangGraph concurrency (ADR-0024) still
-fans out WITHIN a single topic's run, bounded since ADR-0074 by how many API
-keys there are: a subtopic group claims one key for its whole card run, so at
-most one group per key is ever in flight.
+**Jobs run CONCURRENTLY, packed by key budget (ADR-0078, supersedes ADR-0073).**
+A pass claims a batch of pending jobs (`generation_batch_size`) in
+priority-then-`created_at` order, then admits them in that order while their key
+demand fits the pool: each topic wants `N` keys, where `N` is the most subtopics
+in any one of its difficulty tiers (a topic with no curriculum yet gets a
+provisional `settings.default_topic_key_budget`). Admission stops adding a job
+once `sum(N) > pool_size`, skipping past one that would overflow to try smaller
+ones behind it; jobs left unadmitted stay `pending` for the next pass. The
+admitted set runs together via `asyncio.gather`, each job on its OWN DB session,
+one shared `ContentGenerator` so a single `KeyClaimRegistry` governs every
+lease plus the shared reserve. One job's exception marks only that job
+`failed`/`pending`; failure isolation is per-job. Within a run the pipeline's
+LangGraph concurrency (ADR-0024) fans out per subtopic group, each claiming a
+key from its topic's lease (ADR-0074 + ADR-0078).
+
+ADR-0073's strictly-sequential loop was chosen so progress panels finished in
+request order; the owner has since asked for topic-level parallelism against a
+100+ key pool, which this restores (the pre-ADR-0073 `gather` shape, now with
+key-budget admission in front of it).
 """
 
 from __future__ import annotations
@@ -32,6 +41,7 @@ from datetime import UTC, datetime
 from typing import Any, cast
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine, session_scope
@@ -40,6 +50,7 @@ from spoin.embeddings import Embedder, get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline import run_generation_pipeline
+from spoin.generation.pipeline.persistence import topic_tier_width
 from spoin.generation.quota import (
     AllCellsThrottledError,
     AllModelsUnavailableError,
@@ -68,6 +79,7 @@ async def _run_job(
     card_id: uuid.UUID | None,
     generator: ContentGenerator,
     embedder: Embedder,
+    key_budget: int = 1,
 ) -> None:
     """One job, start to finish, on its own session throughout — including the
     status write-back, so a crash between generation and write-back can't leave
@@ -95,7 +107,12 @@ async def _run_job(
 
         async with session_scope() as session:
             report = await run_generation_pipeline(
-                session, generator, embedder, settings, topic_ids=[topic_id]
+                session,
+                generator,
+                embedder,
+                settings,
+                topic_ids=[topic_id],
+                key_budgets={topic_id: key_budget},
             )
             job = await session.get(GenerationJob, job_id)
             assert job is not None
@@ -137,11 +154,56 @@ async def _run_job(
                 job.last_error = str(exc)[:2000]
 
 
-async def run_once() -> int:
-    """Claim whatever is pending, highest priority first, then run the claimed
-    jobs ONE AT A TIME in that order (ADR-0073), with per-job isolation.
+async def _admit_by_key_budget(
+    session: AsyncSession,
+    pending: list[GenerationJob],
+    *,
+    pool_size: int,
+    default_budget: int,
+) -> list[tuple[GenerationJob, int]]:
+    """ADR-0078's queue packer: walk `pending` in claim order and admit each job
+    while the running sum of key demand fits `pool_size`, skipping past one that
+    would overflow so smaller jobs behind it still get a turn.
 
-    Returns the number of jobs processed (attempted, not necessarily succeeded —
+    `pool_size < 1` (no real key pool -- the `fake` backend, most tests) means
+    "no packing": admit everything with a nominal budget of 1.
+
+    Repair jobs (ADR-0076) take no key lease, so they always admit and cost 0.
+    """
+
+    admitted: list[tuple[GenerationJob, int]] = []
+    if pool_size < 1:
+        return [(job, 1) for job in pending]
+
+    running = 0
+    for job in pending:
+        if job.kind == "repair":
+            admitted.append((job, 0))
+            continue
+        width = await topic_tier_width(session, job.topic_id)
+        want = max(1, min(pool_size, width if width is not None else default_budget))
+        if running + want > pool_size:
+            logger.info(
+                "worker: job %s (topic=%s) wants %d key(s), %d/%d already committed -- "
+                "deferring to the next pass",
+                job.id,
+                job.topic_id,
+                want,
+                running,
+                pool_size,
+            )
+            continue
+        running += want
+        admitted.append((job, want))
+    return admitted
+
+
+async def run_once() -> int:
+    """Claim whatever is pending, highest priority first, admit as many as the
+    key pool can hold at once (ADR-0078), then run the admitted set concurrently
+    with per-job isolation.
+
+    Returns the number of jobs dispatched (attempted, not necessarily succeeded —
     see each job's own `status`/`last_error` for outcome).
     """
 
@@ -185,21 +247,42 @@ async def run_once() -> int:
             logger.info("nothing to do")
             return 0
 
+        # Admit as many as the key pool holds at once (ADR-0078). Unadmitted
+        # rows are simply left `pending` -- the FOR UPDATE lock releases when
+        # this txn commits and the next pass re-reads them. `gemini_pool_size`
+        # is the exact key count (`GEMINI_KEY_POOL_SIZE`, validated at boot for
+        # the gemini backend); `< 1` for `fake`/`local` means "no packing".
+        pool_size = settings.gemini_pool_size
+        admitted = await _admit_by_key_budget(
+            session,
+            list(pending),
+            pool_size=pool_size,
+            default_budget=settings.default_topic_key_budget,
+        )
+        if not admitted:
+            logger.info("worker: nothing fits the key pool this pass -- all deferred")
+            return 0
+
         # Claim now, in this same transaction, so a crash before dispatch
         # doesn't leave these silently re-claimable as `pending` next pass.
-        claimed = [(job.id, job.topic_id, job.kind, job.card_id) for job in pending]
-        for job in pending:
+        claimed = [
+            (job.id, job.topic_id, job.kind, job.card_id, budget) for job, budget in admitted
+        ]
+        for job, _budget in admitted:
             job.status = "running"
 
     generator = get_content_generator()
     embedder = get_embedder()
 
-    # Sequential, in claim order (ADR-0073): one topic finishes before the next
-    # starts, so a batch of topics added from the app generates in the order it
-    # was requested. `_run_job` swallows its own exceptions, so a failure just
-    # moves the loop on.
-    for job_id, topic_id, kind, card_id in claimed:
-        await _run_job(job_id, topic_id, kind, card_id, generator, embedder)
+    # Concurrent, in claim order (ADR-0078): the admitted topics all generate
+    # together, each on its own session and its own key lease. `_run_job`
+    # swallows its own exceptions, so one failure never aborts the gather.
+    await asyncio.gather(
+        *(
+            _run_job(job_id, topic_id, kind, card_id, generator, embedder, budget)
+            for job_id, topic_id, kind, card_id, budget in claimed
+        )
+    )
 
     logger.info("worker pass finished (%d job(s) processed)", len(claimed))
     return len(claimed)

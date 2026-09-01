@@ -54,13 +54,31 @@
 - [x] **LangChain** (663 cards, 301 questions across 36 subtopics) — Exit Code 0
   - *Database*: `spoin_db_2`
 
-### In Progress
-- [ ] **The Epic of Gilgamesh** — 520 / 640 cards (81.2%), 0 / 280 questions
+- [x] **The Epic of Gilgamesh** (638 cards, 287 questions across 32 subtopics) — Exit Code 0
   - *Database*: `spoin_db_2`
-  - Paused: Daily thinking ladder quota reached across all 33 keys. Ready to resume once UTC day resets.
+- [x] **Backend Engineering** (828 cards, 295 questions across 53 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+- [x] **Mythology** (672 cards, 300 questions across 44 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+- [x] **Practical Law** (628 cards, 294 questions across 42 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+- [x] **Astronomy** (788 cards, 306 questions across 46 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+- [x] **Psychology** (715 cards, 294 questions across 30 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+
+- [x] **World History** (692 cards, 308 questions across 44 subtopics) — Exit Code 0
+  - *Database*: `spoin_db_2`
+
+### In Progress
+*None (Session finished for the day)*
 
 ### Next in Queue
-1. **FastAPI**
+1. **Game Development** (`Game Development::how to get started, use engines or make one from scratch, which engines, libraries, etc. to use, how to create our own indie games, etc.`)
+2. **Music Theory**
+3. **Human Biology**
+4. **Physics in Real Life** (`Physics in Real Life::everything about all the major and interesting things that happen due to physics in real life.`)
+5. **FastAPI**
 
 ---
 

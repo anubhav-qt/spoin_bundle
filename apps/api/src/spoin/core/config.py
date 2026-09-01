@@ -26,6 +26,16 @@ EmbedderBackend = Literal["hash", "fastembed"]
 #: turns into a startup failure rather than a silently-forgeable token.
 _INSECURE_DEFAULT_JWT_SECRET = "CHANGE-ME-IN-PRODUCTION-KEY-MUST-BE-32-BYTES"
 
+#: The exact size of the Gemini key pool (ADR-0078). This is the number the
+#: worker's queue packer divides between concurrent topics, so a silently
+#: dropped key is a silent loss of generation capacity -- and, worse, one that
+#: reads downstream as a quota problem rather than a config one (see the
+#: per-minute-vs-per-day 429 confusion ADR-0058 fixed). `Settings` fails startup
+#: when `SPOIN_GENERATOR=gemini` and the configured list is not exactly this
+#: long, so the mismatch is caught at boot instead of inferred from a short run.
+#: Bump this in the same commit that adds or removes keys from `.env`.
+GEMINI_KEY_POOL_SIZE = 119
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -114,6 +124,13 @@ class Settings(BaseSettings):
     gemini_request_timeout_seconds: float = 180.0
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
+    #: Provisional key-lease size (ADR-0078) for a topic whose curriculum has not
+    #: been generated yet, so its real tier width -- `max` subtopics in any one
+    #: difficulty tier -- is unknown at admission time. `resolve_and_plan_topic`
+    #: recomputes the true width once curriculum lands and grows/shrinks the
+    #: lease, so this only affects how densely the worker packs the FIRST pass
+    #: that touches a brand-new topic.
+    default_topic_key_budget: int = 8
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.
@@ -355,6 +372,34 @@ class Settings(BaseSettings):
     @property
     def gemini_api_key_list(self) -> list[str]:
         return [key.strip() for key in self.gemini_api_keys.split(",") if key.strip()]
+
+    @property
+    def gemini_pool_size(self) -> int:
+        """The key-pool size the ADR-0078 packer divides between concurrent
+        topics. For the `gemini` backend the `_gemini_key_pool_is_exact`
+        validator guarantees this equals `GEMINI_KEY_POOL_SIZE`; for `fake` /
+        `local` it is just however many keys (usually zero) are configured, and
+        the packer treats `< 1` as "no packing"."""
+
+        return len(self.gemini_api_key_list)
+
+    @model_validator(mode="after")
+    def _gemini_key_pool_is_exact(self) -> Settings:
+        """ADR-0078: the packer's math is only trustworthy if the pool is the
+        size it thinks it is. When the real backend is selected, require exactly
+        `GEMINI_KEY_POOL_SIZE` keys -- a shorter list is capacity lost between
+        `.env` and this process, and this turns that into a boot failure rather
+        than a run that quietly packs fewer topics and looks quota-bound."""
+
+        if self.generator == "gemini":
+            actual = len(self.gemini_api_key_list)
+            if actual != GEMINI_KEY_POOL_SIZE:
+                raise ValueError(
+                    f"SPOIN_GEMINI_API_KEYS has {actual} key(s), but "
+                    f"GEMINI_KEY_POOL_SIZE is {GEMINI_KEY_POOL_SIZE} (config.py). "
+                    "Update one to match the other in the same commit."
+                )
+        return self
 
     @property
     def pool_thresholds_are_sane(self) -> bool:

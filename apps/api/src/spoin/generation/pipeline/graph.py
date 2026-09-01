@@ -49,17 +49,24 @@ async def run_generation_pipeline(
     settings: Settings,
     *,
     topic_ids: list[uuid.UUID],
+    key_budgets: dict[uuid.UUID, int] | None = None,
 ) -> dict[str, object]:
     """ADR-0026's one-shot run: curriculum (if needed) -> cards -> questions,
     for topics that ALREADY EXIST (see `match_and_create_topics`). Callable
     directly from a CLI script (today) or a worker job handler (task 0008) --
     this function has no idea which is calling it, or whether a topic_id is
     brand new or a retry of one whose earlier attempt failed partway.
+
+    `key_budgets` (ADR-0078) is the worker's per-topic key allocation, computed
+    from each topic's widest difficulty tier. Absent (the CLI) or missing an
+    entry means "use `settings.default_topic_key_budget`" -- the run corrects it
+    against the real tier width once curriculum exists.
     """
 
     if not topic_ids:
         return {"topics": []}
 
+    key_budgets = key_budgets or {}
     graph = _build_graph()
     runtime = _Runtime(
         session=session,
@@ -70,9 +77,25 @@ async def run_generation_pipeline(
     )
     initial_state: PipelineState = {
         "topic_ids": [str(topic_id) for topic_id in topic_ids],
+        "topic_key_budgets": {
+            str(topic_id): key_budgets.get(topic_id, settings.default_topic_key_budget)
+            for topic_id in topic_ids
+        },
         "topic_plans": [],
         "item_reports": [],
     }
-    final_state = await graph.ainvoke(initial_state, config={"configurable": {"runtime": runtime}})
+    try:
+        final_state = await graph.ainvoke(
+            initial_state, config={"configurable": {"runtime": runtime}}
+        )
+    finally:
+        # Every lease this run took is freed here, success or crash, so a run
+        # that dies mid-flight doesn't strand keys the next worker pass needs
+        # (ADR-0078). `gate_and_persist` releases on the happy path too; this is
+        # the backstop and is idempotent (release of an already-empty lease is a
+        # no-op).
+        for lease in list(runtime.topic_leases.values()):
+            await generator.release_topic_keys(lease)
+        runtime.topic_leases.clear()
     report: dict[str, object] = final_state["report"]
     return report

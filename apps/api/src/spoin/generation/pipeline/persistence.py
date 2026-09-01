@@ -14,7 +14,7 @@ from __future__ import annotations
 import uuid
 from typing import cast
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.domain.enums import CardStatus, Difficulty, QuestionStatus, RejectionStage, TopicEdgeKind
@@ -141,6 +141,31 @@ async def _reuse_or_create_subtopic(
     session.add(subtopic)
     await session.flush()
     return subtopic, False
+
+
+async def topic_tier_width(session: AsyncSession, topic_id: uuid.UUID) -> int | None:
+    """The topic's key budget (ADR-0078): the largest number of subtopics in any
+    one difficulty tier -- the widest a single tier can ever fan out, and
+    therefore how many keys the topic can actually keep busy at once.
+
+    `None` when the topic has no curriculum yet (no subtopic rows): the caller
+    falls back to `settings.default_topic_key_budget` and the real width is
+    computed once `resolve_and_plan_topic` has persisted the curriculum.
+    """
+
+    rows = (
+        (
+            await session.execute(
+                select(func.count())
+                .select_from(Subtopic)
+                .where(Subtopic.topic_id == topic_id)
+                .group_by(Subtopic.difficulty)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return max(rows) if rows else None
 
 
 async def _load_subtopic_plans(

@@ -20,6 +20,10 @@ The first three are implemented in `generation/pipeline.py` (a LangGraph graph â
 [generation-pipeline.md](../../docs/architecture/generation-pipeline.md)), and this
 package's own entrypoint (`worker/__main__.py`) claims pending `GenerationJob` rows and
 runs it â€” see task [0008](../../docs/tasks/0008-wire-generation-job-worker.md), closed.
+A pass **admits as many claimed jobs as the API key pool holds at once**
+([ADR-0078](../../docs/adr/0078-topic-parallel-key-leases.md): each topic wants `N` keys
+= its widest difficulty tier; admit while `sum(N) <= pool_size`, defer the rest) and runs
+the admitted set concurrently, each job on its own session and its own key lease.
 `python -m spoin.generate_topics` still exists as a direct CLI path that bypasses the
 job queue entirely (useful for one-off scripted runs), but the app's own "type a topic
 in the UI" path now goes through `GenerationJob` end to end.

@@ -49,6 +49,7 @@ from spoin.generation.pipeline.persistence import (
     _seed_progress,
     _update_subtopic_progress,
     load_cards_missing_questions,
+    topic_tier_width,
 )
 from spoin.generation.pipeline.state import (
     _NO_DIFFICULTY_EXAMPLES,
@@ -279,6 +280,38 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         subtopics=subtopic_plans,
     )
 
+    # Take this topic's key lease (ADR-0078) now that its curriculum exists, so
+    # the real tier width -- the most subtopics in any one difficulty tier, and
+    # the widest a tier can fan out -- is known rather than the worker's
+    # pre-curriculum guess. Every subtopic branch below claims a key only from
+    # this lease; a topic that gets zero keys (the pool was fully leased by
+    # siblings) falls back to the whole-pool scan rather than deadlocking.
+    topic_id_str = str(topic.id)
+    if topic_id_str not in runtime.topic_leases:
+        real_width = await topic_tier_width(runtime.session, topic.id)
+        want = real_width if real_width is not None else state["topic_job"].get("key_budget", 1)
+        lease = await runtime.generator.lease_topic_keys(max(1, want))
+        if lease.key_indices:
+            runtime.topic_leases[topic_id_str] = lease
+            logger.info(
+                "topic '%s': key lease -- wanted %d, assigned %d key(s) (ADR-0078)",
+                topic.canonical_name,
+                want,
+                len(lease.key_indices),
+            )
+        elif lease.lease_id == 0:
+            # The no-op base implementation -- a backend without a real key pool
+            # (`fake`, local). Nothing to lease, nothing to warn about.
+            await runtime.generator.release_topic_keys(lease)
+        else:
+            await runtime.generator.release_topic_keys(lease)
+            logger.warning(
+                "topic '%s': no keys free to lease (wanted %d) -- this topic's branches "
+                "will scan the whole pool instead (ADR-0078 fallback)",
+                topic.canonical_name,
+                want,
+            )
+
     groups: dict[str, list[SubtopicPlan]] = {}
     for subtopic_plan in subtopic_plans:
         groups.setdefault(subtopic_plan["subtopic_group_id"], []).append(subtopic_plan)
@@ -307,8 +340,12 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
 
 
 def fan_out_topics(state: PipelineState) -> list[Send]:
+    budgets = state.get("topic_key_budgets", {})
     return [
-        Send("resolve_and_plan_topic", {"topic_job": {"topic_id": topic_id}})
+        Send(
+            "resolve_and_plan_topic",
+            {"topic_job": {"topic_id": topic_id, "key_budget": budgets.get(topic_id, 1)}},
+        )
         for topic_id in state["topic_ids"]
     ]
 
@@ -340,9 +377,13 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     # ADR-0074: this whole branch -- planning, every draft round, both gate
     # passes, every redraft -- runs on ONE key, claimed here and released when
     # the branch returns or raises. With one caller per key no cell can be
-    # raced, so the group's own calls cannot push a cell past its rpm; the
-    # ceiling on how many branches run at once is simply the key count.
-    async with runtime.generator.claimed_key_scope():
+    # raced, so the group's own calls cannot push a cell past its rpm.
+    # ADR-0078: the key is claimed from THIS topic's lease, not the whole pool,
+    # so concurrent topics can't contend for each other's keys; a group finding
+    # every lease key held by a sibling group waits (leases are sized to the
+    # widest tier, so #groups can still exceed the lease when groups span tiers).
+    lease = runtime.topic_leases.get(job["topic_id"])
+    async with runtime.generator.claimed_key_scope(lease=lease):
         return await _generate_subtopic_cards(runtime, job)
 
 
@@ -1663,7 +1704,9 @@ async def _run_topic_question_phase(
         #: already-proven content the backfill framing describes.
         new_cards = [entry for entry in unquestioned if entry[0] in new_ids]
         backfill_cards = [entry for entry in unquestioned if entry[0] not in new_ids]
-        async with runtime.generator.claimed_key_scope():
+        # ADR-0078: the question phase runs on the topic's own key lease too, so
+        # it never contends with a concurrent topic's card writing.
+        async with runtime.generator.claimed_key_scope(lease=runtime.topic_leases.get(topic_id)):
             counts = await _run_question_phase(
                 runtime,
                 topic_id=topic_id,
@@ -1779,5 +1822,11 @@ async def gate_and_persist(  # type: ignore[no-untyped-def]
             for plan in state.get("topic_plans", []):
                 await _mark_progress_done(runtime, uuid.UUID(plan["topic_id"]))
             await runtime.session.commit()
+
+    # Hand every topic's leased keys back to the pool now the run's card AND
+    # question phases are done (ADR-0078). `run_generation_pipeline`'s finally
+    # is the backstop for a crash before this point; releasing twice is a no-op.
+    for topic_id_str in list(runtime.topic_leases):
+        await runtime.generator.release_topic_keys(runtime.topic_leases.pop(topic_id_str))
 
     return {"report": {"topics": topic_reports}}

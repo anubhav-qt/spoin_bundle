@@ -129,9 +129,16 @@ def _cosine(a: list[float], b: list[float]) -> float:
     return dot / (norm_a * norm_b)
 
 
-async def top_candidates(query: str, k: int = 10) -> list[AsciiLibraryEntry]:
+async def top_candidates(
+    query: str, k: int = 10, *, exclude_ids: frozenset[str] = frozenset()
+) -> list[AsciiLibraryEntry]:
     """The `k` library entries whose TITLE is most similar to `query` (the
-    planner's `asset_direction` for an ascii-typed card), ranked descending.
+    fetcher's `asset_direction` for an ascii-typed card), ranked descending.
+
+    `exclude_ids` (ADR-0080) is library entry ids already used somewhere in this
+    topic -- filtered out BEFORE ranking so a used scene never re-enters any
+    later candidate search in the same topic, not asked of the model. An id in
+    the set that isn't in the library is simply ignored.
 
     Returns `[]` for an empty query or an empty/unavailable library -- both
     are the caller's cue to fall back to unaided generation, not an error."""
@@ -143,7 +150,11 @@ async def top_candidates(query: str, k: int = 10) -> list[AsciiLibraryEntry]:
     embedder = get_embedder()
     index, query_vec = await asyncio.gather(_library_index(), embedder.aembed([query]))
     scored = sorted(
-        zip(library, index, strict=True),
+        (
+            (entry, vec)
+            for entry, vec in zip(library, index, strict=True)
+            if entry.id not in exclude_ids
+        ),
         key=lambda pair: _cosine(pair[1], query_vec[0]),
         reverse=True,
     )

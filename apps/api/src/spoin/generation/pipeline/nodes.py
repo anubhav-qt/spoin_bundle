@@ -31,10 +31,12 @@ from spoin.domain.enums import (
 )
 from spoin.domain.models import Card, CardStats, Question, Topic
 from spoin.generation.base import (
+    AsciiFetchQuery,
     CardCorrectionQuery,
     CardDraft,
     CardPlan,
     CardVerificationQuery,
+    FetchedAsciiScene,
 )
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
@@ -50,6 +52,7 @@ from spoin.generation.pipeline.persistence import (
     _update_subtopic_progress,
     load_cards_missing_questions,
     topic_tier_width,
+    topic_used_ascii_ids,
 )
 from spoin.generation.pipeline.state import (
     _NO_DIFFICULTY_EXAMPLES,
@@ -70,6 +73,7 @@ from spoin.generation.pipeline.state import (
     is_technical_topic,
     logger,
 )
+from spoin.generation.quota import QuotaExhaustedError
 
 
 async def _plan_tier_cards(
@@ -138,6 +142,110 @@ async def _plan_tier_cards(
         count,
     )
     return result.items
+
+
+async def _fetch_ascii_for_plans(
+    runtime: _Runtime,
+    *,
+    topic_id: str,
+    topic_name: str,
+    subtopic_title: str,
+    difficulty: Difficulty,
+    plan_pool: list[CardPlan],
+) -> None:
+    """ADR-0080: the fetch sub-step of planning. For each `ascii` brief in
+    `plan_pool`, pick a curated-library scene and attach it
+    (`CardPlan.fetched_scene`), so the writer leaves that card's art alone and
+    the pipeline stamps the fetched scene on the draft. A brief the fetcher
+    can't match keeps `fetched_scene=None` and free-draws.
+
+    Never fails the tier: a fetch error or empty result just means every ascii
+    card free-draws, exactly the pre-ADR-0080 path. `QuotaExhaustedError`
+    propagates like every other generator call's -- it is the run-level stop
+    signal, not a per-call failure.
+    """
+
+    ascii_plans = [
+        p for p in plan_pool if p.card_type.strip().lower() == CardType.ASCII.value
+    ]
+    if not ascii_plans:
+        return
+
+    # Snapshot the topic's already-used scene ids under the lock; seed it from
+    # the DB (active cards + rejected drafts) the first time a topic is fetched
+    # for this run. The LLM call itself runs outside the lock.
+    async with runtime.topic_ascii_lock:
+        used = runtime.topic_ascii_used.get(topic_id)
+        if used is None:
+            used = await topic_used_ascii_ids(runtime.session, uuid.UUID(topic_id))
+            runtime.topic_ascii_used[topic_id] = used
+        exclude = frozenset(used)
+
+    queries = [
+        AsciiFetchQuery(
+            index=n,
+            canonical_title=p.canonical_title,
+            asset_direction=p.asset_direction,
+            content_direction=p.content_direction,
+        )
+        for n, p in enumerate(ascii_plans)
+    ]
+    try:
+        result = await runtime.generator.fetch_ascii_scenes(
+            queries,
+            topic_name=topic_name,
+            subtopic_title=subtopic_title,
+            difficulty=difficulty,
+            exclude_ids=exclude,
+        )
+    except QuotaExhaustedError:
+        raise
+    except Exception as exc:
+        logger.warning(
+            "subtopic '%s' [%s]: ascii fetch raised (%s) -- %d ascii card(s) free-draw",
+            subtopic_title,
+            difficulty.value,
+            exc,
+            len(ascii_plans),
+        )
+        return
+
+    if result.failures:
+        logger.info(
+            "subtopic '%s' [%s]: ascii fetch reported %d issue(s) -- %s",
+            subtopic_title,
+            difficulty.value,
+            len(result.failures),
+            "; ".join(result.failures[:3]),
+        )
+
+    matched = 0
+    async with runtime.topic_ascii_lock:
+        topic_used = runtime.topic_ascii_used.setdefault(topic_id, set())
+        for item in result.items:
+            if not item.matched or not (0 <= item.index < len(ascii_plans)):
+                continue
+            # A src_id already used in this topic -- a concurrent sibling picked
+            # it between the snapshot above and now, or the model repeated one
+            # within the batch -- means that card free-draws instead.
+            if item.src_id in topic_used:
+                continue
+            ascii_plans[item.index].fetched_scene = FetchedAsciiScene(
+                src_id=item.src_id,
+                label=item.label,
+                art=item.art,
+                alt=item.alt,
+            )
+            topic_used.add(item.src_id)
+            matched += 1
+
+    logger.info(
+        "subtopic '%s' [%s]: ascii fetch -- %d/%d card(s) matched a curated scene",
+        subtopic_title,
+        difficulty.value,
+        matched,
+        len(ascii_plans),
+    )
 
 
 def _take_plans(pool: list[CardPlan], card_type: str | None, count: int) -> list[CardPlan]:
@@ -501,6 +609,18 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             ],
         )
 
+        # ADR-0080: pick a curated-library scene for each ascii brief before any
+        # writing. Mutates plan_pool in place (sets `fetched_scene`); a brief it
+        # can't match stays None and free-draws.
+        await _fetch_ascii_for_plans(
+            runtime,
+            topic_id=tier["topic_id"],
+            topic_name=job["topic_name"],
+            subtopic_title=tier["title"],
+            difficulty=difficulty,
+            plan_pool=plan_pool,
+        )
+
         # One-time hero call (task 0006 / ADR-0018), before this tier's
         # normal rounds. Gated on `existing_count == 0` (not just `has_hero`)
         # so it only fires the first time this subtopic-tier is ever
@@ -845,6 +965,16 @@ async def _redraft_until_bar(
                 builds_on=[],
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
+            )
+            # ADR-0080: fetch curated scenes for this redraft's ascii briefs
+            # too, against a pool now missing whatever earlier rounds used.
+            await _fetch_ascii_for_plans(
+                runtime,
+                topic_id=tier["topic_id"],
+                topic_name=topic_name,
+                subtopic_title=tier["title"],
+                difficulty=difficulty,
+                plan_pool=round_plans,
             )
             result = await runtime.generator.generate_cards(
                 topic_name=topic_name,

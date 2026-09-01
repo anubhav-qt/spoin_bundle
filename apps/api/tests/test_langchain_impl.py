@@ -26,6 +26,7 @@ from spoin.generation.base import (
     CardPlan,
     CardVerificationQuery,
     CurriculumDraft,
+    FetchedAsciiScene,
     SubtopicGroupDraft,
     SubtopicTierDraft,
 )
@@ -1201,7 +1202,7 @@ async def test_match_topics_batches_every_query_in_one_call() -> None:
 @pytest.mark.parametrize(
     ("card_type", "expected_phrase"),
     [
-        ("ascii", "ASCII SCENE (MANDATORY)"),
+        ("ascii", "CARD TYPE REQUIREMENT — ASCII SCENE"),
         ("comparison", "MYTH VS FACT / COMPARISON"),
         ("code", "CODE / SYNTAX / CONFIGURATION"),
         ("diagram", "DIAGRAM, WRITTEN IN MERMAID"),
@@ -1253,17 +1254,35 @@ async def test_generate_cards_prompt_selection_by_card_type(
     assert expected_phrase in system_prompt
 
 
-async def test_generate_cards_with_ascii_plan_shows_retrieved_candidates() -> None:
-    """Task 0029: an ascii-typed plan's `asset_direction` is used as a retrieval
-    query against the curated library, and the matches are shown in the SAME
-    card's brief in the user prompt -- not pooled across the batch, and not
-    shown for a plan of a different type."""
+async def test_generate_cards_ascii_plan_uses_fetched_scene_not_writer_art() -> None:
+    """ADR-0080: retrieval moved to the fetcher. The writer prompt no longer
+    carries library candidates; an ascii brief is marked "art: PROVIDED" when
+    the fetcher matched it, and the card's `visual_slots` come from the fetched
+    scene (with its `src_id`), NOT from anything the writer drew."""
 
     generator = _generator()
     wire = _WireCardBatch(
         cards=[
-            _WireCard(title="T1", canonical_title="CT1", summary="S1", body="B1"),
-            _WireCard(title="T2", canonical_title="CT2", summary="S2", body="B2"),
+            # The writer "disobeys" and draws its own scene anyway -- it must be
+            # ignored in favour of the fetched one.
+            _WireCard(
+                title="T1",
+                canonical_title="CT1",
+                summary="S1",
+                body="B1",
+                ascii_label="writer-drew-this",
+                ascii_art="  x\n /|\\",
+                ascii_alt="writer alt",
+            ),
+            _WireCard(
+                title="T2",
+                canonical_title="CT2",
+                summary="S2",
+                body="B2",
+                ascii_label="free-draw",
+                ascii_art="  o\n /|\\\n / \\",
+                ascii_alt="free alt",
+            ),
         ]
     )
     captured_prompt: list[object] = []
@@ -1286,30 +1305,47 @@ async def test_generate_cards_with_ascii_plan_shows_retrieved_candidates() -> No
             difficulty_examples={},
             avoid_bodies=[],
             rejection_feedback=[],
+            card_type="ascii",
             plans=[
                 CardPlan(
                     canonical_title="Progressive Overload",
                     card_type="ascii",
                     asset_direction="a boxer in a fighting stance getting stronger",
                     content_direction="the gag angle",
+                    fetched_scene=FetchedAsciiScene(
+                        src_id="art_52_5",
+                        label="boxer-overload",
+                        art="  o/  vs  \\o\n /|    |\\",
+                        alt="two boxers, one bulking up",
+                    ),
                 ),
                 CardPlan(
                     canonical_title="Rest Days Matter",
-                    card_type="prose",
-                    asset_direction="",
-                    content_direction="the mental-model angle",
+                    card_type="ascii",
+                    asset_direction="a couch that refuses to give the lifter back",
+                    content_direction="the gag angle",
+                    fetched_scene=None,  # no library scene fit -> writer free-draws
                 ),
             ],
         )
 
     assert len(result.items) == 2
     user_prompt = str(captured_prompt[0])
-    # The ascii-typed card's brief carries retrieved candidates...
-    assert "Curated reference pieces" in user_prompt
-    assert "card 1" in user_prompt
-    # ...and they appear once per query, not blanket-appended to the whole
-    # batch's prompt regardless of which card asked for them.
-    assert user_prompt.count("Curated reference pieces") == 1
+    assert "Curated reference pieces" not in user_prompt
+    assert "art: PROVIDED" in user_prompt
+    assert "art: draw one" in user_prompt
+
+    provided, free_draw = result.items
+    assert provided.visual_slots == {
+        "art": "  o/  vs  \\o\n /|    |\\",
+        "alt": "two boxers, one bulking up",
+        "src_id": "art_52_5",
+    }
+    assert provided.visual_id == "boxer-overload"
+    # The no-match card keeps whatever the writer drew, with no src_id.
+    assert free_draw.visual_slots is not None
+    assert free_draw.visual_slots.get("src_id") is None
+    assert "o" in free_draw.visual_slots["art"]
 
 
 async def test_quota_exhausted_error_is_reraised_across_methods() -> None:

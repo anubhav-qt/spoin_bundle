@@ -350,6 +350,14 @@ class _Runtime:
     #: runtime instead, keyed by topic.
     topic_leases: dict[str, TopicKeyLease] = field(default_factory=dict)
     topic_plan_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    #: topic_id -> curated-library entry ids already used by the ASCII fetcher
+    #: for this topic (ADR-0080). Seeded from `topic_used_ascii_ids` on the first
+    #: fetch for a topic (active cards + rejected drafts, the cross-pass source
+    #: of truth), then extended in-process as the fetcher picks within this run
+    #: so a scene is never reused across tiers of the same pass either. Guarded
+    #: by `topic_ascii_lock` -- concurrent subtopic branches share it.
+    topic_ascii_used: dict[str, set[str]] = field(default_factory=dict)
+    topic_ascii_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     #: `AsyncSession` is not safe for concurrent use across coroutines -- every
     #: DB-touching section of `_process_gate_item` (dedup reads, card/question
     #: persist+commit) is serialized through this lock so subtopic-tiers can
@@ -443,7 +451,16 @@ class _GateItem:
 #: three generation-time defects (fence wrapper, duplicate scene in body,
 #: structurally-invalid mermaid) are now enforced deterministically server-side.
 #: v4 content should not be pooled with v3 when judging quality.
-CARD_PROMPT_VERSION = 4
+#:
+#: v4 -> v5 (ADR-0079 + ADR-0080): the ASCII library is gags-only (the
+#: informative-visualisation file is no longer loaded) and the curriculum's
+#: ascii floor rose from 2-3 to 4-5 per subtopic-tier; a dedicated ASCII FETCHER
+#: node now picks one curated scene per ascii card and captions it (the writer
+#: no longer draws matched cards), and each scene is single-use within a topic
+#: (`visual_slots['src_id']`). v5 corpora carry a materially different ASCII mix
+#: -- more cards, all gags, mostly library-sourced -- and should not be pooled
+#: with v4 when judging quality.
+CARD_PROMPT_VERSION = 5
 
 
 def _clean_null_bytes(val: Any) -> Any:
@@ -490,5 +507,14 @@ def _rejected_card(
             # reason is a labeled example, and it is only usable as one if you
             # can tell which prompt version produced it).
             "prompt_version": CARD_PROMPT_VERSION,
+            # ADR-0080: a rejected ascii card still burns the curated-library
+            # scene it used -- recorded here (not `visual_slots`, which
+            # RejectedCard has no column for) so `topic_used_ascii_ids` keeps
+            # excluding it from later fetches in the topic.
+            **(
+                {"src_id": (draft.visual_slots or {})["src_id"]}
+                if draft.visual_slots and draft.visual_slots.get("src_id")
+                else {}
+            ),
         },
     )

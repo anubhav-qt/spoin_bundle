@@ -29,12 +29,14 @@ Rules:
     system design architecture, request flows, state machines, timelines, biological \
     cycles/cascades, economic feedback loops, chemical processes, organizational trees. \
     Aim for at least 1-2 diagram cards in almost every subtopic tier.
-  * "ascii": HIGH PRIORITY across all topics. Silly, funny visual gags and \
-    humorous physical analogies that make concepts stick — characters, \
-    checklists, before/after pairs, timelines, tiny charts, whatever form the joke \
-    wants. Aim for at least 2-3 ascii cards in every subtopic tier, and vary their \
-    FORM across the tier rather than repeating one. Lean generous: these are the \
-    cards learners screenshot and remember.
+  * "ascii": HIGH PRIORITY across all topics — always a comedic gag (ADR-0079). \
+    Silly, funny visual gags and humorous physical analogies that make concepts \
+    stick — characters reacting, before/after pairs, a checklist with a punchline, \
+    a timeline whose order is the joke, an absurd object, whatever form lands the \
+    laugh. Aim for at least 4-5 ascii cards in every subtopic tier (more in a \
+    fuller tier), uncapped, and vary their FORM across the tier rather than \
+    repeating one. Lean generous: these are the cards learners screenshot and \
+    remember.
   * "comparison": HIGH PRIORITY for common misconceptions, myths vs facts, pitfalls, \
     and "wrong way vs right way" contrasts.
   * "prose": For foundational mental models, conceptual principles, and deep intuition. \

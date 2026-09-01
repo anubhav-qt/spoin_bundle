@@ -16,6 +16,8 @@ from collections.abc import AsyncIterator
 
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation.base import (
+    AsciiFetchQuery,
+    AsciiFetchResult,
     AskTurnQuery,
     BatchResult,
     CardCorrectionQuery,
@@ -187,6 +189,39 @@ class FakeContentGenerator(ContentGenerator):
             )
         return BatchResult(items=items)
 
+    async def fetch_ascii_scenes(
+        self,
+        queries: list[AsciiFetchQuery],
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        difficulty: Difficulty,
+        exclude_ids: frozenset[str],
+    ) -> BatchResult[AsciiFetchResult]:
+        """Deterministic stand-in (ADR-0080): "matches" every query to a stable
+        fake library id and hands back a tiny captioned scene, so the planned-
+        ascii path (fetcher owns the art) is what tests exercise by default.
+        Honours `exclude_ids` so a test can assert per-topic non-repetition --
+        an id already used yields `no_match` for that query instead."""
+
+        items: list[AsciiFetchResult] = []
+        for q in queries:
+            src_id = f"fake-lib-{_stable_index(q.canonical_title, modulo=997)}"
+            if src_id in exclude_ids:
+                items.append(AsciiFetchResult(index=q.index, matched=False))
+                continue
+            items.append(
+                AsciiFetchResult(
+                    index=q.index,
+                    matched=True,
+                    src_id=src_id,
+                    label=f"fake-scene-{q.index}",
+                    art=f'  o    "{q.asset_direction[:24] or "gag"}"\n /|\\\n / \\',
+                    alt=f"Stick figure acting out: {q.canonical_title}",
+                )
+            )
+        return BatchResult(items=items)
+
     async def generate_cards(
         self,
         *,
@@ -207,14 +242,26 @@ class FakeContentGenerator(ContentGenerator):
         builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
 
         items: list[CardDraft] = []
-        for _ in range(count):
+        for n in range(count):
             self._card_counter += 1
             idx = self._card_counter
             extra_body = ""
             visual_id = None
             visual_slots = None
 
-            if card_type in (CardType.ASCII, "ascii") or want_hero:
+            # ADR-0080: a planned ascii card whose fetcher matched carries its
+            # scene on the plan; the writer (this call) does NOT redraw it.
+            plan = plans[n] if plans is not None and n < len(plans) else None
+            fetched = plan.fetched_scene if plan is not None else None
+
+            if fetched is not None:
+                visual_id = fetched.label
+                visual_slots = {
+                    "art": fetched.art,
+                    "alt": fetched.alt,
+                    "src_id": fetched.src_id,
+                }
+            elif card_type in (CardType.ASCII, "ascii") or want_hero:
                 visual_id = f"fake-ascii-scene-{idx}"
                 visual_slots = {
                     "art": f'  o   "Check this #{idx}!"\n /|\\\n / \\',

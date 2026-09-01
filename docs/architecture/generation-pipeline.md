@@ -94,6 +94,18 @@ generate_subtopic_cards
     The plan's card_type is a REQUEST: the realised type mix is still counted
     against the tier's quota in code afterwards, unchanged (trusted for taste,
     never for constraints).
+  - then ONE fetch_ascii_scenes() call (ADR-0080, generator pool) over the
+    tier's `ascii` briefs: for each, retrieve the top-10 curated gag scenes by
+    `asset_direction` similarity -- EXCLUDING every scene already used anywhere
+    in this topic (`topic_used_ascii_ids`: active cards' `visual_slots.src_id`
+    plus rejected drafts' `gen_meta.src_id`, so a scene is single-use per topic
+    for its whole life) -- and the model picks one and captions it from the
+    directions. A matched brief carries its scene on `CardPlan.fetched_scene`;
+    the writer is told "art: PROVIDED" and does not draw it, and the pipeline
+    stamps the scene (with its `src_id`) onto the draft. A brief the fetcher
+    can't match ("art: draw one") falls through to the writer's free-draw path
+    (ASCII_INSTRUCTIONS), the rare case. An empty/failed fetch = every ascii
+    card free-draws, exactly the pre-ADR-0080 path.
   - tiers WITHIN one group run sequentially, lowest difficulty first: a
     linked higher tier's generate_cards() call receives the lower tier's
     actual card BODIES as `builds_on` context, so it can genuinely build on
@@ -255,8 +267,9 @@ grid of `(key_index, model)` cells, not a flat list of keys: Gemini rate limits 
 per *model* independently (so exhausting one model's daily quota doesn't touch another's).
 `GeminiContentGenerator` holds TWO governors -- a "thinking" pool (curriculum, topic
 matching, judging, quiz grading -- `SPOIN_GEMINI_THINKING_LADDER`) and a "generator" pool
-(`plan_cards`, `generate_cards` AND `generate_questions` -- high-volume, and upstream of the
-gate rather than a substitute for it, ADR-0029/0059 -- `SPOIN_GEMINI_GENERATOR_LADDER`), each
+(`plan_cards`, `fetch_ascii_scenes`, `generate_cards` AND `generate_questions` -- high-volume,
+and upstream of the gate rather than a substitute for it, ADR-0029/0059/0080 --
+`SPOIN_GEMINI_GENERATOR_LADDER`), each
 an ordered model-fallback ladder. RPD is persisted in
 `QuotaLedger` (`backend=f"gemini:{key_index}:{model}"`); RPM is persisted too since
 ADR-0058 (`QuotaRequest`, a trailing-60s window). Within a rung, keys are tried

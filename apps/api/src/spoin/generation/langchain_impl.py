@@ -88,6 +88,8 @@ from spoin.core.db import session_scope
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
 from spoin.generation.base import (
+    AsciiFetchQuery,
+    AsciiFetchResult,
     AskTurnQuery,
     BatchResult,
     CardCorrectionQuery,
@@ -313,6 +315,22 @@ class _WireCardPlanBatch(BaseModel):
     plans: list[_WireCardPlan] = Field(default_factory=list)
 
 
+class _WireAsciiFetch(_LenientWireModel):
+    #: ADR-0080: one card's pick from the curated-library candidates it was
+    #: shown. `index` matches the number the card was given in the fetch prompt.
+    #: `matched=False` (or an unrecognised `src_id`) => that card free-draws.
+    index: int = -1
+    matched: bool = False
+    src_id: str = ""
+    ascii_label: str = ""
+    ascii_art: str = ""
+    ascii_alt: str = ""
+
+
+class _WireAsciiFetchBatch(BaseModel):
+    scenes: list[_WireAsciiFetch] = Field(default_factory=list)
+
+
 class _WireQuestion(_LenientWireModel):
     card_index: int = Field(
         default=-1,
@@ -443,61 +461,51 @@ def _format_type_quotas(type_quotas: dict[str, int]) -> str:
     return "\n".join(f"- {ct}: about {n}" for ct, n in wanted.items())
 
 
-#: Task 0029: how many curated-library candidates an ascii-typed plan entry
-#: gets shown. High enough that a genuinely good match is very likely in the
-#: set; low enough that ten cards' worth of candidates doesn't dwarf the
-#: rest of the prompt (each candidate carries its own small art block).
+#: ADR-0080: how many curated-library candidates the ASCII fetcher is shown per
+#: card. High enough that a genuinely good match is very likely in the set; low
+#: enough that a tier's worth of candidates doesn't dwarf the fetch prompt (each
+#: candidate carries its own small art block).
 _ASCII_CANDIDATE_COUNT = 10
 
 
-def _format_ascii_candidates(candidates: list[AsciiLibraryEntry]) -> str:
-    if not candidates:
-        return ""
-    blocks = [
-        f'  [Candidate {n}: "{c.title}"]\n  ```\n{c.art}\n  ```'
-        for n, c in enumerate(candidates, start=1)
+def _format_fetch_candidates(query: AsciiFetchQuery, candidates: list[AsciiLibraryEntry]) -> str:
+    """One card's block in the ASCII fetch prompt (ADR-0080): its brief plus the
+    curated-library candidates it may pick from, each with the ID the model must
+    echo back in `src_id`."""
+
+    head = [
+        f"--- card {query.index} ---",
+        f"concept: {query.canonical_title}",
     ]
-    return (
-        "\n  Curated reference pieces for this card's ASCII art"
-        " (from the hand-verified library, all ≤40 columns):\n"
-        "  - EQUAL SIGNIFICANCE: All 10 candidates below are presented without preference"
-        " or ranking order — choose whichever ONE artwork you think best suits this card.\n"
-        "  - MANDATORY BASE: You MUST choose and use ONE of these 10 candidate artworks"
-        " ONLY as the visual base for your ascii_art (do not invent an ASCII drawing from"
-        " scratch).\n"
-        "  - ADAPTATION ALLOWED: You are allowed to trim or delete unneeded lines/elements,"
-        " and add text captions, labels, speech callouts, or simple symbols/emojis around or"
-        " within the drawing to dramatize the card's concept.\n"
-        "  - HARD WIDTH CONSTRAINT: Every line of the final ascii_art must strictly be"
-        " <= 40 monospace characters.\n" + "\n".join(blocks)
-    )
+    if query.asset_direction:
+        head.append(f"scene should show: {query.asset_direction}")
+    if query.content_direction:
+        head.append(f"angle: {query.content_direction}")
+    if not candidates:
+        head.append("candidates: (none available — return matched=false)")
+        return "\n".join(head)
+    head.append("candidates:")
+    blocks = [
+        f'  [ID: {c.id}] "{c.title}"\n  ```\n{c.art}\n  ```' for c in candidates
+    ]
+    return "\n".join(head) + "\n" + "\n".join(blocks)
 
 
-async def _format_plans(plans: list[CardPlan]) -> str:
+def _format_plans(plans: list[CardPlan]) -> str:
     """ADR-0059: this writer call's slice of the tier's briefs. Returns "" when
     unplanned (the hero call, or a planning failure) so `CARDS_USER` renders
     exactly as it did before the planning stage existed.
 
-    Task 0029: an `ascii`-typed plan's `asset_direction` is also used as a
-    retrieval query against the curated library (`content/ascii_library.py`),
-    and the top matches are appended to that plan's own block -- never pooled
-    across the whole batch, since each card's scene is a different query."""
+    ADR-0080: an `ascii` brief carries its art disposition -- "PROVIDED" when the
+    fetcher matched it to a curated-library scene (the writer leaves the ascii
+    fields empty; the pipeline attaches the scene after this call), or "draw
+    one" when no scene fit (the writer free-draws per ASCII_INSTRUCTIONS)."""
 
     if not plans:
         return ""
 
-    # Only ascii-typed plans with a real asset_direction are worth a retrieval
-    # call -- everything else gets `[]` without paying for one.
-    lookups = {
-        n: top_candidates(plan.asset_direction, k=_ASCII_CANDIDATE_COUNT)
-        for n, plan in enumerate(plans)
-        if plan.card_type == CardType.ASCII.value and plan.asset_direction
-    }
-    resolved = dict(zip(lookups.keys(), await asyncio.gather(*lookups.values()), strict=True))
-    ascii_candidates = [resolved.get(n, []) for n in range(len(plans))]
-
     blocks = []
-    for n, (plan, candidates) in enumerate(zip(plans, ascii_candidates, strict=True), start=1):
+    for n, plan in enumerate(plans, start=1):
         lines = [
             f"--- card {n} ---",
             f"concept: {plan.canonical_title}",
@@ -509,9 +517,13 @@ async def _format_plans(plans: list[CardPlan]) -> str:
             lines.append(
                 f"angle (what makes it different from the others): {plan.content_direction}"
             )
-        candidates_block = _format_ascii_candidates(candidates)
-        if candidates_block:
-            lines.append(candidates_block)
+        if plan.card_type == CardType.ASCII.value:
+            lines.append(
+                "art: PROVIDED — a curated scene is already chosen and captioned for "
+                "this card; leave ascii_label / ascii_art / ascii_alt EMPTY"
+                if plan.fetched_scene is not None
+                else "art: draw one — no library scene fit; draw a gag per the ASCII rules"
+            )
         blocks.append("\n".join(lines))
     return (
         "\nThe briefs for the cards to write, one card each, in this order:\n"
@@ -664,11 +676,21 @@ def _strip_duplicate_scene_from_body(body: str, art: str) -> str:
     return body
 
 
-def _finalize_ascii_fields(label: str, art: str, alt: str) -> tuple[str, dict[str, str]]:
+def _finalize_ascii_fields(
+    label: str, art: str, alt: str, *, src_id: str = ""
+) -> tuple[str, dict[str, str]]:
     """Assemble the `visual_id` / `visual_slots` pair from art already known to
-    be non-empty and within budget (originally or after a redraw)."""
+    be non-empty and within budget (originally or after a redraw).
 
-    return (label.strip() or "untitled-scene")[:64], {"art": art, "alt": alt}
+    `src_id` (ADR-0080) is the curated-library entry a fetched scene was adapted
+    from -- carried in `visual_slots` so the card records which library piece it
+    used, and that piece is then excluded from every later fetch in the topic.
+    Empty for a writer-drawn scene (the free-draw fallback and the hero card)."""
+
+    slots = {"art": art, "alt": alt}
+    if src_id:
+        slots["src_id"] = src_id
+    return (label.strip() or "untitled-scene")[:64], slots
 
 
 #: ADR-0067: diagram cards write ```mermaid, and the prompt is trusted for
@@ -1454,6 +1476,102 @@ class GeminiContentGenerator(ContentGenerator):
                 failures.append(f"malformed card plan: {exc}")
         return BatchResult(items=items, failures=failures)
 
+    async def fetch_ascii_scenes(
+        self,
+        queries: list[AsciiFetchQuery],
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        difficulty: Difficulty,
+        exclude_ids: frozenset[str],
+    ) -> BatchResult[AsciiFetchResult]:
+        """ADR-0080: retrieve curated-library candidates per query (excluding
+        anything already used in this topic), then one model call to pick and
+        caption one per card. Survivable: an empty/failed result means every
+        ascii card in the tier free-draws."""
+
+        if not queries:
+            return BatchResult(items=[])
+
+        # One retrieval per card -- each card's scene is its own query, so the
+        # candidate sets are not pooled (they may still overlap, which is fine).
+        candidate_lists = await asyncio.gather(
+            *(
+                top_candidates(
+                    q.asset_direction or q.canonical_title,
+                    k=_ASCII_CANDIDATE_COUNT,
+                    exclude_ids=exclude_ids,
+                )
+                for q in queries
+            )
+        )
+        allowed_ids = {c.id for cands in candidate_lists for c in cands}
+        if not allowed_ids:
+            # Library unavailable or fully excluded for this topic -- nothing to
+            # pick from, every card free-draws.
+            return BatchResult(
+                items=[AsciiFetchResult(index=q.index, matched=False) for q in queries]
+            )
+
+        cards_block = "\n\n".join(
+            _format_fetch_candidates(q, cands)
+            for q, cands in zip(queries, candidate_lists, strict=True)
+        )
+        prompt = [
+            ("system", prompts.ASCII_FETCH_SYSTEM),
+            (
+                "human",
+                prompts.ASCII_FETCH_USER.format(
+                    topic_name=topic_name,
+                    subtopic_title=subtopic_title,
+                    difficulty=difficulty.value,
+                    count=len(queries),
+                    cards_block=cards_block,
+                ),
+            ),
+        ]
+        try:
+            wire = await self._invoke_with_retry(self._generator, _WireAsciiFetchBatch, prompt)
+        except QuotaExhaustedError:
+            raise
+        except Exception as exc:
+            return BatchResult(
+                items=[], failures=[f"fetch_ascii_scenes call failed: {exc}"]
+            )
+
+        valid_indices = {q.index for q in queries}
+        by_index: dict[int, _WireAsciiFetch] = {}
+        for scene in wire.scenes:
+            if scene.index in valid_indices:
+                by_index[scene.index] = scene
+
+        items: list[AsciiFetchResult] = []
+        failures: list[str] = []
+        for q in queries:
+            picked = by_index.get(q.index)
+            # A missing entry, an explicit refusal, or a src_id the query was
+            # never shown all collapse to the same "this card free-draws"
+            # outcome -- distinct from a call failure (handled above).
+            if picked is None or not picked.matched or picked.src_id not in allowed_ids:
+                items.append(AsciiFetchResult(index=q.index, matched=False))
+                continue
+            art = _strip_ascii_fence_wrapper(picked.ascii_art)
+            if not art.strip():
+                items.append(AsciiFetchResult(index=q.index, matched=False))
+                failures.append(f"card {q.index}: picked {picked.src_id} but returned empty art")
+                continue
+            items.append(
+                AsciiFetchResult(
+                    index=q.index,
+                    matched=True,
+                    src_id=picked.src_id,
+                    label=picked.ascii_label,
+                    art=art,
+                    alt=picked.ascii_alt,
+                )
+            )
+        return BatchResult(items=items, failures=failures)
+
     async def _resolve_ascii_art(
         self, wire_cards: list[_WireCard]
     ) -> tuple[dict[int, tuple[str, str, str]], set[int]]:
@@ -1590,7 +1708,7 @@ class GeminiContentGenerator(ContentGenerator):
                     subtopic_description=subtopic_description,
                     difficulty=difficulty.value,
                     count=count,
-                    plans_block=await _format_plans(plans or []),
+                    plans_block=_format_plans(plans or []),
                     difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
                     existing_titles_block=_format_existing_titles(existing_titles),
                     avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
@@ -1613,7 +1731,15 @@ class GeminiContentGenerator(ContentGenerator):
         # from a redraw call must propagate, same as the main generate call.
         resolved_art, rejected_for_art = await self._resolve_ascii_art(wire_result.cards)
         for i, wire_card in enumerate(wire_result.cards):
-            if i in rejected_for_art:
+            # ADR-0080: a planned `ascii` card the fetcher matched carries its
+            # scene on the plan (positional: brief i -> card i, the
+            # PLANNED_CARDS_INSTRUCTIONS contract). The fetcher owns that card's
+            # art; whatever the writer drew for it is ignored, including an
+            # over-budget scene that would otherwise trip the ADR-0066 rejection.
+            plan = plans[i] if plans is not None and i < len(plans) else None
+            fetched = plan.fetched_scene if plan is not None else None
+
+            if fetched is None and i in rejected_for_art:
                 failures.append(
                     f"ascii art {wire_card.ascii_label or '(unlabeled)'!r} still exceeded "
                     f"{_ASCII_MAX_WIDTH} cols after redraw -- card rejected (ADR-0066)"
@@ -1639,7 +1765,23 @@ class GeminiContentGenerator(ContentGenerator):
                 continue
 
             try:
-                if i in resolved_art:
+                if fetched is not None:
+                    # ADR-0080: fetched scenes are already <= 40 cols (the fetch
+                    # prompt's hard rule, over candidates that are all <= 40) --
+                    # this guard is for a fetcher bug, not the normal path. An
+                    # empty or over-budget fetched scene rejects the card rather
+                    # than shipping broken art; it re-fetches next round.
+                    if not fetched.art.strip() or _ascii_over_budget_lines(fetched.art):
+                        failures.append(
+                            f"fetched ascii scene {fetched.label!r} (src {fetched.src_id!r}) "
+                            f"was empty or over {_ASCII_MAX_WIDTH} cols -- card rejected (ADR-0080)"
+                        )
+                        continue
+                    body = _strip_duplicate_scene_from_body(body, fetched.art)
+                    visual_id, visual_slots = _finalize_ascii_fields(
+                        fetched.label, fetched.art, fetched.alt, src_id=fetched.src_id
+                    )
+                elif i in resolved_art:
                     label, art, alt = resolved_art[i]
                     # The prompt tells the model not to redraw its own scene a
                     # second time into `body` (ASCII_INSTRUCTIONS), but a card

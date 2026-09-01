@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from spoin.generation.prompts.ask import ASK_SYSTEM
 from spoin.generation.prompts.cards import (
+    ASCII_FETCH_SYSTEM,
+    ASCII_FETCH_USER,
     ASCII_INSTRUCTIONS,
     CARD_FIELDS_BLOCK,
     CARDS_ASCII_REDRAW_SYSTEM,
@@ -46,6 +48,8 @@ from spoin.generation.prompts.topics import (
 )
 
 __all__ = [
+    "ASCII_FETCH_SYSTEM",
+    "ASCII_FETCH_USER",
     "ASCII_INSTRUCTIONS",
     "ASK_SYSTEM",
     "CARDS_ASCII_REDRAW_SYSTEM",

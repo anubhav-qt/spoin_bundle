@@ -99,6 +99,56 @@ class CardDraft(BaseModel):
     is_hero: bool = False
 
 
+class FetchedAsciiScene(BaseModel):
+    """The ASCII fetcher's resolved scene for one planned `ascii` card (ADR-0080).
+
+    Rides on `CardPlan` from the fetch sub-step of planning. `src_id` is the
+    curated-library entry the art was adapted from -- recorded on the card at
+    `visual_slots["src_id"]` so it is filtered out of every later candidate
+    search in the same topic. A plan whose fetch came back `no_match` carries no
+    `fetched_scene` at all; that card falls through to the writer's free-draw
+    path (`ASCII_INSTRUCTIONS`). This is a retrieved-and-captioned asset, not
+    model-authored card content -- ADR-0059's "a plan is a brief, not a draft"
+    still holds; the writer is simply told to leave this card's art alone.
+    """
+
+    src_id: str
+    label: str
+    art: str
+    alt: str
+
+
+class AsciiFetchQuery(BaseModel):
+    """One planned `ascii` card handed to `fetch_ascii_scenes` (ADR-0080).
+
+    `index` is the plan's position in the batch -- how the result is matched
+    back. `asset_direction` / `content_direction` are the planner's own fields,
+    used both as the retrieval query and as the caption brief.
+    """
+
+    index: int
+    canonical_title: str
+    asset_direction: str
+    content_direction: str
+
+
+class AsciiFetchResult(BaseModel):
+    """The fetcher's verdict for one `AsciiFetchQuery` (ADR-0080).
+
+    `matched=False` -- no candidate represented the card, the rare case -- means
+    `src_id`/`label`/`art`/`alt` are empty and the card free-draws instead.
+    `src_id` MUST be one of the candidate ids the query was shown; a value that
+    isn't is treated as `no_match` by the caller.
+    """
+
+    index: int
+    matched: bool = False
+    src_id: str = ""
+    label: str = ""
+    art: str = ""
+    alt: str = ""
+
+
 class CardPlan(BaseModel):
     """One card's brief, written before anyone writes the card itself (ADR-0059).
 
@@ -141,6 +191,11 @@ class CardPlan(BaseModel):
     #: separate them deliberately, where N independent writer calls could only
     #: be shown the titles that happened to land before them.
     content_direction: str = ""
+    #: ADR-0080: the ASCII fetcher's resolved scene, set in the fetch sub-step
+    #: of planning for an `ascii` plan the fetcher matched to a curated library
+    #: entry. `None` for every non-ascii plan and for an ascii plan the fetcher
+    #: returned `no_match` -- the writer draws those. See `FetchedAsciiScene`.
+    fetched_scene: FetchedAsciiScene | None = None
 
 
 class SubtopicTierDraft(BaseModel):
@@ -576,6 +631,40 @@ class ContentGenerator(ABC):
         back to unplanned generation (exactly the pre-ADR-0059 path) rather than
         failing the tier. A planning call that never returns is a lost
         improvement, never a lost card.
+        """
+
+    @abstractmethod
+    async def fetch_ascii_scenes(
+        self,
+        queries: list[AsciiFetchQuery],
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        difficulty: Difficulty,
+        exclude_ids: frozenset[str],
+    ) -> BatchResult[AsciiFetchResult]:
+        """ADR-0080: the fetch sub-step of planning. One call per subtopic-tier,
+        over that tier's `ascii`-typed plans, on the generator ladder (same as
+        `plan_cards`).
+
+        For each query the implementation retrieves the top curated-library
+        candidates by `asset_direction` similarity (`content.ascii_library.
+        top_candidates`, with `exclude_ids` applied so a scene already used in
+        this topic is never offered again), asks the model to PICK ONE whose
+        drawing can carry the card's idea, and to caption/label it from
+        `asset_direction` + `content_direction` within the 40-column budget.
+        Acceptance is the expected path -- the candidates are the closest
+        matches, and an adapted near-fit beats an unaided free-draw.
+
+        `matched=False` is the rare escape: no candidate represented the card,
+        so it falls through to the writer's free-draw path. A `src_id` the query
+        was not shown is treated as `no_match` by the caller.
+
+        `exclude_ids` is every curated-library id already used by this topic's
+        active cards and rejected drafts, plus anything picked earlier in this
+        same run. Survivable like `plan_cards`: an empty or failed result just
+        means every ascii card in the tier free-draws, exactly the pre-ADR-0080
+        path. `QuotaExhaustedError` propagates.
         """
 
     @abstractmethod

@@ -87,9 +87,68 @@ Already covered in this subtopic — plan around these, never re-plan one of the
 {avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
 
 
+#: ADR-0080: the fetch sub-step of planning. Given a tier's `ascii` plans, each
+#: with its `asset_direction`/`content_direction` and up to 10 curated-library
+#: candidates, the model PICKS one per card and captions it -- it never draws an
+#: original scene. `top_candidates` has already removed anything used elsewhere
+#: in the topic, so a pick is safe to record as single-use.
+ASCII_FETCH_SYSTEM = r"""\
+You choose and caption ASCII art for learning cards from a curated library. You
+do NOT draw original art -- every scene you return is one of the candidates,
+adapted.
+
+For each card you are given its concept, what its scene should show
+(asset_direction), the angle that separates it from its siblings
+(content_direction), and up to 10 candidate library scenes, each with an ID and
+a title. Every candidate already fits a phone (<= 40 monospace columns) and is
+hand-verified.
+
+For each card:
+
+1. PICK ONE candidate whose drawing can carry this card's idea. These are the
+   closest matches in the library and an adapted near-fit beats a scene drawn
+   from nothing -- so ACCEPT unless none of the candidates depicts anything the
+   card could use (a genuinely different subject, not merely an imperfect one).
+   Refusing (matched=false) should be rare.
+
+2. ADAPT the chosen art into the final scene:
+   - Keep its drawing. Trim lines or elements it does not need.
+   - Add short captions, labels, or speech callouts that tie it to THIS card --
+     drawn from asset_direction and content_direction, in the card's voice, and
+     funny. The gag has to land for this concept, not the candidate's original
+     one.
+   - Every line <= 40 monospace characters. Count them. If adapting pushes a
+     line over budget, tighten it -- never ship an over-width line.
+   - No surrounding ``` fence -- the art field holds the drawing only.
+
+3. Return for each card:
+   - index: the card's number, exactly as given -- this is how the scene is
+     attached back to its card.
+   - matched: true if you picked one, false if you refused.
+   - src_id: the EXACT ID of the candidate you picked (empty when matched=false).
+   - ascii_label: a short slug for the finished scene (empty when matched=false).
+   - ascii_art: the adapted drawing, newline-separated (empty when matched=false).
+   - ascii_alt: one plain sentence describing the scene for a screen reader.
+"""
+
+ASCII_FETCH_USER = """\
+Topic: {topic_name}
+Subtopic: {subtopic_title}
+Difficulty: {difficulty}
+
+Choose and caption art for these {count} card(s). Return one entry per card,
+keyed by its index.
+
+{cards_block}"""
+
+
 ASCII_INSTRUCTIONS = r"""\
+FALLBACK ONLY -- most `ascii` cards get their scene from the curated library
+(handled before this call); these instructions are for a card whose brief says
+no library scene fit, and for the hero card.
+
 Whenever a concept has a physical, spatial, or visual gag that would make it
-stick, ALSO draw a small ASCII scene that SHOWS the idea rather than just
+stick, draw a small ASCII scene that SHOWS the idea rather than just
 describing it. One or two panels, and always a joke -- it has to dramatize
 the concept AND land a laugh, not decorate the card with a neutral picture.
 Reach for one often; skip it only when nothing about the idea lends itself to
@@ -325,16 +384,21 @@ CARDS_ASCII_SYSTEM = (
     CARDS_COMMON_HEADER
     + r"""
 
-CARD TYPE REQUIREMENT — ASCII SCENE (MANDATORY):
-Every single card in this batch MUST carry a funny, charming ASCII scene that \
-dramatizes its concept.
+CARD TYPE REQUIREMENT — ASCII SCENE:
+Most cards in this batch have their scene PROVIDED from the curated library \
+(ADR-0080) — their brief says "art: PROVIDED". For those, write ONLY the \
+title, summary, and body, and leave ascii_label / ascii_art / ascii_alt EMPTY: \
+the scene is already chosen and captioned, and anything you draw is discarded.
+
+For a card whose brief says "art: draw one" (no library scene fit), draw a \
+funny, charming ASCII scene that dramatizes its concept:
 - The form is yours to choose per card, and the batch must NOT converge on one:
   * characters reacting, panicking, failing, or acting out the metaphor;
   * a labelled checklist, a before/after pair, a timeline whose order is the joke;
   * a tiny chart made of hashes, an object misbehaving, or pure typography.
   * Faces (`(o_o)`, `(-_-)`, `(>_<)`) are one option among many, never a requirement.
 - Every line MUST be STRICTLY <= 40 characters wide.
-- Set all three ASCII fields on every card:
+- Set all three ASCII fields:
   * ascii_label: short descriptive slug (e.g. "vacuum-dead-tuple"), NEVER empty.
   * ascii_art: the raw drawing, with no surrounding fence.
   * ascii_alt: one plain sentence describing the scene for screen readers.
@@ -515,6 +579,11 @@ Do not substitute a different concept because you find it more interesting, and 
 do not merge two briefs into one card — the set was planned to cover this \
 subtopic without overlapping, and quietly changing one entry re-opens the \
 duplicate it was written to avoid.
+
+A brief marked "art: PROVIDED" (ADR-0080) already has its ASCII scene chosen and \
+captioned from the curated library — write only the title, summary, and body for \
+that card and leave every ascii field EMPTY. A brief marked "art: draw one" had \
+no library scene fit: draw it yourself per the ASCII rules above.
 
 If a brief names a concept you genuinely cannot write accurately, write the \
 closest thing you can stand behind rather than inventing detail to fill it. A \

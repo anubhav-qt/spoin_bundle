@@ -168,6 +168,35 @@ async def topic_tier_width(session: AsyncSession, topic_id: uuid.UUID) -> int | 
     return max(rows) if rows else None
 
 
+async def topic_used_ascii_ids(session: AsyncSession, topic_id: uuid.UUID) -> set[str]:
+    """Every curated-library entry id already used by an ASCII card in this
+    topic (ADR-0080), from active cards (`Card.visual_slots['src_id']`) and from
+    rejected drafts (`RejectedCard.gen_meta['src_id']` -- stamped there because
+    `RejectedCard` has no `visual_slots` column). The fetcher passes these to
+    `top_candidates` as `exclude_ids` so one library scene is used at most once
+    per topic, for the topic's whole life across every worker pass.
+    """
+
+    active = (
+        await session.execute(
+            select(Card.visual_slots["src_id"].astext).where(
+                Card.topic_id == topic_id,
+                Card.status == CardStatus.ACTIVE,
+                Card.visual_slots["src_id"].astext.is_not(None),
+            )
+        )
+    ).scalars().all()
+    rejected = (
+        await session.execute(
+            select(RejectedCard.gen_meta["src_id"].astext).where(
+                RejectedCard.topic_id == topic_id,
+                RejectedCard.gen_meta["src_id"].astext.is_not(None),
+            )
+        )
+    ).scalars().all()
+    return {value for value in (*active, *rejected) if value}
+
+
 async def _load_subtopic_plans(
     session: AsyncSession,
     topic: Topic,

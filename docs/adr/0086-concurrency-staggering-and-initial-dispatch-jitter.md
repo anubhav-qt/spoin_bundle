@@ -73,6 +73,15 @@ We introduce two complementary pacing mechanisms to de-synchronize network arriv
   re-cluster on subsequent rounds. An inter-round jitter `random.uniform(0.5, 3.0s)`
   spaces out subsequent drafting rounds (rounds 2, 3, 4).
 
+## Validation & Benchmark 9 Breakthrough
+
+On 2026-09-04, Benchmark 9 was executed against the topic `"Generative AI"` (`topic_id: 85a8bea1-4997-4f9d-80b2-6408921fb4ad`) with all 4 pillars active:
+* **Result:** **Exit code 0** (full end-to-end completion, 0 crashes, 37m 48s runtime).
+* **Yield:** **426 cards accepted** (19 rejected, 3 failed), **287 questions accepted** (0 rejected).
+* **Topic Completion:** Database cards rose from 138 &rarr; 564 (**97.6% of 578 target**).
+* **Throughput:** **18.86 accepted items/min** (~1,131 total items/hr; ~676 cards/hr) on a single box.
+* Full trace and metrics documented in [ADR-0086 Breakthrough Benchmark](../handoff/adr-0086-breakthrough-benchmark.md).
+
 ## Consequences
 
 ### What becomes easier

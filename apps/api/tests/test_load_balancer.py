@@ -17,6 +17,7 @@ from spoin.generation.load_balancer import (
     Reservation,
     _Slot,
     make_ledger_writer,
+    pack_by_tokens,
 )
 from spoin.generation.quota import (
     AllModelsUnavailableError,
@@ -476,3 +477,35 @@ def test_parse_ladder_takes_an_optional_tpm() -> None:
 
     with pytest.raises(ValueError, match="model:rpd:rpm"):
         parse_ladder("m:500")
+
+
+# --- pack_by_tokens (ADR-0085) ---------------------------------------------
+
+
+def test_pack_by_tokens_cuts_a_chunk_short_when_the_items_are_fat() -> None:
+    """The batch-size setting is the ceiling on COUNT; the budget is the ceiling
+    on WEIGHT, and whichever binds first ends the chunk."""
+
+    items = [("a", 400), ("b", 400), ("c", 400), ("d", 400)]
+    chunks = pack_by_tokens(items, cost=lambda i: i[1], budget=1000, max_items=10)
+    # 400+400 fits, a third would be 1200 -- so it spills.
+    assert [[i[0] for i in c] for c in chunks] == [["a", "b"], ["c", "d"]]
+
+
+def test_pack_by_tokens_still_honours_the_count_ceiling() -> None:
+    items = [("a", 1), ("b", 1), ("c", 1), ("d", 1), ("e", 1)]
+    chunks = pack_by_tokens(items, cost=lambda i: i[1], budget=10_000, max_items=2)
+    assert [len(c) for c in chunks] == [2, 2, 1]
+
+
+def test_pack_by_tokens_gives_an_oversized_item_its_own_chunk() -> None:
+    """Splitting one card's body is not this function's business, and dropping
+    it would be a silent loss of content to satisfy an estimate."""
+
+    items = [("small", 10), ("huge", 99_999), ("small2", 10)]
+    chunks = pack_by_tokens(items, cost=lambda i: i[1], budget=1000, max_items=10)
+    assert [[i[0] for i in c] for c in chunks] == [["small"], ["huge"], ["small2"]]
+
+
+def test_pack_by_tokens_handles_an_empty_list() -> None:
+    assert pack_by_tokens([], cost=lambda _i: 1, budget=100, max_items=5) == []

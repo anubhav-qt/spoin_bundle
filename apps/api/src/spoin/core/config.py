@@ -163,6 +163,16 @@ class Settings(BaseSettings):
     #: but it was sized on the false premise that only requests are metered.
     verification_batch_size: int = 20
     question_batch_size: int = 35
+    #: The most estimated PROMPT tokens one call may carry (ADR-0085). Derived,
+    #: not picked: a cell's ceiling is `tpm / rpm` -- 250,000 / 15 ~= 16,600 --
+    #: which is the largest a call can be while a cell can still spend its full
+    #: requests-per-minute without blowing its tokens-per-minute. Rounded down.
+    #:
+    #: The `*_batch_size` settings above stay the CEILING on item COUNT; this is
+    #: the ceiling on item WEIGHT, and whichever binds first ends the chunk
+    #: (`pack_by_tokens`). What does not fit becomes the next request, and so
+    #: gets its own `(key, model)` from the balancer.
+    gemini_prompt_token_budget: int = 16_000
 
     #: Local-dev-only persistent loop (`python -m spoin.worker --watch`,
     #: wired into docker-compose.yml's `worker` service). Production still

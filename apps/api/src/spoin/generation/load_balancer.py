@@ -31,7 +31,7 @@ import logging
 import math
 import time
 from collections import deque
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -103,6 +103,40 @@ def estimate_tokens(text: str) -> int:
     """
 
     return max(1, len(text) // 4)
+
+
+def pack_by_tokens[T](
+    items: Sequence[T], *, cost: Callable[[T], int], budget: int, max_items: int
+) -> list[list[T]]:
+    """Chunk `items` so each chunk's estimated prompt cost stays under `budget`,
+    and no chunk holds more than `max_items` (ADR-0085).
+
+    This is the "spillover" half of token metering: the batch-size setting stays
+    the CEILING on how many items a call may carry, and the token budget cuts it
+    shorter whenever the items are fat. What does not fit becomes the next
+    chunk, and because every chunk is its own request it gets its own
+    `(key, model)` from `assign()` -- so an overlong batch spreads across cells
+    instead of overrunning one cell's minute.
+
+    An item that is over budget on its own still gets a chunk to itself:
+    splitting one card's body is not this function's business, and dropping it
+    would be a silent loss of content to satisfy an estimate.
+    """
+
+    chunks: list[list[T]] = []
+    current: list[T] = []
+    spent = 0
+    for item in items:
+        item_cost = cost(item)
+        if current and (len(current) >= max_items or spent + item_cost > budget):
+            chunks.append(current)
+            current = []
+            spent = 0
+        current.append(item)
+        spent += item_cost
+    if current:
+        chunks.append(current)
+    return chunks
 
 
 def _backend(key_index: int, model: str) -> str:

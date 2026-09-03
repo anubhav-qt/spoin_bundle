@@ -40,6 +40,7 @@ from spoin.generation.base import (
 )
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
+from spoin.generation.load_balancer import estimate_tokens, pack_by_tokens
 from spoin.generation.pipeline.persistence import (
     _create_deep_dive_stubs,
     _current_question_stems,
@@ -1105,8 +1106,15 @@ async def _correct_subtopic_drafts(
     corrected: list[CardDraft] = []
     failures: list[str] = []
 
-    for start in range(0, len(drafts), batch_size):
-        chunk = drafts[start : start + batch_size]
+    # Correction sends whole card BODIES, so the count ceiling above is only half
+    # the limit -- `pack_by_tokens` cuts the chunk shorter when the cards are fat
+    # and lets the remainder become its own request on its own cell (ADR-0085).
+    for chunk in pack_by_tokens(
+        drafts,
+        cost=lambda d: estimate_tokens(d.title + d.canonical_title + d.summary + d.body),
+        budget=runtime.settings.gemini_prompt_token_budget,
+        max_items=batch_size,
+    ):
         queries = [
             CardCorrectionQuery(
                 index=index,
@@ -1197,8 +1205,12 @@ async def _verify_subtopic_drafts(
     rejected: list[tuple[CardDraft, str]] = []
     failures: list[str] = []
 
-    for start in range(0, len(items), batch_size):
-        chunk = items[start : start + batch_size]
+    for chunk in pack_by_tokens(
+        items,
+        cost=lambda it: estimate_tokens(it[0].canonical_title + it[0].body),
+        budget=runtime.settings.gemini_prompt_token_budget,
+        max_items=batch_size,
+    ):
         queries = [
             CardVerificationQuery(
                 index=index,
@@ -1294,8 +1306,12 @@ async def _generate_questions_for_group(
     drafts: list[tuple[Any, uuid.UUID]] = []
     failures: list[str] = []
 
-    for start in range(0, len(cards), batch_size):
-        chunk = cards[start : start + batch_size]
+    for chunk in pack_by_tokens(
+        cards,
+        cost=lambda c: estimate_tokens(c[1] + c[2]),
+        budget=runtime.settings.gemini_prompt_token_budget,
+        max_items=batch_size,
+    ):
         result = await runtime.generator.generate_questions(
             cards=[(title, body) for _card_id, title, body in chunk],
             difficulty=parsed_difficulty,

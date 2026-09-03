@@ -116,6 +116,7 @@ from spoin.generation.load_balancer import (
     Reservation,
     estimate_tokens,
     make_ledger_writer,
+    pack_by_tokens,
     seed_rpd,
 )
 from spoin.generation.quota import (
@@ -879,6 +880,9 @@ class GeminiContentGenerator(ContentGenerator):
         self._keys = keys
         self._request_timeout_s = settings.gemini_request_timeout_seconds
         self._ascii_redraw_attempts = settings.ascii_redraw_attempts
+        #: Prompt-token ceiling for one call (ADR-0085) -- `fetch_ascii_scenes`
+        #: packs its queries against it, since each carries whole artworks.
+        self._prompt_token_budget = settings.gemini_prompt_token_budget
         #: The two model ladders (ADR-0028). A `LoadBalancer` walks whichever one
         #: a call's `kind` selects; both are over the same physical keys, so one
         #: balancer owns both ladders for its key set (ADR-0084).
@@ -1481,69 +1485,91 @@ class GeminiContentGenerator(ContentGenerator):
                 for q in queries
             )
         )
-        allowed_ids = {c.id for cands in candidate_lists for c in cands}
-        if not allowed_ids:
+        if not any(candidate_lists):
             # Library unavailable or fully excluded for this topic -- nothing to
             # pick from, every card free-draws.
             return BatchResult(
                 items=[AsciiFetchResult(index=q.index, matched=False) for q in queries]
             )
 
-        cards_block = "\n\n".join(
-            _format_fetch_candidates(q, cands)
+        # Each query carries `_ASCII_CANDIDATE_COUNT` whole artworks into the
+        # prompt, so an N-card tier used to send N x k of them in ONE request --
+        # the heaviest prompt the pipeline builds. Pack the queries by their real
+        # rendered weight instead (ADR-0085); every chunk is its own request and
+        # so gets its own `(key, model)` from the balancer. Results are keyed by
+        # `q.index`, not position, so chunking cannot scramble them.
+        rendered = [
+            (q, cands, _format_fetch_candidates(q, cands))
             for q, cands in zip(queries, candidate_lists, strict=True)
-        )
-        prompt = [
-            ("system", prompts.ASCII_FETCH_SYSTEM),
-            (
-                "human",
-                prompts.ASCII_FETCH_USER.format(
-                    topic_name=topic_name,
-                    subtopic_title=subtopic_title,
-                    difficulty=difficulty.value,
-                    count=len(queries),
-                    cards_block=cards_block,
-                ),
-            ),
         ]
-        try:
-            wire = await self._invoke_with_retry("generator", _WireAsciiFetchBatch, prompt)
-        except QuotaExhaustedError:
-            raise
-        except Exception as exc:
-            return BatchResult(items=[], failures=[f"fetch_ascii_scenes call failed: {exc}"])
-
-        valid_indices = {q.index for q in queries}
-        by_index: dict[int, _WireAsciiFetch] = {}
-        for scene in wire.scenes:
-            if scene.index in valid_indices:
-                by_index[scene.index] = scene
+        chunks = pack_by_tokens(
+            rendered,
+            cost=lambda r: estimate_tokens(r[2]),
+            budget=self._prompt_token_budget,
+            max_items=len(rendered),
+        )
 
         items: list[AsciiFetchResult] = []
         failures: list[str] = []
-        for q in queries:
-            picked = by_index.get(q.index)
-            # A missing entry, an explicit refusal, or a src_id the query was
-            # never shown all collapse to the same "this card free-draws"
-            # outcome -- distinct from a call failure (handled above).
-            if picked is None or not picked.matched or picked.src_id not in allowed_ids:
-                items.append(AsciiFetchResult(index=q.index, matched=False))
+        for chunk in chunks:
+            chunk_queries = [q for q, _cands, _text in chunk]
+            allowed_ids = {c.id for _q, cands, _text in chunk for c in cands}
+            cards_block = "\n\n".join(text for _q, _cands, text in chunk)
+            prompt = [
+                ("system", prompts.ASCII_FETCH_SYSTEM),
+                (
+                    "human",
+                    prompts.ASCII_FETCH_USER.format(
+                        topic_name=topic_name,
+                        subtopic_title=subtopic_title,
+                        difficulty=difficulty.value,
+                        count=len(chunk_queries),
+                        cards_block=cards_block,
+                    ),
+                ),
+            ]
+            try:
+                wire = await self._invoke_with_retry("generator", _WireAsciiFetchBatch, prompt)
+            except QuotaExhaustedError:
+                raise
+            except Exception as exc:
+                # One chunk failing is not the whole tier failing: its cards
+                # free-draw and the remaining chunks still get their shot.
+                failures.append(f"fetch_ascii_scenes call failed: {exc}")
+                items.extend(AsciiFetchResult(index=q.index, matched=False) for q in chunk_queries)
                 continue
-            art = _strip_ascii_fence_wrapper(picked.ascii_art)
-            if not art.strip():
-                items.append(AsciiFetchResult(index=q.index, matched=False))
-                failures.append(f"card {q.index}: picked {picked.src_id} but returned empty art")
-                continue
-            items.append(
-                AsciiFetchResult(
-                    index=q.index,
-                    matched=True,
-                    src_id=picked.src_id,
-                    label=picked.ascii_label,
-                    art=art,
-                    alt=picked.ascii_alt,
+
+            valid_indices = {q.index for q in chunk_queries}
+            by_index: dict[int, _WireAsciiFetch] = {}
+            for scene in wire.scenes:
+                if scene.index in valid_indices:
+                    by_index[scene.index] = scene
+
+            for q in chunk_queries:
+                picked = by_index.get(q.index)
+                # A missing entry, an explicit refusal, or a src_id the query was
+                # never shown all collapse to the same "this card free-draws"
+                # outcome -- distinct from a call failure (handled above).
+                if picked is None or not picked.matched or picked.src_id not in allowed_ids:
+                    items.append(AsciiFetchResult(index=q.index, matched=False))
+                    continue
+                art = _strip_ascii_fence_wrapper(picked.ascii_art)
+                if not art.strip():
+                    items.append(AsciiFetchResult(index=q.index, matched=False))
+                    failures.append(
+                        f"card {q.index}: picked {picked.src_id} but returned empty art"
+                    )
+                    continue
+                items.append(
+                    AsciiFetchResult(
+                        index=q.index,
+                        matched=True,
+                        src_id=picked.src_id,
+                        label=picked.ascii_label,
+                        art=art,
+                        alt=picked.ascii_alt,
+                    )
                 )
-            )
         return BatchResult(items=items, failures=failures)
 
     async def _resolve_ascii_art(

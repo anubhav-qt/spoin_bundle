@@ -42,22 +42,35 @@ We introduce two complementary pacing mechanisms to de-synchronize network arriv
 
 ### 1. Pool-Wide Dispatch Staggering in `LoadBalancer` (`gemini_dispatch_stagger_seconds`)
 - `LoadBalancer` enforces a minimum spacing between any two consecutive reservations
-  across the **entire balancer** (`_dispatch_stagger_s`, default `0.5s`).
+  across the **entire balancer** (`_dispatch_stagger_s`, tuned to `1.2s` following Benchmark 8).
 - While `gemini_send_gap_seconds` (10s) spaces requests to the *same* `(key, model)` cell,
   `gemini_dispatch_stagger_seconds` spaces requests across *different* cells.
-- When multiple coroutines call `assign()` simultaneously, the first gets $t = 0$, the
-  second $t = 0.5\text{s}$, the third $t = 1.0\text{s}$, etc.
-- An instantaneous 30-branch fanout is converted into a smooth stream over 15 seconds.
-  Because calls complete in ~2–4 seconds, in-flight concurrency at Google's edge never
-  spikes beyond 3–5 concurrent connections.
+- Initial testing with `0.5s` in Benchmark 8 proved the fanout mechanism (45/50 calls
+  in the initial wave succeeded with 200 OK), but when prompts jumped from ~4,900 chars
+  to ~13,700 chars during drafting, average call latency rose to ~8s. A 0.5s stagger
+  allowed in-flight concurrency to build to 16–20 simultaneous heavy calls, tripping
+  Google's edge shedding. Widening to `1.2s` caps concurrent in-flight connections to
+  $\sim 5\text{--}6$, safely under the edge threshold.
 
 ### 2. Initial Fanout Jitter in `nodes.py` (`gemini_initial_dispatch_jitter_seconds`)
 - Before entering `_generate_subtopic_cards`, each subtopic group branch sleeps for a
   random jitter `uniform(0.0, gemini_initial_dispatch_jitter_seconds)` (default `1.5s`).
 - This prevents dozens of branches from stampeding simultaneously on balancer locks,
-  database reads, or local event loops.
-- Active only when `generator != "fake"` and `gemini_initial_dispatch_jitter_seconds > 0.0`,
-  ensuring unit tests run in milliseconds without synthetic delays.
+  database reads, or local event loops. Active only when `generator != "fake"`.
+
+### 3. Perimeter Shedding Backoff in `_invoke_with_retry`
+- In Benchmark 8, when Google shed a heavy payload with a bare 429, the retry loop
+  in `_invoke_with_retry` immediately tried the next cell in the box with no delay.
+  With 74 other keys available, it machine-gunned 148 cells in under 2 minutes.
+- When an un-scoped/bare 429 arrives, the caller now pauses for `5.0s + random.uniform(0.0, 2.0s)`
+  before requesting the next cell from the balancer. This decorrelated backoff gives
+  the gateway perimeter window time to drain and prevents retrying coroutines from
+  synchronizing their next attempts.
+
+### 4. Inter-Round Drafting Jitter in `nodes.py`
+- In `_generate_subtopic_cards`, subtopics that finish planning simultaneously can
+  re-cluster on subsequent rounds. An inter-round jitter `random.uniform(0.5, 1.5s)`
+  spaces out subsequent drafting rounds (rounds 2, 3, 4).
 
 ## Consequences
 
@@ -68,15 +81,14 @@ We introduce two complementary pacing mechanisms to de-synchronize network arriv
 - **Fairer cell distribution:** Coroutines arrive staggered at `assign()`, so least-spent
   selection and token-window checks see accurate in-flight state rather than racing
   the same cold ledger snapshot.
-- **Sustained throughput:** At a 0.5s stagger, the pool can dispatch up to 120 calls/minute.
-  For a 34-key or 75-key box, this comfortably accommodates the required throughput
-  without artificial bottlenecking.
+- **Cascades are stopped cold:** A transient edge drop pauses that branch for 5–7s instead
+  of burning through all 148 cells in the box.
+- **Sustained throughput:** At a 1.2s stagger, the box dispatches 50 calls/minute,
+  comfortably sustaining generation without artificial bottlenecks.
 
 ### What becomes harder / Costs
-- Initial topic fanout is slightly less bursty, taking ~10–15s for all branches to launch
-  their first call instead of launching all 30 at $t = 0$. This 10s difference is
-  negligible against a multi-minute generation run and prevents the cascading 60s
-  starvation cooldowns caused by 429 storms.
+- Initial topic fanout and subsequent rounds are slightly spaced out. This ~15–30s
+  difference across a multi-minute run is negligible and eliminates cascading failures.
 - Requires maintaining one additional timestamp (`_last_pool_send`) on `LoadBalancer`.
 
 ## Alternatives considered
@@ -86,18 +98,17 @@ Rejected: As demonstrated by Probe A in Benchmarks 3 and 4, per-cell spacing was
 p50 49.5s. But because all cells were cold at start, all cells dispatched their first call
 at the exact same instant, triggering perimeter 429s.
 
+**Immediate cell hopping without perimeter backoff.**
+Rejected: Benchmark 8 proved that rotating to the next cell 0.5s after an edge drop
+exacerbates perimeter load, cascading across all 148 cells in under 2 minutes.
+
 **Global token semaphore across all in-flight calls.**
 Rejected: A token semaphore requires predicting the exact in-flight duration of external
 network calls and introduces distributed coordination overhead. Dispatch staggering is
 simpler, deterministic, and addresses the actual trigger: simultaneous connection arrivals.
 
-**Hard concurrency limit (e.g. `asyncio.Semaphore(5)`).**
-Rejected: A hard semaphore caps concurrency arbitrarily regardless of pool size. Staggering
-spaces the arrival rate on the wire while allowing natural in-flight overlap as responses
-return.
-
 ## Revisit when
 
 - Google publishes explicit perimeter concurrency and burst limits for the Gemini API.
-- The pool size scales past 300 keys where a 0.5s dispatch stagger becomes the binding
-  throughput constraint (at which point stagger can be tuned down to 0.2s or sharded).
+- The pool size scales past 300 keys where a 1.2s dispatch stagger becomes the binding
+  throughput constraint.

@@ -698,6 +698,11 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 tier["existing_count"],
                 target,
             )
+            if round_number > 1 and runtime.settings.generator != "fake":
+                # ADR-0086: Inter-round drafting jitter to prevent subtopics that finished
+                # planning simultaneously from re-clustering into concurrent drafting waves.
+                await asyncio.sleep(random.uniform(0.5, 1.5))
+
             result = await runtime.generator.generate_cards(
                 topic_name=job["topic_name"],
                 subtopic_title=tier["title"],

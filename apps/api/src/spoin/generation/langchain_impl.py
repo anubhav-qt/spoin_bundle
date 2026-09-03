@@ -69,6 +69,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
+import random
 import re
 import time
 from collections.abc import AsyncIterator
@@ -1195,6 +1196,27 @@ class GeminiContentGenerator(ContentGenerator):
                                 f"grid is refusing us. Daily quota remains; this is "
                                 f"throttling, not exhaustion."
                             ) from exc
+                        # ADR-0086: Perimeter backoff on un-scoped/bare 429s.
+                        # When Google's edge gateway sheds connections under perimeter
+                        # load, immediately trying the next cell machine-guns through
+                        # the entire box. Back off 5s + uniform jitter before asking
+                        # the balancer for another key, allowing the perimeter to drain.
+                        backoff_s = (
+                            limit.retry_after_s
+                            if limit.retry_after_s is not None
+                            else (5.0 + random.uniform(0.0, 2.0))
+                        )
+                        logger.info(
+                            "lb %s: cell key=%d model=%s rate-limited (streak %d/%d) -- "
+                            "backing off %.1fs before next cell",
+                            lb.name,
+                            key_index,
+                            model,
+                            throttle_streak,
+                            grid_size,
+                            backoff_s,
+                        )
+                        await asyncio.sleep(backoff_s)
                         continue
                     lb.on_rate_limited(res, now=datetime.now(UTC), per_minute=False)
                     logger.warning(

@@ -142,8 +142,10 @@ class Settings(BaseSettings):
     #: balancer (ADR-0086). While `gemini_send_gap_seconds` paces requests to the
     #: SAME cell, this paces dispatches across DIFFERENT cells to prevent edge
     #: gateway shedding when parallel subtopic branches fan out simultaneously.
+    #: Tuned to 1.2s after Benchmark 8 (0.5s allowed 16-20 heavy calls in flight,
+    #: triggering edge shedding; 1.2s bounds in-flight concurrency to ~5-6 calls).
     #: 0.0 disables dispatch staggering.
-    gemini_dispatch_stagger_seconds: float = 0.5
+    gemini_dispatch_stagger_seconds: float = 1.2
     #: Maximum random jitter (seconds) applied before entering a subtopic group's
     #: card generation branch (ADR-0086), desynchronizing the initial wave before
     #: reaching the balancer or database. 0.0 disables initial jitter.

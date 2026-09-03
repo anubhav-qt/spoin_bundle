@@ -125,15 +125,19 @@ class Settings(BaseSettings):
     #: whether one topic across all keys, paced (`gemini_send_gap_seconds`),
     #: sustains; only then does splitting the pool into boxes get retried.
     topic_key_box_size: int = 75
-    #: Minimum seconds between two sends to the SAME key, enforced by every
-    #: `LoadBalancer` (ADR-0084). The fix for the burst that floored the pool:
-    #: at fan-out, ~N subtopic groups all want a key at once, and without a gap
-    #: a handful of keys get hit repeatedly in the same second -- a burst the
-    #: provider's token bucket rejects even though the per-minute average is
-    #: fine. 4s per key caps each key at its believed 15/min ceiling AND spreads
-    #: the fan-out into a round-robin instead of a thundering herd. Tune with a
-    #: benchmark.
-    gemini_send_gap_seconds: float = 4.0
+    #: Minimum seconds between two sends to the SAME `(key, model)` cell,
+    #: enforced by every `LoadBalancer` (ADR-0084). This IS the rate limiter
+    #: while it is > 0 (the trailing window + learned rpm go dormant): `60/gap`
+    #: requests per minute per cell, round-robined evenly across the pool.
+    #:
+    #: 2026-09-03: 4s (15/min) still drew an 85% 429 rate on a single-topic,
+    #: single-box run -- and the owner then verified against 8 separate Google
+    #: accounts that the daily budget was barely touched, so it is per-MINUTE
+    #: throttling, not exhaustion. 10s (6/min per cell) is the next probe: if it
+    #: flows the real ceiling is between 6 and 15/min; if it still storms the
+    #: keys share projects (finish the audit's Phase B). Tune with a benchmark,
+    #: never by feel.
+    gemini_send_gap_seconds: float = 10.0
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.

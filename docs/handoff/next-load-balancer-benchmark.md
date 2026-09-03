@@ -10,37 +10,46 @@ Paste the **Prompt** block into a fresh session.
 
 > The ADR-0084 in-memory load balancer is on `main` and its mechanism is proven
 > correct (deterministic send rate, even round-robin — see "What we already
-> know"). Two benchmarks failed with 85–95% 429 rates, but the pool was
-> contaminated: ~6,900 lite-tier calls were burned earlier today (mostly a
-> 3.5-hour orphaned `generate_topics` run) and 11+ `(key,model)` cells hit their
-> 500/day cap. **Neither run was a clean test.** Your job is to get one.
+> know"). Two benchmarks failed with 85–95% 429 rates.
 >
-> ### Path A — re-benchmark on a fresh daily budget (do this first)
+> **KEY FINDING (2026-09-03, owner-verified):** the owner checked 8 keys from 8
+> separate Google accounts/projects directly against Google's dashboards —
+> **more than HALF the daily quota is left even on the top thinker models (3.8,
+> 3.7-flash), and ≲20 requests have gone to the flash-lite models all day.** So
+> the "7 keys at 500/day cap" in our `quota_ledger` is **stale garbage** written
+> by the pre-ADR-0084 orphan run's old-code accounting — NOT real exhaustion.
+> The 429 storms are **per-minute throttling**, and 15/min per cell (the old 4s
+> gap) is above the real ceiling. A `gemini_send_gap_seconds = 10.0` (6/min per
+> cell) probe was set at end of session; re-measure from there.
 >
-> 1. Confirm the Google free-tier daily reset has passed (~00:00
->    America/Los_Angeles ≈ **07:00 UTC**). Sanity-check:
->    `docker compose exec -T db psql -U spoin -d spoin_db_2 -tA -c "select coalesce(sum(requests_spent),0) from quota_ledger where day=date_trunc('day',now())"`
->    — should be low (hundreds, not thousands).
-> 2. Re-run benchmark 2 **verbatim**, config unchanged (`topic_key_box_size=75`
->    → one box, `gemini_send_gap_seconds=4.0` → 4s per `(key,model)` cell):
+> ### Path A — probe the real per-minute ceiling (do this first; no reset needed)
+>
+> The daily budget is fine (see KEY FINDING), so this is purely about finding a
+> send rate Gemini accepts. `gemini_send_gap_seconds` is already `10.0` on main.
+>
+> 1. Run benchmark 3 (`topic_key_box_size=75` → one box, `gemini_send_gap_seconds=10.0`
+>    → 6/min per cell):
 >    ```
 >    docker compose exec -T api sh -c 'python -m spoin.generate_topics "Generative AI" 2>&1 | tee /tmp/bench3.log'
 >    ```
->    Run it with `run_in_background`. **Immediately** grab the in-container PID
+>    `run_in_background`. **Immediately** grab the in-container PID
 >    (`docker compose exec -T api bash -c 'for p in /proc/[0-9]*; do tr "\0" " " < $p/cmdline; echo; done | grep generate_topics'`)
 >    — killing the bash task does NOT kill it (see gotchas).
-> 3. Let it run. The fan-out storm (if any) starts ~4 min in. Check at T+5 and
->    T+10 min: `grep -c '429 Too Many' /tmp/bench3.log` vs
+> 2. The fan-out is ~4 min in (after the 60s warm-up + planning). Check at T+5
+>    and T+10: `grep -c '429 Too Many' /tmp/bench3.log` vs
 >    `grep -c 'HTTP/1.1 200' /tmp/bench3.log`, and Generative AI's card count
 >    (base 138).
-> 4. **Decision, from the first ~10 min:**
->    - **429 rate < ~20%, cards climbing** → 4s works on a clean pool; today was
->      pure daily exhaustion. Next: drop `topic_key_box_size` to 34, re-run with
->      two topics, confirm concurrency is safe, then finish the topic queue
->      (`docs/notes/generation-queue.md`).
->    - **429 rate still > ~50% on a fresh day** → the real per-minute ceiling is
->      below 15/min for these keys → shared projects. Either widen the gap
->      (`gemini_send_gap_seconds` 4 → 12–15) and re-test, or go to Path B.
+> 3. **Decision, from the first ~10 min:**
+>    - **429 rate < ~15%, cards climbing** → 6/min per cell is under the real
+>      ceiling. Narrow it back toward 4–6s to reclaim throughput, re-measure,
+>      then drop `topic_key_box_size` to 34 for a two-topic concurrency test, then
+>      finish the queue (`docs/notes/generation-queue.md`).
+>    - **429 rate still > ~40%** even at 6/min → the keys share projects (several
+>      map to one per-minute bucket, so the effective rate per bucket is 2–4×
+>      what the balancer thinks). Go to Path B.
+>    - Watch for a run that **spin-waits without terminating** (bench 2 did this
+>      — a sparse trickle of 200s kept resetting the throttle streak). Kill it;
+>      that itself is the "keys are throttled" signal.
 >
 > ### Path B — finish the key→project audit (the real fix if A confirms sharing)
 >
@@ -74,16 +83,20 @@ Paste the **Prompt** block into a fresh session.
   terminal error — the sparse trickle of 200s kept resetting the throttle
   streak; a "no accepted cards in N minutes → give up" guard is a possible
   follow-up).
-- **Why the pool is contaminated:** `gemini-3.5-flash-lite` 4,766 req today with
-  **7 keys at the 500/day cap**; `gemini-3.1-flash-lite` 2,122 with 4 at cap.
-  Most of that is a 3.5-hour orphaned `generate_topics` (Physical Fitness + Carl
-  Jung) run that survived a `TaskStop`, ran on pre-ADR-0084 code, and was
-  migrated out from under before being killed. No corruption resulted; PF got to
-  ~504 cards, CJ to ~407.
-- **Google returns scopeless `RESOURCE_EXHAUSTED`** on ~99% of 429s (580 vs 2
-  self-identified as per-day this run), so per-minute vs per-day is
-  indistinguishable at the wire. This is the standing ADR-0060 problem.
-- **Daily reset:** Google free tier resets at ~midnight America/Los_Angeles.
+- **Our `quota_ledger` over-counts.** It showed `gemini-3.5-flash-lite` 4,766
+  req today / 7 keys at the 500/day cap — but Google's own dashboards (8
+  separate accounts) show ≲20 flash-lite requests and >50% thinker quota left.
+  The 500s are stale rows from the pre-ADR-0084 orphan `generate_topics`
+  (Physical Fitness + Carl Jung) run — 3.5 h on old code that survived a
+  `TaskStop`, wrote `requests_spent = 500` on its own 429 classification, and
+  was migrated out from under before being killed. No corruption; PF reached
+  ~504 cards, CJ ~407. **A follow-up worth doing:** zero or reconcile today's
+  `quota_ledger` rows so seeds are honest (owner approval — it's a write to
+  `spoin_db_2`).
+- **Google returns scopeless `RESOURCE_EXHAUSTED`** on ~99% of 429s, so
+  per-minute vs per-day is indistinguishable at the wire (standing ADR-0060
+  problem). But the owner's dashboard check settles it for now: **it's
+  per-minute.**
 - `.env` (gitignored) holds 75 keys: ~36 verified-distinct + 33 known-good + ~6
   partially-pruned representatives of a 45-key shared-project block.
 - Migration `c4d5e6f708a9` is **applied** to `spoin_db_2`. alembic head is

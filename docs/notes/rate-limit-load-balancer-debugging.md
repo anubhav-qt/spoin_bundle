@@ -1,11 +1,24 @@
 # The rate-limit debugging arc: Run 8 → key boxes → the load balancer
 
-> **Span:** 2026-08-30 → 2026-09-03. **Outcome:** ADR-0082 (fixed key boxes) +
-> ADR-0083 (least-spent-first inside a box, no rpm decay on a scopeless 429).
+> **Span:** 2026-08-30 → 2026-09-03. **Outcome:** ADR-0082 (fixed key boxes) →
+> ADR-0083 (least-spent-first inside a box) → **ADR-0084 (a per-box in-memory
+> `LoadBalancer` replaces the DB-backed `QuotaGovernor` wholesale)**.
 > **Live DB:** `spoin_db_2`, 75-key pool, box 34, 2 topics concurrent.
 >
 > This is the "why", so the next session does not re-run the dead ends. The
 > decisions are in the ADRs; this is the path between them.
+>
+> **ADR-0084 note (2026-09-03, unbenchmarked):** the owner called for a
+> from-scratch replacement of the quota governor — "it was all AI slop", grown by
+> accretion across ten ADRs against a multi-process assumption that no longer
+> holds. `quota.py` shrank ~1660 → ~150 lines; `quota_request` + `model_unavailable`
+> tables dropped, `quota_ledger` trimmed to `requests_spent`. `make check` green
+> (495 tests). **The migration `c4d5e6f708a9` is written but NOT applied** — needs
+> the owner's `alembic upgrade head` (the new code runs fine against the
+> un-migrated schema; the migration is cleanup). No benchmark run yet: the
+> queued topics (Air Pistol, Generative AI, …) are the first real exercise.
+> Watch the 429 rate against Run 8's; if it's materially higher the box should
+> *grow* (ADR-0082/0084 revisit).
 
 ---
 

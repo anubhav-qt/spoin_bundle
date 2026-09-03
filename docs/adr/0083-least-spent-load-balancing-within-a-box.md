@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-03
 - **Deciders:** Anubhav
+- **Mechanism replaced by:** [ADR-0084](0084-per-box-load-balancer.md) -- least-spent-first-per-call and the box/pool split are kept; they are now how `LoadBalancer.try_assign` sorts candidates rather than a `key_scope` argument on `_invoke_with_retry`. The `scope_certain` gate this ADR added is dropped (see ADR-0084 §on learning).
 
 - **Amends:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- a subtopic
   group's card run no longer PINS to one key. The claim still exists and still

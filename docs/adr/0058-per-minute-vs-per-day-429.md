@@ -3,6 +3,7 @@
 - **Status:** Accepted (amends [ADR-0028](0028-key-model-quota-ladder.md))
 - **Date:** 2026-08-25
 - **Deciders:** Anubhav
+- **Superseded by:** [ADR-0084](0084-per-box-load-balancer.md) -- the `quota_request` table and the shared-window design are removed. The pipeline is the only process on the pool now, so the per-minute window is an in-memory `deque` per box. The per-minute-vs-per-day *classification* (this ADR's core idea) is unchanged and still in `_classify_rate_limit`.
 - **Amended by:** [ADR-0060](0060-unknown-429-scope-defaults-to-per-minute.md) -- the
   unknown-scope fallback below is **reversed**: an unidentifiable 429 is now treated as
   per-minute, and `RetryInfo` is read as evidence even when a `quotaId` accompanies it. The

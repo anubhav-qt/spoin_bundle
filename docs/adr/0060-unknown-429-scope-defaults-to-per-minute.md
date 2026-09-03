@@ -3,6 +3,7 @@
 - **Status:** Accepted (amends [ADR-0058](0058-per-minute-vs-per-day-429.md))
 - **Date:** 2026-08-26
 - **Deciders:** Anubhav
+- **Superseded in part by:** [ADR-0084](0084-per-box-load-balancer.md) -- an unidentified 429 is still treated as per-minute (this ADR's call), and the `scope_certain` gate ADR-0083 added is dropped: the balancer's learned-rpm update is now a measured floor (`min(learned, sends in window)`), safe to apply on every per-minute 429.
 - **Amended by:** [ADR-0083](0083-least-spent-load-balancing-within-a-box.md) --
   an unidentifiable 429 is still treated as per-minute (parked, day refunded;
   this ADR's call, unchanged), but it no longer *also* halves the cell's learned

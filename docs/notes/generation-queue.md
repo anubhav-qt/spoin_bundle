@@ -1,11 +1,13 @@
 # Generation Queue
 
 > **Live DB:** `spoin_db_2`
-> **Regime:** ADR-0082 key boxes (box 34, 2 topics concurrent) + ADR-0074 per-group
-> claim. Redraft brake (`_LATER_PASS_MIN_ROUND_PROGRESS`, nodes.py): a resume pass
-> hands a subtopic-tier off after 5 rounds that each close <10% of its remaining
-> gap — the rest is deferred to a future backfill, not spun on. Gate calls
-> (`correct_cards`/`verify_cards`) run pool-wide, not pinned to the card key.
+> **Regime:** ADR-0082 key boxes (box 34, 2 topics concurrent); ADR-0084 per-box
+> in-memory `LoadBalancer` (replaces the DB quota governor — least-spent-first
+> per call, 60s window, learned ceiling = measured send count on a 429, 60s
+> warm-up). Gate calls (`correct_cards`/`verify_cards`) run on the whole-pool
+> remainder balancer. Redraft brake (`_LATER_PASS_MIN_ROUND_PROGRESS`, nodes.py):
+> a resume pass hands a subtopic-tier off after 5 rounds that each close <10% of
+> its remaining gap — the rest is deferred to a future backfill, not spun on.
 >
 > Reconciled against the DB 2026-09-03. Card/question counts are live rows, not
 > targets — a topic with a curriculum but well under ~450–700 cards still has

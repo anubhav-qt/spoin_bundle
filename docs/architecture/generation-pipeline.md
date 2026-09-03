@@ -180,23 +180,23 @@ structurally impossible rather than merely counted; `tests/test_architecture.py`
 a semaphore ever comes back.
 
 Since ADR-0082, **K is the topic's KEY BOX, not the whole pool**: a topic is handed
-`settings.topic_key_box_size` keys (34 today) for its whole run, and every scan a claim inside it
-makes sees only those. The box is closed: there is no
-shared reserve and no borrowing outside it, which is what keeps total in-flight work a
-constant (`max_concurrent_topics x box_size`, one caller each) no matter what is queued.
-That is the property the reverted [ADR-0078](../adr/0078-topic-parallel-key-leases.md)
-lacked.
+`settings.topic_key_box_size` keys (34 today) for its whole run. The box is closed -- no
+shared reserve, no borrowing -- which keeps total in-flight work a constant
+(`max_concurrent_topics x box_size`, one caller each) whatever is queued, the property the
+reverted [ADR-0078](../adr/0078-topic-parallel-key-leases.md) lacked.
 
-[ADR-0083](../adr/0083-least-spent-load-balancing-within-a-box.md) then dropped ADR-0074's
-per-group **pin**: a subtopic group no longer binds one key for its whole card run. Each
-generation call picks the least-spent key *in the box* fresh (`key_scope="box"`,
-`KeyClaim.sticky=False`); the thinking gate spreads pool-wide (`"pool"`). The burst of ~10
-calls a group makes in a few seconds was tripping the single pinned key's 15-rpm cell while
-the rest of the box sat cold -- `cell_lock` + `_try_reserve_rpm`, not the pin, are what
-make an rpm violation impossible, so spreading the choice costs nothing and un-corners the
-load. ADR-0083 also stops `_shrink_effective_rpm` firing on a scopeless 429 (Google returns
-no `quotaId` on nearly all of them now, and halving on each walked healthy cells to the
-floor over a run).
+**[ADR-0084](../adr/0084-per-box-load-balancer.md) is the current mechanism.** The DB-backed
+`QuotaGovernor` (the `quota_request` table, the `KeyClaim` registry, the AIMD learned rpm)
+is gone: the pipeline is the only process on the pool, so a box now *owns a `LoadBalancer`*
+that holds its state in memory. Per `(key, model)` cell it keeps an RPD counter (seeded once
+from `quota_ledger`, written back every 10), a trailing-60s send `deque`, and a learned rpm
+that drops to the *measured* send count on a 429 (not halved blindly) and probes +1/min back
+up. `assign(kind)` walks the `kind` ladder strongest-rung-first and picks the least-spent
+key in the box that isn't cooling and has window room -- ADR-0083's least-spent-first, now a
+pure in-memory sort under a per-box lock. A fresh balancer treats every cell as cooling for
+60s (the warm-up), so a second box or a crash-restart never co-bursts on an empty window.
+The thinking gate runs on a whole-pool remainder balancer, not a box. `cell_lock` (ADR-0040)
+still serialises the actual send; it, not any pin, is what makes an rpm violation impossible.
 
 ## Worker: per-job isolation, not graph-level fan-out
 

@@ -14,19 +14,20 @@ rewrite to undo" means in practice.
 up to `settings.max_concurrent_topics` pending jobs — `pool // topic_key_box_size`,
 so 2 at the current 75-key pool and a box of 34 — in priority-then-`created_at` order, and runs
 them concurrently, each on its OWN DB session and its OWN box of keys, sharing
-one `ContentGenerator` so a single `KeyClaimRegistry` keeps the boxes disjoint.
-One job's exception marks only that job `failed`/`pending`; failure isolation is
-per-job. Inside a box nothing changed: the pipeline's LangGraph concurrency
-(ADR-0024) fans out per subtopic group, each claiming one key for its whole card
-run (ADR-0074), so at most one group per key is ever in flight — the difference
-is that "the keys" now means this topic's 34, not the whole pool.
+one `ContentGenerator` so a single `BoxPool` keeps the boxes disjoint. One job's
+exception marks only that job `failed`/`pending`; failure isolation is per-job.
+Inside a box, the pipeline's LangGraph concurrency (ADR-0024) fans out per
+subtopic group; each generation call routes through the box's `LoadBalancer`
+(ADR-0084), which picks the least-spent key in the box and serialises the send
+per `(key, model)` cell — so at most one caller per cell, over this topic's 34
+keys, not the whole pool.
 
-That is the hybrid: sequential inside a box, parallel across boxes. ADR-0073's
+That is the hybrid: bounded inside a box, parallel across boxes. ADR-0073's
 strictly-sequential loop under-used a 119-key pool; ADR-0078's width-derived
 leases over-used it (a dozen topics at once burst the per-minute ceilings and
 the run stopped being walk-away-safe). A fixed box makes total in-flight work a
-constant — `max_concurrent_topics * box_size` keys, one caller each — instead of
-a function of how many topics happen to be queued.
+constant — `max_concurrent_topics * box_size` keys — instead of a function of
+how many topics happen to be queued.
 """
 
 from __future__ import annotations

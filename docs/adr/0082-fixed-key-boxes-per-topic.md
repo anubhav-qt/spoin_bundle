@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-02
 - **Deciders:** Anubhav
+- **Mechanism replaced by:** [ADR-0084](0084-per-box-load-balancer.md) -- the box arithmetic (`pool // box_size` topics, a fixed closed slice each, a reserved remainder) is unchanged. What changed underneath: a box now *owns a `LoadBalancer`* instead of narrowing a shared `QuotaGovernor`'s scans.
 
 - **Supersedes:** [ADR-0073](0073-worker-runs-generation-jobs-sequentially.md)'s
   strictly-sequential job loop. The worker runs several jobs concurrently again

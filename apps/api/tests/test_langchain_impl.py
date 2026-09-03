@@ -12,6 +12,7 @@ explicitly NOT covered here — there is no real key to verify that against.
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime, timedelta
 from typing import cast
 from unittest.mock import ANY, AsyncMock, Mock, call, patch
 
@@ -46,9 +47,15 @@ from spoin.generation.langchain_impl import (
     _WireVerification,
     _WireVerificationBatch,
 )
+from spoin.generation.load_balancer import (
+    LoadBalancer,
+    Reservation,
+    _Slot,
+)
 from spoin.generation.quota import (
     AllCellsThrottledError,
     DailyQuotaExhaustedError,
+    LadderRung,
     QuotaExhaustedError,
 )
 
@@ -158,28 +165,45 @@ def _mock_structured(return_value: object, side_effect: object = None) -> AsyncM
     return runnable
 
 
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
+
+
+def _res(key_index: int = 0, model: str = _THINKING_MODEL) -> Reservation:
+    """A `LoadBalancer.assign` result for tests that script the cell sequence."""
+
+    return Reservation(key_index=key_index, model=model, _slot=_Slot(sent_at=_NOW.timestamp()))
+
+
+def _make_lb(keys: tuple[int, ...]) -> LoadBalancer:
+    """A real in-memory balancer with the warm-up already elapsed — no DB, no
+    stubs. `_invoke_with_retry` calls its `assign`; tests that need a scripted
+    cell sequence replace `.assign` with an `AsyncMock` of `_res(...)` values."""
+
+    return LoadBalancer(
+        name="remainder",
+        key_indices=keys,
+        generator_ladder=[LadderRung(_GENERATOR_MODEL, 500, 15)],
+        thinking_ladder=[
+            LadderRung(_THINKING_MODEL, 20, 5),
+            LadderRung("gemini-fallback-model", 20, 5),
+        ],
+        model_unavailable={},
+        rpd_seed={},
+        now=_NOW - timedelta(seconds=120),
+        ledger_writer=None,
+    )
+
+
 def _generator(**settings_overrides: object) -> GeminiContentGenerator:
     generator = GeminiContentGenerator(_settings(**settings_overrides))
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        return_value=(0, _THINKING_MODEL)
-    )
-    generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
-        return_value=(0, _GENERATOR_MODEL)
-    )
-    # Stubbed for the same reason `acquire` is: since ADR-0058 the per-minute
-    # window lives in the database, and these tests are about the LangChain
-    # plumbing, not quota bookkeeping (which test_quota_governor.py owns
-    # against a real session).
-    generator._thinking.note_request_sent = AsyncMock()  # type: ignore[method-assign]
-    generator._generator.note_request_sent = AsyncMock()  # type: ignore[method-assign]
-    # Same again for model availability, which ADR-0065 moved into the database
-    # for the same cross-process reason. Unstubbed these open a session against
-    # the APP's database (they don't go through the `session` fixture), which is
-    # both outside what this file tests and a write this suite must never make.
-    generator._thinking.exclude_model = AsyncMock()  # type: ignore[method-assign]
-    generator._generator.exclude_model = AsyncMock()  # type: ignore[method-assign]
-    generator._thinking.include_model = AsyncMock()  # type: ignore[method-assign]
-    generator._generator.include_model = AsyncMock()  # type: ignore[method-assign]
+    # One real balancer stands in for every scope (ADR-0084): no box is leased
+    # in these tests, so `_invoke_with_retry` falls through to `_remainder()`,
+    # which returns this. These tests are about the LangChain plumbing, not the
+    # balancer's own rules (test_load_balancer.py owns those).
+    lb = _make_lb(tuple(range(len(generator._keys))))
+    generator._remainder_lb = lb
+    lb.exclude_model = Mock()  # type: ignore[method-assign]
+    lb.include_model = Mock()  # type: ignore[method-assign]
     return generator
 
 
@@ -212,19 +236,18 @@ async def test_invoke_with_backoff_retries_503_on_the_same_cell() -> None:
             "ok-result",
         ]
     )
-    pool = generator._thinking
-    pool.note_request_sent = AsyncMock()  # type: ignore[method-assign]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.note_send = Mock()  # type: ignore[method-assign]
+    res = _res(0, _THINKING_MODEL)
     with patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()) as mock_sleep:
-        result = await generator._invoke_with_backoff(
-            runnable, [], pool=pool, key_index=0, model=_THINKING_MODEL
-        )
+        result = await generator._invoke_with_backoff(runnable, [], lb=lb, res=res)
 
     assert result == "ok-result"
     mock_sleep.assert_awaited_once()
-    # Two real requests left the process, so both are stamped into the
-    # per-minute window -- the retry is not covered by the original
-    # reservation (ADR-0058).
-    assert pool.note_request_sent.await_count == 2
+    # Two real requests left the process, so both stamp the window at send time
+    # -- the retry is not covered by the original reservation (ADR-0084).
+    assert lb.note_send.call_count == 2
 
 
 async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> None:
@@ -241,11 +264,10 @@ async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> 
         patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()) as mock_sleep,
         pytest.raises(ServerError),
     ):
-        pool = generator._thinking
-        pool.note_request_sent = AsyncMock()  # type: ignore[method-assign]
-        await generator._invoke_with_backoff(
-            runnable, [], pool=pool, key_index=0, model=_THINKING_MODEL
-        )
+        lb = generator._remainder_lb
+        assert lb is not None
+        lb.note_send = Mock()  # type: ignore[method-assign]
+        await generator._invoke_with_backoff(runnable, [], lb=lb, res=_res(0, _THINKING_MODEL))
 
     mock_sleep.assert_not_awaited()
 
@@ -260,10 +282,12 @@ async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> Non
     would exercise the cooldown path instead of this one."""
 
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(0, _THINKING_MODEL), (1, _THINKING_MODEL)]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(0, _THINKING_MODEL), _res(1, _THINKING_MODEL)]
     )
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    lb.on_rate_limited = Mock()  # type: ignore[method-assign]
 
     draft = CurriculumDraft(
         subtopics=[
@@ -283,20 +307,22 @@ async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> Non
         result = await generator.generate_curriculum("Topic", "desc")
 
     assert result is draft
-    generator._thinking.mark_exhausted.assert_awaited_once_with(0, _THINKING_MODEL, now=ANY)
-    assert generator._thinking.acquire.await_count == 2
+    lb.on_rate_limited.assert_called_once_with(ANY, now=ANY, per_minute=False)
+    assert lb.assign.await_count == 2
 
 
 async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
         side_effect=[
-            (0, _THINKING_MODEL),
-            (1, _THINKING_MODEL),
+            _res(0, _THINKING_MODEL),
+            _res(1, _THINKING_MODEL),
             QuotaExhaustedError("all exhausted"),
         ]
     )
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    lb.on_rate_limited = Mock()  # type: ignore[method-assign]
 
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(side_effect=_rpd_429())
@@ -306,7 +332,7 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
     ):
         await generator.generate_curriculum("Topic", "desc")
 
-    assert generator._thinking.mark_exhausted.await_count == 2
+    assert lb.on_rate_limited.call_count == 2
 
 
 def test_classify_rate_limit_reads_the_quota_id() -> None:
@@ -331,18 +357,9 @@ def test_classify_rate_limit_falls_back_to_per_minute_when_scope_is_unknown() ->
 
     fallback = _classify_rate_limit(_real_429())
     assert fallback.is_daily is False
-    # ...but it is a GUESS, so the cell's learned rpm is not ratcheted down on
-    # it: Google returns bare RESOURCE_EXHAUSTED for every 429 now, and halving
-    # on each walked healthy cells to the 1-rpm floor over a run.
-    assert fallback.scope_certain is False
-
-
-def test_classify_rate_limit_is_scope_certain_when_the_429_identifies_itself() -> None:
-    """A `quotaId` (per-minute) or a short `RetryInfo` is real evidence, so the
-    AIMD rpm shrink still fires -- `scope_certain` only drops on a pure guess."""
-
-    assert _classify_rate_limit(_rpm_429()).scope_certain is True
-    assert _classify_rate_limit(_rpd_429()).scope_certain is True
+    # Under ADR-0084 the balancer's learned-rpm update is a measured floor
+    # (`min(learned, sends in window)`), not AIMD's guess, so it is safe to
+    # apply on this per-minute branch without a `scope_certain` gate.
 
 
 def test_classify_rate_limit_trusts_a_short_retry_delay_over_an_unknown_quota_id() -> None:
@@ -425,11 +442,13 @@ async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
     the day, on keys with their full daily quota still available."""
 
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(0, _THINKING_MODEL), (1, _THINKING_MODEL)]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(0, _THINKING_MODEL), _res(1, _THINKING_MODEL)]
     )
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
-    generator._thinking.mark_rate_limited = AsyncMock()  # type: ignore[method-assign]
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
+    lb.on_rate_limited = Mock()  # type: ignore[method-assign]
 
     draft = CurriculumDraft(
         subtopics=[
@@ -449,10 +468,8 @@ async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
         result = await generator.generate_curriculum("Topic", "desc")
 
     assert result is draft
-    generator._thinking.mark_exhausted.assert_not_awaited()
-    generator._thinking.mark_rate_limited.assert_awaited_once_with(
-        0, _THINKING_MODEL, now=ANY, retry_after_s=13.0, shrink_rpm=True
-    )
+    lb.mark_exhausted.assert_not_called()
+    lb.on_rate_limited.assert_called_once_with(ANY, now=ANY, per_minute=True, retry_after_s=13.0)
 
 
 async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
@@ -470,11 +487,13 @@ async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
     # More throttled calls than the 2 keys x 1 model grid has cells, but each
     # cell still has pace left to give up (rpm 5 -> 2 -> 1), so none of these
     # counts as evidence the provider is refusing us outright.
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(i % 2, _THINKING_MODEL) for i in range(12)]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(i % 2, _THINKING_MODEL) for i in range(12)]
     )
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
-    generator._thinking.mark_rate_limited = AsyncMock()  # type: ignore[method-assign]
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
+    lb.on_rate_limited = Mock()  # type: ignore[method-assign]
     # Stubbing mark_rate_limited above means the real AIMD shrink never runs,
     # so every cell stays at its configured rpm -- exactly the "still has pace
     # to give up" condition this test is about.
@@ -497,8 +516,8 @@ async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
         result = await generator.generate_curriculum("Topic", "desc")
 
     assert result is draft
-    assert generator._thinking.mark_rate_limited.await_count == 9
-    generator._thinking.mark_exhausted.assert_not_awaited()
+    assert lb.on_rate_limited.call_count == 9
+    lb.mark_exhausted.assert_not_called()
 
 
 async def test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop() -> None:
@@ -511,20 +530,22 @@ async def test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop() -> N
     this is discarding quota it still has."""
 
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(i % 2, _THINKING_MODEL) for i in range(40)]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(i % 2, _THINKING_MODEL) for i in range(40)]
     )
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
     # Both cells start already floored, so every throttle below is provider
     # evidence rather than a pacing correction.
     for key_index in (0, 1):
-        generator._thinking._effective_rpm[(key_index, _THINKING_MODEL)] = 1.0
+        lb._cells[(key_index, _THINKING_MODEL)].learned_rpm = 1.0
 
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(side_effect=_rpm_429())
     with (
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
-        patch.object(generator._thinking, "mark_rate_limited", AsyncMock()),
+        patch.object(lb, "on_rate_limited", Mock()),
         pytest.raises(AllCellsThrottledError) as excinfo,
     ):
         await generator.generate_curriculum("Topic", "desc")
@@ -532,7 +553,7 @@ async def test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop() -> N
     assert not isinstance(excinfo.value, DailyQuotaExhaustedError)
     assert "not exhaustion" in str(excinfo.value)
     # Throttling still never spends a cell for the day, floored or not.
-    generator._thinking.mark_exhausted.assert_not_awaited()
+    lb.mark_exhausted.assert_not_called()
 
 
 async def test_a_success_resets_the_floored_throttle_streak() -> None:
@@ -542,11 +563,13 @@ async def test_a_success_resets_the_floored_throttle_streak() -> None:
     before the thing that disproved it."""
 
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(i % 2, _THINKING_MODEL) for i in range(40)]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(i % 2, _THINKING_MODEL) for i in range(40)]
     )
     for key_index in (0, 1):
-        generator._thinking._effective_rpm[(key_index, _THINKING_MODEL)] = 1.0
+        lb._cells[(key_index, _THINKING_MODEL)].learned_rpm = 1.0
 
     draft = CurriculumDraft(
         subtopics=[
@@ -566,7 +589,7 @@ async def test_a_success_resets_the_floored_throttle_streak() -> None:
     runnable.ainvoke = AsyncMock(side_effect=[_rpm_429(), draft, _rpm_429(), draft])
     with (
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
-        patch.object(generator._thinking, "mark_rate_limited", AsyncMock()),
+        patch.object(lb, "on_rate_limited", Mock()),
     ):
         assert await generator.generate_curriculum("Topic", "desc") is draft
         assert await generator.generate_curriculum("Topic", "desc") is draft
@@ -582,10 +605,12 @@ async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same
     condition)."""
 
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(0, _THINKING_MODEL), (0, "gemini-fallback-model")]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(0, _THINKING_MODEL), _res(0, "gemini-fallback-model")]
     )
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
 
     draft = CurriculumDraft(
         subtopics=[
@@ -605,8 +630,8 @@ async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same
         result = await generator.generate_curriculum("Topic", "desc")
 
     assert result is draft
-    generator._thinking.mark_exhausted.assert_not_awaited()
-    second_call_kwargs = generator._thinking.acquire.await_args_list[1].kwargs
+    lb.mark_exhausted.assert_not_called()
+    second_call_kwargs = lb.assign.await_args_list[1].kwargs
     assert second_call_kwargs["exclude_models"] == frozenset({_THINKING_MODEL})
 
 
@@ -616,8 +641,10 @@ async def test_invoke_with_retry_starts_a_recovery_probe_on_timeout() -> None:
     block the caller waiting for it."""
 
     generator = _generator()
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(0, _THINKING_MODEL), (0, "gemini-fallback-model")]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(0, _THINKING_MODEL), _res(0, "gemini-fallback-model")]
     )
     probe_started = asyncio.Event()
 
@@ -645,26 +672,24 @@ async def test_invoke_with_retry_starts_a_recovery_probe_on_timeout() -> None:
         await asyncio.wait_for(probe_started.wait(), timeout=1)
 
     assert result is draft
-    generator._thinking.exclude_model.assert_awaited_once()
-    excluded = generator._thinking.exclude_model.await_args
+    lb.exclude_model.assert_called_once()
+    excluded = lb.exclude_model.call_args
     assert excluded.args[0] == _THINKING_MODEL
     # The exclusion is given exactly the probe's own budget to be cleared in
-    # (ADR-0065) -- not an independently chosen lifetime.
+    # (ADR-0084) -- not an independently chosen lifetime.
     assert excluded.kwargs["expires_in_s"] == _PROBE_BUDGET_SECONDS
-    assert "504" in excluded.kwargs["reason"]
     assert len(generator._active_probes) == 1
 
 
 async def test_probe_model_stops_at_first_key_that_responds() -> None:
-    """The probe must try a DIFFERENT key each attempt (not the one that
-    originally stalled), and stop as soon as any key responds -- it must NOT
-    burn through the rest of the budget once the model is confirmed back, and
-    must NOT touch mark_exhausted (nothing here is out of quota)."""
+    """The probe tries a DIFFERENT key each attempt and stops as soon as any
+    responds -- it must NOT burn the rest of the budget once the model is back,
+    and must NOT mark any cell spent (nothing here is out of quota)."""
 
     generator = _generator(gemini_api_keys="key-a,key-b,key-c")
-    pool = generator._thinking
-    pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
-    pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
 
     fail_client = AsyncMock()
     fail_client.ainvoke = AsyncMock(side_effect=_real_504())
@@ -676,34 +701,32 @@ async def test_probe_model_stops_at_first_key_that_responds() -> None:
         patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()),
         patch("spoin.generation.langchain_impl.time.monotonic", return_value=0.0),
     ):
-        await generator._probe_model(pool, _THINKING_MODEL)
+        await generator._probe_model(lb, _THINKING_MODEL)
 
-    assert generator._client.call_args_list == [call(0, _THINKING_MODEL), call(1, _THINKING_MODEL)]
-    assert pool.record_probe_attempt.await_count == 2
-    pool.include_model.assert_awaited_once_with(_THINKING_MODEL)
-    pool.mark_exhausted.assert_not_awaited()
+    keys = lb.key_indices
+    assert generator._client.call_args_list == [
+        call(keys[0], _THINKING_MODEL),
+        call(keys[1], _THINKING_MODEL),
+    ]
+    lb.include_model.assert_called_once_with(_THINKING_MODEL)
+    lb.mark_exhausted.assert_not_called()
 
 
-async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires() -> None:
-    """If nothing responds within the probe budget, every key actually tried
-    gets marked exhausted (same posture as a real 429) rather than the model
-    just quietly staying excluded with no ledger record of why."""
+async def test_probe_model_marks_every_key_spent_once_budget_expires() -> None:
+    """If nothing responds within the probe budget, every key gets marked spent
+    for the day rather than the model quietly staying excluded with no record."""
 
     generator = _generator(gemini_api_keys="key-a,key-b")
-    pool = generator._thinking
-    pool.record_probe_attempt = AsyncMock()  # type: ignore[method-assign]
-    pool.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
-    # Also keeps the real implementation from consuming one of the scripted
-    # `time.monotonic` values below: patching that name via this module patches
-    # the shared `time` module, which quota.py reads from as well.
-    pool.note_request_sent = AsyncMock()  # type: ignore[method-assign]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
 
     fail_client = AsyncMock()
     fail_client.ainvoke = AsyncMock(side_effect=_real_504())
     generator._client = Mock(return_value=fail_client)  # type: ignore[method-assign]
 
-    # deadline call, then 3 while-checks: two attempts inside budget (key 0,
-    # then key 1), the third past it -- so exactly 2 attempts run.
+    # deadline call, then 3 while-checks: two attempts inside budget, the third
+    # past it -- so exactly 2 attempts run.
     with (
         patch("spoin.generation.langchain_impl.asyncio.sleep", AsyncMock()),
         patch(
@@ -711,15 +734,11 @@ async def test_probe_model_marks_every_tried_key_exhausted_once_budget_expires()
             side_effect=[0.0, 0.0, 0.0, 2000.0],
         ),
     ):
-        await generator._probe_model(pool, _THINKING_MODEL)
+        await generator._probe_model(lb, _THINKING_MODEL)
 
-    assert pool.record_probe_attempt.await_count == 2
-    # Each ping is a real outbound request, so it stamps the per-minute window
-    # at send time exactly like ordinary traffic (ADR-0058).
-    assert pool.note_request_sent.await_count == 2
-    tried = {c.args for c in pool.mark_exhausted.await_args_list}
-    assert tried == {(0, _THINKING_MODEL), (1, _THINKING_MODEL)}
-    pool.include_model.assert_awaited_once_with(_THINKING_MODEL)
+    tried = {c.args for c in lb.mark_exhausted.call_args_list}
+    assert tried == {(k, _THINKING_MODEL) for k in lb.key_indices}
+    lb.include_model.assert_called_once_with(_THINKING_MODEL)
 
 
 async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() -> None:
@@ -729,7 +748,10 @@ async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() ->
     whole grid on an error key rotation can never fix."""
 
     generator = _generator()
-    generator._thinking.mark_exhausted = AsyncMock()  # type: ignore[method-assign]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.mark_exhausted = Mock()  # type: ignore[method-assign]
+    lb.assign = AsyncMock(side_effect=[_res(0, _THINKING_MODEL)])  # type: ignore[method-assign]
 
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(
@@ -741,8 +763,8 @@ async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() ->
     ):
         await generator.generate_curriculum("Topic", "desc")
 
-    generator._thinking.mark_exhausted.assert_not_awaited()
-    assert cast(AsyncMock, generator._thinking.acquire).await_count == 1
+    lb.mark_exhausted.assert_not_called()
+    assert cast(AsyncMock, lb.assign).await_count == 1
 
 
 async def test_generate_cards_partial_failure_does_not_sink_batch() -> None:
@@ -1365,10 +1387,9 @@ async def test_quota_exhausted_error_is_reraised_across_methods() -> None:
     """When QuotaExhaustedError is raised, it must NOT be swallowed into BatchResult.failures;
     it must propagate so worker can pause and requeue cleanly."""
     generator = _generator()
-    generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=QuotaExhaustedError("All exhausted")
-    )
-    generator._thinking.acquire = AsyncMock(  # type: ignore[method-assign]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
         side_effect=QuotaExhaustedError("All exhausted")
     )
 
@@ -1548,8 +1569,10 @@ async def test_generate_cards_ascii_redraw_disabled_rejects_without_a_redraw_cal
 
 async def test_generate_cards_ascii_redraw_quota_exhaustion_propagates() -> None:
     generator = _generator()
-    generator._generator.acquire = AsyncMock(  # type: ignore[method-assign]
-        side_effect=[(0, _GENERATOR_MODEL), QuotaExhaustedError("exhausted mid-redraw")]
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.assign = AsyncMock(  # type: ignore[method-assign]
+        side_effect=[_res(0, _GENERATOR_MODEL), QuotaExhaustedError("exhausted mid-redraw")]
     )
     dispatch = _schema_dispatch(
         {

@@ -75,7 +75,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Literal, TypeVar
+from typing import Any, TypeVar
 
 from google.genai.errors import ClientError, ServerError
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -84,7 +84,6 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from spoin.content.ascii_library import AsciiLibraryEntry, top_candidates
 from spoin.core.config import Settings
-from spoin.core.db import session_scope
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
 from spoin.generation.base import (
@@ -110,17 +109,21 @@ from spoin.generation.base import (
     TopicNameQuery,
     TopicNameVerdict,
 )
+from spoin.generation.load_balancer import (
+    CURRENT_BALANCER,
+    LadderKind,
+    LoadBalancer,
+    Reservation,
+    make_ledger_writer,
+    seed_rpd,
+)
 from spoin.generation.quota import (
-    CURRENT_KEY_CLAIM,
     AllCellsThrottledError,
     AllModelsUnavailableError,
+    BoxPool,
     DailyQuotaExhaustedError,
     KeyBox,
-    KeyClaim,
-    KeyClaimRegistry,
     QuotaExhaustedError,
-    QuotaGovernor,
-    key_spend_today,
     parse_ladder,
 )
 
@@ -149,21 +152,18 @@ _PER_MINUTE_RETRY_CEILING_S = 60.0
 
 @dataclass(frozen=True)
 class _RateLimit:
-    """How to react to one real 429 (ADR-0058).
+    """How to react to one real 429.
 
     `is_daily` is the whole point: it decides between spending this cell for the
-    rest of the day and parking it for `retry_after_s` seconds.
-
-    `scope_certain` is False when neither a `quotaId` nor a `RetryInfo` was in
-    the envelope and per-minute is only the safe *guess* (ADR-0060). The cell is
-    still parked, but its learned rpm is NOT halved on a guess -- Google has
-    been returning bare `RESOURCE_EXHAUSTED` for every 429, and halving on each
-    one walked good cells down to the 1-rpm floor over a run for no real signal.
+    rest of the day and parking it for `retry_after_s` seconds. An
+    unidentifiable 429 (no `quotaId`, no `RetryInfo`) is treated as per-minute
+    (ADR-0060) -- and under ADR-0084 the balancer's learned-rpm update is a
+    measured floor (`min(learned, sends in window)`), not AIMD's guess, so it is
+    safe to apply on every per-minute 429 without a `scope_certain` gate.
     """
 
     is_daily: bool
     retry_after_s: float | None
-    scope_certain: bool = True
 
 
 def _parse_retry_delay(raw: object) -> float | None:
@@ -248,7 +248,7 @@ def _classify_rate_limit(exc: ClientError) -> _RateLimit:
         quota_ids or "(none)",
         error,
     )
-    return _RateLimit(is_daily=False, retry_after_s=None, scope_certain=False)
+    return _RateLimit(is_daily=False, retry_after_s=None)
 
 
 # ------------------------------------------------------------- wire schemas --
@@ -878,79 +878,110 @@ class GeminiContentGenerator(ContentGenerator):
         self._keys = keys
         self._request_timeout_s = settings.gemini_request_timeout_seconds
         self._ascii_redraw_attempts = settings.ascii_redraw_attempts
-        #: ONE registry across BOTH pools (ADR-0074): the pools are separate
-        #: ladders over the same physical keys, so a claim only one of them
-        #: could see would let another group's judging land on the key this
-        #: group is writing cards with.
-        self._claims = KeyClaimRegistry(len(keys))
-        self._thinking = QuotaGovernor(
-            key_count=len(keys),
-            ladder=parse_ladder(settings.gemini_thinking_ladder),
-            reserve_rungs=settings.gemini_thinking_reserve_rungs,
-            claims=self._claims,
+        #: The two model ladders (ADR-0028). A `LoadBalancer` walks whichever one
+        #: a call's `kind` selects; both are over the same physical keys, so one
+        #: balancer owns both ladders for its key set (ADR-0084).
+        self._gen_ladder = parse_ladder(settings.gemini_generator_ladder)
+        self._think_ladder = parse_ladder(settings.gemini_thinking_ladder)
+        #: model -> epoch expiry. ONE dict shared by reference into every
+        #: balancer this run builds: a 503/504 is the model's problem at the
+        #: provider, not one box's (ADR-0084).
+        self._model_unavailable: dict[str, float] = {}
+        self._ledger_writer = make_ledger_writer()
+        #: The pool's key indices, minus a fixed remainder held back for the
+        #: claim-less path (ADR-0082/0084). `pool - max_topics*box` keys stay
+        #: unboxed; a box and the remainder balancer never share a key.
+        remainder = settings.gemini_pool_size - (
+            settings.max_concurrent_topics * settings.topic_key_box_size
         )
-        #: No reserve on the generator pool. The reserve exists because a weak
-        #: model doing curriculum or judging degrades the corpus (ADR-0008), and
-        #: because thinking RPD is small (20/cell). Card and question writing is
-        #: 500/cell and independently gated afterwards -- there is nothing to
-        #: hold back and nothing that would notice.
-        self._generator = QuotaGovernor(
-            key_count=len(keys),
-            ladder=parse_ladder(settings.gemini_generator_ladder),
-            claims=self._claims,
+        self._pool = BoxPool(
+            len(keys), remainder_size=max(1, min(remainder, len(keys) - 1)) if len(keys) > 1 else 0
         )
+        #: Built lazily on the first claim-less call (needs an async ledger read).
+        self._remainder_lb: LoadBalancer | None = None
         self._clients: dict[tuple[int, str], ChatGoogleGenerativeAI] = {}
-        #: (id(pool), model) -> the running recovery-probe task for that
+        #: (id(balancer), model) -> the running recovery-probe task for that
         #: model, if any -- keeps a stalled model from spawning a second probe
         #: on every subsequent timeout while the first one is still running.
         self._active_probes: dict[tuple[int, str], asyncio.Task[None]] = {}
 
     @asynccontextmanager
     async def claimed_key_scope(self, *, box: KeyBox | None = None) -> AsyncIterator[None]:
-        """ADR-0074: everything called inside this block runs on ONE key.
+        """Everything called inside this block routes through `box`'s balancer
+        (ADR-0084) -- so a topic's calls only ever touch its own keys. Without a
+        box (the `fake` backend, a keyless CLI run) the ambient balancer is
+        `None` and calls fall back to the remainder balancer.
 
-        The claim starts UNBOUND. Binding it here would need a key chosen
-        without consulting the ledger, and the ordering that matters --
-        least-spent first -- already lives in `acquire()`; the first call made
-        inside the scope binds it there instead, using the same query every
-        other key choice uses.
+        No key is 'claimed' or pinned any more (ADR-0083 retired the per-group
+        pin; ADR-0084 removed the machinery): the balancer picks the
+        least-spent key in scope fresh on every call. The box's lifetime is the
+        run's, managed by `run_generation_pipeline`'s lease/release, not this
+        scope."""
 
-        With `box` (ADR-0082) that binding scan -- and the later move to a
-        fresher key -- sees only the topic's own keys. Without it the claim
-        ranges over the whole pool, exactly as ADR-0074 described.
-
-        The claim is released even when the body raises, which is what keeps a
-        failed subtopic group from parking a key for the rest of the run. Both
-        pools share `self._claims`, so releasing frees the key for thinking and
-        generator work alike.
-        """
-
-        claim = KeyClaim(box=box)
-        token = CURRENT_KEY_CLAIM.set(claim)
+        token = CURRENT_BALANCER.set(box.balancer if box is not None else None)
         try:
             yield
         finally:
-            CURRENT_KEY_CLAIM.reset(token)
-            await self._claims.release(claim)
+            CURRENT_BALANCER.reset(token)
+
+    async def _remainder(self) -> LoadBalancer:
+        """The balancer for claim-less calls -- curriculum, topic matching, quiz
+        grading, the recovery probe (ADR-0084). Over the pool's reserved
+        remainder keys, so it never contends with a box. Built once, lazily."""
+
+        if self._remainder_lb is None:
+            now = datetime.now(UTC)
+            keys = self._pool.remainder or tuple(range(len(self._keys)))
+            models = frozenset(r.model for r in (*self._gen_ladder, *self._think_ladder))
+            self._remainder_lb = LoadBalancer(
+                name="remainder",
+                key_indices=keys,
+                generator_ladder=self._gen_ladder,
+                thinking_ladder=self._think_ladder,
+                model_unavailable=self._model_unavailable,
+                rpd_seed=await seed_rpd(keys, models, now=now),
+                now=now,
+                ledger_writer=self._ledger_writer,
+            )
+        return self._remainder_lb
 
     async def lease_key_box(self, size: int) -> KeyBox:
-        """Take `size` keys from the pool as one topic's box for its whole run
-        (ADR-0082), coldest first so a day of passes spreads across the pool
-        instead of re-boxing keys 0..N every time (ADR-0065's principle, applied
-        to boxes: a box is held for a run, so first-fit from key 0 would burn the
-        low indices down pass after pass and leave the high ones permanently
-        cold). May return fewer keys when the pool is tight -- see
-        `KeyClaimRegistry.lease_box`."""
+        """Cut a box of up to `size` keys and build its `LoadBalancer`
+        (ADR-0082/0084), coldest-first from the ledger so a day of passes
+        spreads across the pool instead of re-boxing keys 0..N every time. A
+        short or empty box is not an error -- a topic with fewer keys still
+        generates; an empty one runs on the remainder balancer."""
 
-        async with session_scope() as session:
-            spent = await key_spend_today(session, key_count=len(self._keys), now=datetime.now(UTC))
-        coldest_first = sorted(range(len(self._keys)), key=lambda k: (spent.get(k, 0), k))
-        return self._claims.lease_box(size, prefer=coldest_first)
+        now = datetime.now(UTC)
+        models = frozenset(r.model for r in (*self._gen_ladder, *self._think_ladder))
+        seed_all = await seed_rpd(tuple(range(len(self._keys))), models, now=now)
+        per_key: dict[int, int] = {}
+        for (k, _m), spent in seed_all.items():
+            per_key[k] = per_key.get(k, 0) + spent
+        coldest_first = sorted(range(len(self._keys)), key=lambda k: (per_key.get(k, 0), k))
+        box_id, box_keys = self._pool.lease(size, prefer=coldest_first)
+        if not box_keys:
+            return KeyBox(box_id=box_id, key_indices=(), balancer=None)
+        balancer = LoadBalancer(
+            name=f"box-{box_id}",
+            key_indices=box_keys,
+            generator_ladder=self._gen_ladder,
+            thinking_ladder=self._think_ladder,
+            model_unavailable=self._model_unavailable,
+            rpd_seed={cell: s for cell, s in seed_all.items() if cell[0] in box_keys},
+            now=now,
+            ledger_writer=self._ledger_writer,
+        )
+        return KeyBox(box_id=box_id, key_indices=box_keys, balancer=balancer)
 
     async def release_key_box(self, box: KeyBox) -> None:
-        """Return a topic's box to the pool (ADR-0082)."""
+        """Flush the box balancer's day counts to the ledger and return its keys
+        to the pool (ADR-0082/0084). Idempotent."""
 
-        await self._claims.release_box(box)
+        if box.balancer is not None:
+            await box.balancer.flush()
+        if box.key_indices:
+            self._pool.release(box.key_indices)
 
     def _client(self, key_index: int, model: str) -> ChatGoogleGenerativeAI:
         cache_key = (key_index, model)
@@ -981,9 +1012,8 @@ class GeminiContentGenerator(ContentGenerator):
         structured: object,
         prompt: list[tuple[str, Any]],
         *,
-        pool: QuotaGovernor,
-        key_index: int,
-        model: str,
+        lb: LoadBalancer,
+        res: Reservation,
     ) -> Any:
         """A 503 (`ServerError`, status `UNAVAILABLE`) means the model itself is
         overloaded -- Google's own docs describe this as "usually temporary."
@@ -1000,23 +1030,26 @@ class GeminiContentGenerator(ContentGenerator):
         raise immediately and let `_invoke_with_retry` move to the next cell.
 
         This is the module's single outbound send site, so it is also where the
-        per-minute window is stamped (`note_request_sent`, ADR-0058): at the
-        moment the request actually leaves, not when `acquire()` reserved the
-        cell some seconds earlier. Being inside the retry loop means a 503
-        retried on this same cell is counted too -- it is another real request,
-        and the reservation only covered the first one."""
+        window slot is stamped to the true send time (`lb.note_send`, ADR-0084):
+        the reservation was taken when `assign()` chose the cell, seconds
+        earlier, and counting the call in that earlier minute is how our window
+        drifts wide of the provider's. Being inside the retry loop means a 503
+        retried on this same cell is stamped again -- another real request."""
 
+        key_index, model = res.key_index, res.model
         delay = _SERVER_ERROR_BASE_DELAY_S
         for attempt in range(1, _SERVER_ERROR_RETRIES + 1):
             try:
-                await pool.note_request_sent(key_index, model, now=datetime.now(UTC))
+                lb.note_send(res, now=datetime.now(UTC))
                 return await structured.ainvoke(prompt)  # type: ignore[attr-defined]
             except ServerError as exc:
                 if exc.code == 504 or attempt == _SERVER_ERROR_RETRIES:
+                    lb.on_send_aborted(res)
                     raise
                 logger.warning(
-                    "quota: key=%d model=%s got a transient 503 (high demand, attempt "
+                    "lb %s: key=%d model=%s got a transient 503 (high demand, attempt "
                     "%d/%d) -- retrying in %.0fs",
+                    lb.name,
                     key_index,
                     model,
                     attempt,
@@ -1027,38 +1060,20 @@ class GeminiContentGenerator(ContentGenerator):
                 delay *= 2
         raise AssertionError("unreachable: loop always returns or raises on its last attempt")
 
-    @staticmethod
-    def _claim_for_scope(key_scope: Literal["sticky", "box", "pool"]) -> KeyClaim | None:
-        """Resolve `_invoke_with_retry`'s `key_scope` against the ambient claim.
-
-        `sticky` returns the claim as-is (or None when none is set -- curriculum,
-        topic matching, grading, every test). `pool` forces None: least-spent
-        over the whole pool. `box` keeps the claim's box but strips the pin --
-        a fresh `sticky=False` claim so this one call picks the least-spent key
-        in the box and the next call re-picks, rather than all of a unit's
-        calls landing on the key the first one bound.
-        """
-
-        current = CURRENT_KEY_CLAIM.get()
-        if key_scope == "pool" or current is None:
-            return None
-        if key_scope == "box":
-            return KeyClaim(box=current.box, sticky=False)
-        return current
-
     async def _invoke_with_retry(
         self,
-        pool: QuotaGovernor,
+        kind: LadderKind,
         schema: type[_SchemaT],
         prompt: list[tuple[str, Any]],
-        *,
-        key_scope: Literal["sticky", "box", "pool"] = "sticky",
     ) -> _SchemaT:
-        """Acquire a `(key, model)` cell from `pool` and call it; a REAL 429
-        means our local ledger's belief disagreed with the provider's actual
-        state (see this module's docstring). Mark that exact cell exhausted
-        and retry the next cell in the grid, bounded at one attempt per
-        `(key, model)`.
+        """Assign a `(key, model)` cell from the ambient balancer (the box's, or
+        the remainder) and call it. A REAL 429 means the provider disagreed with
+        our local count: park or spend that exact cell and move to the next,
+        bounded at one attempt per `(key, model)`.
+
+        **`max_attempts` counts cells BURNED, not calls made** (ADR-0084). A
+        per-minute 429 doesn't use a cell up -- it parks it -- so counting it
+        here would let a brief throttle burn the whole grid's budget.
 
         **`max_attempts` counts cells BURNED, not calls made** (ADR-0058). A
         per-minute 429 doesn't use a cell up -- it parks it for a few seconds --
@@ -1082,56 +1097,41 @@ class GeminiContentGenerator(ContentGenerator):
         cell in the grid refused us at the slowest pace we have. Any success
         resets the count."""
 
-        max_attempts = pool.key_count * len(pool.ladder)
-        # Not a tuning knob: one full sweep of the grid, all of it floored and
-        # all of it still refusing, is the smallest streak that distinguishes
-        # "this cell is busy" from "nothing here will serve us right now".
+        lb = CURRENT_BALANCER.get() or await self._remainder()
+        ladder = lb.ladder(kind)
+        max_attempts = lb.key_count * len(ladder)
+        # Not a tuning knob: one full sweep of the grid, all of it at the rpm
+        # floor and all of it still refusing, is the smallest streak that
+        # distinguishes "this cell is busy" from "nothing here serves us now".
         grid_size = max_attempts
         cells_burned = 0
         floored_throttles = 0
         last_server_error: ServerError | None = None
-        # A 503 overload -- and a 504 timeout, see the ServerError handler
-        # below -- is treated as per-MODEL, not per-key (every key hits the
-        # same wall) -- once a model has stayed UNAVAILABLE through its own
-        # backoff, exclude it entirely so the next acquire() jumps straight
-        # to the next model in the ladder instead of burning through every
-        # remaining key on a model that's already proven overloaded.
+        # A 503/504 is per-MODEL, not per-key (every key hits the same wall):
+        # once a model stays UNAVAILABLE through its own backoff, exclude it so
+        # the next assign() jumps straight to the next rung.
         unavailable_models: set[str] = set()
         while cells_burned < max_attempts:
             attempt = cells_burned + 1
             try:
-                key_index, model = await pool.acquire(
+                res = await lb.assign(
+                    kind,
                     now=datetime.now(UTC),
                     exclude_models=frozenset(unavailable_models),
-                    # ADR-0074's key claim, three ways (see `KeyClaim.sticky`):
-                    #  "sticky" -- the claim as set by `claimed_key_scope`;
-                    #     pins the unit to one key. Also the no-claim callers
-                    #     (curriculum, matching, grading), which just get the
-                    #     whole pool.
-                    #  "box"   -- keep the claim's BOX scope but not its pin, so
-                    #     a unit's burst of calls (a tier's plan + per-type
-                    #     drafts + ascii) spreads least-spent across its box
-                    #     instead of hammering one key past 15 rpm. Card
-                    #     writing, planning, ascii, questions.
-                    #  "pool"  -- drop the claim entirely; least-spent over the
-                    #     whole pool. The thinking gate (`correct_cards` /
-                    #     `verify_cards`), whose rpm-5 calls must spread widest.
-                    claim=self._claim_for_scope(key_scope),
                 )
             except QuotaExhaustedError:
                 # Every remaining rung was excluded as overloaded, not actually
                 # quota-exhausted -- surface the real 503 instead of a
-                # misleading "quota exhausted" when no cell was ever marked so.
+                # misleading "quota exhausted" when no cell was ever spent.
                 if last_server_error is not None:
                     raise last_server_error from None
                 raise
+            key_index, model = res.key_index, res.model
             client = self._client(key_index, model)
             structured = client.with_structured_output(schema)
             try:
-                async with pool.cell_lock(key_index, model):
-                    result = await self._invoke_with_backoff(
-                        structured, prompt, pool=pool, key_index=key_index, model=model
-                    )
+                async with lb.cell_lock(key_index, model):
+                    result = await self._invoke_with_backoff(structured, prompt, lb=lb, res=res)
             except (ClientError, ChatGoogleGenerativeAIError) as exc:
                 # The new `google-genai` SDK (langchain-google-genai>=4.0) has no
                 # dedicated ResourceExhausted class -- every 4xx is a ClientError,
@@ -1156,22 +1156,16 @@ class GeminiContentGenerator(ContentGenerator):
                 if real_error.code == 429:
                     limit = _classify_rate_limit(real_error)
                     if not limit.is_daily:
-                        # Throttled, not spent. Park the cell for as long as the
-                        # provider asked, refund the day's charge and narrow the
-                        # cell's learned rpm (all three inside mark_rate_limited,
-                        # ADR-0058 + ADR-0065), then try another -- without
-                        # burning a cell.
-                        # Read BEFORE mark_rate_limited, which is what shrinks
-                        # it: the question is whether this call went out at a
-                        # pace we had already bottomed out, not what we are
-                        # about to reduce it to.
-                        was_floored = pool.is_at_rpm_floor(key_index, model)
-                        await pool.mark_rate_limited(
-                            key_index,
-                            model,
+                        # Throttled, not spent. Park the cell, learn the real
+                        # ceiling from the sends that were in the window when it
+                        # refused (ADR-0084) -- read the floor state BEFORE that,
+                        # since it is about the pace this call went out at.
+                        was_floored = lb.is_at_floor(key_index, model)
+                        lb.on_rate_limited(
+                            res,
                             now=datetime.now(UTC),
+                            per_minute=True,
                             retry_after_s=limit.retry_after_s,
-                            shrink_rpm=limit.scope_certain,
                         )
                         if was_floored:
                             floored_throttles += 1
@@ -1179,15 +1173,16 @@ class GeminiContentGenerator(ContentGenerator):
                                 raise AllCellsThrottledError(
                                     f"{floored_throttles} consecutive per-minute 429s at the "
                                     f"one-request-per-minute floor with no success -- every "
-                                    f"cell in the {pool.key_count}x{len(pool.ladder)} grid is "
+                                    f"cell in the {lb.key_count}x{len(ladder)} grid is "
                                     f"refusing us at the slowest pace we have. Daily quota "
                                     f"remains; this is throttling, not exhaustion."
                                 ) from exc
                         continue
+                    lb.on_rate_limited(res, now=datetime.now(UTC), per_minute=False)
                     logger.warning(
-                        "quota: key=%d model=%s got a per-day 429 from the provider despite "
-                        "our ledger showing room -- marking exhausted, trying next cell "
-                        "(cell %d/%d): %s",
+                        "lb %s: key=%d model=%s got a per-day 429 despite our count showing "
+                        "room -- marking spent, trying next cell (cell %d/%d): %s",
+                        lb.name,
                         key_index,
                         model,
                         attempt,
@@ -1195,9 +1190,11 @@ class GeminiContentGenerator(ContentGenerator):
                         exc,
                     )
                 else:
+                    lb.mark_exhausted(key_index, model)
                     logger.warning(
-                        "quota: key=%d model=%s got auth error %d (%s) -- marking exhausted, "
+                        "lb %s: key=%d model=%s got auth error %d (%s) -- marking spent, "
                         "trying next cell (cell %d/%d)",
+                        lb.name,
                         key_index,
                         model,
                         real_error.code,
@@ -1205,7 +1202,6 @@ class GeminiContentGenerator(ContentGenerator):
                         attempt,
                         max_attempts,
                     )
-                await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
                 cells_burned += 1
                 continue
             except ServerError as exc:
@@ -1221,103 +1217,74 @@ class GeminiContentGenerator(ContentGenerator):
                 # checks in the background whether it's come back, cycling
                 # through a different key each attempt.
                 logger.warning(
-                    "quota: model=%s still UNAVAILABLE after backoff on key=%d -- "
-                    "excluding this model, trying next one (attempt %d/%d): %s",
+                    "lb %s: model=%s still UNAVAILABLE after backoff on key=%d -- excluding "
+                    "this model, trying next one (attempt %d/%d): %s",
+                    lb.name,
                     model,
                     key_index,
                     attempt,
                     max_attempts,
                     exc,
                 )
-                await pool.exclude_model(
-                    model,
-                    now=datetime.now(UTC),
-                    # The probe about to start is what will clear this row; the
-                    # exclusion should therefore outlive exactly as long as that
-                    # probe is entitled to take, and no longer (ADR-0065).
-                    expires_in_s=_PROBE_BUDGET_SECONDS,
-                    reason=str(exc),
-                )
-                self._start_recovery_probe(pool, model)
+                lb.exclude_model(model, now=datetime.now(UTC), expires_in_s=_PROBE_BUDGET_SECONDS)
+                self._start_recovery_probe(lb, model)
                 unavailable_models.add(model)
                 last_server_error = exc
                 cells_burned += 1
                 continue
             assert isinstance(result, schema)
             # A call got through: the cell can carry a little more than we last
-            # believed (AIMD's additive increase), and the throttle streak that
-            # would otherwise end this loop is genuinely broken, not merely
-            # paused (ADR-0065).
-            pool.note_call_succeeded(key_index, model)
+            # believed (probe the learned ceiling up), and the throttle streak
+            # that would otherwise end this loop is genuinely broken (ADR-0084).
+            await lb.on_success(res, now=datetime.now(UTC))
             floored_throttles = 0
             return result
         if last_server_error is not None:
-            # Every cell in the grid stayed UNAVAILABLE -- NOT a quota exhaustion
-            # (no cell was marked exhausted), so re-raise the actual 503 rather
-            # than the misleading "unreachable" assertion below.
+            # Every cell stayed UNAVAILABLE -- NOT quota exhaustion, so re-raise
+            # the actual 503 rather than the assertion below.
             raise last_server_error
-        # Every cell in the grid has now been marked exhausted by the loop above,
-        # so this is the same error acquire() would have raised directly had our
-        # ledger been accurate from the start. Raised here rather than by calling
-        # acquire() again: a re-acquire would spend a ledger slot on a call we
-        # have no intention of making, and -- now that a per-minute 429 leaves a
-        # cell alive but cooling -- could block on `acquire()`'s self-pacing sleep
-        # instead of returning the failure the caller is waiting on.
         raise DailyQuotaExhaustedError(
-            f"All {pool.key_count} key(s) x {len(pool.ladder)} model(s) exhausted "
-            f"for {datetime.now(UTC).date()} -- every cell was marked exhausted by a "
-            f"per-day 429 or an auth failure during this call"
+            f"lb {lb.name}: all {lb.key_count} key(s) x {len(ladder)} model(s) exhausted "
+            f"for {datetime.now(UTC).date()} -- every cell was spent by a per-day 429 or "
+            f"an auth failure during this call"
         )
 
-    def _start_recovery_probe(self, pool: QuotaGovernor, model: str) -> None:
+    def _start_recovery_probe(self, lb: LoadBalancer, model: str) -> None:
         """Fire-and-forget: called the moment `_invoke_with_retry` excludes a
-        model after a timeout. Only ever one probe in flight per (pool,
-        model) -- a second timeout on the same model while a probe is already
-        running just excludes it again (already true) rather than piling up
-        duplicate probes."""
+        model after a timeout. Only ever one probe in flight per
+        `(balancer, model)`."""
 
-        key = (id(pool), model)
+        key = (id(lb), model)
         existing = self._active_probes.get(key)
         if existing is not None and not existing.done():
             return
-        self._active_probes[key] = asyncio.create_task(self._probe_model(pool, model))
+        self._active_probes[key] = asyncio.create_task(self._probe_model(lb, model))
 
-    async def _probe_model(self, pool: QuotaGovernor, model: str) -> None:
-        """Runs off the request path, checking whether a model excluded after
-        a timeout has come back. Cycles through a DIFFERENT key each attempt
-        (not just the one that originally stalled) so a single bad key isn't
-        mistaken for the whole model being down, spaced out so every
-        configured key gets tried at least once inside the budget. A
-        successful probe call counts against today's ledger exactly like a
-        real acquired call (`record_probe_attempt`) -- it is one real request
-        against the provider, not free reconnaissance.
+    async def _probe_model(self, lb: LoadBalancer, model: str) -> None:
+        """Off the request path: checks whether a model excluded after a timeout
+        has come back, cycling a different key each attempt so one bad key isn't
+        mistaken for the whole model being down. A probe ping doesn't touch the
+        balancer's counters -- a handful of calls over 20 minutes is noise next
+        to real traffic, and the point is availability, not accounting.
 
-        Only matters for as long as this process stays alive -- fine for the
-        API process and local dev's `--watch` worker loop, but the production
-        worker is a short-lived batch cron pass (apps/worker/README.md) that
-        will usually exit before a 20-minute probe finishes; the next cron
-        run just rediscovers the same model fresh, at the cost of one more
-        timeout.
-        """
+        Only matters while this process lives; a short-lived worker pass that
+        exits mid-probe just rediscovers the model on the next pass."""
 
-        interval = max(_PROBE_MIN_INTERVAL_SECONDS, _PROBE_BUDGET_SECONDS / len(self._keys))
+        keys = lb.key_indices
+        interval = max(_PROBE_MIN_INTERVAL_SECONDS, _PROBE_BUDGET_SECONDS / len(keys))
         deadline = time.monotonic() + _PROBE_BUDGET_SECONDS
-        tried_keys: set[int] = set()
         attempt = 0
         while time.monotonic() < deadline:
-            key_index = attempt % len(self._keys)
+            key_index = keys[attempt % len(keys)]
             attempt += 1
-            tried_keys.add(key_index)
-            await pool.record_probe_attempt(key_index, model, now=datetime.now(UTC))
             try:
-                async with pool.cell_lock(key_index, model):
-                    client = self._client(key_index, model)
-                    await pool.note_request_sent(key_index, model, now=datetime.now(UTC))
-                    await client.ainvoke([("human", "ping")])
+                async with lb.cell_lock(key_index, model):
+                    await self._client(key_index, model).ainvoke([("human", "ping")])
             except Exception as exc:
                 logger.info(
-                    "probe: key=%d model=%s still unavailable (%s) -- next attempt "
+                    "probe: lb %s key=%d model=%s still unavailable (%s) -- next attempt "
                     "in %.0fs with a different key",
+                    lb.name,
                     key_index,
                     model,
                     exc,
@@ -1326,28 +1293,24 @@ class GeminiContentGenerator(ContentGenerator):
                 await asyncio.sleep(interval)
                 continue
             logger.warning(
-                "probe: key=%d model=%s responded -- resuming normal rotation "
-                "(today's ledger counts are kept as-is, not reset)",
+                "probe: lb %s key=%d model=%s responded -- back into rotation",
+                lb.name,
                 key_index,
                 model,
             )
-            await pool.include_model(model)
+            lb.include_model(model)
             return
 
         logger.warning(
-            "probe: model=%s did not respond from any of %d key(s) tried within %.0fs -- "
-            "marking every tried key exhausted, staying excluded for the rest of today",
+            "probe: lb %s model=%s did not respond from any key within %.0fs -- "
+            "marking its cells spent for the day, dropping the exclusion flag",
+            lb.name,
             model,
-            len(tried_keys),
             _PROBE_BUDGET_SECONDS,
         )
-        for key_index in tried_keys:
-            await pool.mark_exhausted(key_index, model, now=datetime.now(UTC))
-        # The ledger now keeps every TRIED key out of rotation for the rest of
-        # today on its own; releasing the manual flag only matters for a key
-        # this probe never got to (e.g. a key pool larger than fit in the
-        # budget), which real traffic is then free to discover for itself.
-        await pool.include_model(model)
+        for key_index in keys:
+            lb.mark_exhausted(key_index, model)
+        lb.include_model(model)
 
     # --------------------------------------------------------------- curriculum --
 
@@ -1375,7 +1338,7 @@ class GeminiContentGenerator(ContentGenerator):
                 ),
             ),
         ]
-        return await self._invoke_with_retry(self._thinking, CurriculumDraft, prompt)
+        return await self._invoke_with_retry("thinking", CurriculumDraft, prompt)
 
     async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
         if not queries:
@@ -1387,9 +1350,7 @@ class GeminiContentGenerator(ContentGenerator):
             ("human", prompts.TOPIC_BATCH_MATCH_USER.format(queries_block=queries_block)),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._thinking, _WireTopicMatchBatch, prompt
-            )
+            wire_result = await self._invoke_with_retry("thinking", _WireTopicMatchBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1421,7 +1382,7 @@ class GeminiContentGenerator(ContentGenerator):
         ]
         try:
             wire_result = await self._invoke_with_retry(
-                self._thinking, _WireTopicNameVerdictBatch, prompt
+                "thinking", _WireTopicNameVerdictBatch, prompt
             )
         except QuotaExhaustedError:
             raise
@@ -1484,9 +1445,7 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._generator, _WireCardPlanBatch, prompt, key_scope="box"
-            )
+            wire_result = await self._invoke_with_retry("generator", _WireCardPlanBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1563,9 +1522,7 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire = await self._invoke_with_retry(
-                self._generator, _WireAsciiFetchBatch, prompt, key_scope="box"
-            )
+            wire = await self._invoke_with_retry("generator", _WireAsciiFetchBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1649,9 +1606,7 @@ class GeminiContentGenerator(ContentGenerator):
             )
             prompt = _ascii_redraw_prompt(pending, escalated=attempt > 0)
             try:
-                redraw = await self._invoke_with_retry(
-                    self._generator, _WireAsciiRedrawBatch, prompt, key_scope="box"
-                )
+                redraw = await self._invoke_with_retry("generator", _WireAsciiRedrawBatch, prompt)
             except QuotaExhaustedError:
                 raise
             except Exception as exc:
@@ -1750,9 +1705,7 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._generator, _WireCardBatch, prompt, key_scope="box"
-            )
+            wire_result = await self._invoke_with_retry("generator", _WireCardBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1881,9 +1834,7 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._thinking, _WireCorrectionBatch, prompt, key_scope="pool"
-            )
+            wire_result = await self._invoke_with_retry("thinking", _WireCorrectionBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1935,9 +1886,7 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._thinking, _WireVerificationBatch, prompt, key_scope="pool"
-            )
+            wire_result = await self._invoke_with_retry("thinking", _WireVerificationBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1988,9 +1937,7 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._generator, _WireQuestionBatch, prompt, key_scope="box"
-            )
+            wire_result = await self._invoke_with_retry("generator", _WireQuestionBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -2050,9 +1997,7 @@ class GeminiContentGenerator(ContentGenerator):
             ("human", prompts.FREE_TEXT_GRADE_USER.format(items_block=items_block)),
         ]
         try:
-            wire_result = await self._invoke_with_retry(
-                self._thinking, _WireFreeTextGradeBatch, prompt
-            )
+            wire_result = await self._invoke_with_retry("thinking", _WireFreeTextGradeBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -2115,9 +2060,7 @@ class GeminiContentGenerator(ContentGenerator):
             ("human", content),
         ]
         try:
-            wire = await self._invoke_with_retry(
-                self._generator, _WireRepairBatch, prompt, key_scope="box"
-            )
+            wire = await self._invoke_with_retry("generator", _WireRepairBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -2167,16 +2110,18 @@ class GeminiContentGenerator(ContentGenerator):
             messages.append(("ai" if role == "assistant" else "human", text))
         messages.append(("human", query.question))
 
-        attempts = min(4, self._generator.key_count * len(self._generator.ladder))
+        lb = await self._remainder()
+        attempts = min(4, lb.key_count * len(lb.ladder("generator")))
         last_exc: Exception | None = None
         for _ in range(max(1, attempts)):
             try:
-                key_index, model = await self._generator.acquire(now=datetime.now(UTC), claim=None)
+                res = await lb.assign("generator", now=datetime.now(UTC))
             except QuotaExhaustedError:
                 raise
+            key_index, model = res.key_index, res.model
             client = self._client(key_index, model)
             try:
-                await self._generator.note_request_sent(key_index, model, now=datetime.now(UTC))
+                lb.note_send(res, now=datetime.now(UTC))
                 async for chunk in client.astream(messages):
                     raw: object = chunk.content
                     if isinstance(raw, list):
@@ -2188,10 +2133,12 @@ class GeminiContentGenerator(ContentGenerator):
                         text = str(raw)
                     if text:
                         yield text
+                await lb.on_success(res, now=datetime.now(UTC))
                 return
             except (ClientError, ChatGoogleGenerativeAIError, ServerError) as exc:
-                # Don't touch the ledger for a one-shot user call -- just move to
-                # another cell. A persistent failure falls through to the raise.
+                # A one-shot user call: don't spend the cell, just move on. A
+                # persistent failure falls through to the raise.
+                lb.on_send_aborted(res)
                 last_exc = exc
                 logger.warning(
                     "askai stream: cell key=%d model=%s failed: %s", key_index, model, exc

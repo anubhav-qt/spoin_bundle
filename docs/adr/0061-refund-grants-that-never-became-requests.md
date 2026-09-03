@@ -3,6 +3,7 @@
 - **Status:** Accepted (amends [ADR-0058](0058-per-minute-vs-per-day-429.md))
 - **Date:** 2026-08-26
 - **Deciders:** Anubhav
+- **Superseded by:** [ADR-0084](0084-per-box-load-balancer.md) -- `quota_request` is gone. The refund still exists as `LoadBalancer.on_send_aborted`, a `deque.remove` of the reservation slot; RPD is reconciled by the write-through instead of a prune sweep.
 
 ## Context
 

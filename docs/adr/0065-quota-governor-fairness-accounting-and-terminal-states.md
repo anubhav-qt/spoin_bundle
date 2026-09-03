@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-08-28
 - **Deciders:** Anubhav
+- **Superseded in part by:** [ADR-0084](0084-per-box-load-balancer.md) -- least-spent-first ordering and the three terminal-state subclasses are kept. The AIMD learned-rpm (`_shrink_effective_rpm` halve / `note_call_succeeded` grow) is replaced by a measured floor: on a 429 the ceiling drops to the send count that was in the window, and probes +1/min back up.
 - **Amended by:** [ADR-0074](0074-key-per-subtopic-scheduling.md) -- least-spent-first
   now orders KEY CLAIMS (one per subtopic group, held across that group's whole card
   run) rather than individual calls. The refund, learned-rpm and terminal-state

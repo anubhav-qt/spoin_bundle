@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
+- **Superseded by:** [ADR-0084](0084-per-box-load-balancer.md) -- the `KeyClaim` / `KeyClaimRegistry` classes are deleted. A box is now a `LoadBalancer` over a fixed key slice; there is no per-group claim or pin (ADR-0083 had already retired the pin). "One key per subtopic group" is not how it works any more; one caller per `(key, model)` cell per call is.
 - **Amended by:** [ADR-0082](0082-fixed-key-boxes-per-topic.md) -- "any unclaimed
   key" (step 3, step 5) now means any unclaimed key in that TOPIC's fixed-size
   box, because several topics run at once. Where this ADR says the parallelism

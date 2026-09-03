@@ -273,106 +273,20 @@ class GenerationJob(Base, UUIDPrimaryKey, Timestamps):
 
 
 class QuotaLedger(Base, Timestamps):
-    """The quota governor's book (ADR-0003 §6).
+    """The one durable piece of the quota system (ADR-0084): today's request
+    count per `(key, model)` cell.
 
-    A real component, not a try/except: it tracks spend against a daily ceiling,
-    enforces a hard stop, and degrades gracefully rather than erroring.
+    The load balancer keeps the count in memory during a run; this table exists
+    so the count survives across the many passes a day contains -- seeded once
+    when a balancer is built, written back best-effort as it climbs. The old
+    `exhausted_at` / `cooldown_until` columns are gone: "exhausted" is just
+    `requests_spent >= rpd`, and a cooldown is a 60-second in-memory fact the
+    balancer never re-reads.
     """
 
     __tablename__ = "quota_ledger"
 
     day: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
-    #: Free text, not an enum — for a multi-key backend (rotating Gemini keys) this
-    #: is `"gemini:{key_index}"`, one ledger row per key per day, no schema change
-    #: needed to add key-awareness on top of the original single-backend design.
+    #: `"gemini:{key_index}:{model}"` -- one row per cell per day.
     backend: Mapped[str] = mapped_column(String(64), primary_key=True)
     requests_spent: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    #: Set once, the moment this row's count reaches that day's target — never
-    #: reset. Explicit rather than inferred from `updated_at` (a plain "last
-    #: touched" timestamp doesn't distinguish "still has headroom" from "just hit
-    #: the wall"), so a caller can query "which key ran out, and when" directly.
-    exhausted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    #: Set by `QuotaGovernor.mark_rate_limited` when the provider returns a
-    #: per-MINUTE 429 for this cell -- `acquire()` skips the cell until it
-    #: passes, without spending `requests_spent` (ADR-0058). Shared rather than
-    #: in-memory so a throttle one process discovers is not re-discovered by
-    #: every other process that then routes straight into the same wall.
-    #: Wall-clock, unlike the monotonic value this replaced: it has to be
-    #: comparable across processes and hosts.
-    cooldown_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-
-
-class QuotaRequest(Base, UUIDPrimaryKey):
-    """One request against a `(key, model)` cell, inside the trailing per-minute
-    window (ADR-0058).
-
-    The RPM counterpart to `QuotaLedger`'s daily count, and shared for the same
-    reason the ledger is: an in-memory window lets two processes each permit the
-    full ceiling, so the provider sees double what either believes it sent.
-
-    **Rows are disposable.** They matter for 60 seconds and are pruned after;
-    nothing reads this table for history. That is also why it is a plain row per
-    request rather than a counter -- a sliding window needs the individual
-    timestamps, and counting rows makes the reserve atomic in one statement
-    (see `quota.py`'s `_try_reserve_rpm`) instead of needing a read-modify-write
-    under a row lock.
-    """
-
-    __tablename__ = "quota_request"
-
-    #: Same `"gemini:{key_index}:{model}"` convention as `QuotaLedger.backend`,
-    #: deliberately: the two tables describe the same cell on two time horizons.
-    backend: Mapped[str] = mapped_column(String(64), nullable=False)
-    #: When the request actually went to the provider. Written at reservation
-    #: time and moved forward when the call really fires (`note_request_sent`) --
-    #: see `_RpmSlot`'s successor in quota.py for why the window has to be
-    #: anchored to the send rather than the grant.
-    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    #: False while the cell is granted but the request hasn't left yet. Reserved
-    #: rows count toward the ceiling exactly like sent ones -- otherwise
-    #: concurrent callers all see room and pile onto the same cell.
-    confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-
-    __table_args__ = (
-        #: Every query here is "this cell, this last minute", and the prune is
-        #: "anything older than that" -- one composite index serves both.
-        Index("ix_quota_request_backend_sent_at", "backend", "sent_at"),
-    )
-
-
-class ModelUnavailable(Base, Timestamps):
-    """A model the provider has stopped answering on, parked out of rotation
-    while a recovery probe checks whether it has come back (ADR-0065).
-
-    Keyed on the MODEL alone, not on a `(key, model)` cell and not on a pool: a
-    503 overload or a 504 stall is a property of the model at the provider, so
-    one process discovering it should keep every other process -- and both
-    ladders that happen to list it -- from walking into the same wall. That is
-    the same reasoning that moved the RPM window into the database (ADR-0058);
-    this row is the availability counterpart to `QuotaLedger.cooldown_until`.
-
-    Unlike `quota_request`, rows here are few and long-lived enough to be worth
-    reading on every `acquire()`; unlike `quota_ledger`, they are not a day's
-    accounting and carry no history -- `include_model` deletes the row outright
-    the moment a probe gets an answer.
-    """
-
-    __tablename__ = "model_unavailable"
-
-    model: Mapped[str] = mapped_column(String(64), primary_key=True)
-    #: When this model was last observed unavailable. Rewritten on every
-    #: re-exclusion, so it reads as "still failing as of", not "first failed at".
-    excluded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    #: When this exclusion stops being believed, absent a probe clearing it
-    #: first. Derived from the probe's own budget, NOT an independent tuning
-    #: knob: the probe that owns this row is given a fixed window to reach a
-    #: verdict, so an exclusion outliving that window is evidence the prober
-    #: died (a short-lived worker pass exiting mid-probe -- see
-    #: `_probe_model`'s docstring), not evidence the model is still down.
-    #: Without it, one crashed process could park a model for every other
-    #: process indefinitely.
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    #: The provider error that caused the exclusion, verbatim-ish. Read by
-    #: humans out of a terminal, and by `AllModelsUnavailableError` when it has
-    #: to explain that a run stopped on an outage rather than on quota.
-    reason: Mapped[str] = mapped_column(String(256), nullable=False)

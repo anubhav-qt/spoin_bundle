@@ -367,3 +367,51 @@ def test_reservation_carries_a_private_slot() -> None:
     res = Reservation(key_index=3, model=_GEN, _slot=slot)
     assert res.key_index == 3
     assert res._slot is slot
+
+
+async def test_send_gap_never_outruns_a_slow_rungs_own_rpm() -> None:
+    """One configured gap, two ladders with different `rpm`: the gap is a floor,
+    widened per rung by `_gap_for`.
+
+    The thinking rungs are rpm 5 (12s between sends) and the generator rungs
+    rpm 15 (4s). A single `gemini_send_gap_seconds = 4.0` used to pace both,
+    driving every thinking cell 3x over its documented limit.
+    """
+
+    lb = _lb(keys=(0,), send_gap_s=4.0)
+
+    think = await lb.try_assign("thinking", now=_NOW)
+    assert isinstance(think, Reservation)
+    # 4s is the configured gap but not this rung's -- 60/5 = 12s is.
+    assert isinstance(await lb.try_assign("thinking", now=_NOW + timedelta(seconds=4.1)), float)
+    assert isinstance(
+        await lb.try_assign("thinking", now=_NOW + timedelta(seconds=12.1)), Reservation
+    )
+
+    # The generator rung's own rpm (15 -> 4s) is not slower than the floor, so
+    # the configured gap still governs it.
+    gen = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(gen, Reservation)
+    assert isinstance(
+        await lb.try_assign("generator", now=_NOW + timedelta(seconds=4.1)), Reservation
+    )
+
+
+async def test_unattributed_429_cooldown_credits_the_window_already_served() -> None:
+    """A 429 with no `RetryInfo` waits one window from the cell's OLDEST live
+    send, not a flat minute from now -- the latter re-serves time the trailing
+    window has already served."""
+
+    lb = _lb(keys=(0,), gen=[LadderRung(_GEN, 500, 15)])
+    res = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(res, Reservation)
+    lb.note_send(res, now=_NOW)
+
+    # The 429 lands 50s after the send that is still in the window: only the
+    # window's remaining 10s is owed, not another full 60.
+    late = _NOW + timedelta(seconds=50)
+    lb.on_rate_limited(res, now=late, per_minute=True)
+    assert isinstance(await lb.try_assign("generator", now=late), float)
+    assert isinstance(
+        await lb.try_assign("generator", now=_NOW + timedelta(seconds=60.1)), Reservation
+    )

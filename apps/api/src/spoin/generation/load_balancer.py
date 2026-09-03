@@ -29,6 +29,7 @@ import asyncio
 import contextlib
 import logging
 import math
+import time
 from collections import deque
 from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
@@ -51,9 +52,10 @@ logger = logging.getLogger("spoin.generation.load_balancer")
 
 #: The trailing window RPM is measured over — 60s is what "per minute" means.
 _WINDOW_S = 60.0
-#: Fallback per-minute cooldown when a 429 arrives with no `RetryInfo`. One full
-#: window is the longest a per-minute limit can last, so waiting it is correct
-#: by definition.
+#: Upper bound on the per-minute cooldown when a 429 arrives with no `RetryInfo`.
+#: One full window is the longest a per-minute limit can last. It is a CAP, not
+#: the wait itself -- `on_rate_limited` prefers the cell's own window, which is
+#: the same fact measured instead of assumed.
 _COOLDOWN_S = 60.0
 #: A fresh balancer treats every cell as cooling for this long (ADR-0084 §4):
 #: its in-memory window starts empty but its keys may have been hot seconds ago
@@ -168,8 +170,8 @@ class _CellState:
     rpd_spent: int
     day: datetime
     #: epoch seconds of this cell's last dispatch/send. The per-(key, model)
-    #: send gap (ADR-0084) is measured from here -- 4s → 15/min per cell, which
-    #: is also why the trailing window below is dormant under pacing.
+    #: send gap (ADR-0084) is measured from here -- see `LoadBalancer._gap_for`,
+    #: which is also why the trailing window below is dormant under pacing.
     last_send: float = 0.0
     #: How many times THIS balancer has dispatched to this cell. The primary
     #: sort key in `try_assign` -- strict round-robin so every (key, model) pair
@@ -243,8 +245,8 @@ class LoadBalancer:
         self._model_unavailable = model_unavailable
         self._ledger_writer = ledger_writer
         #: Minimum seconds between two sends to the SAME `(key, model)` cell
-        #: (`settings.gemini_send_gap_seconds`). This is the burst brake AND,
-        #: at 4s = 15/min per cell, the whole rate limiter: with it on, the
+        #: (`settings.gemini_send_gap_seconds`) -- a FLOOR, widened per rung by
+        #: `_gap_for`. This is the burst brake AND the whole rate limiter: with it on, the
         #: trailing-60s window and the learned-rpm ceiling are dormant (a
         #: constant gap already caps the rate and evens the spread). 0 re-enables
         #: the window (`fake`, tests, and any experiment that sets the gap to 0).
@@ -293,6 +295,20 @@ class LoadBalancer:
             self._cell_locks[cell] = lock
         return lock
 
+    def _gap_for(self, cell: _CellState) -> float:
+        """The send gap THIS cell must honour: the configured gap, but never
+        faster than the cell's own rung allows.
+
+        `gemini_send_gap_seconds` is one constant, and the two ladders are not
+        one rate -- the thinking rungs are rpm 5 (a 12s gap) and the generator
+        rungs rpm 15 (4s). Applying the configured gap to both drove every
+        thinking cell 3x over its documented limit at the 4s setting. The
+        configured value stays a floor so an experiment can still slow the whole
+        pool down; it can no longer speed a rung past its own ceiling.
+        """
+
+        return max(self._send_gap_s, _WINDOW_S / max(1, cell.configured_rpm))
+
     # -- assignment -------------------------------------------------------
 
     async def assign(
@@ -312,8 +328,16 @@ class LoadBalancer:
                 return outcome
             wait_s = outcome
             logger.info("lb %s: no %s cell right now -- waiting %.1fs", self.name, kind, wait_s)
+            started = time.monotonic()
             await asyncio.sleep(wait_s)
-            now = now + timedelta(seconds=wait_s)
+            # Advance by the time that ACTUALLY passed. `asyncio.sleep(w)` returns
+            # no earlier than `w` but, on a loaded event loop, often much later --
+            # and this loop can run thousands of times in a starved pass. Adding
+            # the nominal `w` let this clock drift behind the real one, and the
+            # stamp a reservation then writes to `cell.last_send` under-states how
+            # recently the cell was used, which un-blocks the send gap early and
+            # lets a burst through on a cell whose AVERAGE rate still looks calm.
+            now = now + timedelta(seconds=max(wait_s, time.monotonic() - started))
 
     async def try_assign(
         self,
@@ -353,10 +377,10 @@ class LoadBalancer:
                         soonest = min(soonest, block_until - now_s)
                         continue
                     # Per-(key, model) send gap (ADR-0084): don't hit this exact
-                    # cell again until `_send_gap_s` has passed. 4s = 15/min per
-                    # cell, which IS the rate limiter when pacing is on.
+                    # cell again until this cell's own gap has passed -- see
+                    # `_gap_for`. It IS the rate limiter when pacing is on.
                     if self._send_gap_s > 0.0:
-                        gap_left = self._send_gap_s - (now_s - cell.last_send)
+                        gap_left = self._gap_for(cell) - (now_s - cell.last_send)
                         if gap_left > 0.0:
                             soonest = min(soonest, gap_left)
                             continue
@@ -444,10 +468,19 @@ class LoadBalancer:
         cell = self._cells[(res.key_index, res.model)]
         now_s = now.timestamp()
         if per_minute:
-            cell.cooldown_until = now_s + (retry_after_s if retry_after_s else _COOLDOWN_S)
+            cell.prune(now_s)
+            if retry_after_s:
+                cell.cooldown_until = now_s + retry_after_s
+            else:
+                # No `RetryInfo`. The earliest this cell can be back inside its
+                # per-minute allowance is one full window after its OLDEST still-
+                # live send -- not a flat minute from now, which re-serves time
+                # the window has already served. `_COOLDOWN_S` stays the bound
+                # for a cell with nothing left in its window to reason from.
+                oldest = cell.window[0].sent_at if cell.window else now_s
+                cell.cooldown_until = min(now_s + _COOLDOWN_S, oldest + _WINDOW_S)
             if self._paced:
                 return
-            cell.prune(now_s)
             measured = max(1, len(cell.window))  # the refused call WAS sent — keep its slot
             if measured < cell.learned_rpm:
                 logger.info(

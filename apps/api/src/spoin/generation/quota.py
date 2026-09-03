@@ -57,6 +57,11 @@ class AllModelsUnavailableError(QuotaExhaustedError):
     504 stall). Says nothing about quota; resolves when the provider does."""
 
 
+#: Free-tier tokens-per-minute, per project per model -- the same 250k for the
+#: flash and flash-lite families (owner-supplied, 2026-09-03). ADR-0085.
+_DEFAULT_TPM = 250_000
+
+
 @dataclass(frozen=True)
 class LadderRung:
     """One model's place in a fallback ladder, and its own daily/per-minute
@@ -66,10 +71,18 @@ class LadderRung:
     model: str
     rpd: int
     rpm: int
+    #: Tokens per minute, per project, per model. Free tier is 250k across both
+    #: the flash and flash-lite families (owner-supplied, 2026-09-03), which is
+    #: why it has a default rather than being spelled in every ladder string --
+    #: see ADR-0085 for why a token limit exists here at all.
+    tpm: int = _DEFAULT_TPM
 
 
 def parse_ladder(raw: str) -> list[LadderRung]:
-    """Parses `"model:rpd:rpm,model:rpd:rpm,..."` (see `Settings.gemini_*_ladder`).
+    """Parses `"model:rpd:rpm[:tpm],..."` (see `Settings.gemini_*_ladder`).
+
+    `tpm` is optional: omitted, the rung takes `_DEFAULT_TPM`. Existing ladder
+    strings therefore keep parsing unchanged.
 
     A plain string, not a structured setting, for the same reason
     `gemini_api_keys` is: pydantic-settings JSON-parses list-typed env vars,
@@ -81,8 +94,16 @@ def parse_ladder(raw: str) -> list[LadderRung]:
         part = part.strip()
         if not part:
             continue
-        model, rpd, rpm = part.split(":")
-        rungs.append(LadderRung(model=model, rpd=int(rpd), rpm=int(rpm)))
+        fields = part.split(":")
+        if len(fields) == 3:
+            model, rpd, rpm = fields
+            tpm = _DEFAULT_TPM
+        elif len(fields) == 4:
+            model, rpd, rpm, raw_tpm = fields
+            tpm = int(raw_tpm)
+        else:
+            raise ValueError(f"Ladder rung must be model:rpd:rpm[:tpm], got {part!r}")
+        rungs.append(LadderRung(model=model, rpd=int(rpd), rpm=int(rpm), tpm=tpm))
     if not rungs:
         raise ValueError("Model ladder must have at least one rung")
     return rungs

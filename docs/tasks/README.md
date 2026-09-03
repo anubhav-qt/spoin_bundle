@@ -62,6 +62,7 @@ parallel; 0020 is gated on all three, 0021 on 0020. Read
 | [0008](0008-wire-generation-job-worker.md) | Wire `apps/worker` to the generation pipeline | Done -- 2026-08-17 |
 | [0027](0027-mobile-shell.md) | A mobile shell -- a floating pill nav, and the right rail becomes a topics sheet | Reverted, then superseded -- see ADR-0063 / [ADR-0064](../adr/0064-mobile-shell-tab-bar.md) / task 0028 |
 | [0032](0032-batch-topic-requests.md) | Several custom topics in one batched submission, each with an optional description | Done -- 2026-08-30, `feat/v1-finish-line` (`1f72fc6` API + `3c699fb` web) |
+| [0037](0037-reconcile-token-estimates-with-real-usage.md) | Feed the ADR-0085 token window from real `usageMetadata` instead of a `chars // 4` estimate | Open |
 
 **v1 finish line:** [`docs/handoff/v1-finish-line-plan.md`](../handoff/v1-finish-line-plan.md)
 is the build/review/deploy plan for closing out v1 — the remaining frontend and backend

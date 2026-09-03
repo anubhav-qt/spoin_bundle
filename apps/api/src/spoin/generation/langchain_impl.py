@@ -114,6 +114,7 @@ from spoin.generation.load_balancer import (
     LadderKind,
     LoadBalancer,
     Reservation,
+    estimate_tokens,
     make_ledger_writer,
     seed_rpd,
 )
@@ -472,7 +473,7 @@ def _format_type_quotas(type_quotas: dict[str, int]) -> str:
 #: card. High enough that a genuinely good match is very likely in the set; low
 #: enough that a tier's worth of candidates doesn't dwarf the fetch prompt (each
 #: candidate carries its own small art block).
-_ASCII_CANDIDATE_COUNT = 10
+_ASCII_CANDIDATE_COUNT = 5
 
 
 def _format_fetch_candidates(query: AsciiFetchQuery, candidates: list[AsciiLibraryEntry]) -> str:
@@ -1045,7 +1046,7 @@ class GeminiContentGenerator(ContentGenerator):
         delay = _SERVER_ERROR_BASE_DELAY_S
         for attempt in range(1, _SERVER_ERROR_RETRIES + 1):
             try:
-                lb.note_send(res, now=datetime.now(UTC))
+                lb.note_send(res, now=datetime.now(UTC), tokens=estimate_tokens(str(prompt)))
                 return await structured.ainvoke(prompt)  # type: ignore[attr-defined]
             except ServerError as exc:
                 if exc.code == 504 or attempt == _SERVER_ERROR_RETRIES:
@@ -1088,6 +1089,9 @@ class GeminiContentGenerator(ContentGenerator):
 
         lb = CURRENT_BALANCER.get() or await self._remainder()
         ladder = lb.ladder(kind)
+        # What this call will cost the cell's trailing-minute token window
+        # (ADR-0085). Computed once: the prompt does not change across cells.
+        est_tokens = estimate_tokens(str(prompt))
         max_attempts = lb.key_count * len(ladder)
         grid_size = max_attempts
         cells_burned = 0
@@ -1103,6 +1107,7 @@ class GeminiContentGenerator(ContentGenerator):
                 res = await lb.assign(
                     kind,
                     now=datetime.now(UTC),
+                    est_tokens=est_tokens,
                     exclude_models=frozenset(unavailable_models),
                 )
             except QuotaExhaustedError:
@@ -2093,15 +2098,16 @@ class GeminiContentGenerator(ContentGenerator):
         lb = await self._remainder()
         attempts = min(4, lb.key_count * len(lb.ladder("generator")))
         last_exc: Exception | None = None
+        est_tokens = estimate_tokens(str(messages))
         for _ in range(max(1, attempts)):
             try:
-                res = await lb.assign("generator", now=datetime.now(UTC))
+                res = await lb.assign("generator", now=datetime.now(UTC), est_tokens=est_tokens)
             except QuotaExhaustedError:
                 raise
             key_index, model = res.key_index, res.model
             client = self._client(key_index, model)
             try:
-                lb.note_send(res, now=datetime.now(UTC))
+                lb.note_send(res, now=datetime.now(UTC), tokens=est_tokens)
                 async for chunk in client.astream(messages):
                     raw: object = chunk.content
                     if isinstance(raw, list):

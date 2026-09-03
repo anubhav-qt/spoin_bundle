@@ -139,8 +139,11 @@ class Settings(BaseSettings):
     #: never by feel.
     gemini_send_gap_seconds: float = 10.0
 
-    # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
-    # are the difference between the corpus filling and not filling.
+    # Batch sizes (ADR-0005). Batching is still right -- one 15-card call beats
+    # 15 single-card calls on every axis -- but the reason once stated here, "the
+    # free tier meters requests, not tokens", is FALSE. Tokens are metered too
+    # (ADR-0085), so a batch size trades requests against tokens-per-minute
+    # rather than buying throughput for free.
     generation_batch_size: int = 15
     #: Gate pass 1 (`correct_cards`, ADR-0030). Kept moderate because correction
     #: rewrites whole card BODIES -- its output scales with the batch, so a large
@@ -153,7 +156,12 @@ class Settings(BaseSettings):
     #: not truncation. Bigger chunks here mean fewer thinking-pool calls per tier
     #: (the scarce rung: rpd 20 / rpm 5), which is where gate rate-limiting bites.
     #: ~40 is the ceiling before the model stops genuinely re-rating difficulty.
-    verification_batch_size: int = 40
+    #:
+    #: Cut 40 -> 20 (ADR-0085): each verified card carries its BODY and its ascii
+    #: art into the prompt, so this batch is one of the two biggest token
+    #: consumers in the pipeline. The rate pressure it was sized against is real,
+    #: but it was sized on the false premise that only requests are metered.
+    verification_batch_size: int = 20
     question_batch_size: int = 35
 
     #: Local-dev-only persistent loop (`python -m spoin.worker --watch`,

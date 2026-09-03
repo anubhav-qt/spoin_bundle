@@ -415,3 +415,64 @@ async def test_unattributed_429_cooldown_credits_the_window_already_served() -> 
     assert isinstance(
         await lb.try_assign("generator", now=_NOW + timedelta(seconds=60.1)), Reservation
     )
+
+
+# --- TPM window (ADR-0085) -------------------------------------------------
+
+
+async def test_token_window_blocks_a_cell_over_its_tpm_and_spreads_to_the_next() -> None:
+    """The trailing-minute TOKEN ceiling gates independently of the request
+    ceiling: a cell inside its rpm can still be out of tokens."""
+
+    lb = _lb(keys=(0, 1), gen=[LadderRung(_GEN, 500, 15, 10_000)])
+    first = await lb.try_assign("generator", now=_NOW, est_tokens=6_000)
+    assert isinstance(first, Reservation)
+    lb.note_send(first, now=_NOW, tokens=6_000)
+
+    # Key 0 has 4k of its 10k minute left, so a 6k call must land elsewhere.
+    second = await lb.try_assign("generator", now=_NOW, est_tokens=6_000)
+    assert isinstance(second, Reservation)
+    assert second.key_index != first.key_index
+    lb.note_send(second, now=_NOW, tokens=6_000)
+
+    # Both cells are now over; the balancer reports a wait, not a reservation.
+    assert isinstance(await lb.try_assign("generator", now=_NOW, est_tokens=6_000), float)
+    # A SMALL call still fits in what is left of the same minute.
+    assert isinstance(await lb.try_assign("generator", now=_NOW, est_tokens=1_000), Reservation)
+
+
+async def test_tokens_age_out_of_the_trailing_minute() -> None:
+    lb = _lb(keys=(0,), gen=[LadderRung(_GEN, 500, 15, 10_000)])
+    res = await lb.try_assign("generator", now=_NOW, est_tokens=9_000)
+    assert isinstance(res, Reservation)
+    lb.note_send(res, now=_NOW, tokens=9_000)
+
+    assert isinstance(await lb.try_assign("generator", now=_NOW, est_tokens=9_000), float)
+    later = _NOW + timedelta(seconds=61)
+    assert isinstance(await lb.try_assign("generator", now=later, est_tokens=9_000), Reservation)
+
+
+async def test_aborted_send_refunds_its_tokens() -> None:
+    """A call that never left spent no tokens -- same refund the request window
+    already gets (ADR-0061)."""
+
+    lb = _lb(keys=(0,), gen=[LadderRung(_GEN, 500, 15, 10_000)])
+    res = await lb.try_assign("generator", now=_NOW, est_tokens=9_000)
+    assert isinstance(res, Reservation)
+    lb.note_send(res, now=_NOW, tokens=9_000)
+    lb.on_send_aborted(res)
+
+    assert isinstance(await lb.try_assign("generator", now=_NOW, est_tokens=9_000), Reservation)
+
+
+def test_parse_ladder_takes_an_optional_tpm() -> None:
+    from spoin.generation.quota import parse_ladder
+
+    three = parse_ladder("m:500:15")
+    assert (three[0].rpd, three[0].rpm, three[0].tpm) == (500, 15, 250_000)
+
+    four = parse_ladder("m:500:15:80000")
+    assert four[0].tpm == 80_000
+
+    with pytest.raises(ValueError, match="model:rpd:rpm"):
+        parse_ladder("m:500")

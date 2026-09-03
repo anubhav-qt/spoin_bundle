@@ -6,6 +6,15 @@
 
 ## Context
 
+> **Amended 2026-09-03 by [ADR-0085](0085-tokens-are-metered-too.md).** The premise
+> below — that tokens are not metered — is **false**. The free tier also meters
+> **250,000 tokens per minute** per project per model. This ADR's *rule* stands
+> (a collection-taking interface is still right: one 15-card call beats 15
+> single-card calls on requests AND tokens), but "the size of each call is nearly
+> free" does not, and the batch sizes sized on it were pointed the wrong way.
+> Read ADR-0085 before changing a batch size or writing a prompt on the
+> assumption that length is cheap.
+
 Gemini's free tier meters **requests per day and per minute**, not tokens. Our binding
 constraint is therefore the _number of API calls_, and the size of each call is nearly
 free by comparison.

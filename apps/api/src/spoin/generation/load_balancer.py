@@ -91,6 +91,20 @@ CURRENT_BALANCER: ContextVar[LoadBalancer | None] = ContextVar(
 LedgerWriter = Callable[[int, str, int], Awaitable[None]]
 
 
+def estimate_tokens(text: str) -> int:
+    """A prompt's token cost, before it is sent (ADR-0085).
+
+    Four characters per token is the usual English rule of thumb. It is an
+    ESTIMATE and deliberately so: the exact count is only knowable from the
+    response's `usageMetadata`, which `with_structured_output` does not surface
+    (it returns the parsed model, not the `AIMessage`) -- reconciling against the
+    real figure is deferred, see docs/tasks. The window this feeds is a brake,
+    and a brake sized on a ~20% estimate still brakes.
+    """
+
+    return max(1, len(text) // 4)
+
+
 def _backend(key_index: int, model: str) -> str:
     """The `(key, model)` cell's spelling in `quota_ledger.backend`."""
 
@@ -167,6 +181,7 @@ class Reservation:
 class _CellState:
     rpd_limit: int
     configured_rpm: int
+    tpm_limit: int
     rpd_spent: int
     day: datetime
     #: epoch seconds of this cell's last dispatch/send. The per-(key, model)
@@ -178,6 +193,11 @@ class _CellState:
     #: carries an even share, not just whichever had the coldest ledger seed.
     dispatched: int = 0
     window: deque[_Slot] = field(default_factory=deque)
+    #: `(sent_at, tokens)` for each send inside the trailing minute -- the token
+    #: analogue of `window`, pruned on the same 60s cutoff (ADR-0085). Unlike
+    #: the request window this is NOT dormant under pacing: a constant send gap
+    #: bounds requests per minute, and says nothing at all about tokens.
+    token_window: deque[tuple[float, int]] = field(default_factory=deque)
     learned_rpm: float = 0.0
     cooldown_until: float = 0.0
     last_probe_up: float = 0.0
@@ -192,6 +212,15 @@ class _CellState:
         cutoff = now_s - _WINDOW_S
         while self.window and self.window[0].sent_at <= cutoff:
             self.window.popleft()
+        while self.token_window and self.token_window[0][0] <= cutoff:
+            self.token_window.popleft()
+
+    @property
+    def windowed_tokens(self) -> int:
+        """Tokens sent to this cell inside the trailing minute. Call `prune`
+        first -- this does not prune, so it stays cheap in the assign loop."""
+
+        return sum(t for _, t in self.token_window)
 
     def roll_day(self, now: datetime) -> None:
         start = _day_start(now)
@@ -203,6 +232,7 @@ class _CellState:
         self.flushed_at = 0
         self.learned_rpm = float(self.configured_rpm)
         self.window.clear()
+        self.token_window.clear()
         self.cooldown_until = 0.0
         self.day = start
 
@@ -270,6 +300,7 @@ class LoadBalancer:
                     self._cells[cell] = _CellState(
                         rpd_limit=rung.rpd,
                         configured_rpm=rung.rpm,
+                        tpm_limit=rung.tpm,
                         rpd_spent=seed,
                         day=day,
                     )
@@ -316,6 +347,7 @@ class LoadBalancer:
         kind: LadderKind,
         *,
         now: datetime,
+        est_tokens: int = 0,
         exclude_models: frozenset[str] = frozenset(),
     ) -> Reservation:
         """A cell to make the next `kind` call on. Sleeps and retries while the
@@ -323,7 +355,9 @@ class LoadBalancer:
         `QuotaExhaustedError` subclass when nothing will serve soon."""
 
         while True:
-            outcome = await self.try_assign(kind, now=now, exclude_models=exclude_models)
+            outcome = await self.try_assign(
+                kind, now=now, est_tokens=est_tokens, exclude_models=exclude_models
+            )
             if isinstance(outcome, Reservation):
                 return outcome
             wait_s = outcome
@@ -344,6 +378,7 @@ class LoadBalancer:
         kind: LadderKind,
         *,
         now: datetime,
+        est_tokens: int = 0,
         exclude_models: frozenset[str] = frozenset(),
     ) -> Reservation | float:
         """One pass, no sleeping: a `Reservation`, or the seconds to wait before
@@ -384,6 +419,15 @@ class LoadBalancer:
                         if gap_left > 0.0:
                             soonest = min(soonest, gap_left)
                             continue
+                    # Trailing-minute TOKEN ceiling (ADR-0085). Unlike the
+                    # request window this always gates: the send gap bounds
+                    # requests per minute and says nothing about tokens, and a
+                    # batch call's token cost varies by orders of magnitude.
+                    if est_tokens and cell.windowed_tokens + est_tokens > cell.tpm_limit:
+                        # Wait for the oldest tokens to age out of the minute.
+                        if cell.token_window:
+                            soonest = min(soonest, cell.token_window[0][0] + _WINDOW_S - now_s)
+                        continue
                     # The trailing-60s window only gates when pacing is OFF --
                     # a constant per-cell gap already caps the rate (see
                     # `_paced`).
@@ -424,7 +468,7 @@ class LoadBalancer:
 
     # -- feedback from the call --------------------------------------------
 
-    def note_send(self, res: Reservation, *, now: datetime) -> None:
+    def note_send(self, res: Reservation, *, now: datetime, tokens: int = 0) -> None:
         """The request is leaving now — move its window slot to the true send
         time (ADR-0058's alignment fix) and re-anchor the per-cell send gap to
         it, so a call delayed behind `cell_lock` still spaces the next one out
@@ -434,6 +478,11 @@ class LoadBalancer:
         now_s = now.timestamp()
         res._slot.sent_at = now_s
         cell.last_send = max(cell.last_send, now_s)
+        if tokens:
+            # Anchored to the true send time for the same reason the request
+            # slot is (ADR-0058): a call delayed behind `cell_lock` spends its
+            # tokens in the minute it actually leaves, not the one it reserved.
+            cell.token_window.append((now_s, tokens))
 
     async def on_success(self, res: Reservation, *, now: datetime) -> None:
         cell = self._cells[(res.key_index, res.model)]
@@ -513,6 +562,11 @@ class LoadBalancer:
             return
         with contextlib.suppress(ValueError):
             cell.window.remove(res._slot)
+        # Refund the token slot too -- an aborted send spent no tokens either.
+        for i in range(len(cell.token_window) - 1, -1, -1):
+            if cell.token_window[i][0] == res._slot.sent_at:
+                del cell.token_window[i]
+                break
 
     def mark_exhausted(self, key_index: int, model: str) -> None:
         """Force a cell spent for the day — an auth failure (401/403), or a

@@ -296,3 +296,155 @@ async def test_a_throttled_wait_is_not_reported_as_a_contended_one(
     assert result.other_claims == 0
     assert result.free_keys == 0
     assert not result.waiting_on_a_key
+
+
+# --- ADR-0082: key boxes -----------------------------------------------------
+#
+# The box tests protect a second property on top of "one caller per key": a
+# topic's calls never leave its box. That is what bounds total in-flight work at
+# `max_concurrent_topics * box_size` regardless of how many topics are queued --
+# the bound ADR-0078 lost by letting a spent claim reach a shared reserve.
+
+
+@pytest.mark.asyncio
+async def test_a_boxed_claim_never_binds_outside_its_box(session: AsyncSession) -> None:
+    governor = _governor(keys=4, ladder=_ladder(("model-a", 20, 5)))
+    assert governor.claims is not None
+    box = governor.claims.lease_box(2)
+    claim = KeyClaim(box=box)
+
+    granted = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+
+    assert isinstance(granted, tuple)
+    assert granted[0] in box.key_indices
+
+
+@pytest.mark.asyncio
+async def test_a_spent_boxed_key_moves_within_the_box_not_outside_it(
+    session: AsyncSession,
+) -> None:
+    """ADR-0074's step 2 still applies -- a claim whose key is spent moves to a
+    fresher one -- but "fresher one" means inside the box. The two keys outside
+    it are completely untouched and still refused."""
+
+    governor = _governor(keys=4, ladder=_ladder(("model-a", 20, 5)))
+    assert governor.claims is not None
+    box = governor.claims.lease_box(2, prefer=[0, 1])
+    claim = KeyClaim(box=box)
+
+    first = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+    assert isinstance(first, tuple)
+    await _drain(governor, session, first[0], "model-a", 20)
+
+    second = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+
+    assert isinstance(second, tuple)
+    assert second[0] != first[0]
+    assert second[0] in {0, 1}
+
+
+@pytest.mark.asyncio
+async def test_two_boxes_never_share_a_key(session: AsyncSession) -> None:
+    governor = _governor(keys=4, ladder=_ladder(("model-a", 20, 5)))
+    assert governor.claims is not None
+
+    first = governor.claims.lease_box(2)
+    second = governor.claims.lease_box(2)
+
+    assert len(first.key_indices) == 2
+    assert not first.key_indices & second.key_indices
+
+
+@pytest.mark.asyncio
+async def test_a_box_takes_what_is_left_when_the_pool_is_short(session: AsyncSession) -> None:
+    """A short box is not an error (`lease_box`): a topic with fewer keys than
+    it asked for still generates, where refusing to start would idle them."""
+
+    governor = _governor(keys=3, ladder=_ladder(("model-a", 20, 5)))
+    assert governor.claims is not None
+
+    governor.claims.lease_box(2)
+    second = governor.claims.lease_box(2)
+
+    assert len(second.key_indices) == 1
+
+
+@pytest.mark.asyncio
+async def test_a_box_whose_day_is_spent_reaches_the_reserve_rung(session: AsyncSession) -> None:
+    """The daily-room test is scoped to the box too. With the box's own keys
+    exhausted on the ordinary rung, this claim escalates to the reserve even
+    though the key OUTSIDE the box is completely fresh -- waiting on budget it
+    can never be given is not contention, it is a hang."""
+
+    governor = _governor(keys=2, ladder=_ladder(("model-a", 20, 5), ("reserve", 20, 5)), reserve=1)
+    assert governor.claims is not None
+    box = governor.claims.lease_box(1, prefer=[0])
+    await _drain(governor, session, 0, "model-a", 20)
+
+    granted = await governor.acquire_for_claim_with_session(
+        session, now=_NOW, claim=KeyClaim(box=box)
+    )
+
+    assert granted == (0, "reserve")
+
+
+@pytest.mark.asyncio
+async def test_a_boxed_wait_counts_only_its_own_topics_keys(session: AsyncSession) -> None:
+    """The wait line a boxed claim logs is about ITS topic. A sibling group
+    holds the box's only other key; the two keys outside the box are neither
+    something to wait for nor somewhere to move to, so they are not counted."""
+
+    governor = _governor(keys=4, ladder=_ladder(("model-a", 20, 1)))
+    assert governor.claims is not None
+    box = governor.claims.lease_box(2, prefer=[0, 1])
+    sibling, claim = KeyClaim(box=box), KeyClaim(box=box)
+
+    assert isinstance(
+        await governor.acquire_for_claim_with_session(session, now=_NOW, claim=sibling), tuple
+    )
+    assert isinstance(
+        await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim), tuple
+    )
+    result = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+
+    assert isinstance(result, _ClaimWait)
+    assert result.free_keys == 0
+    assert result.other_claims == 1
+
+
+@pytest.mark.asyncio
+async def test_releasing_a_box_returns_its_keys_and_drops_its_claims(
+    session: AsyncSession,
+) -> None:
+    governor = _governor(keys=2, ladder=_ladder(("model-a", 20, 5)))
+    assert governor.claims is not None
+    box = governor.claims.lease_box(2)
+    claim = KeyClaim(box=box)
+    assert isinstance(
+        await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim), tuple
+    )
+
+    await governor.claims.release_box(box)
+
+    assert claim.key_index is None
+    assert governor.claims.free_keys() == [0, 1]
+    # And the keys are boxable again -- a released box leaves nothing behind.
+    assert len(governor.claims.lease_box(2).key_indices) == 2
+
+
+@pytest.mark.asyncio
+async def test_an_unboxed_claim_still_sees_the_whole_pool(session: AsyncSession) -> None:
+    """ADR-0082 adds a scope, it does not replace one. A claim with no box --
+    the `fake` backend, a CLI run against a keyless generator -- keeps ADR-0074's
+    whole-pool ladder."""
+
+    governor = _governor(keys=2, ladder=_ladder(("model-a", 20, 5)))
+    claim = KeyClaim()
+
+    first = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+    assert isinstance(first, tuple)
+    await _drain(governor, session, first[0], "model-a", 20)
+    second = await governor.acquire_for_claim_with_session(session, now=_NOW, claim=claim)
+
+    assert isinstance(second, tuple)
+    assert second[0] != first[0]

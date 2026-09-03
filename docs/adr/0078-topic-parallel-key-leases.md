@@ -14,7 +14,12 @@
   semaphore** sized to real aggregate RPM, so concurrency is a bounded queue
   rather than an unbounded fan-out — see
   [the key-projects handoff](../handoff/next-key-projects-and-experiment-restore.md).
-- **Superseded-by (history):** rolled back to ADR-0073 / ADR-0074.
+- **Superseded-by (history):** rolled back to ADR-0073 / ADR-0074, then
+  reworked as [ADR-0082](0082-fixed-key-boxes-per-topic.md) (2026-09-02), which
+  keeps this ADR's goal -- topics in parallel -- and drops the two properties
+  that made it unsafe: the box size is a fixed number rather than derived from the
+  curriculum's widest tier, and there is no shared reserve to borrow from, so a
+  topic's key box is closed.
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
 - **Amended by:** [ADR-0081](0081-curriculum-as-a-worker-phase.md) -- the worker

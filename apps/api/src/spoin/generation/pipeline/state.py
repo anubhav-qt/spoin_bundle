@@ -29,6 +29,7 @@ from spoin.domain.enums import CardType, Difficulty, RejectionStage
 from spoin.domain.models import RejectedCard
 from spoin.embeddings import Embedder
 from spoin.generation.base import CardDraft, ContentGenerator
+from spoin.generation.quota import KeyBox
 
 logger = logging.getLogger("spoin.generation.pipeline")
 
@@ -326,6 +327,12 @@ class _Runtime:
     embedder: Embedder
     settings: Settings
     batch_id: uuid.UUID
+    #: topic_id (str) -> the key box that topic's branches draw on (ADR-0082).
+    #: Filled by `run_generation_pipeline` before the graph runs and emptied by
+    #: its `finally`, so a node only ever reads it. A topic missing here got no
+    #: box -- the `fake` backend, or a pool with nothing free -- and its branches
+    #: take ADR-0074's whole-pool claim instead.
+    topic_boxes: dict[str, KeyBox] = field(default_factory=dict)
     topic_plan_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     #: topic_id -> curated-library entry ids already used by the ASCII fetcher
     #: for this topic (ADR-0080). Seeded from `topic_used_ascii_ids` on the first

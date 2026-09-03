@@ -1,6 +1,14 @@
 # ADR-0073: The worker runs generation jobs one at a time
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0082](0082-fixed-key-boxes-per-topic.md)
+  (2026-09-02). The worker runs `pool // topic_key_box_size` jobs concurrently
+  again -- 2 at the current 75-key pool and a 34-key box. What this ADR wanted (topics
+  finishing in request order, visible as progress panels completing one by one)
+  is given up for throughput; everything else here -- per-job sessions, per-job
+  failure isolation, the quota requeue -- is unchanged and still describes the
+  code. Note that ADR-0078 also superseded this ADR once, and was reverted the
+  same day; ADR-0082 is the second attempt, and its Context says what it does
+  differently.
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
 - **Amends:** the "per-job isolation" note in

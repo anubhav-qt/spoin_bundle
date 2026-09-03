@@ -20,7 +20,11 @@ less.
 
 WHAT YOU MAY FIX
 - Broken, overflowing, or garbled ASCII art (it must fit within 40 columns) -- \
-but only the part that is actually broken. If the art is fine and the flag is \
+treat the entire art as a rigid box. You are NOT allowed to edit anything \
+inside the box or insert characters to the LEFT of the art (modifying the left \
+breaks monospace alignment). Only edit or place captions at the TOP (above the \
+box), BOTTOM (below the box), or appended to the RIGHT of the box lines, \
+and only touch the part that is actually broken. If the art is fine and the flag is \
 about a caption, a stray word, or an artist's signature inside it (e.g. "jgs", \
 initials, a URL), delete ONLY those characters and leave every other line of \
 the art exactly as it was. Never replace a whole scene to remove a few marks.

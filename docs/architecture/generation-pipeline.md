@@ -167,7 +167,8 @@ gate_and_persist
 ```
 
 **Concurrency is bounded by the KEY POOL, not by a semaphore**
-([ADR-0074](../adr/0074-key-per-subtopic-scheduling.md)). There used to be a shared
+([ADR-0074](../adr/0074-key-per-subtopic-scheduling.md), scoped to a box by
+[ADR-0082](../adr/0082-fixed-key-boxes-per-topic.md)). There used to be a shared
 `asyncio.Semaphore` here; [ADR-0047](../adr/0047-removal-of-legacy-concurrency-semaphore.md)
 deleted it after measuring a 33-key pool being throttled to five calls at a time, and
 ADR-0074 replaced the *idea* of a global cap with key ownership: a subtopic group claims
@@ -178,18 +179,48 @@ than starting on a shared key. One caller per key is what makes an rpm violation
 structurally impossible rather than merely counted; `tests/test_architecture.py` fails if
 a semaphore ever comes back.
 
+Since ADR-0082, **K is the topic's KEY BOX, not the whole pool**: a topic is handed
+`settings.topic_key_box_size` keys (34 today) for its whole run, and every scan a claim inside it
+makes sees only those. The box is closed: there is no
+shared reserve and no borrowing outside it, which is what keeps total in-flight work a
+constant (`max_concurrent_topics x box_size`, one caller each) no matter what is queued.
+That is the property the reverted [ADR-0078](../adr/0078-topic-parallel-key-leases.md)
+lacked.
+
+[ADR-0083](../adr/0083-least-spent-load-balancing-within-a-box.md) then dropped ADR-0074's
+per-group **pin**: a subtopic group no longer binds one key for its whole card run. Each
+generation call picks the least-spent key *in the box* fresh (`key_scope="box"`,
+`KeyClaim.sticky=False`); the thinking gate spreads pool-wide (`"pool"`). The burst of ~10
+calls a group makes in a few seconds was tripping the single pinned key's 15-rpm cell while
+the rest of the box sat cold -- `cell_lock` + `_try_reserve_rpm`, not the pin, are what
+make an rpm violation impossible, so spreading the choice costs nothing and un-corners the
+load. ADR-0083 also stops `_shrink_effective_rpm` firing on a scopeless 429 (Google returns
+no `quotaId` on nearly all of them now, and halving on each walked healthy cells to the
+floor over a run).
+
 ## Worker: per-job isolation, not graph-level fan-out
 
-`apps/worker`'s `run_once()` claims pending `GenerationJob` rows, marks them `running` in
-that same transaction, then fires one `asyncio` task per job -- **each with its own DB
-session** -- gathered together. One job's exception marks only that job `failed`; it never
+`apps/worker`'s `run_once()` claims as many pending `GenerationJob` rows as the key pool
+holds whole boxes (`settings.max_concurrent_topics` = `pool // topic_key_box_size`, so 2 at the
+current 75-key pool), marks them `running` in that same transaction, then fires one `asyncio` task per
+job -- **each with its own DB session and its own key box** -- gathered together. They share
+one `ContentGenerator`, which is what makes the boxes disjoint: a second generator would
+hand out the same key indices. One job's exception marks only that job `failed`; it never
 touches any other job in the same pass (ADR-0026). This is a different concurrency layer
 from the graph's own `Send` fan-out above: the graph still owns concurrency *within* one
 topic's run (subtopics, tiers); the worker owns concurrency *across* jobs.
 
+The pass claims exactly what it will run, so there is no admit-then-demote step -- a row is
+`running` only when a box is about to be handed to it. The pool's remainder (7 keys at
+75/34) stays unboxed and serves the claim-less path: the API's topic matching, quiz
+grading, and the recovery probe, which therefore stop competing with card generation for
+the same cells.
+
 `run_generation_pipeline` still accepts a list of topic_ids (the CLI can hand it several
 at once, sharing one session -- fine for a manual run where isolation doesn't matter); the
-worker just always calls it with a single-item list, once per job.
+worker just always calls it with a single-item list, once per job. It takes a box for every
+topic it was given, before the graph runs, and releases them all in a `finally` -- a box's
+lifetime is the run's, so a crash mid-branch cannot strand a third of the pool.
 
 ## Subtopic reuse: prevention, not detection
 

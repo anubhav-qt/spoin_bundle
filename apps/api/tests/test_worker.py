@@ -312,3 +312,41 @@ async def test_two_concurrent_passes_never_double_claim_a_job(
         (j.status, j.attempts, j.last_error) for j in rows
     ]
     assert all(j.attempts == 1 for j in rows)
+
+
+# --- ADR-0082: how many jobs one pass runs -----------------------------------
+
+
+def test_max_concurrent_topics_is_whole_boxes_of_the_key_pool() -> None:
+    """The one arithmetic the hybrid regime rests on: a pass runs as many
+    topics as the pool holds WHOLE boxes. The remainder is deliberately left
+    unboxed rather than rounded up into a short box -- an over-admitted topic
+    would take keys a running topic is entitled to, which is the RPM pressure
+    the fixed box exists to bound."""
+
+    settings = Settings(
+        generator="gemini",
+        gemini_api_keys=",".join(f"key-{i}" for i in range(69)),
+        topic_key_box_size=34,
+    )
+
+    assert settings.gemini_pool_size == 69
+    assert settings.max_concurrent_topics == 2
+
+
+def test_a_pool_smaller_than_one_box_still_runs_one_topic() -> None:
+    """Never zero: a pool too small for a whole box runs one topic on a short
+    box, which is the `lease_box` shortfall path, not a stalled queue."""
+
+    settings = Settings(generator="gemini", gemini_api_keys="key-0,key-1", topic_key_box_size=34)
+
+    assert settings.max_concurrent_topics == 1
+
+
+def test_a_backend_with_no_key_pool_is_bounded_only_by_the_batch_size() -> None:
+    """`fake` and local make no provider calls, so the per-minute ceilings the
+    box protects don't exist for them and neither should the limit."""
+
+    settings = Settings(generator="fake", gemini_api_keys="", generation_batch_size=7)
+
+    assert settings.max_concurrent_topics == 7

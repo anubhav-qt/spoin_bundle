@@ -79,9 +79,10 @@ class Settings(BaseSettings):
     #: for it (ADR-0028). Live-verified 2026-08-17 against 9 real keys —
     #: `gemini-2.5-flash` is retired for new accounts (404) and dropped;
     #: `gemini-3.0-flash` never existed as a stable name (only the `-preview`
-    #: suffixed one does).
+    #: suffixed one does). `gemini-3.8-flash` prepended 2026-09-03 as the new
+    #: strongest rung (owner request) -- live-verified 200 the same day.
     gemini_thinking_ladder: str = (
-        "gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,"
+        "gemini-3.8-flash:20:5,gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,"
         "gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5"
     )
     #: How many rungs at the END of `gemini_thinking_ladder` are held back as a
@@ -114,6 +115,18 @@ class Settings(BaseSettings):
     gemini_request_timeout_seconds: float = 180.0
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
+    #: How many keys one topic gets for its whole generation run (ADR-0082).
+    #: This is the ONLY number in the hybrid regime: it sets both a topic's
+    #: internal ceiling (at most this many subtopic groups in flight, ADR-0074)
+    #: and how many topics run at once (`max_concurrent_topics` below). Raising
+    #: it makes each topic finish faster and fewer run at once; lowering it does
+    #: the reverse. 34 against the current 75-key pool is two boxes (7 keys spare
+    #: for the lease-less path) -- the smallest step up from ADR-0073's
+    #: one-topic-at-a-time that is still a step,
+    #: chosen over a narrower box because Run 8's per-minute behaviour is only
+    #: proven at one topic's worth of pressure and this doubles it rather than
+    #: tripling it. Revisit with a benchmark, not by feel.
+    topic_key_box_size: int = 34
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.
@@ -366,6 +379,34 @@ class Settings(BaseSettings):
     @property
     def gemini_api_key_list(self) -> list[str]:
         return [key.strip() for key in self.gemini_api_keys.split(",") if key.strip()]
+
+    @property
+    def gemini_pool_size(self) -> int:
+        """How many keys the box arithmetic has to divide. For `fake` / `local`
+        this is however many keys are configured (usually zero), which
+        `max_concurrent_topics` reads as "no boxing"."""
+
+        return len(self.gemini_api_key_list)
+
+    @property
+    def max_concurrent_topics(self) -> int:
+        """How many generation jobs a worker pass runs at once (ADR-0082):
+        as many whole boxes as the pool holds.
+
+        Derived, never configured -- a second knob could disagree with the box
+        size, and the pair "4 topics of 35 keys from a pool of 119" is a state
+        no arithmetic can make safe.
+
+        With no key pool to divide (`fake`, local -- every test) there is
+        nothing to box and nothing to protect, so the only bound is
+        `generation_batch_size`. A topic-per-key-box ceiling is about the
+        provider's per-minute ceilings; a backend that never calls the provider
+        should not inherit a limit that exists only because of them.
+        """
+
+        if self.gemini_pool_size < 1 or self.topic_key_box_size < 1:
+            return self.generation_batch_size
+        return max(1, self.gemini_pool_size // self.topic_key_box_size)
 
     @property
     def pool_thresholds_are_sane(self) -> bool:

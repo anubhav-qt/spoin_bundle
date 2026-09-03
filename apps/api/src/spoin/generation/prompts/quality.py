@@ -22,6 +22,13 @@ block on an older card), a code \
 block, or a ❌ Myth vs ✅ Fact comparison, PRESERVE and POLISH that archetype \
 rather than converting it into generic text paragraphs.
 
+FOR ASCII ART (STRICT BOX INTEGRITY): Treat the entire ASCII drawing as a rigid \
+box. You are NOT allowed to edit anything inside the box or insert characters to \
+the LEFT of the art (inserting on the left shifts rows and breaks monospace \
+alignment). Any edits, captions, or additions may ONLY be placed at the TOP \
+(above the box), BOTTOM (below the box), or appended to the RIGHT of the box \
+(keeping total line width <= 40 columns).
+
 You are NOT told what difficulty this card was requested at — do not try to \
 infer or preserve one; a difficulty examples block below (if present) is only \
 there to calibrate what "beginner" vs "advanced" writing generally looks like, \

@@ -176,6 +176,60 @@ def _day_start(now: datetime) -> datetime:
     return now.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
+async def key_spend_today(
+    session: AsyncSession, *, key_count: int, now: datetime
+) -> dict[int, int]:
+    """`key_index -> total requests spent today` across EVERY cell of that key
+    (both pools' ladders write into the same `QuotaLedger`). Used to fill a key
+    box coldest-first (ADR-0082) so per-day usage doesn't pile onto low-index
+    keys pass after pass -- the same skew ADR-0065 removed from the per-call
+    scan, which a box held for a whole run would otherwise reintroduce. A key
+    with no rows is absent, which reads as 0 -- an untouched key is the coldest
+    there is."""
+
+    rows = await session.execute(
+        select(QuotaLedger.backend, QuotaLedger.requests_spent).where(
+            QuotaLedger.day == _day_start(now)
+        )
+    )
+    totals: dict[int, int] = {}
+    for backend, spent in rows.all():
+        # backend is "gemini:{key_index}:{model}"
+        parts = backend.split(":")
+        if len(parts) < 3 or not parts[1].isdigit():
+            continue
+        key_index = int(parts[1])
+        if 0 <= key_index < key_count:
+            totals[key_index] = totals.get(key_index, 0) + spent
+    return totals
+
+
+@dataclass
+class KeyBox:
+    """One TOPIC's entire key pool for the whole of its generation run
+    (ADR-0082).
+
+    A box is a fixed-size slice of the pool -- `settings.topic_key_box_size`
+    keys -- handed to a topic when its run starts and returned when it ends.
+    Inside the box, ADR-0074 is unchanged: a subtopic group claims one key for
+    its whole card run, and a group whose key is spent moves to another key IN
+    THIS BOX. Outside it, nothing: a box is the topic's total pool, not a
+    preference. That is what makes the hybrid bound sayable in one line --
+    `pool / box_size` topics at once, ADR-0074 within each.
+
+    Deliberately NOT a lease with a shared reserve to fall back on
+    ([ADR-0078](../../../../docs/adr/0078-topic-parallel-key-leases.md), which
+    was reverted): a fallback that reaches outside the box makes the number of
+    callers on a key a function of how spent the other boxes are, and that is
+    exactly the unbounded per-minute pressure the revert was for.
+    """
+
+    #: Stable id for log lines -- a box is otherwise identified only by which
+    #: keys it holds.
+    box_id: int
+    key_indices: set[int] = field(default_factory=set)
+
+
 @dataclass
 class KeyClaim:
     """One unit of work's ownership of an API key (ADR-0074).
@@ -186,9 +240,32 @@ class KeyClaim:
     notion of "least used" kept in memory. It can move -- step 3 of the ADR's
     ladder re-claims a different key when the held one has no room on any
     preferred rung -- which is why this is a mutable handle and not just an int.
+
+    `box` (ADR-0082) is the set of keys that "another key" may mean: with a box
+    set, every scan this claim makes -- the first bind, the move to a fresher
+    key, the "is the day gone?" check -- sees only the box's keys, so a topic
+    can never reach into another topic's. `None` keeps ADR-0074's whole-pool
+    behaviour, which is the lease-less path (the API's topic matching, the
+    recovery probe, the `fake` backend, and every test that doesn't box).
+
+    `sticky` False turns the pin off: the claim still narrows every scan to its
+    `box`, but a grant never `bind`s, so `key_index` stays None and the NEXT
+    call re-picks the least-spent key in the box from scratch. ADR-0074's pin
+    forced a unit's whole burst of calls -- a tier's plan + one draft per card
+    type + ascii fetch/redraw, ~10 in a few seconds -- onto ONE key, tripping
+    its 15-rpm ceiling while the unit's average rate stayed tiny; spreading
+    that burst least-spent-first across the box is the pre-ADR-0074 ADR-0065
+    behaviour, kept inside the box. `cell_lock` + `_try_reserve_rpm`'s atomic
+    reservation still guarantee one caller per CELL, which is what actually
+    made an rpm violation impossible -- the pin was a concurrency heuristic on
+    top of that, and the heuristic is what unbalanced the load. Card writing,
+    planning, ascii and question generation pass `sticky=False`; the thinking
+    gate goes further and drops the claim entirely (pool-wide).
     """
 
     key_index: int | None = None
+    box: KeyBox | None = None
+    sticky: bool = True
 
 
 class KeyClaimRegistry:
@@ -200,12 +277,20 @@ class KeyClaimRegistry:
     contend with another group's judging on the same project -- exactly the
     concurrency ADR-0074 exists to remove.
 
-    In-process only, deliberately. The claim bounds concurrency *within* one
-    generation run, and ADR-0073 already means one run at a time; the
-    cross-process story stays what it has always been -- `_try_reserve_rpm`'s
-    atomic reservation and the shared ledger (ADR-0058). A DB-backed claim would
-    add a lock nothing currently needs and a crash-recovery problem (a claim
-    outliving the process that took it) for a case that does not arise.
+    The registry also owns KEY BOXES (ADR-0082) -- fixed-size slices of the pool
+    held by one topic for its whole run. Boxes and claims are the same two-level
+    story from opposite ends: a box says which keys a topic may use, a claim says
+    which single key a subtopic group inside it is using right now. They live
+    together here because both answer "who owns key N", and splitting them would
+    let a box hand out a key a claim still holds.
+
+    In-process only, deliberately. Boxes and claims bound concurrency *within*
+    one worker process -- the several jobs a pass runs concurrently share one
+    generator, hence one registry; the cross-process story stays what it has
+    always been -- `_try_reserve_rpm`'s atomic reservation and the shared ledger
+    (ADR-0058). A DB-backed claim would add a lock nothing currently needs and a
+    crash-recovery problem (a claim outliving the process that took it) for a
+    case that does not arise.
     """
 
     def __init__(self, key_count: int) -> None:
@@ -213,6 +298,11 @@ class KeyClaimRegistry:
             raise ValueError("KeyClaimRegistry needs at least one key")
         self._key_count = key_count
         self._claimed: dict[int, KeyClaim] = {}
+        #: key_index -> the TOPIC box that holds it (ADR-0082). A boxed key is
+        #: unavailable to any other box; it IS available to that box's own
+        #: subtopic `KeyClaim`s.
+        self._boxed: dict[int, KeyBox] = {}
+        self._next_box_id = 0
         self._released = asyncio.Condition()
 
     @property
@@ -227,6 +317,65 @@ class KeyClaimRegistry:
 
     def free_keys(self, *, claim: KeyClaim | None = None) -> list[int]:
         return [k for k in range(self._key_count) if self.is_free(k, claim=claim)]
+
+    def claimable_keys(self, claim: KeyClaim) -> list[int]:
+        """The keys `claim` may bind: unowned (or already its own), and inside
+        its box if it has one (ADR-0082).
+
+        This is the single place the box narrows the ladder. Every scan in
+        `_acquire_for_claim` -- the first bind and the move to a fresher key
+        alike -- goes through it, so "a topic never touches another topic's
+        key" holds by construction rather than by each scan remembering to
+        check.
+        """
+
+        candidates = (
+            sorted(claim.box.key_indices) if claim.box is not None else range(self._key_count)
+        )
+        return [k for k in candidates if self.is_free(k, claim=claim)]
+
+    def _boxable(self, key_index: int) -> bool:
+        """A key in no box and bound by no claim -- available to a new box."""
+
+        return key_index not in self._boxed and self._claimed.get(key_index) is None
+
+    def lease_box(self, size: int, *, prefer: list[int] | None = None) -> KeyBox:
+        """Hand a topic a box of up to `size` currently-unboxed keys for its
+        whole run (ADR-0082), coldest first per `prefer`.
+
+        Takes FEWER -- possibly zero -- when the pool is that tight. The worker
+        admits at most `pool // box_size` topics precisely so this doesn't
+        normally happen, but a short box is not an error: a topic with a few
+        keys still makes progress, where refusing to start would just idle them.
+        `prefer` is a ledger-derived least-spent-first order from
+        `GeminiContentGenerator`; keys it omits (or `None` -- a backend with no
+        ledger) fall back to index order.
+        """
+
+        self._next_box_id += 1
+        box = KeyBox(box_id=self._next_box_id)
+        boxable = {k for k in range(self._key_count) if self._boxable(k)}
+        ordered = [k for k in (prefer or []) if k in boxable]
+        ordered += [k for k in sorted(boxable) if k not in set(ordered)]
+        for key_index in ordered[: max(0, size)]:
+            self._boxed[key_index] = box
+            box.key_indices.add(key_index)
+        return box
+
+    async def release_box(self, box: KeyBox) -> None:
+        """Return every key a box holds to the pool (ADR-0082). Also drops any
+        still-bound claim on those keys -- a run that dies mid-branch must not
+        leave a key owned by a claim whose scope has gone."""
+
+        for key_index in list(box.key_indices):
+            self._boxed.pop(key_index, None)
+            holder = self._claimed.get(key_index)
+            if holder is not None and holder.box is box:
+                del self._claimed[key_index]
+                holder.key_index = None
+        box.key_indices.clear()
+        async with self._released:
+            self._released.notify_all()
 
     def bind(self, claim: KeyClaim, key_index: int) -> None:
         """Move `claim` onto `key_index`, releasing whatever it held before.
@@ -535,12 +684,25 @@ class QuotaGovernor:
         entire point of the claim -- one caller per key means no cell can be
         raced, which is what makes an rpm violation structurally impossible
         rather than merely counted.
+
+        **"Any unclaimed key" means "any unclaimed key in this claim's BOX"**
+        when it has one (ADR-0082) -- steps 2 and 4, step 5's escalation, and
+        the "is the day actually gone?" test that gates it. So does the wait at
+        step 6: a boxed claim waits for a SIBLING subtopic group of its own
+        topic to finish, never for another topic. Without a box the scope is the
+        whole pool, exactly as ADR-0074 wrote it.
         """
 
         # Bound to a local because the nested scans below close over it --
         # mypy will not carry an attribute's narrowing into a closure.
         claims = self.claims
         assert claims is not None
+        #: The keys this claim can see at all (ADR-0082). Every "anywhere" below
+        #: -- the free scan, the daily-room test, the wait counts -- is over
+        #: THIS set, not `range(self.key_count)`.
+        scope = (
+            sorted(claim.box.key_indices) if claim.box is not None else list(range(self.key_count))
+        )
         day = _day_start(now)
         unavailable = await self._unavailable_models(session, now=now)
 
@@ -571,17 +733,22 @@ class QuotaGovernor:
                 if attempt.wait_s is not None:
                     waits[(key_index, rung.model)] = attempt.wait_s
                 if attempt.granted:
-                    claims.bind(claim, key_index)
+                    # A non-sticky claim (ADR-0074 pin off) never binds: it
+                    # keeps `key_index` None so the next call re-scans the box
+                    # least-spent-first instead of returning here.
+                    if claim.sticky:
+                        claims.bind(claim, key_index)
                     return key_index, rung.model
             return None
 
         async def take_free(rungs: list[LadderRung]) -> tuple[int, str] | None:
             #: Model-major, least-spent key within each rung -- the same order an
-            #: unclaimed acquire uses, restricted to keys nobody owns.
+            #: unclaimed acquire uses, restricted to keys nobody owns (and, with
+            #: a box, to that box's keys).
             for rung in rungs:
                 spent = await self._rung_spend(session, day, rung.model)
                 for key_index in sorted(
-                    claims.free_keys(claim=claim), key=lambda k: (spent.get(k, 0), k)
+                    claims.claimable_keys(claim), key=lambda k: (spent.get(k, 0), k)
                 ):
                     granted = await take(key_index, [rung])
                     if granted is not None:
@@ -606,11 +773,12 @@ class QuotaGovernor:
         if granted is not None:
             return granted
 
-        if not await self._any_daily_room(session, day, ordinary):
+        if not await self._any_daily_room(session, day, ordinary, scope):
             if not reserve:
                 raise DailyQuotaExhaustedError(
-                    f"All {self.key_count} key(s) exhausted across {len(ordinary)} "
-                    f"ordinary model(s) for {day.date()}, and no reserve rung is configured"
+                    f"All {len(scope)} key(s) available to this claim exhausted across "
+                    f"{len(ordinary)} ordinary model(s) for {day.date()}, and no reserve "
+                    f"rung is configured"
                 )
             logger.warning(
                 "quota: no key has daily room on any ordinary rung -- falling back to the "
@@ -624,9 +792,9 @@ class QuotaGovernor:
             granted = await take_free(reserve)
             if granted is not None:
                 return granted
-            if not await self._any_daily_room(session, day, reserve):
+            if not await self._any_daily_room(session, day, reserve, scope):
                 raise DailyQuotaExhaustedError(
-                    f"All {self.key_count} key(s) exhausted across "
+                    f"All {len(scope)} key(s) available to this claim exhausted across "
                     f"{len(ordinary) + len(reserve)} model(s) for {day.date()}, "
                     f"reserve included"
                 )
@@ -641,29 +809,39 @@ class QuotaGovernor:
         # wait for nor somewhere to move to, and counting it as "free" is what
         # made an earlier version of the log read "1 free" about a key that had
         # just refused the call.
-        unowned = sum(1 for key in range(self.key_count) if claims.is_free(key))
+        # Counted over `scope`, so a boxed claim's log line is about ITS topic:
+        # "12 held by sibling groups, 3 unclaimed" is actionable; the same line
+        # about all 119 keys would be describing work this claim cannot wait for
+        # and cannot use.
+        unowned = sum(1 for key in scope if claims.is_free(key))
         held_by_me = 1 if claim.key_index is not None else 0
         return _ClaimWait(
             seconds=max(0.5, min(min(waits.values()) + 0.2 if waits else 5.0, 60.0)),
-            other_claims=self.key_count - unowned - held_by_me,
+            other_claims=len(scope) - unowned - held_by_me,
             free_keys=unowned,
             throttled_cells=len(waits),
         )
 
     async def _any_daily_room(
-        self, session: AsyncSession, day: datetime, rungs: list[LadderRung]
+        self, session: AsyncSession, day: datetime, rungs: list[LadderRung], keys: list[int]
     ) -> bool:
-        """Whether ANY key still has daily budget on any of `rungs` -- including
-        keys another unit of work currently holds.
+        """Whether any key in `keys` still has daily budget on any of `rungs` --
+        including keys another unit of work currently holds.
 
         Claimed-but-unspent is the whole distinction the reserve turns on: that
         key's budget is real, it is simply busy, and waiting a few seconds for
         it is right where spending the weakest model on the same call is wrong.
+
+        `keys` is the caller's SCOPE, not a filter for convenience: for a boxed
+        claim (ADR-0082) the day that matters is its box's day. Asking about the
+        whole pool there would keep a topic whose own box is spent off the
+        reserve rung for as long as any other topic still had budget -- it would
+        wait out a contention that can never resolve in its favour.
         """
 
         for rung in rungs:
             spent = await self._rung_spend(session, day, rung.model)
-            if any(spent.get(key_index, 0) < rung.rpd for key_index in range(self.key_count)):
+            if any(spent.get(key_index, 0) < rung.rpd for key_index in keys):
                 return True
         return False
 
@@ -679,7 +857,13 @@ class QuotaGovernor:
             return await self._acquire_locked(session, now=now, exclude_models=exclude_models)
 
     async def mark_rate_limited(
-        self, key_index: int, model: str, *, now: datetime, retry_after_s: float | None = None
+        self,
+        key_index: int,
+        model: str,
+        *,
+        now: datetime,
+        retry_after_s: float | None = None,
+        shrink_rpm: bool = True,
     ) -> None:
         """A PER-MINUTE 429 (`GenerateRequestsPerMinutePerProjectPerModel`) --
         this cell has daily quota left and is simply being throttled right now.
@@ -698,9 +882,14 @@ class QuotaGovernor:
            erosion was the only thing terminating the throttle-retry loop; that
            loop now terminates on a measured throttle streak instead
            (`_invoke_with_retry`), so the erosion has nothing left to buy.
-        3. **The cell's effective rpm is halved** -- the provider just told us
-           our ceiling is wrong, and this is the only direct evidence of the
-           real one we will ever get. See `_effective_rpm`.
+        3. **The cell's effective rpm is halved** -- BUT only when `shrink_rpm`
+           is set, i.e. the 429 actually identified itself as per-minute (a
+           `quotaId` or a short `RetryInfo`). Google has been returning bare
+           `RESOURCE_EXHAUSTED` with no scope for every 429; halving on that
+           guess (ADR-0060) walked healthy cells down to the 1-rpm floor over a
+           run and the pool's throughput decayed with it. A guessed per-minute
+           429 still parks the cell and refunds the day -- it just no longer
+           also ratchets the ceiling down on no evidence. See `_effective_rpm`.
 
         Persisted rather than in-memory so that a throttle ONE process discovers
         is not something every other process has to rediscover the hard way, by
@@ -715,7 +904,7 @@ class QuotaGovernor:
         delay = retry_after_s if retry_after_s is not None else _DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS
         async with session_scope() as session:
             await self._mark_rate_limited_with_session(
-                session, key_index, model, now=now, delay=delay
+                session, key_index, model, now=now, delay=delay, shrink_rpm=shrink_rpm
             )
 
     async def mark_rate_limited_with_session(
@@ -726,15 +915,25 @@ class QuotaGovernor:
         *,
         now: datetime,
         retry_after_s: float | None = None,
+        shrink_rpm: bool = True,
     ) -> None:
         """Same as `mark_rate_limited`, reusing a caller-supplied session — for
         tests, same reasoning as `acquire_with_session`."""
 
         delay = retry_after_s if retry_after_s is not None else _DEFAULT_RATE_LIMIT_COOLDOWN_SECONDS
-        await self._mark_rate_limited_with_session(session, key_index, model, now=now, delay=delay)
+        await self._mark_rate_limited_with_session(
+            session, key_index, model, now=now, delay=delay, shrink_rpm=shrink_rpm
+        )
 
     async def _mark_rate_limited_with_session(
-        self, session: AsyncSession, key_index: int, model: str, *, now: datetime, delay: float
+        self,
+        session: AsyncSession,
+        key_index: int,
+        model: str,
+        *,
+        now: datetime,
+        delay: float,
+        shrink_rpm: bool = True,
     ) -> None:
         ledger = await self._ledger_row(session, _day_start(now), key_index, model)
         ledger.cooldown_until = now + timedelta(seconds=delay)
@@ -750,7 +949,8 @@ class QuotaGovernor:
             # agreed was never consumed.
             if ledger.exhausted_at is not None and ledger.requests_spent < self._rpd_for(model):
                 ledger.exhausted_at = None
-        self._shrink_effective_rpm(key_index, model)
+        if shrink_rpm:
+            self._shrink_effective_rpm(key_index, model)
         await session.flush()
         logger.info(
             "quota: key %d model %s hit a per-minute rate limit -- cooling down %.1fs "

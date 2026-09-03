@@ -51,3 +51,6 @@ spoin-content-bundle.json.gz
 
 # Neon backup runtime log — not source
 scripts/neon_backup.log
+
+# throwaway key->project clustering probe (not committed, see docs/handoff/next-key-projects-*.md)
+.keyprobe/

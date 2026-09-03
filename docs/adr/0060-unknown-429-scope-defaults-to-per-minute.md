@@ -3,6 +3,13 @@
 - **Status:** Accepted (amends [ADR-0058](0058-per-minute-vs-per-day-429.md))
 - **Date:** 2026-08-26
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0083](0083-least-spent-load-balancing-within-a-box.md) --
+  an unidentifiable 429 is still treated as per-minute (parked, day refunded;
+  this ADR's call, unchanged), but it no longer *also* halves the cell's learned
+  rpm. Google now returns scopeless `RESOURCE_EXHAUSTED` on nearly every 429, so
+  the AIMD shrink was firing on the common path and walking healthy cells to the
+  1-rpm floor. The shrink now needs a `quotaId` or a short `RetryInfo` --
+  `_RateLimit.scope_certain`.
 
 ## Context
 

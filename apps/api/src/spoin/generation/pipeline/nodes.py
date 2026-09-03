@@ -446,9 +446,13 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
     # ADR-0074: this whole branch -- planning, every draft round, both gate
     # passes, every redraft -- runs on ONE key, claimed here and released when
     # the branch returns or raises. With one caller per key no cell can be
-    # raced, so the group's own calls cannot push a cell past its rpm; the
-    # ceiling on how many branches run at once is simply the key count.
-    async with runtime.generator.claimed_key_scope():
+    # raced, so the group's own calls cannot push a cell past its rpm.
+    # ADR-0082: the key comes from THIS topic's box, so the ceiling on how many
+    # branches run at once is the box size, not the whole pool -- concurrent
+    # topics cannot contend for each other's keys, and a group finding every box
+    # key held by a sibling group waits for one (boxes are fixed-size, so a
+    # topic with more groups than keys serializes the surplus).
+    async with runtime.generator.claimed_key_scope(box=runtime.topic_boxes.get(job["topic_id"])):
         return await _generate_subtopic_cards(runtime, job)
 
 
@@ -779,6 +783,22 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
 #: vs rejected are never the same number" rule).
 _STUCK_ROUND_THRESHOLD = 5
 
+#: A LATER pass (a tier that already had cards before this run began -- i.e. a
+#: backfill of a topic a previous session handed off short) hands a tier off
+#: once `_STUCK_ROUND_THRESHOLD` consecutive redraft rounds each close less than
+#: this fraction of the gap they went in with. Backfill is deferred work by
+#: design -- it is meant to run between new-topic generation, not to hold a key
+#: box while a near-complete tier chases its last card or two. Each redraft
+#: round is a thinking-ladder burst (rpm 5) that ADR-0074 pins near one key, so
+#: a tier converging slower than this melts that key for no real gain; the next
+#: session that picks the topic up resumes the tier from where this one stopped.
+#: `0` accepted is always below this bar, so for a later pass this guard
+#: SUBSUMES the zero-accepted `stuck_rounds` one (same threshold, so a purely
+#: rejected later-pass tier gives up on exactly the round it did before). A
+#: FIRST pass is untouched: it stops at `first_pass_completion_fraction` and
+#: keeps only the zero-accepted guard.
+_LATER_PASS_MIN_ROUND_PROGRESS = 0.10
+
 #: Pure defensive backstop against a bug in `_redraft_until_bar`'s own
 #: per-tier stuck guard letting a loop run away -- not user-configurable,
 #: should never actually trigger in normal operation (the stuck guard
@@ -815,12 +835,18 @@ async def _redraft_until_bar(
       of every batch isn't a bug -- so a first pass doesn't have to chase
       literal 100% itself.
     - A tier that already had cards before this run started (a LATER pass --
-      e.g. a `scan_and_generate` backfill picking the topic back up) chases
-      the full 100%: this run IS "the next time a worker picks it back up,"
-      so it should not hand off early again.
+      e.g. a `scan_and_generate` backfill picking the topic back up) targets
+      the full 100%, BUT hands off once `_STUCK_ROUND_THRESHOLD` consecutive
+      rounds each close less than `_LATER_PASS_MIN_ROUND_PROGRESS` of the gap
+      they began with (see that constant): backfill is deferred work, and a
+      near-complete tier chasing its last card or two round after round is
+      exactly the pin-one-key thinking-ladder melt ADR-0074 + boxes make
+      expensive. The next session that picks the topic up resumes it from where
+      this one stopped.
 
-    Neither case has a round limit. There are two independent stop
-    conditions, each `_STUCK_ROUND_THRESHOLD` consecutive rounds:
+    Neither pass has a hard round limit. The stop conditions are each
+    `_STUCK_ROUND_THRESHOLD` consecutive rounds; a later pass has all three,
+    a first pass only the first two:
     - `stuck_rounds`: the gate accepted zero of this tier's drafts -- the
       content is genuinely, repeatedly rejected for a real reason (e.g. the
       missing difficulty-example catalog, task 0011), not an unlucky round or
@@ -846,6 +872,10 @@ async def _redraft_until_bar(
             accepted_by_tier[sid] = accepted_by_tier.get(sid, 0) + cast(int, report["accepted"])
     stuck_rounds: dict[str, int] = dict.fromkeys(tier_meta, 0)
     no_verdict_rounds: dict[str, int] = dict.fromkeys(tier_meta, 0)
+    #: Later-pass only: consecutive rounds that closed < `_LATER_PASS_MIN_ROUND
+    #: _PROGRESS` of the gap. At `_STUCK_ROUND_THRESHOLD` the tier is handed off
+    #: to a future backfill pass; any round that clears the bar resets it.
+    slow_rounds: dict[str, int] = dict.fromkeys(tier_meta, 0)
     all_reports = list(item_reports)
 
     for round_number in range(1, _ABSOLUTE_MAX_REDRAFT_ROUNDS + 1):
@@ -854,6 +884,7 @@ async def _redraft_until_bar(
             if (
                 stuck_rounds[sid] >= _STUCK_ROUND_THRESHOLD
                 or no_verdict_rounds[sid] >= _STUCK_ROUND_THRESHOLD
+                or slow_rounds[sid] >= _STUCK_ROUND_THRESHOLD
             ):
                 continue
             target = cast(int, meta["target"])
@@ -1011,6 +1042,31 @@ async def _redraft_until_bar(
                     sid,
                     stuck_rounds[sid],
                 )
+            # A later pass that isn't closing its gap fast enough is deferred,
+            # not failed -- see `_LATER_PASS_MIN_ROUND_PROGRESS`. Measured
+            # against the deficit this round STARTED with (`deficits[sid]`), so
+            # "10% of what's left" shrinks with the gap rather than being a fixed
+            # count. One slow round can be an unlucky gate batch; the tier is
+            # only handed off after `_STUCK_ROUND_THRESHOLD` in a row, and any
+            # round that clears the bar resets the streak.
+            round_deficit = deficits.get(sid, 0)
+            is_later_pass = cast(int, tier_meta[sid]["existing_count"]) > 0
+            if is_later_pass and round_deficit > 0:
+                cleared_bar = accepted_this_round >= math.ceil(
+                    round_deficit * _LATER_PASS_MIN_ROUND_PROGRESS
+                )
+                slow_rounds[sid] = 0 if cleared_bar else slow_rounds[sid] + 1
+                if slow_rounds[sid] >= _STUCK_ROUND_THRESHOLD:
+                    logger.info(
+                        "redraft: subtopic %s handed off after %d consecutive round(s) closing "
+                        "< %.0f%% of its remaining gap -- the rest is left for a later backfill "
+                        "pass (a %d-card gap stood after round %d)",
+                        sid,
+                        slow_rounds[sid],
+                        _LATER_PASS_MIN_ROUND_PROGRESS * 100,
+                        round_deficit,
+                        round_number,
+                    )
         all_reports.extend(round_reports)
     else:
         # The loop ran out of rounds without `break`ing (every tier cleared
@@ -1789,7 +1845,9 @@ async def _run_topic_question_phase(
         #: already-proven content the backfill framing describes.
         new_cards = [entry for entry in unquestioned if entry[0] in new_ids]
         backfill_cards = [entry for entry in unquestioned if entry[0] not in new_ids]
-        async with runtime.generator.claimed_key_scope():
+        # ADR-0082: the question phase runs on the topic's own box too, so it
+        # never contends with a concurrent topic's card writing.
+        async with runtime.generator.claimed_key_scope(box=runtime.topic_boxes.get(topic_id)):
             counts = await _run_question_phase(
                 runtime,
                 topic_id=topic_id,

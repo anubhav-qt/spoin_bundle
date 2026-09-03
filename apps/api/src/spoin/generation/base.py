@@ -24,6 +24,7 @@ from typing import Any
 from pydantic import BaseModel, Field, model_validator
 
 from spoin.domain.enums import CardType, Difficulty
+from spoin.generation.quota import KeyBox
 
 
 def _sanitize_null_bytes(val: Any) -> Any:
@@ -497,9 +498,13 @@ class ContentGenerator(ABC):
     """The only interface the rest of the codebase knows about."""
 
     @asynccontextmanager
-    async def claimed_key_scope(self) -> AsyncIterator[None]:
+    async def claimed_key_scope(self, *, box: KeyBox | None = None) -> AsyncIterator[None]:
         """Mark a unit of work that should run on ONE API key start to finish
         (ADR-0074) -- in practice one subtopic group's whole card run.
+
+        `box` (ADR-0082) confines that key -- and every key the claim may move
+        to when this one is spent -- to one topic's slice of the pool; `None`
+        keeps ADR-0074's whole-pool behaviour.
 
         Not abstract, and a no-op by default: a backend without per-key quota
         has nothing to claim, and the pipeline must not have to know which kind
@@ -513,6 +518,23 @@ class ContentGenerator(ABC):
         """
 
         yield
+
+    async def lease_key_box(self, size: int) -> KeyBox:
+        """Take a topic's box of `size` keys for its whole run (ADR-0082). An
+        empty box by default -- a backend without per-key quota has nothing to
+        box, and the pipeline must not have to know which kind it holds (same
+        reasoning as `claimed_key_scope`). Pair every call with
+        `release_key_box` in a `finally`."""
+
+        return KeyBox(box_id=0)
+
+    async def release_key_box(self, box: KeyBox) -> None:
+        """Return a box's keys to the pool (ADR-0082). No-op by default -- an
+        empty box holds none. Idempotent: releasing twice is not an error, which
+        is what lets the pipeline release on the happy path AND in a crash
+        backstop."""
+
+        return None
 
     @abstractmethod
     async def generate_curriculum(

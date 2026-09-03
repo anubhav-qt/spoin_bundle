@@ -3,6 +3,18 @@
 - **Status:** Accepted
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
+- **Amended by:** [ADR-0082](0082-fixed-key-boxes-per-topic.md) -- "any unclaimed
+  key" (step 3, step 5) now means any unclaimed key in that TOPIC's fixed-size
+  box, because several topics run at once. Where this ADR says the parallelism
+  ceiling is the key count, read: the box size.
+- **Amended by:** [ADR-0083](0083-least-spent-load-balancing-within-a-box.md) --
+  the per-group **pin** is off for generation work. A group's card run no longer
+  binds to one key; each call picks the least-spent key *in the box* fresh
+  (`KeyClaim.sticky=False`, `key_scope="box"`), and the gate goes pool-wide
+  (`"pool"`). The claim and its box scope remain; only the "one key for the
+  whole run" heuristic is gone -- `cell_lock` was always what made an rpm
+  violation impossible, not the pin. Read this ADR's "one key per subtopic
+  group" as "one caller per cell per call".
 
 - **Amends:** [ADR-0028](0028-key-model-quota-ladder.md) (the ladder is now walked
   own-key-first, not model-major-across-keys for every call) and
@@ -17,6 +29,8 @@
   generation — cards still persist per group, questions no longer do.
 - **Does not touch:** [ADR-0073](0073-worker-runs-generation-jobs-sequentially.md).
   Jobs still run one topic at a time; this governs concurrency *inside* one run.
+  (No longer true since ADR-0082: several topics run at once, each with its own
+  box. This ADR still governs concurrency inside one of them.)
 
 ## Context
 

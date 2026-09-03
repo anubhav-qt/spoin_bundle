@@ -10,16 +10,23 @@ The same job functions run as a persistent loop once we are paying — a differe
 entrypoint over identical code, which is what "no accommodation may require a
 rewrite to undo" means in practice.
 
-**Jobs run ONE AT A TIME (ADR-0073).** A pass claims a batch of pending jobs
-(`generation_batch_size`) but then runs them strictly sequentially, in
-priority-then-`created_at` order, each on its OWN DB session. So topics finish
-in the order they were requested — the whole batch a user adds from the app
-generates one after another, not all at once. One job's exception marks only
-that job `failed`/`pending` and the loop moves to the next; failure isolation is
-per-job either way. The pipeline's own LangGraph concurrency (ADR-0024) still
-fans out WITHIN a single topic's run, bounded since ADR-0074 by how many API
-keys there are: a subtopic group claims one key for its whole card run, so at
-most one group per key is ever in flight.
+**A pass runs as many jobs as the key pool holds BOXES (ADR-0082).** It claims
+up to `settings.max_concurrent_topics` pending jobs — `pool // topic_key_box_size`,
+so 2 at the current 75-key pool and a box of 34 — in priority-then-`created_at` order, and runs
+them concurrently, each on its OWN DB session and its OWN box of keys, sharing
+one `ContentGenerator` so a single `KeyClaimRegistry` keeps the boxes disjoint.
+One job's exception marks only that job `failed`/`pending`; failure isolation is
+per-job. Inside a box nothing changed: the pipeline's LangGraph concurrency
+(ADR-0024) fans out per subtopic group, each claiming one key for its whole card
+run (ADR-0074), so at most one group per key is ever in flight — the difference
+is that "the keys" now means this topic's 34, not the whole pool.
+
+That is the hybrid: sequential inside a box, parallel across boxes. ADR-0073's
+strictly-sequential loop under-used a 119-key pool; ADR-0078's width-derived
+leases over-used it (a dozen topics at once burst the per-minute ceilings and
+the run stopped being walk-away-safe). A fixed box makes total in-flight work a
+constant — `max_concurrent_topics * box_size` keys, one caller each — instead of
+a function of how many topics happen to be queued.
 """
 
 from __future__ import annotations
@@ -138,15 +145,25 @@ async def _run_job(
 
 
 async def run_once() -> int:
-    """Claim whatever is pending, highest priority first, then run the claimed
-    jobs ONE AT A TIME in that order (ADR-0073), with per-job isolation.
+    """Claim as many pending jobs as the key pool holds boxes, highest priority
+    first, then run them CONCURRENTLY (ADR-0082) with per-job isolation.
 
     Returns the number of jobs processed (attempted, not necessarily succeeded —
     see each job's own `status`/`last_error` for outcome).
     """
 
     settings = get_settings()
-    logger.info("worker pass starting (generator=%s)", settings.generator)
+    # The pool size is logged every pass because the box arithmetic is only as
+    # good as it: a key silently dropped between `.env` and this process shows
+    # up downstream as fewer topics running and reads like a quota problem
+    # rather than a config one (the same confusion ADR-0058 fixed for 429s).
+    logger.info(
+        "worker pass starting (generator=%s, %d key(s), box=%d, up to %d topic(s) at once)",
+        settings.generator,
+        settings.gemini_pool_size,
+        settings.topic_key_box_size,
+        settings.max_concurrent_topics,
+    )
 
     async with session_scope() as session:
         pending = (
@@ -159,7 +176,13 @@ async def run_once() -> int:
                     # work. When quota runs out, low-priority work waits for
                     # tomorrow rather than everyone starving equally.
                     .order_by(GenerationJob.priority.desc(), GenerationJob.created_at)
-                    .limit(settings.generation_batch_size)
+                    # As many jobs as there are whole key boxes (ADR-0082) --
+                    # never more than `generation_batch_size`, which stays the
+                    # outer bound on how much of the queue one pass may touch.
+                    # Claiming exactly what will run is what keeps this simple:
+                    # there is no admit-then-demote step, so a row is `running`
+                    # only if a box is about to be handed to it.
+                    .limit(min(settings.generation_batch_size, settings.max_concurrent_topics))
                     # Two passes that overlap -- `--watch` lapping itself, a cron
                     # pass landing on a slow one, or a second replica -- must not
                     # both dispatch the same `pending` rows: that is duplicate
@@ -194,12 +217,17 @@ async def run_once() -> int:
     generator = get_content_generator()
     embedder = get_embedder()
 
-    # Sequential, in claim order (ADR-0073): one topic finishes before the next
-    # starts, so a batch of topics added from the app generates in the order it
-    # was requested. `_run_job` swallows its own exceptions, so a failure just
-    # moves the loop on.
-    for job_id, topic_id, kind, card_id in claimed:
-        await _run_job(job_id, topic_id, kind, card_id, generator, embedder)
+    # Concurrent, in claim order (ADR-0082): the claimed topics generate
+    # together, each on its own session and its own key box. One shared
+    # `generator` is what makes the boxes disjoint -- two generators would each
+    # hand out the same key indices. `_run_job` swallows its own exceptions, so
+    # one failure never aborts the gather.
+    await asyncio.gather(
+        *(
+            _run_job(job_id, topic_id, kind, card_id, generator, embedder)
+            for job_id, topic_id, kind, card_id in claimed
+        )
+    )
 
     logger.info("worker pass finished (%d job(s) processed)", len(claimed))
     return len(claimed)

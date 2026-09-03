@@ -329,7 +329,20 @@ def test_classify_rate_limit_falls_back_to_per_minute_when_scope_is_unknown() ->
     instead is self-correcting -- the cell keeps walking toward its own RPD
     ceiling on every acquire() and retires itself."""
 
-    assert _classify_rate_limit(_real_429()).is_daily is False
+    fallback = _classify_rate_limit(_real_429())
+    assert fallback.is_daily is False
+    # ...but it is a GUESS, so the cell's learned rpm is not ratcheted down on
+    # it: Google returns bare RESOURCE_EXHAUSTED for every 429 now, and halving
+    # on each walked healthy cells to the 1-rpm floor over a run.
+    assert fallback.scope_certain is False
+
+
+def test_classify_rate_limit_is_scope_certain_when_the_429_identifies_itself() -> None:
+    """A `quotaId` (per-minute) or a short `RetryInfo` is real evidence, so the
+    AIMD rpm shrink still fires -- `scope_certain` only drops on a pure guess."""
+
+    assert _classify_rate_limit(_rpm_429()).scope_certain is True
+    assert _classify_rate_limit(_rpd_429()).scope_certain is True
 
 
 def test_classify_rate_limit_trusts_a_short_retry_delay_over_an_unknown_quota_id() -> None:
@@ -438,7 +451,7 @@ async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
     assert result is draft
     generator._thinking.mark_exhausted.assert_not_awaited()
     generator._thinking.mark_rate_limited.assert_awaited_once_with(
-        0, _THINKING_MODEL, now=ANY, retry_after_s=13.0
+        0, _THINKING_MODEL, now=ANY, retry_after_s=13.0, shrink_rpm=True
     )
 
 

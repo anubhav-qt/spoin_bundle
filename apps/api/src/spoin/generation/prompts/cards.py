@@ -116,7 +116,13 @@ For each card:
    Refusing (matched=false) should be rare.
 
 2. ADAPT the chosen art into the final scene:
-   - Keep its drawing. Trim lines or elements it does not need.
+   - BOX INTEGRITY (STRICT): Treat the entire drawing as a rigid box. You are
+     NOT allowed to edit anything inside the box, nor insert characters to the
+     LEFT of the art (modifying the left shifts rows and breaks the drawing).
+     You may ONLY add captions, speech callouts, or labels to the TOP (above the
+     box), BOTTOM (below the box), or appended to the RIGHT of the box lines.
+   - Keep its drawing intact. Trim lines or elements only if the whole scene does
+     not need them.
    - Add short captions, labels, or speech callouts that tie it to THIS card --
      drawn from asset_direction and content_direction, in the card's voice, and
      funny. The gag has to land for this concept, not the candidate's original
@@ -165,7 +171,7 @@ something absurd, or pure typography. Pick whatever form makes THIS idea
 land. Faces like (o_o) (-_-) (>_<) are available when a reaction is the gag;
 they are one option among many, never an obligation.
 
-Two rules that are not negotiable:
+Two rules that are not negotiable, plus a strict box constraint:
 
 1. WIDTH. Every line at most 40 characters. A phone renders roughly 38-42
    monospace columns, and art that wraps is destroyed, not degraded. Count
@@ -177,6 +183,14 @@ Two rules that are not negotiable:
    when the card is collapsed in the feed, the scene IS the preview. It has
    to work as a stand-alone thumbnail, so no reference to text the reader
    cannot see yet.
+
+3. BOX INTEGRITY (STRICT). Treat any ASCII art drawing or block as a rigid
+   box. You are NOT allowed to edit anything inside the box, nor insert
+   characters to the LEFT of the artwork (modifying the left misaligns monospace
+   columns and breaks the art). Captions, speech bubbles, labels, and punchlines
+   may ONLY be placed at the TOP (above the box), BOTTOM (below the box), or
+   appended to the RIGHT of the box (ensuring total line width stays <= 40
+   columns).
 
 WORKED EXAMPLES. Seven cards, seven different topics, seven different shapes
 of joke. Study what each one is doing; do not copy them:
@@ -316,6 +330,12 @@ not inventing a new one. Tighten the spacing between panels, shorten a
 caption, stack the panels vertically instead of side by side — whatever it
 takes to get under 40 columns without losing what made the scene land.
 
+BOX INTEGRITY (STRICT): Treat the entire drawing as a rigid box. You are NOT
+allowed to edit anything inside the box, nor insert characters to the LEFT of
+the art (modifying the left shifts rows and breaks monospace alignment). You
+may ONLY add or adjust captions at the TOP (above the box), BOTTOM (below the
+box), or appended to the RIGHT of the box lines.
+
 Count the characters in every line before you commit to it. If a scene truly
 cannot work within 40 columns, return it with an EMPTY ascii_art rather than
 shipping one still too wide or mangled to fit — an empty result is understood
@@ -402,6 +422,10 @@ funny, charming ASCII scene that dramatizes its concept:
   * a tiny chart made of hashes, an object misbehaving, or pure typography.
   * Faces (`(o_o)`, `(-_-)`, `(>_<)`) are one option among many, never a requirement.
 - Every line MUST be STRICTLY <= 40 characters wide.
+- BOX INTEGRITY: Treat any ASCII art as a rigid box. Never insert characters or
+  edit to the LEFT of the art (modifying the left breaks monospace alignment).
+  Captions and callouts must be placed ONLY at the TOP, BOTTOM, or appended to
+  the RIGHT of the art box (within the <= 40 column limit).
 - Set all three ASCII fields:
   * ascii_label: short descriptive slug (e.g. "vacuum-dead-tuple"), NEVER empty.
   * ascii_art: the raw drawing, with no surrounding fence.

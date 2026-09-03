@@ -7,6 +7,13 @@
   now orders KEY CLAIMS (one per subtopic group, held across that group's whole card
   run) rather than individual calls. The refund, learned-rpm and terminal-state
   machinery in this ADR is unchanged and still load-bearing.
+- **Amended by:** [ADR-0083](0083-least-spent-load-balancing-within-a-box.md) --
+  two of this ADR's mechanisms are narrowed. (1) ADR-0074's key-claim ordering
+  is reverted to per-call least-spent-first *inside a topic's box* for
+  generation work (the pin is off); the gate runs it pool-wide. (2)
+  `_shrink_effective_rpm` fires only on an *identified* per-minute 429, not on
+  ADR-0060's unidentified-429 guess. The refund and terminal-state machinery are
+  untouched.
 - **Amends:** [ADR-0028](0028-key-model-quota-ladder.md) (key ordering within a rung),
   [ADR-0058](0058-per-minute-vs-per-day-429.md) (reverses its deliberate throttle
   over-count; extends its shared-state posture to model availability),

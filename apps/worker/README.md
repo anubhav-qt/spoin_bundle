@@ -9,7 +9,14 @@ request path.
 
 - **Curriculum pass** — one call per topic, produces subtopics and `deep_dive` edges.
 - **Card generation** — batched, targeted at a subtopic, sequential within a subtopic and
-  parallel across them.
+  parallel across them. A pass runs several topics at once, one **key box** each
+  ([ADR-0082](../../docs/adr/0082-fixed-key-boxes-per-topic.md)): `topic_key_box_size` keys (34)
+  that are that topic's entire pool for the run. How many topics is derived, not
+  configured — `pool // box_size` (2 at the 75-key pool). Inside a box, generation calls
+  spread least-spent-first across the box's keys
+  ([ADR-0083](../../docs/adr/0083-least-spent-load-balancing-within-a-box.md) dropped
+  [ADR-0074](../../docs/adr/0074-key-per-subtopic-scheduling.md)'s per-group key pin); the
+  one-caller-per-cell guarantee is unchanged.
 - **Topic canonicalization** — local embeddings, banded matching, LLM judge for the
   middle band.
 - **Question bank generation** — questions derived from cards. Not built.

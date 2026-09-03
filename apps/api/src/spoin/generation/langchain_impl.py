@@ -75,7 +75,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, TypeVar
+from typing import Any, Literal, TypeVar
 
 from google.genai.errors import ClientError, ServerError
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -84,6 +84,7 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from spoin.content.ascii_library import AsciiLibraryEntry, top_candidates
 from spoin.core.config import Settings
+from spoin.core.db import session_scope
 from spoin.domain.enums import CardType, Difficulty
 from spoin.generation import prompts
 from spoin.generation.base import (
@@ -114,10 +115,12 @@ from spoin.generation.quota import (
     AllCellsThrottledError,
     AllModelsUnavailableError,
     DailyQuotaExhaustedError,
+    KeyBox,
     KeyClaim,
     KeyClaimRegistry,
     QuotaExhaustedError,
     QuotaGovernor,
+    key_spend_today,
     parse_ladder,
 )
 
@@ -150,10 +153,17 @@ class _RateLimit:
 
     `is_daily` is the whole point: it decides between spending this cell for the
     rest of the day and parking it for `retry_after_s` seconds.
+
+    `scope_certain` is False when neither a `quotaId` nor a `RetryInfo` was in
+    the envelope and per-minute is only the safe *guess* (ADR-0060). The cell is
+    still parked, but its learned rpm is NOT halved on a guess -- Google has
+    been returning bare `RESOURCE_EXHAUSTED` for every 429, and halving on each
+    one walked good cells down to the 1-rpm floor over a run for no real signal.
     """
 
     is_daily: bool
     retry_after_s: float | None
+    scope_certain: bool = True
 
 
 def _parse_retry_delay(raw: object) -> float | None:
@@ -238,7 +248,7 @@ def _classify_rate_limit(exc: ClientError) -> _RateLimit:
         quota_ids or "(none)",
         error,
     )
-    return _RateLimit(is_daily=False, retry_after_s=None)
+    return _RateLimit(is_daily=False, retry_after_s=None, scope_certain=False)
 
 
 # ------------------------------------------------------------- wire schemas --
@@ -896,7 +906,7 @@ class GeminiContentGenerator(ContentGenerator):
         self._active_probes: dict[tuple[int, str], asyncio.Task[None]] = {}
 
     @asynccontextmanager
-    async def claimed_key_scope(self) -> AsyncIterator[None]:
+    async def claimed_key_scope(self, *, box: KeyBox | None = None) -> AsyncIterator[None]:
         """ADR-0074: everything called inside this block runs on ONE key.
 
         The claim starts UNBOUND. Binding it here would need a key chosen
@@ -905,19 +915,42 @@ class GeminiContentGenerator(ContentGenerator):
         inside the scope binds it there instead, using the same query every
         other key choice uses.
 
+        With `box` (ADR-0082) that binding scan -- and the later move to a
+        fresher key -- sees only the topic's own keys. Without it the claim
+        ranges over the whole pool, exactly as ADR-0074 described.
+
         The claim is released even when the body raises, which is what keeps a
         failed subtopic group from parking a key for the rest of the run. Both
         pools share `self._claims`, so releasing frees the key for thinking and
         generator work alike.
         """
 
-        claim = KeyClaim()
+        claim = KeyClaim(box=box)
         token = CURRENT_KEY_CLAIM.set(claim)
         try:
             yield
         finally:
             CURRENT_KEY_CLAIM.reset(token)
             await self._claims.release(claim)
+
+    async def lease_key_box(self, size: int) -> KeyBox:
+        """Take `size` keys from the pool as one topic's box for its whole run
+        (ADR-0082), coldest first so a day of passes spreads across the pool
+        instead of re-boxing keys 0..N every time (ADR-0065's principle, applied
+        to boxes: a box is held for a run, so first-fit from key 0 would burn the
+        low indices down pass after pass and leave the high ones permanently
+        cold). May return fewer keys when the pool is tight -- see
+        `KeyClaimRegistry.lease_box`."""
+
+        async with session_scope() as session:
+            spent = await key_spend_today(session, key_count=len(self._keys), now=datetime.now(UTC))
+        coldest_first = sorted(range(len(self._keys)), key=lambda k: (spent.get(k, 0), k))
+        return self._claims.lease_box(size, prefer=coldest_first)
+
+    async def release_key_box(self, box: KeyBox) -> None:
+        """Return a topic's box to the pool (ADR-0082)."""
+
+        await self._claims.release_box(box)
 
     def _client(self, key_index: int, model: str) -> ChatGoogleGenerativeAI:
         cache_key = (key_index, model)
@@ -994,8 +1027,32 @@ class GeminiContentGenerator(ContentGenerator):
                 delay *= 2
         raise AssertionError("unreachable: loop always returns or raises on its last attempt")
 
+    @staticmethod
+    def _claim_for_scope(key_scope: Literal["sticky", "box", "pool"]) -> KeyClaim | None:
+        """Resolve `_invoke_with_retry`'s `key_scope` against the ambient claim.
+
+        `sticky` returns the claim as-is (or None when none is set -- curriculum,
+        topic matching, grading, every test). `pool` forces None: least-spent
+        over the whole pool. `box` keeps the claim's box but strips the pin --
+        a fresh `sticky=False` claim so this one call picks the least-spent key
+        in the box and the next call re-picks, rather than all of a unit's
+        calls landing on the key the first one bound.
+        """
+
+        current = CURRENT_KEY_CLAIM.get()
+        if key_scope == "pool" or current is None:
+            return None
+        if key_scope == "box":
+            return KeyClaim(box=current.box, sticky=False)
+        return current
+
     async def _invoke_with_retry(
-        self, pool: QuotaGovernor, schema: type[_SchemaT], prompt: list[tuple[str, Any]]
+        self,
+        pool: QuotaGovernor,
+        schema: type[_SchemaT],
+        prompt: list[tuple[str, Any]],
+        *,
+        key_scope: Literal["sticky", "box", "pool"] = "sticky",
     ) -> _SchemaT:
         """Acquire a `(key, model)` cell from `pool` and call it; a REAL 429
         means our local ledger's belief disagreed with the provider's actual
@@ -1046,7 +1103,20 @@ class GeminiContentGenerator(ContentGenerator):
                 key_index, model = await pool.acquire(
                     now=datetime.now(UTC),
                     exclude_models=frozenset(unavailable_models),
-                    claim=CURRENT_KEY_CLAIM.get(),
+                    # ADR-0074's key claim, three ways (see `KeyClaim.sticky`):
+                    #  "sticky" -- the claim as set by `claimed_key_scope`;
+                    #     pins the unit to one key. Also the no-claim callers
+                    #     (curriculum, matching, grading), which just get the
+                    #     whole pool.
+                    #  "box"   -- keep the claim's BOX scope but not its pin, so
+                    #     a unit's burst of calls (a tier's plan + per-type
+                    #     drafts + ascii) spreads least-spent across its box
+                    #     instead of hammering one key past 15 rpm. Card
+                    #     writing, planning, ascii, questions.
+                    #  "pool"  -- drop the claim entirely; least-spent over the
+                    #     whole pool. The thinking gate (`correct_cards` /
+                    #     `verify_cards`), whose rpm-5 calls must spread widest.
+                    claim=self._claim_for_scope(key_scope),
                 )
             except QuotaExhaustedError:
                 # Every remaining rung was excluded as overloaded, not actually
@@ -1101,6 +1171,7 @@ class GeminiContentGenerator(ContentGenerator):
                             model,
                             now=datetime.now(UTC),
                             retry_after_s=limit.retry_after_s,
+                            shrink_rpm=limit.scope_certain,
                         )
                         if was_floored:
                             floored_throttles += 1
@@ -1413,7 +1484,9 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(self._generator, _WireCardPlanBatch, prompt)
+            wire_result = await self._invoke_with_retry(
+                self._generator, _WireCardPlanBatch, prompt, key_scope="box"
+            )
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1490,7 +1563,9 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire = await self._invoke_with_retry(self._generator, _WireAsciiFetchBatch, prompt)
+            wire = await self._invoke_with_retry(
+                self._generator, _WireAsciiFetchBatch, prompt, key_scope="box"
+            )
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1575,7 +1650,7 @@ class GeminiContentGenerator(ContentGenerator):
             prompt = _ascii_redraw_prompt(pending, escalated=attempt > 0)
             try:
                 redraw = await self._invoke_with_retry(
-                    self._generator, _WireAsciiRedrawBatch, prompt
+                    self._generator, _WireAsciiRedrawBatch, prompt, key_scope="box"
                 )
             except QuotaExhaustedError:
                 raise
@@ -1675,7 +1750,9 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(self._generator, _WireCardBatch, prompt)
+            wire_result = await self._invoke_with_retry(
+                self._generator, _WireCardBatch, prompt, key_scope="box"
+            )
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -1805,7 +1882,7 @@ class GeminiContentGenerator(ContentGenerator):
         ]
         try:
             wire_result = await self._invoke_with_retry(
-                self._thinking, _WireCorrectionBatch, prompt
+                self._thinking, _WireCorrectionBatch, prompt, key_scope="pool"
             )
         except QuotaExhaustedError:
             raise
@@ -1859,7 +1936,7 @@ class GeminiContentGenerator(ContentGenerator):
         ]
         try:
             wire_result = await self._invoke_with_retry(
-                self._thinking, _WireVerificationBatch, prompt
+                self._thinking, _WireVerificationBatch, prompt, key_scope="pool"
             )
         except QuotaExhaustedError:
             raise
@@ -1911,7 +1988,9 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry(self._generator, _WireQuestionBatch, prompt)
+            wire_result = await self._invoke_with_retry(
+                self._generator, _WireQuestionBatch, prompt, key_scope="box"
+            )
         except QuotaExhaustedError:
             raise
         except Exception as exc:
@@ -2036,7 +2115,9 @@ class GeminiContentGenerator(ContentGenerator):
             ("human", content),
         ]
         try:
-            wire = await self._invoke_with_retry(self._generator, _WireRepairBatch, prompt)
+            wire = await self._invoke_with_retry(
+                self._generator, _WireRepairBatch, prompt, key_scope="box"
+            )
         except QuotaExhaustedError:
             raise
         except Exception as exc:

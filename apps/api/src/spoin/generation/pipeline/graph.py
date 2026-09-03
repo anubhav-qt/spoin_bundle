@@ -24,7 +24,7 @@ from spoin.generation.pipeline.nodes import (
     generate_subtopic_cards,
     resolve_and_plan_topic,
 )
-from spoin.generation.pipeline.state import PipelineState, _Runtime
+from spoin.generation.pipeline.state import PipelineState, _Runtime, logger
 
 
 def _build_graph() -> CompiledStateGraph[Any, Any, Any, Any]:
@@ -55,6 +55,13 @@ async def run_generation_pipeline(
     directly from a CLI script (today) or a worker job handler (task 0008) --
     this function has no idea which is calling it, or whether a topic_id is
     brand new or a retry of one whose earlier attempt failed partway.
+
+    Every topic gets a KEY BOX first (ADR-0082): `settings.topic_key_box_size`
+    keys that its subtopic branches -- and nothing else -- draw on for the whole
+    run. Taken here rather than inside `resolve_and_plan_topic` because a box's
+    lifetime is the RUN's, not a node's: one place takes them, one `finally`
+    gives them back, and a crash anywhere in between cannot strand keys the next
+    worker pass needs.
     """
 
     if not topic_ids:
@@ -73,6 +80,41 @@ async def run_generation_pipeline(
         "topic_plans": [],
         "item_reports": [],
     }
-    final_state = await graph.ainvoke(initial_state, config={"configurable": {"runtime": runtime}})
+    for topic_id in topic_ids:
+        box = await generator.lease_key_box(settings.topic_key_box_size)
+        if box.key_indices:
+            runtime.topic_boxes[str(topic_id)] = box
+            logger.info(
+                "topic %s: key box %d -- %d key(s) (ADR-0082)",
+                topic_id,
+                box.box_id,
+                len(box.key_indices),
+            )
+        else:
+            # Either a backend with no key pool (`fake`, local -- `box_id` 0, the
+            # no-op base implementation) or a pool with nothing free right now.
+            # Both mean the same downstream: this topic's branches fall back to
+            # ADR-0074's whole-pool claim. Only the second is worth a line, and
+            # only as an observation -- the worker admits at most
+            # `pool // box_size` jobs precisely so it stays rare.
+            await generator.release_key_box(box)
+            if box.box_id:
+                logger.warning(
+                    "topic %s: no keys free to box -- this topic's branches will scan the "
+                    "whole pool instead (ADR-0082 fallback)",
+                    topic_id,
+                )
+
+    try:
+        final_state = await graph.ainvoke(
+            initial_state, config={"configurable": {"runtime": runtime}}
+        )
+    finally:
+        # Success or crash, every key this run boxed goes back now. A run that
+        # dies mid-branch must not leave a third of the pool owned by nobody
+        # until the process exits.
+        for box in runtime.topic_boxes.values():
+            await generator.release_key_box(box)
+        runtime.topic_boxes.clear()
     report: dict[str, object] = final_state["report"]
     return report

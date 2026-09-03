@@ -138,6 +138,16 @@ class Settings(BaseSettings):
     #: keys share projects (finish the audit's Phase B). Tune with a benchmark,
     #: never by feel.
     gemini_send_gap_seconds: float = 10.0
+    #: Minimum seconds between any two consecutive reservations across the ENTIRE
+    #: balancer (ADR-0086). While `gemini_send_gap_seconds` paces requests to the
+    #: SAME cell, this paces dispatches across DIFFERENT cells to prevent edge
+    #: gateway shedding when parallel subtopic branches fan out simultaneously.
+    #: 0.0 disables dispatch staggering.
+    gemini_dispatch_stagger_seconds: float = 0.5
+    #: Maximum random jitter (seconds) applied before entering a subtopic group's
+    #: card generation branch (ADR-0086), desynchronizing the initial wave before
+    #: reaching the balancer or database. 0.0 disables initial jitter.
+    gemini_initial_dispatch_jitter_seconds: float = 1.5
 
     # Batch sizes (ADR-0005). Batching is still right -- one 15-card call beats
     # 15 single-card calls on every axis -- but the reason once stated here, "the

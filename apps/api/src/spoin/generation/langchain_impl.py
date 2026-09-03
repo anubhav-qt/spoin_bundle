@@ -896,6 +896,8 @@ class GeminiContentGenerator(ContentGenerator):
         #: Min seconds between two sends to one key, passed into every balancer
         #: (ADR-0084 burst brake).
         self._send_gap_s = settings.gemini_send_gap_seconds
+        #: Pool-wide dispatch stagger (ADR-0086).
+        self._dispatch_stagger_s = settings.gemini_dispatch_stagger_seconds
         #: The pool's key indices, minus a fixed remainder held back for the
         #: claim-less path (ADR-0082/0084). `pool - max_topics*box` keys stay
         #: unboxed; a box and the remainder balancer never share a key.
@@ -951,6 +953,7 @@ class GeminiContentGenerator(ContentGenerator):
                 now=now,
                 ledger_writer=self._ledger_writer,
                 send_gap_s=self._send_gap_s,
+                dispatch_stagger_s=self._dispatch_stagger_s,
             )
         return self._remainder_lb
 
@@ -981,6 +984,7 @@ class GeminiContentGenerator(ContentGenerator):
             now=now,
             ledger_writer=self._ledger_writer,
             send_gap_s=self._send_gap_s,
+            dispatch_stagger_s=self._dispatch_stagger_s,
         )
         return KeyBox(box_id=box_id, key_indices=box_keys, balancer=balancer)
 
@@ -1051,7 +1055,31 @@ class GeminiContentGenerator(ContentGenerator):
         for attempt in range(1, _SERVER_ERROR_RETRIES + 1):
             try:
                 lb.note_send(res, now=datetime.now(UTC), tokens=estimate_tokens(str(prompt)))
-                return await structured.ainvoke(prompt)  # type: ignore[attr-defined]
+                # PROBE D (temporary, 2026-09-03): the call latency `L`. Queue
+                # depth behind `cell_lock` is roughly `L / gap`, which is the
+                # number the send gap has been tuned blind against three times.
+                started = time.monotonic()
+                prompt_chars = len(str(prompt))
+                try:
+                    result = await structured.ainvoke(prompt)  # type: ignore[attr-defined]
+                except BaseException as exc:
+                    logger.info(
+                        "lbprobe call key=%d model=%s latency=%.2f chars=%d outcome=%s",
+                        key_index,
+                        model,
+                        time.monotonic() - started,
+                        prompt_chars,
+                        type(exc).__name__,
+                    )
+                    raise
+                logger.info(
+                    "lbprobe call key=%d model=%s latency=%.2f chars=%d outcome=ok",
+                    key_index,
+                    model,
+                    time.monotonic() - started,
+                    prompt_chars,
+                )
+                return result
             except ServerError as exc:
                 if exc.code == 504 or attempt == _SERVER_ERROR_RETRIES:
                     lb.on_send_aborted(res)

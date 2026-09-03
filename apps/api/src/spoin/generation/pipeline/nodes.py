@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import math
+import random
 import uuid
 from datetime import UTC, datetime
 from typing import Any, cast
@@ -444,6 +445,13 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 
     runtime = _runtime(config)
     job = state["subtopic_group_job"]
+    # ADR-0086: initial dispatch jitter before claiming the key and entering
+    # drafting, to de-synchronize the simultaneous fanout wave across subtopics.
+    # Only active for live generators to keep test suites instant.
+    jitter_max = runtime.settings.gemini_initial_dispatch_jitter_seconds
+    if jitter_max > 0.0 and runtime.settings.generator != "fake":
+        await asyncio.sleep(random.uniform(0.0, jitter_max))
+
     # ADR-0074: this whole branch -- planning, every draft round, both gate
     # passes, every redraft -- runs on ONE key, claimed here and released when
     # the branch returns or raises. With one caller per key no cell can be

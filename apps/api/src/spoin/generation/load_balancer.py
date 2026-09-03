@@ -209,6 +209,11 @@ class Reservation:
     key_index: int
     model: str
     _slot: _Slot = field(repr=False)
+    #: Epoch seconds when `assign()` chose this cell. The send happens later --
+    #: after the caller acquires `cell_lock` -- and the difference is the
+    #: instrumentation in `note_send` (probe A): a reservation that waits a long
+    #: time behind the lock is one the send gap spaced in name only.
+    reserved_at: float = 0.0
 
 
 @dataclass
@@ -294,6 +299,7 @@ class LoadBalancer:
         now: datetime,
         ledger_writer: LedgerWriter | None = None,
         send_gap_s: float = 0.0,
+        dispatch_stagger_s: float = 0.0,
     ) -> None:
         if not key_indices:
             raise ValueError("LoadBalancer needs at least one key")
@@ -316,6 +322,12 @@ class LoadBalancer:
         #: the window (`fake`, tests, and any experiment that sets the gap to 0).
         self._send_gap_s = send_gap_s
         self._paced = send_gap_s > 0.0
+        #: Minimum seconds between ANY two dispatches across this entire balancer
+        #: (`settings.gemini_dispatch_stagger_seconds`, ADR-0086). While `_send_gap_s`
+        #: spaces sends to the SAME cell, this paces dispatches across DIFFERENT cells
+        #: to prevent simultaneous edge-gateway shedding on parallel fanout.
+        self._dispatch_stagger_s = dispatch_stagger_s
+        self._last_pool_send: float = 0.0
         self._lock = asyncio.Lock()
         self._cell_locks: dict[Cell, asyncio.Lock] = {}
         self._created_s = now.timestamp()
@@ -422,6 +434,14 @@ class LoadBalancer:
         now_s = now.timestamp()
         warm_until = self._created_s + _WARMUP_S
         async with self._lock:
+            # Pool-wide dispatch staggering (ADR-0086): don't dispatch again until
+            # dispatch_stagger_s has elapsed since the last reservation across ANY cell
+            # in this balancer.
+            if self._dispatch_stagger_s > 0.0 and self._last_pool_send > 0.0:
+                stagger_left = self._dispatch_stagger_s - (now_s - self._last_pool_send)
+                if stagger_left > 0.0:
+                    return stagger_left
+
             any_model_checked = False
             any_budget = False
             soonest = math.inf
@@ -484,8 +504,14 @@ class LoadBalancer:
                 slot = _Slot(sent_at=now_s)
                 cell.window.append(slot)
                 cell.last_send = max(cell.last_send, now_s)
+                self._last_pool_send = max(self._last_pool_send, now_s)
                 cell.dispatched += 1
-                return Reservation(key_index=cell_id[0], model=cell_id[1], _slot=slot)
+                return Reservation(
+                    key_index=cell_id[0],
+                    model=cell_id[1],
+                    _slot=slot,
+                    reserved_at=now_s,
+                )
 
             if not any_model_checked:
                 raise AllModelsUnavailableError(
@@ -510,8 +536,23 @@ class LoadBalancer:
 
         cell = self._cells[(res.key_index, res.model)]
         now_s = now.timestamp()
+        # PROBE A (temporary, 2026-09-03): what the provider actually sees.
+        # `since_last` is the real spacing between two sends to this cell --
+        # the send gap is enforced at RESERVATION time, so a call that waited
+        # behind `cell_lock` can land far closer to its predecessor than the
+        # gap believes. `queued` is how long this reservation sat before
+        # sending; queue depth is roughly `queued / gap`.
+        logger.info(
+            "lbprobe send key=%d model=%s since_last=%.2f queued=%.2f gap=%.2f",
+            res.key_index,
+            res.model,
+            now_s - cell.last_send,
+            now_s - res.reserved_at if res.reserved_at else 0.0,
+            self._gap_for(cell),
+        )
         res._slot.sent_at = now_s
         cell.last_send = max(cell.last_send, now_s)
+        self._last_pool_send = max(self._last_pool_send, now_s)
         if tokens:
             # Anchored to the true send time for the same reason the request
             # slot is (ADR-0058): a call delayed behind `cell_lock` spends its

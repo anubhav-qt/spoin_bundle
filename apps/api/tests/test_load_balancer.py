@@ -46,6 +46,7 @@ def _lb(
     unavailable: dict[str, float] | None = None,
     writer: object = None,
     send_gap_s: float = 0.0,
+    dispatch_stagger_s: float = 0.0,
 ) -> LoadBalancer:
     return LoadBalancer(
         name="test",
@@ -57,6 +58,7 @@ def _lb(
         now=_warm(),
         ledger_writer=writer,  # type: ignore[arg-type]
         send_gap_s=send_gap_s,
+        dispatch_stagger_s=dispatch_stagger_s,
     )
 
 
@@ -509,3 +511,64 @@ def test_pack_by_tokens_gives_an_oversized_item_its_own_chunk() -> None:
 
 def test_pack_by_tokens_handles_an_empty_list() -> None:
     assert pack_by_tokens([], cost=lambda _i: 1, budget=100, max_items=5) == []
+
+
+# --- dispatch staggering (ADR-0086) ----------------------------------------
+
+
+async def test_dispatch_stagger_spaces_consecutive_reservations_across_different_cells() -> None:
+    """While `send_gap_s` spaces sends to the SAME cell, `dispatch_stagger_s`
+    spaces reservations across DIFFERENT cells (ADR-0086). Even when key 1 is
+    completely fresh and cold, it must wait out the stagger interval."""
+
+    lb = _lb(keys=(0, 1), dispatch_stagger_s=0.5)
+
+    # First reservation takes key 0 immediately at _NOW.
+    res1 = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(res1, Reservation)
+    assert res1.key_index == 0
+
+    # Second reservation at the exact same instant is declined with the remaining stagger wait.
+    wait = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(wait, float)
+    assert pytest.approx(wait, 0.01) == 0.5
+
+    # At _NOW + 0.2s, 0.3s of the stagger remains.
+    wait2 = await lb.try_assign("generator", now=_NOW + timedelta(seconds=0.2))
+    assert isinstance(wait2, float)
+    assert pytest.approx(wait2, 0.01) == 0.3
+
+    # At _NOW + 0.5s, the stagger window has passed -- key 1 is reserved.
+    res2 = await lb.try_assign("generator", now=_NOW + timedelta(seconds=0.5))
+    assert isinstance(res2, Reservation)
+    assert res2.key_index == 1
+
+
+async def test_dispatch_stagger_zero_allows_simultaneous_dispatches_across_cells() -> None:
+    """With dispatch_stagger_s=0.0 (tests, fake backend), different cells can be
+    reserved at the exact same instant without waiting."""
+
+    lb = _lb(keys=(0, 1), dispatch_stagger_s=0.0)
+    res1 = await lb.try_assign("generator", now=_NOW)
+    res2 = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(res1, Reservation) and res1.key_index == 0
+    assert isinstance(res2, Reservation) and res2.key_index == 1
+
+
+async def test_dispatch_stagger_updated_by_note_send() -> None:
+    """A send delayed behind cell_lock anchors the pool dispatch stamp to its
+    actual departure time, protecting the next reservation by the full stagger."""
+
+    lb = _lb(keys=(0, 1), dispatch_stagger_s=0.5)
+    res = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(res, Reservation)
+
+    # Simulated cell_lock delay: send leaves at _NOW + 1.0s.
+    delayed_send = _NOW + timedelta(seconds=1.0)
+    lb.note_send(res, now=delayed_send)
+
+    # At _NOW + 1.2s, only 0.2s has passed since the true send -- must wait 0.3s.
+    wait = await lb.try_assign("generator", now=_NOW + timedelta(seconds=1.2))
+    assert isinstance(wait, float)
+    assert pytest.approx(wait, 0.01) == 0.3
+

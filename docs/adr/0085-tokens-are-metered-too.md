@@ -108,8 +108,11 @@ per-project is not conclusive — see "Revisit when".
 ## Revisit when
 
 - A run paced by this window still shows bare 429s at low per-cell token rates.
-  That would mean the ceiling is **aggregate across keys**, not per project per
-  model, and the fix is a global token semaphore rather than a per-cell window.
+  **Revisited 2026-09-04:** The 3-round isolation test ([handoff](../handoff/adr-0085-concurrency-burst-benchmarks.md))
+  demonstrated that the bare 429s are Google edge gateway shedding on simultaneous
+  heavy in-flight payloads (which occurs on a single key as well as across keys).
+  Resolved by [ADR-0086](0086-concurrency-staggering-and-initial-dispatch-jitter.md)'s
+  pool-wide dispatch staggering and initial branch jitter.
 - The deferred `usageMetadata` reconciliation lands and shows the `chars // 4`
   estimate is off by enough to matter.
 - Google publishes different TPM figures, or the ladder gains a paid tier.

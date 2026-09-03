@@ -1,5 +1,7 @@
 # ADR-0084 load balancer: send-gap benchmarks (2026-09-03)
 
+> **UPDATE (2026-09-04):** Root cause confirmed and resolved in [ADR-0085 benchmarks](adr-0085-concurrency-burst-benchmarks.md) and [ADR-0086](../adr/0086-concurrency-staggering-and-initial-dispatch-jitter.md). The bare 429s were Google edge gateway load shedding on simultaneous in-flight heavy payloads. Resolved by prompt token packing (ADR-0085) and pool-wide dispatch staggering / initial jitter (ADR-0086).
+
 Three benchmarks tried to find a per-cell send rate Gemini accepts. **None found
 one, and the evidence says the send rate is not the variable that matters.**
 

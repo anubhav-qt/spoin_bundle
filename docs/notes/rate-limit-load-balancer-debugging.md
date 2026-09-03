@@ -8,6 +8,17 @@
 > This is the "why", so the next session does not re-run the dead ends. The
 > decisions are in the ADRs; this is the path between them.
 >
+> **Benchmark 1 (`b542r0bob`, 2026-09-03): FAILED.** box-34 / 2-concurrent →
+> 95% 429 rate, `AllCellsThrottledError` in 10 min. Cause: fan-out burst (~60
+> groups want a key in the same 2s) trips the provider's token bucket regardless
+> of the per-minute average, and the learned-rpm floored healthy keys to 1 off a
+> single burst-collision 429. Response (owner's call): `gemini_send_gap_seconds`
+> = 4s minimum between two sends to the SAME (key,model) cell (= 15/min per cell,
+> the gap IS the limiter); trailing-window + learned-rpm shelved while a gap is
+> set; per-run round-robin (`_CellState.dispatched`) is now the primary cell
+> sort; `topic_key_box_size` = 75 (one box, one topic) until the paced run
+> sustains. On main; benchmark 2 pending.
+>
 > **ADR-0084 note (2026-09-03, unbenchmarked):** the owner called for a
 > from-scratch replacement of the quota governor — "it was all AI slop", grown by
 > accretion across ten ADRs against a multi-process assumption that no longer

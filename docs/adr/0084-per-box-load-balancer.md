@@ -164,6 +164,36 @@ transient all-strong-rungs-cooling window is rare and self-corrects within
 seconds. `gemini_thinking_reserve_rungs` stays in `Settings` (unused) rather
 than churning the config surface.
 
+### 5b. A fixed per-cell send gap, and the window shelved (2026-09-03, post-benchmark)
+
+The first benchmark (`b542r0bob`) hit a **95% 429 rate** and
+`AllCellsThrottledError` in 10 minutes: at fan-out ~60 subtopic groups each ask
+for a key in the same 2 seconds, the balancer spreads them one-per-key (all
+under the believed 15/min), the provider's token bucket rejects the *burst*
+regardless of the per-minute average, and the learned-rpm's `min(learned,
+sends-in-window)` then reads "429 after 1 send → ceiling = 1" and floors healthy
+keys. The window models the average; the provider polices the burst.
+
+The fix, on the owner's call:
+
+- **`gemini_send_gap_seconds` (default 4s)** — a minimum interval between two
+  sends to the *same `(key, model)` cell*, enforced in `try_assign`. 4s = 15/min
+  per cell, so the gap *is* the rate limiter, and a fan-out can't hit one cell
+  twice inside it -- it round-robins across the pool instead.
+- **The trailing-60s window and the learned-rpm ceiling are dormant while a gap
+  is set** (`_paced`). A 429 still parks the cell for its cooldown, but no longer
+  ratchets a learned ceiling (there is no rolling average to correct). Set the
+  gap to 0 to bring the window back.
+- **`_CellState.dispatched`** — a per-run dispatch counter, now the *primary*
+  sort key in `try_assign` (ahead of the ledger seed): strict round-robin so
+  every cell carries an even share, not just whichever had the coldest seed.
+- **The retry-loop terminal condition** drops the "floored throttle" streak
+  (there is no floor without a learned rpm) for a plain per-minute-429 streak:
+  `grid_size` in a row with no success → `AllCellsThrottledError`.
+- **One box of the whole pool, one topic at a time** (`topic_key_box_size = 75`)
+  until the paced single-topic run is shown to sustain; only then is splitting
+  the pool into boxes retried.
+
 ### 6. Assume no shared projects
 
 Per the key audit's end state (one key per distinct GCP project kept, plus the

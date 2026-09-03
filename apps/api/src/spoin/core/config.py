@@ -116,17 +116,24 @@ class Settings(BaseSettings):
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
     #: How many keys one topic gets for its whole generation run (ADR-0082).
-    #: This is the ONLY number in the hybrid regime: it sets both a topic's
-    #: internal ceiling (at most this many subtopic groups in flight, ADR-0074)
-    #: and how many topics run at once (`max_concurrent_topics` below). Raising
-    #: it makes each topic finish faster and fewer run at once; lowering it does
-    #: the reverse. 34 against the current 75-key pool is two boxes (7 keys spare
-    #: for the lease-less path) -- the smallest step up from ADR-0073's
-    #: one-topic-at-a-time that is still a step,
-    #: chosen over a narrower box because Run 8's per-minute behaviour is only
-    #: proven at one topic's worth of pressure and this doubles it rather than
-    #: tripling it. Revisit with a benchmark, not by feel.
-    topic_key_box_size: int = 34
+    #: `max_concurrent_topics` below derives from it (`pool // box_size`).
+    #:
+    #: 2026-09-03: back to **one box of the whole pool, one topic at a time**
+    #: after the box-34 / 2-concurrent benchmark hit a 95% 429 rate and
+    #: `AllCellsThrottledError` in 10 minutes (`b542r0bob` --
+    #: docs/notes/rate-limit-load-balancer-debugging.md). The next question is
+    #: whether one topic across all keys, paced (`gemini_send_gap_seconds`),
+    #: sustains; only then does splitting the pool into boxes get retried.
+    topic_key_box_size: int = 75
+    #: Minimum seconds between two sends to the SAME key, enforced by every
+    #: `LoadBalancer` (ADR-0084). The fix for the burst that floored the pool:
+    #: at fan-out, ~N subtopic groups all want a key at once, and without a gap
+    #: a handful of keys get hit repeatedly in the same second -- a burst the
+    #: provider's token bucket rejects even though the per-minute average is
+    #: fine. 4s per key caps each key at its believed 15/min ceiling AND spreads
+    #: the fan-out into a round-robin instead of a thundering herd. Tune with a
+    #: benchmark.
+    gemini_send_gap_seconds: float = 4.0
 
     # Batch sizes (ADR-0005). The free tier meters requests, not tokens, so these
     # are the difference between the corpus filling and not filling.

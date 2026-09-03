@@ -473,20 +473,12 @@ async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
 
 
 async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
-    """`max_attempts` counts cells BURNED, not calls made. A 2x2 grid gets 4
-    cell-attempts; throttling must not consume them, or a brief rate limit
-    surfaces as a hard failure while every key still has daily quota.
-
-    The throttles here all land on cells still ABOVE their rpm floor, which is
-    the ordinary case: AIMD's answer to them is to slow down and carry on, and
-    this test is the guard that it does carry on. See
-    `test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop` for the
-    other half -- what happens once slowing down has run out of room."""
+    """`max_attempts` counts cells BURNED, not calls made. A per-minute 429
+    parks its cell rather than spending it, so a short throttle run (fewer than
+    one full grid sweep) must still get through when a call finally succeeds --
+    the streak resets, nothing is marked exhausted."""
 
     generator = _generator()
-    # More throttled calls than the 2 keys x 1 model grid has cells, but each
-    # cell still has pace left to give up (rpm 5 -> 2 -> 1), so none of these
-    # counts as evidence the provider is refusing us outright.
     lb = generator._remainder_lb
     assert lb is not None
     lb.assign = AsyncMock(  # type: ignore[method-assign]
@@ -494,9 +486,6 @@ async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
     )
     lb.mark_exhausted = Mock()  # type: ignore[method-assign]
     lb.on_rate_limited = Mock()  # type: ignore[method-assign]
-    # Stubbing mark_rate_limited above means the real AIMD shrink never runs,
-    # so every cell stays at its configured rpm -- exactly the "still has pace
-    # to give up" condition this test is about.
 
     draft = CurriculumDraft(
         subtopics=[
@@ -511,12 +500,13 @@ async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
         ]
     )
     runnable = AsyncMock()
-    runnable.ainvoke = AsyncMock(side_effect=[*([_rpm_429()] * 9), draft])
+    # 3 throttles is under the 2x2 grid_size of 4, so the streak never trips.
+    runnable.ainvoke = AsyncMock(side_effect=[_rpm_429(), _rpm_429(), _rpm_429(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
         result = await generator.generate_curriculum("Topic", "desc")
 
     assert result is draft
-    assert lb.on_rate_limited.call_count == 9
+    assert lb.on_rate_limited.call_count == 3
     lb.mark_exhausted.assert_not_called()
 
 

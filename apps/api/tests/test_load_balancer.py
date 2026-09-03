@@ -44,6 +44,7 @@ def _lb(
     seed: dict[tuple[int, str], int] | None = None,
     unavailable: dict[str, float] | None = None,
     writer: object = None,
+    send_gap_s: float = 0.0,
 ) -> LoadBalancer:
     return LoadBalancer(
         name="test",
@@ -54,6 +55,7 @@ def _lb(
         rpd_seed=seed or {},
         now=_warm(),
         ledger_writer=writer,  # type: ignore[arg-type]
+        send_gap_s=send_gap_s,
     )
 
 
@@ -287,11 +289,72 @@ async def test_flush_writes_every_dirty_cell() -> None:
     assert sorted(writes) == [(0, _GEN, 2), (1, _GEN, 1)]
 
 
-async def test_is_at_floor() -> None:
-    lb = _lb(keys=(0,), think=[LadderRung(_THINK, 20, 5)])
-    assert not lb.is_at_floor(0, _THINK)
-    lb._cells[(0, _THINK)].learned_rpm = 1.0
-    assert lb.is_at_floor(0, _THINK)
+async def test_send_gap_paces_one_key_and_spreads_across_the_rest() -> None:
+    """The burst brake (ADR-0084): with a 4s gap, one key can't be hit twice
+    inside 4s -- a fan-out of many calls spreads across the other keys instead
+    of hammering one."""
+
+    lb = _lb(keys=(0, 1, 2), gen=[LadderRung(_GEN, 500, 15)], send_gap_s=4.0)
+    r0 = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(r0, Reservation)
+    first_key = r0.key_index
+
+    # Next two assigns in the same instant go to the OTHER keys, not back to first.
+    seen = {first_key}
+    for _ in range(2):
+        r = await lb.try_assign("generator", now=_NOW)
+        assert isinstance(r, Reservation)
+        assert r.key_index not in seen
+        seen.add(r.key_index)
+    assert seen == {0, 1, 2}
+
+    # All three keys are now inside their 4s gap -> a 4th call in the same
+    # instant gets a wait, not a cell.
+    assert isinstance(await lb.try_assign("generator", now=_NOW), float)
+
+    # 4s later the first key is free again.
+    got = await lb.try_assign("generator", now=_NOW + timedelta(seconds=4.1))
+    assert isinstance(got, Reservation)
+
+
+async def test_send_gap_zero_is_no_pacing() -> None:
+    lb = _lb(keys=(0,), gen=[LadderRung(_GEN, 500, 15)], send_gap_s=0.0)
+    for _ in range(3):
+        r = await lb.try_assign("generator", now=_NOW)
+        assert isinstance(r, Reservation)
+        assert r.key_index == 0  # same key, back to back, no gap
+
+
+async def test_paced_mode_shelves_the_window_and_learned_rpm() -> None:
+    """With a send gap on, the trailing-60s window and the learned ceiling are
+    dormant: a 429 parks the cell for its cooldown but does NOT ratchet
+    learned_rpm, and the window length never blocks an assign."""
+
+    lb = _lb(keys=(0,), think=[LadderRung(_THINK, 20, 5)], send_gap_s=4.0)
+    cell = lb._cells[(0, _THINK)]
+    r = await lb.try_assign("thinking", now=_NOW)
+    assert isinstance(r, Reservation)
+    lb.on_rate_limited(r, now=_NOW, per_minute=True)
+    assert cell.learned_rpm == 5.0  # unchanged -- learning is shelved
+    assert cell.cooldown_until > _NOW.timestamp()  # but the cell is parked
+
+
+async def test_dispatch_round_robins_evenly_across_cells() -> None:
+    """The primary sort key is per-run dispatch count, so 12 assigns across 3
+    keys land 4 apiece -- not piled onto whichever had the coldest ledger seed."""
+
+    lb = _lb(
+        keys=(0, 1, 2),
+        gen=[LadderRung(_GEN, 500, 15)],
+        seed={(0, _GEN): 400, (1, _GEN): 10, (2, _GEN): 0},
+        send_gap_s=0.0,
+    )
+    counts = {0: 0, 1: 0, 2: 0}
+    for i in range(12):
+        r = await lb.try_assign("generator", now=_NOW + timedelta(seconds=i * 0.01))
+        assert isinstance(r, Reservation)
+        counts[r.key_index] += 1
+    assert counts == {0: 4, 1: 4, 2: 4}
 
 
 def test_make_ledger_writer_returns_a_coroutine_callable() -> None:

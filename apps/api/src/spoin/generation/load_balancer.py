@@ -167,6 +167,14 @@ class _CellState:
     configured_rpm: int
     rpd_spent: int
     day: datetime
+    #: epoch seconds of this cell's last dispatch/send. The per-(key, model)
+    #: send gap (ADR-0084) is measured from here -- 4s → 15/min per cell, which
+    #: is also why the trailing window below is dormant under pacing.
+    last_send: float = 0.0
+    #: How many times THIS balancer has dispatched to this cell. The primary
+    #: sort key in `try_assign` -- strict round-robin so every (key, model) pair
+    #: carries an even share, not just whichever had the coldest ledger seed.
+    dispatched: int = 0
     window: deque[_Slot] = field(default_factory=deque)
     learned_rpm: float = 0.0
     cooldown_until: float = 0.0
@@ -219,6 +227,7 @@ class LoadBalancer:
         rpd_seed: dict[Cell, int],
         now: datetime,
         ledger_writer: LedgerWriter | None = None,
+        send_gap_s: float = 0.0,
     ) -> None:
         if not key_indices:
             raise ValueError("LoadBalancer needs at least one key")
@@ -233,6 +242,14 @@ class LoadBalancer:
         #: one box's keys.
         self._model_unavailable = model_unavailable
         self._ledger_writer = ledger_writer
+        #: Minimum seconds between two sends to the SAME `(key, model)` cell
+        #: (`settings.gemini_send_gap_seconds`). This is the burst brake AND,
+        #: at 4s = 15/min per cell, the whole rate limiter: with it on, the
+        #: trailing-60s window and the learned-rpm ceiling are dormant (a
+        #: constant gap already caps the rate and evens the spread). 0 re-enables
+        #: the window (`fake`, tests, and any experiment that sets the gap to 0).
+        self._send_gap_s = send_gap_s
+        self._paced = send_gap_s > 0.0
         self._lock = asyncio.Lock()
         self._cell_locks: dict[Cell, asyncio.Lock] = {}
         self._created_s = now.timestamp()
@@ -275,10 +292,6 @@ class LoadBalancer:
             lock = asyncio.Lock()
             self._cell_locks[cell] = lock
         return lock
-
-    def is_at_floor(self, key_index: int, model: str) -> bool:
-        cell = self._cells.get((key_index, model))
-        return cell is not None and cell.learned_rpm <= _RPM_FLOOR
 
     # -- assignment -------------------------------------------------------
 
@@ -339,10 +352,23 @@ class LoadBalancer:
                     if block_until > now_s:
                         soonest = min(soonest, block_until - now_s)
                         continue
-                    if len(cell.window) >= cell.ceiling:
+                    # Per-(key, model) send gap (ADR-0084): don't hit this exact
+                    # cell again until `_send_gap_s` has passed. 4s = 15/min per
+                    # cell, which IS the rate limiter when pacing is on.
+                    if self._send_gap_s > 0.0:
+                        gap_left = self._send_gap_s - (now_s - cell.last_send)
+                        if gap_left > 0.0:
+                            soonest = min(soonest, gap_left)
+                            continue
+                    # The trailing-60s window only gates when pacing is OFF --
+                    # a constant per-cell gap already caps the rate (see
+                    # `_paced`).
+                    if not self._paced and len(cell.window) >= cell.ceiling:
                         soonest = min(soonest, cell.window[0].sent_at + _WINDOW_S - now_s)
                         continue
-                    score = (cell.rpd_spent, len(cell.window), k)
+                    # Round-robin: fewest dispatches this run first, then the
+                    # coldest ledger seed, then key index.
+                    score = (cell.dispatched, cell.rpd_spent, k)
                     if best is None or score < best[2]:
                         best = (cell_id, cell, score)
                 # Model-major (ADR-0028): take the best key on the strongest rung
@@ -355,6 +381,8 @@ class LoadBalancer:
                 cell_id, cell, _ = best
                 slot = _Slot(sent_at=now_s)
                 cell.window.append(slot)
+                cell.last_send = max(cell.last_send, now_s)
+                cell.dispatched += 1
                 return Reservation(key_index=cell_id[0], model=cell_id[1], _slot=slot)
 
             if not any_model_checked:
@@ -374,21 +402,27 @@ class LoadBalancer:
 
     def note_send(self, res: Reservation, *, now: datetime) -> None:
         """The request is leaving now — move its window slot to the true send
-        time (ADR-0058's alignment fix). Under `cell_lock` the reservation gap
-        is real seconds, and counting a call in the minute it was reserved
-        rather than the minute it arrived is how our window drifts wide of the
-        provider's."""
+        time (ADR-0058's alignment fix) and re-anchor the per-cell send gap to
+        it, so a call delayed behind `cell_lock` still spaces the next one out
+        by the full gap."""
 
-        res._slot.sent_at = now.timestamp()
+        cell = self._cells[(res.key_index, res.model)]
+        now_s = now.timestamp()
+        res._slot.sent_at = now_s
+        cell.last_send = max(cell.last_send, now_s)
 
     async def on_success(self, res: Reservation, *, now: datetime) -> None:
         cell = self._cells[(res.key_index, res.model)]
         cell.rpd_spent += 1
         now_s = now.timestamp()
-        # Probe the learned ceiling back up: +1 per clean minute, capped at the
-        # configured rpm (the measurement only ever explains why the documented
-        # ceiling was too HIGH).
-        if cell.learned_rpm < cell.configured_rpm and now_s - cell.last_probe_up >= _WINDOW_S:
+        # Learned-rpm probe (dormant under pacing — the constant gap is the
+        # ceiling). Only when the window is the limiter: +1 per clean minute,
+        # capped at the configured rpm.
+        if (
+            not self._paced
+            and cell.learned_rpm < cell.configured_rpm
+            and now_s - cell.last_probe_up >= _WINDOW_S
+        ):
             cell.learned_rpm = min(float(cell.configured_rpm), cell.learned_rpm + 1.0)
             cell.last_probe_up = now_s
         await self._maybe_flush(res.key_index, res.model, cell)
@@ -401,14 +435,18 @@ class LoadBalancer:
         per_minute: bool,
         retry_after_s: float | None = None,
     ) -> None:
-        """A 429. Per-minute: park the cell and learn the real ceiling from the
-        number of sends that were in the window when it refused — a measured
-        cap, not AIMD's blind halving (ADR-0084). Per-day: the cell is spent
-        until the daily reset."""
+        """A 429. Per-minute: park the cell for the cooldown. When pacing is OFF
+        the cell also learns its real ceiling from the sends that were in the
+        window when it refused (a measured cap, not AIMD's blind halving); when
+        pacing is ON the constant gap is the only knob and the learned rpm stays
+        put. Per-day: the cell is spent until the daily reset."""
 
         cell = self._cells[(res.key_index, res.model)]
         now_s = now.timestamp()
         if per_minute:
+            cell.cooldown_until = now_s + (retry_after_s if retry_after_s else _COOLDOWN_S)
+            if self._paced:
+                return
             cell.prune(now_s)
             measured = max(1, len(cell.window))  # the refused call WAS sent — keep its slot
             if measured < cell.learned_rpm:
@@ -422,7 +460,6 @@ class LoadBalancer:
                     cell.configured_rpm,
                 )
             cell.learned_rpm = max(_RPM_FLOOR, min(cell.learned_rpm, float(measured)))
-            cell.cooldown_until = now_s + (retry_after_s if retry_after_s else _COOLDOWN_S)
         else:
             cell.rpd_spent = cell.rpd_limit
             logger.warning(

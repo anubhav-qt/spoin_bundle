@@ -888,6 +888,9 @@ class GeminiContentGenerator(ContentGenerator):
         #: provider, not one box's (ADR-0084).
         self._model_unavailable: dict[str, float] = {}
         self._ledger_writer = make_ledger_writer()
+        #: Min seconds between two sends to one key, passed into every balancer
+        #: (ADR-0084 burst brake).
+        self._send_gap_s = settings.gemini_send_gap_seconds
         #: The pool's key indices, minus a fixed remainder held back for the
         #: claim-less path (ADR-0082/0084). `pool - max_topics*box` keys stay
         #: unboxed; a box and the remainder balancer never share a key.
@@ -942,6 +945,7 @@ class GeminiContentGenerator(ContentGenerator):
                 rpd_seed=await seed_rpd(keys, models, now=now),
                 now=now,
                 ledger_writer=self._ledger_writer,
+                send_gap_s=self._send_gap_s,
             )
         return self._remainder_lb
 
@@ -971,6 +975,7 @@ class GeminiContentGenerator(ContentGenerator):
             rpd_seed={cell: s for cell, s in seed_all.items() if cell[0] in box_keys},
             now=now,
             ledger_writer=self._ledger_writer,
+            send_gap_s=self._send_gap_s,
         )
         return KeyBox(box_id=box_id, key_indices=box_keys, balancer=balancer)
 
@@ -1075,37 +1080,18 @@ class GeminiContentGenerator(ContentGenerator):
         per-minute 429 doesn't use a cell up -- it parks it -- so counting it
         here would let a brief throttle burn the whole grid's budget.
 
-        **`max_attempts` counts cells BURNED, not calls made** (ADR-0058). A
-        per-minute 429 doesn't use a cell up -- it parks it for a few seconds --
-        so counting it here would let a brief throttle burn the whole grid's
-        attempt budget and surface as a hard failure.
-
-        **Throttle retries are bounded by evidence, not by erosion** (ADR-0065).
-        They used to be bounded by quota erosion: each retry's `acquire()`
-        billed a cell's RPD and never gave it back, so a throttle storm walked
-        the whole grid toward its ceiling and terminated by exhausting it. That
-        worked, and cost a full day's budget to do it.
-
-        The charge is refunded now, so the loop needs a real stopping condition
-        instead. It counts only throttles arriving on a cell ALREADY at its rpm
-        floor, because those are the only ones that say anything about the
-        provider: a 429 on a cell we had not yet slowed down means our pacing
-        was too fast, and AIMD's response is to slow down and try again -- that
-        is the mechanism working, not failing. A 429 on a cell already down to
-        one request per minute has no such answer; there is no slower to go.
-        `grid_size` of those in a row, with no success in between, means every
-        cell in the grid refused us at the slowest pace we have. Any success
-        resets the count."""
+        **The retry loop stops on a per-minute-429 streak.** Every per-minute
+        429 with no success in between adds one; any success resets it.
+        `grid_size` (one full key x model sweep) in a row means the pool is
+        refusing us wholesale -- `AllCellsThrottledError`, not exhaustion,
+        because the daily budget is intact."""
 
         lb = CURRENT_BALANCER.get() or await self._remainder()
         ladder = lb.ladder(kind)
         max_attempts = lb.key_count * len(ladder)
-        # Not a tuning knob: one full sweep of the grid, all of it at the rpm
-        # floor and all of it still refusing, is the smallest streak that
-        # distinguishes "this cell is busy" from "nothing here serves us now".
         grid_size = max_attempts
         cells_burned = 0
-        floored_throttles = 0
+        throttle_streak = 0
         last_server_error: ServerError | None = None
         # A 503/504 is per-MODEL, not per-key (every key hits the same wall):
         # once a model stays UNAVAILABLE through its own backoff, exclude it so
@@ -1156,27 +1142,22 @@ class GeminiContentGenerator(ContentGenerator):
                 if real_error.code == 429:
                     limit = _classify_rate_limit(real_error)
                     if not limit.is_daily:
-                        # Throttled, not spent. Park the cell, learn the real
-                        # ceiling from the sends that were in the window when it
-                        # refused (ADR-0084) -- read the floor state BEFORE that,
-                        # since it is about the pace this call went out at.
-                        was_floored = lb.is_at_floor(key_index, model)
+                        # Throttled, not spent -- park the cell and move on
+                        # without burning it.
                         lb.on_rate_limited(
                             res,
                             now=datetime.now(UTC),
                             per_minute=True,
                             retry_after_s=limit.retry_after_s,
                         )
-                        if was_floored:
-                            floored_throttles += 1
-                            if floored_throttles >= grid_size:
-                                raise AllCellsThrottledError(
-                                    f"{floored_throttles} consecutive per-minute 429s at the "
-                                    f"one-request-per-minute floor with no success -- every "
-                                    f"cell in the {lb.key_count}x{len(ladder)} grid is "
-                                    f"refusing us at the slowest pace we have. Daily quota "
-                                    f"remains; this is throttling, not exhaustion."
-                                ) from exc
+                        throttle_streak += 1
+                        if throttle_streak >= grid_size:
+                            raise AllCellsThrottledError(
+                                f"{throttle_streak} consecutive per-minute 429s with no "
+                                f"success -- every cell in the {lb.key_count}x{len(ladder)} "
+                                f"grid is refusing us. Daily quota remains; this is "
+                                f"throttling, not exhaustion."
+                            ) from exc
                         continue
                     lb.on_rate_limited(res, now=datetime.now(UTC), per_minute=False)
                     logger.warning(
@@ -1233,11 +1214,10 @@ class GeminiContentGenerator(ContentGenerator):
                 cells_burned += 1
                 continue
             assert isinstance(result, schema)
-            # A call got through: the cell can carry a little more than we last
-            # believed (probe the learned ceiling up), and the throttle streak
-            # that would otherwise end this loop is genuinely broken (ADR-0084).
+            # A call got through -- the throttle streak that would otherwise end
+            # this loop is genuinely broken (ADR-0084).
             await lb.on_success(res, now=datetime.now(UTC))
-            floored_throttles = 0
+            throttle_streak = 0
             return result
         if last_server_error is not None:
             # Every cell stayed UNAVAILABLE -- NOT quota exhaustion, so re-raise

@@ -54,22 +54,23 @@ We introduce two complementary pacing mechanisms to de-synchronize network arriv
 
 ### 2. Initial Fanout Jitter in `nodes.py` (`gemini_initial_dispatch_jitter_seconds`)
 - Before entering `_generate_subtopic_cards`, each subtopic group branch sleeps for a
-  random jitter `uniform(0.0, gemini_initial_dispatch_jitter_seconds)` (default `1.5s`).
-- This prevents dozens of branches from stampeding simultaneously on balancer locks,
-  database reads, or local event loops. Active only when `generator != "fake"`.
+  random jitter `uniform(0.5, gemini_initial_dispatch_jitter_seconds)` (default `3.5s`).
+- The 0.5s floor prevents branches from firing at $t \approx 0$, while the 3.5s ceiling
+  disperses 25–35 subtopics across 3 full seconds (1 arrival every ~100–140ms), joining
+  the balancer's 1.2s stagger queue smoothly. Active only when `generator != "fake"`.
 
 ### 3. Perimeter Shedding Backoff in `_invoke_with_retry`
 - In Benchmark 8, when Google shed a heavy payload with a bare 429, the retry loop
   in `_invoke_with_retry` immediately tried the next cell in the box with no delay.
   With 74 other keys available, it machine-gunned 148 cells in under 2 minutes.
-- When an un-scoped/bare 429 arrives, the caller now pauses for `5.0s + random.uniform(0.0, 2.0s)`
+- When an un-scoped/bare 429 arrives, the caller now pauses for `5.0s + random.uniform(0.5, 3.5s)`
   before requesting the next cell from the balancer. This decorrelated backoff gives
   the gateway perimeter window time to drain and prevents retrying coroutines from
   synchronizing their next attempts.
 
 ### 4. Inter-Round Drafting Jitter in `nodes.py`
 - In `_generate_subtopic_cards`, subtopics that finish planning simultaneously can
-  re-cluster on subsequent rounds. An inter-round jitter `random.uniform(0.5, 1.5s)`
+  re-cluster on subsequent rounds. An inter-round jitter `random.uniform(0.5, 3.0s)`
   spaces out subsequent drafting rounds (rounds 2, 3, 4).
 
 ## Consequences

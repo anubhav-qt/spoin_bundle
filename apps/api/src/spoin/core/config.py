@@ -147,9 +147,9 @@ class Settings(BaseSettings):
     #: 0.0 disables dispatch staggering.
     gemini_dispatch_stagger_seconds: float = 1.2
     #: Maximum random jitter (seconds) applied before entering a subtopic group's
-    #: card generation branch (ADR-0086), desynchronizing the initial wave before
-    #: reaching the balancer or database. 0.0 disables initial jitter.
-    gemini_initial_dispatch_jitter_seconds: float = 1.5
+    #: card generation branch (ADR-0086), desynchronizing the initial wave across
+    #: a 0.5s-3.5s window before reaching the balancer or database. 0.0 disables initial jitter.
+    gemini_initial_dispatch_jitter_seconds: float = 3.5
 
     # Batch sizes (ADR-0005). Batching is still right -- one 15-card call beats
     # 15 single-card calls on every axis -- but the reason once stated here, "the

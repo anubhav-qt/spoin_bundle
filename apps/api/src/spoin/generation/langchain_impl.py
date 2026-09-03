@@ -1204,7 +1204,7 @@ class GeminiContentGenerator(ContentGenerator):
                         backoff_s = (
                             limit.retry_after_s
                             if limit.retry_after_s is not None
-                            else (5.0 + random.uniform(0.0, 2.0))
+                            else (5.0 + random.uniform(0.5, 3.5))
                         )
                         logger.info(
                             "lb %s: cell key=%d model=%s rate-limited (streak %d/%d) -- "

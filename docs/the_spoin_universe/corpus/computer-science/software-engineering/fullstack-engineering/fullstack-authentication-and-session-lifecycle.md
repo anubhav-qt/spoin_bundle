@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, authentication, authorization, session-manag
 
 # Fullstack Authentication and Session Lifecycle
 
-Fullstack authentication encompasses the complete lifecycle of establishing, persisting, validating, and terminating user identity across client browsers, edge proxies, and origin server runtimes. A resilient fullstack auth architecture navigates the conflicting threat models of Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF), maintaining secure session continuity while minimizing database lookup overhead.
-
 ## Client Token Storage: Web Storage vs HttpOnly Cookies
 
 Storing authentication credentials on the client requires balancing two opposing security attack vectors:

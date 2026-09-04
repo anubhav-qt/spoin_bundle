@@ -17,8 +17,6 @@ topic_tags:
 
 # Classical Greek Philosophy: Socrates, Plato, and Aristotle
 
-Classical Athenian philosophy (5th–4th centuries BCE) established the conceptual grammar, ethical categories, and metaphysical systems that defined subsequent Western intellectual history. The developmental arc spanning Socrates, his student Plato, and Plato's student Aristotle moved from dialectical deconstruction to transcendent idealism and empirical systematic naturalism.
-
 ## The Socratic Mission, Method, and Intellectualism
 
 Socrates of Athens (470–399 BCE) shifted Greek philosophical inquiry away from Presocratic natural cosmology toward human ethics, moral definitions, and the cultivation of the soul (*psyche*). Socrates committed no philosophical treatises to writing; his thought is primarily reconstructed through the early dialogues of Plato, alongside accounts by Xenophon, Aristophanes, and retrospective assessments by Aristotle.

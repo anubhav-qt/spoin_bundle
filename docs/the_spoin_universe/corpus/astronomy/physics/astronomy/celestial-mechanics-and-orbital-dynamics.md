@@ -11,8 +11,6 @@ topic_tags: [astronomy, celestial-mechanics, keplers-laws, gravitation, orbital-
 
 # Celestial Mechanics and Orbital Dynamics
 
-Celestial mechanics analyzes the motions of astronomical bodies under the influence of mutual gravitational fields. Originating in the empirical kinematic laws of Johannes Kepler and formalized through Newtonian and relativistic dynamics, celestial mechanics provides the mathematical apparatus governing planetary orbits, spacecraft trajectories, gravitational three-body interactions, and tidal disruption limits.
-
 ## Kepler's Laws of Planetary Motion
 
 Between 1609 and 1619, Johannes Kepler derived three empirical laws governing planetary motion based on Tycho Brahe's precision observational catalog of Mars:

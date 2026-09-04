@@ -11,8 +11,6 @@ topic_tags: [astronomy, extragalactic, galaxy-morphology, cosmic-web, galaxy-clu
 
 # Extragalactic Astronomy and Cosmic Large-Scale Structure
 
-Extragalactic astronomy investigates the universe beyond the boundaries of the Milky Way. Spanning distances from nearby satellite galaxies to cosmological horizons billions of parsecs away, this discipline analyzes galaxy morphology, merger-driven structural evolution, the sponge-like filamentary architecture of the Cosmic Web, and general relativistic gravitational lensing.
-
 ## The Hubble-de Vaucouleurs Morphological Classification
 
 In 1926, Edwin Hubble established the foundational morphological classification of galaxies, historically visualized as the **Hubble Tuning Fork** and later expanded by Gérard de Vaucouleurs:

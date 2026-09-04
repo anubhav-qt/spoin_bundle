@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, bff, caching, edge-caching, surrogate-keys, 
 
 # Data Aggregation, Caching Tiers, and BFF Architecture
 
-Fullstack architectures coordinate how disparate backend data stores are aggregated, transformed, and cached before presentation on client devices. As organizations migrate from monolithic backends toward microservices and third-party APIs, direct client-to-service communication degrades performance and security. Fullstack engineering resolves these bottlenecks through dedicated aggregation layers, such as the Backend-for-Frontend (BFF) pattern, coupled with multi-tiered caching pipelines.
-
 ## The Backend-for-Frontend (BFF) Architectural Pattern
 
 In large-scale web systems, general-purpose backend microservices expose domain-centric, coarse-grained APIs optimized for database normalization rather than user interface presentation. If client browsers communicate directly with these downstream services:

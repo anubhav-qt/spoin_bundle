@@ -17,9 +17,7 @@ topic_tags:
 
 # Classical Eastern Philosophical Traditions: Confucianism, Daoism, Madhyamaka Buddhism, Advaita Vedanta, and Nyaya
 
-In parallel with Mediterranean classical antiquity, Asian intellectual traditions developed rigorous epistemic, metaphysical, and normative systems. These traditions interrogated human nature, social order, logical inference, and the ultimate nature of consciousness and reality.
-
-## Confucianism: Moral Cultivation, Ritual Propriety, and the Junzi
+## Confucianism: Core Virtues, the Junzi, and Zhengming
 
 Confucianism (Ruism / *Rujia*) originated during China's Spring and Autumn and Warring States periods (6th–3rd centuries BCE) amidst widespread feudal warfare and societal disintegration. Its founder, Kong Fuzi (Confucius, 551–479 BCE), recorded in the *Analects* (*Lunyu*), proposed that political stability requires moral cultivation and the restoration of normative relational roles.
 
@@ -31,9 +29,12 @@ Confucian ethics centers on a constellation of core virtues:
 
 The ethical ideal is the **Junzi** (the exemplary person or gentleman), contrasted with the **Xiaoren** (the petty, small-minded individual who acts strictly for self-aggrandizement). Politically, Confucius advocated the **Rectification of Names** (*Zhengming*): a society collapses when linguistic labels divorce from functional reality. A father must act as a true father, a ruler as a true ruler (*Analects* 12.11). Rulers must govern through moral charisma and exemplary virtue (**De**), rather than punitive corporal law (**Xing**).
 
-Later Confucian thinkers debated human nature (*xing*):
-- **Mencius (Mengzi, c. 372–289 BCE):** Maintained that human nature is fundamentally good (*Xing Shan*), possessing four innate moral "sprouts" (*duan*): compassion (sprout of *Ren*), shame (sprout of *Yi*), deference (sprout of *Li*), and discernment of right/wrong (sprout of *Zhi*). Evil arises from social neglect and adverse environments.
-- **Xunzi (c. 310–235 BCE):** Maintained that human nature is innately chaotic, selfish, and bad (*Xing E*). Moral virtue is not an innate biological sprout, but an artificial, hard-won human achievement (*wei*) cultivated through rigorous education, external ritual discipline (*Li*), and teachers.
+## The Confucian Human Nature Debate: Mencius Versus Xunzi
+
+Later classical Confucian thinkers engaged in a foundational debate over human nature (*xing*):
+
+- **Mencius (Mengzi, c. 372–289 BCE):** Maintained that human nature is fundamentally good (*Xing Shan*), possessing four innate moral "sprouts" (*duan*): compassion (sprout of *Ren*), shame (sprout of *Yi*), deference (sprout of *Li*), and discernment of right/wrong (sprout of *Zhi*). Evil arises from social neglect and adverse environments, like a drought stunting fertile crops.
+- **Xunzi (c. 310–235 BCE):** Maintained that human nature is innately chaotic, selfish, and bad (*Xing E*). Moral virtue is not an innate biological sprout, but an artificial, hard-won human achievement (*wei*) cultivated through rigorous education, external ritual discipline (*Li*), and authoritative teachers straightening crooked wood.
 
 ## Daoism: The Ineffable Way, Wu Wei, and Zhuangzi's Relativism
 

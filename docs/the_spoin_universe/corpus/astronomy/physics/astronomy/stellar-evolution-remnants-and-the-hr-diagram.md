@@ -11,8 +11,6 @@ topic_tags: [astronomy, stellar-evolution, hr-diagram, white-dwarfs, chandrasekh
 
 # Stellar Evolution, Remnants, and the Hertzsprung-Russell Diagram
 
-Stellar evolution tracks the physical, structural, and chemical transformations of a star across cosmic time. Driven by the relentless inward pull of gravity against progressively exhausted nuclear fuel reserves, a star's evolutionary pathway and final compact remnant are dictated almost entirely by its initial zero-age main sequence (ZAMS) mass.
-
 ## The Hertzsprung-Russell (H-R) Diagram
 
 The Hertzsprung-Russell (H-R) diagram maps the fundamental observational properties of stars by plotting **Luminosity** $\log(L/L_\odot)$ (or absolute magnitude $M_V$, decreasing upward) against **Effective Surface Temperature** $T_{eff}$ (or spectral type / color index $B-V$, arranged conventionally from hottest on the left to coolest on the right):

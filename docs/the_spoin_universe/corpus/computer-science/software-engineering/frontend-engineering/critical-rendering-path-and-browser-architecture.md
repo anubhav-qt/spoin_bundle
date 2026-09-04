@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, browser-internals, rendering-engine, dom, css
 
 # Critical Rendering Path and Browser Architecture
 
-The critical rendering path represents the sequence of algorithmic transformations a web browser executes to convert raw network byte streams into interactive pixels rendered on a display device. Modern web browsers manage this execution across sandboxed, multiprocess architectures designed to isolate failures, prevent security boundary breaches, and maintain fluid frame rates.
-
 ## Multi-Process Browser Process Isolation
 
 Modern browser engines, such as Chromium and WebKit, partition execution responsibilities across separated operating system processes rather than a single monolithic application thread. The main Browser Process coordinates top-level application functions, including tab management, user address inputs, navigation history, and network socket allocations.

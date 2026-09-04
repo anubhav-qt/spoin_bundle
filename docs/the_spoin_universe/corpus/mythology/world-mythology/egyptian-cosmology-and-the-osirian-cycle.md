@@ -10,8 +10,6 @@ topic_tags: [mythology, ancient-egypt, osiris, isis, ra, maat, duat, horus, keme
 
 # Egyptian Cosmology and the Osirian Cycle
 
-Ancient Egyptian religious cosmology was centered on the preservation of *Ma'at*—the delicate cosmic harmony of truth, justice, balance, and order—against the entropic forces of *Isfet* (chaos). Rooted in the biological rhythms of the Nile's annual inundation and the daily trajectory of the sun, Egyptian myth articulated sacred kingship, death and mummification, and the perpetual rejuvenation of the cosmos through rich liturgical cycles.
-
 ## Theological Traditions of the Nile
 
 Ancient Egyptian religion was not an absolute monolithic dogma, but a polycentric network of major theological traditions localized at distinct cult capitals:
@@ -20,7 +18,7 @@ Ancient Egyptian religion was not an absolute monolithic dogma, but a polycentri
 - **The Hermopolitan Ogdoad (Eight Deities):** The theological school of Hermopolis (Khmun) focused on four primordial gender-paired couples personifying pre-creation chaos: Nun and Naunet (primordial waters), Huh and Hauhet (boundless infinity), Kuk and Kauket (primordial darkness), and Amun and Amaunet (hiddenness). Their kinetic interactions produced the primeval cosmic egg or lotus from which the solar infant emerged.
 - **The Memphite Theology of Ptah:** Inscribed on the 25th-Dynasty Shabaka Stone, the priesthood of Memphis developed an intellectualized, logos-centric creation doctrine. The master artisan god **Ptah** created all gods, cities, and living creatures by first conceiving their forms within his *Heart* (the seat of thought and intention) and then commanding them into physical reality through his *Tongue* (the spoken word of authority and divine magic, *Heka*).
 
-## The Osirian Mythic Cycle: Kingship, Murder, and Resurrection
+## The Osirian Mythic Cycle: Murder, Dismemberment, and Mummification
 
 The myth of Osiris provided the theological justification for Egyptian pharaonic succession and the promise of personal resurrection:
 
@@ -31,6 +29,10 @@ At a grand banquet, Set promised the chest to anyone who fit inside it perfectly
 Isis initiated an epic search, recovered her husband's body encased in a royal palace pillar in Byblos, and hid it in the Nile Delta swamps. Set discovered the cache while hunting, severed Osiris's corpse into fourteen pieces, and scattered them across the nomes of Egypt.
 
 Undeterred, Isis and Nephthys combed Egypt, retrieving thirteen parts (the phallus was eaten by an oxyrhynchus fish; Isis crafted a consecrated golden replica). Assisted by the jackal god **Anubis**, Isis performed the first rites of mummification, wrapping the limbs in linen and binding the shattered flesh with protective amulets. Transforming into a kite (a bird of prey), Isis beat her wings above Osiris's lifeless body, breathing life into him long enough to conceive a son and heir: **Horus**.
+
+## The Contendings of Horus and Seth: Pharaonic Succession and Sovereignty
+
+Following the mummification and revival of Osiris, the divine drama shifted to succession and the cosmic rule of the living:
 
 Osiris, unable to dwell permanently among the living, descended into the underworld (*Duat*) to reign as the eternal sovereign judge of the dead. Isis raised Horus in secret amid the papyrus marshes of Chemmis, sheltering him from Set's scorpions. Matured, Horus contested Set's usurpation before the divine tribunal (*The Contendings of Horus and Seth*). After centuries of legal debates and violent duels, Horus was awarded the terrestrial throne.
 

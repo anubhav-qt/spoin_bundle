@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, state-synchronization, optimistic-ui, websoc
 
 # Client-Server State Synchronization and Optimistic Mutations
 
-State management in fullstack applications bridges two fundamentally distinct computational environments: local volatile client memory and remote persistent server databases. Coordinating state mutations across these domains requires managing asynchronous network latencies, handling transient connection failures, and reconciling concurrent edits through optimistic update lifecycles and conflict resolution models.
-
 ## The Mutation Lifecycle: Pessimistic vs Optimistic Updates
 
 When a user performs an action that mutates server data (such as starring an item, editing a title, or submitting a payment), the fullstack system orchestrates execution along one of two synchronization models:

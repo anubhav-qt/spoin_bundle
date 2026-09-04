@@ -10,8 +10,6 @@ topic_tags: [mythology, greek-mythology, roman-mythology, theogony, titans, zeus
 
 # Greco-Roman Pantheon and Mythic Succession
 
-Classical Greco-Roman mythology chronicles the establishment of cosmic order through a violent generational succession of divine dynasties. Rooted in archaic Greek epic poetry (Hesiod, Homer) and later adapted into Augustan Roman civic and literary traditions (Virgil, Ovid), this canon explores the confrontation between raw primordial nature and Olympian civilization, the boundary between divine sovereignty and mortal tragedy, and the immutable authority of Fate (*Moira*).
-
 ## Hesiod's Theogony: The Generational Succession
 
 Archaic Greek cosmogony, canonized in Hesiod's *Theogony* (c. 700 BCE), charts the genealogy of the gods from formless primordial states through successive violent coups:

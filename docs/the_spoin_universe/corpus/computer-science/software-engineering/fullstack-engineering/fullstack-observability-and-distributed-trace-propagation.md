@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, observability, distributed-tracing, w3c-trac
 
 # Fullstack Observability and Distributed Trace Propagation
 
-Fullstack observability provides unified, end-to-end visibility into application behavior, performance bottlenecks, and runtime failures across the client-server continuum. In traditional architectures, client-side Real User Monitoring (RUM) and backend Application Performance Monitoring (APM) operate in isolated telemetry silos. Fullstack observability bridges these domains through standardized context propagation headers, distributed tracing graphs, and secure production source map de-minification.
-
 ## The Telemetry Disconnect in Multi-Tier Systems
 
 Modern web applications present complex, distributed failure topologies. When a user experiences an error (such as a stalled checkout button or a failed form submission), traditional telemetry systems capture disconnected fragments:

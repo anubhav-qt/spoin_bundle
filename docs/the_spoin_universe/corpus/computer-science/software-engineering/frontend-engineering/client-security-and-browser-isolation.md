@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, security, sop, xss, csp, cors, trusted-types,
 
 # Client Security and Browser Isolation
 
-Web browsers operate as hostile multi-tenant execution environments where untrusted scripts from diverse origins execute within the same client runtime. Client security engineering enforces strict process isolation boundaries, defense-in-depth sanitization mechanisms, cryptographic resource integrity validation, and origin-level access control models to safeguard user data against unauthorized exfiltration.
-
 ## The Same-Origin Policy (SOP) Foundation
 
 The Same-Origin Policy (SOP) serves as the foundational security boundary of the web platform. Under SOP, an origin is defined strictly by the tuple of `<scheme, host, port>`:

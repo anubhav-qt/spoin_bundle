@@ -11,8 +11,6 @@ topic_tags: [astronomy, stellar-structure, nucleosynthesis, pp-chain, cno-cycle,
 
 # Stellar Structure and Stellar Nucleosynthesis
 
-Stars are self-gravitating, continuous fusion reactors existing in dynamic equilibrium. A star maintains structural stability by balancing inward gravitational collapse against outward thermal and radiation pressure. The internal anatomy, lifetime, and nucleosynthetic output of a star are dictated fundamentally by four coupled differential equations of stellar structure and the quantum mechanics of nuclear fusion.
-
 ## The Fundamental Equations of Stellar Structure
 
 A spherically symmetric, non-rotating star in mechanical and thermal equilibrium is described at radial distance $r$ by four governing differential equations:

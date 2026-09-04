@@ -11,8 +11,6 @@ topic_tags: [astronomy, solar-system, planetary-science, terrestrial-planets, ga
 
 # The Solar System and Planetary Science
 
-Planetary science investigates the formation, geophysical differentiation, atmospheric evolution, and orbital distribution of celestial bodies within gravitationally bound star systems. The Solar System serves as the empirical archetype for comparative planetology, characterized by distinct thermal condensation zones, sharply partitioned planetary classes, and vast peripheral reservoirs of primordial icy planetesimals.
-
 ## The Nebular Hypothesis and the Frost Line
 
 The Solar System formed approximately $4.567\text{ billion years ago}$ from the gravitational collapse of a fragmented portion of a giant interstellar molecular cloud composed primarily of hydrogen and helium enriched with heavier stellar nucleosynthetic debris.

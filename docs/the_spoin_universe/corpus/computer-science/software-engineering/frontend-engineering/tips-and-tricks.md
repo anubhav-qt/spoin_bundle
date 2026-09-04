@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, tips-and-tricks, debugging, browser-gotchas, 
 
 # Frontend Engineering Tips and Tricks
 
-Real-world frontend development frequently involves navigating non-obvious engine behaviors, subtle lifecycle hazards, and complex browser platform specifications. This compilation details battle-tested failure modes, underlying architectural causes, and robust production mitigations drawn from real-world postmortems and practitioner experience.
-
 ## The Stacking Context Trap: Resolving the `z-index: 99999` Illusion
 
 In production user interfaces, a common bug occurs when an engineer sets `z-index: 99999` on a modal dialog, dropdown menu, or tooltip, yet the element remains visually trapped underneath an adjacent card or navigation bar with `z-index: 1`.

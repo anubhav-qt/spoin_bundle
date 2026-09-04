@@ -10,8 +10,6 @@ topic_tags: [mythology, mesopotamia, sumerian, babylonian, enuma-elish, gilgames
 
 # Mesopotamian and Ancient Near Eastern Traditions
 
-Mesopotamian mythology, flourishing between the Tigris and Euphrates rivers from the fourth through the first millennium BCE, forms the world's oldest recorded literary and religious canon. Preserved on clay cuneiform tablets in Sumerian and Akkadian dialects, Mesopotamian myth explores cosmic statecraft, the fragile boundary between order and violent chaos, the psychological shock of mortality, and the existential subservience of humanity to capricious deities.
-
 ## The Cuneiform Canon and Literary Stratification
 
 The mythological corpus of ancient Mesopotamia represents an evolving synthesis across four major cultural dynasties: Sumerian city-states (such as Uruk, Ur, and Eridu), the Akkadian Empire of Sargon, the Old and Neo-Babylonian Empires, and the Assyrian Empire.

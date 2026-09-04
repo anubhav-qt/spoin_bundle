@@ -24,7 +24,7 @@ Transport layer protocols govern how data moves between processes across host ne
 
 User Datagram Protocol (UDP, RFC 768) provides a connectionless, minimal message transport without reliability, sequencing, flow control, or congestion management. A UDP packet has an 8-byte header containing source port, destination port, payload length, and checksum. UDP incurs zero handshake latency (0-RTT), carries no retransmission overhead, and delivers packets directly to the application layer in whatever order they arrive. UDP serves as the transport substrate for protocols requiring predictable latency over strict completeness (DNS, real-time media), as well as custom user-space transport protocols like QUIC.
 
-## Evolution of the HTTP Wire Format: HTTP/1.1 to HTTP/3
+## HTTP/1.1 and HTTP/2: From Plaintext Delimiting to Binary Framing
 
 In June 2022, the Internet Engineering Task Force (IETF) obsoleted RFC 7230–7235 and RFC 7540, establishing a modular specification suite: RFC 9110 (HTTP Semantics), RFC 9111 (HTTP Caching), RFC 9112 (HTTP/1.1), RFC 9113 (HTTP/2), and RFC 9114 (HTTP/3). RFC 9110 defines uniform semantics—methods, status codes, and header fields—shared across all wire implementations.
 
@@ -32,7 +32,11 @@ HTTP/1.1 (RFC 9112) transmits plaintext messages over TCP. Persistent connection
 
 HTTP/2 (RFC 9113) addresses application-level HoL blocking by replacing plaintext delimited streams with a binary framing layer over a single TCP connection. Communication is divided into discrete binary frames (`HEADERS`, `DATA`, `SETTINGS`, `RST_STREAM`) multiplexed over independent bidirectional streams identified by stream IDs. HTTP/2 employs HPACK (RFC 7541) to compress repetitive headers using static and dynamic indexing tables. However, because HTTP/2 multiplexes streams over a single TCP byte stream, packet loss causes transport-level HoL blocking: when one TCP packet drops, all multiplexed HTTP/2 streams freeze until retransmission completes.
 
-HTTP/3 (RFC 9114) maps HTTP semantics onto the QUIC transport protocol (RFC 9000), which operates over UDP. QUIC integrates transport setup and TLS 1.3 cryptographic negotiation into a single 1-RTT handshake (or 0-RTT for resumed sessions). QUIC implements stream multiplexing natively at the transport layer: each stream maintains independent flow control and byte offsets. Dropping a packet on stream A delays only stream A, allowing streams B and C to proceed without stall. To eliminate HoL blocking during header decompression, HTTP/3 replaces HPACK with QPACK (RFC 9204), which uses separate unidirectional control streams to synchronize encoder state asynchronously. Furthermore, QUIC identifies connections via opaque Connection IDs (CIDs) rather than the network 4-tuple `(source IP, source port, destination IP, destination port)`, allowing active client sessions to survive IP address changes (connection migration) across Wi-Fi and mobile networks.
+## HTTP/3 and QUIC: Eliminating Head-of-Line Blocking over UDP
+
+HTTP/3 (RFC 9114) maps HTTP semantics onto the QUIC transport protocol (RFC 9000), which operates over UDP. QUIC integrates transport setup and TLS 1.3 cryptographic negotiation into a single 1-RTT handshake (or 0-RTT for resumed sessions). QUIC implements stream multiplexing natively at the transport layer: each stream maintains independent flow control and byte offsets. Dropping a packet on stream A delays only stream A, allowing streams B and C to proceed without stall.
+
+To eliminate HoL blocking during header decompression, HTTP/3 replaces HPACK with QPACK (RFC 9204), which uses separate unidirectional control streams to synchronize encoder state asynchronously. Furthermore, QUIC identifies connections via opaque Connection IDs (CIDs) rather than the network 4-tuple `(source IP, source port, destination IP, destination port)`, allowing active client sessions to survive IP address changes (connection migration) across Wi-Fi and mobile networks.
 
 ## Real-Time Full-Duplex Channels: WebSockets versus Server-Sent Events
 

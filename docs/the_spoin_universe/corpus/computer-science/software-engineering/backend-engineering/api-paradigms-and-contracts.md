@@ -26,6 +26,8 @@ The Richardson Maturity Model (introduced by Leonard Richardson in 2008) classif
 - **Level 2 (HTTP Verbs):** The API aligns operations with standardized HTTP methods defined in RFC 9110 and returns appropriate HTTP status codes (such as `200 OK`, `201 Created`, `204 No Content`, `400 Bad Request`, `404 Not Found`, and `409 Conflict`). This is the dominant architectural level of production "RESTful" APIs.
 - **Level 3 (Hypermedia Controls / HATEOAS):** Responses embed hypermedia controls (`_links`, HAL, JSON:API) that advertise permissible next state transitions dynamically. Clients navigate the application graph through discovered links rather than hardcoding URI routing schemes.
 
+## HTTP Method Semantics: Safety and Idempotency Contracts
+
 RFC 9110 defines critical behavioral contracts across HTTP methods:
 - **Safe Methods:** Methods whose semantics are strictly read-only and produce no state mutation on the origin server (`GET`, `HEAD`, `OPTIONS`, `TRACE`). Safe methods are cacheable by default.
 - **Idempotent Methods:** Methods where the intended effect on server state of multiple identical requests is identical to that of a single request. `PUT` (complete resource replacement) and `DELETE` (resource removal) are idempotent: executing `DELETE /items/5` repeatedly leaves the item absent, regardless of whether the HTTP response transitions from `204 No Content` to `404 Not Found`. `GET` and `HEAD` are safe and trivially idempotent.

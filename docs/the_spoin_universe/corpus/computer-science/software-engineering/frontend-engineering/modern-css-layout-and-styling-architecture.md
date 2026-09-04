@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, css, modern-css, flexbox, css-grid, subgrid, 
 
 # Modern CSS Layout and Styling Architecture
 
-Cascading Style Sheets (CSS) govern the spatial presentation, typographic hierarchy, and visual behavior of web documents. Modern CSS engines provide declarative layout algorithms, isolated stacking contexts, container-relative responsive design primitives, and explicit cascade layer scoping, eliminating historical reliance on fragile JavaScript-driven layout calculations.
-
 ## Box Model Mechanics and Margin Collapsing
 
 Every element rendered by the CSS engine generates a rectangular box comprising four concentric areas: content, padding, border, and margin. Under the default standard box model (`box-sizing: content-box`), declared `width` and `height` properties apply strictly to the innermost content area; any applied padding and border dimensions expand the outer spatial footprint of the element outward.

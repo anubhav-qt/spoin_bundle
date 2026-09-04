@@ -18,10 +18,6 @@ topic_tags:
 
 # Twentieth-Century and Contemporary Philosophy: The Analytic and Continental Divide
 
-In the early decades of the 20th century, Western philosophy fractured into two dominant methodological orientations:
-1. The **Analytic Tradition** (predominating in Anglophone academia, Austria, and Scandinavia): Characterized by mathematical logic, semantic analysis, piecemeal argumentation, and alignment with natural science.
-2. The **Continental Tradition** (predominating in France and Germany): Characterized by phenomenology, existential hermeneutics, critical social theory, and the interrogation of historical, political, and subjective consciousness.
-
 ## The Analytic Tradition: Frege's Logicism and Sense Versus Reference
 
 Gottlob Frege (1848–1925) laid the foundation for modern mathematical logic in his *Begriffsschrift* (1879), replacing traditional Aristotelian subject-predicate syllogistics with function-argument analysis and quantifiers ($\forall, \exists$). Frege pursued **Logicism**—the thesis that arithmetic can be completely reduced to, and derived from, pure formal logic.
@@ -74,11 +70,9 @@ Martin Heidegger (1889–1976), in *Being and Time* (*Sein und Zeit*, 1927), rad
 - **Das Man ("The They"):** The anonymous social conformism of everyday public life, wherein individuals think, judge, and act as "one" does, escaping personal responsibility in **Inauthenticity** (*Uneigentlichkeit*).
 - **Being-toward-Death (*Sein-zum-Tode*):** Death is the non-relational, unsurpassable possibility of Dasein. Confronting mortality through deep existential anxiety (**Angst**) shatters conformist delusions, enabling **Authenticity** (*Eigentlichkeit*).
 
-## French Existentialism: Sartre, De Beauvoir, and Camus
+## French Existentialism: Jean-Paul Sartre and Bad Faith
 
-In post-WWII France, existentialism addressed human freedom, alienation, and political engagement:
-
-### Jean-Paul Sartre (1905–1980)
+In post-WWII France, existentialism addressed human freedom, alienation, and radical responsibility through the philosophy of Jean-Paul Sartre (1905–1980):
 - Core Axiom: **"Existence precedes essence"** (*L'existence précède l'essence*). Unlike an artifact (like a paper knife, whose blueprint/essence precedes its manufacture), a human being exists first, encounters themselves in the world, and only afterward defines their essence through their free choices and actions.
 - Human Ontology (*Being and Nothingness*, 1943):
   - *Être-en-soi* (Being-in-itself): Non-conscious material objects with fixed, immutable essences.
@@ -86,10 +80,14 @@ In post-WWII France, existentialism addressed human freedom, alienation, and pol
 - Because there is no God or human nature to provide external excuses, humans are **"condemned to be free."**
 - **Bad Faith (*Mauvaise Foi*):** The psychological self-deception wherein a free subject pretends to be a fixed object (in-itself), evading the anxiety of freedom. Sartre illustrated this via the café waiter whose rigid, exaggerated movements perform a social role like an automaton to evade his existential freedom.
 
-### Simone de Beauvoir (1908–1986)
+## Existential Ethics and the Absurd: Simone de Beauvoir and Albert Camus
+
+Extending beyond individual subjectivity, French existentialism developed social ethics and confronted the confrontation with an indifferent cosmos:
+
+**Simone de Beauvoir (1908–1986):**
 - In *The Ethics of Ambiguity* (1947), de Beauvoir demonstrated that existentialism yields a rigorous ethics: human beings are caught between *facticity* (material constraints) and *transcendence* (freedom to project future goals). One cannot authentically will one's own freedom without actively willing and defending the freedom of others.
 - In *The Second Sex* (*Le Deuxième Sexe*, 1949), de Beauvoir founded modern feminist philosophy with the declaration: *"One is not born, but rather becomes, a woman"* (*On ne naît pas femme: on le devient*). She dissected how patriarchal civilization constructs woman as the essentialized, subordinate "Other" (*l'Autre*) relative to the normative male subject.
 
-### Albert Camus (1913–1960)
+**Albert Camus (1913–1960):**
 - In *The Myth of Sisyphus* (1942), Camus defined **The Absurd** as the unbridgeable collision between the human demand for purpose, unity, and meaning, and the cold, unreasonable silence of an indifferent universe.
 - Camus declared that suicide is an evasion of the absurd. The authentic response is **Revolt**: living with defiance, passion, and lucid consciousness of meaninglessness. Sisyphus, eternally rolling his stone up the mountain only to watch it plunge downward, is the absurd hero: *"One must imagine Sisyphus happy."*

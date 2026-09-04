@@ -18,8 +18,6 @@ topic_tags:
 
 # Medieval Scholastic and Islamic Golden Age Philosophy: Augustine, Avicenna, Averroes, and Aquinas
 
-The medieval era (c. 5th–14th centuries CE) was marked by intensive, sophisticated syntheses of classical Greek philosophical methodologies (Platonic dialectic and Aristotelian logic) with the theological frameworks of monotheistic Abrahamic traditions. Thinkers across the Islamic world, Jewish diaspora, and Latin Christendom grappled with the relationship between faith and reason, the ontological proof of God, divine illumination, and the metaphysical problem of universals.
-
 ## Augustine of Hippo: Neoplatonic Christian Synthesis, Evil as Privation, and Time
 
 Aurelius Augustinus (Augustine of Hippo, 354–430 CE) established the foundational philosophical synthesis bridging classical Neoplatonism with Western Christian theology, recorded in *Confessions*, *On the City of God* (*De Civitate Dei*), and *On Free Choice of the Will*.
@@ -80,11 +78,15 @@ In Western Europe, Anselm of Canterbury (1033–1109 CE) formulated the first a 
 
 The monk Gaunilo of Marmoutiers challenged Anselm with his *reductio ad absurdum* of the "Lost Island": using identical logic, one could define the "Lost Island" as the greatest conceivable island and deduce that it must objectively exist in the ocean, lest it be inferior to an existing island. Anselm responded that the logic applies uniquely and exclusively to the concept of a maximally great, *necessary* being, whereas all islands are finite, contingent entities.
 
-## Thomas Aquinas: Thomism and the Five Ways
+## Thomas Aquinas: Thomistic Synthesis and A Posteriori Epistemology
 
 Thomas Aquinas (1225–1274 CE), a Dominican friar teaching at the University of Paris, established the monumental intellectual synthesis known as **Thomism**, systematically codified in his *Summa Theologiae*. Aquinas harmonized Aristotelian philosophy with Christian doctrine under the axiom: *"Grace does not destroy nature, but perfects it"* (*gratia non tollit naturam, sed perficit*).
 
-Aquinas rejected Anselm's a priori ontological argument, insisting that because human beings lack direct, unmediated intellectual vision of God's essence, proofs of God must proceed a posteriori—from observed empirical effects in the physical world back to their cause. In *Summa Theologiae* (First Part, Question 2, Article 3), Aquinas articulated the **Five Ways** (*Quinque Viae*):
+Aquinas rejected Anselm's a priori ontological argument, insisting that because human beings lack direct, unmediated intellectual vision of God's essence, proofs of God must proceed a posteriori—from observed empirical effects in the physical world back to their cause. Rather than deriving existence from a pure concept, natural theology must start from sensory observations of change, causation, and contingency in the material cosmos.
+
+## The Five Ways (Quinque Viae) of Thomas Aquinas
+
+In the *Summa Theologiae* (First Part, Question 2, Article 3), Thomas Aquinas articulated five distinct cosmological and teleological demonstrations for the existence of God, known as the **Five Ways** (*Quinque Viae*):
 
 1. **The Argument from Motion (Change):** Physical objects are in motion; whatever moves is moved by something else (the reduction of potentiality to actuality). An infinite regress of moved movers is impossible because there would be no primary source of motion. Therefore, there must exist a **First Unmoved Mover**, which is God.
 2. **The Argument from Efficient Cause:** In the sensible world, nothing can be the efficient cause of its own existence, as it would have to precede itself. An infinite regress of efficient causes is impossible. Therefore, there must exist a **First Uncaused Cause**.

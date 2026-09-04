@@ -11,9 +11,7 @@ topic_tags: [astronomy, cosmology, distance-ladder, hubble-lemaitre-law, cmb, lc
 
 # Observational Cosmology and the Cosmic Distance Ladder
 
-Observational cosmology reconstructs the origin, large-scale geometry, material composition, and dynamic expansion history of the universe as a whole. Grounded in Albert Einstein's General Theory of Relativity and anchored empirically by the Cosmic Distance Ladder, precision modern cosmology operates within the $\Lambda\text{CDM}$ paradigm while actively investigating deep theoretical tensions in universal expansion rates.
-
-## The Cosmic Distance Ladder: Multi-Tiered Metric Calibration
+## The Cosmic Distance Ladder: Parallax and Cepheid Standard Candles
 
 Because direct geometric distance measurements cannot span extragalactic space, astronomers calibrate a succession of interlocking geometric and empirical rungs known as the **Cosmic Distance Ladder**:
 
@@ -27,13 +25,19 @@ Because direct geometric distance measurements cannot span extragalactic space, 
      $$M_V \approx -2.76 \log_{10}(P / \text{days}) - 1.46$$
    - Measuring the observable pulsation period yields the star's absolute magnitude $M$. Comparing $M$ to apparent magnitude $m$ yields the **Distance Modulus**:
      $$\mu = m - M = 5 \log_{10}\left(\frac{d}{10\text{ pc}}\right)$$
-3. **Standard Candles: Type Ia Supernovae (Rung 3, up to $z > 1$):**
+
+## The Cosmic Distance Ladder: Type Ia Supernovae and Cosmological Redshift
+
+Extending distance measurements beyond the reach of Cepheids requires bright standard candles and cosmological expansion indicators on the upper rungs of the **Cosmic Distance Ladder**:
+
+1. **Standard Candles: Type Ia Supernovae (Rung 3, up to $z > 1$):**
    - Calibrated by observing Type Ia supernovae that detonate within nearby galaxies hosting Cepheid variables.
    - Standardized via the Phillips relation, their extreme luminosities ($M_B \approx -19.3$) enable distance determinations spanning billions of light-years.
-4. **Cosmological Redshift (Rung 4):**
+2. **Cosmological Redshift (Rung 4):**
    - At cosmological distances, the expansion of space stretches photon wavelengths:
      $$z = \frac{\lambda_{obs} - \lambda_{emit}}{\lambda_{emit}} = \frac{a(t_0)}{a(t_{emit})} - 1$$
      where $a(t)$ is the cosmic scale factor.
+
 
 ## The Hubble-Lemaître Law and Metric Expansion
 

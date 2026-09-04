@@ -19,8 +19,6 @@ topic_tags:
 
 # Early Modern Epistemology: Continental Rationalism and British Empiricism
 
-The collapse of the Aristotelian-Scholastic consensus during the Scientific Revolution precipitated an internal turn in European philosophy during the 17th and 18th centuries. Thinkers prioritized epistemological foundationalism: before determining the metaphysical structure of the cosmos, philosophy had to determine how the human mind acquires valid knowledge and establishes certainty. This era crystallized around two competing methodologies: Continental Rationalism (relying on innate ideas, intellectual intuition, and deductive demonstration) and British Empiricism (relying on sensory perception, experience, and inductive generalization).
-
 ## René Descartes: Methodological Doubt, the Cogito, and Substance Dualism
 
 René Descartes (1596–1650), in his *Discourse on the Method* (1637) and *Meditations on First Philosophy* (1641), sought to construct an indubitable foundation for the newly emerging mathematical physics. To eliminate false dogmas, Descartes deployed **Methodological (Hyperbolic) Doubt**—treating any belief that admits the slightest theoretical possibility of uncertainty as if it were completely false.
@@ -103,7 +101,7 @@ Berkeley deduced radical **Subjective Idealism (Immaterialism)**: material subst
 
 Physical objects—tables, mountains, trees—are not mind-independent material bodies; they are bundles of sensible ideas directly perceived by conscious minds. To the objection that physical objects would vanish into non-existence the moment a human observer leaves a room, Berkeley responded that the universe is continuously perceived, sustained, and presented to our minds by an omnipresent, infinite mind: **God**.
 
-## David Hume: The Copy Principle, Hume's Fork, and the Problem of Induction
+## David Hume: Impressions, Ideas, and Hume's Fork
 
 David Hume (1711–1776) brought classical empiricism to its radical skeptical conclusion in *A Treatise of Human Nature* (1739–40) and *An Enquiry Concerning Human Understanding* (1748).
 
@@ -116,14 +114,17 @@ Hume formulated **Hume's Fork**, bifurcating all objects of human knowledge into
 1. **Relations of Ideas:** Propositions discoverable by the mere operation of thought, logically necessary, a priori, and certain (mathematics, geometry, formal logic). Denying them produces a contradiction.
 2. **Matters of Fact:** Propositions concerning empirical reality, contingent, a posteriori, and known through experience. Denying a matter of fact implies no contradiction ("The sun will not rise tomorrow" is a false proposition, but entirely conceivable and non-contradictory).
 
-Hume launched a devastating critique of **Causation and Induction**:
-- When observing two billiard balls collide, we observe:
-  1. *Contiguity* in space;
-  2. *Priority* in time (ball A strikes before ball B moves);
-  3. *Constant Conjunction* (repeatedly observing B move when struck by A).
-- We never observe an impression of **"Necessary Connection"** or inherent causal power.
-- Inductive reasoning—inferring that the future will resemble the past—relies on the **Principle of the Uniformity of Nature**.
-- This principle cannot be proven deductively (it is not a relation of ideas, as nature's laws could change without contradiction), nor can it be proven empirically (that would be circular, using induction to justify induction).
-- Therefore, our belief in causation and the uniformity of nature is not grounded in rational demonstration, but in **Psychological Habit and Custom** (*animal faith*).
+## David Hume: The Critique of Causation and the Problem of Induction
+
+All reasoning concerning matters of fact beyond the present testimony of our senses rests on the relation of cause and effect. David Hume launched a devastating critique of **Causation and Induction**:
+
+When observing two billiard balls collide, human experience registers three relations:
+1. *Contiguity* in space;
+2. *Priority* in time (ball A strikes before ball B moves);
+3. *Constant Conjunction* (repeatedly observing B move when struck by A).
+
+We never perceive an impression of **"Necessary Connection"** or inherent causal power binding cause to effect.
+
+Inductive reasoning—inferring that the future will resemble the past—relies on the **Principle of the Uniformity of Nature**. This principle cannot be proven deductively (it is not a relation of ideas, as nature's laws could change without contradiction), nor can it be proven empirically (that would be circular, using induction to justify induction). Therefore, our belief in causation and the uniformity of nature is not grounded in rational demonstration, but in **Psychological Habit and Custom** (*animal faith*).
 
 Hume extended this skepticism to the self: through introspection, one encounters only transient, fleeting perceptions of cold, warmth, anger, or joy; one never perceives an unchanging, permanent entity. The self is merely a **Bundle of Perceptions** in perpetual flux. Finally, in metaethics, Hume formulated the **Is-Ought Gap**: one cannot validly deduce prescriptive moral obligations ("ought") strictly from descriptive empirical facts ("is").

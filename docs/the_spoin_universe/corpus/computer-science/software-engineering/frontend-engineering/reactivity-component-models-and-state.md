@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, reactivity, virtual-dom, signals, state-manag
 
 # Reactivity, Component Models, and State Topologies
 
-Modern frontend engineering structures user interfaces into composable, encapsulated component trees that synchronize view representations with underlying application state. Framework architectures manage this synchronization through divergent reactivity paradigms, ranging from coarse-grained Virtual DOM reconciliation to fine-grained reactive dependency graphs and specialized state topologies.
-
 ## Virtual DOM Reconciliation and the React Fiber Architecture
 
 The Virtual DOM (VDOM) paradigm abstracts direct browser Document Object Model manipulation behind an in-memory tree representation of lightweight JavaScript objects. When application state mutates, the component tree re-executes, generating a new Virtual DOM snapshot that is algorithmically diffed against the preceding snapshot to compute the minimal set of real DOM mutations.

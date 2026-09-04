@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, rendering-architectures, ssr, ssg, isr, islan
 
 # Web Rendering Architectures and Server Components
 
-Web rendering architectures govern how application code, data, and layout instructions are distributed between edge servers and client browsers. Over recent web generations, architectures have evolved from monolithic single-page client bundles toward hybrid server-client primitives, selective hydration models, and component-level execution boundaries.
-
 ## Taxonomy: CSR, SSR, SSG, and ISR
 
 Web rendering models partition work along temporal (build time vs request time) and spatial (server vs client) boundaries:

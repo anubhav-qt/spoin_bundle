@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, zero-downtime, expand-and-contract, database
 
 # Database Schema Evolution and Zero-Downtime Deployments
 
-Deploying updates to a fullstack web application involves coordinating three asynchronous layers: client browser sessions running cached JavaScript bundles, rolling application server clusters, and persistent database schemas. In continuous delivery environments, deploying a schema change must never disrupt active user sessions. Achieving zero-downtime releases requires evolutionary database patterns, backward-compatible API contracts, and disciplined CDN asset retention.
-
 ## The Fullstack Deployment Dilemma
 
 A production web application cannot transition atomically between versions:

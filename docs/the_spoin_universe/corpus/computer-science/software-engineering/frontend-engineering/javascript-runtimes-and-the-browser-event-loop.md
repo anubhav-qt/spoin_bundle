@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, javascript, v8, event-loop, microtasks, turbo
 
 # JavaScript Runtimes and the Browser Event Loop
 
-JavaScript execution within web browsers couples high-performance just-in-time (JIT) virtual machine compilation with an asynchronous, single-threaded event loop coordination model. Modern execution engines optimize dynamically typed source code through speculative optimization pipelines, while the browser event loop arbitrates between synchronous call stacks, asynchronous task queues, microtasks, and hardware-synchronized rendering updates.
-
 ## V8 Engine Compilation Pipeline: Ignition and TurboFan
 
 The Google V8 engine (used in Chromium and Node.js) executes JavaScript using a multi-tiered compilation pipeline designed to minimize startup latency while maximizing long-term execution throughput. The pipeline begins with parsing, where source code text is converted into an Abstract Syntax Tree (AST).

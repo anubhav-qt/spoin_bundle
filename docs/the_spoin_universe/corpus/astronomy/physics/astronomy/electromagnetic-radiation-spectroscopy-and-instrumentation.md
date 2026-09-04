@@ -11,8 +11,6 @@ topic_tags: [astronomy, spectroscopy, blackbody-radiation, telescopes, adaptive-
 
 # Electromagnetic Radiation, Spectroscopy, and Instrumentation
 
-Electromagnetic radiation serves as the primary physical carrier of information across astronomical distances. Modern observational astronomy deciphers celestial mechanics, chemical abundances, surface temperatures, and magnetic topologies through the physical laws of radiative transfer, quantum atomic spectroscopy, and advanced optoelectronic instrumentation spanning radio to gamma-ray regimes.
-
 ## Blackbody Radiation Physics
 
 Thermal radiation emitted by stars, gas clouds, and cosmic background fields approximates ideal blackbody radiators in local thermodynamic equilibrium (LTE). Three core physical laws describe this radiation:

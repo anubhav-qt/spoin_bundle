@@ -16,8 +16,6 @@ topic_tags:
 
 # Hellenistic and Late Antique Philosophy: Stoicism, Epicureanism, Pyrrhonism, and Neoplatonism
 
-Following the death of Alexander the Great in 323 BCE and the subsequent absorption of the Greek city-states into the Roman Empire, philosophical inquiry shifted from broad metaphysical statecraft toward individual therapeutic ethics. Philosophy was pursued as an *art of living* (*ars vitae*) designed to secure psychological tranquility (*ataraxia*) amidst geopolitical volatility.
-
 ## The Stoic System: Physics, Logic, and the Logos
 
 Founded by Zeno of Citium (c. 334–262 BCE) around 300 BCE at the *Stoa Poikile* (Painted Porch) in Athens, Stoicism was systematized by Chrysippus of Soli and transmitted to the Roman world by Seneca the Younger, Epictetus, and Emperor Marcus Aurelius. Stoicism integrated logic, physics, and ethics into a mutually interdependent, organic system.
@@ -69,7 +67,7 @@ Epicurean ethics summarized its psychological cure in the **Tetrapharmakos** (Th
 
 Epicureans rejected civic political ambition (*Lathe biosas*—"Live unnoticed"), maintaining that philosophical **Friendship** (*philia*) in a private community provides the highest social security and psychological joy.
 
-## Ancient Skepticism: Pyrrhonism, Epoché, and Agrippa's Trilemma
+## Pyrrhonism: Equipollence, Epoché, and Ataraxia
 
 Ancient Skepticism developed in two rival traditions: the Academic Skepticism of Plato's Middle Academy (Arcesilaus and Carneades, who attacked Stoic dogmatism and defended probabilism, *to pithanon*) and **Pyrrhonism**, initiated by Pyrrho of Elis (c. 360–270 BCE) and documented by Sextus Empiricus (c. 160–210 CE) in *Outlines of Pyrrhonism*.
 
@@ -80,7 +78,10 @@ Sextus Empiricus classified philosophical schools into three orientations:
 
 The Pyrrhonist method begins by setting contradictory arguments, sensory perceptions, and appearances into opposition (*isostheneia*—the equal persuasive weight or equipollence of opposing claims). Unable to determine which side is objectively true, the investigator experiences **Epoché** (suspension of judgment). Unexpectedly, upon suspending judgment, the investigator is immediately released from anxiety, experiencing **Ataraxia** (mental tranquility)—"like a shadow following a body." The Pyrrhonist does not deny daily appearances; they navigate practical life guided by natural inclinations, bodily appetites, social customs, and technical crafts, but without dogmatic belief (*adoxastos*).
 
+## Agrippa's Five Modes and the Epistemological Trilemma
+
 Agrippa the Skeptic formulated **Agrippa's Five Modes** of doubt, which establish the foundational epistemological trilemma against any claim to justified truth:
+
 1. **Disagreement (*Diaphonia*):** Irreconcilable disputes exist among philosophers and laypeople concerning any given matter.
 2. **Infinite Regress:** Any premise offered to justify a proposition requires a prior justification, which in turn requires another, ad infinitum.
 3. **Relativity:** Objects appear differently depending on the observer, the sensory organ, physical distance, and environmental medium.

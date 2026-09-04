@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, meta-frameworks, server-components, isomorph
 
 # Unified Frameworks and Server-Client Execution Boundaries
 
-Modern fullstack development increasingly converges onto unified meta-frameworks (such as Next.js, Remix / React Router, SvelteKit, and Nuxt). These frameworks unify server and client logic within a single codebase, executing code across disparate runtimes while managing boundaries that prevent proprietary server logic and sensitive credentials from leaking into public client bundles.
-
 ## The Isomorphic JavaScript Execution Model
 
 Isomorphic (or universal) JavaScript code possesses the capacity to execute across both server runtimes (such as Node.js, Bun, Deno, or V8 Edge isolates) and client browser environments. During Server-Side Rendering (SSR), components execute on the server to construct the initial HTML markup, and later re-execute on the client during hydration to attach event listeners and interactive state.

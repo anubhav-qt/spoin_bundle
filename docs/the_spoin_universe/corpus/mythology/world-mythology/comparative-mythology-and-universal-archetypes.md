@@ -10,8 +10,6 @@ topic_tags: [mythology, comparative-mythology, cosmogony, flood-myth, axis-mundi
 
 # Comparative Mythology and Universal Archetypes
 
-Comparative mythology investigates cross-cultural structural parallels, recurring narrative motifs, and cosmological archetypes across disparate human societies. By analyzing shared symbolic grammars—ranging from creation accounts and deluge motifs to cosmic world trees and hero journeys—comparative scholarship identifies how human cultures construct sacred order against primordial chaos.
-
 ## Typology of Creation Cosmologies
 
 Creation narratives (*cosmogonies*) explain how order emerged from primordial non-existence. Anthropological typology categorizes cosmogonies into five primary structural models:

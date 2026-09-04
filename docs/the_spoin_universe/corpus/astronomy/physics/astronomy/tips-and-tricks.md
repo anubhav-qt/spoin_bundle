@@ -11,8 +11,6 @@ topic_tags: [astronomy, tips-and-tricks, observational-pitfalls, misconceptions,
 
 # Practical Astronomy: Observational Traps, Physics Fallacies, and Field Pitfalls
 
-Observational and theoretical astronomy frequently suffer from widespread physical misconceptions, optical equipment marketing fallacies, and counter-intuitive relativistic phenomena. This compilation details critical analytical traps, underlying physical principles, and practical observational realities drawn from experienced astronomical practice.
-
 ## The "Empty Magnification" Trap in Telescopes
 
 A ubiquitous marketing trap in commercial amateur astronomy is the promotion of entry-level telescopes boasting extreme claims: "675x Magnification!"

@@ -17,8 +17,6 @@ topic_tags:
 
 # Cellular Physiology and Metabolic Bioenergetics: Membrane Biophysics, Transport Kinetics, and ATP Synthesis
 
-The human cell operates as an open thermodynamic system that maintains internal disequilibrium relative to its extracellular fluid (ECF). This continuous homeostatic state is sustained by selective membrane permeability, active ion transport, and the enzymatic oxidation of organic substrates into adenosine triphosphate (ATP).
-
 ## The Plasma Membrane and Selective Permeability
 
 The human plasma membrane is organized according to the fluid mosaic model, consisting of an amphipathic phospholipid bilayer approximately 7.5 to 10 nanometers thick. Hydrophilic glycerol-phosphate head groups face the aqueous intracellular and extracellular compartments, while hydrophobic fatty acyl chains (saturated and cis-unsaturated hydrocarbon tails) orient inward, creating a central hydrophobic core.
@@ -37,15 +35,15 @@ Passive transport processes move solutes down their thermodynamic chemical or el
   - *Ion Channels:* Transmembrane aqueous pores that permit rapid ion flux ($10^7$ to $10^8$ ions/second). These channels are typically gated by transmembrane voltage (voltage-gated channels), extracellular or intracellular chemical ligands (ligand-gated channels), or mechanical deformation (mechanosensitive channels).
   - *Carrier Proteins (Transporters):* Solute binding induces conformational transitions that translocate the substrate across the bilayer (e.g., the GLUT family of glucose uniporters). Facilitated transport exhibits classic Michaelis-Menten saturation kinetics, characterized by a maximal transport velocity ($V_{max}$) when carrier binding sites are fully saturated, and a half-maximal affinity constant ($K_m$).
 
-## Primary and Secondary Active Transport Kinetics
+## Primary Active Transport Mechanics and ATPases
 
-Active transport translocates ions or molecules against their steep chemical or electrical gradients, generating physiological concentration non-equilibria.
-
-**Primary Active Transport** directly couples the uphill movement of solutes to the enzymatic hydrolysis of ATP by integral P-type or V-type ATPases:
+Active transport translocates ions or molecules against their steep chemical or electrical gradients, generating physiological concentration non-equilibria. Primary active transport directly couples the uphill movement of solutes to the enzymatic hydrolysis of ATP by integral P-type or V-type ATPases:
 - **The $Na^+/K^+$-ATPase (Sodium-Potassium Pump):** Present on the plasma membrane of all human cells, this electrogenic pump hydrolyzes one ATP molecule to extrude three $Na^+$ ions from the cytoplasm while importing two $K^+$ ions from the extracellular fluid. This asymmetric stoichiometry generates a net outward current, directly contributing 2 to 5 mV to the resting membrane potential and establishing steep transmembrane chemical gradients: intracellular $K^+$ is maintained at ~140 mmol/L (versus ~4 mmol/L extracellularly), while intracellular $Na^+$ is restricted to ~10–14 mmol/L (versus ~142 mmol/L extracellularly). In a resting human adult, the $Na^+/K^+$-ATPase consumes approximately 30% of total basal cellular energy (and up to 70% in central nervous system neurons).
 - **$Ca^{2+}$-ATPases:** The Plasma Membrane $Ca^{2+}$-ATPase (PMCA) and the Sarcoplasmic/Endoplasmic Reticulum $Ca^{2+}$-ATPase (SERCA) pump cytosolic $Ca^{2+}$ into the extracellular space or intracellular stores, maintaining resting cytosolic free calcium below 100 nmol/L.
 
-**Secondary Active Transport** does not hydrolyze ATP directly. Instead, it couples the downhill thermodynamic dissipation of an established ion electrochemical gradient (predominantly the inward $Na^+$ gradient established by the $Na^+/K^+$-ATPase) to drive the uphill translocation of a second substrate against its concentration gradient:
+## Secondary Active Transport: Symporters and Antiporters
+
+Secondary active transport does not hydrolyze ATP directly. Instead, it couples the downhill thermodynamic dissipation of an established ion electrochemical gradient (predominantly the inward $Na^+$ gradient established by the $Na^+/K^+$-ATPase) to drive the uphill translocation of a second substrate against its concentration gradient:
 - **Symporters (Cotransporters):** Move the driving ion and the substrate in the identical physical direction. Examples include the Sodium-Glucose Cotransporters (SGLT1 and SGLT2) in intestinal enterocytes and renal proximal tubules, and the $Na^+$-$K^+$-$2Cl^-$ cotransporter (NKCC2) in the renal loop of Henle.
 - **Antiporters (Exchangers):** Move the driving ion and the substrate in opposite physical directions. Examples include the $Na^+/Ca^{2+}$ exchanger (NCX), which extrudes one $Ca^{2+}$ ion in exchange for the entry of three $Na^+$ ions in cardiac myocytes, and the $Na^+/H^+$ exchanger (NHE1), which regulates intracellular pH.
 
@@ -73,9 +71,9 @@ For each turn of the Citric Acid Cycle (two turns per original glucose molecule)
 
 The primary regulatory checkpoint is isocitrate dehydrogenase, which is activated by high ADP concentrations and allosterically inhibited by elevated ATP and NADH.
 
-## The Electron Transport Chain and Chemiosmotic Coupling
+## Electron Transport Chain Complexes and Vector Proton Pumping
 
-The terminal, highest-yield phase of cellular respiration occurs across the inner mitochondrial membrane via **Oxidative Phosphorylation**, coupling exergonic electron transfer to endergonic ATP synthesis, as formulated in Peter Mitchell's Chemiosmotic Hypothesis.
+The terminal, highest-yield phase of cellular respiration occurs across the inner mitochondrial membrane via oxidative phosphorylation, coupling exergonic electron transfer to endergonic ATP synthesis, as formulated in Peter Mitchell's Chemiosmotic Hypothesis.
 
 The **Electron Transport Chain (ETC)** consists of four multi-protein complexes and two mobile electron shuttles:
 - **Complex I (NADH:Ubiquinone Oxidoreductase):** Accepts electrons from matrix NADH, transferring them via flavin mononucleotide (FMN) and iron-sulfur (Fe-S) clusters to the lipid-soluble electron carrier **Coenzyme Q** (Ubiquinone). This exergonic transfer drives the vector pumping of **4 $H^+$** from the matrix into the intermembrane space.
@@ -83,6 +81,8 @@ The **Electron Transport Chain (ETC)** consists of four multi-protein complexes 
 - **Complex III (Cytochrome $bc_1$ Complex):** Accepts electrons from reduced ubiquinol ($QH_2$) and transfers them via the Q-cycle to the mobile intermembrane protein **Cytochrome c**, pumping **4 $H^+$** across the inner membrane.
 - **Complex IV (Cytochrome c Oxidase):** Collects four electrons from four reduced Cytochrome c molecules and transfers them to molecular oxygen, reducing it to two molecules of water ($O_2 + 4H^+ + 4e^- \to 2 H_2O$). This reaction pumps **2 $H^+$** into the intermembrane space. Complex IV is irreversibly inhibited by cyanide, carbon monoxide, and sodium azide.
 
-The vector pumping of protons generates an electrochemical proton gradient across the inner mitochondrial membrane termed the **Proton Motive Force (PMF)**. The PMF consists of an electrical membrane potential ($\Delta \Psi \approx 160$ to $180\text{ mV}$, inside negative) and a chemical concentration gradient ($\Delta pH \approx 0.5$ to $1.0\text{ units}$, matrix alkaline).
+## ATP Synthase, Proton Motive Force, and Chemiosmotic Coupling
+
+The vector pumping of protons by the respiratory chain generates an electrochemical proton gradient across the inner mitochondrial membrane termed the **Proton Motive Force (PMF)**. The PMF consists of an electrical membrane potential ($\Delta \Psi \approx 160$ to $180\text{ mV}$, inside negative) and a chemical concentration gradient ($\Delta pH \approx 0.5$ to $1.0\text{ units}$, matrix alkaline).
 
 Protons re-enter the mitochondrial matrix down this steep electrochemical gradient exclusively through **Complex V (ATP Synthase)**. The influx of protons through the stationary membrane-bound $F_0$ subunit drives the mechanical rotation of the central stalk, which induces sequential conformational changes in the catalytic $\beta$-subunits of the matrix-facing $F_1$ domain (the binding-change mechanism). This rotary mechanical energy synthesizes ATP from ADP and inorganic phosphate ($P_i$). Under physiological conditions, approximately 4 protons are required to synthesize and export one molecule of ATP (including the proton-coupled phosphate translocase), yielding a theoretical net synthesis of approximately **30 to 32 ATP molecules** per fully oxidized molecule of glucose.

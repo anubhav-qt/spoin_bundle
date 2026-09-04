@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, accessibility, a11y, wcag-22, wai-aria, seman
 
 # Web Accessibility and Semantic Standards
 
-Web accessibility (a11y) guarantees that digital interfaces are perceivable, operable, understandable, and robust for all users, including those relying on assistive technologies such as screen readers, screen magnifiers, voice control software, and switch devices. Accessibility architecture integrates semantic markup, platform accessibility APIs, keyboard focus governance, and adherence to international W3C standards.
-
 ## W3C WCAG 2.2 Core Principles and Evolutionary Updates
 
 The W3C Web Content Accessibility Guidelines (WCAG) 2.2, published as a formal Recommendation on October 5, 2023, establishes four foundational principles (POUR):

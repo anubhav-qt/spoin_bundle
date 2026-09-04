@@ -11,8 +11,6 @@ topic_tags: [fullstack-engineering, type-safety, trpc, openapi, zod, json-schema
 
 # End-to-End Type Safety and API Contract Synchronization
 
-In multi-tier software architectures, the boundary separating client applications from backend services is historically characterized by type erasure. Systems serialize strongly typed internal data structures into weakly typed JSON byte streams across the network. Fullstack type safety bridges this boundary by guaranteeing that data contracts remain synchronized, verifiable, and enforceable across both client and server runtimes without manual type duplication.
-
 ## The Type Loss Gap and Wire Serialization
 
 Traditional web architectures operate across a structural divide: server applications model domain entities using database schemas or static language types (such as Go structs, Rust types, or TypeScript classes), which serialize into JSON strings over HTTP transport. Client applications receive these payloads and deserialize them into unvalidated objects or manually maintained client-side type definitions.

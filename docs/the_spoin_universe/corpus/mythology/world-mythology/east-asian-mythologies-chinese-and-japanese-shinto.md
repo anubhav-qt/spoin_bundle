@@ -10,8 +10,6 @@ topic_tags: [mythology, chinese-mythology, shinto, pangu, nuwa, amaterasu, izana
 
 # East Asian Mythologies: Chinese and Japanese Shinto
 
-East Asian mythologies articulate cosmic order through harmonious complementary dualities, ancestral veneration, and the sacred sacralization of natural topography. In Chinese tradition, cosmological narratives merge Daoist, Confucian, and Buddhist syntheses within an imperial celestial bureaucracy. In Japanese Shinto tradition, indigenous mytho-histories (*Kojiki* and *Nihon Shoki*) root the sacred lineage of the Imperial Yamato dynasty in nature spirits (*kami*) and cosmic purification rites.
-
 ## Chinese Cosmogony: Hundun and the Dismemberment of Pangu
 
 Early Chinese cosmological texts (such as the *Huainanzi* and the *Classic of Mountains and Seas*) describe creation not as a divine command out of nothingness, but as the self-organizing differentiation of primordial chaos (**Hundun**):
@@ -70,7 +68,7 @@ Tainted by the deathly defilement (*kegare*) of Yomi, Izanagi went to a river in
 - Washing his **right eye** gave birth to **Tsukuyomi no Mikoto**, the Moon God.
 - Washing his **nose** gave birth to **Susanoo no Mikoto**, the tempestuous God of Storms and the Sea.
 
-## Amaterasu, the Heavenly Rock Cave, and the Imperial Regalia
+## Amaterasu and the Heavenly Rock Cave
 
 Susanoo behaved with destructive arrogance, rampaging through heaven, destroying Amaterasu's irrigated rice paddies, and hurling a flayed celestial horse through the roof of her sacred weaving hall. Terrified and grieved, Amaterasu retreated into the **Heavenly Rock Cave** (*Ame-no-Iwato*), rolling a great boulder to seal the entrance.
 
@@ -80,7 +78,7 @@ The eight hundred myriad *kami* assembled in the dry riverbed outside the cave. 
 
 Intrigued that the gods were laughing in a universe enveloped in darkness, Amaterasu opened the cave door a crack. Uzume called out that a goddess more radiant than Amaterasu had arrived, directing her gaze toward the bronze mirror. Mesmerized by her own luminous reflection, Amaterasu stepped forward. The strong-armed god Tajikarao seized her hand, pulling her out, while a sacred straw rope (**shimenawa**) was stretched across the cave mouth, permanently restoring light to the universe.
 
-### The Slaying of Yamata no Orochi and the Imperial Regalia
+## Susanoo, Yamata no Orochi, and the Imperial Regalia
 
 Banished from heaven to the earthly province of Izumo, Susanoo redeemed himself by rescuing a maiden from the terrifying **Yamata no Orochi**, an eight-headed, eight-tailed dragon that drank eight vats of refined sake. After the serpent fell into a drunken stupor, Susanoo hacked it to pieces. Inside the beast's tail, his sword struck a hard object: the sacred blade **Kusanagi no Tsurugi** (the Grass-Cutting Sword), which he presented to Amaterasu.
 

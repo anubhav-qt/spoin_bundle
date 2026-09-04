@@ -11,8 +11,6 @@ topic_tags: [astronomy, milky-way, interstellar-medium, dark-matter, rotation-cu
 
 # Galactic Astronomy and the Interstellar Medium
 
-Galactic astronomy investigates the structure, stellar populations, interstellar chemistry, and dynamical evolution of galaxies. Anchored in our direct observational vantage point within the Milky Way, this field deciphers the cycles of stellar birth and death within the Interstellar Medium (ISM), the gravitational kinematics that revealed the necessity of Dark Matter, and the extreme physics of central Supermassive Black Holes.
-
 ## Morphology and Structural Components of the Milky Way
 
 The Milky Way is a barred spiral galaxy of morphological type **SBbc**, containing an estimated 100 to 400 billion stars. Its structural architecture is partitioned into five primary components:

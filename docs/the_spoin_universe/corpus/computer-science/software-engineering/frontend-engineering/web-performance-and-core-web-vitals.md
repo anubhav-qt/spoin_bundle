@@ -11,8 +11,6 @@ topic_tags: [frontend-engineering, web-performance, core-web-vitals, lcp, inp, c
 
 # Web Performance and Core Web Vitals
 
-Web performance engineering quantifies and optimizes the speed, visual stability, and interactive responsiveness of web applications. Modern web performance analysis relies on Google's Core Web Vitals, a standardized set of field-measured metrics evaluated at the 75th percentile of user sessions across both mobile and desktop form factors.
-
 ## Core Web Vitals Metrics and Production Thresholds
 
 The Core Web Vitals framework isolates three distinct dimensions of user experience: loading performance, interface responsiveness, and visual stability:

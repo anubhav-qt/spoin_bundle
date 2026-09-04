@@ -16,8 +16,6 @@ topic_tags:
 
 # Philosophical Foundations: The Shift to Logos, Core Branches, and Epistemic Methods
 
-Philosophy originates as the systematic, rational investigation of fundamental questions concerning existence, knowledge, values, reason, mind, and language. It marks a foundational transition from mythopoetic cosmologies to discursive, evidence-grounded arguments.
-
 ## From Mythos to Logos: The Milesian Revolution
 
 In archaic Mediterranean civilizations (8th–6th centuries BCE), natural phenomena were explained through *mythos*—narratives attributing seismic, meteorological, and astronomical events to the actions and temperaments of anthropomorphic deities. The intellectual transition to *logos* (rational discourse, reasoned argument, and cosmic principle) began along the Ionian coast of Asia Minor in the city of Miletus.

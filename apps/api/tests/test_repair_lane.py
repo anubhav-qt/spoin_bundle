@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 import pytest
 import pytest_asyncio
 from fastapi import HTTPException
+from frog.embeddings import HashEmbedder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -33,7 +34,6 @@ from spoin.domain.models import (
     Topic,
     User,
 )
-from spoin.embeddings import HashEmbedder
 from spoin.generation import repair as repair_module
 from spoin.generation.base import BatchResult, CardRepairQuery, CardRepairResult
 from spoin.generation.fake import FakeContentGenerator

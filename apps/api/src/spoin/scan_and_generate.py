@@ -22,13 +22,14 @@ import sys
 import uuid
 from typing import Any
 
+from frog.embeddings import Embedder
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings, get_settings
 from spoin.core.db import get_engine, session_scope
 from spoin.domain.models import Card, Subtopic, Topic
-from spoin.embeddings import Embedder, get_embedder
+from spoin.embeddings import get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline import (
@@ -64,9 +65,7 @@ async def find_incomplete_topics(
                 )
             ).scalar_one_or_none()
 
-            has_components = (
-                generator is not None and embedder is not None and settings is not None
-            )
+            has_components = generator is not None and embedder is not None and settings is not None
             if topic is None and has_components:
                 logger.info(
                     "Topic '%s' not in DB; minting via match_and_create_topics",

@@ -12,6 +12,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import ClassVar
 
+from frog.embeddings import HashEmbedder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +28,6 @@ from spoin.domain.models import (
     Topic,
     User,
 )
-from spoin.embeddings import HashEmbedder
 from spoin.generation.base import AskTurnQuery
 from spoin.generation.fake import FakeContentGenerator
 

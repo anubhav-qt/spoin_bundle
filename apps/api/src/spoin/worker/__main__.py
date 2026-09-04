@@ -39,12 +39,13 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any, cast
 
+from frog.embeddings import Embedder
 from sqlalchemy import select
 
 from spoin.core.config import get_settings
 from spoin.core.db import get_engine, session_scope
 from spoin.domain.models import GenerationJob
-from spoin.embeddings import Embedder, get_embedder
+from spoin.embeddings import get_embedder
 from spoin.generation import get_content_generator
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline import run_generation_pipeline

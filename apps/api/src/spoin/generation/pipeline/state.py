@@ -21,13 +21,13 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Annotated, Any, TypedDict
 
+from frog.embeddings import Embedder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.content.archetype import classify_archetype
 from spoin.core.config import Settings
 from spoin.domain.enums import CardType, Difficulty, RejectionStage
 from spoin.domain.models import RejectedCard
-from spoin.embeddings import Embedder
 from spoin.generation.base import CardDraft, ContentGenerator
 from spoin.generation.quota import KeyBox
 

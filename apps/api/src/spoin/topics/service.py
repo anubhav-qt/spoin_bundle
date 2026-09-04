@@ -31,6 +31,7 @@ from typing import Literal, cast
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from frog.embeddings import Embedder
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -63,7 +64,6 @@ from spoin.domain.models import (
     UserTopic,
     UserTopicProgress,
 )
-from spoin.embeddings import Embedder
 from spoin.generation.base import ContentGenerator, TopicNameQuery
 from spoin.generation.pipeline import TopicRequest, match_and_create_topics
 from spoin.topics.accent_color import (

@@ -1,0 +1,82 @@
+[project]
+name = "frog"
+version = "0.1.0"
+description = "Spoin's retrieval package: the embedder, the_spoin_universe corpus store, and retrieval over it"
+requires-python = ">=3.13"
+
+# ADR-0087: frog is a LIBRARY, not a service, and it must be installable and
+# type-checkable without `spoin`. Nothing here may pull the API's dependency
+# tree in -- that is the boundary made physical rather than merely stated.
+dependencies = [
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "pgvector>=0.3.6",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+]
+
+[project.optional-dependencies]
+# Mirrors apps/api's `embeddings` extra for the same reason: onnxruntime is a
+# large wheel, and the deterministic `HashEmbedder` keeps the stack bootable
+# without it. ADR-0087 moved these classes here; the settings-reading factory
+# that chooses between them stayed in `spoin.embeddings`.
+embeddings = [
+    "fastembed>=0.4",
+]
+
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+    "mypy>=1.13",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+frog = ["py.typed"]
+
+# ------------------------------------------------------------------- ruff -----
+[tool.ruff]
+src = ["src", "tests"]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF", "TID", "ASYNC"]
+
+# ADR-0087, enforcement half 1 of 2: frog must never import spoin. The
+# dependency runs one way -- api -> frog -- and a package that can reach back
+# into `spoin.core.config` would make the sibling-package layout decorative.
+#
+# Half 2 is the AST-level check in apps/api/tests/test_architecture.py, which
+# catches this even if lint is bypassed locally. Same twice-enforced pattern as
+# ADR-0002's langchain confinement; see CLAUDE.md, "a rule stated only in a doc
+# is a wish".
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"spoin".msg = "frog must not import spoin -- the dependency runs api -> frog only (ADR-0087)."
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+
+# ------------------------------------------------------------------- mypy -----
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["pgvector.*", "fastembed.*"]
+ignore_missing_imports = true
+
+# ----------------------------------------------------------------- pytest -----
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

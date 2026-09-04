@@ -10,12 +10,13 @@ from __future__ import annotations
 
 import uuid
 
+from frog.embeddings import Embedder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
 from spoin.domain.models import Topic
-from spoin.embeddings import Embedder, normalize_topic_text
+from spoin.embeddings import normalize_topic_text
 from spoin.generation.base import (
     ContentGenerator,
     TopicMatchCandidate,

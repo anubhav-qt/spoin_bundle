@@ -11,12 +11,12 @@ from __future__ import annotations
 import uuid
 from typing import Any, cast
 
+from frog.embeddings import Embedder
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
-from spoin.embeddings import Embedder
 from spoin.generation.base import ContentGenerator
 from spoin.generation.pipeline.nodes import (
     fan_out_topics,

@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from frog.embeddings import Embedder, HashEmbedder
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +29,6 @@ from spoin.domain.models import (
     Subtopic,
     Topic,
 )
-from spoin.embeddings import Embedder, HashEmbedder
 from spoin.generation.base import AskTurnQuery, ContentGenerator
 from spoin.generation.quota import QuotaExhaustedError
 

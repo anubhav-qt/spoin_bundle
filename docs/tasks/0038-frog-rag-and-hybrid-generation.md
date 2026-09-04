@@ -1,7 +1,10 @@
 # Task 0038: `frog` (our own RAG), `the_spoin_universe`, and hybrid Mistral/Gemini generation
 
-> **Status:** Phase 0 done (2026-09-04) — ADRs 0087-0090 written and accepted.
-> Phase 1 in progress. Written 2026-09-04.
+> **Status:** Phases 0 and 1 done (2026-09-04). ADRs 0087-0090 accepted;
+> `apps/frog` exists, passes `make check`, and carries the `document`/`chunk`
+> schema and its own alembic chain. **The corpus database itself has not been
+> created yet** — the owner runs `make universe-migrate`. Phase 2 next.
+> Written 2026-09-04.
 > **Depends on:** [`docs/mistral-saga/`](../mistral-saga/README.md) — provider
 > validation. Experiments 1, 2 and 3 have passed; 3b (drafting quality) is
 > deliberately folded into Phase 6 below rather than run standalone, because this
@@ -150,6 +153,22 @@ rule that must hold gets enforced twice, never documented once.
   be storable.
 - The architecture test that frog never imports `spoin`.
 - No ingestion, no retrieval yet. Ends with an empty, migrated, type-checked store.
+
+### What Phase 1 actually landed (2026-09-04)
+
+Everything above, plus three things worth knowing before Phase 2:
+
+- **The Docker friction was real but bounded.** The build context moved to the repo
+  root for the `api`, `seed`, `worker`, `test` and new `universe-seed` services. Each
+  of those services builds its **own** image — rebuilding only `api` leaves the test
+  image stale, which fails as `ModuleNotFoundError: No module named 'frog'`.
+- **`downgrade()` on the initial universe migration raises.** Dropping those tables
+  drops the whole corpus; the recovery path is recreate-and-re-ingest, which is
+  explicit, rather than an `alembic downgrade` that reads as routine.
+- **Pre-existing `ruff` format drift surfaced** in three unrelated files. `ruff>=0.8`
+  is unpinned, so the rebuild pulled 0.16.6 and its formatter disagreed with whatever
+  last touched them. Fixed in its own commit (`3385f43`). Worth pinning ruff at some
+  point so a rebuild is not a formatting event.
 
 ---
 

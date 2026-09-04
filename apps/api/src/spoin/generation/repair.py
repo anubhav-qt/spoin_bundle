@@ -14,6 +14,7 @@ import re
 import uuid
 from datetime import UTC, datetime
 
+from frog.embeddings import Embedder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
@@ -22,7 +23,6 @@ from spoin.content.archetype import classify_archetype
 from spoin.core.db import session_scope
 from spoin.domain.enums import CardStatus, RepairMode, RepairStatus
 from spoin.domain.models import Card, CardRepair, CardReport, Subtopic, Topic
-from spoin.embeddings import Embedder
 from spoin.generation.base import (
     CardCorrectionQuery,
     CardRepairQuery,

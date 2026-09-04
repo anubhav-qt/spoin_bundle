@@ -10,9 +10,19 @@ from __future__ import annotations
 import ast
 import pathlib
 
+import frog
 import pytest
 
 SRC = pathlib.Path(__file__).resolve().parents[1] / "src" / "spoin"
+
+#: ADR-0087. frog is a sibling package; the dependency runs api -> frog only.
+#:
+#: Located by importing it rather than by walking up from this file: the suite runs
+#: both from the repo (apps/api/tests) and inside the image (/app/tests), and a
+#: relative path that is right in one is an IndexError in the other. Importing also
+#: means this checks the frog that is actually installed, not a directory that
+#: happens to sit nearby.
+FROG_SRC = pathlib.Path(frog.__file__).resolve().parent
 
 #: Hard rule 3 / ADR-0002. The one module allowed to import LangChain.
 LANGCHAIN_MODULE = SRC / "generation" / "langchain_impl.py"
@@ -259,3 +269,42 @@ def test_questions_are_written_by_the_topic_wide_phase_only() -> None:
         f"_run_question_phase is called from {sorted(callers)} -- ADR-0074 puts it behind the "
         "topic-wide fan-in phase only"
     )
+
+
+@pytest.mark.parametrize(
+    "path",
+    _python_files(FROG_SRC) if FROG_SRC.is_dir() else [],
+    ids=lambda p: p.name,
+)
+def test_frog_never_imports_spoin(path: pathlib.Path) -> None:
+    """ADR-0087: the dependency runs one way, `api -> frog`.
+
+    frog owns the embedder and the corpus store, and `spoin` depends on it. If frog
+    reached back into `spoin` -- `spoin.core.config` is the tempting one, since
+    frog's own settings deliberately do not carry `embedding_dim` -- neither package
+    could be built, tested or reasoned about alone, and the sibling layout would be
+    decorative.
+
+    Enforced here as well as by frog's `ruff` `banned-api` entry, because a lint rule
+    can be bypassed locally and this cannot (CLAUDE.md: a hard architectural rule gets
+    enforced twice, never documented once -- the same wiring ADR-0002 uses).
+    """
+
+    offenders = {name for name in _imports(path) if name.split(".")[0] == "spoin"}
+    assert not offenders, (
+        f"{path.relative_to(FROG_SRC)} imports {offenders}. "
+        "frog must not import spoin -- the dependency runs api -> frog only (ADR-0087)."
+    )
+
+
+def test_the_frog_boundary_check_is_actually_looking_at_something() -> None:
+    """The test above is parametrized over discovered files, and a parametrization
+    over an empty list passes silently.
+
+    That is the exact failure mode this project has been bitten by elsewhere: a check
+    that reports green because it found nothing to check. If frog moves or the path
+    arithmetic drifts, fail here rather than pretending the boundary is enforced.
+    """
+
+    assert FROG_SRC.is_dir(), f"frog source not found at {FROG_SRC} (ADR-0087)"
+    assert _python_files(FROG_SRC), f"no Python files under {FROG_SRC}"

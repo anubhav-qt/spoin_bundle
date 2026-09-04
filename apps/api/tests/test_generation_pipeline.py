@@ -10,13 +10,13 @@ from __future__ import annotations
 import uuid
 from typing import cast
 
+from frog.embeddings import HashEmbedder
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
 from spoin.domain.enums import CardStatus, Difficulty, RejectionStage
 from spoin.domain.models import Card, Question, RejectedCard, Subtopic, Topic, TopicAlias
-from spoin.embeddings import HashEmbedder
 from spoin.generation.base import (
     AsciiFetchQuery,
     AsciiFetchResult,

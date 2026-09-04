@@ -4,7 +4,8 @@
 # Windows without `make`: use ./make.ps1 <target>, which mirrors these targets.
 
 .DEFAULT_GOAL := help
-.PHONY: help setup dev seed test lint fmt types check migrate migration worker api-types down clean
+.PHONY: help setup dev seed test lint fmt types check migrate migration \
+        universe-migrate universe-migration worker api-types down clean
 
 COMPOSE := docker compose
 API     := $(COMPOSE) run --rm --no-deps api
@@ -32,15 +33,18 @@ seed: ## Apply migrations to spoin_db (no fixtures -- see CLAUDE.md)
 test: ## Run the test suite (against its own database)
 	$(COMPOSE) --profile test run --rm test
 
-lint: ## ruff check + ruff format --check
+lint: ## ruff check + ruff format --check (apps/api and apps/frog)
 	$(API) ruff check src tests
 	$(API) ruff format --check src tests
+	$(API) sh -c "cd /app/frog && ruff check src tests && ruff format --check src tests"
 
-fmt: ## ruff format
+fmt: ## ruff format (apps/api and apps/frog)
 	$(API) ruff format src tests
+	$(API) sh -c "cd /app/frog && ruff format src tests"
 
-types: ## mypy --strict
+types: ## mypy --strict (apps/api and apps/frog)
 	$(API) mypy src
+	$(API) sh -c "cd /app/frog && mypy src"
 
 check: lint types test ## Everything CI runs
 
@@ -49,6 +53,17 @@ migrate: ## Apply migrations
 
 migration: ## Autogenerate a migration: make migration m="add foo"
 	$(COMPOSE) run --rm seed alembic revision --autogenerate -m "$(m)"
+
+# ADR-0088: the corpus database has its OWN alembic environment, in apps/frog,
+# which reads SPOIN_UNIVERSE_DATABASE_URL and nothing else. These targets are
+# separate from `migrate`/`migration` above for the same reason the environment
+# is: so a corpus migration cannot be run against spoin_db_2 by muscle memory.
+universe-migrate: ## Create (if absent) and migrate the_spoin_universe
+	$(COMPOSE) --profile universe run --rm universe-seed
+
+universe-migration: ## Autogenerate a universe migration: make universe-migration m="add foo"
+	$(COMPOSE) --profile universe run --rm --entrypoint alembic universe-seed \
+		revision --autogenerate -m "$(m)"
 
 worker: ## Run one batch pass of the worker, then exit
 	$(COMPOSE) --profile worker run --rm worker

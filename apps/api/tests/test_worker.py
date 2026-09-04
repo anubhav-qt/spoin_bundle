@@ -15,12 +15,12 @@ from contextlib import asynccontextmanager
 
 import pytest
 import pytest_asyncio
+from frog.embeddings import HashEmbedder
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from spoin.core.config import Settings
 from spoin.domain.models import Card, GenerationJob, Topic
-from spoin.embeddings import HashEmbedder
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.quota import (
     AllModelsUnavailableError,

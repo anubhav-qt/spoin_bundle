@@ -9,8 +9,8 @@ total degradation to `None` when there is no real embedder.
 from __future__ import annotations
 
 import pytest
+from frog.embeddings import Embedder, HashEmbedder
 
-from spoin.embeddings import Embedder, HashEmbedder
 from spoin.topics import accent_color
 from spoin.topics.accent_color import (
     ACCENT_HUE_MIN_DISTANCE,

@@ -8,6 +8,22 @@ re-deriving context that already exists on disk.
 
 ## The database
 
+**There are now THREE databases in the local Postgres instance**, all sharing the
+one `db-data` volume: `spoin_db_2` (production), `spoin_db_test` (the test suite's,
+recreated on every run), and `the_spoin_universe` (the source-of-truth corpus,
+[ADR-0088](docs/adr/0088-the-spoin-universe.md)). The corpus database is *derived* —
+rebuildable from the delivered corpus — but it lives on the same volume, so the
+standing prohibition on `docker compose down -v` / `make clean` / `docker volume rm`
+now costs three databases instead of two. It is unchanged and not relaxed by anything
+in ADR-0088.
+
+The corpus database has its **own** alembic environment in `apps/frog/`, run with
+`make universe-migrate` / `make universe-migration`. It reads
+`SPOIN_UNIVERSE_DATABASE_URL` and deliberately nothing else, so a corpus migration
+structurally cannot land on `spoin_db_2`. **Do not add a fallback to
+`SPOIN_DATABASE_URL`** — `apps/frog/tests/test_universe_config.py` fails if anyone
+does.
+
 **`spoin_db_2` is the live database** (the local `.env` points
 `SPOIN_DATABASE_URL` at it, and the running stack uses it). **`spoin_db` is the
 archived earlier copy** — do not point anything at it, migrate it, or read it expecting
@@ -94,6 +110,12 @@ apps/worker   Background jobs. Same codebase as apps/api, a different entrypoint
               runs generation/pipeline/. Nothing here is ever in a user-facing request.
 apps/web      Next.js + TypeScript, deployed to Cloudflare Pages. Rendering and client
               state ONLY, zero business logic — see "rules that generalize" below.
+apps/frog     Retrieval (ADR-0087). Owns the `Embedder` classes and the
+              `the_spoin_universe` corpus store. A library, not a service, and a
+              SIBLING of apps/api rather than a package inside it: `spoin` imports
+              frog, frog must never import `spoin`. Enforced by a ruff banned-api
+              entry in apps/frog/pyproject.toml AND an AST check in
+              tests/test_architecture.py. Has its own alembic chain.
 docs/         Everything durable that isn't code: architecture, ADRs, tasks, mockups.
               This is where "why" lives; see "Read before doing anything" below.
 ```

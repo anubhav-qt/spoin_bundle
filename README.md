@@ -107,6 +107,8 @@ See [content-model.md](docs/architecture/content-model.md).
 apps/api        FastAPI service, the single source of truth for all clients
 apps/worker     Background jobs (same codebase as api, different entrypoint)
 apps/web        Next.js, rendering and client state only, zero business logic
+apps/frog       Retrieval: the embedder and the_spoin_universe corpus store.
+                A library, not a service. api -> frog, never the reverse (ADR-0087)
 packages/       Shared contracts, generated API types
 docs/           Architecture and ADRs
 ```

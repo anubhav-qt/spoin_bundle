@@ -44,10 +44,19 @@ services:
   # container that migrates on boot races itself the moment there is more
   # than one replica.
   seed:
+    # ADR-0087: context is the repo root, not ./apps/api -- the image needs
+    # the sibling package apps/frog, which a context rooted at apps/api
+    # cannot reach. Same for the api, test and worker services below.
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
+      # ADR-0088: `the_spoin_universe` is a SEPARATE database, and this is a
+      # separate variable on purpose -- frog will not fall back to
+      # SPOIN_DATABASE_URL, because a convenience fallback is how a corpus
+      # migration lands on spoin_db_2.
+      SPOIN_UNIVERSE_DATABASE_URL: ${SPOIN_UNIVERSE_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe}
 
     depends_on:
       db:
@@ -56,14 +65,23 @@ services:
     # into a container that is then thrown away.
     volumes:
       - ./apps/api/src:/app/src
+      # Same staleness reasoning as ./apps/api/src above, for the sibling
+      # package (ADR-0087).
+      - ./apps/frog/src:/app/frog/src
       - ./apps/api/alembic:/app/alembic
     command: ["sh", "-c", "alembic upgrade head"]
 
   api:
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
+      # ADR-0088: `the_spoin_universe` is a SEPARATE database, and this is a
+      # separate variable on purpose -- frog will not fall back to
+      # SPOIN_DATABASE_URL, because a convenience fallback is how a corpus
+      # migration lands on spoin_db_2.
+      SPOIN_UNIVERSE_DATABASE_URL: ${SPOIN_UNIVERSE_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe}
 
       SPOIN_ENV: local
       SPOIN_CORS_ORIGINS: http://localhost:3000
@@ -91,6 +109,9 @@ services:
         condition: service_completed_successfully
     volumes:
       - ./apps/api/src:/app/src
+      # Same staleness reasoning as ./apps/api/src above, for the sibling
+      # package (ADR-0087).
+      - ./apps/frog/src:/app/frog/src
       # Mounted so `make lint` / `make types` see the working tree rather than
       # whatever was baked into the image at build time.
       - ./apps/api/tests:/app/tests
@@ -106,6 +127,10 @@ services:
       # banned-api rule appeared to do nothing, and the stale rule kept firing
       # with its old message. Read-only: nothing in the container writes it.
       - ./apps/api/pyproject.toml:/app/pyproject.toml:ro
+      # frog's own lint/type/test config and suite, mounted for the same
+      # staleness reason as apps/api's (ADR-0087 put `make check` over both).
+      - ./apps/frog/tests:/app/frog/tests
+      - ./apps/frog/pyproject.toml:/app/frog/pyproject.toml:ro
     command:
       ["uvicorn", "spoin.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
@@ -158,7 +183,8 @@ services:
   test:
     profiles: ["test"]
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
       SPOIN_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_test
@@ -167,10 +193,17 @@ services:
         condition: service_healthy
     volumes:
       - ./apps/api/src:/app/src
+      # Same staleness reasoning as ./apps/api/src above, for the sibling
+      # package (ADR-0087).
+      - ./apps/frog/src:/app/frog/src
       - ./apps/api/tests:/app/tests
       # pytest reads [tool.pytest.ini_options] from here -- same staleness
       # trap as the api service above.
       - ./apps/api/pyproject.toml:/app/pyproject.toml:ro
+      # frog's own lint/type/test config and suite, mounted for the same
+      # staleness reason as apps/api's (ADR-0087 put `make check` over both).
+      - ./apps/frog/tests:/app/frog/tests
+      - ./apps/frog/pyproject.toml:/app/frog/pyproject.toml:ro
     entrypoint: ["sh", "-c"]
     command:
       - |
@@ -185,6 +218,10 @@ services:
             await conn.close()
         asyncio.run(main())
         PY
+        # ADR-0087: frog's suite runs in the same pass so `make check` covers
+        # both packages. It needs no database at all -- these are unit tests of
+        # the embedder -- so it runs first and fails fast.
+        pytest -q --rootdir /app/frog -c /app/frog/pyproject.toml /app/frog/tests
         pytest -q "$@"
 
   # Always-on here (local dev only) so a topic typed into the app actually
@@ -197,9 +234,15 @@ services:
   #     docker compose run --rm worker python -m spoin.worker
   worker:
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
+      # ADR-0088: `the_spoin_universe` is a SEPARATE database, and this is a
+      # separate variable on purpose -- frog will not fall back to
+      # SPOIN_DATABASE_URL, because a convenience fallback is how a corpus
+      # migration lands on spoin_db_2.
+      SPOIN_UNIVERSE_DATABASE_URL: ${SPOIN_UNIVERSE_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe}
 
       # See the `api` service's identical two lines above for why this reads
       # from `.env` via `${...}` instead of a literal -- same reasoning here.
@@ -213,7 +256,64 @@ services:
         condition: service_completed_successfully
     volumes:
       - ./apps/api/src:/app/src
+      # Same staleness reasoning as ./apps/api/src above, for the sibling
+      # package (ADR-0087).
+      - ./apps/frog/src:/app/frog/src
     command: ["python", "-m", "spoin.worker", "--watch"]
+
+  # ADR-0088: migrations for `the_spoin_universe`, the source-of-truth corpus
+  # database. Its own service because it runs frog's alembic environment, which
+  # reads SPOIN_UNIVERSE_DATABASE_URL and DELIBERATELY nothing else -- a corpus
+  # migration structurally cannot land on spoin_db_2.
+  #
+  # Profile-gated so it never runs as part of a plain `docker compose up`.
+  # Creating the database is non-destructive, but CLAUDE.md's rules about the
+  # `db` service are unchanged and now cover three databases sharing one volume:
+  # spoin_db_2, spoin_db_test, and this one. `docker compose down -v`,
+  # `make clean` and `docker volume rm` remain prohibited.
+  #
+  #     docker compose --profile universe run --rm universe-seed
+  universe-seed:
+    profiles: ["universe"]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    working_dir: /app/frog
+    environment:
+      SPOIN_UNIVERSE_DATABASE_URL: ${SPOIN_UNIVERSE_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/frog/src:/app/frog/src
+      # Mounted so an autogenerated universe migration is written to the host
+      # rather than into a container that is then thrown away -- and so that
+      # `alembic heads` answers from the working tree, not from whatever was
+      # baked in at the last build. The api service's identical mount exists
+      # because that second failure mode already bit this project once.
+      - ./apps/frog/alembic:/app/frog/alembic
+    # CREATE DATABASE cannot run inside a transaction, and alembic will not
+    # create its own target -- so the database is ensured first, idempotently,
+    # then migrated. Mirrors how the `test` service ensures spoin_db_test.
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        python - <<'PY'
+        import asyncio, asyncpg
+        async def main():
+            conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/postgres")
+            try:
+                await conn.execute("CREATE DATABASE the_spoin_universe")
+                print("created the_spoin_universe")
+            except asyncpg.DuplicateDatabaseError:
+                print("the_spoin_universe already exists")
+            await conn.close()
+            conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/the_spoin_universe")
+            await conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
+            await conn.close()
+        asyncio.run(main())
+        PY
+        alembic upgrade head
 
 volumes:
   db-data:

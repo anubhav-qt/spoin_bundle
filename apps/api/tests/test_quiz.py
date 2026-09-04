@@ -15,6 +15,7 @@ import uuid
 
 import pytest
 from fastapi import HTTPException
+from frog.embeddings import HashEmbedder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,7 +30,6 @@ from spoin.api.schemas import (
 from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
 from spoin.domain.models import Question, Topic, User, UserTopicProgress
-from spoin.embeddings import HashEmbedder
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.pipeline import TopicRequest, match_and_create_topics, run_generation_pipeline
 

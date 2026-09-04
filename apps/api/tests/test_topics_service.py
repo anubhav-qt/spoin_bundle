@@ -11,6 +11,7 @@ import uuid
 
 import pytest
 from fastapi import HTTPException
+from frog.embeddings import HashEmbedder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +28,6 @@ from spoin.domain.models import (
     UserTopic,
     UserTopicProgress,
 )
-from spoin.embeddings import HashEmbedder
 from spoin.topics.service import TopicsService, entry_tier_unlock
 
 # ------------------------------------------------------- pure: entry unlock --

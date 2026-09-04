@@ -43,19 +43,36 @@ switch ($Target) {
     'lint' {
         Invoke-Compose ($api + @('ruff', 'check', 'src', 'tests'))
         Invoke-Compose ($api + @('ruff', 'format', '--check', 'src', 'tests'))
+        Invoke-Compose ($api + @('sh', '-c', 'cd /app/frog && ruff check src tests && ruff format --check src tests'))
     }
-    'fmt'       { Invoke-Compose ($api + @('ruff', 'format', 'src', 'tests')) }
-    'types'     { Invoke-Compose ($api + @('mypy', 'src')) }
+    'fmt' {
+        Invoke-Compose ($api + @('ruff', 'format', 'src', 'tests'))
+        Invoke-Compose ($api + @('sh', '-c', 'cd /app/frog && ruff format src tests'))
+    }
+    'types' {
+        Invoke-Compose ($api + @('mypy', 'src'))
+        Invoke-Compose ($api + @('sh', '-c', 'cd /app/frog && mypy src'))
+    }
     'check' {
         Invoke-Compose ($api + @('ruff', 'check', 'src', 'tests'))
         Invoke-Compose ($api + @('ruff', 'format', '--check', 'src', 'tests'))
+        Invoke-Compose ($api + @('sh', '-c', 'cd /app/frog && ruff check src tests && ruff format --check src tests'))
         Invoke-Compose ($api + @('mypy', 'src'))
+        Invoke-Compose ($api + @('sh', '-c', 'cd /app/frog && mypy src'))
         Invoke-Compose @('--profile', 'test', 'run', '--rm', 'test')
     }
     'migrate'   { Invoke-Compose @('run', '--rm', 'seed', 'alembic', 'upgrade', 'head') }
     'migration' {
         if (-not $m) { throw 'Usage: ./make.ps1 migration -m "describe the change"' }
         Invoke-Compose @('run', '--rm', 'seed', 'alembic', 'revision', '--autogenerate', '-m', $m)
+    }
+    # ADR-0088: the corpus database has its own alembic environment reading
+    # SPOIN_UNIVERSE_DATABASE_URL only. Separate targets so a corpus migration
+    # cannot be run against spoin_db_2 by muscle memory.
+    'universe-migrate' { Invoke-Compose @('--profile', 'universe', 'run', '--rm', 'universe-seed') }
+    'universe-migration' {
+        if (-not $m) { throw 'Usage: ./make.ps1 universe-migration -m "describe the change"' }
+        Invoke-Compose @('--profile', 'universe', 'run', '--rm', '--entrypoint', 'alembic', 'universe-seed', 'revision', '--autogenerate', '-m', $m)
     }
     'worker'    { Invoke-Compose @('--profile', 'worker', 'run', '--rm', 'worker') }
     'scan'      { Invoke-Compose ($api + @('python', '-m', 'spoin.scan_and_generate', '--limit', '1')) }
@@ -78,6 +95,8 @@ switch ($Target) {
             'migrate     Apply migrations'
             'migration   Autogenerate a migration: ./make.ps1 migration -m "add foo"'
             'worker      Run one batch pass of the worker, then exit'
+            'universe-migrate    Create (if absent) and migrate the_spoin_universe'
+            'universe-migration  Autogenerate a universe migration (-m "...")'
             'api-types   Regenerate packages/api-types from the live OpenAPI schema'
             'down        Stop everything'
             'clean       Stop everything and delete the database volume'

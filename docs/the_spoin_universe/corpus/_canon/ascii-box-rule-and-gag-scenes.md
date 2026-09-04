@@ -38,7 +38,7 @@ Language models lack native spatial coordinate reasoning. When allowed to genera
 Because prompt instructions alone cannot guarantee 100% compliance across smaller generator models (such as `ministral-3b` and `ministral-8b`), the Spoin backend enforces the 40-column rule via a deterministic server-side validator:
 
 - **Validation Pass:** Upon receiving a generated card draft carrying a `visual_slots` payload, the system splits the raw ASCII text into individual lines and measures the character length of each line.
-- **The Degradation Rule:** If **any single line** in the ASCII block exceeds 40 characters, or if the block contains prohibited syntax (such as embedded backticks or malformed line endings), **the system automatically nulls `visual_id` and `visual_slots`, stripping the visual from the card**.
-- **The Card is Kept:** The text of the card (`title`, `canonical_title`, `summary`, `body`) is preserved and published as a normal prose card.
+- **The Degradation Rule:** If **any single line** in the ASCII block exceeds 40 characters, or if the block contains prohibited syntax (such as embedded backticks or malformed line endings), **the system automatically removes the card**.
+- **The Card is not kept:** The text of the card (`title`, `canonical_title`, `summary`, `body`) is discarded and not published.
 
-This ensures that failures degrade gracefully to **"no art"**, never to **"broken, line-wrapped art"**.
+This ensures that failures degrade gracefully to **"no card"**, and then are regenerated again to get better visuals.

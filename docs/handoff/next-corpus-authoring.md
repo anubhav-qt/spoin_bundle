@@ -2,13 +2,14 @@
 
 > **Written:** 2026-09-05 after authoring Human Biology, World Philosophy, Astronomy, World Mythology, Fullstack Engineering, Frontend Engineering, and Backend Engineering suites.  
 > **Status:** 67 curated documents in `docs/the_spoin_universe/corpus/`.  
-> **Purpose:** Hand off the corpus generation pipeline to a fresh session with complete operational context, invariants, and instructions.
+> **Validator Status:** 8 ok, 59 failing against the newly built machine ingestion contract (`apps/frog/src/frog/ingest/contract.py`).  
+> **Immediate Priority:** Retrofit existing 59 files to pass `python -m frog.ingest --check` (67 ok, 0 failing), then continue authoring.
 
 ---
 
 ## 1. What Already Exists in the Corpus
 
-The corpus currently holds **67 fully compliant documents** organized by category and scope:
+The corpus currently holds **67 documents** organized across 8 suites:
 
 | Directory Path | Subject | Scope | Docs | Notes |
 |---|---|---|---|---|
@@ -21,100 +22,78 @@ The corpus currently holds **67 fully compliant documents** organized by categor
 | `docs/the_spoin_universe/corpus/philosophy/world-philosophy/` | World Philosophy | Survey | 9 | Presocratics/methods, classical Greek (Socrates/Plato/Aristotle), Hellenistic/Late Antique, Eastern traditions, Medieval/Islamic Falsafa, Early Modern epistemology, German Idealism/19th-C critique, 20th-C Analytic/Continental, tips-and-tricks. |
 | `docs/the_spoin_universe/corpus/science/biology/human-biology/` | Human Biology | Survey | 9 | Cellular bioenergetics, genetics/epigenetics, neurobiology & brain, cardiovascular, respiratory, immunology, endocrinology, digestive/renal, tips-and-tricks. |
 
-Every document strictly satisfies the database schema contract (`the_spoin_universe.document` and `the_spoin_universe.chunk`):
-- `title:` is explicitly declared in YAML front matter on every file (`document.title NOT NULL`).
-- `kind: topic_source` includes `category:` and `scope:` (`survey` or `topic`).
-- `sub_category:` is included when present, omitted when None.
-- Every directory includes a dedicated, mandatory `tips-and-tricks.md`.
-- All `##` sections are self-contained without cross-section relative pronouns.
-- Prose is fact-dense (80–250 words per concept), dry, and free of jokes or filler in the body.
+---
+
+## 2. The Ingestion Contract & Validator Invariants (`contract.py`)
+
+The ingester validates all documents against `apps/frog/src/frog/ingest/contract.py` before embedding. Run validation offline via:
+```bash
+python -m frog.ingest --check --corpus docs/the_spoin_universe/corpus
+# Or via make / PowerShell:
+make corpus-check
+.\make.ps1 corpus-check
+```
+
+### The Three Hard Validator Rules:
+1. **⚠️ Nothing Before the First `##` (No Preamble Prose):**
+   - *Rule:* The body must transition immediately from YAML front matter (or optional single `# H1` title line) straight into the first `## Heading`.
+   - *Failure Mode:* Any prose paragraph between `---` / `# Title` and the first `##` raises a hard validation failure (`characters of prose before the first '##' heading`).
+   - *Remedy:* Delete general introductory framing paragraphs entirely, or convert real facts into their own distinct `##` section.
+2. **⚠️ Maximum Section Size: 2,200 Characters (~512 Tokens):**
+   - *Rule:* One `##` section = one chunk. No automated recursive sub-splitter exists. Any section exceeding **2,200 characters** raises a hard failure.
+   - *Remedy:* Do not compress. Split over-long sections into two or more focused, self-contained `##` headings. Each section must cover exactly one coherent conceptual idea.
+3. **⚠️ Valid YAML Front Matter (Quote Colons):**
+   - *Rule:* Any front-matter string containing a colon followed by a space (e.g. `source: "Author: Title (ed.)"`) must be enclosed in double quotes.
 
 ---
 
-## 2. Essential Documents to Read Before Authoring
+## 3. How to Write for the Chunker
 
-1. [`docs/the_spoin_universe/procedure.md`](../the_spoin_universe/procedure.md): **The Authoring Loop.** Follow the 7 phases in exact order (Intake $\to$ Coverage Check $\to$ Research $\to$ Temp Notes $\to$ Curation $\to$ Emission $\to$ Cleanup & Git Commit).
-2. [`docs/handoff/antigravity-corpus-authoring.md`](antigravity-corpus-authoring.md): **The Ingestion Contract.** File layout, front matter specifications, and quality invariants.
-3. [`.agents/rules/corpus-curation.md`](../../.agents/rules/corpus-curation.md): **Persistent Curation Rules.** Standing behavioral guidelines.
-4. [`docs/the_spoin_universe/corpus/README.md`](../the_spoin_universe/corpus/README.md): Current corpus tree and conventions.
-
----
-
-## 3. Invariants & Hard-Learned Lessons
-
-- **Never Omit `title:` in Front Matter:** `document.title` is a `NOT NULL` database column in `the_spoin_universe`. Every markdown file must begin with:
-  ```yaml
-  ---
-  title: Exact Title of Document
-  kind: topic_source
-  category: category name
-  sub_category: optional sub-category
-  scope: survey # or topic
-  source: Primary authoritative source
-  source_date: YYYY or YYYY-MM-DD
-  topic_tags: [tag1, tag2, ...]
-  ---
-  ```
-- **Phase A Intake is Mandatory:** Always run Phase A intake first using the `ask_question` tool, asking:
-  1. Category (prioritize existing corpus categories: `computer science`, `mythology`, `astronomy`, then proposed).
-  2. Sub-category (or `None`).
-  3. Survey vs Topic (broad map of a field vs deep-dive course down to bedrock).
-- **Phase B Coverage Check Enables Compositional Reuse:**
-  - Before researching, check what existing corpus directories cover.
-  - Do **not** re-fetch or re-explain concepts that neighbouring documents already treat well. (e.g. Fullstack Engineering reused protocol and database foundations from Backend, and DOM/rendering concepts from Frontend, needing only one targeted search for W3C Trace Context).
-- **Domain-Agnostic Practitioner Wisdom:**
-  - Phase C research and Phase F `tips-and-tricks.md` apply to **all** human disciplines (sciences, humanities, trades, philosophy, mathematics), not just software/tech.
-  - Cover real-world operational traps, translation distortions, observational blunders, and counter-intuitive edge cases.
-- **ASCII Degradation Policy:**
-  - If a generated ASCII art diagram exceeds 40 columns or fails parser validation, the card is **discarded entirely for regeneration** (do not degrade to text-only prose).
-- **No Waiting for Test Runs:** Keep generating corpus data continuously as instructed by the project owner.
-- **Temp Directory Discipline:** Always write raw research to `docs/the_spoin_universe/temp/` (`00-scope.md`, `01-sources.md`, `10-...`). Always wipe `temp/` at the end of the run, leaving only `temp/README.md`.
+- **One Idea per Section:** A section covering two ideas produces an embedding vector that is the muddy average of both, degrading retrieval ranking.
+- **Informative Headings:** Headings are embedded directly into the chunk's contextual prefix (`Document Title — Section Heading`). Use descriptive headings (`## What REPEATABLE READ Actually Guarantees`), never vague generic markers (`## Overview`, `## Details`, `## Part 2`).
+- **Front-Load Specifics:** The opening sentences carry the heaviest retrieval weight. Lead with concrete mechanisms, numbers, or rules, not rhetorical windups.
+- **Strict Self-Containment:** Chunks are retrieved in isolation alongside chunks from other documents. Never use relative cross-references (`"as mentioned above"`, `"as we saw in the previous section"`, `"this demonstrates"`). Restate the noun directly.
+- **Define Local Terms:** Define unfamiliar domain terms within the section that uses them, never in an introductory glossary chunk.
 
 ---
 
-## 4. Suggested Next Subjects
+## 4. Current Audit Breakdown (60 Oversized Sections across 59 Failing Files)
 
-Depending on the project owner's curriculum goals, logical next candidates include:
-
-- **Natural & Physical Sciences:**
-  - *Organic Chemistry* (Survey under `science` or `chemistry`)
-  - *Quantum Mechanics* (Survey or Topic under `physics`)
-  - *Evolutionary Biology & Genetics* (Survey under `biology`)
-- **Mathematics:**
-  - *Linear Algebra* (Topic or Survey under `mathematics`)
-  - *Calculus & Mathematical Analysis* (Survey under `mathematics`)
-  - *Probability & Statistics* (Survey under `mathematics`)
-- **Computer Science:**
-  - *Distributed Systems* (Survey under `computer science / software engineering`)
-  - *Operating Systems & Systems Programming* (Survey under `computer science`)
-  - *Cryptography & Information Security* (Survey under `computer science`)
-- **Humanities & History:**
-  - *Classical Philosophy: Presocratics to Hellenistic Schools* (Survey under `philosophy`)
-  - *History of the Ancient Silk Road* (Survey under `history`)
+```
+Batch Breakdown of Oversized Sections (> 2,200 chars):
+- science/biology/human-biology/: 38 sections over limit
+- mythology/world-mythology/: 8 sections over limit
+- computer-science/.../backend-engineering/: 7 sections over limit
+- philosophy/world-philosophy/: 7 sections over limit
+- All other batches: 0 oversized sections (only preamble prose cleanup needed)
+```
 
 ---
 
 ## 5. The Ready-to-Paste Prompt for the Next Session
 
 ```markdown
-Continue authoring the source-of-truth corpus for `the_spoin_universe`.
+You are authoring and maintaining the source-of-truth corpus for `the_spoin_universe`.
 
-Read in this order before doing anything:
-1. `docs/handoff/next-corpus-authoring.md` (your operational brief and current corpus inventory)
-2. `docs/the_spoin_universe/procedure.md` (the mandatory 7-phase loop to follow every run)
-3. `docs/handoff/antigravity-corpus-authoring.md` (the ingestion contract)
+### Immediate Objective:
+Run the offline validator and retrofit all 59 failing documents to achieve 100% compliance (67 ok, 0 failing):
+```bash
+python -m frog.ingest --check --corpus docs/the_spoin_universe/corpus
+```
 
-Current state:
-The corpus holds 49 documents across 5 suites (_canon, backend-engineering, frontend-engineering, fullstack-engineering, world-mythology, astronomy).
-Every document has mandatory `title:` in YAML front matter and a dedicated `tips-and-tricks.md`.
+### The Three Mandates to Enforce:
+1. **Wipe all preamble prose before the first `##` heading:**
+   Every document must transition directly from front matter (and optional `# H1`) into the first `##` section. Delete introductory framing paragraphs.
+2. **Split all sections exceeding 2,200 characters:**
+   Do not compress. Split oversized sections into two or more distinct, self-contained `##` sections (one idea per section).
+3. **Quote front-matter values containing colons:**
+   Ensure valid YAML in `science/biology/human-biology/respiratory-physiology-and-gas-exchange.md`.
 
-Rules:
-- Start each subject with Phase A Intake: use the `ask_question` tool to ask Category, Sub-category, and Survey-vs-Topic.
-- Run Phase B Coverage Check before fetching anything to maximize compositional reuse across existing corpus files.
-- Research breadth for surveys, depth for topics. Every domain includes a mandatory `tips-and-tricks.md` capturing authentic practitioner/field wisdom (domain-agnostic).
-- Write raw notes to `docs/the_spoin_universe/temp/` (`00-scope.md`, `01-sources.md`, etc.).
-- Curate dense, dry, self-contained `##` chunks. Never omit `title:` in front matter.
-- Wipe `temp/` leaving only `temp/README.md`, commit your changes to git, and report back.
+### Verification Step:
+Run `python -m frog.ingest --check --corpus docs/the_spoin_universe/corpus`.
+Do not stop until the output prints:
+`checked 67 documents: 67 ok, 0 failing`
 
-Ask me what subject we are authoring next, or present Phase A intake if I have already provided the subject.
+### After Reaching 67 ok, 0 failing:
+Commit the fixes to git, report the clean audit, and run Phase A Intake for the next topic.
 ```

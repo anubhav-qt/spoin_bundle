@@ -8,13 +8,15 @@ re-deriving context that already exists on disk.
 
 ## The database
 
-**There are now THREE databases in the local Postgres instance**, all sharing the
+**There are now FOUR databases in the local Postgres instance**, all sharing the
 one `db-data` volume: `spoin_db_2` (production), `spoin_db_test` (the test suite's,
-recreated on every run), and `the_spoin_universe` (the source-of-truth corpus,
-[ADR-0088](docs/adr/0088-the-spoin-universe.md)). The corpus database is *derived* —
+recreated on every run), `the_spoin_universe` (the source-of-truth corpus,
+[ADR-0088](docs/adr/0088-the-spoin-universe.md)), and `the_spoin_universe_test` (frog's
+ingestion tests, recreated on every run — task 0038 Phase 2). The corpus database is
+*derived* —
 rebuildable from the delivered corpus — but it lives on the same volume, so the
 standing prohibition on `docker compose down -v` / `make clean` / `docker volume rm`
-now costs three databases instead of two. It is unchanged and not relaxed by anything
+now costs four databases instead of two. It is unchanged and not relaxed by anything
 in ADR-0088.
 
 The corpus database has its **own** alembic environment in `apps/frog/`, run with
@@ -23,6 +25,16 @@ The corpus database has its **own** alembic environment in `apps/frog/`, run wit
 structurally cannot land on `spoin_db_2`. **Do not add a fallback to
 `SPOIN_DATABASE_URL`** — `apps/frog/tests/test_universe_config.py` fails if anyone
 does.
+
+The corpus is loaded by `make corpus-ingest`, which runs the **`frog` compose service**
+— the only image in this project with torch and a GPU, because ADR-0092 put bulk
+embedding on the owner's machine and only the app backend deploys. `make corpus-check`
+validates the delivered corpus against the ingestion contract and needs neither a GPU
+nor a database; it is what the corpus-authoring track's deliveries are checked with.
+Ingestion is idempotent by content hash, so re-running it on an unchanged corpus writes
+nothing. A **fourth** database, `the_spoin_universe_test`, is created by the `test`
+service for frog's ingestion tests — same volume, same prohibition, same
+must-end-in-`_test` guard.
 
 **`spoin_db_2` is the live database** (the local `.env` points
 `SPOIN_DATABASE_URL` at it, and the running stack uses it). **`spoin_db` is the
@@ -61,8 +73,10 @@ after the fact by comparing row counts against a benchmark doc), so:
 
 **The single most dangerous command is `docker compose down -v` (a.k.a. `make
 clean`) — and `docker volume rm` on the `db` volume.** The `db` container's one
-volume holds BOTH `spoin_db_2` and the test database `spoin_db_test`
-(docker-compose.yml), so wiping the volume takes production with it. NEVER run
+volume holds `spoin_db_2` AND every other database in the instance -- the test
+databases `spoin_db_test` and `the_spoin_universe_test`, and the corpus
+`the_spoin_universe` (docker-compose.yml) -- so wiping the volume takes production
+with it. NEVER run
 `make clean` / `docker compose down -v` / `docker volume rm` on this project.
 `docker compose down` **without** `-v` is fine (containers stop, volume kept).
 
@@ -110,8 +124,9 @@ apps/worker   Background jobs. Same codebase as apps/api, a different entrypoint
               runs generation/pipeline/. Nothing here is ever in a user-facing request.
 apps/web      Next.js + TypeScript, deployed to Cloudflare Pages. Rendering and client
               state ONLY, zero business logic — see "rules that generalize" below.
-apps/frog     Retrieval (ADR-0087). Owns the `Embedder` classes and the
-              `the_spoin_universe` corpus store. A library, not a service, and a
+apps/frog     Retrieval (ADR-0087). Owns the `Embedder` classes, `normalize_topic_text`
+              (ADR-0093), the `the_spoin_universe` corpus store, and ingestion into it
+              (`frog/ingest/`, task 0038 Phase 2). A library, not a service, and a
               SIBLING of apps/api rather than a package inside it: `spoin` imports
               frog, frog must never import `spoin`. Enforced by a ruff banned-api
               entry in apps/frog/pyproject.toml AND an AST check in

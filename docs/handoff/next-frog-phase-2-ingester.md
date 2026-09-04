@@ -123,6 +123,12 @@ mid-session and re-check counts rather than trusting these numbers.
    Idempotency is the requirement: the corpus is re-delivered many times.
 6. **Chunk on `##` headings.** Measured on the real corpus: median ~291 tokens, max
    ~583, only ~4% over 512. Section-level is right; don't invent a splitter.
+
+   > ⚠️ **These numbers were wrong** and the Phase 2 session repeated them before
+   > checking. Re-measured over 358 sections with `Qwen3-Embedding-0.6B`'s own
+   > tokenizer: **median 339, max 1385, 17% over 512.** The conclusion held — no
+   > splitter — but only after adding an enforced section size limit, because at 17%
+   > the guideline was plainly not holding on its own. See task 0038's Phase 2 record.
 7. **Embed** with `embed_passage`, in batches.
 8. **Upsert** document + chunks, `ordinal` in document order.
 

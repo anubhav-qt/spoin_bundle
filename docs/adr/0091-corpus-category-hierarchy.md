@@ -82,7 +82,10 @@ it is what makes that distinction available later without re-reading every docum
 ### Stored normalized
 
 `category` and `sub_category` go through the same `normalize_topic_text` as
-`chunk.topic_tags` — lowercased, non-alphanumerics to spaces, whitespace collapsed. So
+`chunk.topic_tags` — lowercased, non-alphanumerics to spaces, whitespace collapsed. That
+function now lives in `frog.embeddings`
+([ADR-0093](0093-normalize-topic-text-moves-into-frog.md)); the ingester that applies it
+is on frog's side of the boundary. So
 "Computer Science", "computer-science" and "COMPUTER SCIENCE" are one category rather
 than three. Without this, the intake step's list of "existing categories" grows a
 near-duplicate every time someone types a name slightly differently, which defeats the

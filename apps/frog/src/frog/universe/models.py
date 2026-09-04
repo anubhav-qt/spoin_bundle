@@ -193,7 +193,7 @@ class Chunk(Base, UUIDPrimaryKey, CreatedAt):
 
     embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
 
-    #: Normalized topic slugs, produced by `spoin.embeddings.normalize_topic_text` at
+    #: Normalized topic slugs, produced by `frog.embeddings.normalize_topic_text` at
     #: ingestion time. `the_spoin_universe` is a SEPARATE database, so a chunk cannot
     #: hold a foreign key to `spoin_db_2`'s `topic` table — tagging crosses that
     #: boundary by value (ADR-0088). Sharing one normalizer is what stops tags and

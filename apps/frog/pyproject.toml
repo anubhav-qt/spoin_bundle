@@ -14,6 +14,9 @@ dependencies = [
     "pgvector>=0.3.6",
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    # Front matter. The ingester parses YAML and nothing else does, so this is a real
+    # runtime dependency of frog rather than a dev convenience.
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
@@ -44,6 +47,7 @@ dev = [
     # `ruff format` pass in the same commit.
     "ruff>=0.16.6,<0.17",
     "mypy>=1.13",
+    "types-PyYAML>=6.0",
 ]
 
 [build-system]

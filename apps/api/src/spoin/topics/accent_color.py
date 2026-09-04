@@ -28,9 +28,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 
-from frog.embeddings import Embedder, HashEmbedder
-
-from spoin.embeddings import normalize_topic_text
+from frog.embeddings import Embedder, HashEmbedder, normalize_topic_text
 
 #: ADR-0075. A vocabulary hue within this many degrees of a hue one of the
 #: user's other topics already uses is skipped. 360 / 25 -> ~14 distinct slots

@@ -5,7 +5,8 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help setup dev seed test lint fmt types check migrate migration \
-        universe-migrate universe-migration worker api-types down clean
+        universe-migrate universe-migration corpus-check corpus-ingest \
+        worker api-types down clean
 
 COMPOSE := docker compose
 API     := $(COMPOSE) run --rm --no-deps api
@@ -64,6 +65,15 @@ universe-migrate: ## Create (if absent) and migrate the_spoin_universe
 universe-migration: ## Autogenerate a universe migration: make universe-migration m="add foo"
 	$(COMPOSE) --profile universe run --rm --entrypoint alembic universe-seed \
 		revision --autogenerate -m "$(m)"
+
+# Task 0038, Phase 2. corpus-check needs no GPU and no database -- it is the contract
+# validator alone, and it is what the corpus-authoring track runs. corpus-ingest needs
+# both, and runs in the only image carrying torch (apps/frog/Dockerfile).
+corpus-check: ## Validate the corpus against the ingestion contract; writes nothing
+	$(COMPOSE) --profile frog run --rm frog --check
+
+corpus-ingest: ## Ingest the corpus into the_spoin_universe (GPU; run universe-migrate first)
+	$(COMPOSE) --profile frog run --rm frog
 
 worker: ## Run one batch pass of the worker, then exit
 	$(COMPOSE) --profile worker run --rm worker

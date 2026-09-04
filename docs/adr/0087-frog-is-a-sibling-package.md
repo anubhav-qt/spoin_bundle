@@ -6,6 +6,10 @@
 - **Amended by:** [ADR-0092](0092-qwen3-embedder-and-the-device-split.md) — the
   embedder becomes `Qwen3-Embedding-0.6B` at 1024 dimensions, and the `Embedder`
   interface becomes asymmetric. This ADR's "vectors stay 384-dim" no longer holds.
+- **Amended by:** [ADR-0093](0093-normalize-topic-text-moves-into-frog.md) —
+  `normalize_topic_text` moves into `frog` after all. The "stays in `spoin`" clause below
+  no longer holds; it was written before ADR-0088 gave the function a caller on the far
+  side of a boundary frog cannot cross.
 
 ## Context
 
@@ -54,9 +58,16 @@ comparable, and nothing raises. Corpus chunk vectors and existing
 `card.content_embedding` vectors must remain in the same space, so **384 dimensions
 and the same model are load-bearing, not a default**.
 
-`normalize_topic_text` stays in `spoin`. It is topic-canonicalization logic that
+~~`normalize_topic_text` stays in `spoin`. It is topic-canonicalization logic that
 happens to be applied before embedding, not embedding infrastructure — task 0001's
-threshold calibration depends on it not drifting, and that concern is spoin's.
+threshold calibration depends on it not drifting, and that concern is spoin's.~~
+
+**Superseded by [ADR-0093](0093-normalize-topic-text-moves-into-frog.md)** (2026-09-05).
+The clause above held only until something needed to call the function from frog's side.
+ADR-0088's ingester does, and ADR-0088's own reasoning — *one* normalizer, so corpus tags
+and canonical topic names cannot become two vocabularies — made duplicating it the wrong
+answer. Unlike `get_embedder()`, it reads no settings, so there was nothing for a second
+home to diverge about except the code.
 
 ### All 23 import sites are rewritten, no re-export shim
 

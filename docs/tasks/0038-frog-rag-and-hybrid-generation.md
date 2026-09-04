@@ -1,9 +1,10 @@
 # Task 0038: `frog` (our own RAG), `the_spoin_universe`, and hybrid Mistral/Gemini generation
 
-> **Status:** Phases 0 and 1 done (2026-09-04). ADRs 0087-0090 accepted;
+> **Status:** Phases 0, 1 and 2 done (Phase 2: 2026-09-05). ADRs 0087-0093 accepted;
 > `apps/frog` exists, passes `make check`, and carries the `document`/`chunk`
-> schema and its own alembic chain. **The corpus database itself has not been
-> created yet** — the owner runs `make universe-migrate`. Phase 2 next.
+> schema, its own alembic chain, and the ingester. **The corpus database itself has
+> still not been created** — the owner runs `make universe-migrate` — so nothing has
+> been ingested yet. Phase 3 next.
 > Written 2026-09-04.
 > **Depends on:** [`docs/mistral-saga/`](../mistral-saga/README.md) — provider
 > validation. Experiments 1, 2 and 3 have passed; 3b (drafting quality) is
@@ -215,6 +216,127 @@ supervised and revised.
 ⚠️ **The corpus is the ceiling on card quality.** A thin or wrong corpus produces
 confidently-grounded wrong cards — worse than parametric guessing, because it
 *looks* sourced. Worth saying plainly to the track that owns it.
+
+### What Phase 2 actually landed (2026-09-05)
+
+`frog/ingest/` — three modules and a CLI — plus [ADR-0093](../adr/0093-normalize-topic-text-moves-into-frog.md),
+a GPU compose service, and four contract clarifications. `make check` green: **43 frog
+tests** (was 18) and 534 api tests.
+
+**The normalizer moved.** ADR-0087 kept `normalize_topic_text` in `spoin`; ADR-0088 then
+required the ingester to produce `chunk.topic_tags` with *the same* function, and the
+ingester is in frog, which cannot import `spoin`. ADR-0093 resolves the contradiction by
+moving it into `frog.embeddings`, all six `spoin` call sites importing from there with no
+re-export shim. The distinction that decided it: `get_embedder()` reads settings and so
+duplicating it would duplicate `embedding_dim`; `normalize_topic_text` is a pure function
+of a string with nothing to diverge about except the code.
+
+**Chunking is `##`-section level, with a `##` section enforced to stay chunk-sized.**
+One section, one chunk; **no sub-splitter**, because a section boundary is the author's
+judgment about where one idea ends and a recursive splitter would overrule it with
+machinery that has read less of the material.
+
+⚠️ **The handoff's measured numbers were wrong, and this session repeated them before
+checking.** It claimed median ~291 tokens, max ~583, ~4% over 512. Re-measured over 358
+sections with `Qwen3-Embedding-0.6B`'s **own** tokenizer: **median 339, max 1385, 17%
+over 512** — four times the claimed overflow. That matters because "section-level is
+right, don't invent a splitter" was justified *by* the 4% figure. The conclusion
+survives; the justification had to be rebuilt, and a size limit added, because at 17%
+the guideline plainly was not holding on its own (CLAUDE.md: a rule stated only in a doc
+is a wish). Measure before citing a measurement.
+
+**A section over 2,200 characters now fails the document** (owner's decision: 512
+tokens, enforced like the preamble rule). Characters rather than tokens deliberately —
+`tiktoken` fetches its BPE table over the network on first use and the Qwen3 tokenizer
+would make `--check` need a model download, and both would destroy the property that
+makes `--check` worth having: pure, offline, GPU-free, database-free. 2,200 is
+calibrated, not guessed: the corpus measures **4.58 chars/token** under Qwen3's own
+tokenizer, and the proxy disagrees with a true 512-token cut on 6 of 358 sections, all
+borderline.
+
+**Contextual headers, stored not merely embedded.** Every chunk is prefixed with
+`<document title> — <section heading>` (rag-design-space §3.8's free, structural half)
+before embedding. Owner's call to store the header in `chunk.text` rather than rebuild it
+at query time: embedding a string the stored text does not contain is the silent-
+divergence shape ADR-0092 exists to warn about, and re-ingestion is minutes on a GPU.
+The generated-sentence half of §3.8 is deliberately not built until the eval harness can
+price it.
+
+**Ingestion runs in a new `frog` compose service, the only image with a GPU.** Its own
+Dockerfile on a CUDA 12.8 base — the RTX 5070 is Blackwell (sm_120), and an older runtime
+fails at the first `.to("cuda")` with something that reads like a driver problem and is
+not. torch is ~3GB and would otherwise land in every service building from the api image.
+`make corpus-check` (validate; no GPU, no database, no model) and `make corpus-ingest`.
+
+**Idempotency is tested against a real Postgres**, in a new `the_spoin_universe_test`
+database created by the `test` service alongside `spoin_db_test`, guarded by the same
+hard-error-unless-`_test` rule. What is under test — `source_path`'s UNIQUE constraint,
+`chunk`'s CASCADE — is the database's own behaviour, which CLAUDE.md names as the case
+where the real fixture beats a mock.
+
+#### The corpus, and four kinds of drift
+
+The first audit of 40 delivered documents found the contract holding in some places and
+drifting in four others. All four are now validated, and the two that were judgment calls
+were put to the owner rather than decided here:
+
+| Drift | Found | Resolution |
+|---|---|---|
+| `title` missing | 18 documents | **Fixed by the authoring track mid-session** (`854ce4d`), before the ingester ran. |
+| `source_date: 2024`, a bare year | 26 | Ingester now accepts `YYYY`, `YYYY-MM`, `YYYY-MM-DD`, widening to the first of the period. A bare year is honest for material with no single date; the contract asks for a full date where one exists. |
+| Prose before the first `##` | 26, then 44 as two more batches landed | **Hard error — the document does not ingest.** An intro paragraph belongs to no section, so it is either dropped silently or attached to a chunk it does not describe. An `# H1` line is the one exception. Owner is fixing the corpus and instructing the authoring track. |
+| Flow-style `topic_tags: [a, b]` | 26 | Not drift — YAML parses it identically. |
+| Sections over ~512 tokens | 62 of 358 sections (17%), 38 of them in `human-biology/` alone | **Hard error over 2,200 characters.** Found only because the owner asked whether the handoff told the authoring track to write *for* the chunker — it did not, and the measurement that said this was a non-problem was wrong. |
+| Unquoted YAML value containing `:` | 1 (`respiratory-physiology-and-gas-exchange.md`) | Caught by the parser as invalid YAML. Contract now says to quote such values. |
+
+**Resolved within the session: the corpus is at 67 documents, 67 ok, 0 failing.**
+
+It got there the hard way, which is the useful part of the record. The corpus grew from
+40 to 67 documents *while Phase 2 was being built* — `astronomy/`, `philosophy/`,
+`human-biology/`, plus a `title` fix across the older batches — and each new batch
+arrived reproducing the previous batches' habits. At the point the two hard rules were
+first enforced, only **8 of 67** documents passed: 52 preamble violations, 56 oversized
+sections, one invalid-YAML file. **The drift tracked authoring runs, not subjects.**
+
+The authoring track then retrofitted all 59 failing documents (`de3eac5`), and the fix
+was the right one rather than the cheap one — measured across the retrofit, sections went
+**358 → 428** and the largest went **4,942 → 2,162 characters**, so over-long sections
+were *split into new sections* rather than truncated. Total body text fell by ~15k
+characters, which is almost exactly the 52 deleted intro paragraphs; no substantive prose
+was lost.
+
+That round trip is the argument for an executable contract rather than a documented one.
+The prose version of both rules had been in the contract for a day and was not holding;
+the machine-checked version was satisfied across 59 files in a single pass, because it
+could name every file and field.
+
+The lasting lesson is not any of the four individually — it is that they arrived in
+*batches*, tracking authoring runs rather than subjects. `backend-engineering/` and
+`_canon/` are clean; the three later batches are not. That is why the validator reports
+every problem in every document instead of dying on the first, and why the contract now
+has an executable half at all.
+
+#### Still open after Phase 2
+
+- **The corpus has not been ingested.** `the_spoin_universe` does not exist yet — the
+  owner runs `make universe-migrate` — and the `frog` image has not been built or run
+  against a GPU. Nothing here has been exercised end-to-end against real weights.
+- **The ASCII box rule's enforcement mechanism** is still Phase 6's open decision.
+- **Reading level is a generator-prompt concern, and the prompt does not say so yet.**
+  Owner's decision (2026-09-05): the corpus stays dense and precise, and pitching an
+  explanation at a difficulty tier is the generator's job. The reasoning — one corpus
+  grounds all three tiers, precision never written down cannot be recovered, and the
+  verifier retrieves the same chunks — is written into the contract and the procedure so
+  the authoring track does not soften the material. **What is not yet done is the other
+  half:** when Phase 3 wires retrieval into the prompts, the drafting prompt has to
+  actually carry tier-appropriate-language instruction, or grounded cards will inherit
+  the corpus's register and read as dry to a beginner. This is CLAUDE.md's
+  trusted-for-taste-never-for-constraints split — tone is taste, so it belongs in the
+  prompt; precision is a constraint, so it belongs in the corpus.
+- **Per-section `topic_tags`.** `chunk.topic_tags` is per-chunk by design (ADR-0088) so a
+  broad document can tag sections differently, but the contract has no per-section
+  tagging, so every chunk currently inherits its document's. The column is where the
+  capability lives, not where it is used.
 
 ---
 

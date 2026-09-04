@@ -14,6 +14,7 @@ from __future__ import annotations
 import uuid
 from typing import cast
 
+from frog.embeddings import normalize_topic_text
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +29,6 @@ from spoin.domain.models import (
     TopicAlias,
     TopicEdge,
 )
-from spoin.embeddings import normalize_topic_text
 from spoin.generation.pipeline.state import SubtopicPlan, _existing_title_tag, _Runtime, _slugify
 
 

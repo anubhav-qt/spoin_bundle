@@ -1,21 +1,16 @@
-"""The embedder factory, and topic-text normalization.
+"""The embedder factory.
 
-**The `Embedder` classes themselves live in `frog.embeddings`** (ADR-0087). This
-module keeps only the two things that are genuinely `spoin`'s:
+**The `Embedder` classes live in `frog.embeddings`** (ADR-0087), and since ADR-0093 so
+does `normalize_topic_text`. What is left here is the one thing that is genuinely
+`spoin`'s: `get_embedder()`, because choosing between `HashEmbedder` and
+`FastEmbedEmbedder` reads `spoin.core.config`, and frog cannot import `spoin`. Giving
+frog its own settings object would put `embedding_dim` in two places, and a divergence
+there produces vectors that are silently not comparable to `card.content_embedding`.
 
-- `get_embedder()`, because choosing between `HashEmbedder` and `FastEmbedEmbedder`
-  reads `spoin.core.config`, and frog cannot import `spoin`. Giving frog its own
-  settings object would put `embedding_dim` in two places, and a divergence there
-  produces vectors that are silently not comparable to `card.content_embedding`.
-- `normalize_topic_text`, which is topic-canonicalization logic that happens to run
-  before embedding rather than embedding infrastructure. Task 0001's threshold
-  calibration depends on it, and ADR-0088 has `the_spoin_universe`'s chunk topic tags
-  produced by this exact function so that tags and canonical topic names cannot drift
-  into two vocabularies.
-
-This module deliberately does **not** re-export frog's classes. Import `Embedder`,
-`HashEmbedder` and `FastEmbedEmbedder` from `frog.embeddings` directly — a shim here
-would hide the `api -> frog` dependency at exactly the call sites that should show it.
+This module deliberately does **not** re-export frog's classes, and does not re-export
+the normalizer either. Import `Embedder`, `HashEmbedder`, `FastEmbedEmbedder` and
+`normalize_topic_text` from `frog.embeddings` directly — a shim here would hide the
+`api -> frog` dependency at exactly the call sites that should show it.
 
 Hard rule 5 (why any of this is local at all): embeddings never run against a paid or
 quota'd API. 100% of scarce LLM quota is reserved for card generation. If embeddings
@@ -31,24 +26,7 @@ from frog.embeddings import Embedder, FastEmbedEmbedder, HashEmbedder
 
 from spoin.core.config import get_settings
 
-__all__ = ["get_embedder", "normalize_topic_text"]
-
-
-def normalize_topic_text(raw: str) -> str:
-    """The normalization applied before embedding a topic string.
-
-    **This must stay identical between calibration and production.** Task 0001 is
-    required to write down exactly what it did; if the two ever diverge, the alias
-    cache silently misses and every measured threshold stops meaning what it meant.
-
-    ADR-0088 added a second caller with the same requirement: `the_spoin_universe`'s
-    chunk `topic_tags` are produced by this function, and a change here re-tags the
-    whole corpus or silently stops matching it.
-    """
-
-    lowered = raw.strip().lower()
-    kept = [char if char.isalnum() or char.isspace() else " " for char in lowered]
-    return " ".join("".join(kept).split())
+__all__ = ["get_embedder"]
 
 
 @lru_cache

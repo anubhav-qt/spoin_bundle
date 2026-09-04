@@ -188,6 +188,11 @@ services:
     environment:
       SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
       SPOIN_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_test
+      # frog ingestion idempotency is a claim about the DATABASE - source_path UNIQUE,
+      # chunk ondelete=CASCADE - so it is tested against a real one. Its own database,
+      # never SPOIN_UNIVERSE_DATABASE_URL: the fixture drops and recreates every table
+      # it points at, and frog/tests/conftest.py hard-errors on a name not ending _test.
+      SPOIN_UNIVERSE_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe_test
     depends_on:
       db:
         condition: service_healthy
@@ -211,10 +216,15 @@ services:
         import asyncio, asyncpg
         async def main():
             conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/spoin_db")
-            try:
-                await conn.execute("CREATE DATABASE spoin_db_test")
-            except asyncpg.DuplicateDatabaseError:
-                pass
+            for name in ("spoin_db_test", "the_spoin_universe_test"):
+                try:
+                    await conn.execute(f"CREATE DATABASE {name}")
+                except asyncpg.DuplicateDatabaseError:
+                    pass
+            await conn.close()
+            # pgvector, for the chunk embeddings frog writes.
+            conn = await asyncpg.connect("postgresql://spoin:spoin@db:5432/the_spoin_universe_test")
+            await conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
             await conn.close()
         asyncio.run(main())
         PY
@@ -315,7 +325,53 @@ services:
         PY
         alembic upgrade head
 
+  # Task 0038, Phase 2: corpus ingestion. The ONLY service with a GPU, and the only
+  # one built from apps/frog/Dockerfile -- ADR-0092 put bulk embedding on the owner's
+  # machine (RTX 5070) because only the app backend deploys, so torch lives here
+  # rather than in the api image every other service builds from.
+  #
+  # Profile-gated: ingestion is a deliberate command, never part of `docker compose up`.
+  #
+  #     docker compose --profile frog run --rm frog --check   # validate, no GPU needed
+  #     docker compose --profile frog run --rm frog           # ingest
+  #
+  # `--check` runs the contract validator alone. It loads no model and opens no
+  # database, so it works on a machine with no GPU at all -- which is what the
+  # corpus-authoring track needs from this service.
+  frog:
+    profiles: ["frog"]
+    build:
+      context: .
+      dockerfile: apps/frog/Dockerfile
+    environment:
+      SPOIN_UNIVERSE_DATABASE_URL: ${SPOIN_UNIVERSE_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Same staleness reasoning as the api service's src mount (ADR-0087).
+      - ./apps/frog/src:/app/frog/src
+      # The corpus, read-only. Authored continuously by another track, so it is mounted
+      # rather than baked in -- an image rebuild per delivery would be absurd, and a
+      # read-only mount makes it structurally impossible for the ingester to edit the
+      # material it is reading.
+      - ./docs/the_spoin_universe:/repo/docs/the_spoin_universe:ro
+      # ~1.2GB of model weights, kept across `--rm` runs.
+      - frog-model-cache:/cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
 volumes:
   db-data:
   web-node-modules:
   crdb-data:
+  # Deliberately NOT db-data. Model weights are re-downloadable and this volume is
+  # genuinely disposable -- which is exactly what db-data is not, and keeping them
+  # separate means nobody ever reasons about clearing a cache and reaches for the
+  # volume holding three databases (CLAUDE.md).
+  frog-model-cache:

@@ -222,7 +222,7 @@ PostgreSQL implements ... (dense prose here)
 | `sub_category` | no | Omit the field entirely when the subject has none — its absence is a statement, not missing data. |
 | `scope` | **yes** for `topic_source` | `survey` or `topic`. A survey is a tour of a field that emits `deep_dive` links; a topic is an exhaustive course on one subject ([ADR-0007](../adr/0007-curriculum-driven-generation.md)). It changes what you research, not just how it is filed. |
 | `source` | **yes** | URL, or an origin description for canon (e.g. `Spoin ADR-0022`). This is what a card cites. |
-| `source_date` | no | When the **source material** is from — not when you wrote the file. Lets a card cite material that later goes stale. Omit for canon. |
+| `source_date` | no | When the **source material** is from — not when you wrote the file. Lets a card cite material that later goes stale. Omit for canon. **Accepted forms: `YYYY-MM-DD`, `YYYY-MM`, `YYYY`** — shorter ones widen to the first of the period. Prefer a full date where the source has one; a bare year is right when it genuinely does not (accumulated practitioner experience, a forum thread, a body of postmortems). Anything else is a hard error. |
 | `topic_tags` | **yes** for `topic_source`, optional for `spoin_canon` | See below. |
 
 Two fields you do **not** write: `source_path` (the ingester derives it from the file's
@@ -246,16 +246,106 @@ material. Tag for what a document *is about*, not for where you want it retrieve
 
 ### How documents are chunked
 
-**You do not chunk. The ingester does.** But it will respect document structure, so:
+**You do not chunk. The ingester does — and it does exactly one thing: one `##` section
+becomes one chunk.** There is no splitter, no merger, and no cleverness. Your `##`
+headings *are* the chunk boundaries, so the document structure you write is the
+retrieval unit the model gets, one-to-one.
 
-- **Write in sections with `##` headings.** A section is the natural chunk boundary.
-- **Make each section self-contained.** A chunk is retrieved and shown to a model
-  *without* its neighbours. A section that opens with "As mentioned above..." is a
-  chunk that arrives meaningless.
-- **Define an unfamiliar term in the section that uses it**, not once at the top of
-  the file.
-- Aim for sections of a few hundred words. A section that runs to several thousand
-  will be split by machinery that has less judgment about it than you do.
+That is a deliberate choice: a section boundary is your judgment about where one idea
+ends, and a recursive splitter would overrule it with machinery that has read less of
+the material than you have. But it makes the shape of your document load-bearing in a
+way it would not otherwise be, and two of the rules below are enforced rather than
+suggested because of it.
+
+**Write each section as though it were the only thing a model will see about your
+subject — because it is.** A chunk is retrieved and pasted into a prompt beside five
+chunks from other documents, with no title page, no neighbours, and no way to look
+anything up.
+
+#### The rules
+
+- **Write in sections with `##` headings.** A section is the chunk.
+- **⚠️ Nothing but an optional `# H1` may appear before the first `##`. Hard error** —
+  the document does not ingest at all. An intro paragraph belongs to no section, so it
+  would be either dropped silently or glued onto a chunk it does not describe. If the
+  framing carries a real fact, give it its own `##`; usually it is general context the
+  model already has, and the right move is to delete it.
+- **⚠️ A section must be under 2,200 characters (~512 tokens). Hard error.** Nothing
+  splits an over-long section for you — it becomes one enormous chunk that wins a
+  retrieval slot and then spends a third of the prompt budget on material only partly
+  about the query. If a section is too long it is almost always two ideas wearing one
+  heading: split it into two `##` sections, each self-contained. **Aim for 1,000–2,000
+  characters** — the corpus currently averages ~1,550, which is a good size.
+- **One idea per section.** This is the same rule as the length limit, stated the way
+  that actually helps. A section covering two ideas gets *one* vector that is the
+  average of both — so it ranks mediocre for each and may be retrieved for neither.
+  Two focused sections beat one thorough one, every time.
+- **Make each section self-contained.** "As mentioned above", "as we saw", "in the next
+  section", "this" referring to the previous heading — all arrive meaningless. Re-state
+  the antecedent instead of pointing at it.
+- **Define an unfamiliar term in the section that uses it**, not once at the top of the
+  file. The top of the file is a different chunk, and it may not be retrieved.
+- **Headings are read by the model, so make them descriptive.** They go into every
+  chunk's header (below) and into the vector. `## What REPEATABLE READ actually
+  guarantees` is a heading; `## Overview`, `## Part 2`, `## Details` and `## More` are
+  not — they say nothing about the content and actively make the chunk harder to find.
+- **Front-load the specifics.** The first sentence or two carry the most weight in the
+  vector. Open with the concrete claim, not with a windup.
+- **Quote any front-matter value containing a colon.** `source: West's Respiratory
+  Physiology: The Essentials` is invalid YAML and fails the document; write
+  `source: "West's Respiratory Physiology: The Essentials"`.
+
+#### On reading level — write for precision, not for the beginner
+
+It is tempting to write the corpus in easy language, since Spoin's readers are learning.
+**Don't.** The reader never sees your documents; they see *cards*, generated from your
+material and pitched at a difficulty tier. **Reading level is the generator's job, not
+yours** (owner's decision, 2026-09-05).
+
+Three reasons this is not negotiable:
+
+1. **One corpus grounds all three tiers.** `difficulty` is a property of the card —
+   beginner, intermediate, advanced — and the same chunk of yours must ground a beginner
+   card *and* an advanced one on the same subject. Material written at beginner level
+   leaves the advanced tier nothing to draw on, so softening the corpus caps the ceiling
+   for every tier at once.
+2. **Precision that is never written down cannot be recovered.** Your whole job is
+   turning *recall* into *restatement*. The exact defaults, the version-specific
+   behaviour, the boundary condition everyone misstates — that is the highest
+   value-per-token material you can write, and it is the first thing lost when prose is
+   simplified.
+3. **The verifier retrieves the same chunks.** A softened passage leaves the gate without
+   the precision it needs to check a claim, which turns a check against a source back
+   into a disagreement between two models — the exact failure
+   [ADR-0089](../adr/0089-retrieval-grounded-generation.md) exists to prevent.
+
+What you owe the reader is not simpler language but **self-contained** language: use the
+precise term, and define it in the section that uses it. "`REPEATABLE READ` prevents
+non-repeatable reads — a row re-read within one transaction cannot have changed — but
+the SQL standard still permits phantom reads" is exact *and* learnable. "Isolation levels
+trade consistency for performance" is neither: vague, and it teaches nothing the model
+did not already know.
+
+So keep the real numbers, the real names and the edge cases. Cut jargon that is only an
+insider's shortcut; define jargon that is load-bearing. Making it approachable is
+downstream of you. Making it **true and precise** is yours, and nothing downstream can
+do it for you.
+
+#### What the ingester adds for you
+
+Every chunk is stored and embedded with a *contextual header* built from the document
+title and the section heading:
+
+```
+MVCC and transaction isolation in PostgreSQL — Snapshot isolation
+
+PostgreSQL implements ...
+```
+
+You do not write this. Two things follow for you: your `title` is read by a model on
+**every single chunk** of that document, so make it descriptive rather than clever; and
+you need not repeat the subject in each section's opening sentence, because the header
+already says it.
 
 ---
 
@@ -300,11 +390,20 @@ The practical rules that fall out of that:
 
 Honest list, so nothing here reads as more settled than it is:
 
-- **Chunking strategy** is Phase 2 and not yet built. Section-level is the intent; if
-  the real material argues for something else, the contract changes and you will be
-  told.
-- **The front matter may gain fields** in Phase 2 as the ingester is written. Nothing
-  above is expected to be *removed*, so authoring against it now is safe.
+- ~~**Chunking strategy** is Phase 2 and not yet built.~~ **Built (2026-09-05).** It is
+  section-level, as intended: one `##` section, one chunk, in document order, no
+  sub-splitter. Three things follow for you, all written into §5 above: **nothing before
+  the first `##`** and **nothing over 2,200 characters** are hard errors, and every chunk
+  carries an automatic **contextual header** built from your `title`.
+
+  Worth knowing why the size limit is enforced rather than suggested: when the corpus was
+  measured with the real `Qwen3-Embedding-0.6B` tokenizer, **17% of sections were over
+  512 tokens** and the largest was 1,385 — against an earlier estimate of ~4%, which was
+  wrong. A guideline was not holding, and the section size is what makes "no sub-splitter"
+  a safe design rather than a liability.
+- ~~**The front matter may gain fields** in Phase 2 as the ingester is written.~~ **It
+  gained none.** Every field in §5 is the field the ingester reads, and nothing was
+  removed. `source_date` gained *accepted forms* rather than a new field.
 - **`category`, `sub_category` and `scope` are corpus-side only.** They are real
   columns on `document` ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)), but
   nothing in the product database has them. A database CHECK makes `category` and
@@ -316,6 +415,27 @@ Honest list, so nothing here reads as more settled than it is:
   `source`.
 - **The ASCII box rule's enforcement mechanism** is an open decision for the owner.
   Until it is made, canon quality is the mitigation.
+
+## 9. Checking your work before you hand it over
+
+The ingester's validator runs standalone. It needs no GPU, no database and no model, and
+it reports **every** problem in **every** failing document rather than stopping at the
+first:
+
+```bash
+make corpus-check
+```
+
+Ask the owner to run it at the end of a delivery. A run ends with a line like
+`checked 67 documents: 67 ok, 0 failing`, and each failure names the file and the field:
+
+```
+FAIL mythology/world-mythology/tips-and-tricks.md
+  - 374 characters of prose before the first `##` heading ('The comparative study...'...)
+```
+
+This is the contract made executable. Where this document and the validator disagree,
+**say so** — one of them is wrong and it matters which.
 
 ## Where to read further
 

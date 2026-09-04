@@ -23,7 +23,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0012](0012-question-generation-failure-visibility.md) | Diagnose silent question-generation failures for specific subtopics | mostly resolved, see doc |
 | [0013](0013-card-preview-swap-not-animated.md) | Collapsed-state preview swaps instantly while the body around it animates | unassigned |
 | [0015](0015-topic-mastery-and-retention-mode.md) | Topic mastery message + retention/spaced-repetition mode once a topic is fully read | unassigned |
-| [0038](0038-frog-rag-and-hybrid-generation.md) | `frog` (our own RAG), `the_spoin_universe` corpus, and hybrid Mistral/Gemini generation | in progress -- Phase 0 done (ADRs 0087-0090), Phase 1 underway |
+| [0038](0038-frog-rag-and-hybrid-generation.md) | `frog` (our own RAG), `the_spoin_universe` corpus, and hybrid Mistral/Gemini generation | in progress -- Phases 0-2 done (ADRs 0087-0093; frog, the schema, and the ingester). `the_spoin_universe` still not created; Phase 3 (retrieval + eval harness) next |
 | [0039](0039-embedder-never-reached-the-containers.md) | `SPOIN_EMBEDDER` is not passed into the api/worker/seed services, so 5,491 card vectors and 11 topic vectors in `spoin_db_2` are `HashEmbedder` output, not `bge-small-en-v1.5` | unassigned -- needs owner approval for the backfill |
 | [0017](0017-sql-portability-fixes.md) | Fix the Postgres-only SQL the spike found | unassigned -- unblocked, 0016 returned GO |
 | [0018](0018-alembic-on-cockroachdb.md) | Make the Alembic chain apply cleanly on CockroachDB | unassigned -- unblocked; smaller than written, see 0016 hand-back |

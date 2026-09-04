@@ -74,6 +74,10 @@ switch ($Target) {
         if (-not $m) { throw 'Usage: ./make.ps1 universe-migration -m "describe the change"' }
         Invoke-Compose @('--profile', 'universe', 'run', '--rm', '--entrypoint', 'alembic', 'universe-seed', 'revision', '--autogenerate', '-m', $m)
     }
+    # Task 0038, Phase 2. corpus-check is the contract validator alone -- no GPU, no
+    # database -- and is what the corpus-authoring track runs.
+    'corpus-check'  { Invoke-Compose @('--profile', 'frog', 'run', '--rm', 'frog', '--check') }
+    'corpus-ingest' { Invoke-Compose @('--profile', 'frog', 'run', '--rm', 'frog') }
     'worker'    { Invoke-Compose @('--profile', 'worker', 'run', '--rm', 'worker') }
     'scan'      { Invoke-Compose ($api + @('python', '-m', 'spoin.scan_and_generate', '--limit', '1')) }
     'api-types' {
@@ -97,6 +101,8 @@ switch ($Target) {
             'worker      Run one batch pass of the worker, then exit'
             'universe-migrate    Create (if absent) and migrate the_spoin_universe'
             'universe-migration  Autogenerate a universe migration (-m "...")'
+            'corpus-check        Validate the corpus against the ingestion contract'
+            'corpus-ingest       Ingest the corpus into the_spoin_universe (GPU)'
             'api-types   Regenerate packages/api-types from the live OpenAPI schema'
             'down        Stop everything'
             'clean       Stop everything and delete the database volume'

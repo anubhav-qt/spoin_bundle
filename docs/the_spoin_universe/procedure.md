@@ -333,6 +333,42 @@ a section that opens with "as mentioned above" arrives meaningless. Define an
 unfamiliar term in the section that uses it, not once at the top of the file. Aim for
 a few hundred words per section.
 
+**⚠️ A section must be under 2,200 characters (~512 tokens). Hard error — the
+document does not ingest.** One `##` section becomes exactly one chunk and **nothing
+splits an over-long one for you.** An oversized section becomes one enormous chunk that
+wins a retrieval slot and then spends a third of the prompt budget on material only
+partly about the query. Aim for **1,000–2,000 characters**; the corpus currently runs at
+a median of ~1,550, which is a good size.
+
+When a section runs long it is almost always **two ideas wearing one heading** — which
+is the deeper reason the limit exists. A section covering two ideas is embedded as *one*
+vector that is the average of both, so it ranks mediocre for each and may be retrieved
+for neither. Two focused sections beat one thorough section, every time. Split it.
+
+**Headings are read by the model.** They go into every chunk's contextual header and
+into its vector, so `## What REPEATABLE READ actually guarantees` is a heading and
+`## Overview`, `## Part 2` and `## Details` are not — they say nothing about the content
+and make the chunk harder to find.
+
+**Front-load the specifics.** The opening sentence or two carry the most weight in the
+vector. Start with the concrete claim, not a windup.
+
+**⚠️ Do not write an intro paragraph before the first `##`.** The ingester **fails the
+whole document** for it — not a warning, not a silent drop. Everything except an
+optional `# H1` line must live inside a `##` section, because a paragraph belonging to
+no section either vanishes or gets attached to a chunk it does not describe. This is the
+common contract violation by a wide margin — by the end of task 0038's Phase 2 it was the
+only one left, in 44 of 58 delivered documents. If the framing genuinely earns its tokens, give it its own `##` heading;
+most of the time it is general context the model already has, and the honest move is to
+cut it.
+
+**Your `title` is read on every chunk.** The ingester prefixes each chunk with a header
+built from the document title and the section heading — `MVCC and transaction isolation
+in PostgreSQL — Snapshot isolation` — before embedding and storing it, so a chunk names
+its own subject even when the prose does not. You do not write the header. Two things
+follow: make `title` descriptive rather than clever, and stop repeating the subject in
+every section's opening sentence, because the header already says it.
+
 **Write for reuse across topics, not for this one topic.** This is the part that is
 easy to get wrong. You are not writing "the background section of the Database
 Indexing topic" — you are writing *what is true about B-trees*, in a form that the
@@ -344,6 +380,14 @@ subject to re-fetch material that is already sitting there.
 **Be specific, always.** "PostgreSQL's `REPEATABLE READ` prevents non-repeatable
 reads and, unlike the SQL standard's minimum, also prevents phantom reads" earns its
 tokens. "Isolation levels trade consistency for performance" does not.
+
+**Do not simplify for the learner.** The reader never sees your documents — they see
+cards generated from them, pitched at a difficulty tier. Reading level is the
+generator's job (owner's decision, 2026-09-05). The same chunk must ground a beginner
+card *and* an advanced one, so writing at beginner level caps the ceiling for every tier
+at once, and the verifier retrieving a softened passage loses the precision it needs to
+check a claim. What you owe the learner is **self-contained** language, not simple
+language: use the precise term, and define it in the section that uses it.
 
 **Keep it dry.** Spoin's playfulness lives in the hook layer — a card's title, its
 summary, its ASCII art. **Never in the explanation.** A joke in your source material
@@ -422,7 +466,7 @@ topic_tags:
 | `sub_category` | only if one was chosen | Omit the field entirely when there is none — its absence is a statement, not missing data. |
 | `scope` | **yes** for `topic_source` | `survey` or `topic`, as agreed in Phase A. Omit for `spoin_canon`. |
 | `source` | **yes** | URL, or an origin description for canon. This is what a card cites. |
-| `source_date` | strongly preferred | When the **source material** is from — not when you wrote the file. |
+| `source_date` | strongly preferred | When the **source material** is from — not when you wrote the file. **`YYYY-MM-DD`, `YYYY-MM` or `YYYY`**; shorter forms widen to the first of the period. Use a full date when the source has one, and a bare year when it genuinely does not — accumulated practitioner experience or a body of postmortems has no single date, and inventing one would be a false precision. Anything else fails the document. |
 | `topic_tags` | **yes** for `topic_source` | Normalized on ingestion: lowercased, non-alphanumerics become spaces, whitespace collapses. Write naturally; prefer full names over abbreviations (`kubernetes`, not `k8s`). Tag for what a document *is about*, not where you want it retrieved — retrieval is cross-topic by default. |
 
 Two fields you never write: `source_path` (derived from the file's location) and
@@ -438,6 +482,22 @@ The full contract, including what the ingester does with each field, is in
 [`docs/handoff/antigravity-corpus-authoring.md`](../handoff/antigravity-corpus-authoring.md).
 
 ---
+
+#### Before you hand it over: run the validator
+
+The ingester's contract check runs standalone — no GPU, no database, no model — and
+reports **every** problem in **every** failing file, named by path and by field:
+
+```bash
+make corpus-check
+```
+
+Ask the owner to run it at the end of the run and to paste you the output. A clean
+delivery ends `checked N documents: N ok, 0 failing`. Anything else is work still to do,
+and it is far cheaper to fix now than after the owner has moved on to the next subject.
+
+If the validator and this document disagree, **say so in your Phase G report** — one of
+them is wrong and it matters which.
 
 ### Phase G — Report back
 

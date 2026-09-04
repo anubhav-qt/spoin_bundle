@@ -2,8 +2,13 @@
 
 > **Written:** 2026-09-05 after authoring Human Biology, World Philosophy, Astronomy, World Mythology, Fullstack Engineering, Frontend Engineering, and Backend Engineering suites.  
 > **Status:** 67 curated documents in `docs/the_spoin_universe/corpus/`.  
-> **Validator Status:** 8 ok, 59 failing against the newly built machine ingestion contract (`apps/frog/src/frog/ingest/contract.py`).  
-> **Immediate Priority:** Retrofit existing 59 files to pass `python -m frog.ingest --check` (67 ok, 0 failing), then continue authoring.
+> **Validator Status:** ✅ **67 ok, 0 failing** against the machine ingestion contract
+> (`apps/frog/src/frog/ingest/contract.py`). Was 8 ok / 59 failing when the validator
+> first ran; the retrofit landed in `de3eac5`.  
+> **Immediate Priority:** continue authoring. Run `make corpus-check` at the end of every
+> run and keep it at 0 failing — the two rules that caused the retrofit (nothing before
+> the first `##`; no section over 2,200 characters) are hard errors, and they apply to
+> new documents exactly as they applied to the old ones.
 
 ---
 

@@ -11,9 +11,12 @@ worst possible moment for it to stop working.
 `embedding_dim` is configured in two places — a divergence there produces vectors
 that are silently not comparable and nothing raises. One config, one direction.
 
-`normalize_topic_text` deliberately did *not* move here: it is topic-canonicalization
-logic that happens to run before embedding, and task 0001's threshold calibration
-depends on it. It stays in `spoin.embeddings`.
+`normalize_topic_text` **does** live here, and did not originally. ADR-0087 left it in
+`spoin` as topic-canonicalization logic rather than embedding infrastructure; ADR-0088
+then gave it a second caller — `the_spoin_universe`'s chunk `topic_tags` — on the far
+side of a boundary frog cannot cross. One normalizer was the whole point of that
+sentence, so the function moved rather than the rule bending. See ADR-0087's amendment
+note and ADR-0093.
 """
 
 from __future__ import annotations
@@ -22,6 +25,25 @@ import asyncio
 import hashlib
 import math
 from abc import ABC, abstractmethod
+
+
+def normalize_topic_text(raw: str) -> str:
+    """The normalization applied before embedding a topic string.
+
+    **This must stay identical between calibration and production.** Task 0001 is
+    required to write down exactly what it did; if the two ever diverge, the alias
+    cache silently misses and every measured threshold stops meaning what it meant.
+
+    ADR-0088 and ADR-0091 added the callers that moved this function into frog:
+    `chunk.topic_tags`, `document.category` and `document.sub_category` are all
+    produced by it, so a change here re-tags the whole corpus or silently stops
+    matching it. That two packages share this one function is the mechanism keeping
+    corpus tags and canonical topic names from becoming two vocabularies.
+    """
+
+    lowered = raw.strip().lower()
+    kept = [char if char.isalnum() or char.isspace() else " " for char in lowered]
+    return " ".join("".join(kept).split())
 
 
 class Embedder(ABC):

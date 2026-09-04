@@ -92,9 +92,11 @@ being a migration is correct: it is a real decision.
 to `spoin_db_2`'s `topic` table. Tagging crosses that boundary by value.
 
 Tags are produced by the same `normalize_topic_text` that `spoin` applies before
-embedding a topic string — ADR-0087 kept that function in `spoin` for exactly this
-reason: one normalizer, so tags and canonical topic names cannot drift into two
-vocabularies. They sit on `chunk` rather than `document` so a broad document can have
+embedding a topic string: one normalizer, so tags and canonical topic names cannot drift
+into two vocabularies. **That requirement is what moved the function.** ADR-0087 kept it
+in `spoin`; the ingester that produces these tags lives in frog, which cannot import
+`spoin`, so [ADR-0093](0093-normalize-topic-text-moves-into-frog.md) moved it into
+`frog.embeddings` and had `spoin` import it from there. They sit on `chunk` rather than `document` so a broad document can have
 differently-tagged sections. GIN-indexed because they are a filter, even though the
 filter is not applied by default.
 

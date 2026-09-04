@@ -19,6 +19,7 @@ import uuid
 from importlib import resources
 from typing import Any
 
+from frog.embeddings import normalize_topic_text
 from sqlalchemy import func, select
 
 from spoin.auth.passwords import hash_password
@@ -35,7 +36,7 @@ from spoin.domain.models import (
     UserTopic,
     UserTopicProgress,
 )
-from spoin.embeddings import get_embedder, normalize_topic_text
+from spoin.embeddings import get_embedder
 
 
 def load_fixture() -> dict[str, Any]:

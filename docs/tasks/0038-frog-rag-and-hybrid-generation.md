@@ -174,6 +174,11 @@ Everything above, plus three things worth knowing before Phase 2:
 
 ## Phase 2 — Ingestion and the corpus — *"tadpole grows legs"*
 
+> **Handed off 2026-09-05:** [`docs/handoff/next-frog-phase-2-ingester.md`](../handoff/next-frog-phase-2-ingester.md)
+> carries the brief — current state, the two known blockers (`normalize_topic_text` is
+> on the wrong side of frog's import boundary; 18 corpus documents lack the `NOT NULL`
+> `title`), and the questions to put to the owner before implementing.
+
 **Corpus authoring is Antigravity's, supervised by the owner.** This phase builds
 the machinery that consumes it.
 

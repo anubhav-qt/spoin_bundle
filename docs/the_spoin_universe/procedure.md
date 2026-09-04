@@ -230,6 +230,13 @@ Now go wide. This is the phase where effort is not the constraint.
   discarding. Find out which. Do not average them into a hedge.
 - **Collect the disagreements.** Where authorities genuinely differ, that *is* the
   knowledge — record both positions and who holds them. Do not flatten it.
+- **Mine practitioner experience, field lessons, and community debates.** Search places
+  where experienced people, practitioners, enthusiasts, and specialists discuss
+  real-world practice, subtle edge cases, and common missteps: community forums,
+  Reddit discussions, StackExchange/StackOverflow, specialized publications,
+  practitioner postmortems, and field notes. Textbook introductions cover the idealized
+  happy path; practitioner communities surface the real pitfalls, counter-intuitive
+  nuances, practical rules of thumb, and lived experience that standard guides overlook.
 
 #### If the input is a SURVEY — research for breadth
 
@@ -372,11 +379,18 @@ corpus/
       postgresql/
         mvcc-and-isolation.md
         indexing-and-access-paths.md
+        tips-and-tricks.md
   science/
     physics/
       thermodynamics/
         entropy.md
+        tips-and-tricks.md
 ```
+
+Alongside the conceptual breakdown documents, **every subject (survey or topic) must
+emit a dedicated `tips-and-tricks.md`**. This file gathers hard-learned practitioner
+lessons, real-world traps, counter-intuitive edge cases, and field rules of thumb that
+dispel common beginner myths and prevent painful mistakes across the subject.
 
 Each file is UTF-8 Markdown with YAML front matter:
 
@@ -448,6 +462,10 @@ Close every run with a short written summary to the owner:
 - **Never copy material you do not have the right to reproduce.** Cite the source and
   restate it in your own words. Cards are shown to real users.
 - **Coverage is a nice-to-have; correctness is the product.**
+- **ASCII Art validation failure degrades to 'no card'.** If any line in an ASCII art
+  block exceeds the 40-column monospace limit or contains invalid syntax, the card is
+  discarded entirely (not published as prose) and scheduled for regeneration to ensure
+  the subtopic receives high-quality visual art.
 - **When something in this procedure turns out to be wrong or unworkable, say so in
   the same run.** A procedure that is quietly worked around is worse than no
   procedure — it makes every later run harder to reason about.

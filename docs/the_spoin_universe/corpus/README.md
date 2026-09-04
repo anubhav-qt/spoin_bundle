@@ -16,4 +16,24 @@ is organisational convenience for humans — **the front matter is authoritative
 the ingester reads the fields, not the path. Keep them consistent anyway; a mismatch
 is a review signal that something is misfiled.
 
-Empty until the first authoring run lands.
+## Active Corpus Content
+
+### Spoin Canon (`_canon/`)
+Product mechanics and authoring invariants (kind: `spoin_canon`):
+- `ascii-box-rule-and-gag-scenes.md`: ASCII box invariant (width ≤ 40), gags only, and discard-for-regeneration failure policy.
+- `card-anatomy-and-fields.md`: Card schema, field provenance, and system invariants.
+- `card-archetypes-and-content-shapes.md`: Archetypes derived post-generation; Mermaid client rendering.
+- `curriculum-progression-and-quizzes.md`: Topic budgeting, latched 80% progression, quiz generation from cards.
+- `dual-titles-and-hook-discipline.md`: Display title vs. canonical title; silliness in hook layer, truth in body.
+
+### Subject Matter (`computer-science/software-engineering/backend-engineering/`)
+Initial survey suite (kind: `topic_source`, scope: `survey`):
+- `api-paradigms-and-contracts.md`
+- `asynchronous-messaging-and-event-streams.md`
+- `caching-and-state-management.md`
+- `data-persistence-and-transactions.md`
+- `fault-tolerance-and-observability.md`
+- `security-authentication-and-boundary-defense.md`
+- `server-concurrency-and-io-runtimes.md`
+- `tips-and-tricks.md` (field lessons, operational traps, production rules of thumb)
+- `transport-and-application-protocols.md`

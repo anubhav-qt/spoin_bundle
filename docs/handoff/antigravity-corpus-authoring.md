@@ -111,15 +111,14 @@ What canon needs to cover, at minimum:
 | Quiz-gated progression, and what a good question looks like | [ADR-0009](../adr/0009-quiz-gated-progression.md) |
 | How the feed scrolls; what makes a hook stop a scroll | [ADR-0010](../adr/0010-feed-serving.md) |
 | The ASCII scene library, and that it is **gags only** | [ADR-0021](../adr/0021-ascii-scene-library.md), [ADR-0079](../adr/0079-ascii-library-is-gags-only.md), [ADR-0080](../adr/0080-ascii-fetcher-node.md) |
-| **The ASCII box rule** — art is a rigid box; nothing edited inside it, nothing inserted to its left, captions only top/bottom/appended-right, total width ≤ 40 | [ADR-0021](../adr/0021-ascii-scene-library.md), [ADR-0068](../adr/0068-curated-ascii-art-library-and-worked-few-shot-generator.md) |
+| **The ASCII box rule** — art is a rigid box; nothing edited inside it, nothing inserted to its left, captions only top/bottom/appended-right, total width ≤ 40. **Failure drops the card for regeneration, never degrades to broken art or text-only prose.** | [ADR-0021](../adr/0021-ascii-scene-library.md), [ADR-0068](../adr/0068-curated-ascii-art-library-and-worked-few-shot-generator.md), `corpus/_canon/ascii-box-rule-and-gag-scenes.md` |
 | Diagrams are mermaid, rendered client-side | [ADR-0067](../adr/0067-mermaid-diagrams-and-form-free-ascii.md) |
 | **Silliness lives in the hook layer — title, summary, ASCII art. Never in `body`.** | `CLAUDE.md` |
 | Difficulty tiers, and that difficulty is re-rated server-side rather than self-reported | [content-model.md](../architecture/content-model.md) |
 
-That ASCII box rule row is worth extra care. It is currently enforced **by prompt
-instruction only**, and instruction-only rules are exactly what starts failing when
-the drafting model gets smaller. Well-written canon on it is, for now, the main
-defence. (A server-side check is an open decision the owner has not yet made.)
+The ASCII box rule is enforced by server-side validation: any line exceeding 40 columns
+or containing invalid syntax discards the card entirely so it can be regenerated with
+proper visual art.
 
 ### `topic_source` — authoritative material per topic
 
@@ -137,6 +136,10 @@ defence. (A server-side check is an open decision the owner has not yet made.)
 - **Include the exact things models get wrong**: version-specific behaviour, numbers,
   defaults, names that changed, the edge case everyone misstates. This is the highest
   value-per-token material you can write.
+- **Mandatory `tips-and-tricks.md`:** Every subject (topic or survey) includes a dedicated
+  file capturing field tips, subtle pitfalls, counter-intuitive nuances, and lessons
+  learned from experienced practitioners, community discussions (StackExchange, Reddit),
+  and real-world postmortems.
 
 ---
 
@@ -160,10 +163,12 @@ docs/the_spoin_universe/corpus/
     databases/
       postgresql/
         mvcc-and-isolation.md
+        tips-and-tricks.md
   science/
     physics/
       thermodynamics/
         entropy.md
+        tips-and-tricks.md
 ```
 
 Spoin canon — how the product itself works — sits outside the subject hierarchy,

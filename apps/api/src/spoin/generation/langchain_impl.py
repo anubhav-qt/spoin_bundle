@@ -1187,8 +1187,7 @@ class GeminiContentGenerator(ContentGenerator):
                         result = await structured.ainvoke(prompt)  # type: ignore[attr-defined]
                 except BaseException as exc:
                     logger.info(
-                        "lbprobe call key=%d model=%s latency=%.2f queued=%.2f chars=%d "
-                        "outcome=%s",
+                        "lbprobe call key=%d model=%s latency=%.2f queued=%.2f chars=%d outcome=%s",
                         key_index,
                         model,
                         time.monotonic() - started,

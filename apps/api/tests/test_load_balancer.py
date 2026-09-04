@@ -575,7 +575,6 @@ async def test_dispatch_stagger_updated_by_note_send() -> None:
     assert pytest.approx(wait, 0.01) == 0.3
 
 
-
 # --- active key window -----------------------------------------------------
 
 

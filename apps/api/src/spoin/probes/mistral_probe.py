@@ -98,6 +98,7 @@ def calls_per_minute(model: str, prompt_tokens: int = 12_000) -> float:
     tpm, rps = MODEL_LIMITS[model]
     return min(tpm / max(1, prompt_tokens), rps * 60.0)
 
+
 #: Roughly 4 characters per token. Only used to *size* a synthetic prompt into the
 #: right ballpark -- nothing here depends on it being exact.
 CHARS_PER_TOKEN = 4
@@ -240,9 +241,18 @@ CARD_BATCH_SCHEMA: dict[str, Any] = {
 }
 
 _FILLER_TOPICS = (
-    "consensus protocols", "write-ahead logging", "vector clocks", "quorum reads",
-    "leader election", "hash partitioning", "backpressure", "idempotency keys",
-    "circuit breakers", "read repair", "gossip membership", "log compaction",
+    "consensus protocols",
+    "write-ahead logging",
+    "vector clocks",
+    "quorum reads",
+    "leader election",
+    "hash partitioning",
+    "backpressure",
+    "idempotency keys",
+    "circuit breakers",
+    "read repair",
+    "gossip membership",
+    "log compaction",
 )
 
 

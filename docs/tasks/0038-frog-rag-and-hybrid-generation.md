@@ -1,7 +1,7 @@
 # Task 0038: `frog` (our own RAG), `the_spoin_universe`, and hybrid Mistral/Gemini generation
 
-> **Status:** planned, not started. Written 2026-09-04 to be implemented in a later
-> session.
+> **Status:** Phase 0 done (2026-09-04) — ADRs 0087-0090 written and accepted.
+> Phase 1 in progress. Written 2026-09-04.
 > **Depends on:** [`docs/mistral-saga/`](../mistral-saga/README.md) — provider
 > validation. Experiments 1, 2 and 3 have passed; 3b (drafting quality) is
 > deliberately folded into Phase 6 below rather than run standalone, because this
@@ -142,9 +142,10 @@ rule that must hold gets enforced twice, never documented once.
 
 - `apps/frog/` with `pyproject.toml`, `mypy --strict` + `ruff` wired into `make check`.
 - Embedder moved in from `spoin.embeddings`; `spoin` updated to import from frog.
-- `the_spoin_universe` schema: `document` (provenance — source, author, licence,
-  ingested_at) and `chunk` (text, `Vector(384)`, topic tags, ordinal, FK to
-  document). Provenance is not optional: "we can back with grounding why our
+- `the_spoin_universe` schema: `document` (provenance — source, title,
+  ingested_at, source_date; `author`/`licence` were dropped, see
+  [ADR-0088](../adr/0088-the-spoin-universe.md)) and `chunk` (text, `Vector(384)`,
+  topic tags, ordinal, FK to document). Provenance is not optional: "we can back with grounding why our
   material is high quality" is a **claim about citability**, so the citation has to
   be storable.
 - The architecture test that frog never imports `spoin`.
@@ -254,11 +255,16 @@ porting ADR-0082/0084 wholesale; it solves a problem Mistral does not have.
 
 | Role | Methods | Provider |
 |---|---|---|
-| Generator | `plan_cards`, `fetch_ascii_scenes`, `generate_cards`, `correct_cards`, `generate_questions`, `repair_card_structure` | **Mistral** |
-| Thinking | `generate_curriculum`, `verify_cards`, `grade_free_text`, `validate_topic_names` | **Gemini** |
+| Generator | `plan_cards`, `fetch_ascii_scenes`, `generate_cards`, `generate_questions`, `repair_card_structure`, `stream_topic_answer` | **Mistral** |
+| Thinking | `generate_curriculum`, `match_topics`, `validate_topic_names`, `correct_cards`, `verify_cards`, `grade_free_text` | **Gemini** |
 | Key/scope | `claimed_key_scope`, `lease_key_box`, `release_key_box` | **Gemini** (box leasing is Gemini-pool-specific) |
 
-Confirm each method's real ladder against the code before trusting this table.
+**The table above has been corrected** against `langchain_impl.py`'s
+`_invoke_with_retry` call sites, as this line originally instructed. The draft was
+wrong in one place and incomplete in two: `correct_cards` is a **thinking** call
+(half of ADR-0030's two-pass gate), not a generator call; `stream_topic_answer`
+(AskAI, ADR-0077) is a generator call and was missing; `match_topics` is a thinking
+call and was missing. See [ADR-0090](../adr/0090-hybrid-gemini-mistral-generation.md).
 
 ---
 

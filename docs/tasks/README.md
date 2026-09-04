@@ -23,7 +23,7 @@ timebox. If a task cannot be described that way, it is not ready to be handed to
 | [0012](0012-question-generation-failure-visibility.md) | Diagnose silent question-generation failures for specific subtopics | mostly resolved, see doc |
 | [0013](0013-card-preview-swap-not-animated.md) | Collapsed-state preview swaps instantly while the body around it animates | unassigned |
 | [0015](0015-topic-mastery-and-retention-mode.md) | Topic mastery message + retention/spaced-repetition mode once a topic is fully read | unassigned |
-| [0038](0038-frog-rag-and-hybrid-generation.md) | `frog` (our own RAG), `the_spoin_universe` corpus, and hybrid Mistral/Gemini generation | unassigned |
+| [0038](0038-frog-rag-and-hybrid-generation.md) | `frog` (our own RAG), `the_spoin_universe` corpus, and hybrid Mistral/Gemini generation | in progress -- Phase 0 done (ADRs 0087-0090), Phase 1 underway |
 | [0017](0017-sql-portability-fixes.md) | Fix the Postgres-only SQL the spike found | unassigned -- unblocked, 0016 returned GO |
 | [0018](0018-alembic-on-cockroachdb.md) | Make the Alembic chain apply cleanly on CockroachDB | unassigned -- unblocked; smaller than written, see 0016 hand-back |
 | [0019](0019-transaction-retry-boundary.md) | A transaction retry boundary for CockroachDB's `40001` errors + worker job-claim redesign | unassigned -- unblocked; scope grew, see 0016 hand-back |

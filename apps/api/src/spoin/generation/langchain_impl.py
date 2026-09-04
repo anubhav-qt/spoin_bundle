@@ -952,16 +952,21 @@ class GeminiContentGenerator(ContentGenerator):
     """ADR-0008/ADR-0028/ADR-0029/ADR-0030: cloud, quota-bound, two
     independently-rotating pools.
 
-    `_thinking` covers curriculum, topic matching, the two-pass quality gate
-    (`correct_cards`/`verify_cards`, ADR-0030), and quiz grading — calls where
-    a weak model has a real consequence (ADR-0008's "trusted for taste, never
-    for constraints" rule) — and walks the (newer, better) thinking ladder.
-    `_generator` covers `generate_cards` AND `generate_questions` (ADR-0029):
-    both are high-volume, one-per-item prose calls, so they share the cheaper,
-    higher-throughput lite ladder instead of competing with the thinking
-    pool's much smaller daily budget. Each pool has its own key x model quota
-    grid (ADR-0028) — a call to one never affects the other's remaining
-    budget.
+    The split is by what a call PRODUCES (ADR-0090). `_thinking` covers the
+    calls that return a **verdict** — curriculum, topic matching, topic-name
+    validation, `verify_cards`, and quiz grading — where a weak model's answer
+    is a constraint rather than a preference, and CLAUDE.md's "trusted for
+    taste, never for constraints" rule applies. `_generator` covers the calls
+    that return **prose**: `generate_cards`, `generate_questions` (ADR-0029),
+    `plan_cards`, `fetch_ascii_scenes`, `repair_card_structure`, AskAI's
+    `stream_topic_answer`, and — since ADR-0090 — `correct_cards`.
+
+    `correct_cards` moving here split ADR-0030's two-pass gate across both
+    ladders, which is deliberate: the pass that *rewrites* is prose work, the
+    pass that *decides* is not. See the call site for the full reasoning.
+
+    Each pool has its own key x model quota grid (ADR-0028) — a call to one
+    never affects the other's remaining budget.
     """
 
     def __init__(self, settings: Settings) -> None:
@@ -2016,7 +2021,13 @@ class GeminiContentGenerator(ContentGenerator):
             ),
         ]
         try:
-            wire_result = await self._invoke_with_retry("thinking", _WireCorrectionBatch, prompt)
+            #: ADR-0090: correction is REWRITING, not judgment. It takes a card and a
+            #: criticism and produces better prose, against retrieved source material
+            #: (ADR-0089) -- restatement rather than recall, which is the thing a small
+            #: model can do. Its sibling `verify_cards` returns a VERDICT and stays on
+            #: the thinking ladder permanently; that asymmetry is the whole point, and
+            #: this line is the half of ADR-0030's two-pass gate that moved.
+            wire_result = await self._invoke_with_retry("generator", _WireCorrectionBatch, prompt)
         except QuotaExhaustedError:
             raise
         except Exception as exc:

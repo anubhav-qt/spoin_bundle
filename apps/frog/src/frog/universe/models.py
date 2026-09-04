@@ -17,6 +17,7 @@ from enum import StrEnum
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
+    CheckConstraint,
     DateTime,
     Enum,
     ForeignKey,
@@ -56,6 +57,23 @@ class DocumentKind(StrEnum):
     TOPIC_SOURCE = "topic_source"
 
 
+class DocumentScope(StrEnum):
+    """Whether a document's subject is a field being toured or a subject being taught.
+
+    Mirrors `topic.is_survey` in `spoin_db_2` (ADR-0007), by value rather than by
+    reference — the corpus is a separate database and cannot hold a foreign key to it.
+
+    It is recorded because it changes what the material *is*, not merely where it is
+    filed: survey material is breadth (a field's branches and how they relate), topic
+    material is depth (one subject to bedrock). Retrieval assembling a survey
+    curriculum wants the former; a deep-dive wants the latter, and nothing downstream
+    can tell them apart from the prose alone.
+    """
+
+    SURVEY = "survey"
+    TOPIC = "topic"
+
+
 class Document(Base, UUIDPrimaryKey, CreatedAt):
     """One authored source file, and enough provenance to cite it.
 
@@ -66,6 +84,21 @@ class Document(Base, UUIDPrimaryKey, CreatedAt):
     """
 
     __tablename__ = "document"
+    __table_args__ = (
+        #: The hierarchy is not optional for subject matter, and a CHECK is the only
+        #: thing that keeps that true. `spoin_canon` is exempt because canon is about
+        #: Spoin rather than about a field — it has no category and no scope, and
+        #: forcing it to invent one would put junk values in the columns the
+        #: authoring procedure reads back to offer the owner real options.
+        CheckConstraint(
+            "kind <> 'topic_source' OR (category IS NOT NULL AND scope IS NOT NULL)",
+            name="topic_source_has_category_and_scope",
+        ),
+        #: Read by the authoring procedure's intake step, which lists the categories
+        #: already in use before proposing a new one
+        #: (docs/the_spoin_universe/procedure.md, Phase A).
+        Index("ix_document_category_sub_category", "category", "sub_category"),
+    )
 
     #: Where the material came from — a URL, or an origin description for material
     #: distilled from our own ADRs. NOT NULL: a document nothing can cite is not a
@@ -80,6 +113,33 @@ class Document(Base, UUIDPrimaryKey, CreatedAt):
             values_callable=lambda e: [member.value for member in e],
         ),
         nullable=False,
+    )
+
+    #: ADR-0091: the organising level above topics — "mathematics", "computer
+    #: science". It exists nowhere in `spoin_db_2`; the corpus is the first thing in
+    #: this project that needed one, so this column is where it is introduced.
+    #:
+    #: Nullable only so `spoin_canon` can sit outside the subject hierarchy — the
+    #: CHECK constraint above makes it mandatory for everything else. Stored
+    #: normalized (lowercased, non-alphanumerics to spaces) by the same
+    #: `normalize_topic_text` that produces `chunk.topic_tags`, so "Computer Science"
+    #: and "computer-science" cannot become two categories.
+    category: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
+    #: Optional even for subject matter: "science" earns "biology"/"physics";
+    #: "history" would only earn "history". A level that restates its parent is noise,
+    #: so the absence of a value is meaningful rather than missing data.
+    sub_category: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
+    #: Survey or topic — breadth or depth. Nullable for the same reason as `category`
+    #: and mandatory under the same CHECK.
+    scope: Mapped[DocumentScope | None] = mapped_column(
+        Enum(
+            DocumentScope,
+            name="document_scope",
+            values_callable=lambda e: [member.value for member in e],
+        ),
+        nullable=True,
     )
 
     #: Path within the delivered corpus, and the document's *identity*. Unique, so

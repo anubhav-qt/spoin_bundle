@@ -8,7 +8,7 @@ when a card turns out to be uncitable or the corpus has quietly doubled.
 
 from __future__ import annotations
 
-from frog.universe.models import EMBEDDING_DIM, Chunk, Document, DocumentKind
+from frog.universe.models import EMBEDDING_DIM, Chunk, Document, DocumentKind, DocumentScope
 
 
 def test_vectors_are_384_dimensional() -> None:
@@ -74,3 +74,46 @@ def test_topic_tags_are_indexed_for_containment_search() -> None:
     ]
     assert gin, "topic_tags needs a GIN index"
     assert [c.name for c in gin[0].columns] == ["topic_tags"]
+
+
+def test_the_hierarchy_is_mandatory_for_subject_matter_and_optional_for_canon() -> None:
+    """ADR-0091. The columns are nullable, which on its own would let a document be
+    filed nowhere — so the invariant lives in a CHECK rather than in the ingester's
+    good intentions.
+
+    `spoin_canon` is exempt because canon is about Spoin, not about a field. Forcing
+    it to invent a category would put junk into the exact column the authoring
+    procedure reads back to offer the owner real options.
+    """
+
+    checks = {
+        c.name: str(c.sqltext)
+        for c in Document.__table__.constraints
+        if c.__class__.__name__ == "CheckConstraint"
+    }
+    #: The metadata naming convention prefixes it (`ck_<table>_<name>`), and the
+    #: migration must produce this exact string or autogenerate reports a phantom
+    #: diff forever. Asserted in full rather than by substring for that reason.
+    name = "ck_document_topic_source_has_category_and_scope"
+    assert name in checks
+
+    clause = checks[name]
+    assert "topic_source" in clause
+    assert "category" in clause and "scope" in clause
+
+
+def test_scope_has_exactly_survey_and_topic() -> None:
+    """Mirrors `topic.is_survey` in spoin_db_2 by value — the corpus is a separate
+    database and cannot hold a foreign key to it (ADR-0007, ADR-0088). A third value
+    here would mean the two have drifted apart."""
+
+    assert {s.value for s in DocumentScope} == {"survey", "topic"}
+
+
+def test_category_is_indexed_for_the_intake_step() -> None:
+    """The authoring procedure's first question is "which category?", answered by
+    reading the categories already in use (procedure.md Phase A). That read happens
+    every run; it should not be a sequential scan of the whole corpus."""
+
+    indexed = {tuple(c.name for c in index.columns) for index in Document.__table__.indexes}
+    assert ("category", "sub_category") in indexed

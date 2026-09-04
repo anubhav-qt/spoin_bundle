@@ -3,6 +3,8 @@
 - **Status:** Accepted
 - **Date:** 2026-09-04
 - **Deciders:** project owner, implementing session
+- **Amended by:** [ADR-0091](0091-corpus-category-hierarchy.md) — `document` gains
+  `category`, `sub_category` and `scope`. The schema table below predates them.
 
 ## Context
 

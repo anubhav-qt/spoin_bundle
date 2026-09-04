@@ -316,8 +316,9 @@ validation plan.*
 
 ### ⚠️ Decision point — ASK THE OWNER before implementing: how to enforce the ASCII box rule
 
-**Do not pick a mechanism unilaterally. Ask.** This likely warrants its own ADR
-(next free number, ADR-0091).
+**Do not pick a mechanism unilaterally. Ask.** This likely warrants its own ADR.
+(It was pencilled in as ADR-0091; that number went to the corpus category hierarchy
+on 2026-09-05. Take the next free number — numbers are sequential, never reserved.)
 
 **The gap.** `ASCII_INSTRUCTIONS` rule 3 (BOX INTEGRITY, STRICT) says the art is a
 rigid box: nothing edited inside it, nothing inserted to its **left** (which
@@ -374,7 +375,7 @@ externally owned and open-ended, and gates Phase 3. Phases 3–7 are a session e
 
 ## Hand back
 
-- ADRs 0087–0090 (plus 0091 if the box rule gets one).
+- ADRs 0087–0091 (plus one more if the box rule gets its own).
 - The ingestion contract, written before the corpus arrives.
 - `apps/frog/` passing `make check`.
 - Measured real prompt sizes + a concurrency table at those sizes, in

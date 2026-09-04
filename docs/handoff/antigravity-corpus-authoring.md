@@ -213,9 +213,9 @@ PostgreSQL implements ... (dense prose here)
 |---|---|---|
 | `title` | **yes** | Human-readable. Shown when a card cites this. |
 | `kind` | **yes** | Exactly `spoin_canon` or `topic_source`. A typo is a hard error, not a silent third kind. |
-| `category` | **yes** | Where the subject sits — agreed with the owner at intake, not chosen unilaterally. **No column for this exists in the product database yet**; front matter is the source of truth until the ingester grows one. |
-| `sub_category` | no | Omit the field entirely when the subject has none. Same status as `category`. |
-| `scope` | **yes** | `survey` or `topic`. A survey is a tour of a field that emits `deep_dive` links; a topic is an exhaustive course on one subject ([ADR-0007](../adr/0007-curriculum-driven-generation.md)). It changes what you research, not just how it is filed. |
+| `category` | **yes** for `topic_source` | Where the subject sits — agreed with the owner at intake, not chosen unilaterally. Stored as `document.category` ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)) and normalized on ingestion. Omit for `spoin_canon`. |
+| `sub_category` | no | Omit the field entirely when the subject has none — its absence is a statement, not missing data. |
+| `scope` | **yes** for `topic_source` | `survey` or `topic`. A survey is a tour of a field that emits `deep_dive` links; a topic is an exhaustive course on one subject ([ADR-0007](../adr/0007-curriculum-driven-generation.md)). It changes what you research, not just how it is filed. |
 | `source` | **yes** | URL, or an origin description for canon (e.g. `Spoin ADR-0022`). This is what a card cites. |
 | `source_date` | no | When the **source material** is from — not when you wrote the file. Lets a card cite material that later goes stale. Omit for canon. |
 | `topic_tags` | **yes** for `topic_source`, optional for `spoin_canon` | See below. |
@@ -300,11 +300,11 @@ Honest list, so nothing here reads as more settled than it is:
   told.
 - **The front matter may gain fields** in Phase 2 as the ingester is written. Nothing
   above is expected to be *removed*, so authoring against it now is safe.
-- **`category`, `sub_category` and `scope` have no columns yet.** The corpus is the
-  first thing in this project that needs a hierarchy above the topic level, so these
-  are introduced here and a later migration will read them. That makes consistency in
-  the values you write worth more than usual — an inconsistent set now becomes a
-  cleanup job at migration time.
+- **`category`, `sub_category` and `scope` are corpus-side only.** They are real
+  columns on `document` ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)), but
+  nothing in the product database has them. A database CHECK makes `category` and
+  `scope` mandatory for `topic_source` and optional for `spoin_canon`, so a canon
+  document with no category is correct, not incomplete.
 - **`author` and `licence` were deliberately dropped** from the schema
   ([ADR-0088](../adr/0088-the-spoin-universe.md)). If you find yourself needing to
   record either, that is a real signal — raise it rather than smuggling it into

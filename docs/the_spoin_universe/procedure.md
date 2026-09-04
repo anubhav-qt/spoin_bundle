@@ -42,17 +42,27 @@ and which you are authoring *into*.
 
 | Level | Where it lives | Who creates it |
 |---|---|---|
-| **category** | **New. Corpus-side only.** No column in the product database. | **You**, in front matter and directory layout |
-| **sub_category** | **New. Corpus-side only.** Optional. | **You**, same |
+| **category** | `document.category` in `the_spoin_universe` ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)). **Corpus-side only — no column in the product database.** | **You**, in front matter |
+| **sub_category** | `document.sub_category`. Optional, same status. | **You**, in front matter |
 | **survey / topic** | `topic` table, distinguished by the `is_survey` flag | The product, when a user requests a subject |
 | **subtopic** | `subtopic` table — a curriculum slot with a difficulty tier | The generation pipeline's curriculum pass |
 | **cards** | `card` table | The generation pipeline, grounded in *your* corpus |
 
-**Categories and sub-categories do not exist in the product schema yet.** You are the
-first thing that needs them, and the corpus is where they are introduced. Until the
-ingester grows columns for them, **your front matter is the source of truth** for
-where a document sits. Get them right and consistent; a later migration will read
-them, and inconsistent values now become a cleanup job later.
+**Categories and sub-categories exist in the corpus database and nowhere else.** You
+are the first thing in this project that needed a level above `topic`, so
+[ADR-0091](../adr/0091-corpus-category-hierarchy.md) introduced it on `document` —
+`category`, `sub_category` and `scope`, with a CHECK making the first and third
+mandatory for `topic_source` and optional for `spoin_canon`.
+
+Two consequences for you:
+
+- **Your front matter is what fills those columns.** Values are normalized on the way
+  in (lowercased, non-alphanumerics to spaces), so "Computer Science" and
+  "computer-science" are one category rather than two — but a genuinely different
+  wording is a genuinely new category. Be consistent.
+- **The values are read back to you.** Phase A's list of existing categories is a
+  query against this column. An inconsistent value you write today proposes itself to
+  the owner as an option forever.
 
 ### Survey versus topic — the distinction that changes your research
 
@@ -394,9 +404,9 @@ topic_tags:
 |---|---|---|
 | `title` | **yes** | Human-readable. Shown when a card cites this. |
 | `kind` | **yes** | `topic_source` for subject matter, `spoin_canon` for how Spoin itself works. Exactly one of the two — a typo is a hard error, not a silent third kind. |
-| `category` | **yes** | As agreed in Phase A. |
-| `sub_category` | only if one was chosen | Omit the field entirely when there is none. |
-| `scope` | **yes** | `survey` or `topic`, as agreed in Phase A. |
+| `category` | **yes** for `topic_source` | As agreed in Phase A. Normalized on ingestion. Omit for `spoin_canon`, which sits outside the subject hierarchy. |
+| `sub_category` | only if one was chosen | Omit the field entirely when there is none — its absence is a statement, not missing data. |
+| `scope` | **yes** for `topic_source` | `survey` or `topic`, as agreed in Phase A. Omit for `spoin_canon`. |
 | `source` | **yes** | URL, or an origin description for canon. This is what a card cites. |
 | `source_date` | strongly preferred | When the **source material** is from — not when you wrote the file. |
 | `topic_tags` | **yes** for `topic_source` | Normalized on ingestion: lowercased, non-alphanumerics become spaces, whitespace collapses. Write naturally; prefer full names over abbreviations (`kubernetes`, not `k8s`). Tag for what a document *is about*, not where you want it retrieved — retrieval is cross-topic by default. |

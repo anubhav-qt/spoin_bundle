@@ -91,6 +91,12 @@ shipped.
 This applies from the first pass, not only after a redraft round. If the corpus turns
 out thin, this is the first decision to revisit — see "Revisit when".
 
+**Applied to the Gemini path on 2026-09-05**, ahead of frog being wired in — the
+owner's call, made knowing the retrieval premise is not yet live. Until the corpus
+exists, `correct_cards` is running ungrounded on the lite ladder, which is the weaker
+of the two conditions the decision was argued from. The revisit condition below is the
+thing that catches it if that turns out to be a bad trade.
+
 #### Why route by what a call produces
 
 The routing rule and the ladder split ([ADR-0028](0028-key-model-quota-ladder.md),

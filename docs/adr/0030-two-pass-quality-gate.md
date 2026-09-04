@@ -2,6 +2,12 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-17
+- **Amended by:** [ADR-0090](0090-hybrid-gemini-mistral-generation.md) — this ADR's two
+  passes no longer run on the same model ladder. `verify_cards` returns a verdict and
+  stays on the thinking cells permanently; `correct_cards` rewrites prose against
+  retrieved source ([ADR-0089](0089-retrieval-grounded-generation.md)) and moved to the
+  generator ladder, from the first pass onward. The gate is still two passes; they are
+  no longer the same kind of work.
 - **Deciders:** Anubhav
 - **Extended by:** [ADR-0031](0031-verification-feedback-and-per-tier-gate-durability.md) --
   adds a second feedback channel (verification rejection reasons, alongside this ADR's

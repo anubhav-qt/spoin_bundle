@@ -60,3 +60,6 @@ scripts/neon_backup.log
 # curated result under corpus/ is. The directory's README is kept so it survives.
 docs/the_spoin_universe/temp/*
 !docs/the_spoin_universe/temp/README.md
+
+# Local database archives (pg_dump). Large, binary, and not source.
+.archives/

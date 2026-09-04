@@ -155,9 +155,32 @@ match above a similarity floor.
 *"The card stores a reference plus text, never rendered art"* (ADR-0021, still true even
 though its degradation rule is not). An image card points `visual_id` at a catalog entry.
 
-Open question for the owner in Phase 3, not now: whether `card.visual_id` is enough or
-images want their own nullable FK column. It depends on whether a card may ever hold both
-an ASCII gag and a photograph — probably not, but that is a product call.
+**Owner decision, 2026-09-05: a card never carries both a photograph and an ASCII gag.**
+One visual slot, so `visual_id` is reused rather than images getting their own column.
+
+**But that alone is not enough, and the obvious plan does not work.** Two *kinds* of thing
+can now sit in one column, and the renderer has to tell them apart. The tempting answer —
+switch on `card_type` — fails on a fact worth checking before designing around it:
+**`card_type` is not persisted on the card.** It is a planning-time concept only
+(`topic.card_type_quotas`, `card_type_matches` in `generation/pipeline/state.py`). What
+the card stores is `archetype`, and that is derived from `body`, which never contains the
+visual.
+
+So add a small `visual_kind` enum (`ascii` | `image`), NOT NULL whenever `visual_id` is:
+
+- **A real enum, not free text**, for ADR-0088's reason for `document.kind` — a typo must
+  not be able to create a silent third kind that nothing renders.
+- **Not inferred from the id's shape.** An image id is a UUID and an ASCII scene id is not,
+  so the type is *technically* recoverable by inspection. Doing that would make rendering
+  depend on an implicit string-format rule, which is the class of hidden constraint this
+  codebase enforces against rather than relies on.
+
+Note that an image `visual_id` is a **cross-database reference by value** — the catalog
+lives in `the_spoin_universe`, so it cannot be a foreign key. That is the same boundary
+crossing ADR-0088 already accepted for `chunk.topic_tags` and ADR-0089 for chunk-ID
+provenance, and it inherits the same obligation: nothing at the database level stops a
+`visual_id` pointing at an image that no longer exists, so the renderer must survive a
+dangling reference.
 
 ---
 
@@ -204,13 +227,17 @@ loop burning quota on a topic that can never satisfy it.**
 
 ## Open questions for the owner
 
-- **Cloudinary account and free-tier headroom.** Bandwidth, not storage, is the binding
+- ~~**Cloudinary account and free-tier headroom.**~~ **Owner is creating the account
+  later (2026-09-05).** Not a blocker for Phase 1 — the manifest contract needs no
+  account — but it blocks Phase 2's upload step, so Phase 1 can and should be written and
+  handed to the authoring track first. Bandwidth, not storage, will be the binding
   constraint, and it scales with users rather than corpus size.
 - **Retraction.** When an image's licence turns out to be misstated, what happens to cards
   citing it? This is the image form of ADR-0089's dangling-chunk question, and it is
   currently unanswered for both.
-- **Does a card ever carry both a photograph and an ASCII gag?** Decides whether
-  `visual_id` is reused or images get their own column (Phase 3).
+- ~~**Does a card ever carry both a photograph and an ASCII gag?**~~ **No** (owner,
+  2026-09-05). `visual_id` is reused; a `visual_kind` enum distinguishes them, because
+  `card_type` turns out not to be persisted. See Phase 3.
 
 ## Commit message theme
 

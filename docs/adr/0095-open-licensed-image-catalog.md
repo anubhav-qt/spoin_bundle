@@ -130,6 +130,25 @@ domain — may exceed it comfortably. Internet culture will sit near zero. Forci
 rate would push irrelevant images onto cards, which is worse than the ASCII gag it
 replaced.
 
+### One visual per card, and its kind is stored
+
+**A card never carries both a photograph and an ASCII gag** (owner, 2026-09-05). There is
+one visual slot, so `card.visual_id` is reused rather than images getting a column of
+their own.
+
+That makes the *kind* of visual something the card must state, and it cannot be inferred
+from what already exists: `card_type` is a planning-time concept that is **never persisted
+on the card**, and `archetype` is derived from `body`, which never contains the visual. So
+a `visual_kind` enum accompanies `visual_id` — a real enum for ADR-0088's `document.kind`
+reason, and not a guess from the id's string shape, which would make rendering depend on
+an implicit format rule.
+
+An image `visual_id` is a **cross-database reference by value**: the catalog is in
+`the_spoin_universe`, so it cannot be a foreign key. Same boundary crossing ADR-0088
+accepted for `chunk.topic_tags` and ADR-0089 for chunk-ID provenance, and it carries the
+same obligation — nothing at the database level prevents a dangling reference, so the
+renderer must survive one.
+
 ### Where the catalog lives, and where usage lives
 
 **The catalog lives in `the_spoin_universe`**, delivered by Antigravity as an `images/`

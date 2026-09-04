@@ -115,7 +115,7 @@ async def _library_index() -> list[list[float]]:
             library = load_library()
             embedder = get_embedder()
             _index_cache = (
-                await embedder.aembed([entry.title for entry in library]) if library else []
+                await embedder.aembed_passage([entry.title for entry in library]) if library else []
             )
     return _index_cache
 
@@ -148,7 +148,7 @@ async def top_candidates(
         return []
 
     embedder = get_embedder()
-    index, query_vec = await asyncio.gather(_library_index(), embedder.aembed([query]))
+    index, query_vec = await asyncio.gather(_library_index(), embedder.aembed_query([query]))
     scored = sorted(
         (
             (entry, vec)

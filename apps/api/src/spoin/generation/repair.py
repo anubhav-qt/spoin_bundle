@@ -97,7 +97,7 @@ async def _mint_new_version(
     unique index (`uq_card_family_id_active`) enforces the one-active invariant,
     so both writes must land in the same transaction."""
 
-    embedding = (await embedder.aembed([body]))[0]
+    embedding = (await embedder.aembed_passage([body]))[0]
     new_card = Card(
         family_id=old.family_id,
         version=old.version + 1,

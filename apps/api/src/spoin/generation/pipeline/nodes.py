@@ -1370,7 +1370,7 @@ async def _process_gate_item(
 
     if item.corrected:
         bodies = [draft.body for draft in item.corrected]
-        embeddings = await runtime.embedder.aembed(bodies)
+        embeddings = await runtime.embedder.aembed_passage(bodies)
         accepted_embeddings: list[list[float]] = []
         subtopic_uuid = uuid.UUID(item.subtopic_id)
         async with runtime.session_lock:
@@ -1653,7 +1653,7 @@ async def _run_question_phase(
     if all_question_drafts or all_question_failures:
         parsed_difficulty = Difficulty(difficulty)
         stems = [draft.stem for draft, _card_id in all_question_drafts]
-        embeddings = await runtime.embedder.aembed(stems) if stems else []
+        embeddings = await runtime.embedder.aembed_passage(stems) if stems else []
         new_questions = [
             Question(
                 subtopic_id=uuid.UUID(subtopic_id),

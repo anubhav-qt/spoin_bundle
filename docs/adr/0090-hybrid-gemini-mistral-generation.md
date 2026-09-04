@@ -50,7 +50,7 @@ entirely, and one whose placement is a real decision rather than a lookup.
 | `correct_cards` | rewritten prose | **Mistral** |
 | `generate_questions` | prose | **Mistral** |
 | `repair_card_structure` | repaired prose | **Mistral** |
-| `stream_topic_answer` | prose | **Mistral** |
+| `stream_topic_answer` | prose | **Gemini** (flash-lite) — see below |
 | `generate_curriculum` | structure + judgment | **Gemini** |
 | `match_topics` | a verdict | **Gemini** |
 | `validate_topic_names` | a verdict | **Gemini** |
@@ -60,9 +60,14 @@ entirely, and one whose placement is a real decision rather than a lookup.
 
 Two methods the draft omitted: **`stream_topic_answer`** (AskAI,
 [ADR-0077](0077-askai-deterministic-single-call-retrieval.md)) and **`match_topics`**.
-AskAI runs on Mistral, grounded in frog — a topic-scoped question-answering surface is
-the most obvious consumer the corpus has, and it is the one user-facing call in this
-table.
+
+**AskAI stays on Gemini's flash-lite generator ladder** rather than moving to Mistral
+with the rest of the prose calls (owner's decision, 2026-09-05). It produces prose, so
+the rule above would put it on Mistral — but it is the one *user-facing, latency-visible*
+call in the table, and it is low-volume compared to card generation. Keeping it on
+Gemini reserves Mistral's throughput entirely for the batch work that needs it. This is
+a capacity-allocation exception to the verdict/prose rule, not a revision of it; it will
+still be grounded in frog like everything else.
 
 #### `correct_cards` moves to the generator side, and `verify_cards` never does
 

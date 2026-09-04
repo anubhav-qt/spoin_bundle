@@ -25,6 +25,14 @@ embeddings = [
     "fastembed>=0.4",
 ]
 
+# ADR-0092: the real embedder, `Qwen/Qwen3-Embedding-0.6B` via sentence-transformers.
+# Its own extra rather than folded into `embeddings` above, because torch is ~800MB and
+# the deployed backend is meant to reach for the ONNX CPU path instead (deferred; see
+# the ADR). The default install and the test suite stay free of both.
+embeddings-gpu = [
+    "sentence-transformers>=5.0",
+]
+
 dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
@@ -79,7 +87,10 @@ warn_unreachable = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["pgvector.*", "fastembed.*"]
+# Optional extras, so they are absent from the default install and from CI. Same
+# treatment fastembed already had -- the alternative is a `# type: ignore` at the
+# import site, which CLAUDE.md rules out.
+module = ["pgvector.*", "fastembed.*", "sentence_transformers.*"]
 ignore_missing_imports = true
 
 # ----------------------------------------------------------------- pytest -----

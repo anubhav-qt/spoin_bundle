@@ -124,7 +124,7 @@ class AskService:
 
         # Embedding pre-check (skipped under the hash stand-in).
         if not isinstance(self._embedder, HashEmbedder):
-            qvec = (await self._embedder.aembed([question]))[0]
+            qvec = (await self._embedder.aembed_query([question]))[0]
             refs = [topic.embedding, *(c.content_embedding for c in neighbours)]
             best = max((_cosine(qvec, list(v)) for v in refs if v is not None), default=1.0)
             floor = self._settings.ask_ai_topic_similarity_floor
@@ -288,7 +288,7 @@ class AskService:
                 .limit(self._settings.ask_ai_context_neighbours)
             )
         else:
-            qvec = (await self._embedder.aembed([question]))[0]
+            qvec = (await self._embedder.aembed_query([question]))[0]
             stmt = (
                 select(Card)
                 .where(

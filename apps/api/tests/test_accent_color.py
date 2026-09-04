@@ -30,8 +30,14 @@ class _StubEmbedder(Embedder):
     def __init__(self, table: dict[str, list[float]]) -> None:
         self._table = table
 
-    def embed(self, texts: list[str]) -> list[list[float]]:
+    def embed_passage(self, texts: list[str]) -> list[list[float]]:
         return [list(self._table.get(text, [0.0, 0.0, 0.0, 0.0])) for text in texts]
+
+    def embed_query(self, texts: list[str]) -> list[list[float]]:
+        # Accent-hue matching is symmetric -- a topic name against colour words, both
+        # short labels -- so the stub mirrors the production path in using the passage
+        # side for both (ADR-0092, ADR-0075).
+        return self.embed_passage(texts)
 
 
 @pytest.fixture(autouse=True)

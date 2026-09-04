@@ -3,6 +3,9 @@
 - **Status:** Accepted
 - **Date:** 2026-09-04
 - **Deciders:** project owner, implementing session
+- **Amended by:** [ADR-0092](0092-qwen3-embedder-and-the-device-split.md) — the
+  embedder becomes `Qwen3-Embedding-0.6B` at 1024 dimensions, and the `Embedder`
+  interface becomes asymmetric. This ADR's "vectors stay 384-dim" no longer holds.
 
 ## Context
 

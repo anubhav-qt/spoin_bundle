@@ -15,7 +15,7 @@ def test_embed_takes_a_collection_and_returns_one_vector_per_text() -> None:
     """ADR-0005's batch rule applies to the embedder interface too, and the
     positional correspondence is what every caller assumes without checking."""
 
-    vectors = HashEmbedder(dim=384).embed(["postgres", "kubernetes", "raft consensus"])
+    vectors = HashEmbedder(dim=384).embed_passage(["postgres", "kubernetes", "raft consensus"])
 
     assert len(vectors) == 3
     assert all(len(vector) == 384 for vector in vectors)
@@ -28,7 +28,7 @@ def test_vectors_are_unit_length() -> None:
     HashEmbedder-backed tests disagree with production for a reason no test names.
     """
 
-    vector = HashEmbedder(dim=384).embed_one("distributed systems")
+    vector = HashEmbedder(dim=384).embed_one_passage("distributed systems")
     assert math.isclose(math.sqrt(sum(v * v for v in vector)), 1.0, rel_tol=1e-9)
 
 
@@ -36,7 +36,7 @@ def test_the_empty_string_does_not_divide_by_zero() -> None:
     """No tokens means a zero vector and a zero norm. Reachable from real input —
     a document chunk that is entirely punctuation normalizes to nothing."""
 
-    assert HashEmbedder(dim=8).embed_one("   ") == [0.0] * 8
+    assert HashEmbedder(dim=8).embed_one_passage("   ") == [0.0] * 8
 
 
 def test_it_is_deterministic() -> None:
@@ -44,8 +44,8 @@ def test_it_is_deterministic() -> None:
     stored vector against a freshly computed one starts failing for an unrelated
     reason."""
 
-    a = HashEmbedder(dim=64).embed_one("raft consensus")
-    b = HashEmbedder(dim=64).embed_one("raft consensus")
+    a = HashEmbedder(dim=64).embed_one_passage("raft consensus")
+    b = HashEmbedder(dim=64).embed_one_passage("raft consensus")
     assert a == b
 
 
@@ -55,4 +55,4 @@ async def test_aembed_matches_embed() -> None:
 
     embedder = HashEmbedder(dim=32)
     texts = ["btree", "wal"]
-    assert await embedder.aembed(texts) == embedder.embed(texts)
+    assert await embedder.aembed_passage(texts) == embedder.embed_passage(texts)

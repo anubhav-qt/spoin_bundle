@@ -73,7 +73,9 @@ async def seed() -> None:
             topic.canonical_name = topic_data["canonical_name"]
             topic.description = topic_data["description"]
             topic.is_seeded = True
-            topic.embedding = embedder.embed_one(normalize_topic_text(topic_data["canonical_name"]))
+            topic.embedding = embedder.embed_one_passage(
+                normalize_topic_text(topic_data["canonical_name"])
+            )
             # TEMPORARY (ADR-0015 / docs/tasks/0005): subscriber_count has no live
             # writer other than POST /topics/{id}/subscribe, and with one demo user
             # organic counts would tie every topic at 0-1. Seeding a fixture baseline
@@ -203,7 +205,9 @@ async def _seed_subtopic(
             "prompt_version": None,
             "batch_id": "seed",
         }
-        card.content_embedding = embedder.embed_one(f"{card_data['title']} {card_data['body']}")
+        card.content_embedding = embedder.embed_one_passage(
+            f"{card_data['title']} {card_data['body']}"
+        )
         await session.flush()
 
         stats = await session.scalar(select(CardStats).where(CardStats.card_id == card.id))

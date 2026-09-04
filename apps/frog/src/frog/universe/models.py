@@ -31,11 +31,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from frog.universe.base import Base, CreatedAt, UUIDPrimaryKey
 
-#: ADR-0087: the same 384 dimensions and the same `BAAI/bge-small-en-v1.5` model as
-#: `card.content_embedding` in `spoin_db_2`. This is load-bearing, not a default —
-#: corpus vectors and card vectors that are not in the same space cannot be compared,
-#: and nothing would raise if they diverged.
-EMBEDDING_DIM = 384
+#: ADR-0092: `Qwen/Qwen3-Embedding-0.6B`, 1024 dimensions. Supersedes ADR-0087's
+#: 384-dim commitment — comparability with `card.content_embedding` is preserved by
+#: both moving together, not by the number staying still.
+#:
+#: ⚠️ They have NOT both moved yet. `spoin_db_2` stays at 384 until the regeneration
+#: wipe, because `spoin.domain.models.topic` declares `Vector(...)` from
+#: `embedding_dim` at import time and changing it early would make the ORM disagree
+#: with the live schema. The divergence is safe only because nothing currently
+#: compares a card vector to a chunk vector, and `spoin_db_2`'s vectors are hash
+#: output (task 0039) — meaningless in any space. It ends at the regeneration.
+EMBEDDING_DIM = 1024
 
 
 class DocumentKind(StrEnum):

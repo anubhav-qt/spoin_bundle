@@ -52,7 +52,7 @@ async def match_and_create_topics(
         return []
 
     normalized_names = [normalize_topic_text(request["name"]) for request in topic_requests]
-    embeddings = await embedder.aembed(normalized_names)
+    embeddings = await embedder.aembed_passage(normalized_names)
 
     candidate_lists: list[list[tuple[Topic, float]]] = []
     queries: list[TopicMatchQuery] = []

@@ -11,16 +11,16 @@ from __future__ import annotations
 from frog.universe.models import EMBEDDING_DIM, Chunk, Document, DocumentKind, DocumentScope
 
 
-def test_vectors_are_384_dimensional() -> None:
-    """ADR-0087: the same space as `card.content_embedding` in `spoin_db_2`.
+def test_vectors_are_1024_dimensional() -> None:
+    """ADR-0092: `Qwen3-Embedding-0.6B`'s output width.
 
     This is the one number in the corpus store that cannot be discovered to be wrong
     by testing — mismatched dimensions produce comparisons that are meaningless
-    rather than erroneous.
+    rather than erroneous, so it is pinned here and in the migration.
     """
 
-    assert EMBEDDING_DIM == 384
-    assert Chunk.__table__.c.embedding.type.dim == 384
+    assert EMBEDDING_DIM == 1024
+    assert Chunk.__table__.c.embedding.type.dim == 1024
 
 
 def test_provenance_columns_are_not_nullable() -> None:

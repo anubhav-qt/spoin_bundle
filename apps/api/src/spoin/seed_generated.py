@@ -66,7 +66,9 @@ async def seed_generated() -> None:
             topic.description = topic_data["description"]
             topic.is_seeded = True
             topic.is_survey = topic_data.get("is_survey", False)
-            topic.embedding = embedder.embed_one(normalize_topic_text(topic_data["canonical_name"]))
+            topic.embedding = embedder.embed_one_passage(
+                normalize_topic_text(topic_data["canonical_name"])
+            )
             await session.flush()
 
             subscription = await session.scalar(
@@ -153,7 +155,9 @@ async def _seed_subtopic(
             "prompt_version": None,
             "batch_id": topic.slug,
         }
-        card.content_embedding = embedder.embed_one(f"{card_data['title']} {card_data['body']}")
+        card.content_embedding = embedder.embed_one_passage(
+            f"{card_data['title']} {card_data['body']}"
+        )
         await session.flush()
 
         stats = await session.scalar(select(CardStats).where(CardStats.card_id == card.id))

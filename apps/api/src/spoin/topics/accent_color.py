@@ -144,7 +144,7 @@ async def _vocabulary_index(embedder: Embedder) -> list[list[float]]:
         if _index_cache is None:  # re-check: another caller may have won the race
             vocab = load_color_vocabulary()
             _index_cache = (
-                await embedder.aembed([normalize_topic_text(entry.name) for entry in vocab])
+                await embedder.aembed_passage([normalize_topic_text(entry.name) for entry in vocab])
                 if vocab
                 else []
             )
@@ -181,7 +181,7 @@ async def assign_accent_hue(
     if topic_embedding is not None:
         query_vec = list(topic_embedding)
     else:
-        query_vec = list((await embedder.aembed([normalize_topic_text(topic_name)]))[0])
+        query_vec = list((await embedder.aembed_passage([normalize_topic_text(topic_name)]))[0])
 
     index = await _vocabulary_index(embedder)
     ranked = sorted(

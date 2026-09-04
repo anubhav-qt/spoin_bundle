@@ -1,4 +1,5 @@
 ---
+title: Vedic and Hindu Cosmological Traditions
 kind: topic_source
 category: mythology
 scope: survey

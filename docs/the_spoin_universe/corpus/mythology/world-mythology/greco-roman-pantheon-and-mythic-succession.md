@@ -1,4 +1,5 @@
 ---
+title: Greco-Roman Pantheon and Mythic Succession
 kind: topic_source
 category: mythology
 scope: survey

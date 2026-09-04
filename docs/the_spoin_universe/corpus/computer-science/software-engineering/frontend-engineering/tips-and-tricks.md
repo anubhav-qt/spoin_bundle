@@ -1,4 +1,5 @@
 ---
+title: "Practical Frontend Engineering: Browser Traps, Memory Hazards, and Layout Pitfalls"
 kind: topic_source
 category: computer science
 sub_category: software engineering

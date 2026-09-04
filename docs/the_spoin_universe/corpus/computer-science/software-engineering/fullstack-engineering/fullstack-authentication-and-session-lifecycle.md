@@ -1,4 +1,5 @@
 ---
+title: Fullstack Authentication and Session Lifecycle
 kind: topic_source
 category: computer science
 sub_category: software engineering

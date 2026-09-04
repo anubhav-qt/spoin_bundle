@@ -1,4 +1,5 @@
 ---
+title: "East Asian Mythologies: Chinese and Japanese Shinto"
 kind: topic_source
 category: mythology
 scope: survey

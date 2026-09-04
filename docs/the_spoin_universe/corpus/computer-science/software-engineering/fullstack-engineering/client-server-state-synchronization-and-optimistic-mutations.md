@@ -1,4 +1,5 @@
 ---
+title: Client-Server State Synchronization and Optimistic Mutations
 kind: topic_source
 category: computer science
 sub_category: software engineering

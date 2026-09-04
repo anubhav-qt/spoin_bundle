@@ -1,4 +1,5 @@
 ---
+title: Web Performance and Core Web Vitals
 kind: topic_source
 category: computer science
 sub_category: software engineering

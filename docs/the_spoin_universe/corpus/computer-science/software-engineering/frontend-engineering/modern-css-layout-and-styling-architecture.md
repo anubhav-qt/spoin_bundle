@@ -1,4 +1,5 @@
 ---
+title: Modern CSS Layout and Styling Architecture
 kind: topic_source
 category: computer science
 sub_category: software engineering

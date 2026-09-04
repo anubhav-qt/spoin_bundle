@@ -1,4 +1,5 @@
 ---
+title: Reactivity, Component Models, and State Topologies
 kind: topic_source
 category: computer science
 sub_category: software engineering

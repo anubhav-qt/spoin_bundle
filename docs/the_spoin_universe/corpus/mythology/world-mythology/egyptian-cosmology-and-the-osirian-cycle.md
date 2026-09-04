@@ -1,4 +1,5 @@
 ---
+title: Egyptian Cosmology and the Osirian Cycle
 kind: topic_source
 category: mythology
 scope: survey

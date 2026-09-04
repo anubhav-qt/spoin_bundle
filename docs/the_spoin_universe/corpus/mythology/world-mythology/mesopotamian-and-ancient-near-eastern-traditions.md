@@ -1,4 +1,5 @@
 ---
+title: Mesopotamian and Ancient Near Eastern Traditions
 kind: topic_source
 category: mythology
 scope: survey

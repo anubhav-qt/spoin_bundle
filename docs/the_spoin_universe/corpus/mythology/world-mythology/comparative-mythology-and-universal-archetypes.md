@@ -1,4 +1,5 @@
 ---
+title: Comparative Mythology and Universal Archetypes
 kind: topic_source
 category: mythology
 scope: survey

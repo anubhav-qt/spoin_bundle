@@ -1,4 +1,5 @@
 ---
+title: End-to-End Type Safety and API Contract Synchronization
 kind: topic_source
 category: computer science
 sub_category: software engineering

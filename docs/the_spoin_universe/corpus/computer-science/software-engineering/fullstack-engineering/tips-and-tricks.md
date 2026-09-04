@@ -1,4 +1,5 @@
 ---
+title: "Practical Fullstack Engineering: Boundary Failures, Asset Hazards, and Operational Gotchas"
 kind: topic_source
 category: computer science
 sub_category: software engineering

@@ -1,4 +1,5 @@
 ---
+title: Norse Cosmology and Eschatology
 kind: topic_source
 category: mythology
 scope: survey

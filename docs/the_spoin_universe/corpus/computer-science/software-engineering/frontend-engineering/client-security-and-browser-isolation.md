@@ -1,4 +1,5 @@
 ---
+title: Client Security and Browser Isolation
 kind: topic_source
 category: computer science
 sub_category: software engineering

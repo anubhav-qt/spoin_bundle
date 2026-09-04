@@ -16,7 +16,7 @@ is organisational convenience for humans — **the front matter is authoritative
 the ingester reads the fields, not the path. Keep them consistent anyway; a mismatch
 is a review signal that something is misfiled.
 
-## Active Corpus Content (58 Documents across 7 Suites)
+## Active Corpus Content (67 Documents across 8 Suites)
 
 ### Spoin Canon (`_canon/`, 5 docs)
 Product mechanics and authoring invariants (kind: `spoin_canon`):
@@ -95,4 +95,16 @@ Survey suite (kind: `topic_source`, scope: `survey`):
 - `early-modern-epistemology-rationalism-vs-empiricism.md`
 - `enlightenment-german-idealism-and-19th-century-critique.md`
 - `twentieth-century-and-contemporary-paradigms-analytic-and-continental.md`
+- `tips-and-tricks.md`
+
+### Human Biology (`science/biology/human-biology/`, 9 docs)
+Survey suite (kind: `topic_source`, scope: `survey`):
+- `cellular-physiology-and-metabolic-bioenergetics.md`
+- `human-genetics-molecular-biology-and-epigenetics.md`
+- `neurobiology-and-the-human-brain.md`
+- `cardiovascular-physiology-and-hemodynamics.md`
+- `respiratory-physiology-and-gas-exchange.md`
+- `immunology-and-lymphatic-defense-systems.md`
+- `endocrine-regulation-and-metabolic-homeostasis.md`
+- `digestive-and-renal-excretory-systems.md`
 - `tips-and-tricks.md`

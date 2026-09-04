@@ -1,14 +1,14 @@
 # Handoff: Continuing Corpus Authoring for `the_spoin_universe`
 
-> **Written:** 2026-09-05 after authoring World Philosophy, Astronomy, World Mythology, Fullstack Engineering, Frontend Engineering, and Backend Engineering suites.  
-> **Status:** 58 curated documents in `docs/the_spoin_universe/corpus/`.  
+> **Written:** 2026-09-05 after authoring Human Biology, World Philosophy, Astronomy, World Mythology, Fullstack Engineering, Frontend Engineering, and Backend Engineering suites.  
+> **Status:** 67 curated documents in `docs/the_spoin_universe/corpus/`.  
 > **Purpose:** Hand off the corpus generation pipeline to a fresh session with complete operational context, invariants, and instructions.
 
 ---
 
 ## 1. What Already Exists in the Corpus
 
-The corpus currently holds **58 fully compliant documents** organized by category and scope:
+The corpus currently holds **67 fully compliant documents** organized by category and scope:
 
 | Directory Path | Subject | Scope | Docs | Notes |
 |---|---|---|---|---|
@@ -19,6 +19,7 @@ The corpus currently holds **58 fully compliant documents** organized by categor
 | `docs/the_spoin_universe/corpus/mythology/world-mythology/` | World Mythology | Survey | 9 | Comparative archetypes, Mesopotamia, Egypt, Greco-Roman, Norse, Vedic/Hindu, East Asian (Chinese & Shinto), Mesoamerican/Indigenous, tips-and-tricks. |
 | `docs/the_spoin_universe/corpus/astronomy/physics/astronomy/` | Astronomy | Survey | 9 | Celestial mechanics, solar system, radiation/instrumentation, stellar structure, stellar evolution/H-R, galactic/ISM, extragalactic/cosmic web, cosmology/distance ladder, tips-and-tricks. |
 | `docs/the_spoin_universe/corpus/philosophy/world-philosophy/` | World Philosophy | Survey | 9 | Presocratics/methods, classical Greek (Socrates/Plato/Aristotle), Hellenistic/Late Antique, Eastern traditions, Medieval/Islamic Falsafa, Early Modern epistemology, German Idealism/19th-C critique, 20th-C Analytic/Continental, tips-and-tricks. |
+| `docs/the_spoin_universe/corpus/science/biology/human-biology/` | Human Biology | Survey | 9 | Cellular bioenergetics, genetics/epigenetics, neurobiology & brain, cardiovascular, respiratory, immunology, endocrinology, digestive/renal, tips-and-tricks. |
 
 Every document strictly satisfies the database schema contract (`the_spoin_universe.document` and `the_spoin_universe.chunk`):
 - `title:` is explicitly declared in YAML front matter on every file (`document.title NOT NULL`).

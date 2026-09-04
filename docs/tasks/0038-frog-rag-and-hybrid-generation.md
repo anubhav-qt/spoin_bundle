@@ -1,10 +1,10 @@
 # Task 0038: `frog` (our own RAG), `the_spoin_universe`, and hybrid Mistral/Gemini generation
 
-> **Status:** Phases 0, 1 and 2 done (Phase 2: 2026-09-05). ADRs 0087-0093 accepted;
-> `apps/frog` exists, passes `make check`, and carries the `document`/`chunk`
-> schema, its own alembic chain, and the ingester. **The corpus database itself has
-> still not been created** — the owner runs `make universe-migrate` — so nothing has
-> been ingested yet. Phase 3 next.
+> **Status:** Phases 0, 1 and 2 done (Phase 2: 2026-09-05). ADRs 0087-0094 accepted;
+> `apps/frog` passes `make check` and carries the `document`/`chunk` schema, its own
+> alembic chain, and the ingester. **`the_spoin_universe` exists and is loaded: 90
+> documents, 646 chunks, embedded on the RTX 5070.** Phase 3 (retrieval + eval harness)
+> next.
 > Written 2026-09-04.
 > **Depends on:** [`docs/mistral-saga/`](../mistral-saga/README.md) — provider
 > validation. Experiments 1, 2 and 3 have passed; 3b (drafting quality) is
@@ -316,11 +316,41 @@ The lasting lesson is not any of the four individually — it is that they arriv
 every problem in every document instead of dying on the first, and why the contract now
 has an executable half at all.
 
-#### Still open after Phase 2
+#### The first real ingestion (2026-09-05)
 
-- **The corpus has not been ingested.** `the_spoin_universe` does not exist yet — the
-  owner runs `make universe-migrate` — and the `frog` image has not been built or run
-  against a GPU. Nothing here has been exercised end-to-end against real weights.
+**Done, and everything above is now exercised end-to-end rather than reasoned about.**
+`make universe-migrate` created `the_spoin_universe` and applied all three migrations;
+`make corpus-ingest` loaded **90 documents into 646 chunks in 28 seconds** on the RTX
+5070, with zero failures.
+
+What the run confirmed that the tests could not:
+
+- **Idempotency, live.** The second run reported `scanned=90 ingested=2 unchanged=88
+  failed=0` — 88 documents skipped without being read, embedded or written, and only the
+  two Antigravity had added between the runs ingested. That is the ADR-0088 requirement
+  demonstrated on the real corpus rather than on a fixture.
+- **The vectors are semantic, not hash.** `1024` dims, L2-normalized. A smoke query for
+  *"why does z-index fail inside a transformed ancestor"* returns the frontend
+  tips-and-tricks stacking-context chunk at 0.660; *"what happens at Ragnarok"* returns
+  `norse-cosmology-and-eschatology.md` #6 at 0.649; *"how does insulin regulate blood
+  glucose"* returns the endocrine document's chunks 10 and 9. Every top hit is in the
+  right document.
+- **The contextual header is in the stored text**, as
+  `The ASCII Box Rule and Curated Gag Scene Constraints — Every ASCII Card is a Gag`.
+- **The normalizer (ADR-0093) works in production**: categories came back stored as
+  `computer science`, `software engineering`, `precision sport`, across 8 categories.
+- **`spoin_db_2` is untouched** — 41 topics / 447 subtopics / 5,491 cards, identical to
+  the baseline taken before the migration.
+
+**The `frog` Dockerfile was wrong and building it is what caught that.** It was written
+on an `nvidia/cuda` base, whose Ubuntu 24.04 tags ship Python 3.12 — `apt-get install
+python3.13` fails outright. The fix is smaller than the original: PyTorch's cu128 wheels
+bundle the CUDA runtime and cuDNN as pip packages, and the one thing a container cannot
+bring — the driver — is injected from the host by nvidia-container-toolkit regardless of
+base image. So the image is `python:3.13-slim`, the same base as `apps/api`. Verified in
+the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
+
+#### Still open after Phase 2
 - **The ASCII box rule's enforcement mechanism** is still Phase 6's open decision.
 - **Reading level is a generator-prompt concern, and the prompt does not say so yet.**
   Owner's decision (2026-09-05): the corpus stays dense and precise, and pitching an

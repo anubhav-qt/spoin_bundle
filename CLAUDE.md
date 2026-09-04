@@ -226,6 +226,19 @@ server-side rather than asked for in the prompt
 ([ADR-0021](docs/adr/0021-ascii-scene-library.md)). When you catch yourself adding a
 "please keep this under N characters" line to a prompt, you want a check, not a sentence.
 
+**Heavy work runs locally; the production server stays minimal.**
+[ADR-0094](docs/adr/0094-local-generation-lightweight-production.md). There are exactly two
+environments: the owner's machine (RTX 5070) plus the GitHub remote, which run generation,
+bulk embedding, corpus ingestion, benchmarks and the eval harness — **manually, with no cron
+refill**; and the production server, which hosts only what the app needs to serve a request.
+So: **before adding a dependency to `apps/api`, ask whether the production server needs it.**
+If only generation or ingestion does, it belongs in a separate image — the `frog` service
+carries torch and CUDA (~3GB) in its own image for exactly this reason, keeping it out of the
+image `api`/`worker`/`seed`/`test` all build from. The one place the split leaks is AskAI's
+off-topic gate ([ADR-0077](docs/adr/0077-askai-deterministic-single-call-retrieval.md)), which
+embeds every turn on the request path — which is why the embedder must run on a CPU, and why
+ADR-0092 chose 0.6B over the stronger 4B.
+
 **Silliness lives in the hook layer — title, summary, ASCII art. Never in `body`.** The
 product's claim is quiz-gated mastery of true things. A joke in the line that stops a
 scroll is charm; a joke in the explanation someone is tested on is noise, and it

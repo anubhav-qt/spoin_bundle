@@ -177,6 +177,12 @@ Everything above, plus three things worth knowing before Phase 2:
 **Corpus authoring is Antigravity's, supervised by the owner.** This phase builds
 the machinery that consumes it.
 
+> **The ingestion contract v1 is written and delivered:**
+> [`docs/handoff/antigravity-corpus-authoring.md`](../handoff/antigravity-corpus-authoring.md)
+> (2026-09-04). Phase 2 builds the ingester **against that document**, not the other
+> way round. Front matter may gain fields as the ingester is written; nothing in it
+> should be removed without telling the authoring track.
+
 ### The ingestion contract (the implementing session's real deliverable here)
 
 Define and document the format Antigravity delivers into — file layout, front
@@ -274,16 +280,20 @@ porting ADR-0082/0084 wholesale; it solves a problem Mistral does not have.
 
 | Role | Methods | Provider |
 |---|---|---|
-| Generator | `plan_cards`, `fetch_ascii_scenes`, `generate_cards`, `generate_questions`, `repair_card_structure`, `stream_topic_answer` | **Mistral** |
-| Thinking | `generate_curriculum`, `match_topics`, `validate_topic_names`, `correct_cards`, `verify_cards`, `grade_free_text` | **Gemini** |
+| Generator (prose) | `plan_cards`, `fetch_ascii_scenes`, `generate_cards`, `correct_cards`, `generate_questions`, `repair_card_structure`, `stream_topic_answer` | **Mistral** |
+| Thinking (verdicts) | `generate_curriculum`, `match_topics`, `validate_topic_names`, `verify_cards`, `grade_free_text` | **Gemini** |
 | Key/scope | `claimed_key_scope`, `lease_key_box`, `release_key_box` | **Gemini** (box leasing is Gemini-pool-specific) |
 
-**The table above has been corrected** against `langchain_impl.py`'s
-`_invoke_with_retry` call sites, as this line originally instructed. The draft was
-wrong in one place and incomplete in two: `correct_cards` is a **thinking** call
-(half of ADR-0030's two-pass gate), not a generator call; `stream_topic_answer`
-(AskAI, ADR-0077) is a generator call and was missing; `match_topics` is a thinking
-call and was missing. See [ADR-0090](../adr/0090-hybrid-gemini-mistral-generation.md).
+**The table above has been corrected and then extended by an owner decision.**
+Checked against `langchain_impl.py`'s `_invoke_with_retry` call sites as this line
+originally instructed: `stream_topic_answer` (AskAI, ADR-0077) and `match_topics`
+were missing from the draft entirely. The owner then settled the split as
+**verdict on the thinker, prose on the generator** — which keeps `correct_cards`
+on Mistral (the draft's placement) but for a stated reason, and pins `verify_cards`
+to Gemini permanently. `correct_cards` runs on the generator ladder from the first
+pass, not only after a redraft round: correction happens against retrieved source,
+so it is restatement rather than recall. See
+[ADR-0090](../adr/0090-hybrid-gemini-mistral-generation.md).
 
 ---
 

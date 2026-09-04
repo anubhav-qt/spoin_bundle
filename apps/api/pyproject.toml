@@ -63,7 +63,13 @@ dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
     "httpx>=0.27",
-    "ruff>=0.8",
+    # Capped, not just floored. `ruff>=0.8` alone meant a plain image rebuild could
+    # pull a newer formatter whose output differs from whatever last formatted the
+    # tree -- so `make lint` failed on three untouched files the first time ADR-0087
+    # forced a rebuild (2026-09-04). A formatter is a moving target by design; a
+    # rebuild should not be a formatting event. Raise this deliberately, with a
+    # `ruff format` pass in the same commit.
+    "ruff>=0.16.6,<0.17",
     "mypy>=1.13",
     "pre-commit>=4.0",
 ]

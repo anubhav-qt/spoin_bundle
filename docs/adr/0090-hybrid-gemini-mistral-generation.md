@@ -1,6 +1,6 @@
 # ADR-0090: One `HybridContentGenerator` routes generator-ladder calls to Mistral over raw `httpx` and keeps thinking-ladder calls on Gemini
 
-- **Status:** Accepted
+- **Status:** Accepted (revised same-session — see "The routing table")
 - **Date:** 2026-09-04
 - **Deciders:** project owner, implementing session
 
@@ -31,49 +31,73 @@ throughput Gemini lacks; Gemini has the reasoning Mistral cannot offer here.
 
 ## Decision
 
-**`HybridContentGenerator` implements the existing `ContentGenerator` ABC and routes
-by the ladder a call already belongs to: generator-ladder calls go to Mistral,
-thinking-ladder calls stay on Gemini.**
+**`HybridContentGenerator` implements the existing `ContentGenerator` ABC. The split
+is by what a call PRODUCES: a call that produces a verdict runs on Gemini's thinking
+cells; a call that produces prose runs on Mistral.**
 
-### The routing table, verified against the code
+### The routing table
 
 Task 0038's draft table said to "confirm each method's real ladder against the code
 before trusting this table." Confirmed against `langchain_impl.py`'s
-`_invoke_with_retry` call sites — **and the draft was wrong in one place and
-incomplete in two.**
+`_invoke_with_retry` call sites — which turned up two methods the draft omitted
+entirely, and one whose placement is a real decision rather than a lookup.
 
-| Method | Ladder in code | Routes to |
+| Method | Produces | Routes to |
 |---|---|---|
-| `plan_cards` | generator | **Mistral** |
-| `fetch_ascii_scenes` (and the ASCII redraw call) | generator | **Mistral** |
-| `generate_cards` | generator | **Mistral** |
-| `generate_questions` | generator | **Mistral** |
-| `repair_card_structure` | generator | **Mistral** |
-| `stream_topic_answer` | generator | **Mistral** |
-| `generate_curriculum` | thinking | **Gemini** |
-| `match_topics` | thinking | **Gemini** |
-| `validate_topic_names` | thinking | **Gemini** |
-| `correct_cards` | thinking | **Gemini** |
-| `verify_cards` | thinking | **Gemini** |
-| `grade_free_text` | thinking | **Gemini** |
+| `plan_cards` | a plan | **Mistral** |
+| `fetch_ascii_scenes` (and the ASCII redraw call) | a scene + caption | **Mistral** |
+| `generate_cards` | prose | **Mistral** |
+| `correct_cards` | rewritten prose | **Mistral** |
+| `generate_questions` | prose | **Mistral** |
+| `repair_card_structure` | repaired prose | **Mistral** |
+| `stream_topic_answer` | prose | **Mistral** |
+| `generate_curriculum` | structure + judgment | **Gemini** |
+| `match_topics` | a verdict | **Gemini** |
+| `validate_topic_names` | a verdict | **Gemini** |
+| `verify_cards` | **a verdict** | **Gemini** |
+| `grade_free_text` | a verdict | **Gemini** |
 | `claimed_key_scope`, `lease_key_box`, `release_key_box` | — | **Gemini** (box leasing is Gemini-pool-specific) |
 
-Three corrections to the draft:
+Two methods the draft omitted: **`stream_topic_answer`** (AskAI,
+[ADR-0077](0077-askai-deterministic-single-call-retrieval.md)) and **`match_topics`**.
+AskAI runs on Mistral, grounded in frog — a topic-scoped question-answering surface is
+the most obvious consumer the corpus has, and it is the one user-facing call in this
+table.
 
-1. **`correct_cards` is a thinking call, not a generator call.** The draft put it on
-   Mistral. It is one half of [ADR-0030](0030-two-pass-quality-gate.md)'s two-pass
-   quality gate — judgment, not drafting — and moving it to a 3B model would put the
-   gate's correction pass on a weaker model than the thing it is correcting.
-2. **`stream_topic_answer` was missing.** AskAI ([ADR-0077](0077-askai-deterministic-single-call-retrieval.md))
-   runs on the generator ladder and therefore moves to Mistral.
-3. **`match_topics` was missing.** Thinking ladder, stays on Gemini.
+#### `correct_cards` moves to the generator side, and `verify_cards` never does
 
-Routing by existing ladder rather than by a new hand-written list is deliberate: the
-ladder split ([ADR-0028](0028-key-model-quota-ladder.md),
-[ADR-0029](0029-questions-join-generator-pool.md)) already encodes CLAUDE.md's
-"trusted for taste, never for constraints" judgment about which calls have a real
-consequence when a weak model answers them. Re-deriving that split by hand would be re-litigating a decision
-that already has reasoning behind it.
+This is the load-bearing line, and it is a **change to the ladder the code uses
+today**: `correct_cards` currently runs on the thinking ladder as one half of
+[ADR-0030](0030-two-pass-quality-gate.md)'s two-pass gate. It moves to the generator
+ladder, on both providers.
+
+The two halves of that gate do genuinely different work, and treating the pass as one
+unit had been hiding it:
+
+- **`verify_cards` decides.** It returns accept/reject. That is a *constraint*, and
+  CLAUDE.md's rule is that constraints are never trusted to the cheap path. It stays
+  on the thinking cells permanently — not "for now", not "until Mistral improves".
+- **`correct_cards` rewrites.** It takes a card and a criticism and produces better
+  prose. That is *taste*, and taste is what the generator ladder is for.
+
+What makes the move safe rather than a corner cut is
+[ADR-0089](0089-retrieval-grounded-generation.md): correction happens **against a
+retrieved source**, so the rewriting model is not being asked to recall a fact — it is
+being asked to restate one it has been handed. Recall is the capability a 3B model
+lacks and a frontier model was quietly compensating for; restatement is not. And the
+verdict that follows is still Gemini's, so a bad correction is caught rather than
+shipped.
+
+This applies from the first pass, not only after a redraft round. If the corpus turns
+out thin, this is the first decision to revisit — see "Revisit when".
+
+#### Why route by what a call produces
+
+The routing rule and the ladder split ([ADR-0028](0028-key-model-quota-ladder.md),
+[ADR-0029](0029-questions-join-generator-pool.md)) stay the same object, so there is
+one list rather than two that drift. Both now say the same thing in the same words:
+**verdict on the thinker, prose on the generator** — CLAUDE.md's "trusted for taste,
+never for constraints", applied per call rather than per pass.
 
 ### Raw `httpx`, not `langchain-mistralai`
 
@@ -150,5 +174,12 @@ already carries the reasoning, and a second list would drift from it.
   of the Gemini baseline passes; 10–25 points below is marginal and points at
   `ministral-14b` or restricting Mistral to the ASCII-fetch sub-task; more than 25
   points below fails and this ADR is superseded.
+- **Corrected cards start failing verification more often than uncorrected ones.**
+  That is the signal that moving `correct_cards` to the generator side outran the
+  corpus, and the response is to move it back rather than to argue with the numbers.
+  Phase 6 measures it for free — it already counts gate rejections separately from
+  call failures.
+- Someone proposes moving `verify_cards` to the generator side. It does not move.
+  That is the one row in the table that is a rule rather than a placement.
 - The account's tier changes and a reasoning-capable Mistral model becomes callable.
   The hybrid exists *because* one does not.

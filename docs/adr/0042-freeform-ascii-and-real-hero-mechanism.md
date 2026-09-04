@@ -7,6 +7,13 @@
   library was never authored -- see Context)
 - **Resolves:** [docs/tasks/0006](../tasks/0006-curated-hero-cards.md)
 - **Amended by:** [ADR-0067](0067-mermaid-diagrams-and-form-free-ascii.md) -- the stickman requirement below is removed; an ASCII scene may take any form, and diagram cards moved to mermaid entirely.
+- **Amended by:** [ADR-0066](0066-redraw-over-budget-ascii-art.md) -- **the "drop the
+  visual, keep the card" degradation rule below no longer holds.** Over-budget art is
+  redrawn, and if the redraw fails the card is **rejected outright and regenerated**,
+  never published without its art. This back-reference was missing until 2026-09-05: 0066
+  named 0042 but not the reverse, so a reader arriving here -- or at
+  [ADR-0021](0021-ascii-scene-library.md), whose "degrades to a card with no art" language
+  reads as current -- had no way to learn the rule had been replaced.
 
 ## Context
 

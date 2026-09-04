@@ -6,6 +6,12 @@
   draw art directly instead, with the width/degradation guarantees below re-enforced
   server-side against freehand output rather than a catalog. Kept here, not edited, per
   this repo's "don't edit history" rule.
+- ⚠️ **The degradation rule below is doubly stale.** Every "degrades to a card with no
+  art" / "keeps the card, strips the visual" guarantee in this document was replaced by
+  [ADR-0066](0066-redraw-over-budget-ascii-art.md): a visual that cannot be made valid
+  now **rejects its card for regeneration** rather than publishing it art-less. Read
+  0042 and 0066 before quoting anything below — this note exists because a session in
+  2026-09-05 quoted this ADR's degrade language as current policy.
 - **Amends:** [ADR-0017](0017-card-archetypes.md) (adds `ascii` to the archetype set)
 - **Date:** 2026-08-16
 - **Deciders:** Anubhav

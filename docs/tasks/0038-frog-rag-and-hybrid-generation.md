@@ -372,6 +372,14 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
 
 ## Phase 3 — Retrieval and prompt integration — *"frog achieved"*
 
+> **Phase 3 now has a second consumer.**
+> [Task 0040](0040-open-licensed-image-catalog.md) assigns photographs to cards by
+> retrieving against image descriptions, and is deliberately blocked on this phase rather
+> than forking a second pgvector search. Worth knowing while designing the retrieval API:
+> it needs to serve a query that is *not* prompt assembly — top-1 above a similarity
+> floor, filtered by "not already used in this topic" — so the layer should expose search
+> as something callable, not only as a step inside context packing.
+
 - Query → embed → pgvector search → top-k, cross-topic, filters available but not
   applied by default.
 - **Context assembly against a token cap.** ADR-0085's `pack_by_tokens` is the

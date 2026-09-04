@@ -5,6 +5,11 @@
 > **Status:** this is the ingestion contract, v1. Phase 2 builds the ingester
 > *against this document* — so if a field here turns out to be wrong, say so before
 > the corpus is large, not after.
+>
+> **Companion doc:** [`docs/the_spoin_universe/procedure.md`](../the_spoin_universe/procedure.md)
+> is the *procedure* — the phases you run, in order, every time the owner hands you a
+> subject. This document is the *contract* — what the files must contain and why.
+> Read this one once; read that one every run.
 
 You are authoring the source-of-truth corpus that Spoin's card generator will be
 grounded in. This document tells you what the corpus is for, what shape it has to
@@ -140,19 +145,36 @@ defence. (A server-side check is an open decision the owner has not yet made.)
 ### Layout
 
 ```
-corpus/
-  canon/
+docs/the_spoin_universe/corpus/
+  <category>/
+    <sub_category>/          omit this level entirely when there is none
+      <survey-or-topic>/
+        <document>.md
+```
+
+For example:
+
+```
+docs/the_spoin_universe/corpus/
+  computer-science/
+    databases/
+      postgresql/
+        mvcc-and-isolation.md
+  science/
+    physics/
+      thermodynamics/
+        entropy.md
+```
+
+Spoin canon — how the product itself works — sits outside the subject hierarchy,
+since it is about Spoin rather than about a field:
+
+```
+docs/the_spoin_universe/corpus/
+  _canon/
     card-anatomy.md
     dual-titles.md
     ascii-box-rule.md
-    ...
-  topics/
-    postgresql/
-      mvcc-and-isolation.md
-      indexing.md
-    distributed-systems/
-      consensus.md
-    ...
 ```
 
 The directory is organisational convenience for humans. **The `kind` in front matter
@@ -167,6 +189,9 @@ UTF-8 Markdown with YAML front matter.
 ---
 title: MVCC and transaction isolation in PostgreSQL
 kind: topic_source
+category: computer science
+sub_category: databases
+scope: topic
 source: https://www.postgresql.org/docs/17/mvcc.html
 source_date: 2026-08-01
 topic_tags:
@@ -188,6 +213,9 @@ PostgreSQL implements ... (dense prose here)
 |---|---|---|
 | `title` | **yes** | Human-readable. Shown when a card cites this. |
 | `kind` | **yes** | Exactly `spoin_canon` or `topic_source`. A typo is a hard error, not a silent third kind. |
+| `category` | **yes** | Where the subject sits — agreed with the owner at intake, not chosen unilaterally. **No column for this exists in the product database yet**; front matter is the source of truth until the ingester grows one. |
+| `sub_category` | no | Omit the field entirely when the subject has none. Same status as `category`. |
+| `scope` | **yes** | `survey` or `topic`. A survey is a tour of a field that emits `deep_dive` links; a topic is an exhaustive course on one subject ([ADR-0007](../adr/0007-curriculum-driven-generation.md)). It changes what you research, not just how it is filed. |
 | `source` | **yes** | URL, or an origin description for canon (e.g. `Spoin ADR-0022`). This is what a card cites. |
 | `source_date` | no | When the **source material** is from — not when you wrote the file. Lets a card cite material that later goes stale. Omit for canon. |
 | `topic_tags` | **yes** for `topic_source`, optional for `spoin_canon` | See below. |
@@ -272,6 +300,11 @@ Honest list, so nothing here reads as more settled than it is:
   told.
 - **The front matter may gain fields** in Phase 2 as the ingester is written. Nothing
   above is expected to be *removed*, so authoring against it now is safe.
+- **`category`, `sub_category` and `scope` have no columns yet.** The corpus is the
+  first thing in this project that needs a hierarchy above the topic level, so these
+  are introduced here and a later migration will read them. That makes consistency in
+  the values you write worth more than usual — an inconsistent set now becomes a
+  cleanup job at migration time.
 - **`author` and `licence` were deliberately dropped** from the schema
   ([ADR-0088](../adr/0088-the-spoin-universe.md)). If you find yourself needing to
   record either, that is a real signal — raise it rather than smuggling it into
@@ -286,4 +319,5 @@ Honest list, so nothing here reads as more settled than it is:
 | The mental model everything assumes | [`docs/architecture/overview.md`](../architecture/overview.md) |
 | What a card, subtopic and question are | [`docs/architecture/content-model.md`](../architecture/content-model.md) |
 | Why the corpus exists, and how it is stored | [ADR-0088](../adr/0088-the-spoin-universe.md), [ADR-0089](../adr/0089-retrieval-grounded-generation.md) |
+| The procedure you run each time | [`docs/the_spoin_universe/procedure.md`](../the_spoin_universe/procedure.md) |
 | The full plan this is one track of | [task 0038](../tasks/0038-frog-rag-and-hybrid-generation.md) |

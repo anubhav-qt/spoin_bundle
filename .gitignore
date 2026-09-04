@@ -54,3 +54,9 @@ scripts/neon_backup.log
 
 # throwaway key->project clustering probe (not committed, see docs/handoff/next-key-projects-*.md)
 .keyprobe/
+
+# Research scratch for the corpus authoring loop (docs/the_spoin_universe/procedure.md
+# Phase D). Wiped and rewritten per run, never ingested, never a deliverable -- the
+# curated result under corpus/ is. The directory's README is kept so it survives.
+docs/the_spoin_universe/temp/*
+!docs/the_spoin_universe/temp/README.md

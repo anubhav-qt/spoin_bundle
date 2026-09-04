@@ -69,7 +69,6 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
-import random
 import re
 import time
 from collections.abc import AsyncIterator
@@ -153,6 +152,82 @@ _PROBE_MIN_INTERVAL_SECONDS = 20.0
 _PER_MINUTE_RETRY_CEILING_S = 60.0
 
 
+class _WaveGate:
+    """Batch-and-pause admission control over this process's outbound Gemini calls.
+
+    A *wave* is up to `size` calls in flight together. Once `size` have been
+    admitted the gate is shut: nothing else leaves until every member of that
+    wave has come home AND a `cooldown_s` pause has run. Then the next wave opens.
+
+    This is deliberately stricter than the rolling semaphore it replaces. A
+    semaphore refills a permit the instant any ONE call lands, so it keeps `size`
+    calls perpetually open and the provider never sees a moment with nothing of
+    ours in flight. `inflight_sweep.py` found the source-IP throttle sheds on
+    exactly that number (1% failure at N<=3, 53% at N=4 -- a wall, not a
+    gradient), and a rolling semaphore at N=3 still got shed on once the
+    pipeline's long structured-output batches (7-17s open, against the probe's
+    ~2.5s) began overlapping. Draining to zero between waves is the difference:
+    it gives the edge a window with none of our sockets open in it, and the pause
+    makes that window a length we chose rather than whatever latency left over.
+
+    A wave that drains WITHOUT ever filling costs nothing: `_admitted` resets on
+    every drain, so a trickle of sequential calls -- concurrency 1, measured safe
+    -- is never made to wait. The pause is the price of having run at the ceiling.
+
+    All state is mutated without a lock, and every mutation is a synchronous run
+    between awaits on the one event loop. `_release` in particular takes no await,
+    so a call cancelled mid-request still returns its slot instead of wedging the
+    gate shut for everyone behind it.
+    """
+
+    def __init__(self, size: int, cooldown_s: float) -> None:
+        self._size = max(1, size)
+        self._cooldown_s = max(0.0, cooldown_s)
+        #: Admitted into the CURRENT wave. Reset to 0 whenever the wave drains,
+        #: which is what keeps a trickle from accumulating into a phantom wave.
+        self._admitted = 0
+        #: Requests sent whose response has not landed yet.
+        self._inflight = 0
+        #: Monotonic time before which the next wave may not open.
+        self._open_at = 0.0
+        #: Set while the current wave still has room; cleared the moment it fills.
+        self._wave_open = asyncio.Event()
+        self._wave_open.set()
+
+    @asynccontextmanager
+    async def hold(self) -> AsyncIterator[None]:
+        """Wait for a slot in the current wave and hold it for the round trip."""
+
+        while True:
+            cooldown_left = self._open_at - time.monotonic()
+            if cooldown_left > 0.0:
+                await asyncio.sleep(cooldown_left)
+                continue
+            if self._admitted < self._size:
+                break
+            await self._wave_open.wait()
+
+        self._admitted += 1
+        self._inflight += 1
+        if self._admitted >= self._size:
+            # Shut the gate in the same synchronous step that fills the wave, so
+            # no other waiter can slip through between the two.
+            self._wave_open.clear()
+        try:
+            yield
+        finally:
+            self._release()
+
+    def _release(self) -> None:
+        self._inflight -= 1
+        if self._inflight:
+            return
+        if self._admitted >= self._size:
+            self._open_at = time.monotonic() + self._cooldown_s
+        self._admitted = 0
+        self._wave_open.set()
+
+
 @dataclass(frozen=True)
 class _RateLimit:
     """How to react to one real 429.
@@ -233,13 +308,31 @@ def _classify_rate_limit(exc: ClientError) -> _RateLimit:
         quota_ids.extend(str(c["quotaId"]) for c in (detail, *violations) if c.get("quotaId"))
 
     haystack = " ".join(quota_ids).lower()
+    # A short `RetryInfo` outranks EVERY quotaId, `...PerDay...` included.
+    #
+    # Measured 2026-09-04 with direct single-key probes that bypass this module
+    # entirely: Google throttles on the source IP, and the envelope it sends for
+    # that throttle is `GenerateRequestsPerDayPerProjectPerModel-FreeTier,
+    # limit: 500` on keys nowhere near 500 requests -- 12 keys from 12 separate
+    # projects, fired together, all came back with an IDENTICAL retryDelay, and
+    # firing them is what re-armed a window that had just decayed to 0s. The
+    # quotaId is boilerplate on this path; the delay is the real signal, and
+    # nothing daily resolves in 41 seconds.
+    #
+    # Trusting the id over the delay is what turned a 30s pause into a dead pool:
+    # `on_rate_limited(per_minute=False)` force-sets `rpd_spent = rpd_limit`, so
+    # one mislabelled 429 retires a cell until tomorrow AND writes a fabricated
+    # 500 to `quota_ledger` that `seed_rpd` reads back into the next run. Measured
+    # cost: 136 of 204 generator cells destroyed in 60 seconds, 0 cards.
+    if retry_after is not None and retry_after <= _PER_MINUTE_RETRY_CEILING_S:
+        return _RateLimit(is_daily=False, retry_after_s=retry_after)
     if "perday" in haystack:
         return _RateLimit(is_daily=True, retry_after_s=None)
     if "perminute" in haystack:
         return _RateLimit(is_daily=False, retry_after_s=retry_after)
     if retry_after is not None:
-        if retry_after <= _PER_MINUTE_RETRY_CEILING_S:
-            return _RateLimit(is_daily=False, retry_after_s=retry_after)
+        # Past one RPM window with no recognisable scope -- a delay that long
+        # cannot describe a per-minute limit.
         return _RateLimit(is_daily=True, retry_after_s=None)
     # Neither signal present. Logged rather than silently guessed at, because
     # the guess below is the one thing standing between a throttle and a
@@ -897,8 +990,22 @@ class GeminiContentGenerator(ContentGenerator):
         #: Min seconds between two sends to one key, passed into every balancer
         #: (ADR-0084 burst brake).
         self._send_gap_s = settings.gemini_send_gap_seconds
-        #: Pool-wide dispatch stagger (ADR-0086).
+        #: Pool-wide dispatch stagger -- paces reservation RATE (ADR-0086).
         self._dispatch_stagger_s = settings.gemini_dispatch_stagger_seconds
+        #: Batch-and-pause gate over every outbound call (`_WaveGate`). The
+        #: source-IP throttle sheds on concurrency, not rate: at most
+        #: `gemini_max_inflight_calls` are open together, and the next wave waits
+        #: for the current one to drain plus `gemini_wave_cooldown_seconds`.
+        #: Acquired at the single send site in `_invoke_with_backoff`, released
+        #: when the response lands. One gate for the whole process -- card drafts
+        #: and thinking calls share it.
+        self._wave = _WaveGate(
+            settings.gemini_max_inflight_calls, settings.gemini_wave_cooldown_seconds
+        )
+        #: Sliding active-key window over a box -- rotates only on facts local to
+        #: it (top rung spent, or no budget anywhere in it), never on the failure
+        #: rate (see the config comment on `gemini_active_key_window`).
+        self._active_key_window = settings.gemini_active_key_window
         #: The pool's key indices, minus a fixed remainder held back for the
         #: claim-less path (ADR-0082/0084). `pool - max_topics*box` keys stay
         #: unboxed; a box and the remainder balancer never share a key.
@@ -986,6 +1093,7 @@ class GeminiContentGenerator(ContentGenerator):
             ledger_writer=self._ledger_writer,
             send_gap_s=self._send_gap_s,
             dispatch_stagger_s=self._dispatch_stagger_s,
+            active_key_window=self._active_key_window,
         )
         return KeyBox(box_id=box_id, key_indices=box_keys, balancer=balancer)
 
@@ -1059,25 +1167,42 @@ class GeminiContentGenerator(ContentGenerator):
                 # PROBE D (temporary, 2026-09-03): the call latency `L`. Queue
                 # depth behind `cell_lock` is roughly `L / gap`, which is the
                 # number the send gap has been tuned blind against three times.
-                started = time.monotonic()
+                queued_at = time.monotonic()
                 prompt_chars = len(str(prompt))
+                # `latency` MUST measure the HTTP round trip alone. `queued` --
+                # time spent waiting for a slot at the gate -- is reported
+                # separately: folding the two together is what made the first
+                # wave-gate run unreadable (every `latency=` climbed to 80-140s
+                # and looked like provider slowness when it was our own queue).
+                started = queued_at
                 try:
-                    result = await structured.ainvoke(prompt)  # type: ignore[attr-defined]
+                    # The one place a generation request leaves this process.
+                    # `_wave` caps how many are open at once and drains to zero
+                    # between waves: the source-IP throttle sheds on concurrency,
+                    # so this -- not the dispatch stagger -- is the control that
+                    # keeps us under it. Held for exactly the HTTP round trip; a
+                    # 503 backoff between retries releases the slot.
+                    async with self._wave.hold():
+                        started = time.monotonic()
+                        result = await structured.ainvoke(prompt)  # type: ignore[attr-defined]
                 except BaseException as exc:
                     logger.info(
-                        "lbprobe call key=%d model=%s latency=%.2f chars=%d outcome=%s",
+                        "lbprobe call key=%d model=%s latency=%.2f queued=%.2f chars=%d "
+                        "outcome=%s",
                         key_index,
                         model,
                         time.monotonic() - started,
+                        started - queued_at,
                         prompt_chars,
                         type(exc).__name__,
                     )
                     raise
                 logger.info(
-                    "lbprobe call key=%d model=%s latency=%.2f chars=%d outcome=ok",
+                    "lbprobe call key=%d model=%s latency=%.2f queued=%.2f chars=%d outcome=ok",
                     key_index,
                     model,
                     time.monotonic() - started,
+                    started - queued_at,
                     prompt_chars,
                 )
                 return result
@@ -1180,8 +1305,16 @@ class GeminiContentGenerator(ContentGenerator):
                 if real_error.code == 429:
                     limit = _classify_rate_limit(real_error)
                     if not limit.is_daily:
-                        # Throttled, not spent -- park the cell and move on
-                        # without burning it.
+                        # Throttled, not spent. Park THIS cell for exactly the
+                        # `retryDelay` Google gave us (0-59s, measured) and take
+                        # the next cell the balancer offers -- no caller-side
+                        # sleep. `assign()` already skips cooling cells, and
+                        # `gemini_dispatch_stagger_seconds` (2.0s, the measured
+                        # sustainable rate) paces every reservation it hands back.
+                        # This is the whole point of "use the load balancer": the
+                        # ADR-0086 perimeter backoff that sat here was a second
+                        # pacing layer built for a penalised IP, and it fought the
+                        # balancer instead of using it.
                         lb.on_rate_limited(
                             res,
                             now=datetime.now(UTC),
@@ -1196,27 +1329,16 @@ class GeminiContentGenerator(ContentGenerator):
                                 f"grid is refusing us. Daily quota remains; this is "
                                 f"throttling, not exhaustion."
                             ) from exc
-                        # ADR-0086: Perimeter backoff on un-scoped/bare 429s.
-                        # When Google's edge gateway sheds connections under perimeter
-                        # load, immediately trying the next cell machine-guns through
-                        # the entire box. Back off 5s + uniform jitter before asking
-                        # the balancer for another key, allowing the perimeter to drain.
-                        backoff_s = (
-                            limit.retry_after_s
-                            if limit.retry_after_s is not None
-                            else (5.0 + random.uniform(0.5, 3.5))
-                        )
                         logger.info(
-                            "lb %s: cell key=%d model=%s rate-limited (streak %d/%d) -- "
-                            "backing off %.1fs before next cell",
+                            "lb %s: cell key=%d model=%s throttled (streak %d/%d) -- "
+                            "parked %.0fs, taking next cell",
                             lb.name,
                             key_index,
                             model,
                             throttle_streak,
                             grid_size,
-                            backoff_s,
+                            limit.retry_after_s or 0.0,
                         )
-                        await asyncio.sleep(backoff_s)
                         continue
                     lb.on_rate_limited(res, now=datetime.now(UTC), per_minute=False)
                     logger.warning(
@@ -1317,7 +1439,7 @@ class GeminiContentGenerator(ContentGenerator):
             key_index = keys[attempt % len(keys)]
             attempt += 1
             try:
-                async with lb.cell_lock(key_index, model):
+                async with lb.cell_lock(key_index, model), self._wave.hold():
                     await self._client(key_index, model).ainvoke([("human", "ping")])
             except Exception as exc:
                 logger.info(

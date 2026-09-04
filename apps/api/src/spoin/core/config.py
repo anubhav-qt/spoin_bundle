@@ -118,13 +118,65 @@ class Settings(BaseSettings):
     #: How many keys one topic gets for its whole generation run (ADR-0082).
     #: `max_concurrent_topics` below derives from it (`pool // box_size`).
     #:
-    #: 2026-09-03: back to **one box of the whole pool, one topic at a time**
-    #: after the box-34 / 2-concurrent benchmark hit a 95% 429 rate and
-    #: `AllCellsThrottledError` in 10 minutes (`b542r0bob` --
-    #: docs/notes/rate-limit-load-balancer-debugging.md). The next question is
-    #: whether one topic across all keys, paced (`gemini_send_gap_seconds`),
-    #: sustains; only then does splitting the pool into boxes get retried.
-    topic_key_box_size: int = 75
+    #: The whole pool in ONE box -> `109 // 109` = **one** topic at a time. The
+    #: boxing machinery is deliberately kept (BoxPool still leases, releases and
+    #: keeps slices disjoint) so raising concurrency later is a one-line change;
+    #: we just never lease a second box today.
+    #:
+    #: `GeminiContentGenerator` clamps the unboxed remainder to at least one key
+    #: (a box and the remainder balancer must never share one), so the box gets
+    #: 108 and the claim-less path -- topic matching, curriculum, grading --
+    #: keeps key 108 to itself.
+    #:
+    #: Benchmark 10 tried 34 keys x 3 concurrent topics and produced 0 cards in
+    #: 3 minutes. Measured 2026-09-04 with direct single-key probes that bypass
+    #: this whole module: Google throttles on the **source IP**, not the key or
+    #: the project. 12 keys from 12 separate projects, fired concurrently, all
+    #: came back with an IDENTICAL `retryDelay` (32s) -- and firing them is what
+    #: re-armed a window that had just decayed to 0s. The envelope labels it
+    #: `GenerateRequestsPerDayPerProjectPerModel-FreeTier, limit: 500`, which is
+    #: boilerplate: those keys were nowhere near 500 requests.
+    #:
+    #: So pool size cannot buy concurrency -- 109 keys and 1 key hit the same
+    #: wall -- and topic-level parallelism multiplies arrival rate against a
+    #: ceiling that is already the binding constraint. One box is the known-good
+    #: shape (Benchmark 9: ~5-6 calls in flight, 426 cards in 38 minutes).
+    topic_key_box_size: int = 109
+    #: How many of a box's keys are DISPATCHABLE at any one moment. The box still
+    #: owns all of them; this is a sliding window over it that rotates to the next
+    #: slice when the current one degrades or runs out of top-rung budget.
+    #:
+    #: Measured 2026-09-04 (`keycount_probe.py`) at a CONSTANT 30 req/min and
+    #: ~16k tokens, varying only how many distinct keys the calls spread across:
+    #:
+    #:     5 keys ->  20.0% failure, flat        20 keys -> 18.9%, flat
+    #:    30 keys ->  32.2% failure, flat        60 keys -> 27.8%
+    #:   108 keys ->  42.2%, and the ONLY arm that climbed (17% -> 40% -> 70%)
+    #:
+    #: 20-vs-108 reproduced across two independent runs with different cooldown
+    #: schemes (17.8/41.1, then 18.9/42.2). Spreading one IP's traffic across 100+
+    #: distinct keys measurably degrades it; a small rotating window does not. The
+    #: relationship is NOT clean-monotonic in the middle of the range (20 beat 5,
+    #: 60 beat 30) and one 10-key arm returned 100% failure and stayed there, so
+    #: treat 25 as "inside the good band", not as a tuned optimum.
+    #:
+    #: The window rotates on FACTS local to it -- its top rung spent, or no budget
+    #: left anywhere in it -- and deliberately NOT on the failure rate. A
+    #: rate-triggered rotation shipped and was measured live on 2026-09-04: it
+    #: fired 14 times in 4 minutes on spikes of 60-100%, because every window it
+    #: moved to spiked too. The throttle is keyed to the source IP, so a high
+    #: failure rate is a global fact rotation cannot escape -- and chasing it
+    #: cycled the whole 108-key box every ~2 minutes, recreating the many-keys
+    #: regime this window exists to avoid.
+    #:
+    #: 2026-09-04, AFTER the 07:00 UTC provider-day reset: re-measured 20/30/50
+    #: keys at the same 30 req/min, 16k tokens -- 5.6% / 3.3% / 3.3% failure, flat
+    #: thirds, identical ~0.48 good calls/s. The morning's steep gradient (18.9%
+    #: at 20, 42.2% at 108) was a TRANSIENT IP penalty from ~10h of prior
+    #: hammering; it cleared at the reset. On a healthy IP 50 is as clean as 20,
+    #: so the window is 50: same failure rate, double the cell pool, far more
+    #: headroom before a fact-based rotation is needed.
+    gemini_active_key_window: int = 50
     #: Minimum seconds between two sends to the SAME `(key, model)` cell,
     #: enforced by every `LoadBalancer` (ADR-0084). This IS the rate limiter
     #: while it is > 0 (the trailing window + learned rpm go dormant): `60/gap`
@@ -139,17 +191,62 @@ class Settings(BaseSettings):
     #: never by feel.
     gemini_send_gap_seconds: float = 10.0
     #: Minimum seconds between any two consecutive reservations across the ENTIRE
-    #: balancer (ADR-0086). While `gemini_send_gap_seconds` paces requests to the
-    #: SAME cell, this paces dispatches across DIFFERENT cells to prevent edge
-    #: gateway shedding when parallel subtopic branches fan out simultaneously.
-    #: Tuned to 1.2s after Benchmark 8 (0.5s allowed 16-20 heavy calls in flight,
-    #: triggering edge shedding; 1.2s bounds in-flight concurrency to ~5-6 calls).
-    #: 0.0 disables dispatch staggering.
-    gemini_dispatch_stagger_seconds: float = 1.2
-    #: Maximum random jitter (seconds) applied before entering a subtopic group's
-    #: card generation branch (ADR-0086), desynchronizing the initial wave across
-    #: a 0.5s-3.5s window before reaching the balancer or database. 0.0 disables initial jitter.
-    gemini_initial_dispatch_jitter_seconds: float = 3.5
+    #: balancer -- paces dispatch RATE across different cells (ADR-0086).
+    #:
+    #: 0.0 as of 2026-09-04. `gemini_max_inflight_calls` (below) is now the
+    #: concurrency control, and the source-IP throttle sheds on concurrency, not
+    #: rate -- so a rate stagger on top just caps throughput without adding
+    #: protection, and it masks the difference between in-flight settings when
+    #: they are being tuned. A single-stream probe held 2.2% failure at 0.49
+    #: calls/s indefinitely; the lever that matters is how many run at once.
+    #: > 0.0 re-enables the stagger (e.g. to smooth arrivals into the semaphore
+    #: queue), but the semaphore is the real limit.
+    gemini_dispatch_stagger_seconds: float = 0.0
+    #: Hard cap on Gemini HTTP calls IN FLIGHT at once, process-wide -- the size
+    #: of one WAVE. `_WaveGate` sits at the single outbound send site
+    #: (`_invoke_with_backoff`); every generation call -- card drafts and thinking
+    #: calls, box balancer and remainder balancer alike -- takes a slot before its
+    #: request leaves and returns it when the response lands. Once a wave is full
+    #: nothing else is dispatched until it has fully drained (see
+    #: `gemini_wave_cooldown_seconds`).
+    #:
+    #: 2026-09-04: the source-IP throttle sheds on CONCURRENCY, not request rate.
+    #: A single-stream probe (1 in flight) held 2.2% failure indefinitely; the
+    #: pipeline fanning out to ~4-10 in flight -- at the SAME 2s dispatch spacing
+    #: and SMALLER prompts -- hit 73%. `gemini_dispatch_stagger_seconds` paces
+    #: when reservations are handed out but does nothing about how many calls are
+    #: open at once; this does.
+    #:
+    #: 3. `inflight_sweep.py` found a hard boundary here, not a gradient: holding
+    #: N calls in flight for 150s each against ~8k-token prompts --
+    #:
+    #:     N=2 -> 1.5% fail (flat), 0.85 good calls/s, 0 bare 429s
+    #:     N=3 -> 1.2% fail (flat), 1.11 good calls/s, 0 bare 429s
+    #:     N=4 -> 53.6% fail,       1.31 good calls/s, 220 bare 429s
+    #:     N=5 -> 48.4% fail,       1.49 good calls/s, 200 bare 429s
+    #:
+    #: Zero perimeter shedding at N<=3, a wall at N=4. This is THE constraint the
+    #: whole load balancer exists to respect -- do not raise it without re-running
+    #: that sweep and seeing the boundary has actually moved.
+    #:
+    #: The sweep measured a ROLLING semaphore, and the pipeline shed at N=3
+    #: anyway after ~5 clean minutes -- so 3 is the ceiling on a *steady* stream
+    #: of ~2.5s probe calls, not a licence to keep 3 of the pipeline's 7-17s
+    #: batches perpetually open. Hence the wave shape below.
+    gemini_max_inflight_calls: int = 3
+    #: Seconds to pause after a FULL wave drains, before the next one may open.
+    #:
+    #: A rolling semaphore refills a permit the instant any one call lands, so the
+    #: provider never sees a moment with none of our sockets open. Batch-and-pause
+    #: does: a wave fills, drains to zero, and then this pause runs before anything
+    #: else is dispatched. A wave that drains without ever filling costs no pause
+    #: at all, so a sequential trickle is not penalised.
+    #:
+    #: 2.0 is UNMEASURED -- a starting value, not a tuned one. The probe that would
+    #: justify a number (a wave-mode sweep over size x cooldown, the way
+    #: `inflight_sweep.py` swept N) has not been run. Treat a change here as
+    #: needing evidence, same as `gemini_max_inflight_calls`.
+    gemini_wave_cooldown_seconds: float = 2.0
 
     # Batch sizes (ADR-0005). Batching is still right -- one 15-card call beats
     # 15 single-card calls on every axis -- but the reason once stated here, "the

@@ -300,11 +300,32 @@ class LoadBalancer:
         ledger_writer: LedgerWriter | None = None,
         send_gap_s: float = 0.0,
         dispatch_stagger_s: float = 0.0,
+        active_key_window: int = 0,
     ) -> None:
         if not key_indices:
             raise ValueError("LoadBalancer needs at least one key")
         self.name = name
         self.key_indices = tuple(key_indices)
+        #: Only these keys are dispatchable right now -- a sliding window over the
+        #: box (`settings.gemini_active_key_window`). Google throttles on the
+        #: source IP, and spreading one IP's traffic across 100+ distinct keys
+        #: measurably degrades it (42.2% failure and climbing on 108 keys vs 18.9%
+        #: flat on 20, at identical request rate -- see the config comment). 0
+        #: disables windowing and every key stays live, which is what tests and
+        #: the `fake` backend want.
+        #:
+        #: Rotation is driven ONLY by facts local to the window -- its top rung
+        #: being spent, or the whole window being out of budget. It is explicitly
+        #: NOT driven by the failure rate. A rate-triggered version shipped and was
+        #: measured on 2026-09-04: it rotated 14 times in 4 minutes on spikes of
+        #: 60-100%, because every window it moved to spiked too. Throttling here is
+        #: keyed to the source IP, so a high failure rate is a GLOBAL fact that
+        #: rotating cannot escape -- and chasing it cycled the full 108-key box
+        #: every ~2 minutes, recreating the exact many-keys regime (42% failure and
+        #: climbing) that holding at 25 keys (18.9%, flat) exists to avoid.
+        self._window_size = active_key_window if 0 < active_key_window < len(key_indices) else 0
+        self._window_start = 0
+        self._active_keys = self._window_of(0)
         self._ladders: dict[LadderKind, list[LadderRung]] = {
             "generator": generator_ladder,
             "thinking": thinking_ladder,
@@ -356,6 +377,84 @@ class LoadBalancer:
     @property
     def key_count(self) -> int:
         return len(self.key_indices)
+
+    # -- active key window --------------------------------------------------
+
+    def _window_of(self, start: int) -> tuple[int, ...]:
+        """The `_window_size` keys beginning at `start`, wrapping the box."""
+
+        if not self._window_size:
+            return self.key_indices
+        n = len(self.key_indices)
+        return tuple(self.key_indices[(start + i) % n] for i in range(self._window_size))
+
+    def _rotate_window(self, reason: str) -> None:
+        """Move to the next slice of the box."""
+
+        if not self._window_size:
+            return
+        self._window_start = (self._window_start + self._window_size) % len(self.key_indices)
+        self._active_keys = self._window_of(self._window_start)
+        logger.info(
+            "lb %s: rotating active key window -> %d key(s) starting at %d (%s)",
+            self.name,
+            len(self._active_keys),
+            self._active_keys[0],
+            reason,
+        )
+
+    def _top_rung_spent(self, kind: LadderKind, now_s: float) -> bool:
+        """True when no ACTIVE key has daily budget left on the ladder's strongest
+        still-available rung.
+
+        Degrading to a weaker model is worse than moving to fresh keys that still
+        have the strong one, so this is a rotation trigger. Rungs the provider has
+        marked unavailable (503/504) are skipped rather than counted as spent --
+        that is an outage, and rotating keys cannot fix it.
+        """
+
+        if not self._window_size:
+            return False
+        for rung in self._ladders[kind]:
+            if self._model_unavailable.get(rung.model, 0.0) > now_s:
+                continue
+            return all(
+                self._cells[(k, rung.model)].rpd_spent >= self._cells[(k, rung.model)].rpd_limit
+                for k in self._active_keys
+            )
+        return False
+
+    def _rotate_to_any_budget(self, kind: LadderKind, now_s: float) -> bool:
+        """Walk the remaining windows for one with ANY budget on any rung.
+
+        Distinguishes "this window is spent" (rotate, keep going) from "the whole
+        box is spent" (the caller's `DailyQuotaExhaustedError` is real).
+        """
+
+        if not self._window_size:
+            return False
+        n = len(self.key_indices)
+        starts = range(self._window_size, n, self._window_size)
+        for step in starts:
+            start = (self._window_start + step) % n
+            candidate = self._window_of(start)
+            for rung in self._ladders[kind]:
+                if self._model_unavailable.get(rung.model, 0.0) > now_s:
+                    continue
+                if any(
+                    self._cells[(k, rung.model)].rpd_spent < self._cells[(k, rung.model)].rpd_limit
+                    for k in candidate
+                ):
+                    self._window_start = start
+                    self._active_keys = candidate
+                    logger.info(
+                        "lb %s: active window spent -- rotating to %d key(s) starting at %d",
+                        self.name,
+                        len(candidate),
+                        candidate[0],
+                    )
+                    return True
+        return False
 
     def ladder(self, kind: LadderKind) -> list[LadderRung]:
         return self._ladders[kind]
@@ -442,6 +541,11 @@ class LoadBalancer:
                 if stagger_left > 0.0:
                     return stagger_left
 
+            # Strongest rung dry across the window? Move to fresh keys rather
+            # than serve this call on a weaker model.
+            if self._top_rung_spent(kind, now_s):
+                self._rotate_window("top rung exhausted across the active window")
+
             any_model_checked = False
             any_budget = False
             soonest = math.inf
@@ -453,7 +557,7 @@ class LoadBalancer:
                 if self._model_unavailable.get(rung.model, 0.0) > now_s:
                     continue
                 any_model_checked = True
-                for k in self.key_indices:
+                for k in self._active_keys:
                     cell_id = (k, rung.model)
                     cell = self._cells[cell_id]
                     cell.roll_day(now)
@@ -519,6 +623,11 @@ class LoadBalancer:
                     f"-- provider outage, not quota"
                 )
             if not any_budget:
+                # Only the ACTIVE WINDOW is dry. That is not the same fact as the
+                # box being spent, and reporting it as one would end a run with
+                # 80+ untouched keys sitting in the box.
+                if self._rotate_to_any_budget(kind, now_s):
+                    return 0.5
                 raise DailyQuotaExhaustedError(
                     f"lb {self.name}: all {self.key_count} key(s) exhausted on every "
                     f"{kind} rung for {_day_start(now).date()}"

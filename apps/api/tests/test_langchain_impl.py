@@ -12,6 +12,7 @@ explicitly NOT covered here — there is no real key to verify that against.
 from __future__ import annotations
 
 import asyncio
+import time
 from datetime import UTC, datetime, timedelta
 from typing import cast
 from unittest.mock import ANY, AsyncMock, Mock, call, patch
@@ -36,6 +37,7 @@ from spoin.generation.langchain_impl import (
     _PROBE_BUDGET_SECONDS,
     GeminiContentGenerator,
     _classify_rate_limit,
+    _WaveGate,
     _WireAsciiRedrawBatch,
     _WireAsciiScene,
     _WireCard,
@@ -272,6 +274,115 @@ async def test_invoke_with_backoff_raises_504_immediately_without_retrying() -> 
     mock_sleep.assert_not_awaited()
 
 
+async def test_wave_gate_caps_concurrent_sends() -> None:
+    """`gemini_max_inflight_calls` is the real throttle control: the source-IP
+    limiter sheds on how many requests are open at once, not the rate they are
+    dispatched. A wave of two means at most two `ainvoke`s in flight no matter
+    how many subtopic branches call in -- the rest wait at the gate."""
+
+    generator = _generator(gemini_max_inflight_calls=2, gemini_wave_cooldown_seconds=0.0)
+    lb = generator._remainder_lb
+    assert lb is not None
+    lb.note_send = Mock()  # type: ignore[method-assign]
+
+    live = 0
+    peak = 0
+    release = asyncio.Event()
+
+    async def _slow_invoke(_prompt: object) -> str:
+        nonlocal live, peak
+        live += 1
+        peak = max(peak, live)
+        try:
+            await release.wait()
+            return "ok"
+        finally:
+            live -= 1
+
+    runnable = AsyncMock()
+    runnable.ainvoke = _slow_invoke
+
+    tasks = [
+        asyncio.create_task(
+            generator._invoke_with_backoff(runnable, [], lb=lb, res=_res(i, _THINKING_MODEL))
+        )
+        for i in range(6)
+    ]
+    await asyncio.sleep(0.05)  # let everything that can start, start
+    assert peak == 2, f"a wave of 2 should bound in-flight to 2, saw {peak}"
+
+    release.set()
+    assert await asyncio.gather(*tasks) == ["ok"] * 6
+
+
+async def test_wave_gate_drains_fully_before_the_next_wave_opens() -> None:
+    """The difference from a rolling semaphore, and the whole reason for the
+    change: a semaphore hands the freed permit to the next waiter the instant ONE
+    call lands, so a third call would overlap the still-open second. The gate
+    holds everyone until the wave is empty, giving the edge a window with none of
+    our sockets open in it."""
+
+    gate = _WaveGate(size=2, cooldown_s=0.0)
+    live: set[int] = set()
+    admitted: list[int] = []
+    finish = {i: asyncio.Event() for i in range(4)}
+
+    async def _call(index: int) -> None:
+        async with gate.hold():
+            admitted.append(index)
+            live.add(index)
+            try:
+                await finish[index].wait()
+            finally:
+                live.discard(index)
+
+    tasks = [asyncio.create_task(_call(i)) for i in range(4)]
+    await asyncio.sleep(0.05)
+    assert live == {0, 1}, f"the first wave is calls 0 and 1, saw {live}"
+
+    finish[0].set()
+    await asyncio.sleep(0.05)
+    # A rolling semaphore would have handed call 0's freed permit straight to
+    # call 2 here, overlapping it with call 1. The gate waits for the drain.
+    assert live == {1}, f"call 2 must not start while call 1 is open, saw {live}"
+
+    finish[1].set()
+    await asyncio.sleep(0.05)
+    assert live == {2, 3}, f"the second wave opens only once the first drained, saw {live}"
+
+    for event in finish.values():
+        event.set()
+    await asyncio.gather(*tasks)
+    assert admitted == [0, 1, 2, 3]
+
+
+async def test_wave_gate_pauses_only_after_a_wave_actually_fills() -> None:
+    """A trickle of sequential calls runs at concurrency 1, which is measured
+    safe, so it must not be charged the between-wave pause -- `_admitted` resets
+    on every drain rather than accumulating into a phantom wave. Two calls that
+    genuinely overlap DO fill the wave and are followed by the cooldown."""
+
+    gate = _WaveGate(size=2, cooldown_s=0.2)
+
+    started = time.monotonic()
+    for _ in range(4):
+        async with gate.hold():
+            pass
+    assert time.monotonic() - started < 0.2, "a sequential trickle should never pause"
+
+    both_in = asyncio.Barrier(2)
+
+    async def _overlapping() -> None:
+        async with gate.hold():
+            await both_in.wait()
+
+    await asyncio.gather(_overlapping(), _overlapping())
+    filled_at = time.monotonic()
+    async with gate.hold():
+        pass
+    assert time.monotonic() - filled_at >= 0.2, "a full wave should be followed by the cooldown"
+
+
 async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> None:
     """ADR-0028's drift risk, confirmed live: a real per-DAY 429 from the
     provider means our local ledger disagreed with reality. The retry path must
@@ -388,6 +499,52 @@ def test_classify_rate_limit_trusts_a_short_retry_delay_over_an_unknown_quota_id
     limit = _classify_rate_limit(unknown_id)
     assert limit.is_daily is False
     assert limit.retry_after_s == 13.0
+
+
+def test_classify_rate_limit_trusts_a_short_retry_delay_over_a_per_day_quota_id() -> None:
+    """The envelope Google actually sends when it throttles our IP.
+
+    Captured live 2026-09-04 from a bare `google.genai` client with no balancer in
+    the path: `...PerDayPerProjectPerModel-FreeTier, limit: 500` on keys nowhere
+    near 500 requests, carrying `retryDelay: 41s`. 12 keys on 12 separate projects
+    fired together all returned the SAME delay, and firing them re-armed a window
+    that had just decayed to 0s -- so the quotaId is boilerplate on this path and
+    the delay is the real signal. Nothing daily resolves in 41 seconds.
+
+    Reading the id instead of the delay cost 136 of 204 generator cells in 60
+    seconds (0 cards): the daily branch force-sets `rpd_spent = rpd_limit` and
+    flushes a fabricated 500 to `quota_ledger` for the next run to seed from.
+    """
+
+    ip_throttle = ClientError(
+        429,
+        {
+            "error": {
+                "code": 429,
+                "status": "RESOURCE_EXHAUSTED",
+                "details": [
+                    {
+                        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+                        "violations": [
+                            {
+                                "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+                                "quotaValue": "500",
+                            }
+                        ],
+                    },
+                    {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "41s"},
+                ],
+            }
+        },
+    )
+
+    limit = _classify_rate_limit(ip_throttle)
+    assert limit.is_daily is False, "a 41s wait is a throttle, whatever id rides along"
+    assert limit.retry_after_s == 41.0
+
+    # A per-day id with NO delay still means daily -- positive evidence, nothing
+    # to weigh it against.
+    assert _classify_rate_limit(_rpd_429()).is_daily is True
 
 
 def test_classify_rate_limit_reads_a_long_retry_delay_as_daily() -> None:

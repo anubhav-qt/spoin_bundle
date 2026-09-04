@@ -19,7 +19,7 @@ What remains here is the vocabulary both sides still speak:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -109,8 +109,26 @@ def parse_ladder(raw: str) -> list[LadderRung]:
     return rungs
 
 
+#: Hour (UTC) our ledger day rolls over. Google's free-tier RPD window resets at
+#: midnight Pacific, NOT midnight UTC -- 07:00 UTC under PDT (12:30 IST). Anchoring
+#: this at 00:00 UTC opened a 7-hour blind window: a run launched inside it seeded
+#: every cell from a freshly-rolled, empty ledger while Google still counted the
+#: previous evening's spend. Measured on Benchmark 10 (2026-09-04, launched 01:52
+#: UTC): keys driven to 500/500 on `gemini-3.5-flash-lite` between 19:00 and 21:17
+#: UTC the night before were seeded at 0 and re-dispatched into genuine per-day
+#: 429s, retiring two of three boxes within 25 minutes.
+#:
+#: PST (UTC-8) moves the real reset to 08:00 UTC for part of the year. Left as one
+#: constant rather than a tz lookup: an hour of drift costs an hour of
+#: over-conservative seeding, while the tz dependency costs a correctness surface.
+_DAY_RESET_HOUR_UTC = 7
+
+
 def _day_start(now: datetime) -> datetime:
-    return now.replace(hour=0, minute=0, second=0, microsecond=0)
+    """The most recent provider-day boundary at or before `now`."""
+
+    start = now.replace(hour=_DAY_RESET_HOUR_UTC, minute=0, second=0, microsecond=0)
+    return start if now >= start else start - timedelta(days=1)
 
 
 @dataclass

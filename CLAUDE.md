@@ -151,9 +151,18 @@ a single playful `title` both look fine on the handful of cards anyone actually 
 and degrade everywhere else.
 
 If a task touches **generation reliability** (quota, retries, the LLM call boundary), read
+[`docs/gemini-saga/`](docs/gemini-saga/README.md) first -- the narrative history of the
+Gemini dependency from 2026-08-15 to 2026-09-04, written so that four weeks of dead ends
+do not get re-run. Its one load-bearing fact: **Google's free-tier edge sheds on
+CONCURRENCY -- requests from this source IP simultaneously awaiting a response -- with a
+hard wall between 3 and 4, shared across every key in the pool.** Adding keys buys nothing.
+Provider evaluation in progress lives in [`docs/mistral-saga/`](docs/mistral-saga/README.md),
+which enforces the rule that saga's whole cost bought: **measure a provider's
+concurrency behaviour before building on it** -- the probes are committed under
+`apps/api/src/spoin/probes/`, not left in a scratchpad. Then read
 [`docs/architecture/generation-pipeline.md`](docs/architecture/generation-pipeline.md),
 [ADR-0028](docs/adr/0028-key-model-quota-ladder.md), and
-[ADR-0065](docs/adr/0065-quota-governor-fairness-accounting-and-terminal-states.md) first.
+[ADR-0065](docs/adr/0065-quota-governor-fairness-accounting-and-terminal-states.md).
 The quota ladder has failure modes that look like content-quality problems until you trace
 them back — see the "gate: ... failed" log lines' distinction between a genuine rejection
 and a call that never returned a verdict at all. ADR-0065 draws the matching line on the

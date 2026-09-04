@@ -47,6 +47,7 @@ def _lb(
     writer: object = None,
     send_gap_s: float = 0.0,
     dispatch_stagger_s: float = 0.0,
+    active_key_window: int = 0,
 ) -> LoadBalancer:
     return LoadBalancer(
         name="test",
@@ -59,6 +60,7 @@ def _lb(
         ledger_writer=writer,  # type: ignore[arg-type]
         send_gap_s=send_gap_s,
         dispatch_stagger_s=dispatch_stagger_s,
+        active_key_window=active_key_window,
     )
 
 
@@ -572,3 +574,81 @@ async def test_dispatch_stagger_updated_by_note_send() -> None:
     assert isinstance(wait, float)
     assert pytest.approx(wait, 0.01) == 0.3
 
+
+
+# --- active key window -----------------------------------------------------
+
+
+async def test_window_only_dispatches_to_its_own_slice() -> None:
+    """Google throttles per source IP and degrades as the number of distinct keys
+    in rotation grows -- 42.2% failure and climbing across 108 keys vs 18.9% flat
+    across 20, at an identical request rate (2026-09-04, see
+    `gemini_active_key_window`). So a box may own 10 keys and still only ever
+    dispatch to `window` of them at a time."""
+
+    lb = _lb(keys=tuple(range(10)), active_key_window=3)
+    seen: set[int] = set()
+    for _ in range(30):
+        res = await lb.try_assign("generator", now=_NOW)
+        assert isinstance(res, Reservation)
+        seen.add(res.key_index)
+        await lb.on_success(res, now=_NOW)
+    assert seen == {0, 1, 2}
+
+
+async def test_window_rotates_when_the_top_rung_is_spent_rather_than_degrading() -> None:
+    """Falling to a weaker model is worse than moving to fresh keys that still
+    have the strong one, so an exhausted top rung rotates the window instead of
+    dropping down the ladder."""
+
+    strong, weak = "strong-model", "weak-model"
+    lb = _lb(
+        keys=tuple(range(6)),
+        gen=[LadderRung(strong, 500, 15), LadderRung(weak, 500, 15)],
+        seed={(k, strong): 500 for k in (0, 1, 2)},
+        active_key_window=3,
+    )
+    res = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(res, Reservation)
+    assert res.model == strong, "should rotate to fresh keys, not degrade to the weak rung"
+    assert res.key_index in {3, 4, 5}
+
+
+async def test_a_spent_window_is_not_reported_as_a_spent_box() -> None:
+    """`DailyQuotaExhaustedError` means the BOX is done. Raising it because one
+    25-key slice ran dry would end a run with 80+ untouched keys in hand."""
+
+    lb = _lb(
+        keys=tuple(range(6)),
+        seed={(k, _GEN): 500 for k in (0, 1, 2)},
+        active_key_window=3,
+    )
+    res = await lb.try_assign("generator", now=_NOW)
+    if isinstance(res, float):  # rotated and asked the caller to retry
+        res = await lb.try_assign("generator", now=_NOW)
+    assert isinstance(res, Reservation)
+    assert res.key_index in {3, 4, 5}
+
+
+async def test_whole_box_spent_still_raises() -> None:
+    lb = _lb(
+        keys=tuple(range(6)),
+        seed={(k, _GEN): 500 for k in range(6)},
+        active_key_window=3,
+    )
+    with pytest.raises(DailyQuotaExhaustedError):
+        await lb.try_assign("generator", now=_NOW)
+
+
+async def test_window_disabled_when_it_covers_the_whole_box() -> None:
+    """A window at least as wide as the box is not a window -- every key stays
+    live, which is what the one-key remainder balancer wants."""
+
+    lb = _lb(keys=(0, 1, 2), active_key_window=25)
+    seen: set[int] = set()
+    for _ in range(12):
+        res = await lb.try_assign("generator", now=_NOW)
+        assert isinstance(res, Reservation)
+        seen.add(res.key_index)
+        await lb.on_success(res, now=_NOW)
+    assert seen == {0, 1, 2}

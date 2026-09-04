@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import asyncio
 import math
-import random
 import uuid
 from datetime import UTC, datetime
 from typing import Any, cast
@@ -445,12 +444,10 @@ async def generate_subtopic_cards(  # type: ignore[no-untyped-def]
 
     runtime = _runtime(config)
     job = state["subtopic_group_job"]
-    # ADR-0086: initial dispatch jitter before claiming the key and entering
-    # drafting, to de-synchronize the simultaneous fanout wave across subtopics.
-    # Only active for live generators to keep test suites instant.
-    jitter_max = runtime.settings.gemini_initial_dispatch_jitter_seconds
-    if jitter_max > 0.5 and runtime.settings.generator != "fake":
-        await asyncio.sleep(random.uniform(0.5, jitter_max))
+    # No fanout jitter here any more (ADR-0086, removed 2026-09-04). It existed to
+    # spread the simultaneous subtopic wave off a penalised IP; the penalty
+    # cleared at the 07:00 UTC reset, and `gemini_dispatch_stagger_seconds` (2.0s,
+    # the measured sustainable rate) now paces the whole balancer on its own.
 
     # ADR-0074: this whole branch -- planning, every draft round, both gate
     # passes, every redraft -- runs on ONE key, claimed here and released when
@@ -698,11 +695,6 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 tier["existing_count"],
                 target,
             )
-            if round_number > 1 and runtime.settings.generator != "fake":
-                # ADR-0086: Inter-round drafting jitter to prevent subtopics that finished
-                # planning simultaneously from re-clustering into concurrent drafting waves.
-                await asyncio.sleep(random.uniform(0.5, 3.0))
-
             result = await runtime.generator.generate_cards(
                 topic_name=job["topic_name"],
                 subtopic_title=tier["title"],

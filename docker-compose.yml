@@ -79,6 +79,9 @@ services:
       # the request, before any GenerationJob exists for the worker to pick up.
       SPOIN_GENERATOR: ${SPOIN_GENERATOR:-fake}
       SPOIN_GEMINI_API_KEYS: ${SPOIN_GEMINI_API_KEYS:-}
+      # Read only by spoin.probes.mistral_probe (docs/mistral-saga/). Empty
+      # until provider validation runs; no production code reads it.
+      SPOIN_MISTRAL_API_KEYS: ${SPOIN_MISTRAL_API_KEYS:-}
       SPOIN_GEMINI_THINKING_LADDER: ${SPOIN_GEMINI_THINKING_LADDER:-gemini-3.8-flash:20:5,gemini-3.7-flash:20:5,gemini-3.6-flash:20:5,gemini-3.5-flash:20:5,gemini-3-flash-preview:20:5}
       SPOIN_GEMINI_GENERATOR_LADDER: ${SPOIN_GEMINI_GENERATOR_LADDER:-gemini-3.5-flash-lite:500:15,gemini-3.1-flash-lite:500:15}
     ports:
@@ -202,6 +205,9 @@ services:
       # from `.env` via `${...}` instead of a literal -- same reasoning here.
       SPOIN_GENERATOR: ${SPOIN_GENERATOR:-fake}
       SPOIN_GEMINI_API_KEYS: ${SPOIN_GEMINI_API_KEYS:-}
+      # Read only by spoin.probes.mistral_probe (docs/mistral-saga/). Empty
+      # until provider validation runs; no production code reads it.
+      SPOIN_MISTRAL_API_KEYS: ${SPOIN_MISTRAL_API_KEYS:-}
     depends_on:
       seed:
         condition: service_completed_successfully

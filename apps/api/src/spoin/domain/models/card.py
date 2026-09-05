@@ -63,6 +63,15 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
         ),
         CheckConstraint("version >= 1", name="version_positive"),
         UniqueConstraint("family_id", "version"),
+        #: GIN, because the question this column exists to answer is a CONTAINMENT
+        #: one -- "which cards did this chunk ground?" (rag-design-space 3.12) -- and
+        #: a btree cannot answer it. ADR-0089 rejected free-text provenance for
+        #: exactly this: a citation nothing can query is not a citation.
+        Index(
+            "ix_card_grounded_chunk_ids",
+            "grounded_chunk_ids",
+            postgresql_using="gin",
+        ),
     )
 
     #: Groups every version of the same card. Improving the prompt and
@@ -134,6 +143,25 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
     #: the topic embedding used for canonicalization: same technique, different
     #: vectors, different thresholds. Calibrate separately.
     content_embedding: Mapped[list[float] | None] = mapped_column(Vector(_EMBEDDING_DIM))
+
+    #: The `chunk.id`s in `the_spoin_universe` whose text was in this card's prompt
+    #: (ADR-0089). A real column and not a `gen_meta` key: the question it answers is
+    #: "which cards did this retracted chunk ground?", and JSONB containment over
+    #: every card is not the shape of that question.
+    #:
+    #: NULL and `[]` are different facts, deliberately. NULL means the card predates
+    #: grounding or was written by a path that does not retrieve; `[]` means retrieval
+    #: RAN and had nothing to give -- an empty corpus, or a subtopic it does not
+    #: cover. Reading the second as the first would hide exactly the gap the
+    #: corpus-authoring track needs to see.
+    #:
+    #: There is no foreign key, and cannot be: `chunk` lives in a different DATABASE
+    #: (ADR-0088). So a dangling id is possible -- a chunk revised out of existence
+    #: leaves the card citing something gone, and what that means is an open question
+    #: ADR-0089 names rather than answers.
+    grounded_chunk_ids: Mapped[list[uuid.UUID] | None] = mapped_column(
+        ARRAY(PGUUID(as_uuid=True)), nullable=True
+    )
 
     #: model, prompt_version, generated_at, batch_id, backend. The backend field is
     #: what makes local-vs-cloud quality measurable and lets a bad batch be traced

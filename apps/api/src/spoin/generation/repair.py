@@ -95,6 +95,7 @@ async def _mint_new_version(
     visual_slots: dict[str, str] | None,
     judged_difficulty: object,
     repair_mode: str,
+    grounded_chunk_ids: list[uuid.UUID] | None,
 ) -> Card:
     """A new ACTIVE row in `old`'s family; `old` -> SUPERSEDED. The partial
     unique index (`uq_card_family_id_active`) enforces the one-active invariant,
@@ -118,6 +119,12 @@ async def _mint_new_version(
         visual_slots=visual_slots,
         is_hero=old.is_hero,
         content_embedding=embedding,
+        #: A remake's own grounding (ADR-0089); `None` from the FIX path, which
+        #: edits in place and never retrieves. NULL there is the honest value:
+        #: the new version was not written from the corpus, and claiming the old
+        #: version's citations would be a citation to something this text was
+        #: never checked against.
+        grounded_chunk_ids=grounded_chunk_ids,
         gen_meta={
             **(old.gen_meta or {}),
             "repaired_from": str(old.id),
@@ -249,6 +256,7 @@ async def _run_fix(
         visual_slots=repaired.visual_slots,
         judged_difficulty=None,
         repair_mode="fix",
+        grounded_chunk_ids=None,
     )
 
 
@@ -362,4 +370,5 @@ async def _run_remake(
         visual_slots=card.visual_slots,
         judged_difficulty=verdict.confirmed_difficulty,
         repair_mode="remake",
+        grounded_chunk_ids=list(context.chunk_ids),
     )

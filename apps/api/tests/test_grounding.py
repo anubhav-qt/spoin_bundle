@@ -23,13 +23,14 @@ import pytest
 from frog.embeddings import Embedder, HashEmbedder
 from frog.retrieval import Hit
 from frog.universe.models import EMBEDDING_DIM, Chunk, Document, DocumentKind, DocumentScope
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from conftest import UNIVERSE_TEST_DATABASE_URL
 from spoin.core.config import Settings
 from spoin.core.db import UniverseNotConfiguredError, get_universe_engine
+from spoin.domain.models import Card
 from spoin.generation import grounding as grounding_module
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.grounding import (
@@ -528,3 +529,23 @@ async def test_every_content_call_in_a_run_sees_the_same_passages(
     blocks = {block for blocks in generator.seen.values() for block in blocks}
     assert len(blocks) == 1
     assert "Each transaction sees a snapshot." in blocks.pop()
+
+    #: ADR-0089's third commitment: the card records what grounded it, and it
+    #: records the chunks that were actually IN the prompt rather than what a later
+    #: re-query would return.
+    #: The corpus's one `topic_source` chunk -- the canon document's is never
+    #: retrieved, which is the pinned-not-retrieved rule the sibling test asserts.
+    chunk_id = (
+        (
+            await bound_universe.execute(
+                select(Chunk.id)
+                .join(Document, Document.id == Chunk.document_id)
+                .where(Document.kind == DocumentKind.TOPIC_SOURCE)
+            )
+        )
+        .scalars()
+        .one()
+    )
+    grounded = (await session.execute(select(Card.grounded_chunk_ids))).scalars().all()
+    assert grounded
+    assert all(ids == [chunk_id] for ids in grounded)

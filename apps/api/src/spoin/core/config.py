@@ -19,6 +19,10 @@ from spoin.domain.enums import Difficulty, EngagementKind
 
 GeneratorBackend = Literal["fake", "gemini", "local"]
 EmbedderBackend = Literal["hash", "fastembed"]
+#: `frog`'s ingester takes exactly these two (`frog/ingest/__main__.py --embedder`).
+#: Spelled the same on purpose: the corpus is queried by whatever ingested it, and a
+#: third name here would be a way for the two to disagree.
+CorpusEmbedderBackend = Literal["hash", "qwen3"]
 
 #: Ships as the field default so `local`/`ci` never need a `.env` entry to boot.
 #: A `production` process still carrying this value means the real secret was
@@ -371,6 +375,20 @@ class Settings(BaseSettings):
     ascii_redraw_attempts: int = 2
 
     # -- grounding (ADR-0089) ---------------------------------------------------
+    #: The embedder the CORPUS was ingested with, which is NOT `embedder` above.
+    #: `card.content_embedding` is 384-dimensional today and `chunk.embedding` is 1024
+    #: (ADR-0092), so one setting for both would make every retrieval a dimension
+    #: error -- see task 0039 for why `spoin_db_2` is still 384 and when the two
+    #: converge.
+    #:
+    #: ⚠️ A retrieval query MUST be embedded by the same model the chunks were, or the
+    #: vectors are not comparable and the results are noise that raises nothing. The
+    #: `hash` default is dimension-correct and semantically meaningless: it keeps the
+    #: stack booting and the tests honest, and a run grounded on it is grounded on
+    #: nothing. Production sets `qwen3` -- which needs torch, so it needs an image that
+    #: carries it (ADR-0094).
+    corpus_embedder: CorpusEmbedderBackend = "hash"
+    corpus_embedding_model: str = "Qwen/Qwen3-Embedding-0.6B"
     #: Prompt tokens one call may spend on retrieved corpus context, on top of
     #: everything the prompt already carried.
     #:

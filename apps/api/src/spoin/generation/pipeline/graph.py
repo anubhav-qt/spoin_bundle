@@ -17,7 +17,9 @@ from langgraph.graph.state import CompiledStateGraph
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
+from spoin.embeddings import get_corpus_embedder
 from spoin.generation.base import ContentGenerator
+from spoin.generation.grounding import Grounding
 from spoin.generation.pipeline.nodes import (
     fan_out_topics,
     gate_and_persist,
@@ -74,6 +76,17 @@ async def run_generation_pipeline(
         embedder=embedder,
         settings=settings,
         batch_id=uuid.uuid4(),
+        #: One per RUN, which is what makes its per-subtopic cache correct: the
+        #: cache is only valid while the corpus is fixed, and a run is the
+        #: natural lifetime for that assumption (it re-checks the corpus version
+        #: anyway, because the worker outlives any one run).
+        grounding=Grounding(
+            #: NOT `embedder`: that one writes `card.content_embedding` (384 dims
+            #: today), and the corpus is 1024. See `get_corpus_embedder`.
+            get_corpus_embedder(),
+            token_budget=settings.grounding_token_budget,
+            max_chunks=settings.grounding_max_chunks,
+        ),
     )
     initial_state: PipelineState = {
         "topic_ids": [str(topic_id) for topic_id in topic_ids],

@@ -29,6 +29,7 @@ from spoin.core.config import Settings
 from spoin.domain.enums import CardType, Difficulty, RejectionStage
 from spoin.domain.models import RejectedCard
 from spoin.generation.base import CardDraft, ContentGenerator
+from spoin.generation.grounding import Grounding
 from spoin.generation.quota import KeyBox
 
 logger = logging.getLogger("spoin.generation.pipeline")
@@ -278,6 +279,14 @@ class SubtopicCardsResult(TypedDict):
     existing_question_stems: list[str]
     #: Passed straight through from `SubtopicPlan`.
     target_questions: int
+    #: The three fields the quality gate needs to ask `Grounding` for the SAME
+    #: context this tier was drafted from (ADR-0089). Carried rather than the
+    #: rendered block itself: the block can be several thousand tokens, it would
+    #: ride through graph state once per tier, and `Grounding` has it cached
+    #: anyway -- keyed on exactly this group id (rag-design-space 3.7).
+    subtopic_group_id: str
+    subtopic_title: str
+    subtopic_description: str
 
 
 class PipelineState(TypedDict, total=False):
@@ -327,6 +336,11 @@ class _Runtime:
     embedder: Embedder
     settings: Settings
     batch_id: uuid.UUID
+    #: Retrieval over `the_spoin_universe` for this run, cached per subtopic
+    #: group (ADR-0089). Every node that builds a content prompt asks it for the
+    #: same group's context, so the drafter, the corrector and the verifier are
+    #: looking at one set of passages rather than three.
+    grounding: Grounding
     #: topic_id (str) -> the key box that topic's branches draw on (ADR-0082).
     #: Filled by `run_generation_pipeline` before the graph runs and emptied by
     #: its `finally`, so a node only ever reads it. A topic missing here got no
@@ -385,6 +399,12 @@ class _GateItem:
     #: validation -- kept as the ORIGINAL draft, since correction never ran.
     structural_rejects: list[tuple[CardDraft, str]]
     generator_failure_count: int
+    #: What the gate needs to ask `Grounding` for the SAME context this tier was
+    #: drafted from (ADR-0089). A gate judging a grounded card against different
+    #: sources than the writer had is the coin flip that ADR exists to remove.
+    subtopic_group_id: str
+    subtopic_title: str
+    subtopic_description: str
     #: Existing active cards under this tier with no Question row yet (see
     #: `SubtopicPlan.cards_missing_questions`) -- question generation runs on
     #: these IN ADDITION TO any cards accepted by the gate this run, so a

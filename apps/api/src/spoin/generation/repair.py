@@ -20,15 +20,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
 
 from spoin.content.archetype import classify_archetype
+from spoin.core.config import get_settings
 from spoin.core.db import session_scope
 from spoin.domain.enums import CardStatus, RepairMode, RepairStatus
 from spoin.domain.models import Card, CardRepair, CardReport, Subtopic, Topic
+from spoin.embeddings import get_corpus_embedder
 from spoin.generation.base import (
     CardCorrectionQuery,
     CardRepairQuery,
     CardVerificationQuery,
     ContentGenerator,
 )
+from spoin.generation.grounding import Grounding
 from spoin.generation.quota import QuotaExhaustedError
 from spoin.moderation.service import mark_card_reports_resolved
 
@@ -262,6 +265,30 @@ async def _run_remake(
         f"{subtopic.description}\n\nOPERATOR INSTRUCTION -- this card is being "
         f"regenerated from scratch. Make it as follows: {repair.guidance}"
     )
+    #: A remake writes a card from scratch, so it is grounded exactly as a first
+    #: draft is (ADR-0089) -- and the whole point of a remake is that the card it
+    #: replaces was wrong. Its own `Grounding` because a repair job is one card:
+    #: the per-subtopic cache has nothing to amortise here, and it is the shared
+    #: retrieval and packing posture that matters, not the reuse.
+    #:
+    #: Deliberately the subtopic's OWN description, not `brief` -- the operator's
+    #: instruction says how to rewrite THIS card, and would only pull the query
+    #: off the subtopic it should be retrieving for. It is the writer's input,
+    #: not the retriever's.
+    settings = get_settings()
+    context = await Grounding(
+        #: NOT the `embedder` this function was handed -- that one writes the new
+        #: card's `content_embedding`, in a different vector space (ADR-0092, and
+        #: `get_corpus_embedder`).
+        get_corpus_embedder(),
+        token_budget=settings.grounding_token_budget,
+        max_chunks=settings.grounding_max_chunks,
+    ).for_subtopic(
+        subtopic_group_id=subtopic.subtopic_group_id,
+        topic_name=topic.canonical_name,
+        subtopic_title=subtopic.title,
+        subtopic_description=subtopic.description,
+    )
     drafted = await generator.generate_cards(
         topic_name=topic.canonical_name,
         subtopic_title=subtopic.title,
@@ -273,6 +300,7 @@ async def _run_remake(
         difficulty_examples={},
         avoid_bodies=[card.body],
         rejection_feedback=[],
+        grounding=context.block,
     )
     if not drafted.items:
         repair.status = RepairStatus.FAILED
@@ -294,6 +322,7 @@ async def _run_remake(
             )
         ],
         difficulty_examples={},
+        grounding=context.block,
     )
     fixed = corrected.items[0] if corrected.items else None
     title = fixed.title if fixed else draft.title
@@ -311,6 +340,7 @@ async def _run_remake(
             )
         ],
         difficulty_examples={},
+        grounding=context.block,
     )
     verdict = verdicts.items[0] if verdicts.items else None
     if verdict is None or not verdict.accepted:

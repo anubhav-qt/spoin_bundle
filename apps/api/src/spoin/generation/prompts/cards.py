@@ -23,7 +23,7 @@ is the former it belongs in the corpus.
 
 from __future__ import annotations
 
-from spoin.generation.prompts import canon
+from spoin.generation.prompts import canon, sources
 
 PLAN_SYSTEM = (
     canon.PLAN_CANON
@@ -89,6 +89,11 @@ Write directions, not content. Do not draft body text, do not write the \
 explanation, do not draw the art. A brief that already contains the card leaves \
 the writer nothing to do but reformat it, and reformatting is not writing.
 """
+    #: The planner is the call that decides which cards exist, so it is the one
+    #: that most needs to know what the corpus can actually support. No
+    #: TIER_LANGUAGE: the planner writes directions, not prose, and its output is
+    #: never read by a learner.
+    + sources.WRITER_SOURCES
 )
 
 PLAN_USER = """\
@@ -104,7 +109,7 @@ that clearly wants a different shape should get that shape):
 {type_quotas_block}
 Already covered in this subtopic — plan around these, never re-plan one of them:
 {existing_titles_block}
-{avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
+{avoid_bodies_block}{rejection_feedback_block}{builds_on_block}{grounding_block}"""
 
 
 #: ADR-0080: the fetch sub-step of planning. Given a tier's `ascii` plans, each
@@ -403,6 +408,8 @@ If cards from a LOWER difficulty tier of this same subtopic are shown below \
 ("builds on"), these new cards should genuinely build on them — assume the \
 reader already knows that material, and go deeper rather than re-explaining it.
 """
+    + sources.WRITER_SOURCES
+    + sources.TIER_LANGUAGE
 )
 
 CARDS_COMMON_HEADER = canon.CARDS_CANON + _CARDS_CALL_INSTRUCTIONS
@@ -595,6 +602,13 @@ A hero card is exactly the kind of card an ASCII scene suits best — it is \
 the one card in the subtopic guaranteed to be seen. If a gag or a physical \
 analogy fits the core idea, draw it!
 """
+    #: The hero call composes its own header rather than reusing
+    #: `_CARDS_CALL_INSTRUCTIONS`, so these have to be added explicitly. It writes a
+    #: card a learner reads, from `CARDS_USER`, so it needs both -- and it is the one
+    #: card in a subtopic guaranteed to be seen, which makes it the worst place for
+    #: an ungrounded claim.
+    + sources.WRITER_SOURCES
+    + sources.TIER_LANGUAGE
 )
 
 #: Appended to `CARDS_COMMON_HEADER` only when this call actually carries briefs
@@ -635,4 +649,4 @@ Write exactly {count} NEW cards at this difficulty for this subtopic.
 {plans_block}{difficulty_examples_block}
 Already covered in this subtopic (do not repeat any of these):
 {existing_titles_block}
-{avoid_bodies_block}{rejection_feedback_block}{builds_on_block}"""
+{avoid_bodies_block}{rejection_feedback_block}{builds_on_block}{grounding_block}"""

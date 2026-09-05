@@ -76,6 +76,31 @@ from spoin.generation.pipeline.state import (
 from spoin.generation.quota import QuotaExhaustedError
 
 
+async def _tier_grounding(runtime: _Runtime, topic_name: str, tier: SubtopicPlan) -> str:
+    """ADR-0089's retrieved context for a tier -- which is really its GROUP's.
+
+    Every call about this concept asks through here, and all but the first get it
+    from `Grounding`'s cache (rag-design-space 3.7): the drafter, the redraft after
+    a rejection, and both gate passes end up looking at ONE set of passages. That is
+    not only a saving. A verifier holding different sources than the writer turns a
+    disagreement between two models into a coin flip, which is the failure ADR-0089
+    exists to remove.
+
+    Returns the rendered block, empty when the run is ungrounded. The distinction
+    between "nothing matched" and "no corpus reachable" is logged where it is known,
+    inside `Grounding`, rather than carried through every signature that only needs
+    prompt text.
+    """
+
+    context = await runtime.grounding.for_subtopic(
+        subtopic_group_id=uuid.UUID(tier["subtopic_group_id"]),
+        topic_name=topic_name,
+        subtopic_title=tier["title"],
+        subtopic_description=tier["description"],
+    )
+    return context.block
+
+
 async def _plan_tier_cards(
     runtime: _Runtime,
     *,
@@ -89,6 +114,7 @@ async def _plan_tier_cards(
     builds_on: list[str],
     avoid_bodies: list[str],
     rejection_feedback: list[tuple[str, str]],
+    grounding: str,
 ) -> list[CardPlan]:
     """One planning call for a whole subtopic-tier (ADR-0059), returning the
     pool of briefs the writer rounds below draw from.
@@ -114,6 +140,7 @@ async def _plan_tier_cards(
         builds_on=builds_on,
         avoid_bodies=avoid_bodies,
         rejection_feedback=rejection_feedback,
+        grounding=grounding,
     )
     # Failures and an empty plan are DIFFERENT facts and logged as such
     # (CLAUDE.md: a "failed" outcome and a "rejected"/empty one are never the
@@ -506,6 +533,9 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     cards_missing_questions=tier["cards_missing_questions"],
                     existing_question_stems=tier["existing_question_stems"],
                     target_questions=tier["target_questions"],
+                    subtopic_group_id=tier["subtopic_group_id"],
+                    subtopic_title=tier["title"],
+                    subtopic_description=tier["description"],
                 )
             )
             # Nothing generated THIS run for this tier, so it contributes no
@@ -560,6 +590,11 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
         # a list of titles that happen to already exist. Deliberately placed
         # AFTER `tier_quotas` is settled -- the plan is asked to match the
         # shape budget this call actually intends to fill.
+        #: Retrieved before the tier is planned, because the planner is the call
+        #: that decides which cards exist at all. Cached on the group, so a
+        #: three-tier concept pays for retrieval once (rag-design-space 3.7).
+        tier_grounding = await _tier_grounding(runtime, job["topic_name"], tier)
+
         plan_pool = await _plan_tier_cards(
             runtime,
             topic_name=job["topic_name"],
@@ -574,6 +609,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             rejection_feedback=[
                 (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
             ],
+            grounding=tier_grounding,
         )
 
         # ADR-0080: pick a curated-library scene for each ascii brief before any
@@ -609,6 +645,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
                 ],
                 want_hero=True,
+                grounding=tier_grounding,
             )
             # The model is asked for exactly 1 card here but is trusted for
             # taste, never for constraints (CLAUDE.md) -- a batch call can
@@ -710,6 +747,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 ],
                 card_type=chosen_type,
                 plans=round_plans,
+                grounding=tier_grounding,
             )
             logger.info(
                 "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
@@ -738,6 +776,9 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 cards_missing_questions=tier["cards_missing_questions"],
                 existing_question_stems=tier["existing_question_stems"],
                 target_questions=tier["target_questions"],
+                subtopic_group_id=tier["subtopic_group_id"],
+                subtopic_title=tier["title"],
+                subtopic_description=tier["description"],
             )
         )
         lower_tier_bodies = lower_tier_bodies + [draft.body for draft in drafts]
@@ -947,6 +988,10 @@ async def _redraft_until_bar(
             # next. Leaving redrafts unplanned would also mean a v2 tier is a
             # mix of planned and unplanned cards, which would muddy exactly
             # the comparison `prompt_version` exists to make.
+            #: A cache hit on the group this tier belongs to -- the redraft is
+            #: rewriting the same concept against the same sources.
+            tier_grounding = await _tier_grounding(runtime, topic_name, tier)
+
             round_plans = await _plan_tier_cards(
                 runtime,
                 topic_name=topic_name,
@@ -959,6 +1004,7 @@ async def _redraft_until_bar(
                 builds_on=[],
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
+                grounding=tier_grounding,
             )
             # ADR-0080: the fetcher does NOT run on redraft rounds. A redraft
             # card's asset_direction is new but small in number, and re-running
@@ -979,6 +1025,7 @@ async def _redraft_until_bar(
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
                 plans=round_plans,
+                grounding=tier_grounding,
             )
             logger.info(
                 "redraft round %d: subtopic '%s' [%s] -- requested %d, got %d card(s), "
@@ -1020,6 +1067,9 @@ async def _redraft_until_bar(
                     cards_missing_questions=[],
                     existing_question_stems=existing_question_stems,
                     target_questions=tier["target_questions"],
+                    subtopic_group_id=tier["subtopic_group_id"],
+                    subtopic_title=tier["title"],
+                    subtopic_description=tier["description"],
                 )
             )
 
@@ -1100,6 +1150,7 @@ async def _correct_subtopic_drafts(
     topic_description: str,
     difficulty_examples: dict[Difficulty, list[str]],
     drafts: list[CardDraft],
+    grounding: str,
 ) -> tuple[str, list[CardDraft], list[str]]:
     """ADR-0030 pass 1. Concurrent across subtopics (no DB access -- pure
     generator calls, same principle as `_generate_questions_for_group`).
@@ -1133,7 +1184,7 @@ async def _correct_subtopic_drafts(
             for index, draft in enumerate(chunk)
         ]
         result = await runtime.generator.correct_cards(
-            queries, difficulty_examples=difficulty_examples
+            queries, difficulty_examples=difficulty_examples, grounding=grounding
         )
         chunk_failures = list(result.failures)
         failures.extend(result.failures)
@@ -1193,6 +1244,7 @@ async def _verify_subtopic_drafts(
     subtopic_id: str,
     difficulty_examples: dict[Difficulty, list[str]],
     items: list[tuple[CardDraft, list[float]]],
+    grounding: str,
 ) -> tuple[
     str, list[tuple[CardDraft, list[float], Difficulty]], list[tuple[CardDraft, str]], list[str]
 ]:
@@ -1226,7 +1278,7 @@ async def _verify_subtopic_drafts(
             for index, (draft, _embedding) in enumerate(chunk)
         ]
         result = await runtime.generator.verify_cards(
-            queries, difficulty_examples=difficulty_examples
+            queries, difficulty_examples=difficulty_examples, grounding=grounding
         )
         chunk_failures = list(result.failures)
         failures.extend(result.failures)
@@ -1290,6 +1342,7 @@ async def _generate_questions_for_group(
     cards: list[tuple[uuid.UUID, str, str]],
     existing_stems: list[str],
     is_backfill: bool,
+    grounding: str,
 ) -> tuple[str, str, str, list[tuple[Any, uuid.UUID]], list[str]]:
     """Concurrent, no DB writes -- `cards` is `(id, title, body)` rather than
     ORM `Card` rows so this works identically whether the cards were just
@@ -1322,6 +1375,7 @@ async def _generate_questions_for_group(
             difficulty=parsed_difficulty,
             existing_stems=existing_stems,
             is_backfill=is_backfill,
+            grounding=grounding,
         )
         failures.extend(result.failures)
         for draft in result.items:
@@ -1356,6 +1410,16 @@ async def _process_gate_item(
     tier's correction+verification calls sitting uncommitted behind it.
     """
 
+    #: The same passages the writer had (ADR-0089), from `Grounding`'s cache --
+    #: this is the group the drafting node already retrieved for, so this costs a
+    #: corpus-version check rather than a search.
+    grounding = await runtime.grounding.for_subtopic(
+        subtopic_group_id=uuid.UUID(item.subtopic_group_id),
+        topic_name=item.topic_name,
+        subtopic_title=item.subtopic_title,
+        subtopic_description=item.subtopic_description,
+    )
+
     if item.survivors:
         _, corrected, failures = await _correct_subtopic_drafts(
             runtime,
@@ -1364,6 +1428,7 @@ async def _process_gate_item(
             topic_description=item.topic_description,
             difficulty_examples=item.difficulty_examples,
             drafts=item.survivors,
+            grounding=grounding.block,
         )
         item.corrected = corrected
         item.correction_failure_count = len(failures)
@@ -1413,6 +1478,7 @@ async def _process_gate_item(
             subtopic_id=item.subtopic_id,
             difficulty_examples=item.difficulty_examples,
             items=item.dedup_survivors,
+            grounding=grounding.block,
         )
         item.verified = verified
         item.verification_rejects = verify_rejects
@@ -1572,6 +1638,28 @@ async def _process_gate_item(
     }
 
 
+async def _question_grounding(runtime: _Runtime, key: tuple[str, str, str, str] | None) -> str:
+    """The question phase's context, or `""` when the tier cannot be looked up.
+
+    A missing key means this tier is not in `topic_plans` -- a backfill run whose
+    cards were drafted by an earlier pass. Writing its questions ungrounded is the
+    honest answer: the alternative is inventing a query from the card text and
+    grounding the questions in passages the CARD was never written from, which is
+    worse than not grounding them at all.
+    """
+
+    if key is None:
+        return ""
+    subtopic_group_id, topic_name, subtopic_title, subtopic_description = key
+    context = await runtime.grounding.for_subtopic(
+        subtopic_group_id=uuid.UUID(subtopic_group_id),
+        topic_name=topic_name,
+        subtopic_title=subtopic_title,
+        subtopic_description=subtopic_description,
+    )
+    return context.block
+
+
 async def _run_question_phase(
     runtime: _Runtime,
     *,
@@ -1584,6 +1672,7 @@ async def _run_question_phase(
     target_questions: int,
     generated_at: str,
     backend: str,
+    grounding: str,
 ) -> tuple[int, int]:
     """One subtopic-tier's questions, written from cards that are already
     persisted and already past the gate. Returns (accepted, rejected).
@@ -1643,6 +1732,7 @@ async def _run_question_phase(
             cards=cards_batch,
             existing_stems=running_existing_stems,
             is_backfill=is_backfill,
+            grounding=grounding,
         )
         all_question_drafts.extend(question_drafts)
         all_question_failures.extend(question_failures)
@@ -1761,6 +1851,9 @@ async def _gate_and_persist_results(
                 survivors=survivors,
                 structural_rejects=structural_rejects,
                 generator_failure_count=len(result["generator_failures"]),
+                subtopic_group_id=result["subtopic_group_id"],
+                subtopic_title=result["subtopic_title"],
+                subtopic_description=result["subtopic_description"],
                 existing_cards_missing_questions=result["cards_missing_questions"],
                 existing_question_stems=result["existing_question_stems"],
                 target_questions=result["target_questions"],
@@ -1828,11 +1921,22 @@ async def _run_topic_question_phase(
         return {}
 
     targets: dict[tuple[str, str], int] = {}
+    #: (subtopic_id, difficulty) -> what `Grounding` needs to hand this tier the
+    #: same passages its cards were written from. Read off `topic_plans` for the
+    #: same reason `targets` is: the question phase runs topic-wide and long after
+    #: the drafting branch that had the tier in hand (ADR-0074).
+    grounding_keys: dict[tuple[str, str], tuple[str, str, str, str]] = {}
     for plan in state.get("topic_plans", []):
         for subtopic in plan["subtopics"]:
             targets[(subtopic["subtopic_id"], subtopic["difficulty"])] = subtopic[
                 "target_questions"
             ]
+            grounding_keys[(subtopic["subtopic_id"], subtopic["difficulty"])] = (
+                subtopic["subtopic_group_id"],
+                plan["topic_name"],
+                subtopic["title"],
+                subtopic["description"],
+            )
 
     merged: dict[tuple[str, str, str], list[str]] = {}
     for report in item_reports:
@@ -1880,6 +1984,9 @@ async def _run_topic_question_phase(
                 target_questions=targets.get((subtopic_id, difficulty), 0),
                 generated_at=generated_at,
                 backend=backend,
+                grounding=await _question_grounding(
+                    runtime, grounding_keys.get((subtopic_id, difficulty))
+                ),
             )
         return topic_id, counts
 

@@ -162,6 +162,7 @@ class FakeContentGenerator(ContentGenerator):
         builds_on: list[str],
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
+        grounding: str = "",
     ) -> BatchResult[CardPlan]:
         """Hands back exactly `count` briefs whose type mix honours `type_quotas`
         (ADR-0059), so a test exercising the planned path gets the same shape
@@ -238,6 +239,7 @@ class FakeContentGenerator(ContentGenerator):
         want_hero: bool = False,
         card_type: CardType | str | None = None,
         plans: list[CardPlan] | None = None,
+        grounding: str = "",
     ) -> BatchResult[CardDraft]:
         builds_on_note = f" Builds on {len(builds_on)} lower-tier card(s)." if builds_on else ""
 
@@ -315,6 +317,7 @@ class FakeContentGenerator(ContentGenerator):
         queries: list[CardCorrectionQuery],
         *,
         difficulty_examples: dict[Difficulty, list[str]],
+        grounding: str = "",
     ) -> BatchResult[CardCorrectionResult]:
         # Deterministic pass-through: the fake never finds anything to fix.
         # Correction-behavior itself is exercised by tests that construct their
@@ -338,6 +341,7 @@ class FakeContentGenerator(ContentGenerator):
         queries: list[CardVerificationQuery],
         *,
         difficulty_examples: dict[Difficulty, list[str]],
+        grounding: str = "",
     ) -> BatchResult[CardVerificationResult]:
         items = [
             CardVerificationResult(
@@ -364,6 +368,7 @@ class FakeContentGenerator(ContentGenerator):
         *,
         existing_stems: list[str],
         is_backfill: bool,
+        grounding: str = "",
     ) -> BatchResult[QuestionDraft]:
         items: list[QuestionDraft] = []
         for index, (title, _body) in enumerate(cards):

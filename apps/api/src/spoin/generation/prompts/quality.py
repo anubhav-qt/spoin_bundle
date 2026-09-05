@@ -10,7 +10,7 @@ a check against a source.
 
 from __future__ import annotations
 
-from spoin.generation.prompts import canon
+from spoin.generation.prompts import canon, sources
 
 CORRECTION_SYSTEM = (
     canon.CORRECTION_CANON
@@ -47,12 +47,13 @@ If a card needs no changes, return it EXACTLY as given with was_edited=false. \
 If you change anything, set was_edited=true and give a one-line note on what \
 you fixed. Never reject a card here — that only happens in a later pass.
 """
+    + sources.JUDGE_SOURCES
 )
 
 CORRECTION_USER = """\
 Topic: {topic_name}
 Description: {topic_description}
-{difficulty_examples_block}
+{difficulty_examples_block}{grounding_block}
 Review each of the following {count} cards.
 
 {cards_block}
@@ -75,10 +76,11 @@ already fix: a genuine difficulty mismatch, remaining factual error, or \
 content that still doesn't belong to its topic. Give a short reason whenever \
 accepted=false.
 """
+    + sources.JUDGE_SOURCES
 )
 
 VERIFICATION_USER = """\
-{difficulty_examples_block}
+{difficulty_examples_block}{grounding_block}
 Give a final verdict on each of the following {count} cards, now that you know \
 what difficulty each was requested at.
 

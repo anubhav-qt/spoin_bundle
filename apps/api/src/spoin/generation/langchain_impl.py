@@ -1590,6 +1590,7 @@ class GeminiContentGenerator(ContentGenerator):
         builds_on: list[str],
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
+        grounding: str = "",
     ) -> BatchResult[CardPlan]:
         prompt = [
             ("system", prompts.PLAN_SYSTEM),
@@ -1606,6 +1607,7 @@ class GeminiContentGenerator(ContentGenerator):
                     avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
                     rejection_feedback_block=_format_rejection_feedback(rejection_feedback),
                     builds_on_block=_format_builds_on(builds_on),
+                    grounding_block=grounding,
                 ),
             ),
         ]
@@ -1850,6 +1852,7 @@ class GeminiContentGenerator(ContentGenerator):
         want_hero: bool = False,
         card_type: CardType | str | None = None,
         plans: list[CardPlan] | None = None,
+        grounding: str = "",
     ) -> BatchResult[CardDraft]:
         if want_hero:
             system_prompt = prompts.HERO_CARDS_SYSTEM
@@ -1888,6 +1891,10 @@ class GeminiContentGenerator(ContentGenerator):
                     avoid_bodies_block=_format_avoid_bodies(avoid_bodies),
                     rejection_feedback_block=_format_rejection_feedback(rejection_feedback),
                     builds_on_block=_format_builds_on(builds_on),
+                    #: Already rendered and already packed to a token budget by
+                    #: `generation/grounding.py` -- interpolated whole, and empty when
+                    #: the run is ungrounded.
+                    grounding_block=grounding,
                 ),
             ),
         ]
@@ -1994,6 +2001,7 @@ class GeminiContentGenerator(ContentGenerator):
         queries: list[CardCorrectionQuery],
         *,
         difficulty_examples: dict[Difficulty, list[str]],
+        grounding: str = "",
     ) -> BatchResult[CardCorrectionResult]:
         if not queries:
             return BatchResult(items=[])
@@ -2015,6 +2023,7 @@ class GeminiContentGenerator(ContentGenerator):
                     topic_name=topic_name,
                     topic_description=topic_description or "(no additional description given)",
                     difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
+                    grounding_block=grounding,
                     count=len(queries),
                     cards_block=cards_block,
                 ),
@@ -2057,6 +2066,7 @@ class GeminiContentGenerator(ContentGenerator):
         queries: list[CardVerificationQuery],
         *,
         difficulty_examples: dict[Difficulty, list[str]],
+        grounding: str = "",
     ) -> BatchResult[CardVerificationResult]:
         if not queries:
             return BatchResult(items=[])
@@ -2073,6 +2083,7 @@ class GeminiContentGenerator(ContentGenerator):
                 "human",
                 prompts.VERIFICATION_USER.format(
                     difficulty_examples_block=_format_difficulty_examples(difficulty_examples),
+                    grounding_block=grounding,
                     count=len(queries),
                     cards_block=cards_block,
                 ),
@@ -2108,6 +2119,7 @@ class GeminiContentGenerator(ContentGenerator):
         *,
         existing_stems: list[str],
         is_backfill: bool,
+        grounding: str = "",
     ) -> BatchResult[QuestionDraft]:
         if not cards:
             return BatchResult(items=[])
@@ -2125,6 +2137,7 @@ class GeminiContentGenerator(ContentGenerator):
                 prompts.QUESTIONS_USER.format(
                     difficulty=difficulty.value,
                     existing_stems_block=_format_existing_question_stems(existing_stems),
+                    grounding_block=grounding,
                     cards_block=cards_block,
                 ),
             ),

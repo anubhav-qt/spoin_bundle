@@ -9,7 +9,7 @@ about how Spoin cards are built.
 
 from __future__ import annotations
 
-from spoin.generation.prompts import canon
+from spoin.generation.prompts import canon, sources
 
 QUESTIONS_SYSTEM = (
     canon.QUESTIONS_CANON
@@ -40,13 +40,14 @@ hit a transient failure after the card was already accepted). Write with the \
 same confidence and rigor you would for any other card; do not hedge, and do \
 not treat the card's content as still under review.
 """
+    + sources.WRITER_SOURCES
 )
 
 QUESTIONS_USER = """\
 Difficulty: {difficulty}
 Write one question per card below, in order, following the mcq/free_text split \
 described above.
-{existing_stems_block}
+{existing_stems_block}{grounding_block}
 {cards_block}
 """
 

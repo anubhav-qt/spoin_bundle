@@ -17,6 +17,7 @@ import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import pytest
 from frog.embeddings import Embedder, HashEmbedder
@@ -27,8 +28,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from conftest import UNIVERSE_TEST_DATABASE_URL
+from spoin.core.config import Settings
 from spoin.core.db import UniverseNotConfiguredError, get_universe_engine
 from spoin.generation import grounding as grounding_module
+from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.grounding import (
     Grounding,
     GroundingContext,
@@ -38,6 +41,7 @@ from spoin.generation.grounding import (
     render_block,
 )
 from spoin.generation.load_balancer import estimate_tokens
+from spoin.generation.pipeline import TopicRequest, match_and_create_topics, run_generation_pipeline
 
 
 def _hit(text_: str, *, title: str = "MVCC", score: float = 0.7) -> Hit:
@@ -219,17 +223,26 @@ async def _seed(session: AsyncSession, embedder: Embedder) -> None:
 
 
 @pytest.fixture
-def bound_universe(universe_session: AsyncSession, monkeypatch: pytest.MonkeyPatch) -> AsyncSession:
+def bound_universe(
+    universe_sessions: async_sessionmaker[AsyncSession],
+    universe_session: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
+) -> AsyncSession:
     """Point `grounding`'s session scope at the test corpus.
 
     Patched at the module rather than reconfigured through `Settings`, because
     `get_universe_engine` is `lru_cache`d — a settings override would leak an engine on
     the test database into every later test in the process.
+
+    A fresh session per scope, as production's pool gives. The returned session is the
+    test's own, for seeding; retrieval never borrows it, so a pipeline retrieving from
+    concurrent subtopic branches does not trip over `AsyncSession`'s concurrency rule.
     """
 
     @asynccontextmanager
     async def scope() -> AsyncIterator[AsyncSession]:
-        yield universe_session
+        async with universe_sessions() as session:
+            yield session
 
     monkeypatch.setattr(grounding_module, "universe_session_scope", scope)
     return universe_session
@@ -429,3 +442,89 @@ async def test_the_corpus_engine_is_read_only(universe_session: AsyncSession) ->
                 await session.execute(text("DELETE FROM document"))
     finally:
         await engine.dispose()
+
+
+# -- the wiring: one set of passages, shared by every call about a subtopic ------
+
+
+class _RecordingGenerator(FakeContentGenerator):
+    """Records the `grounding` block each generation call was handed.
+
+    Subclassing the fake rather than mocking the pipeline: what is under test is
+    which calls the pipeline threads the block into, and that is only visible from
+    where the calls land.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.seen: dict[str, list[str]] = {}
+
+    def _note(self, call: str, grounding: str) -> None:
+        self.seen.setdefault(call, []).append(grounding)
+
+    async def plan_cards(self, **kwargs: Any) -> Any:
+        self._note("plan_cards", kwargs.get("grounding", ""))
+        return await super().plan_cards(**kwargs)
+
+    async def generate_cards(self, **kwargs: Any) -> Any:
+        self._note("generate_cards", kwargs.get("grounding", ""))
+        return await super().generate_cards(**kwargs)
+
+    async def correct_cards(self, queries: Any, **kwargs: Any) -> Any:
+        self._note("correct_cards", kwargs.get("grounding", ""))
+        return await super().correct_cards(queries, **kwargs)
+
+    async def verify_cards(self, queries: Any, **kwargs: Any) -> Any:
+        self._note("verify_cards", kwargs.get("grounding", ""))
+        return await super().verify_cards(queries, **kwargs)
+
+    async def generate_questions(self, cards: Any, difficulty: Any, **kwargs: Any) -> Any:
+        self._note("generate_questions", kwargs.get("grounding", ""))
+        return await super().generate_questions(cards, difficulty, **kwargs)
+
+
+async def test_every_content_call_in_a_run_sees_the_same_passages(
+    session: AsyncSession,
+    settings: Settings,
+    bound_universe: AsyncSession,
+) -> None:
+    """ADR-0089's actual claim, end to end.
+
+    The drafter writing from one set of sources while the verifier judges against
+    another is the coin-flip this design exists to remove, so the assertion is not
+    "everything got grounding" but "everything got the SAME grounding". It holds
+    because `Grounding` caches on the subtopic group and every node asks it rather
+    than retrieving for itself.
+    """
+
+    #: Seeded with what `get_corpus_embedder()` returns under the test settings, which
+    #: is the constraint this test also documents: a query embedded by a different
+    #: model than the chunks is not a worse result, it is a dimension error. The
+    #: pipeline's own embedder stays 384-dimensional -- it writes
+    #: `card.content_embedding`, a different vector space entirely (task 0039).
+    await _seed(bound_universe, HashEmbedder(EMBEDDING_DIM))
+    generator = _RecordingGenerator()
+    embedder = HashEmbedder(settings.embedding_dim)
+
+    outcomes = await match_and_create_topics(
+        session,
+        generator,
+        embedder,
+        settings,
+        topic_requests=[TopicRequest(name="PostgreSQL internals", description="")],
+    )
+    topic_ids = [uuid.UUID(outcome["topic_id"]) for outcome in outcomes]
+    await run_generation_pipeline(session, generator, embedder, settings, topic_ids=topic_ids)
+
+    #: Every content call, drafters and thinkers alike (ADR-0089 is explicit that
+    #: the gate grounding in the same corpus is the point, not a nicety).
+    assert set(generator.seen) == {
+        "plan_cards",
+        "generate_cards",
+        "correct_cards",
+        "verify_cards",
+        "generate_questions",
+    }
+    blocks = {block for blocks in generator.seen.values() for block in blocks}
+    assert len(blocks) == 1
+    assert "Each transaction sees a snapshot." in blocks.pop()

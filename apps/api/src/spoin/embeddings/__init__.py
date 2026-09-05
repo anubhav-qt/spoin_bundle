@@ -22,11 +22,12 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from frog.embeddings import Embedder, FastEmbedEmbedder, HashEmbedder
+from frog.embeddings import Embedder, FastEmbedEmbedder, HashEmbedder, Qwen3Embedder
+from frog.universe.models import EMBEDDING_DIM
 
 from spoin.core.config import get_settings
 
-__all__ = ["get_embedder"]
+__all__ = ["get_corpus_embedder", "get_embedder"]
 
 
 @lru_cache
@@ -35,3 +36,26 @@ def get_embedder() -> Embedder:
     if settings.embedder == "fastembed":
         return FastEmbedEmbedder(settings.embedding_model)
     return HashEmbedder(settings.embedding_dim)
+
+
+@lru_cache
+def get_corpus_embedder() -> Embedder:
+    """The embedder for `the_spoin_universe` queries -- a SECOND factory on purpose.
+
+    A retrieval query has to be embedded by the model the chunks were embedded with,
+    and that is not the model `get_embedder()` returns: `card.content_embedding` is
+    384-dimensional today while `chunk.embedding` is 1024 (ADR-0092), so sharing one
+    factory would make every retrieval a dimension error rather than a silent quality
+    loss. Task 0039 is where the two converge; until then they are two spaces and the
+    code says so.
+
+    Its dimension comes from frog's `EMBEDDING_DIM` rather than from a setting, because
+    that constant is what the `chunk.embedding` column was created with -- a
+    configurable that disagreed with it could only ever produce vectors the database
+    refuses.
+    """
+
+    settings = get_settings()
+    if settings.corpus_embedder == "qwen3":
+        return Qwen3Embedder(settings.corpus_embedding_model)
+    return HashEmbedder(EMBEDDING_DIM)

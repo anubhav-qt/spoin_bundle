@@ -90,12 +90,17 @@ UNIVERSE_TEST_DATABASE_URL = os.environ.get("SPOIN_UNIVERSE_TEST_DATABASE_URL", 
 
 
 @pytest_asyncio.fixture
-async def universe_session() -> AsyncIterator[AsyncSession]:
-    """A session on an empty corpus database.
+async def universe_sessions() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
+    """A sessionmaker on an empty corpus database.
 
     Grounding is `spoin`'s (ADR-0087 puts packing on this side of the boundary), so its
     tests live here rather than in frog's suite — but what they exercise is frog's
     schema, so the fixture builds frog's metadata.
+
+    A maker rather than a session, because the pipeline retrieves from concurrent
+    subtopic branches and `AsyncSession` is not safe for concurrent use. Production
+    takes one session per retrieval from a pool; a test sharing one across branches
+    would fail on that instead of on what it is testing.
     """
 
     if not UNIVERSE_TEST_DATABASE_URL:
@@ -112,11 +117,17 @@ async def universe_session() -> AsyncIterator[AsyncSession]:
         await engine.dispose()
         pytest.skip(f"Corpus database unavailable: {exc}")
 
-    maker = async_sessionmaker(engine, expire_on_commit=False)
-    async with maker() as db:
-        yield db
+    yield async_sessionmaker(engine, expire_on_commit=False)
 
     await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def universe_session(
+    universe_sessions: async_sessionmaker[AsyncSession],
+) -> AsyncIterator[AsyncSession]:
+    async with universe_sessions() as db:
+        yield db
 
 
 @pytest_asyncio.fixture

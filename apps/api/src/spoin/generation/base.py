@@ -603,6 +603,7 @@ class ContentGenerator(ABC):
         builds_on: list[str],
         avoid_bodies: list[str],
         rejection_feedback: list[tuple[str, str]],
+        grounding: str = "",
     ) -> BatchResult[CardPlan]:
         """ADR-0059: one call per subtopic-tier, BEFORE any card is written, on
         the generator ladder (not the thinking one -- this is planning, not
@@ -631,6 +632,12 @@ class ContentGenerator(ABC):
         back to unplanned generation (exactly the pre-ADR-0059 path) rather than
         failing the tier. A planning call that never returns is a lost
         improvement, never a lost card.
+
+        `grounding` is the retrieved source block described on `generate_cards`.
+        The planner gets it because it is the one call that decides WHICH cards
+        exist: planning a tier against what the corpus can actually support
+        beats planning from parametric memory and discovering the gap one
+        rejected card at a time.
         """
 
     @abstractmethod
@@ -684,6 +691,7 @@ class ContentGenerator(ABC):
         want_hero: bool = False,
         card_type: CardType | str | None = None,
         plans: list[CardPlan] | None = None,
+        grounding: str = "",
     ) -> BatchResult[CardDraft]:
         """`plans` (ADR-0059) is this call's slice of the tier's briefs, from
         `plan_cards` -- when present, the writer is told WHICH cards to write
@@ -736,6 +744,22 @@ class ContentGenerator(ABC):
         sequentially, lowest first, so `builds_on` is available by the time a
         higher tier's call happens.
 
+        `grounding` (ADR-0089) is retrieved corpus context for this subtopic,
+        already rendered and already packed to a token budget by
+        `generation/grounding.py` -- the writer is expected to write FROM it
+        rather than from parametric memory, which is the whole reason a 3B
+        drafting model is viable at all (ADR-0090). Empty string means
+        ungrounded: no corpus configured, or nothing in it matched. Both are
+        survivable and produce cards, exactly as before ADR-0089 -- but they
+        are not the same fact, and the caller distinguishes them
+        (`GroundingContext.outcome`).
+
+        It is the SAME block for every call in a subtopic group, by design
+        (rag-design-space 3.7): the drafter, the redraft after a rejection and
+        the verifier check against one set of passages, so a disagreement
+        between them is about the writing rather than about which sources each
+        happened to see.
+
         `want_hero`: the caller (`generate_subtopic_cards`, exactly once per
         subtopic-tier, before its normal rounds) is asking for this
         subtopic-tier's ONE hero card instead of an ordinary one -- a
@@ -751,6 +775,7 @@ class ContentGenerator(ABC):
         queries: list[CardCorrectionQuery],
         *,
         difficulty_examples: dict[Difficulty, list[str]],
+        grounding: str = "",
     ) -> BatchResult[CardCorrectionResult]:
         """Quality gate pass 1 (ADR-0030): fix topic drift and factual errors
         IN PLACE, without being told the requested difficulty. Never rejects —
@@ -759,6 +784,12 @@ class ContentGenerator(ABC):
 
         `~judge_batch_size` cards per request -- kept moderate because this pass
         rewrites whole bodies, so its output scales with the batch.
+
+        `grounding` is what makes this pass restatement rather than recall
+        (ADR-0090): a corrector fixing a factual error out of its own memory is
+        guessing, and being restatement is the reason this call sits on the
+        cheaper generator ladder at all. Same block as the drafter saw -- see
+        `generate_cards`.
         """
 
     @abstractmethod
@@ -767,6 +798,7 @@ class ContentGenerator(ABC):
         queries: list[CardVerificationQuery],
         *,
         difficulty_examples: dict[Difficulty, list[str]],
+        grounding: str = "",
     ) -> BatchResult[CardVerificationResult]:
         """Quality gate pass 2 (ADR-0030): the corrected cards, now WITH their
         requested difficulty visible, get a final accept/reject and a
@@ -776,6 +808,14 @@ class ContentGenerator(ABC):
         `~verification_batch_size` cards per request -- larger than pass 1 (the
         output is a few tokens per card), which cuts thinking-pool calls per
         tier.
+
+        `grounding` is THE point of ADR-0089, not a nicety: a gate checking a
+        grounded draft against its own parametric memory reintroduces exactly
+        the unreliability the corpus exists to remove, and turns a disagreement
+        between two models into a coin-flip instead of a check against a
+        source. Deliberately the same subtopic-level block the drafter saw;
+        retrieving per CLAIM would be sharper (rag-design-space 3.10) and is
+        deferred.
         """
 
     @abstractmethod
@@ -786,6 +826,7 @@ class ContentGenerator(ABC):
         *,
         existing_stems: list[str],
         is_backfill: bool,
+        grounding: str = "",
     ) -> BatchResult[QuestionDraft]:
         """Questions come FROM cards, so the quiz structurally cannot test material
         the corpus never taught. `cards` is (title, body).
@@ -807,7 +848,13 @@ class ContentGenerator(ABC):
         gate; the only gap is the missing question. `cards_for_questions` in
         `pipeline.py`'s `_process_gate_item` always calls this once per mode
         (never a mix of both in one call) so `is_backfill` applies to the
-        WHOLE batch, not per-card."""
+        WHOLE batch, not per-card.
+
+        `grounding` is the same block the card was written from. A question is
+        the thing a user is actually graded against, so a stem or a distractor
+        invented beyond what the card taught is the most expensive kind of
+        wrong -- and a card's body is not always enough to write a precise
+        distractor from."""
 
     @abstractmethod
     async def grade_free_text(

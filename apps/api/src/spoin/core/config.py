@@ -392,17 +392,26 @@ class Settings(BaseSettings):
     #: Prompt tokens one call may spend on retrieved corpus context, on top of
     #: everything the prompt already carried.
     #:
-    #: PROVISIONAL, and deliberately conservative. ADR-0089's table prices prompt size
-    #: directly in throughput -- `ministral-8b` drops under the 34 calls/min target
-    #: above ~18k tokens -- but the number that decides this is a MEASURED post-RAG
-    #: prompt size from run logs, which is task 0038 Phase 4 and has not happened.
-    #: Picking a budget up front and hoping is the mistake the gemini-saga was four
-    #: weeks of, so this is a starting point to measure from, not an answer.
-    grounding_token_budget: int = 6000
-    #: A ceiling on chunks per call regardless of how small they are, so a prompt full
-    #: of short fragments does not become an unreadable list. Same relationship the
-    #: batch-size setting has to `pack_by_tokens`'s budget (ADR-0085): the count is the
-    #: ceiling, the budget cuts it shorter.
+    #: **This is the limit that actually binds**, and `grounding_max_chunks` below is
+    #: the loose ceiling over it -- ADR-0085's posture, the same way the batch-size
+    #: setting relates to `pack_by_tokens`'s budget there. It was the other way round
+    #: when first written (budget 6000 against a cap of 8), which made the budget dead
+    #: code: measured against the real corpus on 2026-09-05, a passage costs a median
+    #: 434 prompt tokens and at most 602, so eight of them never reached 6000 and the
+    #: COUNT silently decided every prompt's size.
+    #:
+    #: 3000 buys 4-7 passages, and puts a grounded prompt at roughly 15.3k against
+    #: today's ~12k -- inside the ~18k where ADR-0089's table has `ministral-8b`
+    #: dropping below the 34 calls/min target, with room for the corpus to get denser.
+    #: Owner's number, chosen against that measurement.
+    #:
+    #: Still PROVISIONAL in the sense that matters: what settles it is a MEASURED
+    #: post-RAG prompt size from run logs (task 0038 Phase 4), which cannot happen
+    #: while `corpus_embedder` is `hash`.
+    grounding_token_budget: int = 3000
+    #: A ceiling on passages per call regardless of how small they are, so a prompt
+    #: full of short fragments does not become an unreadable list. Deliberately looser
+    #: than the budget: this catches the pathological case, the budget does the work.
     grounding_max_chunks: int = 8
 
     # -- feed (ADR-0010) --------------------------------------------------------

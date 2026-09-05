@@ -34,6 +34,7 @@ from spoin.domain.models import Card
 from spoin.generation import grounding as grounding_module
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.grounding import (
+    _LABEL_TOKENS,
     Grounding,
     GroundingContext,
     GroundingOutcome,
@@ -549,3 +550,27 @@ async def test_every_content_call_in_a_run_sees_the_same_passages(
     grounded = (await session.execute(select(Card.grounded_chunk_ids))).scalars().all()
     assert grounded
     assert all(ids == [chunk_id] for ids in grounded)
+
+
+def test_the_token_budget_binds_before_the_chunk_count(settings: Settings) -> None:
+    """The two limits are not peers: the budget does the cutting and the count is a
+    loose ceiling over it (ADR-0085's posture).
+
+    Asserted against the SHIPPED settings and a realistically-sized passage, because
+    getting this backwards is invisible. It shipped backwards once -- a 6000-token
+    budget behind a cap of 8, against a corpus whose passages measured a median 434
+    tokens, so eight of them never reached the budget and the COUNT silently decided
+    every prompt's size. Nothing failed; the setting was simply dead.
+    """
+
+    #: The corpus's measured median passage, 2026-09-05: 434 prompt tokens including
+    #: its source label, at `estimate_tokens`' four-characters-per-token rule.
+    median_passage = _hit("x" * (434 - _LABEL_TOKENS) * 4)
+
+    packed = pack(
+        [median_passage] * settings.grounding_max_chunks,
+        budget=settings.grounding_token_budget,
+        max_chunks=settings.grounding_max_chunks,
+    )
+
+    assert len(packed) < settings.grounding_max_chunks

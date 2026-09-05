@@ -108,6 +108,13 @@ class Topic(Base, UUIDPrimaryKey, Timestamps):
     """The canonical entity. Content is generated once per topic and shared."""
 
     __tablename__ = "topic"
+    __table_args__ = (
+        #: See `Card.__table_args__` for why this is in the database (ADR-0097).
+        CheckConstraint(
+            "(embedding IS NULL) = (embedding_model IS NULL)",
+            name="embedding_names_its_model",
+        ),
+    )
 
     slug: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     #: The system's name for the topic. Never rendered — the UI always shows

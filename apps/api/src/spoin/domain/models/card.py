@@ -75,6 +75,15 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
             "grounded_chunk_ids",
             postgresql_using="gin",
         ),
+        #: A vector that cannot name its model is a vector nobody can safely trust
+        #: later, and task 0039 is what that costs: a column silently holding two
+        #: incomparable kinds, every comparison across them noise, nothing raising.
+        #: In the database rather than in the nine call sites that write one, per
+        #: CLAUDE.md -- a rule enforced only by discipline is a wish (ADR-0097).
+        CheckConstraint(
+            "(content_embedding IS NULL) = (embedding_model IS NULL)",
+            name="embedding_names_its_model",
+        ),
     )
 
     #: Groups every version of the same card. Improving the prompt and

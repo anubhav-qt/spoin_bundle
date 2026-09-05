@@ -54,6 +54,11 @@ class Question(Base, UUIDPrimaryKey, CreatedAt):
             " OR (kind = 'free_text' AND rubric IS NOT NULL)",
             name="kind_fields_present",
         ),
+        #: See `Card.__table_args__` for why this is in the database (ADR-0097).
+        CheckConstraint(
+            "(embedding IS NULL) = (embedding_model IS NULL)",
+            name="embedding_names_its_model",
+        ),
     )
 
     subtopic_id: Mapped[uuid.UUID] = mapped_column(

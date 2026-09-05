@@ -56,7 +56,10 @@ Concretely:
 - Every embedded row carries an **`embedding_model` stamp**, fed by a new
   `Embedder.model_name` property. This is task 0039's durable half: without it a
   column can hold two incomparable kinds of vector and no query, log line or test can
-  tell.
+  tell. The stamp is enforced by the database, not by the nine call sites that write a
+  vector — `CHECK ((embedding IS NULL) = (embedding_model IS NULL))` on all three
+  tables (`b9876ddc6238`), because nine correct call sites are discipline and a tenth
+  is one merge away.
 - `apps/api/Dockerfile` takes an `EMBEDDER_BACKEND` build arg — `gpu` (cu128 torch)
   for the worker, `cpu` for the api and the test suite, `none` for `seed` and
   `universe-seed`, which run alembic and never embed. `Qwen3Embedder` already passes

@@ -190,6 +190,9 @@ and destroys the alignment.
 the block. Dialogue appended to the right must not move any existing line.
 - **No line may exceed 40 monospace columns** — counting leading whitespace, borders \
 and any trailing dialogue. Phone viewports wrap past that.
+- **No limit on HEIGHT** — the budget is per line, so a line added above or below \
+is free. A label that will not fit beside a figure gets its own line there; never \
+shorten it away. Most art uses ~23 of the 40 columns, so short labels fit right too.
 
 A server-side validator measures every line. If one line is over 40 columns, the whole \
 card is discarded — not just the art. The title, summary and body you wrote go with \

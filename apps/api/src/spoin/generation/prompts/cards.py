@@ -142,12 +142,21 @@ For each card:
 2. ADAPT the chosen art into the final scene, under the box rule above:
    - Keep its drawing intact. Trim lines or elements only if the whole scene does
      not need them.
-   - Add short captions, labels, or speech callouts that tie it to THIS card --
-     drawn from asset_direction and content_direction, in the card's voice, and
-     funny. The gag has to land for this concept, not the candidate's original
-     one.
-   - Count the columns after adapting. A caption is the usual way a line goes
-     over budget; tighten it rather than shipping it.
+   - ADD TEXT TO THE SCENE. This is required, not optional: art with no words
+     is unreadable to someone who cannot decode the picture, and the scene is
+     the card's hook, so it has to carry meaning on its own. Every scene you
+     return ships with BOTH:
+       * labels naming what the parts are -- which figure is the king, which
+         box is the heap, what the arrow is doing. A label sits beside the
+         thing it names, or directly under it.
+       * at least one line of dialogue, a stage direction, or a caption that
+         lands the gag for THIS card -- drawn from asset_direction and
+         content_direction, in the card's voice, and funny. The joke has to
+         work for this concept, not the candidate's original one.
+   - Count the columns after adapting. If a label or line of dialogue does not
+     fit beside the figure, MOVE IT to its own line above or below the art --
+     there is no height limit, so that always works. Never shorten it to
+     nothing and never drop it to save columns.
    - No surrounding ``` fence -- the art field holds the drawing only.
 
 3. Return for each card:
@@ -157,7 +166,10 @@ For each card:
    - src_id: the EXACT ID of the candidate you picked (empty when matched=false).
    - ascii_label: a short slug for the finished scene (empty when matched=false).
    - ascii_art: the adapted drawing, newline-separated (empty when matched=false).
-   - ascii_alt: one plain sentence describing the scene for a screen reader.
+   - ascii_alt: the caption printed under the scene. Say what the drawing is
+     showing and what the joke is, in one plain sentence, so a reader who
+     cannot make sense of the art still gets both. Not a list of shapes: name
+     the thing being depicted and the point it makes.
 """
 )
 
@@ -312,7 +324,14 @@ If you draw one, set:
 - ascii_art: the raw art itself, newline-separated, every line <= 40
   characters. Do NOT wrap it in a fence -- this field holds the drawing
   only, and stray backticks render as literal backticks on the card.
-- ascii_alt: one plain sentence describing the scene for a screen reader.
+  The drawing MUST carry text: labels naming what its parts are, and a line
+  of dialogue or a caption that lands the gag. Wordless art is unreadable to
+  anyone who cannot decode the picture. Height is unlimited, so put a label
+  that will not fit beside a figure on its own line above or below it.
+- ascii_alt: the caption printed under the scene. Say what the drawing is
+  showing and what the joke is, in one plain sentence, so a reader who
+  cannot make sense of the art still gets both. Not a list of shapes: name
+  the thing being depicted and the point it makes.
 
 Do NOT also reproduce the same drawing inside `body`. The scene renders once,
 at the top of the card, in both the collapsed and the expanded state -- a
@@ -348,8 +367,14 @@ For each scene return:
 - index: the exact number the scene was given in the input. This is how the
   redraw is matched back to its card, so it MUST match.
 - ascii_label: keep the original slug unless it no longer fits the redrawn scene.
+  Keep the scene's labels and dialogue -- moving a long line ABOVE or BELOW the
+  art is how it comes under budget, since height is unlimited. Deleting the text
+  to save columns produces wordless art, which is the failure this avoids.
 - ascii_art: the redrawn art, newline-separated, every line <= 40 characters.
-- ascii_alt: one plain sentence describing the scene for a screen reader.
+- ascii_alt: the caption printed under the scene. Say what the drawing is
+  showing and what the joke is, in one plain sentence, so a reader who
+  cannot make sense of the art still gets both. Not a list of shapes: name
+  the thing being depicted and the point it makes.
 """
 )
 
@@ -440,8 +465,13 @@ converge on one:
 
 Set all three ASCII fields for a card you drew:
   * ascii_label: short descriptive slug (e.g. "vacuum-dead-tuple"), NEVER empty.
-  * ascii_art: the raw drawing, with no surrounding fence.
-  * ascii_alt: one plain sentence describing the scene for screen readers.
+  * ascii_art: the raw drawing, with no surrounding fence. It MUST carry
+    text -- labels naming its parts, plus dialogue or a caption. Height is
+    unlimited; a label that will not fit beside a figure goes on its own
+    line above or below it.
+  * ascii_alt: the caption printed under the scene -- what the drawing shows
+    and what the joke is, in one plain sentence, for a reader who cannot make
+    sense of the art.
 """
 )
 

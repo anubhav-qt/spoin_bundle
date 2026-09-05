@@ -1189,15 +1189,12 @@ body {
   font-size: 15px;
   line-height: 1.68;
   color: var(--fg);
-  max-height: 520px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
-}
-
-.card-body::-webkit-scrollbar { width: 8px; }
-.card-body::-webkit-scrollbar-track { background: transparent; }
-.card-body::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+  /* Deliberately no `max-height`/`overflow-y`, for the same reason
+     `.card-ascii` has none: an expanded card is as tall as what it holds. The
+     520px cap this replaces (90c87eb, uncommented) put a second scroller
+     inside a card that is already inside the feed's scroller, so a long body
+     read as a card cut off mid-sentence -- and a tall ASCII scene pushed the
+     prose it explains into that hidden region. Owner call, 2026-09-05. */
 .card-body::-webkit-scrollbar-thumb:hover { background: var(--fg-3); }
 
 .card-body strong {

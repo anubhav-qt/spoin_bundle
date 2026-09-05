@@ -4,6 +4,8 @@
 - **Date:** 2026-09-05
 - **Deciders:** project owner
 
+> **See also [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** it applies this ADR's measure-first posture to the neighbouring question of text ON the art, and adds to `_ASCII_BOX` the one fact the box rule never stated — that height is unbounded, so a caption that will not fit beside a figure moves to its own line instead of being cut.
+
 ## Context
 
 `ASCII_INSTRUCTIONS` rule 3 (BOX INTEGRITY, STRICT) says the art is a rigid box:

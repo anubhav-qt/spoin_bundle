@@ -16,6 +16,8 @@
 - **Date:** 2026-08-16
 - **Deciders:** Anubhav
 
+> **Amended by [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** a scene must now carry text on it — labels naming its parts and a line of dialogue or a caption — because the scene is the hook and wordless art cannot be read. `visual_slots.alt` is now the reader-facing caption printed under the drawing, not screen-reader alt text.
+
 ## Context
 
 A stack of title + summary cards, even with the archetype-varied teasers from

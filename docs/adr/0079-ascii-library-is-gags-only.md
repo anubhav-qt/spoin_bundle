@@ -13,6 +13,8 @@
   [ADR-0067](0067-mermaid-diagrams-and-form-free-ascii.md),
   [ADR-0059](0059-card-planning-pass-and-prompt-versioning.md)
 
+> **Amended by [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** a scene must now carry text on it — labels naming its parts and a line of dialogue or a caption — because the scene is the hook and wordless art cannot be read. `visual_slots.alt` is now the reader-facing caption printed under the drawing, not screen-reader alt text.
+
 ## Context
 
 ADR-0068 split the curated ASCII reference library into two files:

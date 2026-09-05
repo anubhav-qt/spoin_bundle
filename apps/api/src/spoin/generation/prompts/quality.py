@@ -1,8 +1,21 @@
-"""Quality gate prompts and system instructions (correction pass 1 and verification pass 2)."""
+"""Quality gate prompts and system instructions (correction pass 1 and verification pass 2).
+
+Both passes open with a pinned canon preamble (`canon.py`). ADR-0089 is explicit that
+the gate grounding its factual check in the same corpus the drafter used is the point
+of the design rather than a nicety, and the same argument covers the conventions: a
+gate judging a card against its own idea of what a Spoin card is, while the writer
+worked from canon, turns a disagreement between two models into a coin flip instead of
+a check against a source.
+"""
 
 from __future__ import annotations
 
-CORRECTION_SYSTEM = """\
+from spoin.generation.prompts import canon
+
+CORRECTION_SYSTEM = (
+    canon.CORRECTION_CANON
+    + """
+
 You are pass 1 of a two-pass quality gate for flashcard-style learning content \
 (ADR-0030). For each card below, check two things against the TOPIC it is \
 assigned to (given as its canonical name and description, not whatever topic \
@@ -22,12 +35,8 @@ block on an older card), a code \
 block, or a ❌ Myth vs ✅ Fact comparison, PRESERVE and POLISH that archetype \
 rather than converting it into generic text paragraphs.
 
-FOR ASCII ART (STRICT BOX INTEGRITY): Treat the entire ASCII drawing as a rigid \
-box. You are NOT allowed to edit anything inside the box or insert characters to \
-the LEFT of the art (inserting on the left shifts rows and breaks monospace \
-alignment). Any edits, captions, or additions may ONLY be placed at the TOP \
-(above the box), BOTTOM (below the box), or appended to the RIGHT of the box \
-(keeping total line width <= 40 columns).
+An ASCII scene is edited under the box rule in the preamble above — it applies to a \
+corrector touching existing art exactly as it applies to the writer who drew it.
 
 You are NOT told what difficulty this card was requested at — do not try to \
 infer or preserve one; a difficulty examples block below (if present) is only \
@@ -38,6 +47,7 @@ If a card needs no changes, return it EXACTLY as given with was_edited=false. \
 If you change anything, set was_edited=true and give a one-line note on what \
 you fixed. Never reject a card here — that only happens in a later pass.
 """
+)
 
 CORRECTION_USER = """\
 Topic: {topic_name}
@@ -48,7 +58,10 @@ Review each of the following {count} cards.
 {cards_block}
 """
 
-VERIFICATION_SYSTEM = """\
+VERIFICATION_SYSTEM = (
+    canon.VERIFICATION_CANON
+    + """
+
 You are pass 2 of a two-pass quality gate for flashcard-style learning content \
 (ADR-0030) — the final check on cards already corrected by pass 1. For each \
 card, you are now shown the difficulty it was requested at. Confirm whether \
@@ -62,6 +75,7 @@ already fix: a genuine difficulty mismatch, remaining factual error, or \
 content that still doesn't belong to its topic. Give a short reason whenever \
 accepted=false.
 """
+)
 
 VERIFICATION_USER = """\
 {difficulty_examples_block}

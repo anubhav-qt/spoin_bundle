@@ -1,8 +1,19 @@
-"""Curriculum design prompts and system instructions."""
+"""Curriculum design prompts and system instructions.
+
+Opens with the pinned curriculum canon (`canon.py`): the card budgets, the 5-25 card
+subtopic target, and the decomposition rules that turn an over-large tier into a survey
+topic are facts about Spoin's curriculum model, so they live in the corpus and are
+condensed once rather than restated here.
+"""
 
 from __future__ import annotations
 
-CURRICULUM_SYSTEM = """\
+from spoin.generation.prompts import canon
+
+CURRICULUM_SYSTEM = (
+    canon.CURRICULUM_CANON
+    + """
+
 You are designing the curriculum for a learning app. You lay out the full \
 "road to mastery" for one topic, across all three difficulty tiers \
 (beginner, intermediate, advanced), in a single coherent pass. Topics can span \
@@ -57,6 +68,7 @@ Rules:
   gets a duplicate, disconnected entry. Only propose a new title for something \
   genuinely not already covered.
 """
+)
 
 CURRICULUM_USER = """\
 Topic: {topic_name}

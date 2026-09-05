@@ -4,11 +4,31 @@ The planning prompts (ADR-0059) are deliberately narrow: they describe one job
 -- decide what the tier's cards are and what shape each takes -- and say nothing
 about how to write prose, because the call that uses them never writes any.
 See the ADR for the theory this split is testing.
+
+**Every system prompt here opens with a pinned canon preamble** from `canon.py`, and
+this file no longer restates what the preamble says. That split has a rule: canon is
+what is true of Spoin cards in general -- what a card is, dual titles, silliness in the
+hook layer, the 40-column box -- and lives in the corpus, condensed once. What stays
+here is what is true of THIS CALL: its output contract, its mechanics, its worked
+examples, and the per-card-type craft that no corpus document is about.
+
+The rule exists because the two used to overlap. `ASCII_INSTRUCTIONS` stated the
+40-column limit and the box rule in its own words, `CARDS_ASCII_SYSTEM` stated them
+again in different words, `ASCII_FETCH_SYSTEM` a third time and
+`CARDS_ASCII_REDRAW_SYSTEM` a fourth -- four phrasings of one constraint, drifting
+independently, and a model given two versions of a rule gets to choose. When you add a
+rule here, ask first whether it is a fact about Spoin or a fact about this call. If it
+is the former it belongs in the corpus.
 """
 
 from __future__ import annotations
 
-PLAN_SYSTEM = """\
+from spoin.generation.prompts import canon
+
+PLAN_SYSTEM = (
+    canon.PLAN_CANON
+    + """
+
 You plan a batch of flashcard-style learning cards for one subtopic at one \
 difficulty. You do NOT write the cards. Someone else writes them, from the plan \
 you produce, one card per entry.
@@ -37,12 +57,7 @@ things happen — request flow, a pipeline, a feedback loop, a timeline, a causa
    - comparison: a specific, commonly-held WRONG belief worth correcting. \
 Only when a real misconception exists — an invented one is worse than none.
    - ascii: an idea a small drawn scene or physical metaphor would genuinely dramatize. \
-     * ALWAYS A GAG. Every ascii card is a humorous scene — a comedic reaction, a \
-funny character, a silly physical metaphor, an absurd object, a joke-timeline, a \
-checklist with a punchline (panic, celebration, confusion, struggle, relatable \
-character moments). Never a straight informative diagram of hardware, tools, or \
-technical objects — if the idea only wants a neutral illustration and no joke, it \
-is a diagram or prose card, not an ascii one. \
+The gag rule that decides whether an idea qualifies is in the canon preamble above. \
      * ASSET DIRECTION GUIDELINE: When writing asset_direction for an ascii card, do \
 NOT copy-paste an exact verbatim title from the reference library catalog. Instead, \
 write a natural, generalized description of the visual scene, action, emotion, or \
@@ -74,6 +89,7 @@ Write directions, not content. Do not draft body text, do not write the \
 explanation, do not draw the art. A brief that already contains the card leaves \
 the writer nothing to do but reformat it, and reformatting is not writing.
 """
+)
 
 PLAN_USER = """\
 Topic: {topic_name}
@@ -96,7 +112,10 @@ Already covered in this subtopic — plan around these, never re-plan one of the
 #: candidates, the model PICKS one per card and captions it -- it never draws an
 #: original scene. `top_candidates` has already removed anything used elsewhere
 #: in the topic, so a pick is safe to record as single-use.
-ASCII_FETCH_SYSTEM = r"""\
+ASCII_FETCH_SYSTEM = (
+    canon.ASCII_FETCH_CANON
+    + r"""
+
 You choose and caption ASCII art for learning cards from a curated library. You
 do NOT draw original art -- every scene you return is one of the candidates,
 adapted.
@@ -115,20 +134,15 @@ For each card:
    card could use (a genuinely different subject, not merely an imperfect one).
    Refusing (matched=false) should be rare.
 
-2. ADAPT the chosen art into the final scene:
-   - BOX INTEGRITY (STRICT): Treat the entire drawing as a rigid box. You are
-     NOT allowed to edit anything inside the box, nor insert characters to the
-     LEFT of the art (modifying the left shifts rows and breaks the drawing).
-     You may ONLY add captions, speech callouts, or labels to the TOP (above the
-     box), BOTTOM (below the box), or appended to the RIGHT of the box lines.
+2. ADAPT the chosen art into the final scene, under the box rule above:
    - Keep its drawing intact. Trim lines or elements only if the whole scene does
      not need them.
    - Add short captions, labels, or speech callouts that tie it to THIS card --
      drawn from asset_direction and content_direction, in the card's voice, and
      funny. The gag has to land for this concept, not the candidate's original
      one.
-   - Every line <= 40 monospace characters. Count them. If adapting pushes a
-     line over budget, tighten it -- never ship an over-width line.
+   - Count the columns after adapting. A caption is the usual way a line goes
+     over budget; tighten it rather than shipping it.
    - No surrounding ``` fence -- the art field holds the drawing only.
 
 3. Return for each card:
@@ -140,6 +154,7 @@ For each card:
    - ascii_art: the adapted drawing, newline-separated (empty when matched=false).
    - ascii_alt: one plain sentence describing the scene for a screen reader.
 """
+)
 
 ASCII_FETCH_USER = """\
 Topic: {topic_name}
@@ -152,6 +167,12 @@ keyed by its index.
 {cards_block}"""
 
 
+#: The pinned canon preamble carries the gag rule and the box rule (`_ASCII_GAG`,
+#: `_ASCII_BOX`); this block used to state both again in its own words, and two of the
+#: other three ascii prompts stated them a third and fourth time. What survives here is
+#: what canon has nothing to say about: that this is the FALLBACK path, that the scene
+#: doubles as the collapsed-card thumbnail, the seven worked examples, and the output
+#: contract for the three ascii fields.
 ASCII_INSTRUCTIONS = r"""\
 FALLBACK ONLY -- most `ascii` cards get their scene from the curated library
 (handled before this call); these instructions are for a card whose brief says
@@ -159,10 +180,8 @@ no library scene fit, and for the hero card.
 
 Whenever a concept has a physical, spatial, or visual gag that would make it
 stick, draw a small ASCII scene that SHOWS the idea rather than just
-describing it. One or two panels, and always a joke -- it has to dramatize
-the concept AND land a laugh, not decorate the card with a neutral picture.
-Reach for one often; skip it only when nothing about the idea lends itself to
-a scene worth a punchline.
+describing it. One or two panels. Reach for one often; skip it only when
+nothing about the idea lends itself to a scene worth a punchline.
 
 There is NO required cast and no required style. A scene may be characters
 reacting, or it may be a labelled checklist, a before/after pair, a timeline
@@ -171,26 +190,10 @@ something absurd, or pure typography. Pick whatever form makes THIS idea
 land. Faces like (o_o) (-_-) (>_<) are available when a reaction is the gag;
 they are one option among many, never an obligation.
 
-Two rules that are not negotiable, plus a strict box constraint:
-
-1. WIDTH. Every line at most 40 characters. A phone renders roughly 38-42
-   monospace columns, and art that wraps is destroyed, not degraded. Count
-   the characters in each line before committing to it. If a scene cannot
-   work in 40 columns, do not draw it at all rather than drawing it broken.
-
-2. LEFT-ALIGNED, SELF-CONTAINED. The scene renders left-aligned in a box
-   directly under the title, standing in for the usual one-line hook -- and
-   when the card is collapsed in the feed, the scene IS the preview. It has
-   to work as a stand-alone thumbnail, so no reference to text the reader
-   cannot see yet.
-
-3. BOX INTEGRITY (STRICT). Treat any ASCII art drawing or block as a rigid
-   box. You are NOT allowed to edit anything inside the box, nor insert
-   characters to the LEFT of the artwork (modifying the left misaligns monospace
-   columns and breaks the art). Captions, speech bubbles, labels, and punchlines
-   may ONLY be placed at the TOP (above the box), BOTTOM (below the box), or
-   appended to the RIGHT of the box (ensuring total line width stays <= 40
-   columns).
+SELF-CONTAINED. The scene renders left-aligned in a box directly under the
+title, standing in for the usual one-line hook -- and when the card is
+collapsed in the feed, the scene IS the preview. It has to work as a
+stand-alone thumbnail, so never refer to text the reader cannot see yet.
 
 WORKED EXAMPLES. Seven cards, seven different topics, seven different shapes
 of joke. Study what each one is doing; do not copy them:
@@ -318,23 +321,18 @@ no scene genuinely fits.
 #: ADR-0066. A drawing that broke the 40-column budget is handed back here to
 #: be re-fitted, rather than dropped from its card. The model is re-fitting an
 #: existing scene, not inventing one — same gag, same characters, narrower.
-CARDS_ASCII_REDRAW_SYSTEM = r"""\
-You are fixing ASCII art that broke a HARD width limit. Each scene below was
-drawn for a learning card but has at least one line wider than 40 monospace
-columns — on a phone (roughly 38-42 columns) that art wraps and is destroyed,
-not merely degraded.
+CARDS_ASCII_REDRAW_SYSTEM = (
+    canon.REPAIR_CANON
+    + r"""
 
-Redraw each scene so EVERY line is at most 40 characters wide, keeping the
-same gag, the same characters, the same idea. You are re-fitting a drawing,
-not inventing a new one. Tighten the spacing between panels, shorten a
-caption, stack the panels vertically instead of side by side — whatever it
-takes to get under 40 columns without losing what made the scene land.
+You are fixing ASCII art that broke the width limit above. Each scene below was
+drawn for a learning card but has at least one line over 40 monospace columns.
 
-BOX INTEGRITY (STRICT): Treat the entire drawing as a rigid box. You are NOT
-allowed to edit anything inside the box, nor insert characters to the LEFT of
-the art (modifying the left shifts rows and breaks monospace alignment). You
-may ONLY add or adjust captions at the TOP (above the box), BOTTOM (below the
-box), or appended to the RIGHT of the box lines.
+Redraw each scene so EVERY line fits, keeping the same gag, the same
+characters, the same idea. You are re-fitting a drawing, not inventing a new
+one. Tighten the spacing between panels, shorten a caption, stack the panels
+vertically instead of side by side — whatever it takes to get under 40 columns
+without losing what made the scene land.
 
 Count the characters in every line before you commit to it. If a scene truly
 cannot work within 40 columns, return it with an EMPTY ascii_art rather than
@@ -348,6 +346,7 @@ For each scene return:
 - ascii_art: the redrawn art, newline-separated, every line <= 40 characters.
 - ascii_alt: one plain sentence describing the scene for a screen reader.
 """
+)
 
 CARDS_ASCII_REDRAW_USER = """\
 {escalation_block}Redraw the following {count} ASCII scene(s) so every line fits \
@@ -355,27 +354,31 @@ within 40 columns. Return one entry per scene, keyed by its index.
 
 {scenes_block}"""
 
+#: The OUTPUT CONTRACT only. What each field means, how playful `title` may be, and
+#: why `summary` is written rather than truncated are all in the pinned canon preamble
+#: now (`_CARD_UNIT`, `_TITLES`, `_SUMMARY`) -- this block used to restate all three in
+#: its own words. What is left is the part canon has no opinion about: which markdown
+#: shapes a `body` may reach for, which is craft for this call rather than a fact about
+#: what a Spoin card is.
 CARD_FIELDS_BLOCK = """\
-Each card needs:
-- title: the display title. Playful/punchy is welcome here SOMETIMES, not always.
-- canonical_title: the literal, descriptive name of the concept — NEVER playful. \
-  This is what every other part of the app reads (quiz stems, search, the list \
-  of titles already covered you'll be shown next time). Getting this field \
-  identical to `title` every time defeats the point — it exists specifically so \
-  a joke in `title` doesn't make the concept unfindable elsewhere.
-- summary: a purpose-written one-to-two sentence hook for a collapsed card face. \
-  NOT a truncation of body — the opening of a good explanation is usually \
-  throat-clearing, and a hook needs a different opening.
-- body: the actual explanation, in markdown. Use markdown shapes that fit the \
-  material: a fenced code block with a language tag for command/query/config-heavy \
-  material, a compact arrow-chain diagram for request-flow/process-order material, \
-  a "wrong way / right way" (X/checkmark) pair for misconception-correction \
-  material. Plain prose is fine when nothing else fits better — don't force a \
-  shape that doesn't belong.\
+Emit exactly four written fields per card: `title`, `canonical_title`, `summary`, \
+and `body`.
+
+`body` is markdown, and the shape should fit the material: a fenced code block with a \
+language tag for command/query/config-heavy material, a ```mermaid block for anything \
+whose meaning is in how parts connect, a "wrong way / right way" pair for correcting a \
+misconception. Plain prose is the right answer whenever nothing else genuinely fits — \
+never force a shape onto an idea that does not want one.\
 """
 
-CARDS_COMMON_HEADER = (
-    """\
+#: Everything a card-writing call needs that is NOT canon: its role, its output
+#: contract, and the four dedup/rejection/builds-on mechanics that depend on blocks
+#: appearing in the user message. Split out from `CARDS_COMMON_HEADER` so a variant can
+#: pair it with a DIFFERENT canon preamble -- the ascii variant needs the box rule and
+#: the prose variant does not -- without a caller having to strip a prefix back off.
+_CARDS_CALL_INSTRUCTIONS = (
+    """
+
 You write flashcard-style learning content for a learning app, at a single \
 requested difficulty, for one subtopic at a time.
 
@@ -402,10 +405,16 @@ reader already knows that material, and go deeper rather than re-explaining it.
 """
 )
 
+CARDS_COMMON_HEADER = canon.CARDS_CANON + _CARDS_CALL_INSTRUCTIONS
+
 CARDS_SYSTEM = CARDS_COMMON_HEADER + "\n" + ASCII_INSTRUCTIONS
 
+#: The ascii variant pairs the same call instructions with the ASCII canon preamble, so
+#: the gag rule and the box rule arrive once, at the top, instead of being restated
+#: inside the card-type requirement as they used to be.
 CARDS_ASCII_SYSTEM = (
-    CARDS_COMMON_HEADER
+    canon.CARDS_ASCII_CANON
+    + _CARDS_CALL_INSTRUCTIONS
     + r"""
 
 CARD TYPE REQUIREMENT — ASCII SCENE:
@@ -414,19 +423,15 @@ Most cards in this batch have their scene PROVIDED from the curated library \
 title, summary, and body, and leave ascii_label / ascii_art / ascii_alt EMPTY: \
 the scene is already chosen and captioned, and anything you draw is discarded.
 
-For a card whose brief says "art: draw one" (no library scene fit), draw a \
-funny, charming ASCII scene that dramatizes its concept:
-- The form is yours to choose per card, and the batch must NOT converge on one:
+For a card whose brief says "art: draw one" (no library scene fit), draw the \
+scene yourself. The form is yours to choose per card, and the batch must NOT \
+converge on one:
   * characters reacting, panicking, failing, or acting out the metaphor;
   * a labelled checklist, a before/after pair, a timeline whose order is the joke;
   * a tiny chart made of hashes, an object misbehaving, or pure typography.
   * Faces (`(o_o)`, `(-_-)`, `(>_<)`) are one option among many, never a requirement.
-- Every line MUST be STRICTLY <= 40 characters wide.
-- BOX INTEGRITY: Treat any ASCII art as a rigid box. Never insert characters or
-  edit to the LEFT of the art (modifying the left breaks monospace alignment).
-  Captions and callouts must be placed ONLY at the TOP, BOTTOM, or appended to
-  the RIGHT of the art box (within the <= 40 column limit).
-- Set all three ASCII fields:
+
+Set all three ASCII fields for a card you drew:
   * ascii_label: short descriptive slug (e.g. "vacuum-dead-tuple"), NEVER empty.
   * ascii_art: the raw drawing, with no surrounding fence.
   * ascii_alt: one plain sentence describing the scene for screen readers.
@@ -461,19 +466,17 @@ with an appropriate language tag (e.g. ```python, ```sql, ```bash, ```typescript
 """
 )
 
+#: Pairs the call instructions with the DIAGRAM canon preamble, which carries the
+#: mermaid-not-ASCII rule -- this prompt used to argue that case itself, in a paragraph
+#: that said the same thing as `_MERMAID` in different words.
 CARDS_DIAGRAM_SYSTEM = (
-    CARDS_COMMON_HEADER
+    canon.CARDS_DIAGRAM_CANON
+    + _CARDS_CALL_INSTRUCTIONS
     + """
 
 CARD TYPE REQUIREMENT — DIAGRAM, WRITTEN IN MERMAID (MANDATORY):
 Every single card in this batch MUST illustrate the concept with a diagram, and the \
 diagram MUST be written as MERMAID inside a ```mermaid fenced block.
-
-Mermaid, not hand-drawn ASCII boxes. An ASCII diagram has to be aligned by the writer \
-against a column count the writer cannot see, and it breaks silently: what lines up in \
-your head wraps and is destroyed at a phone's ~40 monospace columns. Mermaid carries \
-the STRUCTURE and lets the client lay it out at whatever width it actually has. Describe \
-what connects to what; never draw the picture yourself.
 
 SHAPE (this matters as much as the content):
 - Aim for a roughly SQUARE diagram. Not a tall thin column, not a wide flat strip \
@@ -560,8 +563,12 @@ analogies, and fundamental principles.
 """
 )
 
+#: The hero call draws its own scene (there is no library fetch step for it), so it
+#: takes the ASCII canon preamble rather than the plain one.
 HERO_CARDS_SYSTEM = (
-    """\
+    canon.CARDS_ASCII_CANON
+    + """
+
 You write flashcard-style learning content for a learning app. This particular \
 call is for ONE specific card: the HERO card for a subtopic — the single card \
 that anchors it in the feed. A hero card renders larger, with distinct styling, \

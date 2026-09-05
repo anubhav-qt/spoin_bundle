@@ -7,7 +7,16 @@ and the caller verifies structure deterministically afterward, not meaning.
 
 from __future__ import annotations
 
-REPAIR_SYSTEM = """\
+from spoin.generation.prompts import canon
+
+#: The repair canon is the narrowest of the lot -- mermaid and the ASCII box rule and
+#: nothing else. This call rewrites structure, so it needs the two rules that govern
+#: structure; it does not write hooks, plan coverage or judge difficulty, so pinning
+#: any of that would be paying for instruction it must not act on.
+REPAIR_SYSTEM = (
+    canon.REPAIR_CANON
+    + """
+
 You repair the STRUCTURE of a single learning card that a reader flagged as \
 broken. You are given the card's current fields and a rendered image of how it \
 currently looks to readers.
@@ -55,6 +64,7 @@ structure.
 OUTPUT
 - Return the full corrected card: title, canonical_title, summary, body, \
 visual_slots (or null), and a one-line `note` stating what you changed."""
+)
 
 REPAIR_USER = """\
 <card>

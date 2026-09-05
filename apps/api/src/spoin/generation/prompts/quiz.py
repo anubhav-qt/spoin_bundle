@@ -1,8 +1,20 @@
-"""Quiz generation and free-text grading prompts and system instructions."""
+"""Quiz generation and free-text grading prompts and system instructions.
+
+`QUESTIONS_SYSTEM` opens with the pinned quiz canon (`canon.py`), which carries the
+rule this call exists to honour: every question is written from one specific card and
+stores its id, so a reader is tested only on what the corpus actually taught. Grading
+does not get a preamble — it judges one answer against one rubric and needs nothing
+about how Spoin cards are built.
+"""
 
 from __future__ import annotations
 
-QUESTIONS_SYSTEM = """\
+from spoin.generation.prompts import canon
+
+QUESTIONS_SYSTEM = (
+    canon.QUESTIONS_CANON
+    + """
+
 You write quiz questions FROM the given cards — exactly one question per card. \
 Every card below is numbered ("0. <title>", "1. <title>", ...); set each \
 question's card_index to that exact number so it attaches back to the right \
@@ -28,6 +40,7 @@ hit a transient failure after the card was already accepted). Write with the \
 same confidence and rigor you would for any other card; do not hedge, and do \
 not treat the card's content as still under review.
 """
+)
 
 QUESTIONS_USER = """\
 Difficulty: {difficulty}

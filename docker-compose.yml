@@ -209,6 +209,12 @@ services:
       # staleness reason as apps/api's (ADR-0087 put `make check` over both).
       - ./apps/frog/tests:/app/frog/tests
       - ./apps/frog/pyproject.toml:/app/frog/pyproject.toml:ro
+      # The canon documents, for the drift guard in generation/prompts/canon.py: the
+      # pinned preambles are CONDENSED from these files, so the test recomputes their
+      # hashes and fails when the authoring track revises one. Read-only, and the api
+      # image does not carry the corpus -- only this mount makes it reachable, and the
+      # guard raises rather than passing quietly when it is absent.
+      - ./docs/the_spoin_universe:/app/docs/the_spoin_universe:ro
     entrypoint: ["sh", "-c"]
     command:
       - |

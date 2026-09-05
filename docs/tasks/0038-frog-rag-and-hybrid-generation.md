@@ -410,6 +410,11 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
 
 ### What Phase 3 still owes
 
+> **Handed off 2026-09-05:** [`docs/handoff/next-frog-phase-3-eval-harness.md`](../handoff/next-frog-phase-3-eval-harness.md)
+> carries the brief for the rest of it, and names the blocker that gates everything
+> below: `corpus_embedder` is `hash`, so nothing here can be measured yet.
+
+
 - **The eval harness (3.2).** Hand-labelled golden set, reviewed as an HTML artifact
   that saves labels back; 30-50 real subtopic queries, recall@k and precision@k. No ANN
   index until it has run.

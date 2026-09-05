@@ -86,8 +86,7 @@ async def run_generation_pipeline(
             #: SECOND factory, because a query embedded by a different model than
             #: the chunks is a dimension error rather than a worse result.
             get_embedder(),
-            token_budget=settings.grounding_token_budget,
-            max_chunks=settings.grounding_max_chunks,
+            chunks=settings.grounding_chunks,
         ),
     )
     initial_state: PipelineState = {

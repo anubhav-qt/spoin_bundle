@@ -1,13 +1,19 @@
-"""Retrieved corpus context, packed to a budget and reused across a subtopic.
+"""Retrieved corpus context, reused across a subtopic.
 
 Shape and reasoning: docs/adr/0089-retrieval-grounded-generation.md.
 `frog.retrieval` does the search; this module decides what a prompt actually gets.
 
-**Why this lives in `spoin` and not in `frog`.** The budgeting posture it has to reuse
-— `pack_by_tokens`, ADR-0085 — is in `spoin.generation.load_balancer`, and frog cannot
-import `spoin` (ADR-0087). Reimplementing the posture across the boundary would leave
-two copies of a rule that decides throughput, and they would drift. Packing is also
-prompt-shaped work, which is this package's job rather than the search package's.
+**Two passages, asked for as two.** `Settings.grounding_chunks` is the `k` handed to
+the database, not a cap applied to a wider result. There is no token budget and no
+score floor — see that setting for why neither can earn its place: the ingestion
+contract already bounds two passages at roughly 1200 prompt tokens, and the corpus
+covers a topic before that topic is live. This module used to pack a top-10 result
+down to a budget; that budget could never bind, which is the dead code `8a8e64c`
+removed and this change stops recreating.
+
+**Why this lives in `spoin` and not in `frog`.** It is prompt-shaped work — what a
+generation prompt is given — which is this package's job rather than the search
+package's. frog answers "what is most similar"; this decides what that is worth.
 
 **Canon is not retrieved.** `generation/prompts/canon.py` pins it into every system
 prompt as a fixed preamble (rag-design-space §3.9, amending ADR-0088), so retrieval
@@ -38,7 +44,7 @@ from frog.universe.models import DocumentKind
 from sqlalchemy.exc import SQLAlchemyError
 
 from spoin.core.db import UniverseNotConfiguredError, universe_session_scope
-from spoin.generation.load_balancer import estimate_tokens, pack_by_tokens
+from spoin.generation.load_balancer import estimate_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -138,37 +144,6 @@ def render_block(hits: list[Hit]) -> str:
     )
 
 
-#: Roughly what one `--- source n: title (url) ---` line costs. A constant rather than
-#: a rendered measurement per hit: the label is small and near-constant, and the
-#: alternative is rendering every candidate to price candidates that will be dropped.
-_LABEL_TOKENS = 20
-
-
-def pack(hits: list[Hit], *, budget: int, max_chunks: int) -> list[Hit]:
-    """The prefix of `hits` that fits in `budget` prompt tokens.
-
-    `pack_by_tokens` (ADR-0085) does the arithmetic, and **only its first chunk is
-    kept**. Its spillover semantics are right for its own caller — an overlong batch
-    of cards becomes several requests — and wrong here: a second chunk of retrieved
-    context is not a second call's worth of work, it is the passages that lost. Hits
-    arrive most-similar-first, so the prefix that fits is also the best that fits.
-
-    The cost is measured on the rendered passage rather than on `hit.text`, because
-    the labels are prompt tokens too and a per-hit label is not negligible at eight
-    hits.
-    """
-
-    if not hits:
-        return []
-    chunks = pack_by_tokens(
-        hits,
-        cost=lambda hit: estimate_tokens(hit.text) + _LABEL_TOKENS,
-        budget=budget,
-        max_items=max_chunks,
-    )
-    return chunks[0]
-
-
 class Grounding:
     """Retrieval for a generation run, cached per subtopic group.
 
@@ -184,10 +159,9 @@ class Grounding:
     than swallowed — an ungrounded run has to be visible as one.
     """
 
-    def __init__(self, embedder: Embedder, *, token_budget: int, max_chunks: int) -> None:
+    def __init__(self, embedder: Embedder, *, chunks: int) -> None:
         self._embedder = embedder
-        self._token_budget = token_budget
-        self._max_chunks = max_chunks
+        self._chunks = chunks
         self._cache: dict[tuple[str, uuid.UUID], GroundingContext] = {}
 
     async def for_subtopic(
@@ -223,8 +197,12 @@ class Grounding:
                     session,
                     self._embedder,
                     build_query(topic_name, subtopic_title, subtopic_description),
+                    #: Asked of the database as the final count, not trimmed to it
+                    #: afterwards -- retrieving ten to keep two is nine wasted rows
+                    #: per call and an invitation to re-rank in the application.
+                    k=self._chunks,
                     #: Canon is pinned into the system prompt, not retrieved
-                    #: (rag-design-space §3.9), so the budget is subject matter only.
+                    #: (rag-design-space §3.9), so this is subject matter only.
                     kinds=[DocumentKind.TOPIC_SOURCE],
                 )
         except UniverseNotConfiguredError:
@@ -239,13 +217,12 @@ class Grounding:
         return context
 
     def _context(self, hits: list[Hit]) -> GroundingContext:
-        packed = pack(hits, budget=self._token_budget, max_chunks=self._max_chunks)
-        if not packed:
+        if not hits:
             return GroundingContext.empty(GroundingOutcome.NO_MATCH)
-        block = render_block(packed)
+        block = render_block(hits)
         return GroundingContext(
             block=block,
-            chunk_ids=tuple(hit.chunk_id for hit in packed),
+            chunk_ids=tuple(hit.chunk_id for hit in hits),
             outcome=GroundingOutcome.GROUNDED,
             estimated_tokens=estimate_tokens(block),
             retrieved=len(hits),

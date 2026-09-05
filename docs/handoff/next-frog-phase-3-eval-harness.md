@@ -1,5 +1,12 @@
 # Handoff: task 0038, finishing Phase 3 — the eval harness, and the embedder that gates everything
 
+> **Historical as of 2026-09-05.** Read it for reasoning, not for state. Three things
+> it describes are gone: the embedder it calls a blocker is packaged and shipped
+> (ADR-0097 — one embedder, `qwen3` at 1024 dims, everywhere); `grounding_token_budget`
+> and `grounding_max_chunks` no longer exist, replaced by a flat
+> `grounding_chunks = 2`; and `spoin_db_2` was dropped and rebuilt empty, so every row
+> count in here describes a database that no longer holds them.
+>
 > Written 2026-09-05 at the end of the session that landed retrieval, grounding, prompt
 > wiring and card provenance (`38f49ee` → `8a8e64c`, pushed). Supersedes
 > [`next-frog-phase-3-retrieval.md`](next-frog-phase-3-retrieval.md), which is now

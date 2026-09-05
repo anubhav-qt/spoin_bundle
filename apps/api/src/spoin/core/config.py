@@ -389,33 +389,22 @@ class Settings(BaseSettings):
     ascii_redraw_attempts: int = 2
 
     # -- grounding (ADR-0089) ---------------------------------------------------
-    #: Prompt tokens one call may spend on retrieved corpus context, on top of
-    #: everything the prompt already carried.
+    #: How many corpus passages ground one call. **Two, always** — asked of the
+    #: database as `k=2` rather than retrieved wide and trimmed down.
     #:
-    #: **This is the limit that actually binds**, and `grounding_max_chunks` below is
-    #: the loose ceiling over it -- ADR-0085's posture, the same way the batch-size
-    #: setting relates to `pack_by_tokens`'s budget there. It was the other way round
-    #: when first written (budget 6000 against a cap of 8), which made the budget dead
-    #: code: measured against the real corpus on 2026-09-05, a passage costs a median
-    #: 434 prompt tokens and at most 602, so eight of them never reached 6000 and the
-    #: COUNT silently decided every prompt's size.
+    #: There is deliberately no token budget beside this and no `min_score` floor
+    #: under it. A budget could not bind: the ingestion contract caps a section at
+    #: `MAX_SECTION_CHARS` (2200), so two passages plus their labels cannot exceed
+    #: roughly 1200 prompt tokens whatever the corpus does, and a limit that cannot
+    #: bind is the dead code `8a8e64c` already removed once. A floor would guard
+    #: against a passage from an unrelated area winning by default, which is a real
+    #: retrieval risk (ADR-0088) and not a real risk *here*: the owner's commitment is
+    #: that the curated corpus covers a topic before that topic exists in production,
+    #: so there is no uncovered topic for a stray passage to be the best answer to.
     #:
-    #: 3000 buys 4-7 passages, and puts a grounded prompt at roughly 15.3k against
-    #: today's ~12k -- inside the ~18k where ADR-0089's table has `ministral-8b`
-    #: dropping below the 34 calls/min target, with room for the corpus to get denser.
-    #: Owner's number, chosen against that measurement.
-    #:
-    #: Still PROVISIONAL in the sense that matters, and more so than it reads: the
-    #: "~12k" above is in TOKENS, while the `chars=` field those run logs actually
-    #: carry is `len(str(prompt))` -- characters. `mistral_probe.DEFAULT_PROMPT_TOKENS`
-    #: reads the same logs as tokens and sizes its synthetic prompt 4x too large if
-    #: they are characters. What settles both is a MEASURED post-RAG prompt size
-    #: (task 0038 Phase 4), reported in both units.
-    grounding_token_budget: int = 3000
-    #: A ceiling on passages per call regardless of how small they are, so a prompt
-    #: full of short fragments does not become an unreadable list. Deliberately looser
-    #: than the budget: this catches the pathological case, the budget does the work.
-    grounding_max_chunks: int = 8
+    #: Owner's number and owner's reasoning, 2026-09-05. It replaced a 3000-token
+    #: budget over a cap of 8 that was never measured against a real retrieval run.
+    grounding_chunks: int = 2
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

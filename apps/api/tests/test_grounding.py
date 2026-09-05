@@ -34,12 +34,10 @@ from spoin.domain.models import Card
 from spoin.generation import grounding as grounding_module
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.grounding import (
-    _LABEL_TOKENS,
     Grounding,
     GroundingContext,
     GroundingOutcome,
     build_query,
-    pack,
     render_block,
 )
 from spoin.generation.load_balancer import estimate_tokens
@@ -64,46 +62,6 @@ def _hit(text_: str, *, title: str = "MVCC", score: float = 0.7) -> Hit:
 
 
 # -- packing and rendering -----------------------------------------------------
-
-
-def test_pack_keeps_the_best_prefix_that_fits_and_drops_the_rest() -> None:
-    """Hits arrive most-similar-first, so the prefix that fits is the best that fits.
-
-    The dropped hits are dropped, not spilled into a second block: `pack_by_tokens`'s
-    spillover means "these become another request", which is the right answer for a
-    batch of cards and the wrong one for context that lost a relevance contest.
-    """
-
-    hits = [_hit("word " * 200) for _ in range(5)]
-    per_hit = estimate_tokens(hits[0].text)
-
-    packed = pack(hits, budget=per_hit * 2 + 100, max_chunks=99)
-
-    assert packed == hits[:2]
-
-
-def test_pack_stops_at_max_chunks_even_when_the_budget_would_allow_more() -> None:
-    """The count is the ceiling and the budget cuts it shorter (ADR-0085's posture) —
-    a prompt of thirty one-line fragments is within any budget and unreadable."""
-
-    hits = [_hit("short") for _ in range(10)]
-
-    assert len(pack(hits, budget=1_000_000, max_chunks=3)) == 3
-
-
-def test_pack_keeps_one_oversized_hit_rather_than_returning_nothing() -> None:
-    """`pack_by_tokens` gives an over-budget item its own chunk rather than dropping
-    it, and taking the first chunk inherits that. Grounding a card in one long passage
-    beats grounding it in nothing — the budget is a throughput target, not a
-    correctness bound."""
-
-    huge = _hit("word " * 10_000)
-
-    assert pack([huge], budget=10, max_chunks=8) == [huge]
-
-
-def test_pack_of_nothing_is_nothing() -> None:
-    assert pack([], budget=1000, max_chunks=8) == []
 
 
 def test_render_block_labels_every_passage_with_where_it_came_from() -> None:
@@ -260,7 +218,7 @@ async def test_grounding_retrieves_topic_material_and_reports_what_grounded_the_
     embedder = _CountingEmbedder()
     await _seed(bound_universe, embedder)
 
-    context = await Grounding(embedder, token_budget=6000, max_chunks=8).for_subtopic(
+    context = await Grounding(embedder, chunks=8).for_subtopic(
         subtopic_group_id=uuid.uuid4(),
         topic_name="PostgreSQL",
         subtopic_title="MVCC",
@@ -284,7 +242,7 @@ async def test_canon_is_not_retrieved_it_is_pinned(bound_universe: AsyncSession)
     embedder = _CountingEmbedder()
     await _seed(bound_universe, embedder)
 
-    context = await Grounding(embedder, token_budget=6000, max_chunks=8).for_subtopic(
+    context = await Grounding(embedder, chunks=8).for_subtopic(
         subtopic_group_id=uuid.uuid4(),
         topic_name="Spoin",
         subtopic_title="ASCII art",
@@ -300,7 +258,7 @@ async def test_an_empty_corpus_is_no_match_not_unavailable(
     """The corpus was reachable and had nothing. Reporting that as `UNAVAILABLE` would
     send someone to debug an environment variable that is fine."""
 
-    context = await Grounding(_CountingEmbedder(), token_budget=6000, max_chunks=8).for_subtopic(
+    context = await Grounding(_CountingEmbedder(), chunks=8).for_subtopic(
         subtopic_group_id=uuid.uuid4(),
         topic_name="PostgreSQL",
         subtopic_title="MVCC",
@@ -320,7 +278,7 @@ async def test_a_subtopic_group_is_retrieved_once_and_reused(
 
     embedder = _CountingEmbedder()
     await _seed(bound_universe, embedder)
-    grounding = Grounding(embedder, token_budget=6000, max_chunks=8)
+    grounding = Grounding(embedder, chunks=8)
     group = uuid.uuid4()
 
     async def ask() -> GroundingContext:
@@ -343,7 +301,7 @@ async def test_a_different_subtopic_group_is_retrieved_again(
 ) -> None:
     embedder = _CountingEmbedder()
     await _seed(bound_universe, embedder)
-    grounding = Grounding(embedder, token_budget=6000, max_chunks=8)
+    grounding = Grounding(embedder, chunks=8)
 
     for _ in range(2):
         await grounding.for_subtopic(
@@ -364,7 +322,7 @@ async def test_a_re_ingestion_invalidates_the_cache(bound_universe: AsyncSession
 
     embedder = _CountingEmbedder()
     await _seed(bound_universe, embedder)
-    grounding = Grounding(embedder, token_budget=6000, max_chunks=8)
+    grounding = Grounding(embedder, chunks=8)
     group = uuid.uuid4()
 
     async def ask() -> GroundingContext:
@@ -406,7 +364,7 @@ async def test_an_unreachable_corpus_degrades_to_ungrounded_generation(
 
     monkeypatch.setattr(grounding_module, "universe_session_scope", unconfigured)
 
-    context = await Grounding(_CountingEmbedder(), token_budget=6000, max_chunks=8).for_subtopic(
+    context = await Grounding(_CountingEmbedder(), chunks=8).for_subtopic(
         subtopic_group_id=uuid.uuid4(),
         topic_name="PostgreSQL",
         subtopic_title="MVCC",
@@ -557,25 +515,51 @@ async def test_every_content_call_in_a_run_sees_the_same_passages(
     assert all(ids == [chunk_id] for ids in grounded)
 
 
-def test_the_token_budget_binds_before_the_chunk_count(settings: Settings) -> None:
-    """The two limits are not peers: the budget does the cutting and the count is a
-    loose ceiling over it (ADR-0085's posture).
+async def test_only_the_shipped_count_of_passages_reaches_the_prompt(
+    bound_universe: AsyncSession,
+    settings: Settings,
+) -> None:
+    """`grounding_chunks` is the `k` handed to the search, not a trim applied after.
 
-    Asserted against the SHIPPED settings and a realistically-sized passage, because
-    getting this backwards is invisible. It shipped backwards once -- a 6000-token
-    budget behind a cap of 8, against a corpus whose passages measured a median 434
-    tokens, so eight of them never reached the budget and the COUNT silently decided
-    every prompt's size. Nothing failed; the setting was simply dead.
+    Asserted against the SHIPPED setting and a corpus holding more matches than it
+    allows, because the failure is invisible: every passage in the corpus reaching
+    every prompt still produces cards, just larger and slower ones.
+
+    Its predecessor guarded a token budget against a chunk count. Both are gone --
+    a budget could not bind once the count is 2, and a limit that cannot bind is the
+    dead setting `8a8e64c` removed. Two passages are bounded at roughly 1200 prompt
+    tokens by the ingestion contract's `MAX_SECTION_CHARS`, not by anything here.
     """
 
-    #: The corpus's measured median passage, 2026-09-05: 434 prompt tokens including
-    #: its source label, at `estimate_tokens`' four-characters-per-token rule.
-    median_passage = _hit("x" * (434 - _LABEL_TOKENS) * 4)
+    embedder = HashEmbedder(EMBEDDING_DIM)
+    now = datetime.now(UTC)
+    document = _document("cs/pg/mvcc.md", kind=DocumentKind.TOPIC_SOURCE, ingested_at=now)
+    bound_universe.add(document)
+    await bound_universe.flush()
+    bodies = [
+        f"MVCC — Snapshot isolation {n}\n\nEach transaction sees a snapshot." for n in range(4)
+    ]
+    bound_universe.add_all(
+        Chunk(
+            document_id=document.id,
+            ordinal=ordinal,
+            text=body,
+            embedding=embedder.embed_one_passage(body),
+            topic_tags=["postgresql"],
+        )
+        for ordinal, body in enumerate(bodies)
+    )
+    await bound_universe.commit()
 
-    packed = pack(
-        [median_passage] * settings.grounding_max_chunks,
-        budget=settings.grounding_token_budget,
-        max_chunks=settings.grounding_max_chunks,
+    context = await Grounding(embedder, chunks=settings.grounding_chunks).for_subtopic(
+        subtopic_group_id=uuid.uuid4(),
+        topic_name="PostgreSQL",
+        subtopic_title="MVCC",
+        subtopic_description="How a transaction sees a fixed view of the database.",
     )
 
-    assert len(packed) < settings.grounding_max_chunks
+    assert settings.grounding_chunks == 2
+    assert len(context.chunk_ids) == settings.grounding_chunks
+    #: `retrieved` is what the search returned, and the search was asked for exactly
+    #: this many -- nothing is fetched to be discarded.
+    assert context.retrieved == settings.grounding_chunks

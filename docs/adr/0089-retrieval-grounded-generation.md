@@ -1,8 +1,14 @@
 # ADR-0089: Generation is grounded in retrieved corpus context, packed against a token budget, and each card records the chunks that grounded it
 
-- **Status:** Accepted
+- **Status:** Accepted, **partially superseded 2026-09-05**
 - **Date:** 2026-09-04
 - **Deciders:** project owner, implementing session
+- **Amended by the owner, 2026-09-05:** the token budget is gone and grounding is a
+  **fixed top 2** — the alternative this ADR rejected below. Grounding itself, and the
+  `grounded_chunk_ids` provenance, are unchanged and still stand. Two things the ADR
+  did not know moved the answer; both are recorded in the rejected alternative and in
+  `Settings.grounding_chunks`. The title's "packed against a token budget" no longer
+  describes the code.
 
 ## Context
 
@@ -34,6 +40,13 @@ corpus exists to remove, and turns a disagreement between two models into a
 coin-flip rather than a check against a source.
 
 ### Context assembly is capped, and the cap is a design budget
+
+> **Superseded 2026-09-05.** The cap is `Settings.grounding_chunks = 2`, and there is
+> no token budget. The throughput table below is still the right way to reason about
+> prompt size, and its numbers are still the numbers — what changed is that two
+> passages are bounded at roughly 1200 prompt tokens by the ingestion contract, so a
+> budget had nothing left to decide. Read this section for the reasoning, not for what
+> the code does.
 
 `pack_by_tokens` ([ADR-0085](0085-tokens-are-metered-too.md),
 `generation/load_balancer.py`) already packs items against a prompt-token budget with
@@ -107,6 +120,20 @@ leaving.
 fixed k has an unbounded token cost, and the table above shows token cost is exactly
 what decides whether the target throughput is reachable at all.
 
+> **Adopted 2026-09-05**, on the owner's decision, because the premise turned out to
+> be false. Chunk sizes do *not* vary without bound: the ingestion contract rejects a
+> section over `MAX_SECTION_CHARS` (2200), which is a hard check at ingest, not a
+> guideline. At k=2 that caps grounding at roughly 1200 prompt tokens no matter what
+> the corpus does — so the token cost of a fixed k is bounded after all, and a budget
+> over it could never bind. A limit that cannot bind is the dead setting `8a8e64c`
+> removed once already; keeping one here would have recreated it.
+>
+> The related `min_score` floor was also dropped, for a reason outside this ADR: the
+> owner's commitment is that the curated corpus covers a topic before that topic
+> exists in production, so there is no uncovered topic for a stray passage to be the
+> best answer to. That is what a floor would have guarded against (ADR-0088's
+> cross-topic risk), and it is guaranteed upstream instead.
+
 **Record provenance as free text in the card body.** No schema change. Rejected: not
 queryable, so it cannot answer "which cards did this retracted chunk ground?" — which
 is the question provenance exists to answer.
@@ -114,8 +141,9 @@ is the question provenance exists to answer.
 ## Revisit when
 
 - Phase 4's measurement lands. If real prompt sizes push past ~38k, `ministral-3b`
-  stops clearing the target rate and the model choice reopens — as does whether the
-  budget should cut retrieval depth instead.
+  stops clearing the target rate and the model choice reopens — as does whether 2 is
+  still the right depth. (The budget that would have cut depth is gone; depth is now
+  the only lever, which makes this signal more directly actionable, not less.)
 - A chunk is found to be wrong after cards have been generated from it. That is the
   first real test of whether stored chunk IDs are enough to act on, and the answer
   probably amends this ADR.

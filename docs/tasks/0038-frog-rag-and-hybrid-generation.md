@@ -403,7 +403,7 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
 |---|---|
 | `frog.retrieval` | `search` / `search_many`, cross-topic by default, every filter available and off. Returns chunk ids, cosine similarity (not distance) and document provenance. Tested, including the `embed_query`-not-`embed_passage` guard ADR-0092 makes silent -- verified by mutation. |
 | Pinned canon | [ADR-0096](../adr/0096-canon-is-pinned-not-retrieved.md), amending ADR-0088. Ten per-call-type preambles condensed from the five `_canon` documents, with a sha256 drift guard. All 15 system prompts rebuilt on them. |
-| `spoin.generation.grounding` | Packs hits to a token budget with `pack_by_tokens` (first chunk only -- spillover is wrong for context), renders the block, and caches per subtopic GROUP keyed on a corpus version (3.7). Three outcomes: GROUNDED / NO_MATCH / UNAVAILABLE. Never raises. |
+| `spoin.generation.grounding` | Asks the corpus for the top `Settings.grounding_chunks` (2), renders the block, and caches per subtopic GROUP keyed on a corpus version (3.7). Three outcomes: GROUNDED / NO_MATCH / UNAVAILABLE. Never raises. It packed a top-10 result against a token budget until 2026-09-05; see ADR-0089's amendment for why the budget could not bind. |
 | Prompt wiring | `plan_cards`, `generate_cards`, `correct_cards`, `verify_cards`, `generate_questions`, plus the `remake` repair path. Drafters and thinkers, one shared block per subtopic group -- asserted end to end. `prompts/sources.py` carries the instructions, including the tier-language one this phase owed. |
 | Provenance | `card.grounded_chunk_ids`, ARRAY(UUID) with a GIN index. **Migration written, NOT applied** (`a1b2c3d4e5f6`). |
 | `get_corpus_embedder()` | A second factory. `card.content_embedding` is 384-dimensional and `chunk.embedding` is 1024, so one factory for both would make every retrieval a dimension error rather than a quality loss. |
@@ -426,8 +426,13 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
   grounded on nothing. `qwen3` needs torch, which the `api`/`worker` image deliberately
   does not carry (ADR-0094). **This gates any real measurement of grounded output, and
   therefore gates Phase 4.**
-- **A `min_score` floor.** Deliberately unset: a floor chosen before the eval harness
-  is an invented constant.
+- **A `min_score` floor.** Still unset, and now deliberately permanent rather than
+  deferred (owner, 2026-09-05). A floor guards against a passage from an unrelated area
+  winning by default -- ADR-0088's cross-topic risk, which the Phase 3 pools showed for
+  real when Physical Fitness drew 10m air-pistol passages at 0.339. The owner's
+  commitment removes the precondition: the curated corpus covers a topic before that
+  topic exists in production, so there is no uncovered topic for a stray passage to be
+  the best answer to. The eval harness is not what settles this any more.
 
 ---
 

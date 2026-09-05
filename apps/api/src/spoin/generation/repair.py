@@ -290,8 +290,7 @@ async def _run_remake(
         #: caller may pass a stand-in; it is the same model either way now
         #: (ADR-0097 collapsed the two vector spaces into one).
         get_embedder(),
-        token_budget=settings.grounding_token_budget,
-        max_chunks=settings.grounding_max_chunks,
+        chunks=settings.grounding_chunks,
     ).for_subtopic(
         subtopic_group_id=subtopic.subtopic_group_id,
         topic_name=topic.canonical_name,

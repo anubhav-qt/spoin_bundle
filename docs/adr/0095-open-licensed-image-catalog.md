@@ -149,6 +149,23 @@ accepted for `chunk.topic_tags` and ADR-0089 for chunk-ID provenance, and it car
 same obligation — nothing at the database level prevents a dangling reference, so the
 renderer must survive one.
 
+### Retraction: the image goes, and its cards are rebuilt without one
+
+**An image that turns out not to be legally usable is removed, and every card citing it is
+regenerated as an ASCII or diagram card** (owner, 2026-09-05) — not reassigned to a
+different photograph.
+
+Forcing the replacement to a non-image kind is the conservative choice and is deliberate:
+if an image was wrong, the cheapest correct move is to stop gambling on that topic's
+imagery rather than draw again from the same pool that produced the problem. It also makes
+retraction terminate — a rule that reassigns could re-retract indefinitely.
+
+Mechanically this is the query [ADR-0089](0089-retrieval-grounded-generation.md) already
+argued provenance must make answerable — *"which cards did this retracted chunk ground?"* —
+in its image form, and it is answerable for the same reason: the reference is stored, so it
+is queryable. It is also why the cross-database reference below must tolerate dangling:
+between removing an image and regenerating its cards, those cards point at nothing.
+
 ### Where the catalog lives, and where usage lives
 
 **The catalog lives in `the_spoin_universe`**, delivered by Antigravity as an `images/`

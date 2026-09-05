@@ -232,9 +232,15 @@ loop burning quota on a topic that can never satisfy it.**
   account — but it blocks Phase 2's upload step, so Phase 1 can and should be written and
   handed to the authoring track first. Bandwidth, not storage, will be the binding
   constraint, and it scales with users rather than corpus size.
-- **Retraction.** When an image's licence turns out to be misstated, what happens to cards
-  citing it? This is the image form of ADR-0089's dangling-chunk question, and it is
-  currently unanswered for both.
+- ~~**Retraction.**~~ **Answered** (owner, 2026-09-05): the image is removed and every
+  card citing it is **regenerated as an ASCII or diagram card**, never reassigned to
+  another photograph. Forcing a non-image replacement makes retraction terminate and stops
+  us drawing again from the pool that produced the problem. Needs, in Phase 3/5: a query
+  from image id to citing cards, a removal path, and regeneration with the card kind
+  pinned away from `IMAGE`. Note this leaves cards pointing at a removed image until they
+  are rebuilt — the renderer must tolerate a dangling `visual_id`, which it must anyway
+  because the reference crosses a database boundary.
+  ADR-0089's dangling-*chunk* equivalent remains unanswered and is still worth deciding.
 - ~~**Does a card ever carry both a photograph and an ASCII gag?**~~ **No** (owner,
   2026-09-05). `visual_id` is reused; a `visual_kind` enum distinguishes them, because
   `card_type` turns out not to be persisted. See Phase 3.

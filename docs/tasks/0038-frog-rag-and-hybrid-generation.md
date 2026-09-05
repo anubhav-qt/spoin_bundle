@@ -372,6 +372,11 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
 
 ## Phase 3 — Retrieval and prompt integration — *"frog achieved"*
 
+> **Handed off 2026-09-05:** [`docs/handoff/next-frog-phase-3-retrieval.md`](../handoff/next-frog-phase-3-retrieval.md)
+> carries the brief — current state, the gotchas (stale ingested corpus, `embed_query` vs
+> `embed_passage`, why there is deliberately no ANN index yet), and the questions to put to
+> the owner first.
+>
 > **Phase 3 now has a second consumer.**
 > [Task 0040](0040-open-licensed-image-catalog.md) assigns photographs to cards by
 > retrieving against image descriptions, and is deliberately blocked on this phase rather

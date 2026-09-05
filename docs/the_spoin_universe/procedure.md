@@ -436,6 +436,12 @@ emit a dedicated `tips-and-tricks.md`**. This file gathers hard-learned practiti
 lessons, real-world traps, counter-intuitive edge cases, and field rules of thumb that
 dispel common beginner myths and prevent painful mistakes across the subject.
 
+**Mermaid diagrams for code and theory:** For subjects in computer science, software
+engineering, and theoretical systems, documents must feature a significantly higher density
+of structured client-rendered Mermaid diagrams (` ```mermaid `). Because pure code topics
+have zero external photographic images, Mermaid diagrams are the primary visual learning
+anchor for architectures, state machines, and data structures.
+
 Each file is UTF-8 Markdown with YAML front matter:
 
 ```markdown
@@ -515,6 +521,46 @@ Close every run with a short written summary to the owner:
 
 ---
 
+### Phase H — Images: the same subject, sourced as pictures
+
+**Every subject gets an image pass. This phase is not optional and it is not a one-off
+campaign** — a subject delivered without it is an incomplete delivery, and the gap is
+invisible afterwards, because a topic with no images simply generates no image cards and
+looks entirely fine.
+
+The contract is § 10 of
+[`docs/handoff/antigravity-corpus-authoring.md`](../handoff/antigravity-corpus-authoring.md).
+Read it before sourcing anything; what follows is only where the pass sits in a run.
+
+1. **While researching (Phase C), keep the pictures.** You already encounter and discard
+   imagery while fetching source material, and you are already deciding whether a picture
+   illustrates an idea. That judgment is the expensive part and it is happening anyway —
+   this phase is about not throwing it away.
+2. **Filter by licence before anything else.** The allowlist is closed: `cc0`,
+   `public-domain`, `cc-by`, `cc-by-sa`, `unsplash`, `pexels`, `pixabay`. NonCommercial is
+   out because Spoin is commercial; NoDerivatives is out because Cloudinary resizes, which
+   makes a derivative work. An image whose licence you cannot establish from its own page
+   is left out and reported, not guessed at.
+3. **Look at every image before you describe it — strictly, with your vision
+   capability.** Never describe from a caption, filename or catalogue entry: those say
+   what an image is filed as, not what it shows. If you cannot load and view it, it does
+   not go in the manifest.
+4. **Write the description as retrieval bait, not as a caption.** It is the only signal
+   matching a photograph to a card. Describe *this* picture — what is visible, what is
+   happening, the terms a card about it would use.
+5. **Emit one `images.md` per subject** under `docs/the_spoin_universe/images/`, mirroring
+   the corpus path.
+6. **Follow the Three-Tier Distribution Model:**
+   Across a subject's 500–750 cards, images follow three tiers (§ 10 of authoring handoff):
+   - **Tier 1: Visually Rich (60–80 images):** Astronomy, Biology, History, Mythology.
+     Provides ~1 visual anchor per 7–9 cards (~8–10 per chapter). Sourced in batches of 12–15
+     with mandatory `view_file` visual inspection.
+   - **Tier 2: Cultural / Artifact (20–35 images):** Philosophy, Vedic Philosophy, Psychology,
+     Sports/Pistol, Game Development. Authentic primary physical artifacts only.
+   - **Tier 3: Pure Code & Theory (0 images — `images: []`):** Computer science, software
+     engineering, and theory subjects. Strictly zero photos. Compensated by dense Mermaid
+     diagrams embedded directly in the corpus documents during Phase F.
+
 ## 4. The rules that do not belong to any one phase
 
 - **Never invent a fact to fill a gap.** Covered above, and worth repeating because it
@@ -540,3 +586,4 @@ Close every run with a short written summary to the owner:
 | Quiz-gated progression | [ADR-0009](../adr/0009-quiz-gated-progression.md) |
 | Why the corpus exists and how it is stored | [ADR-0088](../adr/0088-the-spoin-universe.md), [ADR-0089](../adr/0089-retrieval-grounded-generation.md) |
 | The full plan this is one track of | [task 0038](../tasks/0038-frog-rag-and-hybrid-generation.md) |
+| The image manifest contract (Phase H) | [`docs/handoff/antigravity-corpus-authoring.md`](../handoff/antigravity-corpus-authoring.md) § 10, [ADR-0095](../adr/0095-open-licensed-image-catalog.md) |

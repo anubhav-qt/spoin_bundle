@@ -294,6 +294,8 @@ anything up.
 - **Quote any front-matter value containing a colon.** `source: West's Respiratory
   Physiology: The Essentials` is invalid YAML and fails the document; write
   `source: "West's Respiratory Physiology: The Essentials"`.
+- **Embed Mermaid diagrams heavily for code and theory.** While observational fields (astronomy, biology) receive photographic manifests under `images/`, pure code, systems engineering, and theoretical topics have zero photographs (`images: []`). To compensate, **corpus chunks for these subjects must embed structured client-rendered Mermaid diagrams (` ```mermaid `)**. Model memory layouts, borrow-checker lifespans, AST transformations, network protocol flows, state machines, and concurrency pipelines directly in Mermaid syntax inside the chunk. The generator retrieves these chunks and restates the diagrams into `diagram` cards.
+
 
 #### On reading level — write for precision, not for the beginner
 
@@ -437,6 +439,216 @@ FAIL mythology/world-mythology/tips-and-tricks.md
 This is the contract made executable. Where this document and the validator disagree,
 **say so** — one of them is wrong and it matters which.
 
+## 10. Images: the `images/` manifest
+
+Everything above this section is about prose. This one is about photographs, and it is a
+**separate delivery with a different contract** — read it before sourcing a single image.
+The decision is [ADR-0095](../adr/0095-open-licensed-image-catalog.md); the build is
+[task 0040](../tasks/0040-open-licensed-image-catalog.md).
+
+### Why this exists, and the one fact that shapes every rule below
+
+A card's visual layer is ASCII gag art ([ADR-0079](../adr/0079-ascii-library-is-gags-only.md))
+and mermaid ([ADR-0067](../adr/0067-mermaid-diagrams-and-form-free-ascii.md)). Neither can
+show what something *looks like*. For Saturn's rings, the Osirian cycle, or a pistol
+shooter's stance, a photograph is the densest thing that could occupy that space. You are
+already making the expensive judgment — *does this picture actually illustrate this idea* —
+while you research, and currently throwing it away.
+
+**The generation model is never told images exist.** It emits no image reference at any
+point. A photograph reaches a card by retrieval against your `description`, server-side,
+after the card is drafted. That is the fact every rule below inherits: your description is
+the only thing standing between a card and a confidently irrelevant picture, and there is
+no later human step that catches a bad one.
+
+### Layout
+
+`docs/the_spoin_universe/images/`, mirroring the corpus hierarchy exactly, **one manifest
+file per subject**:
+
+```
+docs/the_spoin_universe/images/
+  astronomy/
+    physics/
+      astronomy/
+        images.md
+  history/
+    world-history/          no sub_category level, exactly as in the corpus
+      images.md
+```
+
+**Manifest entries only — never image binaries.** Hundreds of images per subject as git
+blobs would bloat the repository permanently and irreversibly, and the corpus is
+deliberately text-only. The ingester fetches each image, uploads it to Cloudinary, and
+stores the returned URL; Cloudinary is then our durable copy, which also takes link rot at
+the original source out of the failure set.
+
+One file per subject rather than one per image (owner, 2026-09-05): a subject's whole
+visual set is reviewable in one diff, and a licence audit is per-subject in practice.
+
+### File format
+
+YAML front matter naming the subject, then an `images:` list. **There is no prose body** —
+this file is data, not a document, and the ingester parses it differently from a corpus
+document. Do not add `##` sections; they are not chunk boundaries here and nothing reads
+them.
+
+```markdown
+---
+kind: image_manifest
+category: astronomy
+sub_category: physics
+subject: astronomy
+images:
+  - title: Saturn's rings backlit by the Sun
+    description: >
+      Saturn photographed from inside its own shadow by Cassini, the rings lit
+      from behind so the finest dust in the E and G rings glows brightly while
+      the dense B ring reads as a dark band. Forward scattering makes the
+      smallest particles the most visible, inverting the usual appearance.
+    source_url: https://photojournal.jpl.nasa.gov/jpeg/PIA17172.jpg
+    source_page: https://photojournal.jpl.nasa.gov/catalog/PIA17172
+    licence: public-domain
+    attribution: NASA/JPL-Caltech/Space Science Institute
+    topic_tags:
+      - saturn
+      - planetary rings
+      - cassini
+  - title: ...
+---
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `kind` | **yes** | Exactly `image_manifest`. A typo is a hard error, not a silent third kind — same rule as `document.kind`. |
+| `category` | **yes** | Same normalized hierarchy as documents ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)). Agreed with the owner at intake, not chosen unilaterally. |
+| `sub_category` | no | Omit the field entirely when the subject has none — its absence is a statement, not missing data. |
+| `subject` | **yes** | The leaf folder name, matching the corpus tree. |
+| `title` | **yes** | Human-readable. Shown when a card cites the image. |
+| `description` | **yes** | **This is what gets embedded and matched against card text.** See below — it is the highest-leverage field in the delivery. |
+| `source_url` | **yes** | Direct URL to the **image file itself**, not the page it sits on. If it does not return image bytes, it is the wrong URL. |
+| `source_page` | **yes** | The page it was found on. This is what a human checks the licence against, and it is not optional even when the direct URL looks obvious. |
+| `licence` | **yes** | From the closed allowlist below. Free text is a hard error — a typo'd licence is legal exposure, not just an unretrieved row. |
+| `attribution` | **yes** | The exact string to display on the card. Required **even for `cc0`**, where it is `public domain`. |
+| `topic_tags` | **yes** | Normalized exactly like document tags — lowercased, non-alphanumerics to spaces. |
+
+Two fields you never write: `cloudinary_url` and `content_hash`. Both are derived, for the
+same idempotency reason `source_path` and `content_hash` are derived for documents —
+re-ingesting an unchanged manifest must not re-upload, or the Cloudinary free tier is spent
+on repeat deliveries.
+
+### `description` is the whole game
+
+⚠️ **Look at every image with your vision capability before you describe it. This is a
+hard requirement, not a suggestion.** Load the image, see what is actually in the frame,
+and describe that.
+
+**Never write a description from the source page's caption, the filename, the alt text,
+the archive's catalogue entry, or the search query that returned the image.** Those say
+what the image is *filed as*, which is not the same thing as what it shows, and they are
+wrong often enough to matter — archives mislabel, crops differ from the original plate,
+a "photograph" turns out to be an engraving, a thumbnail turns out to be a contact sheet
+of twelve. A guessed description is undetectable at review time and produces exactly the
+failure this whole contract exists to prevent: a card that looks sourced while showing
+something else.
+
+**If you cannot load and view an image, you cannot describe it.** Leave it out of the
+manifest and list it in your report. No exceptions, however good the metadata looks.
+
+Looking also does a second job the metadata cannot: it is how you catch an image that is
+correctly licensed and genuinely on-topic but unusable — a watermark, an unreadable
+detail at card width, text in a language the reader will not have, a diagram where you
+expected a photograph.
+
+With that settled: the description is **not alt text and not a caption.** It is the text
+a card's body is semantically matched against, and retrieval has no other signal.
+
+- ✅ *"Saturn photographed from inside its own shadow by Cassini, the rings lit from behind
+  so the finest dust glows while the dense B ring reads dark"* — matches a card about ring
+  composition, or about forward scattering.
+- ❌ *"Saturn"* — matches nothing in particular, and will therefore be assigned to whatever
+  card happens to land closest.
+
+Two to four sentences. Name **what is visible**, **what is happening**, and **the terms a
+card about this would use**. Describe *this picture*, not the subject in general: if your
+description would be equally true of a different photograph, it is too vague to retrieve
+correctly.
+
+### The licence allowlist
+
+Allowed, and nothing else:
+
+`cc0` · `public-domain` · `cc-by` · `cc-by-sa` · `unsplash` · `pexels` · `pixabay`
+
+Two rejections that are counter-intuitive enough to state outright:
+
+- **NC (NonCommercial)** — Spoin is commercial (owner, 2026-09-05). Excluded regardless of
+  how well the image fits.
+- **ND (NoDerivatives)** — Cloudinary crops and resizes, which produces a derivative work.
+  ND is disqualified by the **architecture**, not by policy, so it cannot be waived.
+
+When a licence is unclear, ambiguous, or stated only in a page's boilerplate rather than on
+the image itself, **leave the image out and say so in your report**. An image we cannot
+defend is worse than a gap.
+
+### Where to source
+
+| Tier | Sources |
+|---|---|
+| Gateways | **Openverse API** (800M+ items; filter `license=by,cc0` plus commercial-use and modify/adapt at query time — the single best programmatic entry point), Wikimedia Commons |
+| Science / nature | NASA, ESA/Hubble, JWST, NOAA Photo Library and Ocean Exploration, FathomNet, USGS, NIH/NLM, CDC PHIL, Wellcome Collection, Biodiversity Heritage Library, PhyloPic |
+| Art / history / mythology | Smithsonian Open Access, the Met, Rijksmuseum, Art Institute of Chicago, Cleveland Museum, National Gallery of Art, **Getty Open Content** (the museum, *not* Getty Images), Library of Congress, British Library on Flickr, NYPL, Europeana, DPLA |
+| Contemporary / everyday | Unsplash, Pexels, Pixabay — the tier museums cannot cover |
+
+Two traps:
+
+- **NOAA** is public domain *unless the caption contains the word "copyright"*, which some
+  do. It is a per-image check, never a blanket rule.
+- **Schmidt Ocean Institute** has excellent deep-sea imagery and explicitly prohibits
+  commercial use. Excluded despite being exactly on-topic.
+
+### Generalized Distribution: Sizing the Catalog Across Subjects
+
+A typical Spoin subject generates **500 to 750 cards**. Cards do not have a 1:1 image requirement—pure mathematical derivations, algorithmic proofs, and syntax definitions must never be saddled with forced or irrelevant stock images. Image catalogs provide semantic visual anchors for observational, morphological, structural, and historical cards.
+
+To maintain consistent depth across the universe without arbitrary guessing, all subjects fall into a **Three-Tier Distribution Model**:
+
+| Tier | Archetype & Subjects | Target Images | Visual Architecture & Compensation Rules |
+|---|---|---|---|
+| **Tier 1: Visually Rich** | • Astronomy<br>• Human Biology<br>• World History<br>• World Mythology<br>• Natural Sciences | **60–80 images**<br>*(~8–10 per chapter)* | **Photographic / Primary Observational:** Provides ~1 visual anchor for every 7–9 cards (~10–15% visual coverage). Every core physical body, morphological structure, anatomical system, or historical era must have at least one verified visual anchor. Sourced in steady batches of 12–15 images via strict multimodal vision inspection. |
+| **Tier 2: Cultural & Artifact** | • World Philosophy<br>• Vedic Philosophy (Gita)<br>• General Psychology<br>• 10m Air Pistol<br>• Game Development | **20–35 images**<br>*(focused authentic set)* | **Artifact & Primary Source Grounding:** Strict focus on authentic artifacts: primary manuscripts, laboratory apparatus, classical iconography, and physical competitive equipment. Abstract ideas are left unphotographed rather than diluted with generic stock images. |
+| **Tier 3: Pure Code & Theory** | • Rust, Generative AI<br>• LangChain, Backend<br>• Frontend, Fullstack<br>• Systems Engineering | **0 images (`images: []`)**<br>*(zero photographs)* | **Mermaid Diagram Compensation Principle (Mandatory):** A photograph of a screen or stock keyboard illustrates nothing a diagram would not do infinitely better. Therefore, Tier 3 manifests must be empty (`images: []`), **AND the corpus chunks and card generation prompts MUST feature a substantially higher density of Mermaid diagrams (` ```mermaid `)**.<br>Memory layouts, borrow checker lifetimes, ASTs, network topologies, sequence flows, state machines, and execution loops must be visually grounded via structured, client-rendered Mermaid blocks. |
+
+### Say plainly which subjects have no images
+
+**"No sourceable imagery" (`images: []`) is a normal, expected outcome for Tier 3, and recording it honestly is doing the job right.** An empty manifest with a clean declaration beats a manifest filled with thirty stretched, decorative stock photos.
+
+Unavailable by construction, and not worth spending time on: internet culture and memes (stacked rightsholders and fair-use failure under commercial distribution), living people, current products and corporate logos, and recent news photography.
+
+**Never pad a manifest with artificial relevance.** Images are assigned to cards automatically by semantic embedding similarity with no human in the loop—so a loosely-relevant image does not sit idle; it gets bound to an unrelated card and makes it look sourced while displaying something erroneous.
+
+For Tier 3 subjects, channel all visual authoring energy into **Mermaid diagrams** within the prose documents. A software architecture card with an accurate client-rendered Mermaid sequence diagram is pedagogically superior to any photograph.
+
+### Checking your work
+
+`make corpus-check` validates **documents**. Image-manifest validation lands with
+[task 0040](../tasks/0040-open-licensed-image-catalog.md) Phase 2 and does not exist yet, so
+until it does, manifests are checked by review rather than by machine. That makes the
+licence and description fields matter more at authoring time, not less — there is currently
+nothing between a wrong licence and a published card.
+
+Close an image delivery the way you close a corpus delivery (procedure, Phase G): where it
+landed, what you deliberately left out and why, anything whose licence you could not
+establish, and every subject you are reporting as having no sourceable imagery.
+
+### This is standing procedure, not a one-off
+
+**Every new subject gets an image pass as part of its normal delivery**, using this
+contract, at the point [the procedure's Phase H](../the_spoin_universe/procedure.md) names.
+It is not a backfill campaign that happens once — a subject delivered without an image pass
+is an incomplete delivery, and the gap is invisible afterwards, because a topic with no
+images simply generates no image cards and looks entirely fine.
+
 ## Where to read further
 
 | | |
@@ -446,3 +658,4 @@ This is the contract made executable. Where this document and the validator disa
 | Why the corpus exists, and how it is stored | [ADR-0088](../adr/0088-the-spoin-universe.md), [ADR-0089](../adr/0089-retrieval-grounded-generation.md) |
 | The procedure you run each time | [`docs/the_spoin_universe/procedure.md`](../the_spoin_universe/procedure.md) |
 | The full plan this is one track of | [task 0038](../tasks/0038-frog-rag-and-hybrid-generation.md) |
+| The image sourcing run this contract is for | [`next-image-sourcing.md`](next-image-sourcing.md), [task 0040](../tasks/0040-open-licensed-image-catalog.md) |

@@ -1,6 +1,21 @@
 # Task 0040: An open-licensed image catalog, and photographs on cards
 
-> **Status:** planned, not started. Written 2026-09-05.
+> **Status: Phase 1 done** (2026-09-05) — the manifest contract is written and the
+> sourcing run is handed to the authoring track. Phases 2-5 not started.
+> Written 2026-09-05.
+>
+> **The contract is § 10 of
+> [`docs/handoff/antigravity-corpus-authoring.md`](../handoff/antigravity-corpus-authoring.md)**,
+> and the standing rule that every new subject gets an image pass is Phase H of
+> [`procedure.md`](../the_spoin_universe/procedure.md). The sourcing run for all 16
+> existing subjects, with the prompt, is
+> [`docs/handoff/next-image-sourcing.md`](../handoff/next-image-sourcing.md).
+>
+> **One decision Phase 1 settled that this document left open:** manifest entries are
+> filed **one file per subject** (`images.md` holding an `images:` list), not one file
+> per image (owner, 2026-09-05). A subject's whole visual set is then reviewable in one
+> diff and a licence audit is per-subject, at the cost of the ingester hashing entries
+> rather than files — note that when building Phase 2's idempotency.
 > **Decision:** [ADR-0095](../adr/0095-open-licensed-image-catalog.md) — read it first;
 > this document is the build, not the reasoning.
 > **Depends on:** [task 0038](0038-frog-rag-and-hybrid-generation.md) Phase 3. Server-side

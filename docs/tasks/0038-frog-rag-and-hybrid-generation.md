@@ -359,7 +359,9 @@ base image. So the image is `python:3.13-slim`, the same base as `apps/api`. Ver
 the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
 
 #### Still open after Phase 2
-- **The ASCII box rule's enforcement mechanism** is still Phase 6's open decision.
+- **The ASCII box rule's enforcement mechanism** was Phase 6's open decision, settled
+  2026-09-05: measure first, enforce later
+  ([ADR-0098](../adr/0098-measure-the-ascii-box-rule-before-enforcing-it.md)).
 - **Reading level is a generator-prompt concern, and the prompt does not say so yet.**
   Owner's decision (2026-09-05): the corpus stays dense and precise, and pitching an
   explanation at a difficulty tier is the generator's job. The reasoning — one corpus
@@ -565,11 +567,20 @@ validation plan.*
   counts.** CLAUDE.md's rule: a call that never returned a verdict is not the same
   fact as content judged and found bad.
 
-### ⚠️ Decision point — ASK THE OWNER before implementing: how to enforce the ASCII box rule
+### Decided — the ASCII box rule is MEASURED here, not enforced
 
-**Do not pick a mechanism unilaterally. Ask.** This likely warrants its own ADR.
-(It was pencilled in as ADR-0091; that number went to the corpus category hierarchy
-on 2026-09-05. Take the next free number — numbers are sequential, never reserved.)
+> **Settled 2026-09-05 by the owner:
+> [ADR-0098](../adr/0098-measure-the-ascii-box-rule-before-enforcing-it.md)** — option
+> (e). Nothing is enforced yet; this phase's run records violation counts and the
+> mechanism is chosen from that data. **What this phase must build is the counter, not
+> a check:** a byte diff of each fetched scene against its `src_id` library entry,
+> counted and logged and never rejecting a card, reported separately from every other
+> rejection reason.
+>
+> Read the ADR before building it — in particular the consequence that "measure first"
+> is only cheap on the fetched path, because a free-drawn scene has no source and its
+> measurement instrument *is* the enforcement heuristic option (b) was hesitated over.
+> The options below are kept as the reasoning the decision was made against.
 
 **The gap.** `ASCII_INSTRUCTIONS` rule 3 (BOX INTEGRITY, STRICT) says the art is a
 rigid box: nothing edited inside it, nothing inserted to its **left** (which

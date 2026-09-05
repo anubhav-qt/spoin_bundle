@@ -11,7 +11,7 @@ There were two embedders and two vector spaces.
 `get_embedder()` returned a 384-dimensional model for `card.content_embedding`,
 `topic.embedding` and `question.embedding`. `get_corpus_embedder()` returned
 `Qwen/Qwen3-Embedding-0.6B` at 1024 dimensions for `the_spoin_universe`'s chunks
-([ADR-0092](0092-qwen3-embedding-0-6b.md)). The split was not an oversight — the two
+([ADR-0092](0092-qwen3-embedder-and-the-device-split.md)). The split was not an oversight — the two
 columns genuinely held incomparable vectors, and one factory would have made every
 retrieval a dimension error rather than a silent quality loss. Task 0039 was where
 they were meant to converge.
@@ -80,9 +80,10 @@ retrieval query is embedded by the model its chunks were, structurally rather th
 convention. Task 0039's "flag and backfill must land together" problem disappears —
 there is no second kind of vector to land beside.
 
-**Harder, and paid for deliberately.** The deployed api image now carries torch: about
-800MB for the CPU wheel, on an image [ADR-0094](0094-local-generation-lightweight-production.md)
-argues should stay minimal. That is the cost of AskAI's off-topic gate embedding on
+**Harder, and paid for deliberately.** The deployed api image now carries torch, on an
+image [ADR-0094](0094-local-generation-lightweight-production.md) argues should stay
+minimal. **Measured, not estimated: 539MB -> 2.46GB.** The CPU wheel is far heavier than
+the ~800MB its download size suggests, and the worker's cu128 image is 12.3GB. That is the cost of AskAI's off-topic gate embedding on
 the request path ([ADR-0077](0077-askai-deterministic-single-call-retrieval.md)) with
 the same model as everything else, and it is why ADR-0092 chose 0.6B over the stronger
 4B. `make test` also loads a real model, so the suite is slower than it was and CI
@@ -120,18 +121,19 @@ else.
 api image, so this would have kept it torch-free. Rejected as scope: it is a different
 inference path from the one the corpus was embedded with, it needs its own export and
 verification, and ADR-0092 deferred it until the backend actually deploys. Doing it
-under time pressure to save 800MB on an image that is not yet deployed is the wrong
-order.
+under time pressure to save 1.9GB on an image that is not yet deployed is the wrong
+order. That number is the strongest argument for revisiting it once the backend ships.
 
 **A build arg per service versus one image for all.** Installing torch unconditionally
 is one line and no build matrix. Rejected because `api`, `worker`, `seed`, `test` and
 `universe-seed` share the Dockerfile, and it would put ~3GB into the test and CI
 images to serve one service — the exact argument `apps/frog/Dockerfile`'s header
-makes.
+makes. Measured after the fact, that argument was if anything understated: the CUDA
+image is 12.3GB.
 
 ## Revisit when
 
-- **The backend actually deploys.** Then torch's 800MB in the api image has a real
+- **The backend actually deploys.** Then torch's 1.9GB in the api image has a real
   bill attached, and ADR-0092's ONNX CPU path becomes worth building.
 - **AskAI's gate latency is measured on a production-shaped CPU.** 0.6B was chosen to
   make this viable; if a turn's embedding is slow enough to be felt on the request
@@ -143,7 +145,7 @@ makes.
 
 ## Related
 
-- [ADR-0092](0092-qwen3-embedding-0-6b.md) — chose the model, and one model across two
+- [ADR-0092](0092-qwen3-embedder-and-the-device-split.md) — chose the model, and one model across two
   devices. This ADR extends that to one model across two *spaces*.
 - [ADR-0087](0087-frog-is-a-sibling-package.md) — says "shared 384-dim vector space";
   the sharing is now at 1024.

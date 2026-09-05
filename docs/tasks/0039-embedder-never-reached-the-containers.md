@@ -85,12 +85,14 @@ backfill have to land together.
 
    **This one is still open**, and it is the part of this task that outlives it: the
    thresholds are now *measurable* for the first time, and none of them have been
-   measured. Task 0001 is where that lives.
+   measured. [Task 0042](0042-recalibrate-thresholds-against-real-vectors.md) is where
+   that lives — NOT task 0001, which this doc originally pointed at and which has been
+   obsolete since ADR-0025.
 
 ## Related
 
 - [rag-design-space.md](../architecture/rag-design-space.md) — §0, and why this gates
   everything in task 0038's Phase 3
-- [task 0001](0001-topic-threshold-calibration.md) — thresholds measured against
-  the stand-in
+- [task 0042](0042-recalibrate-thresholds-against-real-vectors.md) — thresholds
+  measured against the stand-in, and still unmeasured
 - [ADR-0087](../adr/0087-frog-is-a-sibling-package.md) — the shared 384-dim vector space

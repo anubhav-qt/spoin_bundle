@@ -90,10 +90,11 @@ the same model as everything else, and it is why ADR-0092 chose 0.6B over the st
 needs the weights cached; the `frog-model-cache` volume is mounted for exactly that.
 
 **Unvalidated, and newly visible.** Every threshold in the system was calibrated
-against hash vectors — [task 0001](../tasks/0001-topic-threshold-calibration.md) says
-so explicitly, and the near-duplicate card threshold and the accent-hue distances have
-the same problem. They are not stale, they are unmeasured. Real vectors make measuring
-them possible for the first time; nothing here does that measurement.
+against hash vectors — `card_duplicate_threshold`, the accent-hue distances, and
+retrieval's still-unset `min_score`. They are not stale, they are unmeasured. Real
+vectors make measuring them possible for the first time; nothing here does that
+measurement, and [task 0042](../tasks/0042-recalibrate-thresholds-against-real-vectors.md)
+is where it lives.
 
 **ADR-0094 is bent, not broken.** Heavy work still runs locally: only the worker gets
 CUDA. What the production image gained is the ability to embed one short turn per
@@ -139,7 +140,7 @@ image is 12.3GB.
   make this viable; if a turn's embedding is slow enough to be felt on the request
   path, the answer is the ONNX path or a smaller model on that path alone — and a
   second model on that path would reopen this ADR directly.
-- **A thresholds pass runs against real vectors** (task 0001). If the numbers that
+- **A thresholds pass runs against real vectors** (task 0042). If the numbers that
   come back say the model is wrong for topic canonicalization specifically, that is
   the evidence that would justify a second space — and it does not exist today.
 
@@ -153,5 +154,6 @@ image is 12.3GB.
   image, and what this costs it.
 - [Task 0039](../tasks/0039-embedder-never-reached-the-containers.md) — the bug that
   forced the question, and where the stamp requirement comes from.
-- [Task 0001](../tasks/0001-topic-threshold-calibration.md) — every threshold that is
-  now measurable for the first time.
+- [Task 0042](../tasks/0042-recalibrate-thresholds-against-real-vectors.md) — every
+  threshold that is now measurable for the first time. (Task 0001, which task 0039
+  pointed at, has been obsolete since ADR-0025 removed the thresholds it calibrates.)

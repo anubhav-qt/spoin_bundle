@@ -78,6 +78,12 @@ Two tables. Every column below is a decision, not a placeholder.
 
 #### Why `kind` is a real enum
 
+> **Amended by [ADR-0096](0096-canon-is-pinned-not-retrieved.md).** "Retrieval treats
+> the two kinds differently" is now literal in a stronger sense than this section
+> imagined: `spoin_canon` is **not retrieved at all**. It is pinned into the system
+> prompt per call type, and every retrieval filters to `topic_source`. The enum is
+> more load-bearing for it, not less -- it is what makes the exclusion expressible.
+
 Retrieval treats the two kinds differently and will keep doing so:
 **Spoin canon** — how the product itself works, how a hook lands, the ASCII box rule,
 [dual titles](0022-dual-titles.md), [archetypes](0017-card-archetypes.md) — is

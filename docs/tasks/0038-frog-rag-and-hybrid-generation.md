@@ -397,6 +397,33 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
   it.
 - Inspect retrieval scores on cross-topic hits (the ADR-0088 risk above).
 
+### What landed (2026-09-05)
+
+| | |
+|---|---|
+| `frog.retrieval` | `search` / `search_many`, cross-topic by default, every filter available and off. Returns chunk ids, cosine similarity (not distance) and document provenance. Tested, including the `embed_query`-not-`embed_passage` guard ADR-0092 makes silent -- verified by mutation. |
+| Pinned canon | [ADR-0096](../adr/0096-canon-is-pinned-not-retrieved.md), amending ADR-0088. Ten per-call-type preambles condensed from the five `_canon` documents, with a sha256 drift guard. All 15 system prompts rebuilt on them. |
+| `spoin.generation.grounding` | Packs hits to a token budget with `pack_by_tokens` (first chunk only -- spillover is wrong for context), renders the block, and caches per subtopic GROUP keyed on a corpus version (3.7). Three outcomes: GROUNDED / NO_MATCH / UNAVAILABLE. Never raises. |
+| Prompt wiring | `plan_cards`, `generate_cards`, `correct_cards`, `verify_cards`, `generate_questions`, plus the `remake` repair path. Drafters and thinkers, one shared block per subtopic group -- asserted end to end. `prompts/sources.py` carries the instructions, including the tier-language one this phase owed. |
+| Provenance | `card.grounded_chunk_ids`, ARRAY(UUID) with a GIN index. **Migration written, NOT applied** (`a1b2c3d4e5f6`). |
+| `get_corpus_embedder()` | A second factory. `card.content_embedding` is 384-dimensional and `chunk.embedding` is 1024, so one factory for both would make every retrieval a dimension error rather than a quality loss. |
+
+### What Phase 3 still owes
+
+- **The eval harness (3.2).** Hand-labelled golden set, reviewed as an HTML artifact
+  that saves labels back; 30-50 real subtopic queries, recall@k and precision@k. No ANN
+  index until it has run.
+- **Cross-topic score inspection.** Only a 5-query smoke exists. Early signal is mild --
+  off-subtopic hits at 0.435-0.440 against 0.653 for the correct one -- but that is five
+  queries, not a finding. Needs the real embedder, so it runs in the `frog` image.
+- **A real embedder on the generation path.** `corpus_embedder` defaults to `hash`,
+  which is dimension-correct and semantically meaningless: a run grounded on it is
+  grounded on nothing. `qwen3` needs torch, which the `api`/`worker` image deliberately
+  does not carry (ADR-0094). **This gates any real measurement of grounded output, and
+  therefore gates Phase 4.**
+- **A `min_score` floor.** Deliberately unset: a floor chosen before the eval harness
+  is an invented constant.
+
 ---
 
 ## Phase 4 — Measure real sizes, then sweep Mistral

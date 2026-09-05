@@ -63,3 +63,7 @@ docs/the_spoin_universe/temp/*
 
 # Local database archives (pg_dump). Large, binary, and not source.
 .archives/
+
+# Retrieval-eval working files (task 0038 Phase 3). Both rebuild from
+# scripts/eval/build_queries.py and scripts/eval/retrieve_pools.py; pools.json is ~1MB.
+.eval/

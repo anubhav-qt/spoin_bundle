@@ -1,0 +1,812 @@
+<title>Corpus Relevance Judgements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root {
+    --ground: #f6f8f6;
+    --surface: #ffffff;
+    --surface-2: #eef2ef;
+    --ink: #14201b;
+    --muted: #5b6d64;
+    --faint: #7d8f86;
+    --line: #dce4df;
+    --line-strong: #c3cec8;
+    --accent: #17705a;
+    --accent-ink: #ffffff;
+    --accent-soft: #ddeee7;
+    --flag: #9c5a1f;
+    --flag-soft: #f6e7d8;
+    --shadow: 0 1px 2px rgba(20, 32, 27, .06), 0 8px 24px -16px rgba(20, 32, 27, .3);
+
+    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0e1312;
+      --surface: #161c1a;
+      --surface-2: #1d2523;
+      --ink: #e7eeea;
+      --muted: #93a49a;
+      --faint: #6d7d74;
+      --line: #262f2c;
+      --line-strong: #35403b;
+      --accent: #46bd9b;
+      --accent-ink: #08201a;
+      --accent-soft: #14302a;
+      --flag: #d29455;
+      --flag-soft: #33251597;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0e1312;
+    --surface: #161c1a;
+    --surface-2: #1d2523;
+    --ink: #e7eeea;
+    --muted: #93a49a;
+    --faint: #6d7d74;
+    --line: #262f2c;
+    --line-strong: #35403b;
+    --accent: #46bd9b;
+    --accent-ink: #08201a;
+    --accent-soft: #14302a;
+    --flag: #d29455;
+    --flag-soft: #33251597;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  /* ---------- rail ---------- */
+
+  .rail {
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+
+  .rail-head {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .wordmark {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    margin: 0;
+  }
+
+  .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .meter {
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .meter > i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    width: 0;
+    transition: width .2s ease;
+  }
+
+  .queue {
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: 8px;
+  }
+
+  .topic-head {
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    padding: 12px 18px 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--faint);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .qrow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: baseline;
+    width: 100%;
+    text-align: left;
+    padding: 7px 18px;
+    background: none;
+    border: 0;
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+
+  .qrow:hover { background: var(--surface-2); color: var(--ink); }
+
+  .qrow[aria-current="true"] {
+    border-left-color: var(--accent);
+    background: var(--surface-2);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .qrow .tally {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+  }
+
+  .qrow[data-done="true"] .tally { color: var(--accent); }
+
+  .rail-foot {
+    border-top: 1px solid var(--line);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scores {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px 10px;
+  }
+
+  .scores div { display: flex; flex-direction: column; gap: 1px; }
+
+  .scores dt {
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .scores dd {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .save-state {
+    font-size: 11px;
+    color: var(--faint);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--line-strong);
+    flex: none;
+  }
+
+  .dot[data-on="true"] { background: var(--accent); }
+
+  /* ---------- main ---------- */
+
+  main {
+    padding: 0 0 96px;
+    max-width: 860px;
+  }
+
+  .brief {
+    padding: 30px 40px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .crumb {
+    font-size: 11px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0 0 8px;
+  }
+
+  h1 {
+    font-size: 25px;
+    line-height: 1.2;
+    letter-spacing: -.015em;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+
+  .desc {
+    margin: 0 0 18px;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+
+  .query {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: var(--muted);
+    overflow-x: auto;
+  }
+
+  .query b {
+    color: var(--faint);
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .ask {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 40px 10px;
+  }
+
+  .ask p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 58ch;
+  }
+
+  .ask strong { color: var(--ink); font-weight: 600; }
+
+  .range {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .pool { display: flex; flex-direction: column; }
+
+  .cand {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    gap: 0 16px;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--line);
+    border-left: 3px solid transparent;
+    align-items: start;
+  }
+
+  .cand[data-marked="true"] {
+    border-left-color: var(--accent);
+    background: color-mix(in srgb, var(--accent-soft) 45%, transparent);
+  }
+
+  .rank {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-top: 2px;
+  }
+
+  .rank .n { font-size: 12px; color: var(--faint); }
+
+  .rank .score { font-size: 15px; font-weight: 500; }
+
+  .bar {
+    height: 3px;
+    background: var(--surface-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar > i { display: block; height: 100%; background: var(--line-strong); }
+
+  .cand[data-marked="true"] .bar > i { background: var(--accent); }
+
+  .prov {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .prov .title { font-weight: 600; color: var(--ink); }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .02em;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--surface-2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .chip[data-off="true"] {
+    background: var(--flag-soft);
+    color: var(--flag);
+    font-weight: 500;
+  }
+
+  .passage {
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.62;
+    margin: 0;
+    max-width: 66ch;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  .passage.clipped {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .more {
+    background: none;
+    border: 0;
+    padding: 4px 0 0;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .mark {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 6px 11px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mark:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cand[data-marked="true"] .mark {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .mark .key {
+    opacity: .55;
+    margin-left: 6px;
+    font-size: 10px;
+  }
+
+  /* ---------- footer ---------- */
+
+  .bar-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 300px;
+    right: 0;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 11px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .keys {
+    display: flex;
+    gap: 14px;
+    font-size: 11.5px;
+    color: var(--faint);
+    flex-wrap: wrap;
+  }
+
+  kbd {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    border: 1px solid var(--line-strong);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    padding: 0 4px;
+    color: var(--muted);
+  }
+
+  .nav { display: flex; gap: 8px; flex: none; }
+
+  .btn {
+    font-family: inherit;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .btn:hover { border-color: var(--accent); }
+
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+  .btn.primary[data-done="true"] { background: var(--surface); color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .rail { position: static; max-height: none; }
+    .queue { max-height: 220px; }
+    .bar-bottom { left: 0; padding: 10px 20px; }
+    .brief, .ask, .cand { padding-left: 20px; padding-right: 20px; }
+    .keys { display: none; }
+  }
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-head">
+      <h2 class="wordmark">Corpus relevance judgements</h2>
+      <p class="sub">44 real subtopic queries &middot; top 10 of <code>the_spoin_universe</code></p>
+      <div class="meter"><i id="meter"></i></div>
+      <p class="sub" id="progress">0 of 44 judged</p>
+    </div>
+    <nav class="queue" id="queue" aria-label="Queries"></nav>
+    <div class="rail-foot">
+      <dl class="scores">
+        <div><dt>P@3</dt><dd id="p3">&mdash;</dd></div>
+        <div><dt>P@5</dt><dd id="p5">&mdash;</dd></div>
+        <div><dt>R@5</dt><dd id="r5">&mdash;</dd></div>
+      </dl>
+      <p class="sub" id="basis">Precision counts every judged query, including one where nothing in the pool is relevant. Recall is against the pool, so it measures ranking, not corpus coverage.</p>
+      <p class="save-state"><span class="dot" id="dot"></span><span id="save">Connecting&hellip;</span></p>
+    </div>
+  </aside>
+
+  <main>
+    <header class="brief">
+      <p class="crumb" id="crumb"></p>
+      <h1 id="title"></h1>
+      <p class="desc" id="desc"></p>
+      <div class="query"><b>Query sent to the embedder</b><span id="qtext"></span></div>
+    </header>
+
+    <div class="ask">
+      <p><strong>Mark every passage that would genuinely help write a card on this subtopic.</strong> Leave the rest &mdash; unmarked counts as not relevant.</p>
+      <span class="range" id="range"></span>
+    </div>
+
+    <div class="pool" id="pool"></div>
+  </main>
+</div>
+
+<div class="bar-bottom">
+  <div class="keys">
+    <span><kbd>1</kbd>&ndash;<kbd>0</kbd> mark</span>
+    <span><kbd>J</kbd><kbd>K</kbd> next / previous</span>
+    <span><kbd>D</kbd> judged</span>
+  </div>
+  <div class="nav">
+    <button class="btn" id="prev">Previous</button>
+    <button class="btn primary" id="done">Mark judged</button>
+    <button class="btn" id="next">Next</button>
+  </div>
+</div>
+
+<script>
+  const POOLS = __POOLS__;
+
+  const state = { i: 0, marks: {}, done: {} };
+  let db = null;
+  const pending = new Set();
+
+  const el = (id) => document.getElementById(id);
+  const marksFor = (gid) => (state.marks[gid] ||= {});
+
+  /* ---------- persistence ---------- */
+
+  function saveNote(text, on) {
+    el("save").textContent = text;
+    el("dot").dataset.on = on ? "true" : "false";
+  }
+
+  async function connect() {
+    db = await window.claude?.use?.("db");
+    if (!db) {
+      saveNote("Not saving — open the published page to keep judgements", false);
+      return;
+    }
+    try {
+      const snap = await db.collection("judgements").get();
+      for (const doc of snap.docs) {
+        const body = doc.data() || {};
+        // use() resolves after the page is already interactive, so anything marked
+        // in the meantime is the NEWER fact: stored state merges under it, never over.
+        state.marks[doc.id] = { ...(body.marks || {}), ...(state.marks[doc.id] || {}) };
+        if (body.done && !(doc.id in state.done)) state.done[doc.id] = true;
+      }
+      saveNote("Saved", true);
+      render();
+    } catch (e) {
+      saveNote("Could not load earlier judgements", false);
+      return;
+    }
+    if (pending.size) flush();
+  }
+
+  async function flush() {
+    const ids = [...pending];
+    pending.clear();
+    try {
+      await Promise.all(ids.map((id) => db.doc("judgements/" + id).set({
+        marks: marksFor(id),
+        done: !!state.done[id],
+        updatedAt: new Date().toISOString(),
+      })));
+      saveNote("Saved", true);
+    } catch (e) {
+      saveNote(e.code === "revoked" ? "Access ended — judgements not saved" : "Save failed — retry by re-marking", false);
+    }
+  }
+
+  let timer = null;
+  function persist(gid) {
+    pending.add(gid);
+    if (!db) {
+      saveNote("Marked — saving as soon as the store connects", false);
+      return;
+    }
+    saveNote("Saving…", true);
+    clearTimeout(timer);
+    timer = setTimeout(flush, 450);
+  }
+
+  /* ---------- metrics ---------- */
+
+  function metrics() {
+    let n = 0, hit = 0, p3 = 0, p5 = 0, r5 = 0;
+    for (const entry of POOLS) {
+      if (!state.done[entry.group_id]) continue;
+      const marks = marksFor(entry.group_id);
+      const hits = entry.candidates.map((c) => (marks[c.chunk_id] ? 1 : 0));
+      const total = hits.reduce((a, b) => a + b, 0);
+      n += 1;
+      p3 += hits.slice(0, 3).reduce((a, b) => a + b, 0) / 3;
+      p5 += hits.slice(0, 5).reduce((a, b) => a + b, 0) / 5;
+      // A pool with nothing relevant in it scores precision 0 — that is the whole
+      // finding for a topic the corpus does not cover. Recall there is 0/0, not 0,
+      // so it is the one number such a query stays out of.
+      if (!total) continue;
+      hit += 1;
+      r5 += hits.slice(0, 5).reduce((a, b) => a + b, 0) / total;
+    }
+    el("p3").textContent = n ? (p3 / n).toFixed(2) : "—";
+    el("p5").textContent = n ? (p5 / n).toFixed(2) : "—";
+    el("r5").textContent = hit ? (r5 / hit).toFixed(2) : "—";
+    el("basis").textContent = n
+      ? "Precision over all " + n + " judged " + (n === 1 ? "query" : "queries") +
+        " — one with nothing relevant scores 0. Recall over the " + hit +
+        " with a hit, and against the pool, so it measures ranking, not corpus coverage."
+      : "Precision counts every judged query, including one where nothing in the pool is relevant. Recall is against the pool, so it measures ranking, not corpus coverage.";
+  }
+
+  /* ---------- render ---------- */
+
+  function renderQueue() {
+    const queue = el("queue");
+    queue.textContent = "";
+    let topic = null;
+    POOLS.forEach((entry, i) => {
+      if (entry.topic_name !== topic) {
+        topic = entry.topic_name;
+        const h = document.createElement("p");
+        h.className = "topic-head";
+        h.textContent = topic;
+        queue.append(h);
+      }
+      const marked = Object.values(marksFor(entry.group_id)).filter(Boolean).length;
+      const row = document.createElement("button");
+      row.className = "qrow";
+      row.type = "button";
+      row.dataset.done = state.done[entry.group_id] ? "true" : "false";
+      if (i === state.i) row.setAttribute("aria-current", "true");
+      row.innerHTML = '<span></span><span class="tally"></span>';
+      row.firstChild.textContent = entry.title;
+      row.lastChild.textContent = state.done[entry.group_id] ? marked + " ✓" : (marked || "");
+      row.addEventListener("click", () => { state.i = i; render(); });
+      queue.append(row);
+    });
+  }
+
+  function renderPool() {
+    const entry = POOLS[state.i];
+    const marks = marksFor(entry.group_id);
+    const area = (c) => [c.category, c.sub_category].filter(Boolean).join(" / ") || "uncategorised";
+    const home = entry.candidates.length ? area(entry.candidates[0]) : "";
+
+    el("crumb").textContent = entry.topic_name + " · query " + (state.i + 1) + " of " + POOLS.length;
+    el("title").textContent = entry.title;
+    el("desc").textContent = entry.description;
+    el("qtext").textContent = entry.query;
+
+    const scores = entry.candidates.map((c) => c.score);
+    el("range").textContent = scores.length
+      ? "similarity " + Math.min(...scores).toFixed(3) + " – " + Math.max(...scores).toFixed(3)
+      : "no candidates";
+
+    const pool = el("pool");
+    pool.textContent = "";
+    entry.candidates.forEach((c, n) => {
+      const row = document.createElement("article");
+      row.className = "cand";
+      row.dataset.marked = marks[c.chunk_id] ? "true" : "false";
+
+      const rank = document.createElement("div");
+      rank.className = "rank";
+      rank.innerHTML = '<span class="n"></span><span class="score"></span><span class="bar"><i></i></span>';
+      rank.children[0].textContent = "#" + (n + 1);
+      rank.children[1].textContent = c.score.toFixed(3);
+      rank.children[2].firstChild.style.width = Math.max(2, Math.min(100, c.score * 100)) + "%";
+
+      const body = document.createElement("div");
+      const prov = document.createElement("div");
+      prov.className = "prov";
+      const title = document.createElement("span");
+      title.className = "title";
+      title.textContent = c.document_title;
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = area(c);
+      if (area(c) !== home) chip.dataset.off = "true";
+      const path = document.createElement("span");
+      path.className = "chip";
+      path.textContent = c.source_path;
+      prov.append(title, chip, path);
+
+      const passage = document.createElement("p");
+      passage.className = "passage clipped";
+      passage.textContent = c.text;
+      const more = document.createElement("button");
+      more.className = "more";
+      more.type = "button";
+      more.textContent = "Show the whole passage";
+      more.addEventListener("click", () => {
+        const clipped = passage.classList.toggle("clipped");
+        more.textContent = clipped ? "Show the whole passage" : "Collapse";
+      });
+      body.append(prov, passage, more);
+
+      const mark = document.createElement("button");
+      mark.className = "mark";
+      mark.type = "button";
+      mark.innerHTML = '<span></span><span class="key"></span>';
+      mark.firstChild.textContent = marks[c.chunk_id] ? "Relevant" : "Mark";
+      mark.lastChild.textContent = n < 9 ? n + 1 : 0;
+      mark.addEventListener("click", () => toggle(n));
+
+      row.append(rank, body, mark);
+      pool.append(row);
+    });
+
+    el("done").dataset.done = state.done[entry.group_id] ? "true" : "false";
+    el("done").textContent = state.done[entry.group_id] ? "Judged ✓" : "Mark judged";
+  }
+
+  function render() {
+    renderQueue();
+    renderPool();
+    const judged = Object.values(state.done).filter(Boolean).length;
+    el("progress").textContent = judged + " of " + POOLS.length + " judged";
+    el("meter").style.width = (judged / POOLS.length * 100) + "%";
+    metrics();
+    document.querySelector('.qrow[aria-current="true"]')?.scrollIntoView({ block: "nearest" });
+  }
+
+  /* ---------- actions ---------- */
+
+  function toggle(n) {
+    const entry = POOLS[state.i];
+    const c = entry.candidates[n];
+    if (!c) return;
+    const marks = marksFor(entry.group_id);
+    if (marks[c.chunk_id]) delete marks[c.chunk_id];
+    else marks[c.chunk_id] = true;
+    persist(entry.group_id);
+    render();
+  }
+
+  function move(step) {
+    state.i = Math.min(POOLS.length - 1, Math.max(0, state.i + step));
+    window.scrollTo({ top: 0 });
+    render();
+  }
+
+  function markDone() {
+    const gid = POOLS[state.i].group_id;
+    state.done[gid] = !state.done[gid];
+    persist(gid);
+    render();
+    if (state.done[gid]) move(1);
+  }
+
+  el("prev").addEventListener("click", () => move(-1));
+  el("next").addEventListener("click", () => move(1));
+  el("done").addEventListener("click", markDone);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const key = e.key.toLowerCase();
+    if (/^[0-9]$/.test(key)) { toggle(key === "0" ? 9 : Number(key) - 1); e.preventDefault(); }
+    else if (key === "j" || key === "arrowright") { move(1); e.preventDefault(); }
+    else if (key === "k" || key === "arrowleft") { move(-1); e.preventDefault(); }
+    else if (key === "d") { markDone(); e.preventDefault(); }
+  });
+
+  render();
+  connect();
+</script>

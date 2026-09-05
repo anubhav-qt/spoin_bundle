@@ -177,10 +177,11 @@ model, no database — so you can run it while authoring.
 building beside it; its own alembic revision on frog's chain
 (`make universe-migration`). Idempotent by content hash.
 
-**V1.4 — The projection.** `spoin_db_2` side: create/reconcile `Topic` and `Subtopic` rows
-from the curriculum tables. Reconciliation is the delicate part — subtopics carry user
-progress, so this must match on stable identity and never orphan progress. Records
-`curriculum_corpus_version` so staleness is computable.
+**V1.4 — The projection.** `spoin_db_2` side: create or update `Topic` and `Subtopic` rows
+from the curriculum tables, matched on (topic, title, difficulty). A subtopic dropped from the
+file is dropped from the database. There are no users and no production content, so this is a
+plain upsert — not a reconciliation. Records `curriculum_corpus_version` so staleness is
+computable.
 
 **V1.5 — Delete `generate_curriculum` and rewire the pipeline.** The topic branch now asserts
 a projected curriculum exists instead of generating one.
@@ -196,12 +197,10 @@ document paths, and the same concept is reusable across curricula without duplic
 Linear Algebra's authored subtopics rather than restating them; **claims as rows**
 (ADR-0100's own revisit condition), so a card can answer *why does Spoin believe this*.
 
-Authoring-assist tooling belongs here too, and it is the one genuinely useful piece of my
-first draft: **a coverage probe you run while authoring** — given a subtopic you are drafting,
-what does the universe actually have for it, and at what depth? That is a tool for the human,
-not a composer that replaces them. It is what makes `survey_only` detectable: a corpus holding
-TCP at survey depth cannot support a congestion-control subtopic, and the probe would say so
-before you commit the curriculum rather than after cards are drafted.
+A **coverage probe** — given a subtopic, what does the universe have for it and at what
+depth — is worth building only if authoring at scale makes it useful. It is a convenience for
+the author, never a gate: the person writing the curriculum wrote the corpus and already knows
+what is in it.
 
 ## 7. Required schema changes
 
@@ -244,13 +243,12 @@ the same obligation to tolerate a dangling reference.
                  for each subtopic × tier:
                      upsert Subtopic, matched on (topic, title, difficulty)
                      set target_cards, min_cards, source_document_ids
-                 subtopics no longer in the file → mark, never silently delete
+                 subtopics no longer in the file are removed
 5. STAMP      topic.curriculum_corpus_version = corpus_version()
 ```
 
-No model call at any step. Step 4's "mark, never delete" is the safeguard for user progress:
-a removed subtopic is a decision with consequences for people mid-topic, so it surfaces
-rather than cascading.
+No model call at any step. The file is the truth and the database follows it — which is what
+makes a curriculum editable by editing the file and re-running the projection.
 
 Card generation then runs unchanged against the projected subtopics.
 
@@ -285,18 +283,17 @@ supporting passage is a feature, not a leak.
 
 | Failure | Safeguard |
 |---|---|
-| **Projection orphans user progress** | Match on stable identity; removed subtopics are marked, never deleted. The riskiest step in the design |
-| **Authored subtopic the corpus cannot support** | Nothing detects it in V1 — cards would draft on whatever the top 2 returned. The coverage probe (§6) is the answer, and until it exists this is a known hole carried deliberately |
-| **Curriculum and corpus drift apart** | `--check` fails when a `sources` path does not exist; `curriculum_corpus_version` makes staleness computable |
+| **Curriculum references a document that moved or was deleted** | `--check` fails when a `sources` path does not exist; `curriculum_corpus_version` makes staleness computable |
 | **Prerequisite cycles** | Rejected at `--check`, before ingestion |
 | **`target_cards` outside the DB's band** | Caught at `--check` rather than as a constraint violation mid-projection |
 | **Authoring becomes the bottleneck** | Real and accepted: this trades marginal cost per topic for control. The demand queue is what keeps the effort pointed at topics people actually want |
 | **Two classes of topic** | Avoided by choice — no LLM fallback, so every live topic is authored |
 
-The second row deserves emphasis: **V1 has no mechanism preventing you from authoring a
-subtopic the corpus cannot teach.** The gate would still reject bad cards, but the failure
-would surface as mysterious low yield rather than as "the corpus does not cover this". The
-coverage probe closes it, and it is the first thing to build after V1.
+Two failure modes are deliberately absent from that table. **Losing user progress** is not
+one — there are no users and no production content; `spoin_db_2` holds one test topic. And
+**a subtopic the corpus cannot teach** is not one either: the same person authors the corpus
+and the curriculum, in the same tree, so coverage is a fact the author already holds rather
+than a condition the system has to detect.
 
 ## 12. Implementation tasks, in dependency order
 
@@ -309,8 +306,7 @@ coverage probe closes it, and it is the first thing to build after V1.
 | 5 | Author one real curriculum (Rust — the corpus already covers it) end to end | 1, 4 |
 | 6 | Delete `generate_curriculum`; rewire `resolve_and_plan_topic` | 5 |
 | 7 | Curation-request capture + demand-ranked surface | 3, 6 |
-| 8 | Coverage probe as an authoring aid (§6, §11) | 5 |
-| 9 | ADRs, written from what 5 and 8 actually showed | 5, 8 |
+| 8 | ADRs, written from what 5 actually showed | 5 |
 
 Task 5 before task 6 on purpose: prove the authored path works on a real topic before
 deleting the generated one.

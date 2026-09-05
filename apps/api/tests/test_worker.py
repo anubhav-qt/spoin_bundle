@@ -16,6 +16,7 @@ from contextlib import asynccontextmanager
 import pytest
 import pytest_asyncio
 from frog.embeddings import HashEmbedder
+from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -96,7 +97,7 @@ async def _worker_env(
     monkeypatch.setattr(worker_module, "session_scope", _test_session_scope)
     monkeypatch.setattr(worker_module, "get_settings", lambda: settings)
     monkeypatch.setattr(worker_module, "get_content_generator", lambda: FakeContentGenerator())
-    monkeypatch.setattr(worker_module, "get_embedder", lambda: HashEmbedder(settings.embedding_dim))
+    monkeypatch.setattr(worker_module, "get_embedder", lambda: HashEmbedder(EMBEDDING_DIM))
 
     yield
 

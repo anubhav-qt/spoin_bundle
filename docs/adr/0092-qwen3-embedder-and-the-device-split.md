@@ -6,6 +6,10 @@
   384-dim, same model" commitment
 - **Depends on:** [task 0039](../tasks/0039-embedder-never-reached-the-containers.md) —
   the reason a re-embed is happening at all
+- **Completed by:** [ADR-0097](0097-one-embedder-one-vector-space.md) — the
+  "regeneration wipe" this ADR waits for below happened on 2026-09-05. `spoin_db_2` is
+  1024-dim, the two databases no longer diverge, and there is one embedder rather than
+  two.
 
 ## Context
 
@@ -72,7 +76,8 @@ and comparability is preserved by both moving together, not by the number stayin
 ### The two databases diverge temporarily, on purpose
 
 `the_spoin_universe` moves to 1024 now. **`spoin_db_2` stays at 384 until the
-regeneration wipe.** `spoin.domain.models.topic` reads `embedding_dim` at import time to
+regeneration wipe** — which happened on 2026-09-05 (ADR-0097); this section is history,
+not current state. `spoin.domain.models.topic` reads `embedding_dim` at import time to
 declare `Vector(...)`, so changing it before the columns change would make the ORM
 disagree with the live schema and break every insert.
 

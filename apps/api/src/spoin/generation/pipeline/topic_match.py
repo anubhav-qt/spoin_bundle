@@ -127,6 +127,7 @@ async def match_and_create_topics(
                 topic = existing_by_slug
                 if topic.embedding is None:
                     topic.embedding = embedding
+                    topic.embedding_model = embedder.model_name
                 logger.info(
                     "topic '%s': matched existing topic by slug '%s' (id=%s)",
                     request["name"],
@@ -149,6 +150,7 @@ async def match_and_create_topics(
                 session.add(topic)
                 await session.flush()
                 topic.embedding = embedding
+                topic.embedding_model = embedder.model_name
                 logger.info(
                     "topic '%s': no match, minted new topic (id=%s)", request["name"], topic.id
                 )

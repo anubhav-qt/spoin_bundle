@@ -1541,6 +1541,7 @@ async def _process_gate_item(
             visual_slots=_clean_null_bytes(draft.visual_slots),
             is_hero=draft.is_hero,
             content_embedding=embedding,
+            embedding_model=runtime.embedder.model_name,
             #: The chunks that were in this card's prompt (ADR-0089) -- from the
             #: same `GroundingContext` the drafter and both gate passes used, so
             #: the citation names what the model actually saw rather than what a
@@ -1764,6 +1765,7 @@ async def _run_question_phase(
                 explanation=_clean_null_bytes(draft.explanation),
                 status=QuestionStatus.ACTIVE,
                 embedding=embedding,
+                embedding_model=runtime.embedder.model_name,
                 gen_meta={
                     "backend": backend,
                     "generated_at": generated_at,

@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from typing import ClassVar
 
 from frog.embeddings import HashEmbedder
+from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -75,7 +76,7 @@ async def _topic(session: AsyncSession) -> tuple[User, Topic, Card]:
 def _svc(session: AsyncSession, generator: FakeContentGenerator | None = None) -> AskService:
     settings = Settings(_env_file=None)  # type: ignore[call-arg]
     return AskService(
-        session, settings, generator or FakeContentGenerator(), HashEmbedder(settings.embedding_dim)
+        session, settings, generator or FakeContentGenerator(), HashEmbedder(EMBEDDING_DIM)
     )
 
 

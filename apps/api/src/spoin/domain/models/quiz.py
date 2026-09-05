@@ -10,6 +10,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
+from frog.universe.models import EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     JSON,
@@ -28,11 +29,13 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from spoin.core.config import get_settings
 from spoin.domain.base import Base, CreatedAt, Timestamps, UUIDPrimaryKey, pg_enum
 from spoin.domain.enums import Difficulty, QuestionKind, QuestionStatus, QuizKind
 
-_EMBEDDING_DIM = get_settings().embedding_dim
+#: The one embedding dimension (ADR-0097). Taken from frog's constant rather than a
+#: setting because that constant is what this column was created with: a configurable
+#: that disagreed with it could only ever produce vectors the database refuses.
+_EMBEDDING_DIM = EMBEDDING_DIM
 
 
 class Question(Base, UUIDPrimaryKey, CreatedAt):
@@ -82,6 +85,13 @@ class Question(Base, UUIDPrimaryKey, CreatedAt):
         pg_enum(QuestionStatus, "question_status"), default=QuestionStatus.DRAFT, nullable=False
     )
     embedding: Mapped[list[float] | None] = mapped_column(Vector(_EMBEDDING_DIM))
+
+    #: Which model produced `embedding`. Task 0039 is what its absence costs: `.env` named
+    #: an embedder nothing read, every vector was `HashEmbedder` output, and no query,
+    #: log line or test could tell — a column holding two incomparable kinds of vector
+    #: is worse than a column holding either, and nothing raises. The stamp is how a
+    #: future model change stays a fact rather than a guess.
+    embedding_model: Mapped[str | None] = mapped_column(String(120))
     #: Always cloud + strongest model. A wrong answer key is worse than a wrong
     #: card: a bad card teaches something incorrect, a bad key tells a user they
     #: are wrong when they are right, which destroys trust in the whole system.

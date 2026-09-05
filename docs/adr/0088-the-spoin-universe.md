@@ -73,7 +73,7 @@ Two tables. Every column below is a decision, not a placeholder.
 | `document_id` | FK to `document`, `ondelete=CASCADE` |
 | `ordinal` | NOT NULL. Position within the document; makes a chunk citable as "part 3 of". |
 | `text` | NOT NULL. |
-| `embedding` | `Vector(384)` — the same space as `card.content_embedding` (ADR-0087). |
+| `embedding` | `Vector(1024)` — the same space as `card.content_embedding`, which is the point (ADR-0087, moved to 1024 by ADR-0092 here and ADR-0097 there). |
 | `topic_tags` | `ARRAY(Text)`, GIN-indexed. |
 
 #### Why `kind` is a real enum

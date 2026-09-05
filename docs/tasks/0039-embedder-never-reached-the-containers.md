@@ -1,9 +1,23 @@
 # Task 0039: `SPOIN_EMBEDDER` never reaches the containers, so production vectors are hash vectors
 
-> **Status:** found 2026-09-05 while surveying the RAG design space
-> ([rag-design-space.md](../architecture/rag-design-space.md) §0). Not fixed — the
-> repair needs a bulk write to `spoin_db_2` and therefore the owner's explicit
-> approval (CLAUDE.md).
+> **Status: DONE**, 2026-09-05, by
+> [ADR-0097](../adr/0097-one-embedder-one-vector-space.md) — which went further than
+> this task proposed. Found the same day while surveying the RAG design space
+> ([rag-design-space.md](../architecture/rag-design-space.md) §0).
+>
+> **What actually happened.** The owner's call was that a repair which re-embeds
+> everything anyway should land on the model the corpus is authored for, not on the
+> one this task assumed. So instead of `fastembed` at 384 dimensions, there is now ONE
+> embedder — `Qwen/Qwen3-Embedding-0.6B` at 1024 — for cards, topics, questions,
+> scenes, AskAI's gate and corpus retrieval alike. `get_corpus_embedder()` is gone.
+>
+> And instead of a resumable backfill, `spoin_db_2` was **dropped and rebuilt** from
+> the migration chain (owner's explicit approval, off-machine Neon backup verified
+> first). The discarded vectors were hash output, so nothing of value was in them, and
+> the corpus is about to be regenerated against real retrieval regardless.
+>
+> The four numbered work items below all landed, item 2 included. Read them for why,
+> not for what to do.
 
 ## What is wrong
 
@@ -55,6 +69,8 @@ backfill have to land together.
 
 ## The work
 
+*All four are done — see the status note above for how items 1 and 3 changed shape.*
+
 1. Pass `SPOIN_EMBEDDER` and `SPOIN_EMBEDDING_MODEL` into the `api`, `worker` and
    `seed` services in `docker-compose.yml`.
 2. Add an `embedding_model` stamp to every embedded row, so a future model change can
@@ -66,6 +82,10 @@ backfill have to land together.
 4. Re-check anything with a tuned threshold against real vectors. Task 0001's
    calibration was measured against `HashEmbedder`, which its own docstring says is
    meaningless — so those thresholds are unvalidated, not merely stale.
+
+   **This one is still open**, and it is the part of this task that outlives it: the
+   thresholds are now *measurable* for the first time, and none of them have been
+   measured. Task 0001 is where that lives.
 
 ## Related
 

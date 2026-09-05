@@ -6,6 +6,9 @@
 - **Amended by:** [ADR-0092](0092-qwen3-embedder-and-the-device-split.md) — the
   embedder becomes `Qwen3-Embedding-0.6B` at 1024 dimensions, and the `Embedder`
   interface becomes asymmetric. This ADR's "vectors stay 384-dim" no longer holds.
+- **Amended by:** [ADR-0097](0097-one-embedder-one-vector-space.md) — `spoin_db_2`'s
+  columns move to 1024 too, so the "same space" this ADR committed to is restored at
+  the new number. Every "384" below reads as 1024.
 - **Amended by:** [ADR-0093](0093-normalize-topic-text-moves-into-frog.md) —
   `normalize_topic_text` moves into `frog` after all. The "stays in `spoin`" clause below
   no longer holds; it was written before ADR-0088 gave the function a caller on the far

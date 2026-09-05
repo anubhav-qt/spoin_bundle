@@ -15,6 +15,7 @@ import pytest
 import pytest_asyncio
 from fastapi import HTTPException
 from frog.embeddings import HashEmbedder
+from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -191,7 +192,7 @@ async def _enqueue_and_run(
         await svc.enqueue_remake(card.id, instructions=guidance, image=None)
     job = await session.scalar(select(GenerationJob).where(GenerationJob.card_id == card.id))
     assert job is not None
-    await repair_module.run_card_repair(job.id, card.id, generator, HashEmbedder(384))
+    await repair_module.run_card_repair(job.id, card.id, generator, HashEmbedder(EMBEDDING_DIM))
     # run_card_repair committed on its own session; refresh this one's cached
     # copy of the original card so assertions read its post-repair state.
     await session.refresh(card)

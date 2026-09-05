@@ -64,6 +64,10 @@ class _AsymmetricEmbedder(Embedder):
         self.query_calls: list[list[str]] = []
         self.passage_calls: list[list[str]] = []
 
+    @property
+    def model_name(self) -> str:
+        return "asymmetric-stub"
+
     def embed_query(self, texts: list[str]) -> list[list[float]]:
         self.query_calls.append(list(texts))
         return [_at_angle(0.0) for _ in texts]

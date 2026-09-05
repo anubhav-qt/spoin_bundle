@@ -77,6 +77,7 @@ async def seed() -> None:
             topic.embedding = embedder.embed_one_passage(
                 normalize_topic_text(topic_data["canonical_name"])
             )
+            topic.embedding_model = embedder.model_name
             # TEMPORARY (ADR-0015 / docs/tasks/0005): subscriber_count has no live
             # writer other than POST /topics/{id}/subscribe, and with one demo user
             # organic counts would tie every topic at 0-1. Seeding a fixture baseline
@@ -209,6 +210,7 @@ async def _seed_subtopic(
         card.content_embedding = embedder.embed_one_passage(
             f"{card_data['title']} {card_data['body']}"
         )
+        card.embedding_model = embedder.model_name
         await session.flush()
 
         stats = await session.scalar(select(CardStats).where(CardStats.card_id == card.id))

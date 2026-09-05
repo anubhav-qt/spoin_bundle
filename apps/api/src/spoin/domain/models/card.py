@@ -10,6 +10,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
+from frog.universe.models import EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     JSON,
@@ -30,7 +31,6 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from spoin.core.config import get_settings
 from spoin.domain.base import Base, CreatedAt, Timestamps, UUIDPrimaryKey, pg_enum
 from spoin.domain.enums import (
     CardReportReason,
@@ -43,7 +43,10 @@ from spoin.domain.enums import (
 )
 from spoin.domain.models.topic import Subtopic
 
-_EMBEDDING_DIM = get_settings().embedding_dim
+#: The one embedding dimension (ADR-0097). Taken from frog's constant rather than a
+#: setting because that constant is what this column was created with: a configurable
+#: that disagreed with it could only ever produce vectors the database refuses.
+_EMBEDDING_DIM = EMBEDDING_DIM
 
 
 class Card(Base, UUIDPrimaryKey, CreatedAt):
@@ -143,6 +146,13 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
     #: the topic embedding used for canonicalization: same technique, different
     #: vectors, different thresholds. Calibrate separately.
     content_embedding: Mapped[list[float] | None] = mapped_column(Vector(_EMBEDDING_DIM))
+
+    #: Which model produced `content_embedding`. Task 0039 is what its absence costs: `.env` named
+    #: an embedder nothing read, every vector was `HashEmbedder` output, and no query,
+    #: log line or test could tell — a column holding two incomparable kinds of vector
+    #: is worse than a column holding either, and nothing raises. The stamp is how a
+    #: future model change stays a fact rather than a guess.
+    embedding_model: Mapped[str | None] = mapped_column(String(120))
 
     #: The `chunk.id`s in `the_spoin_universe` whose text was in this card's prompt
     #: (ADR-0089). A real column and not a `gen_meta` key: the question it answers is

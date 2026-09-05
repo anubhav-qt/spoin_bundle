@@ -17,7 +17,7 @@ from langgraph.graph.state import CompiledStateGraph
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.config import Settings
-from spoin.embeddings import get_corpus_embedder
+from spoin.embeddings import get_embedder
 from spoin.generation.base import ContentGenerator
 from spoin.generation.grounding import Grounding
 from spoin.generation.pipeline.nodes import (
@@ -81,9 +81,11 @@ async def run_generation_pipeline(
         #: natural lifetime for that assumption (it re-checks the corpus version
         #: anyway, because the worker outlives any one run).
         grounding=Grounding(
-            #: NOT `embedder`: that one writes `card.content_embedding` (384 dims
-            #: today), and the corpus is 1024. See `get_corpus_embedder`.
-            get_corpus_embedder(),
+            #: The same embedder that writes `card.content_embedding` -- one model,
+            #: one 1024-dim space, since ADR-0097. This argument used to name a
+            #: SECOND factory, because a query embedded by a different model than
+            #: the chunks is a dimension error rather than a worse result.
+            get_embedder(),
             token_budget=settings.grounding_token_budget,
             max_chunks=settings.grounding_max_chunks,
         ),

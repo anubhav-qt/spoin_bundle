@@ -30,6 +30,10 @@ class _StubEmbedder(Embedder):
     def __init__(self, table: dict[str, list[float]]) -> None:
         self._table = table
 
+    @property
+    def model_name(self) -> str:
+        return "stub"
+
     def embed_passage(self, texts: list[str]) -> list[list[float]]:
         return [list(self._table.get(text, [0.0, 0.0, 0.0, 0.0])) for text in texts]
 

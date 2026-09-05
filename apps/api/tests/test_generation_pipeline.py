@@ -11,6 +11,7 @@ import uuid
 from typing import cast
 
 from frog.embeddings import HashEmbedder
+from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -48,7 +49,7 @@ async def _plan_and_generate(
     committing between them, see pipeline.py's module docstring)."""
 
     generator = generator if generator is not None else FakeContentGenerator()
-    embedder = HashEmbedder(settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
     requests = [TopicRequest(name=name, description="") for name in names]
 
     outcomes = await match_and_create_topics(
@@ -209,7 +210,7 @@ async def test_first_topic_ever_skips_the_llm_call_when_no_candidates_exist(
     is never called (ADR-0025's "not a judgment call" case)."""
 
     generator = FakeContentGenerator()
-    embedder = HashEmbedder(settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
     calls: list[object] = []
     original = generator.match_topics
 
@@ -424,7 +425,7 @@ async def test_rejected_duplicate_body_feeds_forward_into_next_run(
     subtopic-tier, so the writer sees the actual rejected content."""
 
     generator = _RecordingDuplicateGenerator()
-    embedder = HashEmbedder(settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
     outcomes = await match_and_create_topics(
         session,
         generator,
@@ -587,7 +588,7 @@ async def test_second_pass_only_drafts_the_true_deficit(
     used to bound itself by the tier's absolute target, ignoring
     `existing_count` entirely)."""
 
-    embedder = HashEmbedder(settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
     # Rejects exactly one card per tier's verify batch -- every tier lands at
     # target-1 (9/10 for the fake curriculum) after round 1, cleanly meeting
     # the 90% first-pass bar, so the redraft loop above does not fire and

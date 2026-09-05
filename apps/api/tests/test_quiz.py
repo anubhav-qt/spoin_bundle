@@ -16,6 +16,7 @@ import uuid
 import pytest
 from fastapi import HTTPException
 from frog.embeddings import HashEmbedder
+from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -36,7 +37,7 @@ from spoin.generation.pipeline import TopicRequest, match_and_create_topics, run
 
 async def _make_topic_with_bank(session: AsyncSession, settings: Settings) -> uuid.UUID:
     generator = FakeContentGenerator()
-    embedder = HashEmbedder(settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
     outcomes = await match_and_create_topics(
         session,
         generator,

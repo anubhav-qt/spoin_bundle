@@ -12,6 +12,7 @@ import uuid
 import pytest
 from fastapi import HTTPException
 from frog.embeddings import HashEmbedder
+from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -217,7 +218,7 @@ async def test_set_color_stores_a_chosen_hue(
 ) -> None:
     user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
     service = TopicsService(session, service_settings)
-    embedder = HashEmbedder(service_settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
 
     out = await service.set_color(user_id, topic_id, 200, embedder)
 
@@ -239,7 +240,7 @@ async def test_set_color_none_resets_to_the_deterministic_default(
 
     user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
     service = TopicsService(session, service_settings)
-    embedder = HashEmbedder(service_settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
     await service.set_color(user_id, topic_id, 200, embedder)
 
     out = await service.set_color(user_id, topic_id, None, embedder)
@@ -256,7 +257,7 @@ async def test_set_color_sentinel_opts_out_of_topic_color(
 
     user_id, topic_id, _cards = await _topic_with_cards(session, subtopics=[])
     service = TopicsService(session, service_settings)
-    embedder = HashEmbedder(service_settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
 
     out = await service.set_color(user_id, topic_id, -1, embedder)
 

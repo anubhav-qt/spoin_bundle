@@ -24,7 +24,7 @@ from spoin.core.config import get_settings
 from spoin.core.db import session_scope
 from spoin.domain.enums import CardStatus, RepairMode, RepairStatus
 from spoin.domain.models import Card, CardRepair, CardReport, Subtopic, Topic
-from spoin.embeddings import get_corpus_embedder
+from spoin.embeddings import get_embedder
 from spoin.generation.base import (
     CardCorrectionQuery,
     CardRepairQuery,
@@ -119,6 +119,7 @@ async def _mint_new_version(
         visual_slots=visual_slots,
         is_hero=old.is_hero,
         content_embedding=embedding,
+        embedding_model=embedder.model_name,
         #: A remake's own grounding (ADR-0089); `None` from the FIX path, which
         #: edits in place and never retrieves. NULL there is the honest value:
         #: the new version was not written from the corpus, and claiming the old
@@ -285,10 +286,10 @@ async def _run_remake(
     #: not the retriever's.
     settings = get_settings()
     context = await Grounding(
-        #: NOT the `embedder` this function was handed -- that one writes the new
-        #: card's `content_embedding`, in a different vector space (ADR-0092, and
-        #: `get_corpus_embedder`).
-        get_corpus_embedder(),
+        #: Called rather than reusing the `embedder` argument only because a
+        #: caller may pass a stand-in; it is the same model either way now
+        #: (ADR-0097 collapsed the two vector spaces into one).
+        get_embedder(),
         token_budget=settings.grounding_token_budget,
         max_chunks=settings.grounding_max_chunks,
     ).for_subtopic(

@@ -70,6 +70,7 @@ async def seed_generated() -> None:
             topic.embedding = embedder.embed_one_passage(
                 normalize_topic_text(topic_data["canonical_name"])
             )
+            topic.embedding_model = embedder.model_name
             await session.flush()
 
             subscription = await session.scalar(
@@ -159,6 +160,7 @@ async def _seed_subtopic(
         card.content_embedding = embedder.embed_one_passage(
             f"{card_data['title']} {card_data['body']}"
         )
+        card.embedding_model = embedder.model_name
         await session.flush()
 
         stats = await session.scalar(select(CardStats).where(CardStats.card_id == card.id))

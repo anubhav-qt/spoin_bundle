@@ -18,11 +18,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from spoin.domain.enums import Difficulty, EngagementKind
 
 GeneratorBackend = Literal["fake", "gemini", "local"]
-EmbedderBackend = Literal["hash", "fastembed"]
 #: `frog`'s ingester takes exactly these two (`frog/ingest/__main__.py --embedder`).
 #: Spelled the same on purpose: the corpus is queried by whatever ingested it, and a
-#: third name here would be a way for the two to disagree.
-CorpusEmbedderBackend = Literal["hash", "qwen3"]
+#: third name here would be a way for the two to disagree. There was a separate
+#: `CorpusEmbedderBackend` alias until ADR-0097 collapsed the two vector spaces into
+#: one; it said the same words and existed only to keep the split visible.
+EmbedderBackend = Literal["hash", "qwen3"]
 
 #: Ships as the field default so `local`/`ci` never need a `.env` entry to boot.
 #: A `production` process still carrying this value means the real secret was
@@ -317,9 +318,22 @@ class Settings(BaseSettings):
     topic_live_coverage_fraction: float = 0.5
 
     # -- embeddings (hard rule 5) ----------------------------------------------
+    #: ONE embedder, for cards, topics, questions, ASCII scenes and corpus retrieval
+    #: alike (ADR-0097). There were two until 2026-09-05, at two dimensions, and the
+    #: split is what made task 0039 possible: `.env` set an embedder nothing read, so
+    #: every vector in `spoin_db_2` was `HashEmbedder` output -- semantically
+    #: meaningless by its own docstring, and nothing raised.
+    #:
+    #: `hash` remains, and remains dimension-correct, for one purpose: a stack that
+    #: boots with no model weights on disk. It is not a fallback anything should
+    #: select in anger -- a run grounded on it is grounded on nothing.
+    #:
+    #: There is deliberately no `embedding_dim` setting. The dimension is
+    #: `frog.universe.models.EMBEDDING_DIM`, which is what the vector columns were
+    #: created with; a configurable that disagreed with it could only ever produce
+    #: vectors the database refuses.
     embedder: EmbedderBackend = "hash"
-    embedding_model: str = "BAAI/bge-small-en-v1.5"
-    embedding_dim: int = 384
+    embedding_model: str = "Qwen/Qwen3-Embedding-0.6B"
 
     #: How many existing-topic candidates the embedding pre-filter offers the
     #: batched matching call per incoming topic (ADR-0025). Not a threshold — the
@@ -375,20 +389,6 @@ class Settings(BaseSettings):
     ascii_redraw_attempts: int = 2
 
     # -- grounding (ADR-0089) ---------------------------------------------------
-    #: The embedder the CORPUS was ingested with, which is NOT `embedder` above.
-    #: `card.content_embedding` is 384-dimensional today and `chunk.embedding` is 1024
-    #: (ADR-0092), so one setting for both would make every retrieval a dimension
-    #: error -- see task 0039 for why `spoin_db_2` is still 384 and when the two
-    #: converge.
-    #:
-    #: ⚠️ A retrieval query MUST be embedded by the same model the chunks were, or the
-    #: vectors are not comparable and the results are noise that raises nothing. The
-    #: `hash` default is dimension-correct and semantically meaningless: it keeps the
-    #: stack booting and the tests honest, and a run grounded on it is grounded on
-    #: nothing. Production sets `qwen3` -- which needs torch, so it needs an image that
-    #: carries it (ADR-0094).
-    corpus_embedder: CorpusEmbedderBackend = "hash"
-    corpus_embedding_model: str = "Qwen/Qwen3-Embedding-0.6B"
     #: Prompt tokens one call may spend on retrieved corpus context, on top of
     #: everything the prompt already carried.
     #:
@@ -405,9 +405,12 @@ class Settings(BaseSettings):
     #: dropping below the 34 calls/min target, with room for the corpus to get denser.
     #: Owner's number, chosen against that measurement.
     #:
-    #: Still PROVISIONAL in the sense that matters: what settles it is a MEASURED
-    #: post-RAG prompt size from run logs (task 0038 Phase 4), which cannot happen
-    #: while `corpus_embedder` is `hash`.
+    #: Still PROVISIONAL in the sense that matters, and more so than it reads: the
+    #: "~12k" above is in TOKENS, while the `chars=` field those run logs actually
+    #: carry is `len(str(prompt))` -- characters. `mistral_probe.DEFAULT_PROMPT_TOKENS`
+    #: reads the same logs as tokens and sizes its synthetic prompt 4x too large if
+    #: they are characters. What settles both is a MEASURED post-RAG prompt size
+    #: (task 0038 Phase 4), reported in both units.
     grounding_token_budget: int = 3000
     #: A ceiling on passages per call regardless of how small they are, so a prompt
     #: full of short fragments does not become an unreadable list. Deliberately looser

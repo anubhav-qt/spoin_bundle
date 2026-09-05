@@ -75,6 +75,10 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        # The request path embeds (ADR-0077's off-topic gate), so this image needs the
+        # model -- on CPU, which is what ADR-0092 sized 0.6B for.
+        EMBEDDER_BACKEND: cpu
     environment:
       SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
       # ADR-0088: `the_spoin_universe` is a SEPARATE database, and this is a
@@ -86,6 +90,13 @@ services:
       SPOIN_ENV: local
       SPOIN_CORS_ORIGINS: http://localhost:3000
       SPOIN_JWT_SECRET_KEY: dev-secret-not-for-prod
+      # ADR-0097: one embedder everywhere. Spelled out here because compose injects
+      # only the variables this file names -- task 0039 is the bug where `.env` set
+      # SPOIN_EMBEDDER and nothing read it, so every vector in production was a
+      # meaningless hash vector and nothing raised.
+      SPOIN_EMBEDDER: ${SPOIN_EMBEDDER:-qwen3}
+      SPOIN_EMBEDDING_MODEL: ${SPOIN_EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
+
       # From the root .env (docker compose auto-loads it for ${...} substitution
       # in this file -- it does NOT inject the whole file into containers on its
       # own, only vars explicitly referenced here, which is why this and the
@@ -131,6 +142,9 @@ services:
       # staleness reason as apps/api's (ADR-0087 put `make check` over both).
       - ./apps/frog/tests:/app/frog/tests
       - ./apps/frog/pyproject.toml:/app/frog/pyproject.toml:ro
+      # The same ~1.2GB of Qwen3 weights the `frog` service caches. One model, one
+      # download; the volume is separate from db-data and always has been.
+      - frog-model-cache:/cache/huggingface
     command:
       ["uvicorn", "spoin.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
@@ -185,6 +199,10 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        # The suite runs the real embedder rather than a stand-in: task 0039 is what
+        # happens when the thing under test is not the thing that runs.
+        EMBEDDER_BACKEND: cpu
     environment:
       SPOIN_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db
       SPOIN_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_test
@@ -193,6 +211,12 @@ services:
       # never SPOIN_UNIVERSE_DATABASE_URL: the fixture drops and recreates every table
       # it points at, and frog/tests/conftest.py hard-errors on a name not ending _test.
       SPOIN_UNIVERSE_TEST_DATABASE_URL: postgresql+asyncpg://spoin:spoin@db:5432/the_spoin_universe_test
+      # ADR-0097: one embedder everywhere. Spelled out here because compose injects
+      # only the variables this file names -- task 0039 is the bug where `.env` set
+      # SPOIN_EMBEDDER and nothing read it, so every vector in production was a
+      # meaningless hash vector and nothing raised.
+      SPOIN_EMBEDDER: ${SPOIN_EMBEDDER:-qwen3}
+      SPOIN_EMBEDDING_MODEL: ${SPOIN_EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
     depends_on:
       db:
         condition: service_healthy
@@ -215,6 +239,8 @@ services:
       # image does not carry the corpus -- only this mount makes it reachable, and the
       # guard raises rather than passing quietly when it is absent.
       - ./docs/the_spoin_universe:/app/docs/the_spoin_universe:ro
+      # Without this the suite re-downloads 1.2GB of weights on every `make test`.
+      - frog-model-cache:/cache/huggingface
     entrypoint: ["sh", "-c"]
     command:
       - |
@@ -252,6 +278,11 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        # Generation embeds in bulk -- every grounding query, every card written. This
+        # is the one service with the GPU on the api image (ADR-0094 keeps generation
+        # local), so it is the one that gets the CUDA wheel.
+        EMBEDDER_BACKEND: gpu
     environment:
       SPOIN_DATABASE_URL: ${SPOIN_DATABASE_URL:-postgresql+asyncpg://spoin:spoin@db:5432/spoin_db_2}
       # ADR-0088: `the_spoin_universe` is a SEPARATE database, and this is a
@@ -267,6 +298,12 @@ services:
       # Read only by spoin.probes.mistral_probe (docs/mistral-saga/). Empty
       # until provider validation runs; no production code reads it.
       SPOIN_MISTRAL_API_KEYS: ${SPOIN_MISTRAL_API_KEYS:-}
+      # ADR-0097: one embedder everywhere. Spelled out here because compose injects
+      # only the variables this file names -- task 0039 is the bug where `.env` set
+      # SPOIN_EMBEDDER and nothing read it, so every vector in production was a
+      # meaningless hash vector and nothing raised.
+      SPOIN_EMBEDDER: ${SPOIN_EMBEDDER:-qwen3}
+      SPOIN_EMBEDDING_MODEL: ${SPOIN_EMBEDDING_MODEL:-Qwen/Qwen3-Embedding-0.6B}
     depends_on:
       seed:
         condition: service_completed_successfully
@@ -275,6 +312,14 @@ services:
       # Same staleness reasoning as ./apps/api/src above, for the sibling
       # package (ADR-0087).
       - ./apps/frog/src:/app/frog/src
+      - frog-model-cache:/cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     command: ["python", "-m", "spoin.worker", "--watch"]
 
   # ADR-0088: migrations for `the_spoin_universe`, the source-of-truth corpus

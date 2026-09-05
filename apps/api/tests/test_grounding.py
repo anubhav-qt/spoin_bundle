@@ -175,6 +175,10 @@ class _CountingEmbedder(Embedder):
         self._inner = HashEmbedder(EMBEDDING_DIM)
         self.queries = 0
 
+    @property
+    def model_name(self) -> str:
+        return self._inner.model_name
+
     def embed_passage(self, texts: list[str]) -> list[list[float]]:
         return self._inner.embed_passage(texts)
 
@@ -499,14 +503,15 @@ async def test_every_content_call_in_a_run_sees_the_same_passages(
     than retrieving for itself.
     """
 
-    #: Seeded with what `get_corpus_embedder()` returns under the test settings, which
-    #: is the constraint this test also documents: a query embedded by a different
-    #: model than the chunks is not a worse result, it is a dimension error. The
-    #: pipeline's own embedder stays 384-dimensional -- it writes
-    #: `card.content_embedding`, a different vector space entirely (task 0039).
+    #: Seeded with what `get_embedder()` returns under the test settings, which is
+    #: the constraint this test also documents: a query embedded by a different model
+    #: than the chunks is not a worse result, it is a dimension error. ADR-0097 made
+    #: that structural by deleting the second factory -- there is one model and one
+    #: 1024-dim space now, so the pipeline's embedder and the corpus's are the same
+    #: object.
     await _seed(bound_universe, HashEmbedder(EMBEDDING_DIM))
     generator = _RecordingGenerator()
-    embedder = HashEmbedder(settings.embedding_dim)
+    embedder = HashEmbedder(EMBEDDING_DIM)
 
     outcomes = await match_and_create_topics(
         session,

@@ -59,6 +59,17 @@ class Embedder(ABC):
     A caller has to decide which side it is on, which is the point.
     """
 
+    @property
+    @abstractmethod
+    def model_name(self) -> str:
+        """What produced these vectors, for the `embedding_model` stamp on every row.
+
+        Task 0039 is what its absence costs: a column can hold vectors from two
+        different models, comparisons across them are noise, and nothing raises. A
+        stored vector that cannot name its model is a vector nobody can safely trust
+        later.
+        """
+
     @abstractmethod
     def embed_passage(self, texts: list[str]) -> list[list[float]]:
         """Embed corpus-side text: chunks, card bodies, topic descriptions.
@@ -117,6 +128,13 @@ class HashEmbedder(Embedder):
     def __init__(self, dim: int) -> None:
         self._dim = dim
 
+    @property
+    def model_name(self) -> str:
+        """Named, and deliberately not a real model id: a row stamped `hash` is a row
+        whose vector means nothing, and that should be greppable rather than plausible."""
+
+        return "hash"
+
     def embed_passage(self, texts: list[str]) -> list[list[float]]:
         return [self._one(text) for text in texts]
 
@@ -154,7 +172,12 @@ class FastEmbedEmbedder(Embedder):
     def __init__(self, model_name: str) -> None:
         from fastembed import TextEmbedding
 
+        self._model_name = model_name
         self._model = TextEmbedding(model_name=model_name)
+
+    @property
+    def model_name(self) -> str:
+        return self._model_name
 
     def embed_passage(self, texts: list[str]) -> list[list[float]]:
         return [list(map(float, vector)) for vector in self._model.embed(texts)]
@@ -186,7 +209,12 @@ class Qwen3Embedder(Embedder):
 
         #: `None` lets sentence-transformers pick CUDA when it is there and fall back to
         #: CPU when it is not, which is exactly the GPU-here / CPU-deployed split.
+        self._model_name = model_name
         self._model = SentenceTransformer(model_name, device=device)
+
+    @property
+    def model_name(self) -> str:
+        return self._model_name
 
     def embed_passage(self, texts: list[str]) -> list[list[float]]:
         return self._encode(texts, prompt_name=None)

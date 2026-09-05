@@ -13,6 +13,8 @@
   retrieval instead of from a description list), [Task 0029](../tasks/0029-mermaid-shape-budget-and-curated-ascii-library.md),
   [Task 0033](../tasks/0033-grow-the-curated-ascii-library-over-time.md)
 
+> **Amended by [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** a scene must now carry text on it — labels naming its parts and a line of dialogue or a caption — because the scene is the hook and wordless art cannot be read. `visual_slots.alt` is now the reader-facing caption printed under the drawing, not screen-reader alt text.
+
 ## Context
 
 Since [ADR-0042](0042-freeform-ascii-and-real-hero-mechanism.md) the writer call

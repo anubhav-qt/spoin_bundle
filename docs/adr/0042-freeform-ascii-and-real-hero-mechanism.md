@@ -15,6 +15,8 @@
   [ADR-0021](0021-ascii-scene-library.md), whose "degrades to a card with no art" language
   reads as current -- had no way to learn the rule had been replaced.
 
+> **Amended by [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** a scene must now carry text on it — labels naming its parts and a line of dialogue or a caption — because the scene is the hook and wordless art cannot be read. `visual_slots.alt` is now the reader-facing caption printed under the drawing, not screen-reader alt text.
+
 ## Context
 
 ADR-0021 decided ASCII art should be **selected** from a curated, hand-authored scene

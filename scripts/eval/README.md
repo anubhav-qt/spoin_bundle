@@ -1,8 +1,14 @@
 # Retrieval eval (task 0038, Phase 3)
 
-Measures how good `frog.retrieval` actually is at finding corpus passages for a subtopic,
-before anything is tuned on top of it. No `min_score` floor, ANN index, reranker or hybrid
-retrieval gets chosen until these labels exist — see ADR-0088 and ADR-0093.
+Measures how good `frog.retrieval` actually is at finding corpus passages for a subtopic.
+
+> **The decision this was built to inform has been made without it** (owner,
+> 2026-09-05): grounding takes the top 2 with no `min_score` floor, because the curated
+> corpus covers a topic before that topic is live. See ADR-0089's amendment.
+>
+> The harness is kept, not deleted. It measures retrieval quality, which is still worth
+> knowing before adding an ANN index, a reranker or hybrid retrieval — none of which
+> should be chosen on intuition. Nothing currently blocks on it.
 
 Three steps, two of them in containers because the query builder is `spoin`'s and the
 embedder needs the GPU:

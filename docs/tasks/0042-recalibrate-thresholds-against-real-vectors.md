@@ -31,12 +31,12 @@ ADR-0097 made them measurable for the first time. Nothing has measured them.
 |---|---|---|
 | `Settings.card_duplicate_threshold` | `0.9` | Whether a freshly drafted card is rejected as a near-duplicate of one already in the corpus (`find_corpus_duplicate`). Too low silently discards good cards; too high fills the feed with restatements. |
 | `content/accent_color.py` hue distances | see ADR-0075 | Which accent hue a topic gets, and the minimum distance between two topics' hues. |
-| retrieval `min_score` | **unset** | Whether a weak corpus hit is offered as grounding at all. Deliberately not chosen yet — task 0038 Phase 3's labelling pass is what should choose it. |
+| ~~retrieval `min_score`~~ | **permanently unset** | Not part of this task. The owner settled it on 2026-09-05: grounding takes the top 2 with no floor, because the curated corpus covers a topic before that topic is live. See ADR-0089's amendment. |
 
-The third is the interesting one. Phase 3's pools showed all 440 similarity scores
-falling in 0.236–0.836 with a median of 0.421, and Physical Fitness — a topic the corpus
-does not cover — pulling 10m air-pistol passages at 0.339, inside the band good hits
-occupy. **Do not pick a floor on score alone**; that is what the labels are for.
+The scores are worth knowing anyway, because they bound how much a threshold can
+separate: Phase 3's pools put all 440 similarity scores in 0.236–0.836 with a median of
+0.421 — a tight band. Whatever `card_duplicate_threshold` becomes, it is being asked to
+cut a distribution narrower than the 0-to-1 range its current 0.9 implies.
 
 ## The work
 
@@ -47,9 +47,7 @@ occupy. **Do not pick a floor on score alone**; that is what the labels are for.
 3. For the accent hues: check that the vocabulary distances still separate topics
    sensibly under a 1024-dim space — ADR-0075's list was built against 384-dim hash
    vectors, so both the hue assignments and the min-distance may be wrong.
-4. For retrieval `min_score`: derive it from task 0038 Phase 3's labels, not from the
-   score distribution.
-5. Delete `SPOIN_TOPIC_MERGE_HIGH` / `SPOIN_TOPIC_MERGE_LOW` from `.env.example`. No
+4. Delete `SPOIN_TOPIC_MERGE_HIGH` / `SPOIN_TOPIC_MERGE_LOW` from `.env.example`. No
    setting reads them — they are the fossil of the system ADR-0025 removed, and they
    are why task 0001 looks live when it is not.
 
@@ -59,6 +57,4 @@ occupy. **Do not pick a floor on score alone**; that is what the labels are for.
   these numbers are newly measurable
 - [Task 0039](0039-embedder-never-reached-the-containers.md) — why they were
   meaningless
-- [Task 0038](0038-frog-rag-and-hybrid-generation.md) — Phase 3's labelling pass, which
-  is what settles `min_score`
 - [ADR-0075](../adr/0075-embedding-derived-topic-accent-color.md) — the hue vocabulary

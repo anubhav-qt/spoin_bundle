@@ -179,6 +179,7 @@ async def _seed(session: AsyncSession, embedder: Embedder) -> None:
             ordinal=0,
             text=body,
             embedding=embedder.embed_one_passage(body),
+            embedding_model=embedder.model_name,
             topic_tags=["postgresql"],
         )
         for document, body in zip(documents, bodies, strict=True)
@@ -545,6 +546,7 @@ async def test_only_the_shipped_count_of_passages_reaches_the_prompt(
             ordinal=ordinal,
             text=body,
             embedding=embedder.embed_one_passage(body),
+            embedding_model=embedder.model_name,
             topic_tags=["postgresql"],
         )
         for ordinal, body in enumerate(bodies)

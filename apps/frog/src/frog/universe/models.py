@@ -193,6 +193,17 @@ class Chunk(Base, UUIDPrimaryKey, CreatedAt):
 
     embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
 
+    #: Which model produced `embedding`. NOT NULL, unlike its counterparts on
+    #: `spoin_db_2` — a chunk always has a vector here, so it can always name the model
+    #: that made it, and the pair is enforced by the column rather than by a CHECK.
+    #:
+    #: ADR-0097 added this to `card`, `question` and `topic` and left the corpus
+    #: without it, which is task 0039's failure mode on the database that grounds every
+    #: prompt: ingest once with `--embedder hash` and every retrieval is noise that
+    #: raises nothing. Answering "which model made these vectors?" cost a GPU model
+    #: load and a cosine comparison on 2026-09-05. It should cost a SELECT.
+    embedding_model: Mapped[str] = mapped_column(String(120), nullable=False)
+
     #: Normalized topic slugs, produced by `frog.embeddings.normalize_topic_text` at
     #: ingestion time. `the_spoin_universe` is a SEPARATE database, so a chunk cannot
     #: hold a foreign key to `spoin_db_2`'s `topic` table — tagging crosses that

@@ -1,11 +1,19 @@
 # Task 0038: `frog` (our own RAG), `the_spoin_universe`, and hybrid Mistral/Gemini generation
 
-> **Status:** Phases 0, 1 and 2 done (Phase 2: 2026-09-05). ADRs 0087-0094 accepted;
-> `apps/frog` passes `make check` and carries the `document`/`chunk` schema, its own
-> alembic chain, and the ingester. **`the_spoin_universe` exists and is loaded: 90
-> documents, 646 chunks, embedded on the RTX 5070.** Phase 3 (retrieval + eval harness)
-> next.
-> Written 2026-09-04.
+> **Status: Phases 0-3 done** (Phase 3: 2026-09-05). ADRs 0087-0094, 0096 and 0097
+> accepted. **frog is complete**: retrieval, pinned canon, grounding wired into all five
+> content calls plus the repair path, card provenance, and one embedder at 1024
+> dimensions everywhere.
+>
+> **`the_spoin_universe`: 148 documents, 933 chunks, `Qwen/Qwen3-Embedding-0.6B`,
+> in sync with the corpus on disk** (verified 2026-09-05 — every chunk now carries an
+> `embedding_model` stamp, and the file list and the document list match exactly).
+>
+> **Phase 4 is next, and it needs a repopulated `spoin_db_2`** — the database was
+> dropped and rebuilt empty on 2026-09-05 (ADR-0097), so there are no topics to build
+> prompts from. See "Starting the next session" at the end of Phase 3.
+>
+> Written 2026-09-04, status rewritten 2026-09-05.
 > **Depends on:** [`docs/mistral-saga/`](../mistral-saga/README.md) — provider
 > validation. Experiments 1, 2 and 3 have passed; 3b (drafting quality) is
 > deliberately folded into Phase 6 below rather than run standalone, because this
@@ -405,34 +413,70 @@ the container: torch 2.11.0+cu128, RTX 5070, compute capability (12, 0).
 | Pinned canon | [ADR-0096](../adr/0096-canon-is-pinned-not-retrieved.md), amending ADR-0088. Ten per-call-type preambles condensed from the five `_canon` documents, with a sha256 drift guard. All 15 system prompts rebuilt on them. |
 | `spoin.generation.grounding` | Asks the corpus for the top `Settings.grounding_chunks` (2), renders the block, and caches per subtopic GROUP keyed on a corpus version (3.7). Three outcomes: GROUNDED / NO_MATCH / UNAVAILABLE. Never raises. It packed a top-10 result against a token budget until 2026-09-05; see ADR-0089's amendment for why the budget could not bind. |
 | Prompt wiring | `plan_cards`, `generate_cards`, `correct_cards`, `verify_cards`, `generate_questions`, plus the `remake` repair path. Drafters and thinkers, one shared block per subtopic group -- asserted end to end. `prompts/sources.py` carries the instructions, including the tier-language one this phase owed. |
-| Provenance | `card.grounded_chunk_ids`, ARRAY(UUID) with a GIN index. **Migration written, NOT applied** (`a1b2c3d4e5f6`). |
-| `get_corpus_embedder()` | A second factory. `card.content_embedding` is 384-dimensional and `chunk.embedding` is 1024, so one factory for both would make every retrieval a dimension error rather than a quality loss. |
+| Provenance | `card.grounded_chunk_ids`, ARRAY(UUID) with a GIN index. Migration `a1b2c3d4e5f6`, **applied**. |
+| ~~`get_corpus_embedder()`~~ | Deleted by [ADR-0097](../adr/0097-one-embedder-one-vector-space.md). It existed because `card.content_embedding` was 384-dimensional and `chunk.embedding` 1024; both are 1024 now, and one model serves everything, so a second factory would be a distinction the code no longer has. |
+| Corpus provenance | `chunk.embedding_model`, `NOT NULL` (migration `181a8aae1097`), written by the ingester from the embedder that produced the vector. ADR-0097 stamped `spoin_db_2` and left the corpus without one, which is task 0039's failure mode on the database that grounds every prompt. |
+| `scripts/eval/ground_smoke.py` | The chain end to end -- worker image, Qwen3 on the GPU, the corpus, `Grounding`, the rendered block -- with no LLM and no writes. Every unit test uses `HashEmbedder` over a seeded fake corpus; this is the only thing that exercises the real one. |
 
-### What Phase 3 still owes
+### What Phase 3 owed, and how each closed
 
-> **Handed off 2026-09-05:** [`docs/handoff/next-frog-phase-3-eval-harness.md`](../handoff/next-frog-phase-3-eval-harness.md)
-> carries the brief for the rest of it, and names the blocker that gates everything
-> below: `corpus_embedder` is `hash`, so nothing here can be measured yet.
+- **A real embedder on the generation path.** Done, and larger than planned:
+  [ADR-0097](../adr/0097-one-embedder-one-vector-space.md) put ONE embedder
+  (`Qwen3-Embedding-0.6B`, 1024 dims) behind cards, topics, questions, scenes, AskAI's
+  gate and retrieval alike. `apps/api/Dockerfile` takes an `EMBEDDER_BACKEND` build arg
+  — `gpu` for the worker, `cpu` for api and test, `none` for the alembic-only services.
+- **The eval harness (3.2).** Built and committed (`scripts/eval/`), including the
+  labelling page. **Nothing blocks on it.** The decision it was built to inform —
+  whether to set a `min_score` floor — was made without it (below), and the owner is
+  not running the labelling pass. Kept because retrieval quality is still worth
+  measuring before an ANN index, a reranker or hybrid retrieval, none of which should
+  be chosen on intuition.
+- **Cross-topic score inspection.** The 44-query pools replaced the 5-query smoke: all
+  440 scores fall in 0.236-0.836, median 0.421, top-1 median 0.526. The one clear
+  failure was Physical Fitness, a topic the corpus does not cover, drawing 10m
+  air-pistol passages at 0.339 — ADR-0088's cross-topic risk, observed rather than
+  theorised. Settled by the guarantee below rather than by a threshold.
+- **A `min_score` floor.** **Permanently unset** (owner, 2026-09-05). A floor guards
+  against a passage from an unrelated area winning by default; the owner's commitment
+  is that the curated corpus covers a topic before that topic exists in production, so
+  there is no uncovered topic for a stray passage to be the best answer to. Grounding
+  takes the top 2, and the token budget went with the floor — see
+  [ADR-0089](../adr/0089-retrieval-grounded-generation.md)'s amendment for why a budget
+  could not bind once the count is 2.
 
+---
 
-- **The eval harness (3.2).** Hand-labelled golden set, reviewed as an HTML artifact
-  that saves labels back; 30-50 real subtopic queries, recall@k and precision@k. No ANN
-  index until it has run.
-- **Cross-topic score inspection.** Only a 5-query smoke exists. Early signal is mild --
-  off-subtopic hits at 0.435-0.440 against 0.653 for the correct one -- but that is five
-  queries, not a finding. Needs the real embedder, so it runs in the `frog` image.
-- **A real embedder on the generation path.** `corpus_embedder` defaults to `hash`,
-  which is dimension-correct and semantically meaningless: a run grounded on it is
-  grounded on nothing. `qwen3` needs torch, which the `api`/`worker` image deliberately
-  does not carry (ADR-0094). **This gates any real measurement of grounded output, and
-  therefore gates Phase 4.**
-- **A `min_score` floor.** Still unset, and now deliberately permanent rather than
-  deferred (owner, 2026-09-05). A floor guards against a passage from an unrelated area
-  winning by default -- ADR-0088's cross-topic risk, which the Phase 3 pools showed for
-  real when Physical Fitness drew 10m air-pistol passages at 0.339. The owner's
-  commitment removes the precondition: the curated corpus covers a topic before that
-  topic exists in production, so there is no uncovered topic for a stray passage to be
-  the best answer to. The eval harness is not what settles this any more.
+## Starting the next session
+
+frog is done. The next thing to run is a **pipeline generation test**, and the shape of
+it is deliberately left open (owner, 2026-09-05). What is set up for it:
+
+- `spoin_db_2` is **empty**, schema at head, 1024-dim vector columns with
+  `embedding_model` stamps and CHECK constraints. There are no topics, so a generation
+  run starts by requesting one.
+- `SPOIN_GENERATOR=gemini`. Phase 5's `MistralContentGenerator` does not exist yet, so
+  a test today runs on the Gemini ladder.
+- The worker image carries CUDA torch and reaches the RTX 5070; `SPOIN_EMBEDDER=qwen3`
+  and `SPOIN_UNIVERSE_DATABASE_URL` are both explicit in `.env`.
+- Grounding is verified working end to end against the real corpus. Re-run it after any
+  corpus change, before trusting a generation run:
+
+  ```bash
+  MSYS_NO_PATHCONV=1 docker compose run --rm --no-deps \
+      -v "E:/spoin_bundle/scripts:/repo/scripts" --entrypoint python worker \
+      /repo/scripts/eval/ground_smoke.py --topic "PostgreSQL" \
+      --subtopic "MVCC" --description "How a transaction sees a fixed view."
+  ```
+
+  `outcome=grounded` with two on-topic passages means the chain is live. `UNAVAILABLE`
+  means the corpus could not be read and generation would proceed **ungrounded without
+  failing** — which produces worse cards, not an error.
+
+**One thing to watch in the first run.** `card_duplicate_threshold` is 0.9 and was
+chosen against `HashEmbedder` scores, which are meaningless. Under real vectors it is
+unmeasured, and if it is too low the run silently discards good cards as
+near-duplicates. Check the `near_duplicate` rejection rate on a small run before a long
+one — [task 0042](0042-recalibrate-thresholds-against-real-vectors.md).
 
 ---
 

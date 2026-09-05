@@ -164,6 +164,10 @@ async def ingest_document(
                 ordinal=ordinal,
                 text=text,
                 embedding=vector,
+                #: From the embedder that just produced `vector`, never from config —
+                #: a stamp read from somewhere other than the thing that did the work
+                #: is a stamp that can lie.
+                embedding_model=embedder.model_name,
                 #: Tags sit on `chunk` rather than `document` (ADR-0088) so a broad
                 #: source can have differently-tagged sections. The contract has no
                 #: per-section tagging yet, so every chunk inherits the document's —

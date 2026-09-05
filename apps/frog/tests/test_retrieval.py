@@ -130,6 +130,9 @@ async def _corpus(session: AsyncSession) -> tuple[list[Document], list[Chunk]]:
             ordinal=index,
             text=f"Document {owner} — section {index}\n\nBody {index}.",
             embedding=_at_angle(angle),
+            #: These vectors come from `_at_angle`, not from any model, so the
+            #: stamp says so rather than naming one that never ran.
+            embedding_model="fixture-at-angle",
             topic_tags=list(_DOCUMENTS[owner][5]),
         )
         for index, (owner, angle) in enumerate(zip(_CHUNK_OWNERS, _ANGLES, strict=True))

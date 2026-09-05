@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     env: Literal["local", "ci", "production"] = "local"
     log_level: str = "INFO"
     database_url: str = "postgresql+asyncpg://spoin:spoin@localhost:5432/spoin"
+    #: `the_spoin_universe`, the corpus (ADR-0088), read-only from this process.
+    #: **Empty by default and never falling back to `database_url`** — the same rule
+    #: frog's alembic environment is held to, and for a sharper reason here: a
+    #: fallback would point retrieval at `spoin_db_2`, which has no `document` table,
+    #: and the failure would arrive as a confusing SQL error rather than as
+    #: "no corpus configured". Empty means generation runs ungrounded (ADR-0089).
+    universe_database_url: str = ""
     #: Comma-separated. Deliberately a plain string rather than a list: a list-typed
     #: setting makes pydantic-settings JSON-parse the env var, so a perfectly
     #: ordinary `SPOIN_CORS_ORIGINS=http://localhost:3000` fails to start the app.
@@ -362,6 +369,23 @@ class Settings(BaseSettings):
     #: drop-the-visual posture only in that it stops here -- it rejects the card
     #: rather than shipping it without art.
     ascii_redraw_attempts: int = 2
+
+    # -- grounding (ADR-0089) ---------------------------------------------------
+    #: Prompt tokens one call may spend on retrieved corpus context, on top of
+    #: everything the prompt already carried.
+    #:
+    #: PROVISIONAL, and deliberately conservative. ADR-0089's table prices prompt size
+    #: directly in throughput -- `ministral-8b` drops under the 34 calls/min target
+    #: above ~18k tokens -- but the number that decides this is a MEASURED post-RAG
+    #: prompt size from run logs, which is task 0038 Phase 4 and has not happened.
+    #: Picking a budget up front and hoping is the mistake the gemini-saga was four
+    #: weeks of, so this is a starting point to measure from, not an answer.
+    grounding_token_budget: int = 6000
+    #: A ceiling on chunks per call regardless of how small they are, so a prompt full
+    #: of short fragments does not become an unreadable list. Same relationship the
+    #: batch-size setting has to `pack_by_tokens`'s budget (ADR-0085): the count is the
+    #: ceiling, the budget cuts it shorter.
+    grounding_max_chunks: int = 8
 
     # -- feed (ADR-0010) --------------------------------------------------------
     rank_w_quality: float = 1.0

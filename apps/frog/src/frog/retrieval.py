@@ -27,7 +27,7 @@ import uuid
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from frog.embeddings import Embedder
@@ -220,3 +220,27 @@ async def search_many(
             hits = [hit for hit in hits if hit.score >= min_score]
         results.append(hits)
     return results
+
+
+async def corpus_version(session: AsyncSession) -> str:
+    """A token that changes whenever the corpus does, for a caller's cache key.
+
+    The consumer is `spoin.generation.grounding`, which retrieves once per subtopic
+    group and reuses the result across every card draft in it (rag-design-space §3.7).
+    That cache lives in a **long-running worker**, and the owner re-ingests the corpus
+    on the same machine while it runs — so "the process started before the corpus
+    changed" is a real state, and a cache keyed on the subtopic alone would serve
+    context from a document that has since been revised or retracted.
+
+    Cheap deliberately: a count and a max over a table of hundreds of rows, read once
+    per subtopic rather than per call. `ingested_at` moves whenever a document's
+    content hash changed (task 0038 Phase 2), and the count moves when one is added or
+    deleted — between them, every edit the ingester can make is visible. It is NOT a
+    content hash of the corpus: a revision that somehow left both unchanged would be
+    missed, and that is an accepted trade for not hashing the corpus on every subtopic.
+    """
+
+    documents, ingested = (
+        await session.execute(select(func.count(Document.id), func.max(Document.ingested_at)))
+    ).one()
+    return f"{documents}@{ingested.isoformat() if ingested is not None else 'empty'}"

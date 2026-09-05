@@ -13,6 +13,7 @@ from collections.abc import AsyncIterator
 
 import pytest
 import pytest_asyncio
+from frog.universe.base import Base as UniverseBase
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.sql import text
 
@@ -30,7 +31,7 @@ from spoin.domain.models import Card, CardStats, Subtopic, Topic, User, UserTopi
 TEST_DATABASE_URL = os.environ.get("SPOIN_TEST_DATABASE_URL", "")
 
 
-def _reject_unsafe_test_database(url: str) -> None:
+def _reject_unsafe_test_database(url: str, variable: str = "SPOIN_TEST_DATABASE_URL") -> None:
     """Hard-stop, not a skip: this fixture is about to DROP AND RECREATE every
     table on `url` below. A skip is silent and easy to miss; a real database
     getting wiped because of it is not something to fail quietly on. Requires
@@ -42,7 +43,7 @@ def _reject_unsafe_test_database(url: str) -> None:
     db_name = url.rsplit("/", 1)[-1].split("?", 1)[0]
     if not db_name.endswith("_test"):
         raise RuntimeError(
-            f"SPOIN_TEST_DATABASE_URL points at database {db_name!r}, which does not "
+            f"{variable} points at database {db_name!r}, which does not "
             "end in `_test`. This fixture drops and recreates every table it touches "
             "-- refusing to run against what looks like a real database. Use `make "
             "test` (or `docker compose --profile test run --rm test`), which points "
@@ -73,6 +74,43 @@ async def session() -> AsyncIterator[AsyncSession]:
     except Exception as exc:  # pragma: no cover - environment dependent
         await engine.dispose()
         pytest.skip(f"Database unavailable: {exc}")
+
+    maker = async_sessionmaker(engine, expire_on_commit=False)
+    async with maker() as db:
+        yield db
+
+    await engine.dispose()
+
+
+#: The corpus database (ADR-0088), for `test_grounding.py`. Its own variable and never
+#: SPOIN_UNIVERSE_DATABASE_URL, for the same reason as above: the fixture below drops
+#: and recreates every table it points at, and `the_spoin_universe` is a real corpus
+#: someone may be mid-ingestion into.
+UNIVERSE_TEST_DATABASE_URL = os.environ.get("SPOIN_UNIVERSE_TEST_DATABASE_URL", "")
+
+
+@pytest_asyncio.fixture
+async def universe_session() -> AsyncIterator[AsyncSession]:
+    """A session on an empty corpus database.
+
+    Grounding is `spoin`'s (ADR-0087 puts packing on this side of the boundary), so its
+    tests live here rather than in frog's suite — but what they exercise is frog's
+    schema, so the fixture builds frog's metadata.
+    """
+
+    if not UNIVERSE_TEST_DATABASE_URL:
+        pytest.skip("No corpus database configured; set SPOIN_UNIVERSE_TEST_DATABASE_URL")
+    _reject_unsafe_test_database(UNIVERSE_TEST_DATABASE_URL, "SPOIN_UNIVERSE_TEST_DATABASE_URL")
+
+    engine = create_async_engine(UNIVERSE_TEST_DATABASE_URL)
+    try:
+        async with engine.begin() as connection:
+            await connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+            await connection.run_sync(UniverseBase.metadata.drop_all)
+            await connection.run_sync(UniverseBase.metadata.create_all)
+    except Exception as exc:  # pragma: no cover - environment dependent
+        await engine.dispose()
+        pytest.skip(f"Corpus database unavailable: {exc}")
 
     maker = async_sessionmaker(engine, expire_on_commit=False)
     async with maker() as db:

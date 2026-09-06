@@ -176,6 +176,7 @@ class CardType(StrEnum):
     """Predetermined archetype / format for card generation."""
 
     PROSE = "prose"
+    IMAGE = "image"
     CODE = "code"
     DIAGRAM = "diagram"
     COMPARISON = "comparison"

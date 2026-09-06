@@ -8,6 +8,7 @@ reconciles `Topic` and `Subtopic` rows to match them:
       upsert Topic          matched on slug(topic_name)
       for each subtopic x tier:
           upsert Subtopic   matched on (topic, title, difficulty)
+                            carrying that tier's declared grounding scope
       subtopics no longer in the file are removed        (§4: plain upsert, not a merge)
   stamp topic.curriculum_corpus_version = corpus_version()
 
@@ -201,6 +202,11 @@ async def _project_one(
             plan = tier_plans[tier_name]
             target_cards = int(plan["target_cards"])
             card_types = {str(k): int(v) for k, v in dict(plan["card_types"]).items()}
+            #: The tier's declared corpus scope, carried across verbatim. The
+            #: projection does NOT resolve these to chunk ids: a re-ingest rebuilds a
+            #: document's chunks, so ids stored here would rot silently. Retrieval
+            #: resolves them late, against whatever the corpus currently holds.
+            grounding = [str(ref) for ref in plan.get("grounding", [])]
 
             if existing is None:
                 subtopic = Subtopic(
@@ -223,6 +229,7 @@ async def _project_one(
             #: time (`nodes.py`'s `is_technical_topic`); the projection stores the
             #: authored quotas as-is.
             subtopic.card_type_quotas = card_types or None
+            subtopic.grounding_refs = grounding or None
             subtopic.position = position
             await db.flush()
             kept.add(subtopic.id)

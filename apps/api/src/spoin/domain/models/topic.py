@@ -30,7 +30,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -316,6 +316,22 @@ class Subtopic(Base, UUIDPrimaryKey, CreatedAt):
 
     #: Predetermined capacity / quotas for each card type (prose, code, diagram, comparison, ascii)
     card_type_quotas: Mapped[dict[str, int] | None] = mapped_column(JSONB, nullable=True)
+
+    #: The corpus sections this tier's cards may be written from, as authored:
+    #: `<path relative to corpus/>#<exact ## heading>`
+    #: (docs/architecture/authored-curriculum.md). Projected from the curriculum, never
+    #: inferred -- the author knows which passages teach this tier, and retrieval
+    #: guessing corpus-wide is the guess this column removes. Ranking still happens
+    #: WITHIN the list, per card, so the declaration is a scope and not a citation.
+    #:
+    #: Text refs rather than resolved chunk ids, on purpose: re-ingesting a changed
+    #: document deletes and rebuilds its chunks, so uuids stored here would rot on the
+    #: next `make corpus-ingest` with nothing to notice. Crosses the database boundary
+    #: by value, like `card.grounded_chunk_ids` and `chunk.topic_tags` (ADR-0088), and
+    #: inherits the same obligation to tolerate a reference that no longer resolves.
+    #:
+    #: Null means no declared scope -- the open corpus-wide query, as before.
+    grounding_refs: Mapped[list[str] | None] = mapped_column(ARRAY(Text), nullable=True)
 
     topic: Mapped[Topic] = relationship(back_populates="subtopics")
     cards: Mapped[list[Card]] = relationship(back_populates="subtopic")

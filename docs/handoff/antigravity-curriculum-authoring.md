@@ -76,24 +76,31 @@ subtopics:
   - title: Ownership & Move Semantics
     description: Why a value has exactly one owner, and what a move actually costs
     prerequisites: []
-    sources:
-      - computer-science/programming-languages/rust/foundations-ownership-borrowing-and-lifetimes.md
     tiers:
       beginner:
-        target_cards: 18
-        card_types: { prose: 8, code: 6, comparison: 2, ascii: 2 }
+        target_cards: 16
+        card_types: { prose: 5, code: 4, ascii: 4, diagram: 2, comparison: 1 }
+        grounding:
+          - "computer-science/programming-languages/rust/foundations.md#Ownership and Move Semantics"
+          - "computer-science/programming-languages/rust/foundations.md#The Borrow Checker: Shared vs Exclusive Borrows"
+          - "computer-science/programming-languages/rust/tips-and-tricks.md#Common Borrow Checker Mistakes"
       intermediate:
-        target_cards: 14
-        card_types: { prose: 5, code: 6, diagram: 1, ascii: 2 }
+        target_cards: 18
+        card_types: { prose: 6, code: 5, ascii: 4, diagram: 2, comparison: 1 }
+        grounding:
+          - "computer-science/programming-languages/rust/foundations.md#Lifetimes: Annotations and Elision Rules"
+          - "computer-science/programming-languages/rust/foundations.md#Reborrowing Mechanics and Split Borrows"
   - title: Smart Pointers (Box, Rc, Arc)
     description: Heap ownership, shared ownership, and what each pointer costs
     prerequisites: [Ownership & Move Semantics]
-    sources:
-      - computer-science/programming-languages/rust/memory-management-smart-pointers-and-interior-mutability.md
     tiers:
       intermediate:
         target_cards: 15
-        card_types: { prose: 6, code: 7, ascii: 2 }
+        card_types: { prose: 5, code: 4, ascii: 4, diagram: 1, comparison: 1 }
+        grounding:
+          - "computer-science/programming-languages/rust/memory-management.md#Heap Allocation with Box"
+          - "computer-science/programming-languages/rust/memory-management.md#Shared Ownership with Rc and Arc"
+          - "computer-science/programming-languages/rust/memory-management.md#Interior Mutability: RefCell and Mutex"
 ---
 ```
 
@@ -107,22 +114,24 @@ subtopics:
 | `subtopics[].title` | **yes** | The unit a learner sees and progresses through. Stable — it is the projection's match key, so renaming one replaces it rather than editing it. |
 | `subtopics[].description` | **yes** | What this subtopic covers, in one or two sentences. This is what the card writer is briefed with, so vagueness here shows up in every card. |
 | `subtopics[].prerequisites` | **yes** (may be empty) | Titles of other subtopics **in this same file**. Must form a DAG. This is the ordering; document order is not. |
-| `subtopics[].sources` | **yes** | Corpus paths, relative to `docs/the_spoin_universe/corpus/`, that teach this subtopic. Every path must exist. |
 | `tiers` | **yes** | A map of `beginner` / `intermediate` / `advanced` → that tier's plan. Include only the tiers the subtopic should be taught at; a concept that is meaningless to a beginner simply has no `beginner` key. |
 | `tiers.<t>.target_cards` | **yes** | **Must be 5–25** — the database enforces this band (`target_cards BETWEEN 5 AND 25`), so a value outside it fails validation rather than the migration. |
 | `tiers.<t>.card_types` | **yes** | Quotas per card type. Must sum to `target_cards`. |
+| `tiers.<t>.grounding` | **yes** | List of section-level corpus anchors: `"<corpus_path>#<exact ## heading>"`. Quote every entry because headings with colons `:` break YAML parsing otherwise. 5–10 sections per tier. |
 
 ### The card-type vocabulary
 
-Exactly these five, and a typo is a hard error rather than a silent sixth kind:
+Exactly these six, and a typo is a hard error:
 
-| Type | What it is |
-|---|---|
-| `prose` | Explanation carrying the idea in words |
-| `code` | A worked code example. **Non-technical topics must use 0** — enforced outside the prompt |
-| `diagram` | A mermaid diagram ([ADR-0067](../adr/0067-mermaid-diagrams-and-form-free-ascii.md)) |
-| `comparison` | Myth vs fact, or A vs B ([ADR-0017](../adr/0017-card-archetypes.md)) |
-| `ascii` | A curated ASCII gag scene ([ADR-0079](../adr/0079-ascii-library-is-gags-only.md), [ADR-0099](../adr/0099-ascii-scenes-carry-their-own-explanation.md)) |
+| Type | What it is | Quota Guideline (Photographic / Observational) | Quota Guideline (Pure Code & Theory) |
+|---|---|---|---|
+| **`prose`** | Explanation carrying the idea in words | **Strictly 25–30% max** (4–6 cards). Hard ceiling — never exceed 30% to prevent text walls in the feed. | **Strictly 25–30% max** (4–6 cards). Kept tight; code and diagrams carry the weight. |
+| **`image`** | A card anchored by a verified photographic asset from the open-licensed catalog ([ADR-0095](../adr/0095-open-licensed-image-catalog.md)), carrying dense observational retrieval bait. | **2–3 per tier** (~12–18%). Sums across tiers to match the exact count of sourced images in `images.md` (e.g. 76 cards in Astronomy). | **Strictly 0** (Tier 3 pure code/theory manifests are strictly empty `images: []`). |
+| **`code`** | A worked code example | **Strictly 0** for non-technical topics (enforced outside prompt). | **4–6 cards per tier** (~25%). Primary worked examples. |
+| **`diagram`** | A mermaid diagram ([ADR-0067](../adr/0067-mermaid-diagrams-and-form-free-ascii.md)) | **2–3 per tier** (~10–15%). Reserved strictly for things photos cannot show. | **2–4 per tier** (~15–20%). Primary visual anchor. |
+| **`comparison`** | Myth vs fact, or A vs B ([ADR-0017](../adr/0017-card-archetypes.md)) | **4–6 per tier** (~25–30%). High density from `tips-and-tricks.md` misconceptions. | **2–3 per tier** (~10–15%). Architectural trade-offs. |
+| **`ascii`** | A curated ASCII gag scene ([ADR-0079](../adr/0079-ascii-library-is-gags-only.md)) | **3–5 per tier** (~20–25%). Curated gags learners screenshot. | **4–5 per tier** (~20–25%). Aggressively breaks up code/text walls. |
+
 
 **Two constraints on quotas that are worth knowing while you write them.** Every `ascii` card
 consumes a curated library scene, and a scene is single-use within a topic
@@ -147,6 +156,12 @@ subtopics at 12 cards each says nothing.
 **Tier by what a learner at that level can actually use.** A subtopic present at all three
 tiers is teaching three genuinely different treatments of the concept, not the same material
 three times. If you cannot say what the advanced treatment adds, leave the tier out.
+
+**Photographic subjects lean on `image`.** For observational topics (Tier 1 & 2), cards typed
+as `image` are anchored by genuine photographs from the verified catalog (`images.md`). Their
+descriptions serve as dense semantic retrieval bait so the model grounds explanations in
+physical morphology, color palettes, and observable structures. Quotas of 2–3 `image` cards
+per tier ensure full coverage of all sourced visual anchors across the curriculum.
 
 **Code and theory subjects lean on `diagram`.** Canon
 (`_canon/card-archetypes-and-content-shapes.md`) sets this: subjects with no photographic

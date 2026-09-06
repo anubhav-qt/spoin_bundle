@@ -20,15 +20,19 @@ ADR-0068 initially explored dividing ASCII art into two categories: comedic gags
 
 The scenes users screenshot and share are the witty ones. The ASCII slot exists to provide character, levity, and engagement at the perimeter of an otherwise rigorous technical curriculum.
 
-## The ASCII Box Rule
+## The ASCII Box Rule: The Art Is Immutable
 
-Language models lack native spatial coordinate reasoning. When allowed to generate or edit ASCII art freely, models skew columns, misalign vertical borders, and produce illegible, sideways drawings. To guarantee aesthetic quality, ADR-0021, ADR-0068, and ADR-0079 establish the **ASCII Box Rule**:
+Language models lack native spatial coordinate reasoning. When allowed to generate or edit ASCII art freely, models skew columns, misalign vertical borders, and produce illegible, sideways drawings. To guarantee aesthetic quality, ADR-0021, ADR-0068, and ADR-0079 establish the **ASCII Box Rule**. Its first half governs what may be done to a drawing at all:
 
 1. **Art is an Immutable Rigid Box:** The ASCII drawing is treated as a fixed two-dimensional character block. The model must never edit lines inside the drawing, delete interior characters, or attempt to redraw parts of the figure.
 2. **Nothing Inserted to the Left:** No characters, labels, prefixes, or dialogue may be placed to the left of the artwork. Inserting characters to the left shifts the entire drawing rightward, breaking horizontal column alignment.
 3. **Captions and Annotations Restricted to Safe Zones:**
    - Text, titles, or stage directions (`*CONFUSED LOOK*`) must be placed strictly **above** the art block or **below** the art block.
    - Speech bubbles or dialogue labels appended to the right of the art block must strictly preserve the base drawing's line coordinates.
+## The ASCII Box Rule: Width, Height and the Text a Scene Carries
+
+The second half of the **ASCII Box Rule** (ADR-0021, ADR-0068, ADR-0079, ADR-0099) governs the shape of the scene rather than the handling of it: how wide a line may be, how tall a drawing may grow, and what words must ship with it. Numbering continues from the immutability rules above.
+
 4. **The 40-Column Width Invariant:**
    - Every single line of the ASCII visual—including characters, leading whitespace, trailing dialogue, and borders—**must not exceed 40 monospace columns**.
    - Mobile smartphone viewports break and force awkward horizontal scrolling or line-wrapping if a preformatted block exceeds 40 characters.

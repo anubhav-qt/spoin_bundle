@@ -1835,7 +1835,7 @@ class GeminiContentGenerator(ContentGenerator):
             system_prompt = prompts.CARDS_CODE_SYSTEM
         elif card_type in (CardType.DIAGRAM, "diagram"):
             system_prompt = prompts.CARDS_DIAGRAM_SYSTEM
-        elif card_type in (CardType.PROSE, "prose"):
+        elif card_type in (CardType.PROSE, "prose") or card_type in (CardType.IMAGE, "image"):
             system_prompt = prompts.CARDS_PROSE_SYSTEM
         else:
             system_prompt = prompts.CARDS_SYSTEM

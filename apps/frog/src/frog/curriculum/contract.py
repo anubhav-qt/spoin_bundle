@@ -41,33 +41,84 @@ _FRONT_MATTER = re.compile(r"\A---\r?\n(?P<yaml>.*?)\r?\n---[ \t]*\r?\n?(?P<body
 TIERS: tuple[str, ...] = ("beginner", "intermediate", "advanced")
 
 #: Mirrors `spoin.domain.enums.CardType` by value (ADR-0087: no import).
-CARD_TYPES: tuple[str, ...] = ("prose", "code", "diagram", "comparison", "ascii")
+CARD_TYPES: tuple[str, ...] = ("prose", "image", "code", "diagram", "comparison", "ascii")
 
 #: The band the database enforces on `subtopic.target_cards`.
 MIN_TARGET_CARDS = 5
 MAX_TARGET_CARDS = 25
 
 
+#: A grounding reference: `<path relative to corpus/>#<the exact `##` heading>`.
+#: Split on the FIRST `#` -- a path cannot contain one, and a heading routinely can.
+GROUNDING_SEPARATOR = "#"
+
+
+def split_grounding_ref(ref: str) -> tuple[str, str] | None:
+    """`"a/b.md#Some Heading"` -> `("a/b.md", "Some Heading")`, or None if malformed.
+
+    One parser, shared by the validator, the projection and retrieval. Two
+    implementations of a string format is a drift surface, and this one crosses a
+    package boundary and a database.
+    """
+
+    path, separator, heading = ref.partition(GROUNDING_SEPARATOR)
+    if not separator or not path.strip() or not heading.strip():
+        return None
+    return path.strip(), heading.strip()
+
+
 @dataclass(frozen=True)
 class ParsedTier:
-    """One tier's plan for a subtopic: how many cards, and the mix."""
+    """One tier's plan: how many cards, the mix, and which corpus sections ground them."""
 
     tier: str
     target_cards: int
     #: Only the types the author named; a missing type is zero. Keys are a subset of
     #: ``CARD_TYPES`` and the values sum to ``target_cards`` -- both checked here.
     card_types: dict[str, int]
+    #: The sections this tier's cards may be written from, as
+    #: `<path relative to corpus/>#<exact ## heading>`. Non-empty: a tier with no
+    #: declared scope would silently fall through to an open corpus-wide query for
+    #: every one of its cards, which is the behaviour this field exists to replace.
+    #:
+    #: **A scope, not a citation.** Retrieval ranks WITHIN this list per card (from
+    #: the card's own plan), so the list should be everything that legitimately
+    #: teaches this tier. Too narrow is the real failure -- two sections grounding
+    #: twenty cards means twenty cards written from the same passage.
+    grounding: list[str]
 
 
 @dataclass(frozen=True)
 class ParsedSubtopic:
-    """One curriculum unit -- becomes a subtopic group spanning its tiers."""
+    """One curriculum unit -- becomes a subtopic group spanning its tiers.
+
+    Note what is absent: a subtopic-level `sources`. It was replaced by per-tier
+    `grounding`, not supplemented by it -- two fields naming corpus material is a
+    drift surface, and the tier is the level where the declaration is actually
+    useful (a beginner tier and an advanced one should not draw on the same
+    sections; rag-design-space §3.11).
+    """
 
     title: str
     description: str
     prerequisites: list[str]
-    sources: list[str]
     tiers: list[ParsedTier]
+
+    @property
+    def source_paths(self) -> list[str]:
+        """Every distinct document this subtopic's tiers ground on, in first-seen order.
+
+        Derived, never authored -- it is what the old `sources` field used to say, and
+        deriving it is what keeps it from disagreeing with `grounding`.
+        """
+
+        paths: list[str] = []
+        for tier in self.tiers:
+            for ref in tier.grounding:
+                split = split_grounding_ref(ref)
+                if split is not None and split[0] not in paths:
+                    paths.append(split[0])
+        return paths
 
 
 @dataclass(frozen=True)
@@ -249,23 +300,27 @@ def _subtopic(entry: Any, index: int, errors: CurriculumErrors) -> ParsedSubtopi
     description = _required_str(entry, "description", where, errors)
 
     prerequisites = _str_list(entry, "prerequisites", where, errors, allow_empty=True)
-    sources = _str_list(entry, "sources", where, errors, allow_empty=False)
     tiers = _tiers(entry, where, errors)
 
-    if (
-        title is None
-        or description is None
-        or prerequisites is None
-        or sources is None
-        or tiers is None
-    ):
+    if "sources" in entry:
+        #: A hard error rather than a silent ignore: a curriculum still carrying the
+        #: old subtopic-level field was written against the old contract, and every
+        #: tier in it is missing the `grounding` that replaced it.
+        errors.add(
+            _at(
+                where,
+                "`sources` was replaced by per-tier `grounding` -- move each path to "
+                "the tier(s) that use it, as `<path>#<exact ## heading>`",
+            )
+        )
+
+    if title is None or description is None or prerequisites is None or tiers is None:
         return None
 
     return ParsedSubtopic(
         title=title,
         description=description,
         prerequisites=prerequisites,
-        sources=sources,
         tiers=tiers,
     )
 
@@ -343,8 +398,9 @@ def _tier_plan(
         target = raw_target
 
     card_types = _card_types(plan, at, errors)
+    grounding = _grounding(plan, at, errors)
 
-    if target is None or card_types is None:
+    if target is None or card_types is None or grounding is None:
         return None
 
     total = sum(card_types.values())
@@ -352,7 +408,40 @@ def _tier_plan(
         errors.add(f"{at}: `card_types` sums to {total}, not `target_cards` ({target})")
         return None
 
-    return ParsedTier(tier=tier_name, target_cards=target, card_types=card_types)
+    return ParsedTier(
+        tier=tier_name, target_cards=target, card_types=card_types, grounding=grounding
+    )
+
+
+def _grounding(plan: dict[str, Any], at: str, errors: CurriculumErrors) -> list[str] | None:
+    """This tier's declared corpus scope, each entry `<path>#<exact ## heading>`.
+
+    Only the SHAPE is checked here -- that the reference splits into a path and a
+    heading. Whether the file exists and whether it really contains that heading is
+    the runner's job, because only it has the corpus tree.
+
+    Duplicates are collapsed rather than rejected: naming a section twice is a copy
+    -paste slip with an obvious intent, not an error worth handing back.
+    """
+
+    refs = _str_list(plan, "grounding", at, errors, allow_empty=False)
+    if refs is None:
+        return None
+
+    seen: list[str] = []
+    ok = True
+    for ref in refs:
+        if split_grounding_ref(ref) is None:
+            errors.add(
+                f"{at}: grounding entry {ref!r} is not "
+                "`<path relative to corpus/>#<exact ## heading>`. Headings often contain "
+                "`: `, so the whole entry must be QUOTED in YAML or it parses as a mapping."
+            )
+            ok = False
+            continue
+        if ref not in seen:
+            seen.append(ref)
+    return seen if ok else None
 
 
 def _card_types(plan: dict[str, Any], at: str, errors: CurriculumErrors) -> dict[str, int] | None:

@@ -10,19 +10,23 @@ topic_tags:
   - client rendering
 ---
 
-## The Four Archetype Tags and Collapsed Preview Badging
+## The Six Card Types, Archetype Tags, and Collapsed Preview Badging
 
-Card content is not uniform; different technical concepts demand different structural representations. ADR-0017 established **archetypes** as a set of content-shape tags attached to a card:
+Card content is not uniform; different concepts demand different structural representations. In Spoin, every card is planned and authored under one of **six first-class card types** (`prose`, `image`, `code`, `diagram`, `comparison`, `ascii`):
+- `prose`: High-density conceptual explanation carrying the core idea in words, strictly capped at 25–30% of target cards.
+- `image`: The card attaches a verified photographic visual anchor from the open-licensed image catalog ([ADR-0095](../adr/0095-open-licensed-image-catalog.md)), grounded in dense observational retrieval bait.
 - `code`: The card `body` contains one or more syntax-highlighted code blocks (e.g. ```` ```python ````).
-- `diagram`: The card `body` contains a structured architectural diagram or sequence flow encoded in Mermaid syntax.
-- `comparison`: The card `body` features a structured comparative layout or Markdown table evaluating trade-offs across multiple technologies, algorithms, or approaches.
-- `ascii`: The card carries an attached ASCII art scene in `visual_id` and `visual_slots`.
-- `[]` (Empty set): The card consists purely of structured technical prose.
+- `diagram`: The card `body` contains a structured architectural diagram or sequence flow encoded in Mermaid syntax ([ADR-0067](../adr/0067-mermaid-diagrams-and-form-free-ascii.md)).
+- `comparison`: The card `body` features a structured comparative layout, Myth vs. Fact pair (❌ / ✅), or Markdown table evaluating trade-offs ([ADR-0017](../adr/0017-card-archetypes.md)).
+- `ascii`: The card carries an attached ASCII art gag scene in `visual_id` and `visual_slots` ([ADR-0079](../adr/0079-ascii-library-is-gags-only.md)).
 
-The web and mobile clients use these archetype tags to enrich the collapsed card preview in the feed. Rather than displaying a generic text preview for every card, the client adapts:
+The web and mobile clients use these card types and archetype tags to enrich the collapsed card preview in the feed:
+- An `image` card displays a photographic hero thumbnail preview with rich observational framing.
 - A `code` card displays a programming language pill badge (e.g. `TypeScript`, `SQL`, `Rust`) alongside the first line of the snippet.
 - A `diagram` card displays an architectural flowchart indicator.
-- A `comparison` card renders a comparative badge indicating trade-off analysis.
+- A `comparison` card renders a comparative badge indicating trade-off analysis or misconception correction.
+- An `ascii` card displays a visual gag teaser.
+- A `prose` card displays a concise conceptual hook.
 
 ## Archetypes are Derived Post-Generation, Never Requested
 

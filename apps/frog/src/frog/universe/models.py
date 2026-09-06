@@ -191,6 +191,17 @@ class Chunk(Base, UUIDPrimaryKey, CreatedAt):
 
     text: Mapped[str] = mapped_column(Text, nullable=False)
 
+    #: The `##` heading this chunk was cut at, stored separately even though
+    #: `contextual_text` already prefixes it into `text`.
+    #:
+    #: It is what makes a chunk ADDRESSABLE by a human. An authored curriculum declares
+    #: its grounding as `<document path>#<exact heading>` (authored-curriculum.md), and
+    #: resolving that to rows has to be a join, not a `LIKE` against the prefix of
+    #: `text` -- which would match a heading that is another's prefix and would break
+    #: the moment the header format changed. Nullable only for chunks written before
+    #: this column existed; re-ingestion with `--force` fills them.
+    heading: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
 
     #: Which model produced `embedding`. NOT NULL, unlike its counterparts on
@@ -221,6 +232,10 @@ class Chunk(Base, UUIDPrimaryKey, CreatedAt):
         #: Ingestion writes chunks in order and retrieval cites them by position;
         #: both want one document's chunks together.
         Index("ix_chunk_document_id_ordinal", "document_id", "ordinal", unique=True),
+        #: How an authored curriculum's `<path>#<heading>` grounding reference
+        #: resolves to rows. Composite because a heading is only unique within its
+        #: document -- "Overview" appears in many.
+        Index("ix_chunk_document_id_heading", "document_id", "heading"),
         #: GIN because `topic_tags` is an array searched with containment operators.
         #: Present even though the filter is off by default — Phase 3 inspects
         #: cross-topic retrieval scores, and turning the filter on should not then

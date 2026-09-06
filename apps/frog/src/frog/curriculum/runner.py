@@ -3,8 +3,8 @@
 Two halves, deliberately separable:
 
 - `validate_curricula` is pure -- no database -- and adds the one check
-  `parse_curriculum` cannot do alone: **every `sources` path in every subtopic must
-  exist under the corpus tree**. This is what `make curriculum-check` runs.
+  `parse_curriculum` cannot do alone: **every `grounding` reference must name a real
+  `##` section of a real corpus document**. This is what `make curriculum-check` runs.
 - `ingest_curricula` writes the valid ones into `the_spoin_universe`, idempotent by
   content hash exactly as the corpus ingester is (ADR-0088). This is what
   `make curriculum-ingest` runs.
@@ -17,13 +17,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from difflib import get_close_matches
 from pathlib import Path
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from frog.curriculum.contract import CurriculumErrors, ParsedCurriculum, parse_curriculum
+from frog.curriculum.contract import (
+    CurriculumErrors,
+    ParsedCurriculum,
+    parse_curriculum,
+    split_grounding_ref,
+)
 from frog.curriculum.models import Curriculum, CurriculumSubtopic
+from frog.ingest.contract import parse_document
 
 #: One file per topic: `docs/the_spoin_universe/curricula/<topic>/curriculum.md`. The
 #: directory name is the author's slug for the topic; the canonical name is the
@@ -55,13 +62,15 @@ def validate_curricula(
 
     passed: list[ParsedCurriculum] = []
     failures: list[CurriculumErrors] = []
+    #: Shared across every file in the run -- see `_document_headings`.
+    heading_cache: dict[str, list[str] | None] = {}
 
     for path in sorted(curricula_root.glob(_CURRICULUM_GLOB)):
         source_path = source_path_of(curricula_root, path)
         curriculum, errors = parse_curriculum(source_path, path.read_bytes())
 
         if curriculum is not None:
-            _check_sources_exist(curriculum, corpus_root, errors)
+            _check_grounding_exists(curriculum, corpus_root, errors, heading_cache)
 
         if curriculum is None or errors:
             failures.append(errors)
@@ -71,23 +80,80 @@ def validate_curricula(
     return passed, failures
 
 
-def _check_sources_exist(
-    curriculum: ParsedCurriculum, corpus_root: Path, errors: CurriculumErrors
+def _check_grounding_exists(
+    curriculum: ParsedCurriculum,
+    corpus_root: Path,
+    errors: CurriculumErrors,
+    cache: dict[str, list[str] | None],
 ) -> None:
-    """Every `sources` path must resolve to a file under `corpus_root`.
+    """Every `grounding` reference must name a real `##` section of a real document.
 
-    A path listed because it merely mentions the term makes card grounding worse, not
-    better (the contract), so a typo pointing at nothing is worth catching here rather
-    than discovering it as an empty retrieval during a generation run.
+    Checked against `frog.ingest.contract.parse_document` -- the SAME parser the
+    ingester chunks with -- rather than by searching the file for the heading text.
+    That matters twice: a substring search passes `#Foo` against a document whose only
+    heading is `## Foobar`, and it would happily match a `##` line inside a fenced code
+    block that never becomes a chunk. Agreeing with the chunker is the whole point: a
+    reference that validates here must resolve to a row after ingestion.
+
+    A document that does not satisfy the corpus contract is reported as exactly that,
+    not as a missing heading -- the author's next move is different in each case.
     """
 
     for subtopic in curriculum.subtopics:
-        for source in subtopic.sources:
-            if not (corpus_root / source).is_file():
-                errors.add(
-                    f"subtopic {subtopic.title!r}: source {source!r} does not exist under "
-                    f"{corpus_root.as_posix()}"
-                )
+        for tier in subtopic.tiers:
+            where = f"subtopic {subtopic.title!r}, tier {tier.tier!r}"
+            for ref in tier.grounding:
+                split = split_grounding_ref(ref)
+                if split is None:  # pragma: no cover - shape is checked in the contract
+                    continue
+                path, heading = split
+                headings = _document_headings(corpus_root, path, cache)
+                if headings is None:
+                    errors.add(
+                        f"{where}: grounding document {path!r} does not exist under "
+                        f"{corpus_root.as_posix()}, or does not satisfy the corpus "
+                        "contract (run `make corpus-check`)"
+                    )
+                    continue
+                if heading not in headings:
+                    errors.add(
+                        f"{where}: {path} has no `## {heading}` section"
+                        + _did_you_mean(heading, headings)
+                    )
+
+
+def _document_headings(
+    corpus_root: Path, path: str, cache: dict[str, list[str] | None]
+) -> list[str] | None:
+    """Section headings of one corpus document, or None if it cannot be read.
+
+    Cached across the whole run: a tier names several sections of one document and
+    several tiers name the same document, so without this a ten-subtopic curriculum
+    re-parses the same files a hundred times.
+    """
+
+    if path in cache:
+        return cache[path]
+    document_path = corpus_root / path
+    headings: list[str] | None = None
+    if document_path.is_file():
+        parsed, _errors = parse_document(path, document_path.read_bytes())
+        if parsed is not None:
+            headings = [section.heading for section in parsed.sections]
+    cache[path] = headings
+    return headings
+
+
+def _did_you_mean(heading: str, candidates: list[str]) -> str:
+    """The closest real heading, when there is one close enough to be the intent.
+
+    These references are long, exact strings copied by hand out of a document -- the
+    overwhelmingly likely failure is a truncation or a typo, not an invented section.
+    Naming the near miss turns a delivery round-trip into a one-line fix.
+    """
+
+    match = get_close_matches(heading, candidates, n=1, cutoff=0.6)
+    return f" -- did you mean {match[0]!r}?" if match else ""
 
 
 @dataclass
@@ -159,11 +225,12 @@ async def ingest_curriculum(session: AsyncSession, parsed: ParsedCurriculum) -> 
                 title=subtopic.title,
                 description=subtopic.description,
                 prerequisites=list(subtopic.prerequisites),
-                source_paths=list(subtopic.sources),
+                source_paths=list(subtopic.source_paths),
                 tiers={
                     tier.tier: {
                         "target_cards": tier.target_cards,
                         "card_types": dict(tier.card_types),
+                        "grounding": list(tier.grounding),
                     }
                     for tier in subtopic.tiers
                 },

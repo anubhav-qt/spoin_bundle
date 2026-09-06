@@ -157,12 +157,18 @@ async def ingest_document(
     document.ingested_at = datetime.now(UTC)
     await session.flush()
 
-    for ordinal, (text, vector) in enumerate(zip(texts, vectors, strict=True)):
+    for ordinal, (section, text, vector) in enumerate(
+        zip(parsed.sections, texts, vectors, strict=True)
+    ):
         session.add(
             Chunk(
                 document_id=document.id,
                 ordinal=ordinal,
                 text=text,
+                #: Stored alongside the text it is already prefixed into, so an
+                #: authored `<path>#<heading>` reference resolves by join rather
+                #: than by matching the front of `text`.
+                heading=section.heading,
                 embedding=vector,
                 #: From the embedder that just produced `vector`, never from config —
                 #: a stamp read from somewhere other than the thing that did the work

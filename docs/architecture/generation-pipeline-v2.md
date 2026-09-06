@@ -166,7 +166,11 @@ users request.
 ## 5. What does not change
 
 - **No LLM in the feed read path** (hard rule 1), and the feed only ever sees `active` cards.
-- **Card grounding** — top 2, no floor, no token budget (ADR-0089 as amended).
+- ~~**Card grounding** — top 2, no floor, no token budget (ADR-0089 as amended).~~
+  **Changed the same day by [ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md):**
+  the curriculum declares a per-tier scope and retrieval runs once per card inside it.
+  Reading this design against the first authored topic is what surfaced it — 568 cards
+  would have been written from 20 of the corpus's 152 chunks.
 - **The two-pass gate**, dedup, ASCII fetch, question generation, the quiz ladder.
 - **Every LLM interface method takes a collection** (ADR-0005), Mistral's included.
 - **LangChain/LangGraph confinement** (ADR-0002) — and Mistral on raw httpx adds no new

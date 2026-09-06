@@ -41,14 +41,27 @@ from pathlib import Path
 #: needs no database, no GPU and no network — the same purity that makes
 #: `make corpus-check` worth having.
 CANON_SOURCE_HASHES: dict[str, str] = {
+    #: Re-pinned 2026-09-06 after `## The ASCII Box Rule` was split in two — it was
+    #: 2598 characters against the ingestion contract's 2200 cap, so the section could
+    #: not be ingested as a chunk at all. Reviewed as the guard requires: the split is
+    #: editorial, at the seam between the immutability rules (1-3) and the geometry and
+    #: text rules (4-6). No rule changed, gained a clause or lost one, so no preamble
+    #: below condenses anything different than it did.
     "ascii-box-rule-and-gag-scenes.md": (
-        "4750c503962a43f3696e9821a0aaf1028b501ea0dda140ac32dab506cfc0431f"
+        "3784ab178999691d09fe3e03de2b95e203805e6b3b877c81ae6e4a27efbd9baf"
     ),
     "card-anatomy-and-fields.md": (
         "84a696bd04c3e35e28f7553df90c8c1317de8eb8fb9a5337467b7e32c514f10c"
     ),
+    #: Re-pinned 2026-09-06 after the document grew a sixth card type, `image`
+    #: (ADR-0095's open-licensed catalog). Reviewed as the guard requires rather than
+    #: bumped: no preamble changed, because no prompt can act on it yet. Image
+    #: ingestion is unbuilt (task 0040 Phase 2), nothing retrieves an image, and
+    #: `_card_matches_type` cannot yet tell an image card from a prose one -- teaching
+    #: the writer a type it has no way to produce would spend tokens inviting a shape
+    #: the pipeline would then miscount. Revisit when the image path lands.
     "card-archetypes-and-content-shapes.md": (
-        "098898ba8ef548ff3261400405fb1950cd0f5e23ffdfaff7078ab3374c375dc1"
+        "2f22df6a4e08c3ddf42b0a9f9aa8298a56423e2abd054add6fee338a39662a35"
     ),
     "curriculum-progression-and-quizzes.md": (
         "3e84db863a02edb577e8ce1c81ce84147387bceac7de6f69f5514f9a1025ece5"

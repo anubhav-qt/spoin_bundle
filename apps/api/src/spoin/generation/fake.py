@@ -255,6 +255,11 @@ class FakeContentGenerator(ContentGenerator):
                 extra_body = (
                     f"\n\n```diagram\n[Source_{idx}] --> [Process_{idx}] --> [Sink_{idx}]\n```\n"
                 )
+            elif card_type in (CardType.IMAGE, "image"):
+                extra_body = (
+                    f"\n\nObservational framing #{idx}: verified visual anchor "
+                    f"with high-density morphology for {idx}."
+                )
 
             angle_key = (subtopic_title, difficulty.value)
             angle_index = self._angle_counters.get(angle_key, 0)

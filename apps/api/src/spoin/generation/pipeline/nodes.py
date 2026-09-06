@@ -41,6 +41,7 @@ from spoin.generation.base import (
 )
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
+from spoin.generation.grounding import CardGrounding, GroundingContext
 from spoin.generation.load_balancer import estimate_tokens, pack_by_tokens
 from spoin.generation.pipeline.persistence import (
     _current_question_stems,
@@ -73,7 +74,9 @@ from spoin.generation.pipeline.state import (
 from spoin.generation.quota import QuotaExhaustedError
 
 
-async def _tier_grounding(runtime: _Runtime, topic_name: str, tier: SubtopicPlan) -> str:
+async def _tier_grounding(
+    runtime: _Runtime, topic_name: str, tier: SubtopicPlan
+) -> GroundingContext:
     """ADR-0089's retrieved context for a tier -- which is really its GROUP's.
 
     Every call about this concept asks through here, and all but the first get it
@@ -83,19 +86,121 @@ async def _tier_grounding(runtime: _Runtime, topic_name: str, tier: SubtopicPlan
     disagreement between two models into a coin flip, which is the failure ADR-0089
     exists to remove.
 
-    Returns the rendered block, empty when the run is ungrounded. The distinction
-    between "nothing matched" and "no corpus reachable" is logged where it is known,
-    inside `Grounding`, rather than carried through every signature that only needs
-    prompt text.
+    Still subtopic-shaped, and still the right shape for what now uses it: the
+    PLANNER, which decides which cards should exist and therefore wants breadth
+    across the subtopic rather than passages chosen for a card that does not exist
+    yet. The writer no longer uses this -- it retrieves per card, inside the scope
+    the curriculum declared (`Grounding.for_cards`).
+
+    Returns the whole context rather than its block: a round that has to fall back
+    to it still needs its chunk ids, so the cards written from it cite what they
+    actually read.
     """
 
-    context = await runtime.grounding.for_subtopic(
+    return await runtime.grounding.for_subtopic(
         subtopic_group_id=uuid.UUID(tier["subtopic_group_id"]),
         topic_name=topic_name,
         subtopic_title=tier["title"],
         subtopic_description=tier["description"],
     )
-    return context.block
+
+
+def _fit_round(runtime: _Runtime, plans: list[CardPlan]) -> tuple[list[CardPlan], list[CardPlan]]:
+    """Split a round's plans into what fits in one call and what waits for the next.
+
+    Two budgets, and the output one usually binds first. A drafting response carries
+    whole card bodies, and one truncated at the model's output cap fails to parse --
+    which loses every card in the batch, not just the overflow. So the number of cards
+    is capped by `output_budget // card_output_tokens_estimate`, and the prompt side is
+    packed by `pack_by_tokens` exactly as the gate passes already are.
+
+    A single plan that is over budget on its own still gets a round to itself: splitting
+    one brief is not this function's business, and dropping it would be a silent loss
+    of a card to satisfy an estimate (same posture as `pack_by_tokens`).
+    """
+
+    if not plans:
+        return plans, []
+
+    settings = runtime.settings
+    by_output = max(1, settings.card_output_tokens_estimate)
+    #: Mistral's cap, used whichever backend is running: it is the TIGHTEST of the
+    #: drafting providers (ADR-0090 routes drafting there), so packing to it is safe
+    #: on Gemini and correct on Mistral. A per-backend output cap would be a second
+    #: knob to keep in step for no gain while one provider is strictly tighter.
+    max_cards = max(1, settings.mistral_max_output_tokens // by_output)
+    #: The prompt budget minus what the round's non-plan context already costs. Left as
+    #: the plain budget rather than measured: the preamble, avoid-bodies and grounding
+    #: block are the same for every round of a tier, and `pack_by_tokens` is a guard
+    #: against a fat batch, not an exact accountant.
+    packed = pack_by_tokens(
+        plans,
+        cost=lambda plan: estimate_tokens(plan.canonical_title + plan.content_direction),
+        budget=settings.gemini_prompt_token_budget,
+        max_items=min(max_cards, settings.generation_batch_size),
+    )
+    first = packed[0]
+    deferred = [plan for chunk in packed[1:] for plan in chunk]
+    if deferred:
+        logger.info(
+            "drafting round packed to %d card(s); %d deferred to the next round "
+            "(output cap %d cards, prompt budget %d tokens)",
+            len(first),
+            len(deferred),
+            max_cards,
+            settings.gemini_prompt_token_budget,
+        )
+    return first, deferred
+
+
+async def _round_grounding(
+    runtime: _Runtime,
+    *,
+    topic_name: str,
+    tier: SubtopicPlan,
+    plans: list[CardPlan],
+    fallback: GroundingContext,
+) -> CardGrounding:
+    """Retrieval for one drafting round: per card, inside the tier's declared scope.
+
+    Falls back to the subtopic-level block when the round has no plans -- planning
+    failure is explicitly survivable (ADR-0059) and an unplanned round has no per-card
+    query to retrieve with, so it gets exactly the pre-ADR-0059 behaviour rather than
+    nothing.
+    """
+
+    if not plans:
+        return CardGrounding(
+            block=fallback.block,
+            chunk_ids_by_index={},
+            #: Every card in this round read the subtopic block and nothing else,
+            #: so that is exactly what each of them cites.
+            union=fallback.chunk_ids,
+            outcome=fallback.outcome,
+            estimated_tokens=fallback.estimated_tokens,
+            retrieved=fallback.retrieved,
+            allowance_used=0,
+        )
+
+    context = await runtime.grounding.for_cards(
+        topic_name=topic_name,
+        subtopic_title=tier["title"],
+        plans=plans,
+        grounding_refs=tier["grounding_refs"] or None,
+    )
+    logger.info(
+        "subtopic '%s' [%s]: grounded %d card(s) on %d distinct passage(s)%s",
+        tier["title"],
+        tier["difficulty"],
+        len(plans),
+        context.retrieved,
+        (
+            f" -- {context.allowance_used} used the open-corpus allowance"
+            if context.allowance_used
+            else ""
+        ),
+    )
+    return context
 
 
 async def _plan_tier_cards(
@@ -305,6 +410,7 @@ async def _persist_drafts(
     drafts: list[CardDraft],
     generated_at: str,
     backend: str,
+    chunk_ids: list[tuple[uuid.UUID, ...]] | None = None,
 ) -> list[str]:
     """Write freshly-returned drafts as `status=draft` rows, immediately. Returns ids.
 
@@ -346,6 +452,13 @@ async def _persist_drafts(
             visual_id=_clean_null_bytes(draft.visual_id[:64]) if draft.visual_id else None,
             visual_slots=_clean_null_bytes(draft.visual_slots),
             is_hero=draft.is_hero,
+            #: Recorded HERE, at draft time, not at acceptance -- retrieval is
+            #: per card now, so this finally means the passages retrieved for
+            #: THIS card rather than the ones its subtopic happened to get
+            #: (ADR-0089, rag-design-space 3.12). A rejected draft keeps its
+            #: citation too, which is what makes a bad passage traceable to
+            #: everything it produced, accepted or not.
+            grounded_chunk_ids=list(citations),
             gen_meta={
                 "backend": backend,
                 "generated_at": generated_at,
@@ -353,7 +466,7 @@ async def _persist_drafts(
                 "prompt_version": CARD_PROMPT_VERSION,
             },
         )
-        for draft in drafts
+        for draft, citations in zip(drafts, chunk_ids or [() for _ in drafts], strict=True)
     ]
     async with runtime.session_lock:
         runtime.session.add_all(rows)
@@ -538,6 +651,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
     topic_is_technical = is_technical_topic(job["topic_name"])
     all_card_types = [
         CardType.PROSE.value,
+        CardType.IMAGE.value,
         *([] if not topic_is_technical else [CardType.CODE.value]),
         CardType.DIAGRAM.value,
         CardType.COMPARISON.value,
@@ -556,6 +670,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     difficulty=tier["difficulty"],
                     drafts=[],
                     draft_card_ids=[],
+                    grounding_allowance_used=0,
                     generator_failures=[],
                     is_standalone=is_standalone,
                     cards_missing_questions=tier["cards_missing_questions"],
@@ -578,6 +693,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
         #: `status=draft` as soon as the writer returns, and the gate flips those
         #: rows rather than inserting new ones.
         draft_card_ids: list[str] = []
+        allowance_used = 0
         failures: list[str] = []
         existing_titles = list(tier["existing_titles"])
         # The actual DEFICIT this call should draft -- not the tier's full
@@ -641,7 +757,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             rejection_feedback=[
                 (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
             ],
-            grounding=tier_grounding,
+            grounding=tier_grounding.block,
         )
 
         # ADR-0080: pick a curated-library scene for each ascii brief before any
@@ -677,7 +793,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     (entry["body"], entry["reason"]) for entry in tier["rejection_feedback"]
                 ],
                 want_hero=True,
-                grounding=tier_grounding,
+                grounding=tier_grounding.block,
             )
             # The model is asked for exactly 1 card here but is trusted for
             # taste, never for constraints (CLAUDE.md) -- a batch call can
@@ -711,6 +827,10 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     drafts=hero_items,
                     generated_at=generated_at,
                     backend=backend,
+                    #: The hero has no plan -- it is a different framing, not one of
+                    #: the tier's briefs -- so it is written from the subtopic block
+                    #: and cites exactly that.
+                    chunk_ids=[tier_grounding.chunk_ids] * len(hero_items),
                 )
             )
             failures.extend(hero_result.failures)
@@ -760,6 +880,29 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 request_count = min(batch_size, remaining)
 
             round_plans = _take_plans(plan_pool, chosen_type, request_count)
+            #: The count above is a CEILING, not the batch. `_fit_round` cuts it
+            #: shorter whenever the plans are fat or the output would not fit, and what
+            #: does not fit stays in the pool for the next round -- the spillover half
+            #: of token metering (ADR-0085), applied to drafting rather than only to
+            #: the two gate passes.
+            round_plans, deferred = _fit_round(runtime, round_plans)
+            if deferred:
+                plan_pool[:0] = deferred
+                request_count = len(round_plans)
+            #: Retrieval is per CARD now, within the scope the curriculum
+            #: declared for this tier (generation-pipeline-v2). The block sent
+            #: is the deduplicated union of the round's cards' passages; the
+            #: per-card ids travel separately so each card cites what was
+            #: retrieved for IT. A round with no plans (planning failed) keeps
+            #: the subtopic-level block, which is the pre-ADR-0059 path.
+            round_grounding = await _round_grounding(
+                runtime,
+                topic_name=job["topic_name"],
+                tier=tier,
+                plans=round_plans,
+                fallback=tier_grounding,
+            )
+            allowance_used += round_grounding.allowance_used
             logger.info(
                 "subtopic '%s' [%s]: round %d (type=%s) -- requesting %d card(s) "
                 "(%d planned, %d/%d so far, existing=%d target=%d)",
@@ -789,7 +932,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 ],
                 card_type=chosen_type,
                 plans=round_plans,
-                grounding=tier_grounding,
+                grounding=round_grounding.block,
             )
             logger.info(
                 "subtopic '%s' [%s]: round %d got %d card(s), %d generator failure(s)",
@@ -811,6 +954,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     drafts=result.items,
                     generated_at=generated_at,
                     backend=backend,
+                    chunk_ids=round_grounding.chunk_ids_for(len(result.items)),
                 )
             )
             existing_titles.extend(
@@ -824,6 +968,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 difficulty=tier["difficulty"],
                 drafts=drafts,
                 draft_card_ids=draft_card_ids,
+                grounding_allowance_used=allowance_used,
                 generator_failures=failures,
                 is_standalone=is_standalone,
                 cards_missing_questions=tier["cards_missing_questions"],
@@ -1056,7 +1201,17 @@ async def _redraft_until_bar(
                 builds_on=[],
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
-                grounding=tier_grounding,
+                grounding=tier_grounding.block,
+            )
+            #: Per-card retrieval on redraft rounds too: a redraft's plans are new,
+            #: so its cards want passages chosen for THEM rather than the ones round 1
+            #: happened to pull. Same declared scope -- the tier's, unchanged.
+            redraft_grounding = await _round_grounding(
+                runtime,
+                topic_name=topic_name,
+                tier=tier,
+                plans=round_plans,
+                fallback=tier_grounding,
             )
             # ADR-0080: the fetcher does NOT run on redraft rounds. A redraft
             # card's asset_direction is new but small in number, and re-running
@@ -1077,7 +1232,7 @@ async def _redraft_until_bar(
                 avoid_bodies=avoid_bodies,
                 rejection_feedback=rejection_feedback,
                 plans=round_plans,
-                grounding=tier_grounding,
+                grounding=tier_grounding.block,
             )
             logger.info(
                 "redraft round %d: subtopic '%s' [%s] -- requested %d, got %d card(s), "
@@ -1111,6 +1266,7 @@ async def _redraft_until_bar(
                 drafts=result.items,
                 generated_at=generated_at,
                 backend=runtime.settings.generator,
+                chunk_ids=redraft_grounding.chunk_ids_for(len(result.items)),
             )
             round_results.append(
                 SubtopicCardsResult(
@@ -1119,6 +1275,7 @@ async def _redraft_until_bar(
                     difficulty=tier["difficulty"],
                     drafts=result.items,
                     draft_card_ids=round_draft_card_ids,
+                    grounding_allowance_used=redraft_grounding.allowance_used,
                     generator_failures=result.failures,
                     is_standalone=is_standalone,
                     # Round 1 already drained this tier's pre-run
@@ -1463,6 +1620,30 @@ async def _generate_questions_for_group(
     return topic_id, subtopic_id, difficulty, drafts, failures
 
 
+async def _drafted_chunk_ids(runtime: _Runtime, item: _GateItem) -> list[uuid.UUID]:
+    """Every distinct passage this tier's drafts were written from, in first-seen order.
+
+    Read from the draft rows rather than carried through `_GateItem`, because the rows
+    are already the authority: `_persist_drafts` recorded each card's citation when the
+    writer returned, and re-deriving it here would be a second copy that can disagree.
+    """
+
+    card_ids = [uuid.UUID(card_id) for card_id, _draft in item.survivors]
+    if not card_ids:
+        return []
+    async with runtime.session_lock:
+        rows = (
+            (
+                await runtime.session.execute(
+                    select(Card.grounded_chunk_ids).where(Card.id.in_(card_ids))
+                )
+            )
+            .scalars()
+            .all()
+        )
+    return list(dict.fromkeys(chunk_id for row in rows if row for chunk_id in row))
+
+
 async def _process_gate_item(
     runtime: _Runtime,
     item: _GateItem,
@@ -1491,12 +1672,24 @@ async def _process_gate_item(
     #: The same passages the writer had (ADR-0089), from `Grounding`'s cache --
     #: this is the group the drafting node already retrieved for, so this costs a
     #: corpus-version check rather than a search.
-    grounding = await runtime.grounding.for_subtopic(
-        subtopic_group_id=uuid.UUID(item.subtopic_group_id),
-        topic_name=item.topic_name,
-        subtopic_title=item.subtopic_title,
-        subtopic_description=item.subtopic_description,
-    )
+    #: ADR-0089's invariant, kept now that drafting retrieves per card: the corrector
+    #: and the verifier are handed the passages THESE cards were written from, read back
+    #: by the ids recorded on their draft rows, not a fresh subtopic query. A verifier
+    #: holding different evidence than the writer turns a disagreement between two
+    #: models into a coin flip, which is the failure that ADR exists to remove.
+    #:
+    #: Falls back to the subtopic-level block when the drafts carry no citations at all
+    #: -- an ungrounded run, or drafts from before per-card retrieval landed.
+    gate_chunk_ids = await _drafted_chunk_ids(runtime, item)
+    grounding_block = await runtime.grounding.block_for_chunk_ids(gate_chunk_ids)
+    if not grounding_block:
+        fallback = await runtime.grounding.for_subtopic(
+            subtopic_group_id=uuid.UUID(item.subtopic_group_id),
+            topic_name=item.topic_name,
+            subtopic_title=item.subtopic_title,
+            subtopic_description=item.subtopic_description,
+        )
+        grounding_block = fallback.block
 
     if item.survivors:
         _, corrected, failures = await _correct_subtopic_drafts(
@@ -1506,7 +1699,7 @@ async def _process_gate_item(
             topic_description=item.topic_description,
             difficulty_examples=item.difficulty_examples,
             drafts=item.survivors,
-            grounding=grounding.block,
+            grounding=grounding_block,
         )
         item.corrected = corrected
         item.correction_failure_count = len(failures)
@@ -1556,7 +1749,7 @@ async def _process_gate_item(
             subtopic_id=item.subtopic_id,
             difficulty_examples=item.difficulty_examples,
             items=item.dedup_survivors,
-            grounding=grounding.block,
+            grounding=grounding_block,
         )
         item.verified = verified
         item.verification_rejects = verify_rejects
@@ -1636,7 +1829,9 @@ async def _process_gate_item(
                 #: the citation names what the model actually saw rather than what a
                 #: later re-query would return. `list(...)` because the context is
                 #: shared across a whole subtopic group and must stay immutable.
-                "grounded_chunk_ids": list(grounding.chunk_ids),
+                #: Already recorded at draft time, per card. Left alone here so the
+                #: citation keeps naming what THIS card was retrieved for rather
+                #: than being flattened to whatever its whole gate batch saw.
             },
         )
         for card_id, draft, embedding, confirmed_difficulty in item.verified
@@ -1747,6 +1942,9 @@ async def _process_gate_item(
         "accepted": len(accepted_updates),
         "rejected": total_rejected,
         "failed": total_failed,
+        #: Separate from every other count here, and deliberately so: it is not a
+        #: failure, it is the declared scope being too narrow for this many cards.
+        "grounding_allowance_used": item.grounding_allowance_used,
         #: Questions are NOT written here any more (ADR-0074) -- they run as one
         #: topic-wide phase after every group has cleared its card bar. The ids
         #: travel so that phase can still tell a card drafted THIS run from one
@@ -1973,6 +2171,7 @@ async def _gate_and_persist_results(
                 survivors=survivors,
                 structural_rejects=structural_rejects,
                 generator_failure_count=len(result["generator_failures"]),
+                grounding_allowance_used=result["grounding_allowance_used"],
                 subtopic_group_id=result["subtopic_group_id"],
                 subtopic_title=result["subtopic_title"],
                 subtopic_description=result["subtopic_description"],

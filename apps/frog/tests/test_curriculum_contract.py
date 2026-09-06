@@ -21,24 +21,27 @@ subtopics:
   - title: Ownership & Move Semantics
     description: Why a value has exactly one owner, and what a move costs
     prerequisites: []
-    sources:
-      - computer-science/programming-languages/rust/foundations.md
     tiers:
       beginner:
         target_cards: 18
         card_types: { prose: 8, code: 6, comparison: 2, ascii: 2 }
+        grounding:
+          - "computer-science/programming-languages/rust/foundations.md#Ownership"
+          - "computer-science/programming-languages/rust/foundations.md#Move Semantics"
       intermediate:
         target_cards: 14
         card_types: { prose: 5, code: 6, diagram: 1, ascii: 2 }
+        grounding:
+          - "computer-science/programming-languages/rust/foundations.md#Borrowing"
   - title: Smart Pointers
     description: Heap ownership, shared ownership, and what each pointer costs
     prerequisites: [Ownership & Move Semantics]
-    sources:
-      - computer-science/programming-languages/rust/smart-pointers.md
     tiers:
       intermediate:
         target_cards: 15
         card_types: { prose: 6, code: 7, ascii: 2 }
+        grounding:
+          - "computer-science/programming-languages/rust/smart-pointers.md#Box and Heap Allocation"
 ---
 """
 
@@ -103,7 +106,6 @@ is_survey: false
 subtopics:
   - title: Ownership
     prerequisites: []
-    sources: [computer-science/x.md]
 ---
 """
     _, problems = _parse(raw)
@@ -165,13 +167,21 @@ subtopics:
   - title: A
     description: d
     prerequisites: [B]
-    sources: [computer-science/x.md]
-    tiers: { beginner: { target_cards: 5, card_types: { prose: 5 } } }
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+        grounding:
+          - "computer-science/x.md#A"
   - title: B
     description: d
     prerequisites: [A]
-    sources: [computer-science/x.md]
-    tiers: { beginner: { target_cards: 5, card_types: { prose: 5 } } }
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+        grounding:
+          - "computer-science/x.md#B"
 ---
 """
     _, problems = _parse(raw)
@@ -190,3 +200,158 @@ def test_duplicate_titles() -> None:
     raw = VALID.replace(b"title: Smart Pointers", b"title: Ownership & Move Semantics")
     _, problems = _parse(raw)
     assert any("duplicate title" in p for p in problems)
+
+
+def test_tier_level_grounding_parses_clean() -> None:
+    raw = b"""---
+topic: Rust
+description: Systems programming with ownership, borrowing and fearless concurrency
+is_survey: false
+subtopics:
+  - title: Ownership & Move Semantics
+    description: Why a value has exactly one owner, and what a move costs
+    prerequisites: []
+    tiers:
+      beginner:
+        target_cards: 10
+        card_types: { prose: 5, ascii: 2, diagram: 1, comparison: 2 }
+        grounding:
+          - "computer-science/programming-languages/rust/foundations.md#Ownership"
+          - "computer-science/programming-languages/rust/foundations.md#Move Semantics"
+---
+"""
+    curriculum, problems = _parse(raw)
+    assert problems == []
+    assert curriculum is not None
+    assert curriculum.subtopics[0].source_paths == [
+        "computer-science/programming-languages/rust/foundations.md"
+    ]
+    assert curriculum.subtopics[0].tiers[0].grounding == [
+        "computer-science/programming-languages/rust/foundations.md#Ownership",
+        "computer-science/programming-languages/rust/foundations.md#Move Semantics",
+    ]
+
+
+def test_a_tier_without_grounding_is_rejected() -> None:
+    """A tier with no declared scope would fall through to an open corpus-wide
+    query for every one of its cards -- the behaviour `grounding` replaced."""
+
+    raw = b"""---
+topic: Rust
+description: Systems programming
+is_survey: false
+subtopics:
+  - title: Ownership & Move Semantics
+    description: Why a value has exactly one owner
+    prerequisites: []
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+---
+"""
+    _, problems = _parse(raw)
+    assert any("`grounding` is missing" in p for p in problems)
+
+
+def test_invalid_grounding_format() -> None:
+    raw = b"""---
+topic: Rust
+description: Systems programming
+is_survey: false
+subtopics:
+  - title: Ownership & Move Semantics
+    description: Why a value has exactly one owner
+    prerequisites: []
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+        grounding:
+          - "invalid_path_without_hash"
+---
+"""
+    _, problems = _parse(raw)
+    assert any("grounding entry" in p for p in problems)
+
+
+def test_the_old_subtopic_level_sources_field_is_rejected() -> None:
+    """`sources` was replaced by per-tier `grounding`, not supplemented by it.
+
+    A hard error rather than a silent ignore: a file still carrying `sources` was
+    written against the old contract, so every tier in it is missing the field that
+    replaced it, and saying so names the actual work.
+    """
+
+    raw = b"""---
+topic: Rust
+description: Systems programming
+is_survey: false
+subtopics:
+  - title: Ownership
+    description: One owner per value
+    prerequisites: []
+    sources: [computer-science/rust/foundations.md]
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+        grounding: ["computer-science/rust/foundations.md#Ownership"]
+---
+"""
+    _, problems = _parse(raw)
+    assert any("`sources` was replaced by per-tier `grounding`" in p for p in problems)
+
+
+def test_duplicate_grounding_entries_collapse_rather_than_fail() -> None:
+    """Naming a section twice is a copy-paste slip with an obvious intent."""
+
+    raw = b"""---
+topic: Rust
+description: Systems programming
+is_survey: false
+subtopics:
+  - title: Ownership
+    description: One owner per value
+    prerequisites: []
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+        grounding:
+          - "a.md#Ownership"
+          - "a.md#Ownership"
+---
+"""
+    curriculum, problems = _parse(raw)
+    assert problems == []
+    assert curriculum is not None
+    assert curriculum.subtopics[0].tiers[0].grounding == ["a.md#Ownership"]
+
+
+def test_a_heading_containing_a_colon_survives_when_quoted() -> None:
+    """The failure mode the contract warns about. Unquoted, YAML reads `a.md#Foo: Bar`
+    as a mapping rather than a string, and the whole subtopic parses as garbage."""
+
+    raw = b"""---
+topic: Astronomy
+description: A survey
+is_survey: true
+subtopics:
+  - title: Stellar Structure
+    description: Interiors
+    prerequisites: []
+    tiers:
+      beginner:
+        target_cards: 5
+        card_types: { prose: 5 }
+        grounding:
+          - "stellar.md#Physical Foundations: Hydrostatic Equilibrium and the Virial Thermostat"
+---
+"""
+    curriculum, problems = _parse(raw)
+    assert problems == []
+    assert curriculum is not None
+    assert curriculum.subtopics[0].tiers[0].grounding == [
+        "stellar.md#Physical Foundations: Hydrostatic Equilibrium and the Virial Thermostat"
+    ]

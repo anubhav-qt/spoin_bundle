@@ -303,6 +303,21 @@ class Settings(BaseSettings):
     # (ADR-0085), so a batch size trades requests against tokens-per-minute
     # rather than buying throughput for free.
     generation_batch_size: int = 15
+    #: A drafting round is packed to fit BOTH budgets, with the overflow becoming the
+    #: next round -- `generation_batch_size` above stays the ceiling, exactly as
+    #: ADR-0085 already has `pack_by_tokens` do for the two gate passes.
+    #:
+    #: Two budgets because a drafting call is the one place where the binding
+    #: constraint is usually OUTPUT, not input: the response carries N whole card
+    #: bodies, and a response truncated at the model's output cap fails to parse, which
+    #: loses **every card in the batch** rather than the overflow. Packing on input
+    #: alone would happily put thirty cards into one comfortable prompt and lose all
+    #: thirty.
+    #:
+    #: Per-card output estimate: title, canonical_title, summary and a Markdown body,
+    #: plus JSON structure. Deliberately generous -- the cost of overestimating is one
+    #: extra request, and the cost of underestimating is a whole batch.
+    card_output_tokens_estimate: int = 900
     #: Gate pass 1 (`correct_cards`, ADR-0030). Kept moderate because correction
     #: rewrites whole card BODIES -- its output scales with the batch, so a large
     #: chunk risks the model's output-token cap (truncation fails the whole call)
@@ -441,6 +456,15 @@ class Settings(BaseSettings):
     #:
     #: Owner's number and owner's reasoning, 2026-09-05. It replaced a 3000-token
     #: budget over a cap of 8 that was never measured against a real retrieval run.
+    #:
+    #: **This is per CARD now, not per subtopic** (ADR-0101), so the "roughly 1200
+    #: prompt tokens" above is no longer what a drafting call carries: the prompt gets
+    #: the deduplicated UNION of a round's cards' passages, which for astronomy's
+    #: 6-9-section tier scopes measures ~2800 tokens on average and ~4000 at worst.
+    #: The no-budget argument survives the change — the union is bounded by the
+    #: declared scope rather than by the corpus — but the number it was quoting does
+    #: not. Left at 2 because a round of nine cards already unions most of a scope;
+    #: raising it buys breadth the union is delivering anyway.
     grounding_chunks: int = 2
 
     # -- feed (ADR-0010) --------------------------------------------------------

@@ -204,6 +204,7 @@ async def _load_subtopic_plans(
                 description=subtopic.description,
                 target_cards=subtopic.target_cards,
                 card_type_quotas=subtopic.card_type_quotas or {},
+                grounding_refs=list(subtopic.grounding_refs or []),
                 existing_titles=[_existing_title_tag(c, t, d) for c, t, d in existing],
                 existing_count=this_subtopic_count,
                 avoid_duplicate_bodies=list(avoid_bodies),

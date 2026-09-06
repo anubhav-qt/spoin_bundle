@@ -155,6 +155,8 @@ def _card_matches_type(draft: CardDraft, card_type: str, *, topic_name: str | No
         return "diagram" in tags
     if card_type == CardType.COMPARISON.value:
         return "comparison" in tags
+    if card_type == CardType.IMAGE.value:
+        return not tags and draft.visual_id is None
     if card_type == CardType.PROSE.value:
         return not tags and draft.visual_id is None
     return False
@@ -186,6 +188,10 @@ class SubtopicPlan(TypedDict):
     description: str
     target_cards: int
     card_type_quotas: dict[str, int]
+    #: The corpus sections this tier's cards may be written from, as authored
+    #: (`subtopic.grounding_refs`). Empty means no declared scope -- retrieval
+    #: falls back to the open corpus-wide query it always did.
+    grounding_refs: list[str]
     #: Pre-fetched in resolve_and_plan_topic -- see module docstring for why
     #: this can't be a DB read inside generate_subtopic_cards. Spans every
     #: sibling subtopic in the same subtopic_group_id (ADR-0007's cross-tier ask).
@@ -271,6 +277,12 @@ class SubtopicCardsResult(TypedDict):
     #: whole subtopic group finishes drafting -- one run lost ~350 drafted cards that
     #: way. The gate then flips these rows in place, so this is how it finds them.
     draft_card_ids: list[str]
+    #: How many of this tier's cards were grounded by topping the author's
+    #: declared scope up from the open corpus. Reported rather than only logged:
+    #: a tier that keeps using the allowance is telling the author their
+    #: `grounding` is too narrow, and that is the feedback the whole declared-
+    #: scope design depends on being able to see.
+    grounding_allowance_used: int
     generator_failures: list[str]
     #: True iff this subtopic-tier has no sibling tiers in its
     #: `subtopic_group_id` -- decides whether the quality gate's two passes
@@ -411,6 +423,8 @@ class _GateItem:
     #: validation -- kept as the ORIGINAL draft, since correction never ran.
     structural_rejects: list[tuple[str, CardDraft, str]]
     generator_failure_count: int
+    #: Summed across this tier's drafting rounds -- see `SubtopicCardsResult`.
+    grounding_allowance_used: int
     #: What the gate needs to ask `Grounding` for the SAME context this tier was
     #: drafted from (ADR-0089). A gate judging a grounded card against different
     #: sources than the writer had is the coin flip that ADR exists to remove.

@@ -212,9 +212,16 @@ curriculum                     one per authored topic
   ├─ source_path (unique), content_hash, ingested_at
 curriculum_subtopic
   ├─ curriculum_id FK, ordinal
-  ├─ title, description, tiers[], target_cards
+  ├─ title, description
+  ├─ tiers jsonb                 {tier: {target_cards, card_types, grounding}}
   ├─ prerequisites text[]        titles within this curriculum
-  └─ source_paths text[]         documents backing it
+  └─ source_paths text[]         DERIVED from the tiers' grounding, never authored
+
+`grounding` is a list of `<corpus path>#<exact ## heading>` per tier -- the sections
+that tier's cards may be written from (ADR-0101). It replaced a subtopic-level
+`sources` field: two fields naming corpus material is a drift surface, and the tier is
+the level where the declaration is actually useful, because a beginner tier and an
+advanced one should not draw on the same passages.
 ```
 
 Deliberately **no** vector column and **no** `chunk` rows — structure is not retrieved (§3C).
@@ -223,7 +230,7 @@ Deliberately **no** vector column and **no** `chunk` rows — structure is not r
 
 ```
 topic.curriculum_corpus_version   varchar, nullable
-subtopic.source_document_ids      uuid[]   -- authored provenance, cross-DB by value
+subtopic.grounding_refs           text[]   -- the tier's declared scope, as authored
 curation_request                  new table: normalized_name, raw_name, demand_count,
                                   first_requested_at, status
 ```
@@ -270,6 +277,14 @@ means the matching machinery (ADR-0025) still earns its place: it decides whethe
 is an existing topic, an alias, or genuinely new.
 
 ## 10. Retrieval requirements
+
+> **Resolved by [ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md),
+> 2026-09-06.** The include filter this section calls optional was built
+> (`search(..., include_chunk_ids=...)`), and the declaration moved from the subtopic's
+> `sources` to a per-tier `grounding` list of section anchors. Retrieval now runs once per
+> CARD within that scope, topped up from an open query when the scope comes up short -- and
+> the top-ups are counted per tier, which turns the open question below into a measurement
+> rather than an argument.
 
 **V1 needs no change to frog.** Card grounding already works per subtopic and is unchanged.
 

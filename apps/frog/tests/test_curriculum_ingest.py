@@ -16,6 +16,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from frog.curriculum.models import Curriculum, CurriculumSubtopic
 from frog.curriculum.runner import ingest_curricula
 
+_CORPUS_DOC = """---
+kind: topic_source
+title: Rust reference material
+source: The Rust Reference
+scope: topic
+category: computer-science
+topic_tags: [rust]
+---
+## {heading}
+Reference prose for the {heading} section.
+"""
+
 _TEMPLATE = """---
 topic: Rust
 description: {description}
@@ -24,21 +36,21 @@ subtopics:
   - title: Ownership
     description: One owner per value
     prerequisites: []
-    sources:
-      - cs/ownership.md
     tiers:
       beginner:
         target_cards: 6
         card_types: {{ prose: 4, code: 2 }}
+        grounding:
+          - "cs/ownership.md#Ownership"
   - title: Smart Pointers
     description: Heap and shared ownership
     prerequisites: [Ownership]
-    sources:
-      - cs/pointers.md
     tiers:
       intermediate:
         target_cards: 8
         card_types: {{ prose: 5, code: 3 }}
+        grounding:
+          - "cs/pointers.md#Smart Pointers"
 ---
 """
 
@@ -48,8 +60,8 @@ def _tree(tmp_path: Path, *, description: str = "Systems programming") -> tuple[
     corpus = tmp_path / "corpus"
     (curricula / "rust").mkdir(parents=True)
     (corpus / "cs").mkdir(parents=True)
-    for name in ("ownership.md", "pointers.md"):
-        (corpus / "cs" / name).write_text("x", encoding="utf-8")
+    for name, heading in (("ownership.md", "Ownership"), ("pointers.md", "Smart Pointers")):
+        (corpus / "cs" / name).write_text(_CORPUS_DOC.format(heading=heading), encoding="utf-8")
     (curricula / "rust" / "curriculum.md").write_text(
         _TEMPLATE.format(description=description), encoding="utf-8"
     )
@@ -95,11 +107,11 @@ subtopics:
   - title: Ownership
     description: One owner per value
     prerequisites: []
-    sources: [cs/ownership.md]
     tiers:
       beginner:
         target_cards: 6
         card_types: { prose: 6 }
+        grounding: ["cs/ownership.md#Ownership"]
 ---
 """,
         encoding="utf-8",
@@ -118,7 +130,15 @@ subtopics:
     remaining = await session.scalar(select(CurriculumSubtopic))
     assert remaining is not None
     assert remaining.title == "Ownership"
-    assert remaining.tiers == {"beginner": {"target_cards": 6, "card_types": {"prose": 6}}}
+    assert remaining.tiers == {
+        "beginner": {
+            "target_cards": 6,
+            "card_types": {"prose": 6},
+            #: The declared scope rides in the tier JSONB, which is what the projection
+            #: reads to fill `subtopic.grounding_refs`.
+            "grounding": ["cs/ownership.md#Ownership"],
+        }
+    }
 
 
 @pytest.mark.asyncio

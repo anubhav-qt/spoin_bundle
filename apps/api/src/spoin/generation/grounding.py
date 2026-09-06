@@ -35,15 +35,20 @@ from __future__ import annotations
 
 import logging
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 
+from frog.curriculum.contract import split_grounding_ref
 from frog.embeddings import Embedder
-from frog.retrieval import Hit, corpus_version, search
-from frog.universe.models import DocumentKind
+from frog.retrieval import Hit, corpus_version, search, search_many
+from frog.universe.models import Chunk, Document, DocumentKind
+from sqlalchemy import select, tuple_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.core.db import UniverseNotConfiguredError, universe_session_scope
+from spoin.generation.base import CardPlan
 from spoin.generation.load_balancer import estimate_tokens
 
 logger = logging.getLogger(__name__)
@@ -102,6 +107,21 @@ class GroundingContext:
     @classmethod
     def empty(cls, outcome: GroundingOutcome) -> GroundingContext:
         return cls(block="", chunk_ids=(), outcome=outcome, estimated_tokens=0, retrieved=0)
+
+
+def build_card_query(topic_name: str, subtopic_title: str, plan: CardPlan) -> str:
+    """The retrieval query for ONE card, from the brief the planner wrote for it.
+
+    ADR-0059's planning pass is what makes per-card retrieval possible at all: it
+    produces a `CardPlan` for every card BEFORE any card is written, so there is a
+    real per-card query at the moment retrieval has to happen. rag-design-space §3.7
+    assumed no such query existed and cached one block per subtopic on that basis.
+
+    `content_direction` carries the angle and `canonical_title` the concept; the topic
+    and subtopic keep a short brief from matching the wrong field entirely.
+    """
+
+    return f"{topic_name}: {subtopic_title}. {plan.canonical_title}. {plan.content_direction}"
 
 
 def build_query(topic_name: str, subtopic_title: str, subtopic_description: str) -> str:
@@ -163,6 +183,10 @@ class Grounding:
         self._embedder = embedder
         self._chunks = chunks
         self._cache: dict[tuple[str, uuid.UUID], GroundingContext] = {}
+        #: Resolved scopes, keyed by corpus version + the refs themselves. A tier's
+        #: refs resolve to the same chunk ids for every batch and every redraft
+        #: round it runs, and re-resolving them per batch would be a join per call.
+        self._scopes: dict[tuple[str, tuple[str, ...]], list[uuid.UUID]] = {}
 
     async def for_subtopic(
         self,
@@ -216,6 +240,226 @@ class Grounding:
         self._cache[key] = context
         return context
 
+    async def for_cards(
+        self,
+        *,
+        topic_name: str,
+        subtopic_title: str,
+        plans: Sequence[CardPlan],
+        grounding_refs: Sequence[str] | None,
+    ) -> CardGrounding:
+        """Retrieve per card, send one deduplicated block (generation-pipeline-v2).
+
+        Two things happen here that `for_subtopic` could not:
+
+        **Retrieval is per card.** Each plan gets its own query, so a batch of fifteen
+        cards no longer shares the two passages their subtopic happened to match.
+        rag-design-space 3.7 cached one block per subtopic because "the query does not
+        change within a subtopic" -- true before ADR-0059's planner existed, false now.
+
+        **The author declares the scope.** `grounding_refs` names the sections this
+        tier's cards may be written from; ranking happens WITHIN them. That is
+        CLAUDE.md's rule applied to retrieval -- the constraint belongs to the author,
+        who knows which passages teach this tier, and the taste belongs to the machine,
+        which picks better among a dozen candidates than a human would across hundreds
+        of cards.
+
+        **The allowance.** When the declared scope cannot fill `k` for a card, the
+        shortfall is topped up from an open corpus-wide query. It is meant to be rare,
+        it keeps a slightly-wrong declaration from starving a card, and it is COUNTED
+        (`allowance_used`) rather than silent -- a tier that keeps using it is
+        reporting that its scope is too narrow.
+
+        Never raises, same contract as `for_subtopic`: an unreachable corpus degrades
+        to ungrounded generation rather than losing the run.
+        """
+
+        if not plans:
+            return CardGrounding.empty(GroundingOutcome.NO_MATCH)
+
+        queries = [build_card_query(topic_name, subtopic_title, plan) for plan in plans]
+        try:
+            async with universe_session_scope() as session:
+                version = await corpus_version(session)
+                scope = await self._scope_for(session, version, grounding_refs)
+                per_card = await self._retrieve(session, queries, scope)
+        except UniverseNotConfiguredError:
+            logger.warning("grounding unavailable: SPOIN_UNIVERSE_DATABASE_URL is not set")
+            return CardGrounding.empty(GroundingOutcome.UNAVAILABLE)
+        except SQLAlchemyError:
+            logger.exception("grounding unavailable: the corpus database could not be read")
+            return CardGrounding.empty(GroundingOutcome.UNAVAILABLE)
+
+        allowance_used = sum(1 for _hits, topped_up in per_card if topped_up)
+
+        #: The union, in first-seen order, deduplicated by chunk id. Cards in one batch
+        #: share a subtopic, so this collapses hard -- which is what makes per-card
+        #: retrieval affordable inside a batched call.
+        union: list[Hit] = []
+        seen: set[uuid.UUID] = set()
+        for hits, _topped_up in per_card:
+            for hit in hits:
+                if hit.chunk_id not in seen:
+                    seen.add(hit.chunk_id)
+                    union.append(hit)
+
+        if not union:
+            return CardGrounding.empty(GroundingOutcome.NO_MATCH)
+
+        block = render_block(union)
+        return CardGrounding(
+            block=block,
+            chunk_ids_by_index={
+                index: tuple(hit.chunk_id for hit in hits)
+                for index, (hits, _topped_up) in enumerate(per_card)
+            },
+            union=tuple(hit.chunk_id for hit in union),
+            outcome=GroundingOutcome.GROUNDED,
+            estimated_tokens=estimate_tokens(block),
+            retrieved=len(union),
+            allowance_used=allowance_used,
+        )
+
+    async def block_for_chunk_ids(self, chunk_ids: Sequence[uuid.UUID]) -> str:
+        """The prompt block for an EXPLICIT set of chunks, in relevance-free order.
+
+        This is how the gate keeps ADR-0089's invariant now that drafting is per
+        card: the corrector and the verifier are handed the passages the cards
+        in front of them were actually written from, read back by id, rather
+        than a fresh subtopic query that would show them different sources. A
+        verifier holding different evidence than the writer turns a disagreement
+        between two models into a coin flip, which is the failure ADR-0089
+        exists to remove.
+        """
+
+        if not chunk_ids:
+            return ""
+        try:
+            async with universe_session_scope() as session:
+                rows = (
+                    await session.execute(
+                        select(Chunk, Document)
+                        .join(Document, Document.id == Chunk.document_id)
+                        .where(Chunk.id.in_(list(dict.fromkeys(chunk_ids))))
+                    )
+                ).all()
+        except UniverseNotConfiguredError:
+            return ""
+        except SQLAlchemyError:
+            logger.exception("grounding: could not read back the drafters' passages")
+            return ""
+
+        #: `score` is meaningless here -- nothing was ranked, these chunks were
+        #: chosen by the drafter's own retrieval -- so it is zero rather than
+        #: invented. `render_block` does not show it.
+        hits = [
+            Hit(
+                chunk_id=chunk.id,
+                document_id=document.id,
+                score=0.0,
+                text=chunk.text,
+                ordinal=chunk.ordinal,
+                topic_tags=list(chunk.topic_tags),
+                document_title=document.title,
+                source=document.source,
+                source_path=document.source_path,
+                kind=document.kind,
+                category=document.category,
+                sub_category=document.sub_category,
+            )
+            for chunk, document in rows
+        ]
+        return render_block(hits)
+
+    async def _scope_for(
+        self, session: AsyncSession, version: str, refs: Sequence[str] | None
+    ) -> list[uuid.UUID] | None:
+        """This tier's declared scope as chunk ids, or None for "no scope declared".
+
+        No declaration means the open corpus-wide query. Every reference failing to
+        resolve produces the same open query but is a completely different fact, so it
+        is logged at ERROR: the cards look identical either way, and confusing the two
+        would hide a whole tier grounding on material its curriculum never named.
+        """
+
+        if not refs:
+            return None
+        key = (version, tuple(refs))
+        cached = self._scopes.get(key)
+        if cached is not None:
+            return cached
+
+        chunk_ids, missing = await _resolve_scope(session, refs)
+        if missing:
+            logger.warning(
+                "grounding: %d of %d declared reference(s) did not resolve -- %s. "
+                "Re-run `make curriculum-check`, then `make corpus-ingest`.",
+                len(missing),
+                len(refs),
+                "; ".join(missing[:3]),
+            )
+        if not chunk_ids:
+            logger.error(
+                "grounding: NONE of the %d declared reference(s) resolved; this tier "
+                "falls back to an open corpus-wide query, so its cards are NOT scoped "
+                "the way its curriculum says they are.",
+                len(refs),
+            )
+            return None
+        self._scopes[key] = chunk_ids
+        return chunk_ids
+
+    async def _retrieve(
+        self,
+        session: AsyncSession,
+        queries: list[str],
+        scope: list[uuid.UUID] | None,
+    ) -> list[tuple[list[Hit], bool]]:
+        """Top-k per query within `scope`, topped up from the open corpus when short.
+
+        Returns `(hits, allowance_was_used)` per query, in the order given.
+        """
+
+        scoped = await search_many(
+            session,
+            self._embedder,
+            queries,
+            k=self._chunks,
+            kinds=[DocumentKind.TOPIC_SOURCE],
+            include_chunk_ids=scope,
+        )
+        if scope is None:
+            return [(hits, False) for hits in scoped]
+
+        #: The trigger is STRUCTURAL -- fewer chunks came back than were asked for --
+        #: rather than a similarity floor. No calibrated floor exists yet, and inventing
+        #: a constant to defend a guess is worse than not having one; the scores are
+        #: recorded per card, so the first real run can settle what the floor should be.
+        short = [index for index, hits in enumerate(scoped) if len(hits) < self._chunks]
+        if not short:
+            return [(hits, False) for hits in scoped]
+
+        logger.info(
+            "grounding: declared scope filled %d/%d card(s); topping the rest up from "
+            "the open corpus",
+            len(queries) - len(short),
+            len(queries),
+        )
+        topped = await search_many(
+            session,
+            self._embedder,
+            [queries[index] for index in short],
+            k=self._chunks,
+            kinds=[DocumentKind.TOPIC_SOURCE],
+            exclude_chunk_ids=scope,
+        )
+        results: list[tuple[list[Hit], bool]] = [(hits, False) for hits in scoped]
+        for index, extra in zip(short, topped, strict=True):
+            hits = scoped[index]
+            room = self._chunks - len(hits)
+            results[index] = (hits + extra[:room], True)
+        return results
+
     def _context(self, hits: list[Hit]) -> GroundingContext:
         if not hits:
             return GroundingContext.empty(GroundingOutcome.NO_MATCH)
@@ -227,3 +471,108 @@ class Grounding:
             estimated_tokens=estimate_tokens(block),
             retrieved=len(hits),
         )
+
+
+@dataclass(frozen=True)
+class CardGrounding:
+    """Per-card retrieval for one batch of cards, plus how it was obtained.
+
+    `blocks` is what the prompt carries: ONE deduplicated block for the whole batch,
+    not a block per card. Addressing passages to individual cards in the prompt --
+    "card 1 write from P1,P2; card 2 from P3,P4" -- would load the whole scheme onto
+    instruction-following, which ADR-0090 names as the drafting model's weak spot. The
+    union costs less than it looks: cards in one batch share a subtopic, so their
+    passages overlap heavily and collapse.
+
+    `chunk_ids_by_index` stays exact per card regardless, because we know which query
+    returned what. That is what finally makes `card.grounded_chunk_ids` mean "the
+    passages retrieved for THIS card" rather than "the passages this card's subtopic
+    got", which is what ADR-0089 wanted and rag-design-space §3.12 needs.
+    """
+
+    block: str
+    #: Position in the batch -> the chunks retrieved for that card, in rank order.
+    chunk_ids_by_index: dict[int, tuple[uuid.UUID, ...]]
+    #: Every chunk in `block`, deduplicated. The citation for a card that has no
+    #: brief of its own -- the hero call, or a round whose planning failed -- which
+    #: read this block and nothing else.
+    union: tuple[uuid.UUID, ...]
+    outcome: GroundingOutcome
+    estimated_tokens: int
+    #: Distinct chunks in `block`, after the union collapsed duplicates.
+    retrieved: int
+    #: Cards whose declared scope could not fill `k` and were topped up from an open
+    #: corpus-wide query. Counted, never silent: a tier that keeps falling back is
+    #: telling the author their `grounding` is too narrow, and that is feedback to act
+    #: on rather than a failure to paper over.
+    allowance_used: int
+
+    def chunk_ids_for(self, count: int) -> list[tuple[uuid.UUID, ...]]:
+        """Per-card citations for the `count` drafts a writer actually returned.
+
+        Matched positionally, because the writer is briefed with the plans in
+        order and asked to write one card per brief. It is best-effort by
+        construction -- the model is trusted for taste, never for constraints
+        (CLAUDE.md), so it can return fewer cards than briefs, or more.
+
+        A card with no matching brief cites the ROUND's union rather than
+        nothing: it was written from that block, so the union is the honest
+        answer, and an empty citation would read as ungrounded.
+        """
+
+        return [self.chunk_ids_by_index.get(index, self.union) for index in range(count)]
+
+    @classmethod
+    def empty(cls, outcome: GroundingOutcome) -> CardGrounding:
+        return cls(
+            block="",
+            chunk_ids_by_index={},
+            union=(),
+            outcome=outcome,
+            estimated_tokens=0,
+            retrieved=0,
+            allowance_used=0,
+        )
+
+
+async def _resolve_scope(
+    session: AsyncSession, refs: Sequence[str]
+) -> tuple[list[uuid.UUID], list[str]]:
+    """Authored `<path>#<heading>` references -> chunk ids, plus the ones that missed.
+
+    A join on `(document.source_path, chunk.heading)`, which is why `chunk.heading` is
+    a column rather than something recovered from the front of `chunk.text`: a prefix
+    match would resolve `#Ownership` to `## Ownership Foundations`, silently grounding
+    a tier on the wrong passage.
+
+    Unresolved references are RETURNED, not logged and dropped. A curriculum whose
+    refs stopped resolving -- a renamed heading, or a corpus not re-ingested since --
+    is a condition the run has to be able to report, and it is the difference between
+    "the author scoped this narrowly" and "the scope evaporated".
+    """
+
+    #: (ref, (path, heading)) kept together: a malformed ref has no key, and zipping
+    #: two lists that dropped different elements would misattribute the misses.
+    keyed = [(ref, split_grounding_ref(ref)) for ref in refs]
+    wanted = [key for _ref, key in keyed if key is not None]
+    if not wanted:
+        return [], list(refs)
+
+    rows = (
+        await session.execute(
+            select(Document.source_path, Chunk.heading, Chunk.id)
+            .join(Chunk, Chunk.document_id == Document.id)
+            .where(tuple_(Document.source_path, Chunk.heading).in_(wanted))
+        )
+    ).all()
+    found = {(source_path, heading): chunk_id for source_path, heading, chunk_id in rows}
+
+    chunk_ids: list[uuid.UUID] = []
+    missing: list[str] = []
+    for ref, key in keyed:
+        chunk_id = found.get(key) if key is not None else None
+        if chunk_id is None:
+            missing.append(ref)
+        else:
+            chunk_ids.append(chunk_id)
+    return chunk_ids, missing

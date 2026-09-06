@@ -85,6 +85,7 @@ def _select_hits(
     topic_tags: Collection[str] | None,
     exclude_document_ids: Collection[uuid.UUID] | None,
     exclude_chunk_ids: Collection[uuid.UUID] | None,
+    include_chunk_ids: Collection[uuid.UUID] | None,
 ) -> Select[tuple[Chunk, Document, float]]:
     """The query, built once and shared by the single and batch entrypoints.
 
@@ -112,6 +113,16 @@ def _select_hits(
         statement = statement.where(Document.kind.in_(list(kinds)))
     if topic_tags is not None:
         statement = statement.where(Chunk.topic_tags.overlap(list(topic_tags)))
+    if include_chunk_ids is not None:
+        #: The mirror of `exclude_chunk_ids`, and the mechanism behind an authored
+        #: curriculum's declared scope (authored-curriculum.md §10): rank WITHIN the
+        #: sections the author said teach this tier, instead of guessing corpus-wide.
+        #:
+        #: An EMPTY collection means an empty scope and returns nothing -- distinct
+        #: from `None`, which means unscoped. Collapsing the two would turn a
+        #: curriculum whose refs all failed to resolve into a silent open query,
+        #: which is the one outcome the caller most needs to be able to see.
+        statement = statement.where(Chunk.id.in_(list(include_chunk_ids)))
     if exclude_document_ids:
         statement = statement.where(Document.id.not_in(list(exclude_document_ids)))
     if exclude_chunk_ids:
@@ -147,6 +158,7 @@ async def search(
     min_score: float | None = None,
     exclude_document_ids: Collection[uuid.UUID] | None = None,
     exclude_chunk_ids: Collection[uuid.UUID] | None = None,
+    include_chunk_ids: Collection[uuid.UUID] | None = None,
 ) -> list[Hit]:
     """Top-`k` chunks for one query string, most similar first.
 
@@ -167,6 +179,7 @@ async def search(
         min_score=min_score,
         exclude_document_ids=exclude_document_ids,
         exclude_chunk_ids=exclude_chunk_ids,
+        include_chunk_ids=include_chunk_ids,
     )
     return hits[0]
 
@@ -182,6 +195,7 @@ async def search_many(
     min_score: float | None = None,
     exclude_document_ids: Collection[uuid.UUID] | None = None,
     exclude_chunk_ids: Collection[uuid.UUID] | None = None,
+    include_chunk_ids: Collection[uuid.UUID] | None = None,
 ) -> list[list[Hit]]:
     """`search` for several queries, one embedding call for all of them.
 
@@ -213,6 +227,7 @@ async def search_many(
                 topic_tags=topic_tags,
                 exclude_document_ids=exclude_document_ids,
                 exclude_chunk_ids=exclude_chunk_ids,
+                include_chunk_ids=include_chunk_ids,
             )
         )
         hits = [_hit(chunk, document, score) for chunk, document, score in rows.all()]

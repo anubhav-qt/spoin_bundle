@@ -285,6 +285,10 @@ simply never have.
 
 ### 3.7 Retrieve once per subtopic, not once per call
 
+> ⚠️ **Superseded by [ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md).** The premise below — *the query does not change within a subtopic* — expired when [ADR-0059](../adr/0059-plan-before-writing.md) added a planning pass that produces a per-card brief before any card is written. Retrieval is now once per card, inside a scope the curriculum declares per tier. What stays true is the reasoning for the PLANNER, which still retrieves per subtopic because it wants breadth across cards that do not exist yet.
+
+> ⚠️ **Superseded by [ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md).** The premise below — *the query does not change within a subtopic* — expired when [ADR-0059](../adr/0059-plan-before-writing.md) added a planning pass that produces a per-card brief before any card is written. Retrieval is now once per card, inside a scope the curriculum declares per tier. What stays true is the reasoning for the PLANNER, which still retrieves per subtopic because it wants breadth across cards that do not exist yet.
+
 The query is known before generation and does not change within a subtopic (asymmetry
 2). So retrieve **once**, assemble the context **once**, and reuse it across every card
 draft in that subtopic and across both providers. Key the cache by
@@ -317,6 +321,10 @@ anything else; this would amend that.
 
 ### 3.10 The verifier retrieves per claim, not per subtopic
 
+> Partly delivered by [ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md): the verifier no longer holds subtopic-level context, it reads back the passages the cards in front of it were actually written from. Per *claim* decomposition is still open, and the plumbing for it now exists.
+
+> Partly delivered by [ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md): the verifier no longer holds subtopic-level context, it reads back the passages the cards in front of it were actually written from. Per *claim* decomposition is still open, and the plumbing for it now exists.
+
 The sharpest idea in this document, and the one most specific to Spoin.
 
 The writer's retrieval is subtopic-shaped. The verifier's should not be. Decompose the
@@ -330,6 +338,10 @@ an aspiration. It is expensive, and it is on the thinking ladder where expense i
 point.
 
 ### 3.11 Difficulty-aware retrieval
+
+> Delivered as an authored fact rather than an inferred signal ([ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md)): `grounding` is declared per TIER, so a beginner tier and an advanced one name different sections. Tagging chunks with a complexity signal is no longer needed for this; it would only help a topic nobody has scoped.
+
+> Delivered as an authored fact rather than an inferred signal ([ADR-0101](../adr/0101-author-declared-grounding-scope-and-per-card-retrieval.md)): `grounding` is declared per TIER, so a beginner tier and an advanced one name different sections. Tagging chunks with a complexity signal is no longer needed for this; it would only help a topic nobody has scoped.
 
 A beginner card and an advanced card on the same subtopic want different passages.
 Nobody else's RAG has this signal; ours does, on every query, from `subtopic.difficulty`.

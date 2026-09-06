@@ -42,13 +42,13 @@ from pathlib import Path
 #: `make corpus-check` worth having.
 CANON_SOURCE_HASHES: dict[str, str] = {
     "ascii-box-rule-and-gag-scenes.md": (
-        "fab943a78e62c364d4d533db62870de03d7161bff5d50d44fc607239a298bd82"
+        "4750c503962a43f3696e9821a0aaf1028b501ea0dda140ac32dab506cfc0431f"
     ),
     "card-anatomy-and-fields.md": (
         "84a696bd04c3e35e28f7553df90c8c1317de8eb8fb9a5337467b7e32c514f10c"
     ),
     "card-archetypes-and-content-shapes.md": (
-        "4e344c2ee9e09f045bd877acc756c3cc39b06bc41d9b6770e6c31cd5e5d7a2a9"
+        "098898ba8ef548ff3261400405fb1950cd0f5e23ffdfaff7078ab3374c375dc1"
     ),
     "curriculum-progression-and-quizzes.md": (
         "3e84db863a02edb577e8ce1c81ce84147387bceac7de6f69f5514f9a1025ece5"

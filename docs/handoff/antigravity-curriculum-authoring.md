@@ -145,6 +145,14 @@ subtopics at 12 cards each says nothing.
 tiers is teaching three genuinely different treatments of the concept, not the same material
 three times. If you cannot say what the advanced treatment adds, leave the tier out.
 
+**Code and theory subjects lean on `diagram`.** Canon
+(`_canon/card-archetypes-and-content-shapes.md`) sets this: subjects with no photographic
+imagery — Rust, backend, systems, generative AI — compensate with a significantly higher
+density of mermaid `diagram` cards, which become their primary visual anchor. Architectures,
+state machines, memory layouts, parse trees, concurrent pipelines and protocol handshakes are
+what those quotas are for. The quota is where that rule takes effect, because nothing
+downstream chooses the mix.
+
 **Only name sources that actually teach the subtopic.** A path listed because it mentions the
 term makes card grounding worse, not better.
 

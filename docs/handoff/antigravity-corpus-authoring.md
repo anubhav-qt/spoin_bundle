@@ -229,6 +229,79 @@ Two fields you do **not** write: `source_path` (the ingester derives it from the
 path in the delivery) and `content_hash` (computed). Both are how re-ingestion stays
 idempotent.
 
+### Epistemic fields — how sure are we, and of what?
+
+[ADR-0100](../adr/0100-the-universe-is-a-claim-qualified-knowledge-system.md) is the reason
+these exist. The corpus is not a collection of essays; it is what Spoin claims to know. frog
+does not judge a passage, it retrieves it — the generator drafts from it and the gate is
+grounded on that same passage — so a confidently-written falsehood becomes a canonical
+falsehood that nothing downstream can catch.
+
+| Field | Required | Notes |
+|---|---|---|
+| `knowledge_kind` | **yes** for `topic_source` | The dominant claim class of the document: `normative`, `empirical`, `mechanistic`, `heuristic`, `implementation`, or `pedagogical`. A closed vocabulary; a typo is a hard error. |
+| `applies_to` | **yes** when `knowledge_kind: implementation` | What the document is true *of*: `{framework: langgraph, version: "1.x"}`, `{standard: ISSF, edition: "2024-2026"}`. Omit entirely for knowledge that is not version-scoped. |
+| `verified_on` | **yes** when `applies_to` is present | `YYYY-MM-DD`. When you last checked the claim against the thing it describes — not when you wrote the file. |
+| `source_tier` | **yes** for `topic_source` | Where the material sits in the hierarchy below. |
+| `status` | no | `current` (default), `historical`, `deprecated`. |
+
+**The six classes, and why they may never be presented as equivalent:**
+
+| Class | Means | Example |
+|---|---|---|
+| `normative` | A specification, standard or rule says so | ISSF regulation, the Rust reference, an RFC |
+| `empirical` | Measured — and the population and conditions travel with it | "Elite shooters exhibited X under these conditions" |
+| `mechanistic` | A causal explanation of *why* | The baroreceptor chain. Needs the most care |
+| `heuristic` | Practical, usually works, not a law | "Prefer bounded channels" |
+| `implementation` | True of one product, framework or version | "LangGraph 1.x prefers `Command`" |
+| `pedagogical` | A teaching abstraction | "Rust as a DAG of data transformations" |
+
+**Five silent promotions, each forbidden:** heuristic → law, typical value → universal
+constant, implementation detail → conceptual truth, mental model → formal specification,
+expert recommendation → experimentally proven fact.
+
+### The source hierarchy
+
+```
+primary specification / official standard
+  → official documentation
+    → primary research
+      → authoritative textbook or monograph
+        → recognised expert material
+          → secondary synthesis
+            → community heuristic
+```
+
+**Never silently promote a lower tier.** A manufacturer's manual does not become an empirical
+law. A coach's recommendation does not become a universal biological truth.
+
+### No false precision
+
+Every exact value, threshold, percentage, timing and universal prescription must be traceable
+to one of the classes above. Before writing a number, decide whether it is normative,
+measured, typical, approximate, implementation-dependent, or heuristic — and say which.
+
+- ❌ *"Elite shooters always fire within 8 seconds."*
+- ✅ *"Many coaching protocols use a bounded hold window; the exact duration varies by athlete
+  and method."*
+
+The words **modern**, **standard**, **preferred**, **current** and **supported** may not
+appear without version or date scope. They are how a snapshot of a moving ecosystem disguises
+itself as stable knowledge.
+
+### Counterexamples are part of a concept
+
+A concept is not represented because it has a definition. For anything important, the corpus
+should carry the rule, a canonical example, a **counterexample**, the common **misconception**,
+the **boundary** where the rule stops applying, and the **consequence**.
+
+### When the evidence is not there
+
+**"Insufficient evidence" is a valid deliverable and beats a plausible answer.** Mark the gap
+and ask; never fill it with model-generated material that sounds right. The full role-by-role
+workflow this belongs to is
+[`corpus-authoring-system.md`](corpus-authoring-system.md).
+
 ### Topic tags
 
 Tags are normalized before storage: lowercased, every non-alphanumeric character

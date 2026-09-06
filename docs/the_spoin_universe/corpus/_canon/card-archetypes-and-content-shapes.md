@@ -57,3 +57,14 @@ Key rules governing diagrams:
 - **Client-Side Rendering:** The backend emits pure Mermaid text. The web and mobile frontends parse the text and render scalable, interactive SVGs styled to match the dark/light theme of the application.
 - **Strict Prohibition on ASCII Flowcharts:** Text-only box-and-arrow diagrams (e.g. `[Client] ---> [Server]`) are strictly forbidden inside ASCII art slots. ASCII art is reserved exclusively for pictorial illustrative scenes and gags. Technical architectures, state machines, and sequence workflows must exclusively use Mermaid.
 - **Simplicity and Mobile Viewports:** Diagrams must remain readable on narrow mobile screens. Complex diagrams should be decomposed into multiple simple, sequential steps rather than overflowing wide canvas layouts.
+
+## Visual Distribution Balance: Mermaid Density for Pure Code and Theory
+
+Visual grounding across the Spoin feed is balanced across two complementary media kinds:
+1. **Photographic Image Catalog:** Serves observational and empirical subjects (Astronomy, Human Biology, World History, World Mythology) with verified open-licensed imagery (~60–80 images per subject, ~1 visual anchor per 7–9 cards).
+2. **Client-Rendered Mermaid Diagrams:** Serves pure code, engineering, and theoretical subjects (Rust, Backend, Systems Engineering, Generative AI).
+
+Because pure code and theory subjects deliberately feature zero photographic images (`images: []` in manifests), **they must compensate with a significantly higher density of Mermaid `diagram` cards and corpus diagrams**:
+- Every complex architecture, state machine, memory layout (stack/heap, pointers, borrow graphs), AST parse tree, concurrent pipeline, or protocol handshake must be modeled using Mermaid.
+- In software engineering and computer science feeds, Mermaid diagrams function as the primary visual anchor, replacing photographs with structured, theme-reactive interactive SVGs.
+

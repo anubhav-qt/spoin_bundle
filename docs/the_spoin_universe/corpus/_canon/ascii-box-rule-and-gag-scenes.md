@@ -32,6 +32,14 @@ Language models lack native spatial coordinate reasoning. When allowed to genera
 4. **The 40-Column Width Invariant:**
    - Every single line of the ASCII visual—including characters, leading whitespace, trailing dialogue, and borders—**must not exceed 40 monospace columns**.
    - Mobile smartphone viewports break and force awkward horizontal scrolling or line-wrapping if a preformatted block exceeds 40 characters.
+5. **Height is Unbounded (ADR-0099):**
+   - The budget is **per line, not per drawing**. Nothing measures how tall a scene is, and no validator has ever done so.
+   - Lines added above or below the art are therefore **free**, and a scene may grow downward as far as its text needs.
+   - So a label that will not fit beside a figure **gets its own line above or below it — it is never shortened away and never dropped**. Trimming text to save columns is the wrong repair; moving it down is the right one.
+6. **Every Scene Must Carry Text (ADR-0099):**
+   - The scene is the card's hook — the first thing a reader meets. Art with no words is unreadable to anyone who cannot decode the picture, which makes a wordless scene a failed hook rather than a minimal one.
+   - Every scene ships with **labels naming its parts** (which figure is the king, which box is the heap, what the arrow does) **and at least one line of dialogue, stage direction, or caption** that lands the gag for that specific card.
+   - Most curated art is far narrower than the budget — a typical line uses about 23 of the 40 columns — so short labels usually fit to the right of a figure as well.
 
 ## Server-Side Validation and Graceful Degradation
 
@@ -42,3 +50,11 @@ Because prompt instructions alone cannot guarantee 100% compliance across smalle
 - **The Card is not kept:** The text of the card (`title`, `canonical_title`, `summary`, `body`) is discarded and not published.
 
 This ensures that failures degrade gracefully to **"no card"**, and then are regenerated again to get better visuals.
+
+## The Caption Beneath the Scene
+
+Every scene carries a one-sentence caption, stored as `visual_slots.alt` and printed under the drawing on the card.
+
+**It is not screen-reader alt text and it is not a title.** It is written for a sighted reader who could not make sense of the drawing, and it must give them both halves: **what the drawing is showing, and what the joke is**. Naming the shapes is not enough — name the thing being depicted and the point it makes.
+
+This was specified as "one plain sentence describing the scene for a screen reader" until 2026-09-05, which asked for the wrong artefact: alt text enumerates, a caption explains. See ADR-0099.

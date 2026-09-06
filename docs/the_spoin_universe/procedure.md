@@ -45,7 +45,7 @@ and which you are authoring *into*.
 | **category** | `document.category` in `the_spoin_universe` ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)). **Corpus-side only — no column in the product database.** | **You**, in front matter |
 | **sub_category** | `document.sub_category`. Optional, same status. | **You**, in front matter |
 | **survey / topic** | `topic` table, distinguished by the `is_survey` flag | The product, when a user requests a subject |
-| **subtopic** | `subtopic` table — a curriculum slot with a difficulty tier | The generation pipeline's curriculum pass |
+| **subtopic** | `subtopic` table — a curriculum slot with a difficulty tier | **You**, in the topic's `curriculum.md` — see [Phase I](#phase-i--curriculum-the-teaching-structure). Generated curricula are being removed |
 | **cards** | `card` table | The generation pipeline, grounded in *your* corpus |
 
 **Categories and sub-categories exist in the corpus database and nowhere else.** You
@@ -560,6 +560,27 @@ Read it before sourcing anything; what follows is only where the pass sits in a 
    - **Tier 3: Pure Code & Theory (0 images — `images: []`):** Computer science, software
      engineering, and theory subjects. Strictly zero photos. Compensated by dense Mermaid
      diagrams embedded directly in the corpus documents during Phase F.
+
+### Phase I — Curriculum: the teaching structure
+
+**The third and last delivery for a topic, and it is authored, never generated.** No model
+decides what Spoin teaches or in what order; the curriculum file is the truth, and
+deterministic code projects it into the subtopic rows the card generator works from.
+
+The contract is
+[`docs/handoff/antigravity-curriculum-authoring.md`](../handoff/antigravity-curriculum-authoring.md).
+Read it before proposing anything. In outline:
+
+1. **Only after knowledge (Phases A–G) and images are delivered and accepted.** A curriculum
+   names the corpus documents backing each subtopic, so it cannot precede them, and a
+   subtopic's card mix depends on what visual material the topic actually has.
+2. **Propose one curriculum with brief reasoning** — why these subtopics, why this order, why
+   these weights. Not a menu of options, not a list of open questions.
+3. **The owner proceeds or changes it.** Expect changes; the proposal saves them a blank
+   page, it does not decide on their behalf.
+4. **Then write `curricula/<topic>/curriculum.md`** and run `make curriculum-check`.
+
+---
 
 ## 4. The rules that do not belong to any one phase
 

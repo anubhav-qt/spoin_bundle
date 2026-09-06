@@ -74,19 +74,28 @@ async def _ensure_alias(
 
 async def topic_used_ascii_ids(session: AsyncSession, topic_id: uuid.UUID) -> set[str]:
     """Every curated-library entry id already used by an ASCII card in this
-    topic (ADR-0080), from active cards (`Card.visual_slots['src_id']`) and from
+    topic (ADR-0080), from cards (`Card.visual_slots['src_id']`) and from
     rejected drafts (`RejectedCard.gen_meta['src_id']` -- stamped there because
     `RejectedCard` has no `visual_slots` column). The fetcher passes these to
     `top_candidates` as `exclude_ids` so one library scene is used at most once
     per topic, for the topic's whole life across every worker pass.
+
+    **DRAFT counts as used, not just ACTIVE.** Cards are written at `status=draft`
+    the moment the writer returns and the gate flips them in place afterwards
+    (generation-pipeline-v2), so a scene claimed by a draft is invisible to this
+    query for as long as the gate takes. A second worker pass in that window would
+    re-issue the same scene, and the duplicate only becomes visible once both
+    cards go active -- at which point the run that made it is over. The in-memory
+    set on `_Runtime` covers reuse WITHIN a run; this is what covers reuse across
+    runs, and it has to see the same rows.
     """
 
-    active = (
+    held = (
         (
             await session.execute(
                 select(Card.visual_slots["src_id"].astext).where(
                     Card.topic_id == topic_id,
-                    Card.status == CardStatus.ACTIVE,
+                    Card.status.in_([CardStatus.ACTIVE, CardStatus.DRAFT]),
                     Card.visual_slots["src_id"].astext.is_not(None),
                 )
             )
@@ -106,7 +115,7 @@ async def topic_used_ascii_ids(session: AsyncSession, topic_id: uuid.UUID) -> se
         .scalars()
         .all()
     )
-    return {value for value in (*active, *rejected) if value}
+    return {value for value in (*held, *rejected) if value}
 
 
 async def _load_subtopic_plans(

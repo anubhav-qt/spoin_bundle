@@ -24,6 +24,40 @@ from spoin.generation.pipeline.state import is_technical_topic
 
 _ASCII_MAX_WIDTH = 40
 
+#: Codepoints that render TWO monospace columns while counting as one character.
+#:
+#: This is why the width check above was passing on visibly broken art: a line of 38
+#: characters containing three emoji draws as 44 columns, and nothing measuring
+#: `len(line)` can see it. The rule is stated to the writer in the ASCII box canon and
+#: enforced here, which is CLAUDE.md's "a hard rule gets enforced, never merely
+#: documented".
+#:
+#: Ranges rather than a library: this needs no network, no data file and no dependency
+#: in the api image (ADR-0094), and the East Asian Wide/Fullwidth blocks plus the emoji
+#: planes are the whole of what a drafting model actually reaches for.
+_DOUBLE_WIDTH_RANGES = (
+    (0x1100, 0x115F),  # Hangul Jamo
+    (0x2600, 0x27BF),  # Misc symbols and dingbats
+    (0x2E80, 0xA4CF),  # CJK radicals through Yi
+    (0xAC00, 0xD7A3),  # Hangul syllables
+    (0xF900, 0xFAFF),  # CJK compatibility ideographs
+    (0xFE30, 0xFE4F),  # CJK compatibility forms
+    (0xFF00, 0xFF60),  # Fullwidth forms
+    (0xFFE0, 0xFFE6),
+    (0x1F000, 0x1FAFF),  # Emoji planes
+)
+
+
+def _double_width_chars(text: str) -> list[str]:
+    """Every double-width character in `text`, in order, deduplicated."""
+
+    found: list[str] = []
+    for char in text:
+        point = ord(char)
+        if any(low <= point <= high for low, high in _DOUBLE_WIDTH_RANGES) and char not in found:
+            found.append(char)
+    return found
+
 
 def passes_minimal_gate(
     draft: CardDraft, *, topic_name: str | None = None
@@ -65,6 +99,17 @@ def passes_minimal_gate(
         art = str(slots.get("art", ""))
         if not art.strip():
             return False, "ASCII art is empty"
+
+        #: Checked BEFORE the width loop, because it is the reason the width loop
+        #: could report a pass on art that is visibly over budget.
+        wide = _double_width_chars(art)
+        if wide:
+            return (
+                False,
+                f"ASCII box rule violated: {''.join(wide)!r} render two monospace columns "
+                f"each, so the 40-column budget is broken without the character count "
+                f"showing it -- draw with plain ASCII",
+            )
 
         # 1. Box Rule: Every line <= 40 columns
         for n, line in enumerate(art.split("\n"), start=1):

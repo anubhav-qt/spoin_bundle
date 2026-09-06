@@ -866,6 +866,16 @@ _MERMAID_PIPE_LABEL_RE = re.compile(r"\|([^|\n]*)\|")
 _MERMAID_LABEL_PUNCT_RE = re.compile(r"[()\[\]{}]")
 
 
+#: What sits on the right-hand side of an arrow, up to the end of the line: the node
+#: the edge points AT. Anchored on the arrow rather than parsed properly because a real
+#: mermaid parser is not what this check is -- it looks for the one mistake that makes a
+#: whole diagram unrenderable.
+_MERMAID_BARE_ENDPOINT_RE = re.compile(
+    r"(?:-->|---|-\.->|==>)(?:\|[^|]*\|)?\s*([A-Za-z][A-Za-z0-9 ]*?)\s*$",
+    re.MULTILINE,
+)
+
+
 def _mermaid_structural_issue(source: str) -> str | None:
     """Returns a short reason string if `source` fails the light structural
     check, or `None` if it passes. Deliberately permissive -- a false
@@ -890,6 +900,20 @@ def _mermaid_structural_issue(source: str) -> str | None:
     closes = source.count("]") + source.count(")") + source.count("}")
     if opens != closes:
         return f"unbalanced brackets ({opens} opening vs {closes} closing)"
+
+    #: A bare multi-word node id -- `Light --> Distant Galaxy` -- is a mermaid syntax
+    #: error, and it is the single most common one the drafting model makes: it writes
+    #: the label it wants to see instead of `G[Distant Galaxy]`. The whole diagram then
+    #: fails to parse and the card renders a wall of mermaid source, which is what the
+    #: feed was showing. Cheap to detect and unambiguous, so it earns a place in a
+    #: check that is otherwise deliberately permissive.
+    for endpoint in _MERMAID_BARE_ENDPOINT_RE.findall(source):
+        bare = endpoint.strip()
+        if " " in bare:
+            return (
+                f"node id {bare!r} contains a space -- mermaid needs a single-token id "
+                f"with a bracketed label, e.g. {bare.split()[0]}[{bare}]"
+            )
 
     for label in _MERMAID_PIPE_LABEL_RE.findall(source):
         stripped = label.strip()
@@ -1910,10 +1934,13 @@ class GeminiContentGenerator(ContentGenerator):
 
         items: list[CardDraft] = []
         failures: list[str] = []
-        # ADR-0066: redraw any over-budget ASCII art before assembling cards.
-        # Called outside the try/except above on purpose — a QuotaExhaustedError
-        # from a redraw call must propagate, same as the main generate call.
-        resolved_art, rejected_for_art = await self._resolve_ascii_art(wire_result.cards)
+        #: ADR-0066's redraw pass is NOT called any more. It existed to rescue
+        #: over-budget art the writer drew, and the writer no longer draws: scenes come
+        #: from the curated library (owner, 2026-09-07), which is pre-verified within
+        #: 40 columns. Redrawing art that is dropped moments later would spend real LLM
+        #: calls on nothing. `_resolve_ascii_art` and `_ascii_redraw_prompt` are kept
+        #: rather than deleted -- they are the machinery ADR-0066 describes, and the
+        #: fetch path's own adaptation step is where they would come back.
         for i, wire_card in enumerate(wire_result.cards):
             # ADR-0080: a planned `ascii` card the fetcher matched carries its
             # scene on the plan (positional: brief i -> card i, the
@@ -1923,12 +1950,6 @@ class GeminiContentGenerator(ContentGenerator):
             plan = plans[i] if plans is not None and i < len(plans) else None
             fetched = plan.fetched_scene if plan is not None else None
 
-            if fetched is None and i in rejected_for_art:
-                failures.append(
-                    f"ascii art {wire_card.ascii_label or '(unlabeled)'!r} still exceeded "
-                    f"{_ASCII_MAX_WIDTH} cols after redraw -- card rejected (ADR-0066)"
-                )
-                continue
             body = wire_card.body
 
             # Any ```mermaid fence in the body is a genuine content defect if
@@ -1965,34 +1986,26 @@ class GeminiContentGenerator(ContentGenerator):
                     visual_id, visual_slots = _finalize_ascii_fields(
                         fetched.label, fetched.art, fetched.alt, src_id=fetched.src_id
                     )
-                elif i in resolved_art:
-                    #: The scene the ADR-0066 redraw pass resolved for this card --
-                    #: unchanged if it already fit 40 columns, redrawn if it did not.
-                    #: Read from that pass rather than from `wire_card.ascii_art`
-                    #: directly, or a redrawn scene would be assembled from the
-                    #: over-budget original the redraw exists to replace.
-                    label, art, alt = resolved_art[i]
-                    # The prompt tells the model not to redraw its own scene a
-                    # second time into `body` (ASCII_INSTRUCTIONS), but a card
-                    # is not trusted to have honored that on its own -- strip a
-                    # duplicate copy deterministically rather than shipping the
-                    # same picture twice.
-                    body = _strip_duplicate_scene_from_body(body, art)
-                    if _is_stub_scene(art):
-                        #: Dropped, NOT rejected -- the same posture the over-budget
-                        #: redraw path ends in. A rejected card regenerates (ADR-0066),
-                        #: so failing the card here would spend a fresh drafting call on
-                        #: every scene the weak model fumbles; the card itself is fine
-                        #: and simply ships without art.
-                        logger.info(
-                            "ascii: dropping stub scene for %r (%d chars, one line)",
-                            wire_card.canonical_title or wire_card.title,
-                            len(art),
-                        )
-                        visual_id, visual_slots = None, None
-                    else:
-                        visual_id, visual_slots = _finalize_ascii_fields(label, art, alt)
                 else:
+                    #: **ASCII comes from the curated library ONLY** (owner, 2026-09-07,
+                    #: restoring ADR-0021's original decision). The free-draw path that
+                    #: the `non-ascii-library-generation-testing` branch put here was
+                    #: testing ADR-0021's own "revisit when" condition -- whether model
+                    #: ASCII quality had improved enough to draw directly. It had not:
+                    #: ADR-0090 routes drafting to `ministral-8b`, and the first real run
+                    #: shipped emoji-built scenes and one-line fragments. The question is
+                    #: answered, so the branch closes.
+                    #:
+                    #: Art the writer drew anyway is DROPPED, not rejected -- the card
+                    #: itself is fine and simply ships without a scene, whereas rejecting
+                    #: would regenerate it (ADR-0066) and buy nothing, because the next
+                    #: draft has no library entry to reach for either.
+                    if wire_card.ascii_art.strip():
+                        logger.info(
+                            "ascii: dropping writer-drawn scene for %r -- art is library-only now",
+                            wire_card.canonical_title or wire_card.title,
+                        )
+                        body = _strip_duplicate_scene_from_body(body, wire_card.ascii_art)
                     visual_id, visual_slots = None, None
                 visual_kind = VisualKind.ASCII if visual_id is not None else None
                 items.append(

@@ -337,7 +337,7 @@ async def _fetch_ascii_for_plans(
         raise
     except Exception as exc:
         logger.warning(
-            "subtopic '%s' [%s]: ascii fetch raised (%s) -- %d ascii card(s) free-draw",
+            "subtopic '%s' [%s]: ascii fetch raised (%s) -- %d ascii card(s) ship without a scene",
             subtopic_title,
             difficulty.value,
             exc,
@@ -360,10 +360,19 @@ async def _fetch_ascii_for_plans(
         for item in result.items:
             if not item.matched or not (0 <= item.index < len(ascii_plans)):
                 continue
-            # A src_id already used in this topic -- a concurrent sibling picked
-            # it between the snapshot above and now, or the model repeated one
-            # within the batch -- means that card free-draws instead.
+            #: A src_id already used in this topic -- a concurrent sibling picked it
+            #: between the snapshot above and now, or the model repeated one within the
+            #: batch -- means that card ships with NO scene rather than a repeat.
+            #:
+            #: Re-checked here even though `exclude_ids` already told the model, because
+            #: the model is trusted for taste and never for constraints (CLAUDE.md): the
+            #: exclusion list is an instruction it can ignore, and this set is the thing
+            #: that actually makes "one scene per topic" true.
             if item.src_id in topic_used:
+                logger.debug(
+                    "ascii fetch: %r already used in this topic -- card gets no scene",
+                    item.src_id,
+                )
                 continue
             ascii_plans[item.index].fetched_scene = FetchedAsciiScene(
                 src_id=item.src_id,
@@ -963,7 +972,28 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 < tier_quotas[ct]
             ]
 
-            if unfilled_types:
+            if CardType.IMAGE.value in unfilled_types:
+                #: **Image cards are drafted FIRST, before any other type** (owner,
+                #: 2026-09-07). Assignment is a top-1 retrieval that excludes what the
+                #: topic already used, so the pool of photographs only shrinks as the
+                #: tier goes on. Drafting image cards last means they pick over whatever
+                #: is left after every other type has taken its turn; drafting them
+                #: first means each one chooses from the full catalog and gets the best
+                #: match rather than the last one standing.
+                #:
+                #: It also front-loads the type most likely to come up short: the
+                #: planner ceiling already capped this quota at real availability
+                #: (ADR-0102), so if the catalog is thinner than expected the shortfall
+                #: shows up at the start of the tier instead of after a run's worth of
+                #: other work.
+                chosen_type = CardType.IMAGE.value
+                unmet = tier_quotas[chosen_type] - sum(
+                    1
+                    for d in drafts
+                    if _card_matches_type(d, chosen_type, topic_name=job["topic_name"])
+                )
+                request_count = min(batch_size, remaining, max(1, unmet))
+            elif unfilled_types:
                 # Pick the unfilled card type with the largest remaining deficit
                 chosen_type = max(
                     unfilled_types,

@@ -1111,7 +1111,7 @@ body {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   font-size: 11px;
   line-height: 1.4;
   color: var(--fg-3);
@@ -1140,6 +1140,15 @@ body {
   font-size: 11px;
   line-height: 1.4;
   color: var(--fg-3);
+}
+
+/* The same caption, under a photograph. The -4px pull above is calibrated to
+   `.card-ascii`'s 14px bottom padding, which leaves visual space the caption can eat
+   into; an image frame ends on the picture's last row of pixels, so the same rule puts
+   the caption hard against the image. Positive space, and a little more of it than the
+   ASCII case gets, because there is no padding underneath doing the work. */
+.card-image .card-visual-caption {
+  margin: 10px 0 0;
 }
 
 .card-head {

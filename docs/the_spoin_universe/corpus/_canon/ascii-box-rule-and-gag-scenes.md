@@ -40,7 +40,12 @@ The second half of the **ASCII Box Rule** (ADR-0021, ADR-0068, ADR-0079, ADR-009
    - The budget is **per line, not per drawing**. Nothing measures how tall a scene is, and no validator has ever done so.
    - Lines added above or below the art are therefore **free**, and a scene may grow downward as far as its text needs.
    - So a label that will not fit beside a figure **gets its own line above or below it — it is never shortened away and never dropped**. Trimming text to save columns is the wrong repair; moving it down is the right one.
-6. **Every Scene Must Carry Text (ADR-0099):**
+6. **No Emoji, Ever:**
+   - An emoji is a single codepoint that renders **two monospace columns**, so a line measuring 38 characters draws as 44. The 40-column budget is silently broken and no validator counting characters can see it.
+   - It also destroys alignment against the plain ASCII glyphs beside it, which is the column integrity the box rule exists to protect.
+   - Use plain ASCII instead: `*` for a spark, `~` for water, `o` for a body, `#` for mass, `^` for a peak.
+
+7. **Every Scene Must Carry Text (ADR-0099):**
    - The scene is the card's hook — the first thing a reader meets. Art with no words is unreadable to anyone who cannot decode the picture, which makes a wordless scene a failed hook rather than a minimal one.
    - Every scene ships with **labels naming its parts** (which figure is the king, which box is the heap, what the arrow does) **and at least one line of dialogue, stage direction, or caption** that lands the gag for that specific card.
    - Most curated art is far narrower than the budget — a typical line uses about 23 of the 40 columns — so short labels usually fit to the right of a figure as well.

@@ -150,9 +150,20 @@ For each card:
    card could use (a genuinely different subject, not merely an imperfect one).
    Refusing (matched=false) should be rare.
 
-2. ADAPT the chosen art into the final scene, under the box rule above:
+2. ADAPT the chosen art into the final scene, under the box rule above.
+
+   **What you add is TEXT. Only text.** Labels, dialogue, a caption, a stage
+   direction. That is the entire adaptation.
+
    - Keep its drawing intact. Trim lines or elements only if the whole scene does
      not need them.
+   - **Do not draw anything new.** No extra figures, no added boxes or borders, no
+     frame around the scene, no second panel, no decorative characters padding it
+     out. If the concept seems to need a picture the candidate does not contain,
+     say it in a caption line instead of drawing it. Every original stroke a model
+     adds to hand-verified art is a stroke nobody checked, and it is where the
+     columns skew.
+   - Never redraw a line that is already there to "improve" or "fix" it.
    - ADD TEXT TO THE SCENE. This is required, not optional: art with no words
      is unreadable to someone who cannot decode the picture, and the scene is
      the card's hook, so it has to carry meaning on its own. Every scene you
@@ -202,9 +213,16 @@ keyed by its index.
 #: doubles as the collapsed-card thumbnail, the seven worked examples, and the output
 #: contract for the three ascii fields.
 ASCII_INSTRUCTIONS = r"""\
-FALLBACK ONLY -- most `ascii` cards get their scene from the curated library
-(handled before this call); these instructions are for a card whose brief says
-no library scene fit, and for the hero card.
+DO NOT DRAW ASCII ART. Every scene comes from the curated library, chosen before
+this call; a card whose brief found no library entry simply ships without one.
+
+Leave `ascii_art`, `ascii_label` and `ascii_alt` EMPTY. Anything you draw is
+discarded before the card is saved, so it costs the reader nothing and costs you
+the tokens you spent on it. Spatial coordinates are the one thing a language
+model cannot track, and every attempt has produced skewed columns.
+
+The rest of this section describes the scenes the library holds, so that the
+`body` you write pairs with one -- not so that you draw it.
 
 Whenever a concept has a physical, spatial, or visual gag that would make it
 stick, draw a small ASCII scene that SHOWS the idea rather than just
@@ -573,6 +591,17 @@ SHAPE (this matters as much as the content):
   widest row. Beyond that a diagram stops teaching and starts needing its own diagram.
 - Keep node labels SHORT — a few words. A long label stretches its row and \
   flattens the whole diagram into a strip. Detail belongs in the prose, not in a box.
+- NODE IDS (this is the mistake that breaks whole diagrams): every node is a SHORT \
+  single-token id — letters and digits, no spaces — followed by its label in brackets. \
+  The words a reader sees go INSIDE the brackets, never in the id.
+      Correct:   `L[Light] --> G[Distant Galaxy]`
+      Correct:   `S1["&str (reader 1)"] --> B[String Buffer]`
+      WRONG:     `Light --> Distant Galaxy`      (a space in an id is a syntax error)
+      WRONG:     `subgraph Shared Reads (&str)`  (quote it: `subgraph "Shared Reads"`)
+  A single bare multi-word id makes the ENTIRE diagram fail to parse, and the card then \
+  shows raw mermaid source to the reader instead of a picture.
+- NO EMOJI anywhere in a diagram — not in a label, not in a node, not in a subgraph \
+  title. They break the SVG text metrics and render as boxes on many devices.
 - EDGE LABELS: if a label on an arrow contains ANY punctuation — parens, commas, \
   colons, brackets — wrap the whole label in double quotes, e.g. \
   `A -->|"Screen Pixels (e.g. 500, 300)"| B`, never `A -->|Screen Pixels (e.g. 500, 300)| B`. \

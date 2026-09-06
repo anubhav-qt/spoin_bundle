@@ -41,14 +41,21 @@ from pathlib import Path
 #: needs no database, no GPU and no network — the same purity that makes
 #: `make corpus-check` worth having.
 CANON_SOURCE_HASHES: dict[str, str] = {
-    #: Re-pinned 2026-09-06 after `## The ASCII Box Rule` was split in two — it was
+    #: Re-pinned 2026-09-07 after the box rule gained a no-emoji clause. Reviewed as
+    #: the guard requires: `_ASCII_BOX` below gained the matching line, because this is
+    #: a rule the writer has to follow rather than one only the validator enforces. The
+    #: first Mistral run shipped scenes built out of emoji, which count as one character
+    #: and draw as two columns -- the 40-column budget was passing while the art was
+    #: visibly broken.
+    #:
+    #: Previously re-pinned 2026-09-06 after `## The ASCII Box Rule` was split in two — it was
     #: 2598 characters against the ingestion contract's 2200 cap, so the section could
     #: not be ingested as a chunk at all. Reviewed as the guard requires: the split is
     #: editorial, at the seam between the immutability rules (1-3) and the geometry and
     #: text rules (4-6). No rule changed, gained a clause or lost one, so no preamble
     #: below condenses anything different than it did.
     "ascii-box-rule-and-gag-scenes.md": (
-        "3784ab178999691d09fe3e03de2b95e203805e6b3b877c81ae6e4a27efbd9baf"
+        "fe44a0e10caf3610fb2e31a1913a23b743b8ef95dba1d630fec1bc299ce311d4"
     ),
     "card-anatomy-and-fields.md": (
         "84a696bd04c3e35e28f7553df90c8c1317de8eb8fb9a5337467b7e32c514f10c"
@@ -203,13 +210,13 @@ and destroys the alignment.
 the block. Dialogue appended to the right must not move any existing line.
 - **No line may exceed 40 monospace columns** — counting leading whitespace, borders \
 and any trailing dialogue. Phone viewports wrap past that.
-- **No limit on HEIGHT** — the budget is per line, so a line added above or below \
-is free. A label that will not fit beside a figure gets its own line there; never \
-shorten it away. Most art uses ~23 of the 40 columns, so short labels fit right too.
+- **HEIGHT is free** — the budget is per line. A label that will not fit beside a \
+figure gets its own line above or below; never shorten it away.
+- **No emoji, anywhere.** One emoji is one character but two monospace columns, so it \
+breaks the budget invisibly and misaligns every glyph beside it. Use `*` `~` `o` `#`.
 
-A server-side validator measures every line. If one line is over 40 columns, the whole \
-card is discarded — not just the art. The title, summary and body you wrote go with \
-it, and the card is generated again from scratch."""
+A validator measures every line and every character width. A violation discards the \
+whole card — title, summary and body with it — and it is written again from scratch."""
 
 _CURRICULUM = """\
 A topic is decomposed once into subtopics across three tiers (beginner, intermediate, \

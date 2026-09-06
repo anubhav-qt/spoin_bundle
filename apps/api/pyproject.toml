@@ -47,6 +47,12 @@ generation = [
     # -- re-verify langchain_impl.py's error handling before raising this cap.
     "langchain-google-genai>=4.0,<5.0",
     "langgraph>=0.6",
+    # ADR-0090: Mistral is called over raw `httpx`, not `langchain-mistralai` -- the
+    # committed probe already exercised this exact request shape 646 times, and a
+    # LangChain client would mean a new dependency AND a new ADR-0002 banned-api
+    # entry to wrap it. In `generation` rather than the base dependencies because
+    # only generation calls it; the deployed backend does not (ADR-0094).
+    "httpx>=0.27",
 ]
 
 # Task 0016 / ADR-0048: CockroachDB viability spike. Kept as its own extra --

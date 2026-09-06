@@ -24,6 +24,14 @@ def get_content_generator() -> ContentGenerator:
         from spoin.generation.langchain_impl import GeminiContentGenerator
 
         return GeminiContentGenerator(settings)
+    if settings.generator == "hybrid":
+        # ADR-0090: prose on Mistral, verdicts on Gemini. Lazily imported inside the
+        # branch for the same reason `gemini` is -- it subclasses the LangChain impl,
+        # so importing it at module top-level would make `import spoin.generation`
+        # require the `generation` extra even for SPOIN_GENERATOR=fake.
+        from spoin.generation.hybrid import HybridContentGenerator
+
+        return HybridContentGenerator(settings)
     if settings.generator == "local":
         raise NotImplementedError(
             "SPOIN_GENERATOR=local has no implementation yet (ADR-0008). "

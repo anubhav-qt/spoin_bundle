@@ -198,55 +198,6 @@ class CardPlan(BaseModel):
     fetched_scene: FetchedAsciiScene | None = None
 
 
-class SubtopicTierDraft(BaseModel):
-    """One difficulty tier's treatment of a `SubtopicGroupDraft`."""
-
-    difficulty: Difficulty
-    description: str
-    target_cards: int = Field(ge=5, le=25)
-    #: Predetermined capacity / quota for each card type (prose, code, diagram, comparison, ascii).
-    card_type_quotas: dict[str, int] = Field(default_factory=dict)
-
-
-class SubtopicGroupDraft(BaseModel):
-    """One curriculum-authored concept, and the model's own decision about which
-    difficulty tiers it actually needs.
-
-    This does NOT default to three tiers. Mechanically generating a beginner,
-    intermediate, AND advanced entry for every concept forces the model to pad —
-    some concepts only make sense at one or two tiers, and asking it to fill a grid
-    regardless just produces near-duplicate cards with the difficulty label as the
-    only real difference. `tiers` is 1-3 entries, whichever the model decides this
-    concept genuinely needs; a taste decision (same trust level as `target_cards`),
-    not one requiring independent verification the way a per-card difficulty tag does.
-    """
-
-    title: str
-    tiers: list[SubtopicTierDraft] = Field(min_length=1, max_length=3)
-    position: int = 0
-
-
-class CurriculumDraft(BaseModel):
-    """The output of the curriculum pass — one call per topic, all three tiers.
-
-    A single call rather than three so the model can lay out a coherent
-    progression instead of three disconnected lists.
-    """
-
-    #: At least one — a topic with zero subtopics would leave the pipeline's
-    #: per-topic branch with nothing to fan out for card generation, which the
-    #: graph topology assumes never happens (every topic branch dispatches >=1
-    #: subtopic branch on the way to the shared persist step; see pipeline.py's
-    #: `fan_out_subtopics` docstring for why that invariant matters).
-    subtopics: list[SubtopicGroupDraft] = Field(min_length=1)
-    #: Emitted when the topic is too broad for one curriculum (>~20 subtopics per
-    #: tier). The broad topic is NOT deleted — it becomes a survey, and these are
-    #: the deeper siblings it introduces. Rule 2 of ADR-0007 is generative, not
-    #: destructive.
-    deep_dive_topics: list[str] = Field(default_factory=list)
-    is_survey: bool = False
-
-
 class TopicMatchCandidate(BaseModel):
     """One existing topic offered as a possible match, from the embedding
     pre-filter (ADR-0025). `similarity` is context for the judgment, never a
@@ -536,34 +487,10 @@ class ContentGenerator(ABC):
 
         return None
 
-    @abstractmethod
-    async def generate_curriculum(
-        self,
-        topic_name: str,
-        description: str,
-        existing_subtopics: list[str] | None = None,
-    ) -> CurriculumDraft:
-        """One call per topic. The highest-stakes call in the system: every card in
-        the topic inherits its quality, so it always runs on the strongest
-        available model regardless of what generates the cards.
-
-        `existing_subtopics` carries titles (with description) already under
-        THIS exact topic — from an older seed fixture, or a prior partial run.
-        Same prevention pattern already used for card titles (see
-        `generate_cards`'s `existing_titles`), one level up: if a subtopic this
-        call wants to propose is already covered by one of these, it should
-        reuse the EXISTING title VERBATIM in its output, so the pipeline's
-        persistence step can match on it directly and reuse that row instead of
-        forking a near-duplicate. Deciding whether something counts as "already
-        covered" is the same kind of taste call as everything else in the
-        curriculum pass — not one that needs independent verification.
-
-        Post-ADR-0026, a topic only ever reaches this call once (ADR-0025's
-        batched matching already ruled out that it's an existing topic), so in
-        practice `existing_subtopics` is empty — kept as a parameter rather than
-        removed because a partially-failed prior run can still leave some
-        subtopics behind to reconcile against on retry.
-        """
+    # `generate_curriculum` was here. It is deleted, not reassigned: the curriculum
+    # is authored beside the corpus and projected deterministically into
+    # `Topic`/`Subtopic`, never generated (ADR-0007, authored-curriculum.md). It was
+    # the one high-stakes call in the system with no corpus grounding at all.
 
     @abstractmethod
     async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:

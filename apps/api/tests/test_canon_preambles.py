@@ -21,7 +21,8 @@ from spoin.generation.prompts import canon
 #: than discovered by a `_CANON` suffix scan: a preamble that stops being exported
 #: should break this list loudly, not silently drop out of the coverage.
 ALL_PREAMBLES: dict[str, str] = {
-    "generate_curriculum": canon.CURRICULUM_CANON,
+    # `generate_curriculum` / `CURRICULUM_CANON` went with ADR-0007 -- curricula are
+    # authored, not generated, so there is no curriculum prompt to pin a preamble to.
     "plan_cards": canon.PLAN_CANON,
     "generate_cards": canon.CARDS_CANON,
     "generate_cards:diagram": canon.CARDS_DIAGRAM_CANON,

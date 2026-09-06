@@ -34,3 +34,27 @@ These rules govern how Antigravity authors, curates, and maintains `the_spoin_un
 - **Hook Layer Separation:** Silliness and charm live exclusively in the hook layer (`title`, `summary`, ASCII art). The `body` is strictly dry, factual technical truth that users are tested on and that quality gates verify.
 - **Dual Titles:** `title` is the playful feed display title; `canonical_title` is the literal descriptive name read by search, quizzes, remediation, and generation already-covered lists.
 - **Compositional Reuse:** Always write for cross-topic retrieval (e.g. *what is true about B-trees*), never narrating toward the specific topic that triggered the run.
+
+---
+
+## 5. Visual Media Balance: Image Tiers & Mermaid Diagram Mandate
+- **Three-Tier Distribution Framework:**
+  - **Tier 1 (Visually Rich - 60–80 images):** Astronomy, Biology, History, Mythology. Sourced methodically in batches of 12–15 with mandatory multimodal `view_file` visual inspection.
+  - **Tier 2 (Cultural / Artifact - 20–35 images):** Philosophy, Vedic Philosophy, Psychology, Sports/Pistol, Game Development. Authentic primary physical artifacts only.
+  - **Tier 3 (Pure Code & Theory - 0 images):** Rust, Generative AI, LangChain, Backend, Frontend, Fullstack, Systems Engineering. Manifests must be empty (`images: []`).
+- **Mandatory Mermaid Diagram Density in Code / Theory Corpus:**
+  - Pure code and theoretical subjects have zero photographic images. To maintain high visual pedagogical clarity, **the corpus documents and card prompts MUST feature a substantially higher density of client-rendered Mermaid diagrams (` ```mermaid `)**.
+  - Every architectural abstraction, state transition, network protocol, data structure layout (e.g. B-tree pages, LSM-tree compactions, stack/heap boundaries, memory borrows), or async event loop must include a structured Mermaid flowchart or sequence diagram.
+  - Never attempt to draw text box-and-arrow diagrams in ASCII; Mermaid is the exclusive tool for technical diagrams.
+
+---
+
+## 6. Operational Playbook & Reinforcement Learning (`docs/handoff/reinforcement-learning-topic-authoring.md`)
+Every topic authoring delivery must execute the three phases strictly in sequence:
+1. **Knowledge:** $\le 2200$ chars, one `##` heading = one chunk, zero preamble, self-contained terms, mandatory `tips-and-tricks.md`.
+2. **Images:** 100% multimodal `view_file` visual inspection, live HTTP 200 checks, closed allowlist, zero binaries.
+3. **Curriculum:** 10–12 subtopics in an acyclic DAG, 500–750 total cards ($5 \le \text{target\_cards} \le 25$), non-technical `code: 0`.
+
+Consult the comprehensive guide: [`docs/handoff/reinforcement-learning-topic-authoring.md`](../../docs/handoff/reinforcement-learning-topic-authoring.md).
+
+

@@ -29,12 +29,9 @@ from spoin.generation.base import (
     CardVerificationQuery,
     CardVerificationResult,
     ContentGenerator,
-    CurriculumDraft,
     FreeTextGradeQuery,
     FreeTextGradeResult,
     QuestionDraft,
-    SubtopicGroupDraft,
-    SubtopicTierDraft,
     TopicMatchQuery,
     TopicMatchResult,
     TopicNameQuery,
@@ -80,45 +77,20 @@ class FakeContentGenerator(ContentGenerator):
         #: everything) shouldn't be the only path a test ever exercises.
         self._reject_one = reject_one_per_verify_batch
         self._card_counter = 0
+        #: Per subtopic-tier, so a tier's cards always draw CONSECUTIVE angles
+        #: from `_FAKE_ANGLES` and therefore never collide with each other under
+        #: `HashEmbedder`. A single global counter made that depend on how the
+        #: concurrent subtopic-group branches happened to interleave -- which is
+        #: scheduling, not behaviour, and it started producing in-batch
+        #: near-duplicates the moment drafts began being persisted mid-loop
+        #: (generation-pipeline-v2.md §1) and the awaits moved.
+        self._angle_counters: dict[tuple[str, str], int] = {}
         self._plan_counter = 0
 
-    async def generate_curriculum(
-        self,
-        topic_name: str,
-        description: str,
-        existing_subtopics: list[str] | None = None,
-    ) -> CurriculumDraft:
-        groups = [
-            SubtopicGroupDraft(
-                title=f"{topic_name}: part {n + 1}",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=difficulty,
-                        description=f"Placeholder curriculum slot {n + 1} for {topic_name}.",
-                        target_cards=10,
-                        card_type_quotas={
-                            "prose": 2,
-                            "code": 2,
-                            "diagram": 2,
-                            "comparison": 2,
-                            "ascii": 2,
-                        },
-                    )
-                    for difficulty in Difficulty
-                ],
-                position=n,
-            )
-            for n in range(3)
-        ]
-        if existing_subtopics:
-            # Deterministically "decide" the first already-existing subtopic is
-            # the same as its own first group, reusing the EXACT title verbatim —
-            # simulates the real prevention behavior (generate_curriculum's
-            # docstring) so a test can assert the pipeline's persistence step
-            # actually reuses that row instead of forking a duplicate.
-            reused_title = existing_subtopics[0].split(" :: ", 1)[0]
-            groups[0].title = reused_title
-        return CurriculumDraft(subtopics=groups)
+    # `generate_curriculum` removed with the ABC method (ADR-0007): curricula are
+    # authored and projected, never generated. Tests that need a topic with a
+    # curriculum call `tests/conftest.py`'s `project_fake_curriculum`, which writes
+    # the `Subtopic` rows `spoin.curriculum.projection` writes in production.
 
     async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
         # Deterministic stand-in for an LLM opinion: the highest-similarity
@@ -284,7 +256,10 @@ class FakeContentGenerator(ContentGenerator):
                     f"\n\n```diagram\n[Source_{idx}] --> [Process_{idx}] --> [Sink_{idx}]\n```\n"
                 )
 
-            angle = _FAKE_ANGLES[(idx - 1) % len(_FAKE_ANGLES)]
+            angle_key = (subtopic_title, difficulty.value)
+            angle_index = self._angle_counters.get(angle_key, 0)
+            self._angle_counters[angle_key] = angle_index + 1
+            angle = _FAKE_ANGLES[angle_index % len(_FAKE_ANGLES)]
             items.append(
                 CardDraft(
                     title=(

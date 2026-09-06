@@ -27,10 +27,10 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from conftest import UNIVERSE_TEST_DATABASE_URL
+from conftest import UNIVERSE_TEST_DATABASE_URL, project_fake_curriculum
 from spoin.core.config import Settings
 from spoin.core.db import UniverseNotConfiguredError, get_universe_engine
-from spoin.domain.models import Card
+from spoin.domain.models import Card, Topic
 from spoin.generation import grounding as grounding_module
 from spoin.generation.fake import FakeContentGenerator
 from spoin.generation.grounding import (
@@ -480,6 +480,14 @@ async def test_every_content_call_in_a_run_sees_the_same_passages(
         topic_requests=[TopicRequest(name="PostgreSQL internals", description="")],
     )
     topic_ids = [uuid.UUID(outcome["topic_id"]) for outcome in outcomes]
+    # Stands in for `make curriculum-project`: curricula are authored and projected,
+    # never generated (ADR-0007), and the pipeline requires the `Subtopic` rows to
+    # already exist.
+    for topic_id in topic_ids:
+        topic = await session.get(Topic, topic_id)
+        assert topic is not None
+        await project_fake_curriculum(session, topic, settings)
+    await session.commit()
     await run_generation_pipeline(session, generator, embedder, settings, topic_ids=topic_ids)
 
     #: Every content call, drafters and thinkers alike (ADR-0089 is explicit that

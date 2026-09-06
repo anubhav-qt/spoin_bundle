@@ -20,6 +20,7 @@ from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from conftest import project_fake_curriculum
 from spoin.core.config import Settings
 from spoin.domain.models import Card, GenerationJob, Topic
 from spoin.generation.fake import FakeContentGenerator
@@ -44,10 +45,14 @@ class _FlakyGenerator(FakeContentGenerator):
         super().__init__()
         self._fail_topic_name = fail_topic_name
 
-    async def generate_curriculum(self, topic_name, description, existing_subtopics=None):  # type: ignore[no-untyped-def]
-        if topic_name == self._fail_topic_name:
+    async def generate_cards(self, **kwargs):  # type: ignore[no-untyped-def,override]
+        # `generate_curriculum` used to be the injection point; ADR-0007 deleted it.
+        # `generate_cards` is the next call taking `topic_name` whose raise the
+        # pipeline lets propagate -- `plan_cards` failing is survivable by design
+        # (ADR-0059), so failing there would not fail the job.
+        if kwargs.get("topic_name") == self._fail_topic_name:
             raise RuntimeError("simulated generation failure")
-        return await super().generate_curriculum(topic_name, description, existing_subtopics)
+        return await super().generate_cards(**kwargs)
 
 
 class _QuotaExhaustedGenerator(FakeContentGenerator):
@@ -67,10 +72,10 @@ class _QuotaExhaustedGenerator(FakeContentGenerator):
         self._exhausted_topic_name = exhausted_topic_name
         self._error = error
 
-    async def generate_curriculum(self, topic_name, description, existing_subtopics=None):  # type: ignore[no-untyped-def]
-        if topic_name == self._exhausted_topic_name:
+    async def generate_cards(self, **kwargs):  # type: ignore[no-untyped-def,override]
+        if kwargs.get("topic_name") == self._exhausted_topic_name:
             raise self._error("all keys exhausted for today (simulated)")
-        return await super().generate_curriculum(topic_name, description, existing_subtopics)
+        return await super().generate_cards(**kwargs)
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -104,10 +109,15 @@ async def _worker_env(
     await engine.dispose()
 
 
-async def test_run_once_completes_a_pending_job_and_persists_cards(session: AsyncSession) -> None:
+async def test_run_once_completes_a_pending_job_and_persists_cards(
+    session: AsyncSession, settings: Settings
+) -> None:
     topic = Topic(slug="worker-topic", canonical_name="Worker Topic")
     session.add(topic)
     await session.flush()
+    # A worker job is only ever queued for a topic whose curriculum was authored and
+    # projected (ADR-0007); `resolve_and_plan_topic` refuses one without.
+    await project_fake_curriculum(session, topic, settings)
     job = GenerationJob(topic_id=topic.id, status="pending")
     session.add(job)
     await session.commit()
@@ -128,12 +138,14 @@ async def test_run_once_completes_a_pending_job_and_persists_cards(session: Asyn
 
 
 async def test_run_once_isolates_one_jobs_failure_from_others(
-    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch, settings: Settings
 ) -> None:
     good_topic = Topic(slug="good-topic", canonical_name="Good Topic")
     bad_topic = Topic(slug="bad-topic", canonical_name="Bad Topic")
     session.add_all([good_topic, bad_topic])
     await session.flush()
+    await project_fake_curriculum(session, good_topic, settings)
+    await project_fake_curriculum(session, bad_topic, settings)
     good_job = GenerationJob(topic_id=good_topic.id, status="pending")
     bad_job = GenerationJob(topic_id=bad_topic.id, status="pending")
     session.add_all([good_job, bad_job])
@@ -167,11 +179,12 @@ async def test_run_once_isolates_one_jobs_failure_from_others(
 
 
 async def test_quota_exhausted_requeues_the_job_instead_of_failing_it(
-    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch, settings: Settings
 ) -> None:
     topic = Topic(slug="quota-topic", canonical_name="Quota Topic")
     session.add(topic)
     await session.flush()
+    await project_fake_curriculum(session, topic, settings)
     job = GenerationJob(topic_id=topic.id, status="pending")
     session.add(job)
     await session.commit()
@@ -195,7 +208,7 @@ async def test_quota_exhausted_requeues_the_job_instead_of_failing_it(
 
 
 async def test_a_provider_outage_is_not_recorded_as_quota_exhaustion(
-    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch, settings: Settings
 ) -> None:
     """ADR-0065. Both conditions requeue identically, so the only thing that
     tells them apart later is what got written down -- and a stalled queue whose
@@ -205,6 +218,7 @@ async def test_a_provider_outage_is_not_recorded_as_quota_exhaustion(
     topic = Topic(slug="outage-topic", canonical_name="Outage Topic")
     session.add(topic)
     await session.flush()
+    await project_fake_curriculum(session, topic, settings)
     job = GenerationJob(topic_id=topic.id, status="pending")
     session.add(job)
     await session.commit()

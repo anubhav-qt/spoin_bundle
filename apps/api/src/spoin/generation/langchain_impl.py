@@ -27,12 +27,9 @@ type were the direct target, one malformed item would fail the whole batch atomi
 type by hand, with per-item failures collected into `BatchResult.failures` and
 good items still landing in `BatchResult.items`.
 
-`generate_curriculum` skips this — there's no meaningful "partial curriculum," so
-a hard failure there is allowed to raise and fail the whole topic branch, matching
-ADR-0007's framing of the curriculum pass as the highest-stakes single point of
-failure. `match_topics` (ADR-0025) does use the wire/domain split, same as the
-other batch methods, since a malformed verdict for one topic in the batch
-shouldn't fail matching for every other topic in it.
+`match_topics` (ADR-0025) uses the wire/domain split, same as the other batch
+methods, since a malformed verdict for one topic in the batch shouldn't fail
+matching for every other topic in it.
 
 ## Real 429s vs. local ledger drift
 
@@ -59,9 +56,8 @@ distinguishes them by `quotaId`, and the two demand opposite responses:
 it cannot positively identify as per-minute (ADR-0060 -- the day-long branch is the
 one that costs the whole grid when guessed wrong). Only once every cell
 has been genuinely exhausted does the final exception (a `QuotaExhaustedError` from
-`acquire()`, or a non-quota error) propagate to the caller -- generate_curriculum
-lets it raise hard (see above); every other method's existing `except Exception`
-already converts it to a `BatchResult` failure.
+`acquire()`, or a non-quota error) propagate to the caller -- every method's
+existing `except Exception` converts it to a `BatchResult` failure.
 """
 
 from __future__ import annotations
@@ -100,7 +96,6 @@ from spoin.generation.base import (
     CardVerificationQuery,
     CardVerificationResult,
     ContentGenerator,
-    CurriculumDraft,
     FreeTextGradeQuery,
     FreeTextGradeResult,
     QuestionDraft,
@@ -1477,33 +1472,9 @@ class GeminiContentGenerator(ContentGenerator):
             lb.mark_exhausted(key_index, model)
         lb.include_model(model)
 
-    # --------------------------------------------------------------- curriculum --
-
-    async def generate_curriculum(
-        self,
-        topic_name: str,
-        description: str,
-        existing_subtopics: list[str] | None = None,
-    ) -> CurriculumDraft:
-        existing_subtopics_block = ""
-        if existing_subtopics:
-            existing_subtopics_block = (
-                "\nSubtopics already under THIS topic (reuse the exact title "
-                "verbatim if one of these already covers what you were about to "
-                "propose):\n" + "\n".join(f"- {item}" for item in existing_subtopics) + "\n"
-            )
-        prompt = [
-            ("system", prompts.CURRICULUM_SYSTEM),
-            (
-                "human",
-                prompts.CURRICULUM_USER.format(
-                    topic_name=topic_name,
-                    description=description or "(no additional description given)",
-                    existing_subtopics_block=existing_subtopics_block,
-                ),
-            ),
-        ]
-        return await self._invoke_with_retry("thinking", CurriculumDraft, prompt)
+    # `generate_curriculum` lived here. Deleted, not grounded (ADR-0007,
+    # authored-curriculum.md): the curriculum is authored beside the corpus and
+    # projected into `Topic`/`Subtopic` by deterministic code, with no model call.
 
     async def match_topics(self, queries: list[TopicMatchQuery]) -> BatchResult[TopicMatchResult]:
         if not queries:

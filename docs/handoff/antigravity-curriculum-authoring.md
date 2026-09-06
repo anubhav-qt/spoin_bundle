@@ -128,8 +128,11 @@ Exactly these five, and a typo is a hard error rather than a silent sixth kind:
 consumes a curated library scene, and a scene is single-use within a topic
 ([ADR-0080](../adr/0080-ascii-fetcher-node.md)) — so a topic asking for more ascii cards than
 the library can distinctly serve will have some fall back to free-drawing. And `code` quotas
-on a non-technical topic are forced to zero regardless of what the file says, so setting one
-is a mistake the validator should catch rather than a preference.
+on a non-technical topic are forced to zero downstream regardless of what the file says
+(enforced outside the prompt) — `make curriculum-check` does **not** catch a stray `code`
+quota, because the format carries no technical/non-technical flag for it to judge against,
+so treat a non-zero `code` quota on a non-technical topic as a mistake even though
+validation stays silent about it.
 
 ## Writing a good curriculum
 

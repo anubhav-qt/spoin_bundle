@@ -236,7 +236,9 @@ def _preamble(*fragments: str) -> str:
 # spends tokens describing a field and invites the self-report the rule forbids.
 # ---------------------------------------------------------------------------
 
-CURRICULUM_CANON = _preamble(_CURRICULUM, _PROGRESSION)
+# `CURRICULUM_CANON` was here. Removed with `generate_curriculum` (ADR-0007): the
+# curriculum is authored, not generated, so there is no curriculum prompt to pin a
+# preamble to. `_CURRICULUM` stays -- `PLAN_CANON` still needs the card-budget facts.
 
 PLAN_CANON = _preamble(_CARD_UNIT, _CURRICULUM, _ASCII_GAG)
 

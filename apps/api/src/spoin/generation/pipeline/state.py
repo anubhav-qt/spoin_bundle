@@ -265,6 +265,12 @@ class SubtopicCardsResult(TypedDict):
     subtopic_id: str
     difficulty: str
     drafts: list[CardDraft]
+    #: The `card.id` of each draft in `drafts`, same order, same length. Every draft
+    #: is written to the database as `status=draft` the moment the writer returns
+    #: (generation-pipeline-v2.md §1) rather than being held in memory until its
+    #: whole subtopic group finishes drafting -- one run lost ~350 drafted cards that
+    #: way. The gate then flips these rows in place, so this is how it finds them.
+    draft_card_ids: list[str]
     generator_failures: list[str]
     #: True iff this subtopic-tier has no sibling tiers in its
     #: `subtopic_group_id` -- decides whether the quality gate's two passes
@@ -394,10 +400,16 @@ class _GateItem:
     topic_name: str
     topic_description: str
     difficulty_examples: dict[Difficulty, list[str]]
-    survivors: list[CardDraft]
-    #: (draft, reason) for cards that never made it past structural
+    #: (card_id, draft). Every list on this item carries the `card.id` of the row
+    #: already written at `status=draft`, because the gate's job is now to FLIP that
+    #: row rather than to decide whether to insert one. Threading the id explicitly
+    #: rather than by position is deliberate: correction drops a draft whose result
+    #: never came back, and dedup and verification each filter, so nothing downstream
+    #: stays positionally aligned with the list the tier started from.
+    survivors: list[tuple[str, CardDraft]]
+    #: (card_id, draft, reason) for cards that never made it past structural
     #: validation -- kept as the ORIGINAL draft, since correction never ran.
-    structural_rejects: list[tuple[CardDraft, str]]
+    structural_rejects: list[tuple[str, CardDraft, str]]
     generator_failure_count: int
     #: What the gate needs to ask `Grounding` for the SAME context this tier was
     #: drafted from (ADR-0089). A gate judging a grounded card against different
@@ -417,14 +429,14 @@ class _GateItem:
     #: Dynamic question budget for this tier (see `SubtopicPlan.target_questions`).
     target_questions: int = 0
     #: Filled in by later phases.
-    corrected: list[CardDraft] = field(default_factory=list)
+    corrected: list[tuple[str, CardDraft]] = field(default_factory=list)
     correction_failure_count: int = 0
-    dedup_survivors: list[tuple[CardDraft, list[float]]] = field(default_factory=list)
-    #: (draft, reason) for near-duplicate rejects, post-correction.
-    dedup_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
-    verified: list[tuple[CardDraft, list[float], Difficulty]] = field(default_factory=list)
-    #: (draft, reason) for pass-2 rejects, post-correction.
-    verification_rejects: list[tuple[CardDraft, str]] = field(default_factory=list)
+    dedup_survivors: list[tuple[str, CardDraft, list[float]]] = field(default_factory=list)
+    #: (card_id, draft, reason) for near-duplicate rejects, post-correction.
+    dedup_rejects: list[tuple[str, CardDraft, str]] = field(default_factory=list)
+    verified: list[tuple[str, CardDraft, list[float], Difficulty]] = field(default_factory=list)
+    #: (card_id, draft, reason) for pass-2 rejects, post-correction.
+    verification_rejects: list[tuple[str, CardDraft, str]] = field(default_factory=list)
     verification_failure_count: int = 0
 
 

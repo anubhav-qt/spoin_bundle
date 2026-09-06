@@ -140,9 +140,17 @@ class Topic(Base, UUIDPrimaryKey, Timestamps):
     #: differs and must stay honest about which this is (ADR-0007).
     is_survey: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    #: Deep-dive topics are created immediately but get curricula lazily, on first
-    #: subscription. Nothing here is generated until someone wants it.
+    #: Set by the deterministic projection of an authored curriculum
+    #: (docs/architecture/authored-curriculum.md): "a curriculum was projected", at
+    #: this time. Pre-authored-curriculum this meant "we generated one"; the
+    #: generated path (`generate_curriculum`) is gone. A deep-dive stub still has
+    #: this null until its curriculum is authored and projected.
     curriculum_generated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    #: The corpus version (`frog.retrieval.corpus_version`) the projection last ran
+    #: against, so "the corpus moved under this curriculum" is a comparison rather
+    #: than a re-parse. Null until first projected.
+    curriculum_corpus_version: Mapped[str | None] = mapped_column(String(64))
 
     #: Denormalised for the fairness cap and fill priority (ADR-0006). Maintained
     #: by a batch job — never counted at request time.

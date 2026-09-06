@@ -23,10 +23,6 @@ from spoin.generation.prompts.cards import (
     PLAN_USER,
     PLANNED_CARDS_INSTRUCTIONS,
 )
-from spoin.generation.prompts.curriculum import (
-    CURRICULUM_SYSTEM,
-    CURRICULUM_USER,
-)
 from spoin.generation.prompts.quality import (
     CORRECTION_SYSTEM,
     CORRECTION_USER,
@@ -65,8 +61,6 @@ __all__ = [
     "CARD_FIELDS_BLOCK",
     "CORRECTION_SYSTEM",
     "CORRECTION_USER",
-    "CURRICULUM_SYSTEM",
-    "CURRICULUM_USER",
     "FREE_TEXT_GRADE_SYSTEM",
     "FREE_TEXT_GRADE_USER",
     "HERO_CARDS_SYSTEM",

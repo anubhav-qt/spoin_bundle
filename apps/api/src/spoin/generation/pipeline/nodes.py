@@ -18,6 +18,7 @@ from typing import Any, cast
 
 from langgraph.types import Command, Send
 from sqlalchemy import func, select
+from sqlalchemy import update as sa_update
 
 from spoin.content.archetype import classify_archetype
 from spoin.content.difficulty_examples import get_difficulty_examples
@@ -42,13 +43,10 @@ from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
 from spoin.generation.load_balancer import estimate_tokens, pack_by_tokens
 from spoin.generation.pipeline.persistence import (
-    _create_deep_dive_stubs,
     _current_question_stems,
-    _existing_subtopic_hints,
     _load_subtopic_plans,
     _mark_progress_done,
     _recent_rejection_context,
-    _reuse_or_create_subtopic,
     _seed_progress,
     _update_subtopic_progress,
     load_cards_missing_questions,
@@ -66,7 +64,6 @@ from spoin.generation.pipeline.state import (
     _clean_null_bytes,
     _existing_title_tag,
     _GateItem,
-    _min_cards,
     _rejected_card,
     _Runtime,
     _runtime,
@@ -300,13 +297,83 @@ def _take_plans(pool: list[CardPlan], card_type: str | None, count: int) -> list
     return taken
 
 
+async def _persist_drafts(
+    runtime: _Runtime,
+    *,
+    topic_id: str,
+    subtopic_id: str,
+    drafts: list[CardDraft],
+    generated_at: str,
+    backend: str,
+) -> list[str]:
+    """Write freshly-returned drafts as `status=draft` rows, immediately. Returns ids.
+
+    generation-pipeline-v2.md §1. A run used to hold every drafted card in container
+    memory until its whole subtopic group finished drafting and the gate ran -- one
+    interrupted run lost ~350 of them and kept 86. Writing here means a run that dies
+    loses nothing but the calls actually in flight.
+
+    **Safe by construction, and with no migration.** `CardStatus.DRAFT` already exists
+    for exactly this (`domain/enums.py`), the feed's candidate query already filters
+    `status = 'active'`, and `uq_card_family_id_active` is a PARTIAL unique index
+    (`WHERE status = 'active'`), so any number of drafts coexist without colliding. A
+    draft is invisible to readers.
+
+    `content_embedding` and `embedding_model` are both NULL until the gate accepts --
+    the pairing the `embedding_names_its_model` CHECK requires, and honest: nothing has
+    embedded this text yet. `judged_difficulty` is NULL for the same reason; only pass
+    2 can set it.
+
+    Orphan drafts from a killed run are a real state and an honest one: visible, not
+    served, and available for a later pass to gate or discard.
+    """
+
+    if not drafts:
+        return []
+
+    rows = [
+        Card(
+            family_id=uuid.uuid4(),
+            topic_id=uuid.UUID(topic_id),
+            subtopic_id=uuid.UUID(subtopic_id),
+            difficulty=draft.difficulty,
+            status=CardStatus.DRAFT,
+            title=_clean_null_bytes(draft.title[:120]),
+            canonical_title=_clean_null_bytes(draft.canonical_title[:160]),
+            summary=_clean_null_bytes(draft.summary),
+            body=_clean_null_bytes(draft.body),
+            archetype=classify_archetype(_clean_null_bytes(draft.body)),
+            visual_id=_clean_null_bytes(draft.visual_id[:64]) if draft.visual_id else None,
+            visual_slots=_clean_null_bytes(draft.visual_slots),
+            is_hero=draft.is_hero,
+            gen_meta={
+                "backend": backend,
+                "generated_at": generated_at,
+                "batch_id": str(runtime.batch_id),
+                "prompt_version": CARD_PROMPT_VERSION,
+            },
+        )
+        for draft in drafts
+    ]
+    async with runtime.session_lock:
+        runtime.session.add_all(rows)
+        await runtime.session.flush()
+        # Committed here, not at the end of the group: an uncommitted draft is a
+        # draft the crash this whole change exists to survive would still lose.
+        await runtime.session.commit()
+    logger.info("subtopic %s: persisted %d draft(s) at status=draft", subtopic_id, len(rows))
+    return [str(row.id) for row in rows]
+
+
 async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
     state: PipelineState, config
 ) -> Command[Any]:
-    """The topic this branch is for already exists -- ADR-0025's matching phase
-    decided that before this graph even started. All this does now is the
-    curriculum pass (if not already done) and grouping subtopics by difficulty
-    tier for the card-generation fan-out.
+    """The topic already exists (ADR-0025 matched it before the graph started) and
+    its curriculum is **authored, not generated**: `make curriculum-ingest &&
+    make curriculum-project` created its `Subtopic` rows from
+    `docs/the_spoin_universe/curricula/<topic>/curriculum.md`
+    (docs/architecture/authored-curriculum.md). This node asserts that projection
+    ran, then groups the subtopics by tier for the card fan-out. No model call.
 
     Returns a `Command` (state update + routing) instead of a plain dict,
     specifically so the fan-out to `generate_subtopic_cards` can use THIS
@@ -323,75 +390,20 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         topic = await runtime.session.get(Topic, topic_id)
     assert topic is not None, f"GenerationJob referenced missing topic {topic_id}"
 
-    need_curriculum = topic.curriculum_generated_at is None
+    if topic.curriculum_generated_at is None:
+        # Nothing is generated for a topic whose curriculum nobody authored
+        # (authored-curriculum.md §2). `make curriculum-project` is what stamps this.
+        raise RuntimeError(
+            f"topic '{topic.canonical_name}' has no projected curriculum. Author one at "
+            f"docs/the_spoin_universe/curricula/<topic>/curriculum.md, then run "
+            f"`make curriculum-check && make curriculum-ingest && make curriculum-project`."
+        )
+
+    #: Both come from the projection now rather than from a `CurriculumDraft`.
+    #: Deep-dive edges (ADR-0007) are not part of the authored format yet, so nothing
+    #: proposes them -- an honest empty list, not a dropped feature.
     deep_dive_names: list[str] = []
     is_survey = topic.is_survey
-
-    if need_curriculum:
-        logger.info("topic '%s': generating curriculum...", topic.canonical_name)
-        async with runtime.topic_plan_lock:
-            existing_subtopic_hints = await _existing_subtopic_hints(runtime.session, topic.id)
-        draft = await runtime.generator.generate_curriculum(
-            topic.canonical_name, topic.description or "", existing_subtopic_hints or None
-        )
-        total_tiers = sum(len(group.tiers) for group in draft.subtopics)
-        logger.info(
-            "topic '%s': curriculum generated -- %d subtopic group(s), %d tier(s) total, "
-            "survey=%s, %d deep-dive topic(s) proposed",
-            topic.canonical_name,
-            len(draft.subtopics),
-            total_tiers,
-            draft.is_survey,
-            len(draft.deep_dive_topics),
-        )
-        async with runtime.topic_plan_lock:
-            topic.is_survey = draft.is_survey
-            await _create_deep_dive_stubs(
-                runtime.session, parent=topic, names=draft.deep_dive_topics
-            )
-            for group in draft.subtopics:
-                tier_rows = [
-                    (
-                        *(
-                            await _reuse_or_create_subtopic(
-                                runtime.session,
-                                topic_id=topic.id,
-                                title=group.title,
-                                difficulty=tier.difficulty,
-                            )
-                        ),
-                        tier,
-                    )
-                    for tier in group.tiers
-                ]
-                # A new group adopts an EXISTING subtopic's group id if any of its
-                # tiers reused one -- keeps that subtopic's prior tier siblings (if
-                # any) connected to the new tiers landing alongside it, rather than
-                # forking a second, disconnected group for the same concept. A
-                # reused row's OWN group id is never overwritten.
-                group_id = next(
-                    (row[0].subtopic_group_id for row in tier_rows if row[1]), uuid.uuid4()
-                )
-                for subtopic, reused, tier in tier_rows:
-                    if not reused:
-                        subtopic.subtopic_group_id = group_id
-                    subtopic.description = tier.description
-                    subtopic.target_cards = tier.target_cards
-                    subtopic.card_type_quotas = tier.card_type_quotas or None
-                    subtopic.min_cards = _min_cards(
-                        tier.target_cards, runtime.settings.min_cards_fraction
-                    )
-                    subtopic.position = group.position
-            topic.curriculum_generated_at = datetime.now(UTC)
-            await runtime.session.flush()
-            # Committed immediately, not left pending until gate_and_persist's
-            # fan-in: card generation runs next with no DB access at all, so a
-            # crash anywhere in that phase would otherwise discard a fully
-            # generated curriculum along with it (a real gap this closes --
-            # see docs/tasks and the run this fix accompanies).
-            await runtime.session.commit()
-            deep_dive_names = draft.deep_dive_topics
-            is_survey = draft.is_survey
 
     async with runtime.topic_plan_lock:
         subtopic_plans = await _load_subtopic_plans(
@@ -403,6 +415,16 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
         )
         await _seed_progress(runtime, topic.id, topic.canonical_name, subtopic_plans)
         await runtime.session.commit()
+
+    if not subtopic_plans:
+        # Stamped as projected but carrying no `Subtopic` rows -- a stale stamp, or a
+        # projection that was reverted. Every topic branch must fan out >=1 subtopic
+        # group (see below), so this fails loudly rather than silently producing a
+        # topic branch that reaches `gate_and_persist` having generated nothing.
+        raise RuntimeError(
+            f"topic '{topic.canonical_name}' is stamped as projected but has no "
+            f"subtopics. Re-run `make curriculum-ingest && make curriculum-project`."
+        )
 
     plan = TopicPlanResult(
         topic_id=str(topic.id),
@@ -428,9 +450,8 @@ async def resolve_and_plan_topic(  # type: ignore[no-untyped-def]
 
     # Every subtopic group gets a branch -- deliberately NOT filtered down to
     # only under-target ones here (see generate_subtopic_cards, which does that
-    # per-tier). `CurriculumDraft.subtopics` requires at least one entry, so
-    # every topic branch is guaranteed >=1 group Send, keeping every topic's
-    # path to `gate_and_persist` the same shape.
+    # per-tier). The empty-`subtopic_plans` guard above keeps every topic branch at
+    # >=1 group Send, so every topic's path to `gate_and_persist` is the same shape.
     return Command(
         update={"topic_plans": [plan]},
         goto=[
@@ -497,6 +518,12 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
     is_standalone = len(job["tiers"]) == 1
     difficulty_examples = get_difficulty_examples() if is_standalone else _NO_DIFFICULTY_EXAMPLES
 
+    #: One stamp for every row this run writes -- the drafts `_persist_drafts` lands
+    #: mid-loop and the gate's updates alike -- so a card's `gen_meta` does not
+    #: disagree with itself by however long the drafting took.
+    generated_at = datetime.now(UTC).isoformat()
+    backend = runtime.settings.generator
+
     results: list[SubtopicCardsResult] = []
     lower_tier_bodies: list[str] = []
     #: Per-tier state the redraft loop below needs after this first round's
@@ -528,6 +555,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                     subtopic_id=tier["subtopic_id"],
                     difficulty=tier["difficulty"],
                     drafts=[],
+                    draft_card_ids=[],
                     generator_failures=[],
                     is_standalone=is_standalone,
                     cards_missing_questions=tier["cards_missing_questions"],
@@ -546,6 +574,10 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             continue
 
         drafts: list[CardDraft] = []
+        #: Aligned with `drafts`: `_persist_drafts` writes each round's cards at
+        #: `status=draft` as soon as the writer returns, and the gate flips those
+        #: rows rather than inserting new ones.
+        draft_card_ids: list[str] = []
         failures: list[str] = []
         existing_titles = list(tier["existing_titles"])
         # The actual DEFICIT this call should draft -- not the tier's full
@@ -671,6 +703,16 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 len(hero_items),
                 len(hero_result.failures),
             )
+            draft_card_ids.extend(
+                await _persist_drafts(
+                    runtime,
+                    topic_id=tier["topic_id"],
+                    subtopic_id=tier["subtopic_id"],
+                    drafts=hero_items,
+                    generated_at=generated_at,
+                    backend=backend,
+                )
+            )
             failures.extend(hero_result.failures)
             drafts.extend(hero_items)
             existing_titles.extend(
@@ -761,6 +803,16 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             if not result.items:
                 break  # no usable progress this round -- stop
             drafts.extend(result.items)
+            draft_card_ids.extend(
+                await _persist_drafts(
+                    runtime,
+                    topic_id=tier["topic_id"],
+                    subtopic_id=tier["subtopic_id"],
+                    drafts=result.items,
+                    generated_at=generated_at,
+                    backend=backend,
+                )
+            )
             existing_titles.extend(
                 _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in result.items
             )
@@ -771,6 +823,7 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 subtopic_id=tier["subtopic_id"],
                 difficulty=tier["difficulty"],
                 drafts=drafts,
+                draft_card_ids=draft_card_ids,
                 generator_failures=failures,
                 is_standalone=is_standalone,
                 cards_missing_questions=tier["cards_missing_questions"],
@@ -792,14 +845,13 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
 
     # Gate+persist THIS group's results right now (ADR-0026) rather than
     # handing them to a later global writer -- see this function's docstring.
-    generated_at = datetime.now(UTC).isoformat()
     item_reports = await _gate_and_persist_results(
         runtime,
         topic_name=job["topic_name"],
         topic_description=job["topic_description"],
         results=results,
         generated_at=generated_at,
-        backend=runtime.settings.generator,
+        backend=backend,
         threshold=runtime.settings.card_duplicate_threshold,
     )
     item_reports = await _redraft_until_bar(
@@ -1052,12 +1104,21 @@ async def _redraft_until_bar(
             existing_titles.extend(
                 _existing_title_tag(d.canonical_title, d.title, d.difficulty) for d in result.items
             )
+            round_draft_card_ids = await _persist_drafts(
+                runtime,
+                topic_id=tier["topic_id"],
+                subtopic_id=sid,
+                drafts=result.items,
+                generated_at=generated_at,
+                backend=runtime.settings.generator,
+            )
             round_results.append(
                 SubtopicCardsResult(
                     topic_id=tier["topic_id"],
                     subtopic_id=sid,
                     difficulty=tier["difficulty"],
                     drafts=result.items,
+                    draft_card_ids=round_draft_card_ids,
                     generator_failures=result.failures,
                     is_standalone=is_standalone,
                     # Round 1 already drained this tier's pre-run
@@ -1149,17 +1210,23 @@ async def _correct_subtopic_drafts(
     topic_name: str,
     topic_description: str,
     difficulty_examples: dict[Difficulty, list[str]],
-    drafts: list[CardDraft],
+    drafts: list[tuple[str, CardDraft]],
     grounding: str,
-) -> tuple[str, list[CardDraft], list[str]]:
+) -> tuple[str, list[tuple[str, CardDraft]], list[str]]:
     """ADR-0030 pass 1. Concurrent across subtopics (no DB access -- pure
     generator calls, same principle as `_generate_questions_for_group`).
-    Returns corrected drafts in receipt order; a draft whose correction never
-    came back (malformed/missing item) is DROPPED and reported as a failure --
-    there is nothing safe to persist without a corrected body."""
+    Returns (card_id, corrected draft) in receipt order; a draft whose correction
+    never came back (malformed/missing item) is DROPPED and reported as a failure --
+    there is nothing safe to persist without a corrected body.
+
+    Each draft carries its `card.id` because that draft is ALREADY a row: it was
+    written at `status=draft` when the writer returned (generation-pipeline-v2.md §1),
+    and this pass rewrites its text rather than deciding whether it gets one. Dropping
+    a draft here leaves its row at `status=draft` -- honest, invisible to readers, and
+    available to a later pass."""
 
     batch_size = runtime.settings.judge_batch_size
-    corrected: list[CardDraft] = []
+    corrected: list[tuple[str, CardDraft]] = []
     failures: list[str] = []
 
     # Correction sends whole card BODIES, so the count ceiling above is only half
@@ -1167,7 +1234,9 @@ async def _correct_subtopic_drafts(
     # and lets the remainder become its own request on its own cell (ADR-0085).
     for chunk in pack_by_tokens(
         drafts,
-        cost=lambda d: estimate_tokens(d.title + d.canonical_title + d.summary + d.body),
+        cost=lambda d: estimate_tokens(
+            d[1].title + d[1].canonical_title + d[1].summary + d[1].body
+        ),
         budget=runtime.settings.gemini_prompt_token_budget,
         max_items=batch_size,
     ):
@@ -1181,7 +1250,7 @@ async def _correct_subtopic_drafts(
                 summary=draft.summary,
                 body=draft.body,
             )
-            for index, draft in enumerate(chunk)
+            for index, (_card_id, draft) in enumerate(chunk)
         ]
         result = await runtime.generator.correct_cards(
             queries, difficulty_examples=difficulty_examples, grounding=grounding
@@ -1190,7 +1259,7 @@ async def _correct_subtopic_drafts(
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
         edited_count = 0
-        for index, draft in enumerate(chunk):
+        for index, (card_id, draft) in enumerate(chunk):
             correction = by_index.get(index)
             if correction is None:
                 reason = f"correction pass returned no result for card {index}"
@@ -1206,13 +1275,16 @@ async def _correct_subtopic_drafts(
                     correction.note or "no note given",
                 )
             corrected.append(
-                draft.model_copy(
-                    update={
-                        "title": correction.title,
-                        "canonical_title": correction.canonical_title,
-                        "summary": correction.summary,
-                        "body": correction.body,
-                    }
+                (
+                    card_id,
+                    draft.model_copy(
+                        update={
+                            "title": correction.title,
+                            "canonical_title": correction.canonical_title,
+                            "summary": correction.summary,
+                            "body": correction.body,
+                        }
+                    ),
                 )
             )
         logger.info(
@@ -1243,28 +1315,34 @@ async def _verify_subtopic_drafts(
     *,
     subtopic_id: str,
     difficulty_examples: dict[Difficulty, list[str]],
-    items: list[tuple[CardDraft, list[float]]],
+    items: list[tuple[str, CardDraft, list[float]]],
     grounding: str,
 ) -> tuple[
-    str, list[tuple[CardDraft, list[float], Difficulty]], list[tuple[CardDraft, str]], list[str]
+    str,
+    list[tuple[str, CardDraft, list[float], Difficulty]],
+    list[tuple[str, CardDraft, str]],
+    list[str],
 ]:
-    """ADR-0030 pass 2. `items` is (corrected draft, its post-correction
-    embedding) for every card that survived dedup. Concurrent across
-    subtopics, same reasoning as `_correct_subtopic_drafts`. Returns
-    (subtopic_id, accepted[(draft, embedding, confirmed_difficulty)],
-    rejected[(draft, reason)], failures)."""
+    """ADR-0030 pass 2. `items` is (card_id, corrected draft, its post-correction
+    embedding) for every card that survived dedup. Concurrent across subtopics, same
+    reasoning as `_correct_subtopic_drafts`. Returns (subtopic_id,
+    accepted[(card_id, draft, embedding, confirmed_difficulty)],
+    rejected[(card_id, draft, reason)], failures).
+
+    This is the terminal check, and the only pass whose verdict changes a row's
+    status: accepted rows go `draft -> active`, rejected ones `draft -> rejected`."""
 
     # Larger chunks than pass 1 (`verification_batch_size` vs `judge_batch_size`)
     # -- a verdict per card is a few tokens, so this pass isn't truncation-bound,
     # and fewer calls here is a direct cut to thinking-pool rate pressure.
     batch_size = runtime.settings.verification_batch_size
-    accepted: list[tuple[CardDraft, list[float], Difficulty]] = []
-    rejected: list[tuple[CardDraft, str]] = []
+    accepted: list[tuple[str, CardDraft, list[float], Difficulty]] = []
+    rejected: list[tuple[str, CardDraft, str]] = []
     failures: list[str] = []
 
     for chunk in pack_by_tokens(
         items,
-        cost=lambda it: estimate_tokens(it[0].canonical_title + it[0].body),
+        cost=lambda it: estimate_tokens(it[1].canonical_title + it[1].body),
         budget=runtime.settings.gemini_prompt_token_budget,
         max_items=batch_size,
     ):
@@ -1275,7 +1353,7 @@ async def _verify_subtopic_drafts(
                 body=draft.body,
                 requested_difficulty=draft.difficulty,
             )
-            for index, (draft, _embedding) in enumerate(chunk)
+            for index, (_card_id, draft, _embedding) in enumerate(chunk)
         ]
         result = await runtime.generator.verify_cards(
             queries, difficulty_examples=difficulty_examples, grounding=grounding
@@ -1284,7 +1362,7 @@ async def _verify_subtopic_drafts(
         failures.extend(result.failures)
         by_index = {item.index: item for item in result.items}
         chunk_accepted = 0
-        for index, (draft, embedding) in enumerate(chunk):
+        for index, (card_id, draft, embedding) in enumerate(chunk):
             verdict = by_index.get(index)
             if verdict is None:
                 reason = f"verification pass returned no result for card {index}"
@@ -1299,7 +1377,7 @@ async def _verify_subtopic_drafts(
                     subtopic_id,
                     reason,
                 )
-                rejected.append((draft, reason))
+                rejected.append((card_id, draft, reason))
                 continue
             if verdict.confirmed_difficulty != draft.difficulty:
                 logger.info(
@@ -1310,7 +1388,7 @@ async def _verify_subtopic_drafts(
                     verdict.confirmed_difficulty.value,
                 )
             chunk_accepted += 1
-            accepted.append((draft, embedding, verdict.confirmed_difficulty))
+            accepted.append((card_id, draft, embedding, verdict.confirmed_difficulty))
         logger.info(
             "gate: pass 2 verification for subtopic %s -- %d/%d accepted this chunk, %d failure(s)",
             subtopic_id,
@@ -1434,12 +1512,12 @@ async def _process_gate_item(
         item.correction_failure_count = len(failures)
 
     if item.corrected:
-        bodies = [draft.body for draft in item.corrected]
+        bodies = [draft.body for _card_id, draft in item.corrected]
         embeddings = await runtime.embedder.aembed_passage(bodies)
         accepted_embeddings: list[list[float]] = []
         subtopic_uuid = uuid.UUID(item.subtopic_id)
         async with runtime.session_lock:
-            for draft, embedding in zip(item.corrected, embeddings, strict=True):
+            for (card_id, draft), embedding in zip(item.corrected, embeddings, strict=True):
                 corpus_hit = await find_corpus_duplicate(
                     runtime.session,
                     subtopic_id=subtopic_uuid,
@@ -1454,7 +1532,7 @@ async def _process_gate_item(
                         item.subtopic_id,
                         reason,
                     )
-                    item.dedup_rejects.append((draft, reason))
+                    item.dedup_rejects.append((card_id, draft, reason))
                     continue
                 batch_hit = find_batch_duplicate(
                     embedding, accepted_embeddings, threshold=threshold
@@ -1467,10 +1545,10 @@ async def _process_gate_item(
                         item.subtopic_id,
                         reason,
                     )
-                    item.dedup_rejects.append((draft, reason))
+                    item.dedup_rejects.append((card_id, draft, reason))
                     continue
                 accepted_embeddings.append(embedding)
-                item.dedup_survivors.append((draft, embedding))
+                item.dedup_survivors.append((card_id, draft, embedding))
 
     if item.dedup_survivors:
         _, verified, verify_rejects, verify_failures = await _verify_subtopic_drafts(
@@ -1495,7 +1573,7 @@ async def _process_gate_item(
             backend=backend,
             batch_id=runtime.batch_id,
         )
-        for draft, reason in item.structural_rejects
+        for _card_id, draft, reason in item.structural_rejects
     ]
     rejected_rows += [
         _rejected_card(
@@ -1508,7 +1586,7 @@ async def _process_gate_item(
             backend=backend,
             batch_id=runtime.batch_id,
         )
-        for draft, reason in item.dedup_rejects
+        for _card_id, draft, reason in item.dedup_rejects
     ]
     rejected_rows += [
         _rejected_card(
@@ -1521,56 +1599,88 @@ async def _process_gate_item(
             backend=backend,
             batch_id=runtime.batch_id,
         )
-        for draft, reason in item.verification_rejects
+        for _card_id, draft, reason in item.verification_rejects
     ]
 
-    new_cards = [
-        Card(
-            family_id=uuid.uuid4(),
-            topic_id=uuid.UUID(item.topic_id),
-            subtopic_id=uuid.UUID(item.subtopic_id),
-            difficulty=draft.difficulty,
-            judged_difficulty=confirmed_difficulty,
-            status=CardStatus.ACTIVE,
-            title=_clean_null_bytes(draft.title[:120]),
-            canonical_title=_clean_null_bytes(draft.canonical_title[:160]),
-            summary=_clean_null_bytes(draft.summary),
-            body=_clean_null_bytes(draft.body),
-            archetype=classify_archetype(_clean_null_bytes(draft.body)),
-            visual_id=_clean_null_bytes(draft.visual_id[:64]) if draft.visual_id else None,
-            visual_slots=_clean_null_bytes(draft.visual_slots),
-            is_hero=draft.is_hero,
-            content_embedding=embedding,
-            embedding_model=runtime.embedder.model_name,
-            #: The chunks that were in this card's prompt (ADR-0089) -- from the
-            #: same `GroundingContext` the drafter and both gate passes used, so
-            #: the citation names what the model actually saw rather than what a
-            #: later re-query would return. `list(...)` because the context is
-            #: shared across a whole subtopic group and must stay immutable.
-            grounded_chunk_ids=list(grounding.chunk_ids),
-            gen_meta={
-                "backend": backend,
-                "generated_at": generated_at,
-                "batch_id": str(runtime.batch_id),
-                "prompt_version": CARD_PROMPT_VERSION,
+    #: Every draft in this tier already HAS a row, written at `status=draft` the moment
+    #: the writer returned (generation-pipeline-v2.md §1). The gate no longer decides
+    #: whether a card is inserted -- it flips a row that exists. Accepted rows also take
+    #: the corrected text, the embedding and the verdict's difficulty, none of which
+    #: existed at draft time.
+    #:
+    #: A rejected draft keeps its row at `status=rejected` AND still writes a
+    #: `rejected_card` (owner's call): the card row holds the full body and provenance
+    #: as an audit trail, while `rejected_card` keeps carrying the structured reason
+    #: that feeds prevention context back into the next `generate_cards` call. Neither
+    #: loop changes.
+    accepted_updates: list[tuple[uuid.UUID, dict[str, Any]]] = [
+        (
+            uuid.UUID(card_id),
+            {
+                "status": CardStatus.ACTIVE,
+                "judged_difficulty": confirmed_difficulty,
+                "title": _clean_null_bytes(draft.title[:120]),
+                "canonical_title": _clean_null_bytes(draft.canonical_title[:160]),
+                "summary": _clean_null_bytes(draft.summary),
+                "body": _clean_null_bytes(draft.body),
+                #: Re-derived from the CORRECTED body -- pass 1 rewrites prose, and an
+                #: archetype classified from the pre-correction text would describe a
+                #: card that no longer exists (ADR-0017).
+                "archetype": classify_archetype(_clean_null_bytes(draft.body)),
+                "visual_id": (_clean_null_bytes(draft.visual_id[:64]) if draft.visual_id else None),
+                "visual_slots": _clean_null_bytes(draft.visual_slots),
+                "content_embedding": embedding,
+                "embedding_model": runtime.embedder.model_name,
+                #: The chunks that were in this card's prompt (ADR-0089) -- from the
+                #: same `GroundingContext` the drafter and both gate passes used, so
+                #: the citation names what the model actually saw rather than what a
+                #: later re-query would return. `list(...)` because the context is
+                #: shared across a whole subtopic group and must stay immutable.
+                "grounded_chunk_ids": list(grounding.chunk_ids),
             },
         )
-        for draft, embedding, confirmed_difficulty in item.verified
+        for card_id, draft, embedding, confirmed_difficulty in item.verified
+    ]
+
+    #: Rejected at any of the three stages. The body is updated too for verification
+    #: rejects, whose draft went through pass 1 -- so the audit row and the
+    #: `rejected_card` reason describe the same text.
+    rejected_updates: list[tuple[uuid.UUID, dict[str, Any]]] = [
+        (uuid.UUID(card_id), {"status": CardStatus.REJECTED})
+        for card_id, _draft, _reason in item.structural_rejects
+    ]
+    rejected_updates += [
+        (
+            uuid.UUID(card_id),
+            {
+                "status": CardStatus.REJECTED,
+                "title": _clean_null_bytes(draft.title[:120]),
+                "canonical_title": _clean_null_bytes(draft.canonical_title[:160]),
+                "summary": _clean_null_bytes(draft.summary),
+                "body": _clean_null_bytes(draft.body),
+            },
+        )
+        for card_id, draft, _reason in (*item.dedup_rejects, *item.verification_rejects)
     ]
 
     async with runtime.session_lock:
         runtime.session.add_all(rejected_rows)
-        runtime.session.add_all(new_cards)
+        for row_id, values in (*accepted_updates, *rejected_updates):
+            await runtime.session.execute(sa_update(Card).where(Card.id == row_id).values(**values))
         # Parent flushed before the child (`CardStats.card_id` FK) is added, not
         # as an optimisation: on CockroachDB, adding a parent and an FK child in
         # the same flush raises ForeignKeyViolationError because the child's FK
         # check does not see the not-yet-flushed parent (0016 spike). Every
         # parent→child insert in this codebase already flushes the parent first
-        # (`_reuse_or_create_subtopic`, `_create_deep_dive_stubs`, the seed
-        # scripts); keep it that way — do not collapse these two flushes into one.
+        # (`spoin.curriculum.projection`, the seed scripts); keep it that way — do
+        # not collapse these two flushes into one.
         await runtime.session.flush()
-        for card in new_cards:
-            runtime.session.add(CardStats(card_id=card.id))
+        #: Only for cards that just went ACTIVE, and only if they have no row yet --
+        #: a draft that a previous interrupted run already activated would otherwise
+        #: collide on `card_stats`' primary key.
+        for row_id, _values in accepted_updates:
+            if await runtime.session.get(CardStats, row_id) is None:
+                runtime.session.add(CardStats(card_id=row_id))
         await runtime.session.flush()
         # Committed as soon as THIS tier's cards are written -- a crash
         # anywhere else in this batch (a different tier, question
@@ -1619,7 +1729,7 @@ async def _process_gate_item(
         "(correction=%d verification=%d generator=%d)",
         item.subtopic_id,
         item.difficulty,
-        len(new_cards),
+        len(accepted_updates),
         total_rejected,
         len(item.structural_rejects),
         len(item.dedup_rejects),
@@ -1634,14 +1744,14 @@ async def _process_gate_item(
         "topic_id": item.topic_id,
         "subtopic_id": item.subtopic_id,
         "difficulty": item.difficulty,
-        "accepted": len(new_cards),
+        "accepted": len(accepted_updates),
         "rejected": total_rejected,
         "failed": total_failed,
         #: Questions are NOT written here any more (ADR-0074) -- they run as one
         #: topic-wide phase after every group has cleared its card bar. The ids
         #: travel so that phase can still tell a card drafted THIS run from one
         #: it is merely backfilling, which is what `is_backfill` turns on.
-        "new_card_ids": [str(card.id) for card in new_cards],
+        "new_card_ids": [str(row_id) for row_id, _values in accepted_updates],
     }
 
 
@@ -1838,14 +1948,18 @@ async def _gate_and_persist_results(
 
     items: list[_GateItem] = []
     for result in results:
-        survivors: list[CardDraft] = []
-        structural_rejects: list[tuple[CardDraft, str]] = []
-        for draft in result["drafts"]:
+        survivors: list[tuple[str, CardDraft]] = []
+        structural_rejects: list[tuple[str, CardDraft, str]] = []
+        #: `strict=True`: every draft was written as a `status=draft` row by
+        #: `_persist_drafts`, so the two lists are the same length by construction. A
+        #: mismatch means a drafting path forgot to persist, and the gate would then
+        #: silently drop cards -- loud is the only safe failure here.
+        for card_id, draft in zip(result["draft_card_ids"], result["drafts"], strict=True):
             ok, reason = passes_minimal_gate(draft)
             if ok:
-                survivors.append(draft)
+                survivors.append((card_id, draft))
             else:
-                structural_rejects.append((draft, reason or "failed structural gate"))
+                structural_rejects.append((card_id, draft, reason or "failed structural gate"))
 
         examples = get_difficulty_examples() if result["is_standalone"] else _NO_DIFFICULTY_EXAMPLES
         items.append(

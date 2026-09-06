@@ -20,6 +20,7 @@ from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from conftest import project_fake_curriculum
 from spoin.api.routers.quiz import start_quiz, submit_free_text, submit_mcq
 from spoin.api.routers.topics import subscribe_topic
 from spoin.api.schemas import (
@@ -46,6 +47,12 @@ async def _make_topic_with_bank(session: AsyncSession, settings: Settings) -> uu
         topic_requests=[TopicRequest(name=f"Quiz Topic {uuid.uuid4().hex[:6]}", description="")],
     )
     topic_id = uuid.UUID(outcomes[0]["topic_id"])
+    # Stands in for `make curriculum-project` -- the pipeline no longer generates a
+    # curriculum, it requires a projected one (ADR-0007).
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+    await project_fake_curriculum(session, topic, settings)
+    await session.commit()
     await run_generation_pipeline(session, generator, embedder, settings, topic_ids=[topic_id])
     return topic_id
 

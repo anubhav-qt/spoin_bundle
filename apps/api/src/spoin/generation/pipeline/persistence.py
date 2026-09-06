@@ -18,7 +18,7 @@ from frog.embeddings import normalize_topic_text
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from spoin.domain.enums import CardStatus, Difficulty, QuestionStatus, RejectionStage, TopicEdgeKind
+from spoin.domain.enums import CardStatus, QuestionStatus, RejectionStage
 from spoin.domain.models import (
     Card,
     GenerationJob,
@@ -27,9 +27,8 @@ from spoin.domain.models import (
     Subtopic,
     Topic,
     TopicAlias,
-    TopicEdge,
 )
-from spoin.generation.pipeline.state import SubtopicPlan, _existing_title_tag, _Runtime, _slugify
+from spoin.generation.pipeline.state import SubtopicPlan, _existing_title_tag, _Runtime
 
 
 async def _find_top_topic_candidates(
@@ -65,82 +64,12 @@ async def _ensure_alias(
         )
 
 
-async def _create_deep_dive_stubs(
-    session: AsyncSession, *, parent: Topic, names: list[str]
-) -> None:
-    """ADR-0007: deep-dive topics are created as canonical topics immediately,
-    without curricula -- those are generated lazily on first subscription."""
-
-    for name in names:
-        slug = _slugify(name)
-        child = await session.scalar(select(Topic).where(Topic.slug == slug))
-        if child is None:
-            child = Topic(slug=slug, canonical_name=name, is_seeded=parent.is_seeded)
-            session.add(child)
-            await session.flush()
-        edge = await session.scalar(
-            select(TopicEdge).where(
-                TopicEdge.from_topic_id == parent.id,
-                TopicEdge.to_topic_id == child.id,
-                TopicEdge.kind == TopicEdgeKind.DEEP_DIVE,
-            )
-        )
-        if edge is None:
-            session.add(
-                TopicEdge(
-                    from_topic_id=parent.id, to_topic_id=child.id, kind=TopicEdgeKind.DEEP_DIVE
-                )
-            )
-
-
-async def _existing_subtopic_hints(session: AsyncSession, topic_id: uuid.UUID) -> list[str]:
-    """Titles (with description) of subtopics already under THIS topic -- fed to
-    `generate_curriculum` as `existing_subtopics` so the model can reuse an exact
-    title verbatim when a subtopic it wants is already covered (prevention, same
-    pattern already used for card titles -- see `generate_cards`'s
-    `existing_titles`). Empty for a topic reaching this for the first time
-    (the normal case post-ADR-0025); non-empty when `run_generation_pipeline` is
-    called again for a topic that already has some subtopics from an earlier
-    call -- see `generate_curriculum`'s docstring."""
-
-    rows = (
-        await session.execute(
-            select(Subtopic.title, Subtopic.description)
-            .where(Subtopic.topic_id == topic_id)
-            .distinct()
-        )
-    ).all()
-    return [f"{title} :: {description}" if description else title for title, description in rows]
-
-
-async def _reuse_or_create_subtopic(
-    session: AsyncSession, *, topic_id: uuid.UUID, title: str, difficulty: Difficulty
-) -> tuple[Subtopic, bool]:
-    """Exact title+difficulty match only -- the curriculum call is trusted to have
-    already reused an existing title verbatim where it judged that appropriate
-    (see `_existing_subtopic_hints`); this is just the mechanical lookup that
-    honors that decision. Returns (row, was_reused)."""
-
-    existing = await session.scalar(
-        select(Subtopic).where(
-            Subtopic.topic_id == topic_id,
-            Subtopic.title == title,
-            Subtopic.difficulty == difficulty,
-        )
-    )
-    if existing is not None:
-        return existing, True
-    subtopic = Subtopic(
-        topic_id=topic_id,
-        title=title,
-        difficulty=difficulty,
-        description="",
-        target_cards=5,
-        min_cards=1,
-    )
-    session.add(subtopic)
-    await session.flush()
-    return subtopic, False
+# `_create_deep_dive_stubs`, `_existing_subtopic_hints` and `_reuse_or_create_subtopic`
+# lived here. All three served `generate_curriculum` (ADR-0007), which is deleted: the
+# curriculum is authored and projected into `Subtopic` rows by
+# `spoin.curriculum.projection`, so the pipeline no longer creates subtopics or
+# deep-dive stubs. If the authored path grows deep-dive edges, they belong in the
+# projection, not here.
 
 
 async def topic_used_ascii_ids(session: AsyncSession, topic_id: uuid.UUID) -> set[str]:

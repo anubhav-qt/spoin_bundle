@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import uuid
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 
 import pytest
 import pytest_asyncio
@@ -182,3 +183,61 @@ async def corpus(session: AsyncSession) -> dict[str, object]:
     await session.flush()
 
     return {"user": user, "topic": topic, "cards": cards}
+
+
+#: The card-type budget every projected test subtopic-tier gets. Sums to
+#: `_FAKE_TARGET_CARDS` and spreads across all five types, so a test exercising the
+#: quota round-robin sees every type exactly as it did when the deleted
+#: `FakeContentGenerator.generate_curriculum` produced these numbers.
+_FAKE_QUOTAS = {"prose": 2, "code": 2, "diagram": 2, "comparison": 2, "ascii": 2}
+_FAKE_TARGET_CARDS = 10
+
+
+async def project_fake_curriculum(
+    session: AsyncSession,
+    topic: Topic,
+    settings: Settings,
+    *,
+    groups: int = 3,
+) -> list[Subtopic]:
+    """Write the `Subtopic` rows `make curriculum-project` would, for one topic.
+
+    Curricula are authored and projected, never generated (ADR-0007,
+    docs/architecture/authored-curriculum.md), so a topic no longer arrives at the
+    pipeline with nothing and gets a curriculum invented for it -- `resolve_and_plan_topic`
+    now *requires* a projected one. Every integration test that used to lean on
+    `FakeContentGenerator.generate_curriculum` calls this instead.
+
+    The shape is deliberately identical to what that deleted method produced -- three
+    groups, all three tiers each, `target_cards=10`, the same five-way quota -- so the
+    card counts, quota accounting and dedup behaviour these tests assert on are testing
+    the same pipeline they always did, not a new fixture's arithmetic.
+
+    `min_cards` comes from `settings.min_cards_fraction` for the same reason the real
+    projection reads it: one place decides what coverage means.
+    """
+
+    created: list[Subtopic] = []
+    for index in range(groups):
+        group_id = uuid.uuid4()
+        for difficulty in Difficulty:
+            subtopic = Subtopic(
+                topic_id=topic.id,
+                subtopic_group_id=group_id,
+                difficulty=difficulty,
+                title=f"{topic.canonical_name}: part {index + 1}",
+                description=(
+                    f"Placeholder curriculum slot {index + 1} for {topic.canonical_name}."
+                ),
+                target_cards=_FAKE_TARGET_CARDS,
+                min_cards=max(1, round(_FAKE_TARGET_CARDS * settings.min_cards_fraction)),
+                card_type_quotas=dict(_FAKE_QUOTAS),
+                position=index,
+            )
+            session.add(subtopic)
+            created.append(subtopic)
+
+    #: The stamp is what `resolve_and_plan_topic` reads to decide a curriculum exists.
+    topic.curriculum_generated_at = datetime.now(UTC)
+    await session.flush()
+    return created

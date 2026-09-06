@@ -27,6 +27,10 @@ from frog.universe.config import universe_url
 # autogenerate produces an empty migration and nobody notices until deploy.
 import frog.universe.models  # noqa: F401  isort:skip
 
+# Curricula are authored structure, not corpus knowledge (authored-curriculum.md),
+# but they share this one Base / one alembic chain -- so their tables register here too.
+import frog.curriculum.models  # noqa: F401  isort:skip
+
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

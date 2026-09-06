@@ -10,11 +10,13 @@ from __future__ import annotations
 import uuid
 from typing import cast
 
+import pytest
 from frog.embeddings import HashEmbedder
 from frog.universe.models import EMBEDDING_DIM
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from conftest import TEST_DATABASE_URL, project_fake_curriculum
 from spoin.core.config import Settings
 from spoin.domain.enums import CardStatus, Difficulty, RejectionStage
 from spoin.domain.models import Card, Question, RejectedCard, Subtopic, Topic, TopicAlias
@@ -36,6 +38,7 @@ from spoin.generation.pipeline.persistence import (
     _recent_rejection_context,
 )
 from spoin.generation.pipeline.state import CARD_PROMPT_VERSION
+from spoin.generation.quota import DailyQuotaExhaustedError, QuotaExhaustedError
 
 
 async def _plan_and_generate(
@@ -58,6 +61,18 @@ async def _plan_and_generate(
     new_topic_ids = [
         uuid.UUID(outcome["topic_id"]) for outcome in outcomes if not outcome["matched_existing"]
     ]
+    # What `make curriculum-project` does in production. Curricula are authored and
+    # projected, never generated (ADR-0007), so a topic reaches the pipeline with its
+    # `Subtopic` rows already in place -- `resolve_and_plan_topic` requires them and
+    # refuses to invent any. The helper writes the exact shape the deleted
+    # `FakeContentGenerator.generate_curriculum` used to, so every card count, quota
+    # and dedup assertion below is testing the same pipeline it always was.
+    for topic_id in new_topic_ids:
+        topic = await session.get(Topic, topic_id)
+        assert topic is not None
+        await project_fake_curriculum(session, topic, settings)
+    await session.commit()
+
     generation_report = await run_generation_pipeline(
         session, generator, embedder, settings, topic_ids=new_topic_ids
     )
@@ -120,7 +135,7 @@ async def test_fresh_topic_generates_cards_dual_titles_and_questions(
         assert question.card_id in {card.id for card in cards}
 
 
-async def test_rerun_skips_curriculum_and_does_not_duplicate(
+async def test_rerun_matches_the_existing_topic_and_does_not_duplicate(
     session: AsyncSession, settings: Settings
 ) -> None:
     first = await _plan_and_generate(session, settings, "Rust Ownership")
@@ -132,7 +147,8 @@ async def test_rerun_skips_curriculum_and_does_not_duplicate(
     assert first_topic["merged_into_existing"] is False
     assert second_topic["merged_into_existing"] is True
     assert first_topic["topic_id"] == second_topic["topic_id"]
-    # Matched onto the existing topic — no generation ran a second time.
+    # Matched onto the existing topic (ADR-0025) — no generation ran a second time,
+    # and the projected subtopics from the first run are still the only ones there.
     assert second_topic["accepted"] == 0
 
     subtopics = (
@@ -256,16 +272,24 @@ async def test_verification_rejection_is_persisted_to_rejected_card(
     assert len(rejected_rows) > 0
     assert all(row.stage == RejectionStage.VERIFICATION for row in rejected_rows)
     assert all(row.reason for row in rejected_rows)
-    # A rejected draft never becomes an active Card, ever, for the same family.
-    active_bodies = {
-        card.body
-        for card in (
-            await session.execute(select(Card).where(Card.topic_id == topic_report["topic_id"]))
-        )
-        .scalars()
-        .all()
-    }
-    assert not active_bodies & {row.body for row in rejected_rows}
+
+    # A rejected draft never becomes an ACTIVE card. It does keep its `card` row --
+    # written at `status=draft` the moment the writer returned, then flipped here
+    # (generation-pipeline-v2.md §1) -- so the status filter is load-bearing rather
+    # than incidental: the body is deliberately still in the table.
+    async def _bodies(status: CardStatus) -> set[str]:
+        rows = (
+            await session.execute(
+                select(Card).where(Card.topic_id == topic_report["topic_id"], Card.status == status)
+            )
+        ).scalars()
+        return {card.body for card in rows}
+
+    rejected_bodies = {row.body for row in rejected_rows}
+    assert not (await _bodies(CardStatus.ACTIVE)) & rejected_bodies
+    # ...and the audit trail the design asks for: every `rejected_card` reason has a
+    # `card` row at `status=rejected` carrying the same body. Both loops stay.
+    assert rejected_bodies <= await _bodies(CardStatus.REJECTED)
 
 
 class _PlanRecordingGenerator(FakeContentGenerator):
@@ -434,6 +458,10 @@ async def test_rejected_duplicate_body_feeds_forward_into_next_run(
         topic_requests=[TopicRequest(name="Ornithology", description="")],
     )
     topic_id = uuid.UUID(outcomes[0]["topic_id"])
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+    await project_fake_curriculum(session, topic, settings)
+    await session.commit()
 
     await run_generation_pipeline(session, generator, embedder, settings, topic_ids=[topic_id])
 
@@ -779,7 +807,12 @@ async def test_redraft_loop_stuck_guard_stops_on_persistent_rejection(
     assert topic_report["rejected"] > 0
 
     cards = (await session.execute(select(Card).where(Card.topic_id == topic_id))).scalars().all()
-    assert len(cards) == 0
+    # Nothing became ACTIVE. Every draft still HAS a row -- written at `status=draft`
+    # the moment the writer returned and flipped to `rejected` by the gate
+    # (generation-pipeline-v2.md §1) -- and none is left stranded at `draft`, which is
+    # the property that says the gate saw every row it was supposed to.
+    assert cards, "the drafts should have been persisted even though all were rejected"
+    assert {card.status for card in cards} == {CardStatus.REJECTED}
 
 
 async def test_structural_rejection_feeds_forward_into_next_run(
@@ -839,3 +872,89 @@ async def test_structural_rejection_feeds_forward_into_next_run(
         max_verification_feedback_bodies=settings.max_verification_feedback_bodies,
     )
     assert any(reason == structural_reason for _body, reason in redraft_feedback)
+
+
+class _GateExplodesGenerator(FakeContentGenerator):
+    """Drafts normally, then dies at the gate's first pass.
+
+    Stands in for the real thing that ends a run mid-flight -- quota exhaustion, a
+    provider outage, someone pressing Ctrl-C -- at the point where it used to be most
+    expensive: after the calls were paid for and before anything was written.
+    """
+
+    async def correct_cards(self, queries, **kwargs):  # type: ignore[no-untyped-def,override]
+        raise DailyQuotaExhaustedError("simulated: the day's budget went mid-gate")
+
+
+async def test_drafts_survive_a_run_that_dies_at_the_gate(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """generation-pipeline-v2.md §1, the whole reason drafts are persisted eagerly.
+
+    A run used to hold every drafted card in container memory until its subtopic group
+    finished drafting and the gate ran; one interrupted run lost ~350 of them and kept
+    86. The cards are written at `status=draft` the moment the writer returns, so the
+    calls that were already paid for are on disk when the run dies.
+
+    Orphan drafts are a real state and an honest one: visible, not served, and
+    available for a later pass to gate or discard -- which is what the status
+    assertions below pin down.
+    """
+
+    generator = _GateExplodesGenerator()
+    embedder = HashEmbedder(EMBEDDING_DIM)
+    outcomes = await match_and_create_topics(
+        session,
+        generator,
+        embedder,
+        settings,
+        topic_requests=[TopicRequest(name="Tectonics", description="")],
+    )
+    topic_id = uuid.UUID(outcomes[0]["topic_id"])
+    topic = await session.get(Topic, topic_id)
+    assert topic is not None
+    await project_fake_curriculum(session, topic, settings)
+    await session.commit()
+
+    with pytest.raises(QuotaExhaustedError):
+        await run_generation_pipeline(session, generator, embedder, settings, topic_ids=[topic_id])
+
+    # Read back through a FRESH connection, not the session the run just died on.
+    # That is what "on disk" has to mean here: anything this sees was genuinely
+    # COMMITTED by `_persist_drafts`, not merely pending in a session that the
+    # failure left unusable.
+    engine = create_async_engine(TEST_DATABASE_URL)
+    try:
+        async with async_sessionmaker(engine, expire_on_commit=False)() as fresh:
+            cards = (
+                (await fresh.execute(select(Card).where(Card.topic_id == topic_id))).scalars().all()
+            )
+    finally:
+        await engine.dispose()
+    assert cards, "drafts paid for before the gate died should be on disk"
+    assert {card.status for card in cards} == {CardStatus.DRAFT}
+    # A draft has no vector yet -- nothing has embedded it, and the CHECK constraint
+    # requires the pair to be null together.
+    assert all(card.content_embedding is None and card.embedding_model is None for card in cards)
+    # And it is invisible to the feed, whose candidate query filters `status='active'`.
+    assert not [card for card in cards if card.status == CardStatus.ACTIVE]
+
+
+async def test_a_completed_run_leaves_no_card_at_draft(
+    session: AsyncSession, settings: Settings
+) -> None:
+    """The other half: eager persistence must not leak. Every draft a finished run
+    wrote has been flipped to `active` or `rejected` by the gate -- a row still sitting
+    at `draft` afterwards would mean the gate never saw it."""
+
+    report = await _plan_and_generate(session, settings, "Ocean Currents")
+    topic_id = uuid.UUID(cast(str, report["topics"][0]["topic_id"]))  # type: ignore[index]
+
+    statuses = set(
+        (await session.execute(select(Card.status).where(Card.topic_id == topic_id)))
+        .scalars()
+        .all()
+    )
+    assert statuses
+    assert CardStatus.DRAFT not in statuses
+    assert CardStatus.ACTIVE in statuses

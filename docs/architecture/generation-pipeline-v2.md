@@ -1,7 +1,13 @@
 # Generation pipeline v2: authored curricula, Mistral prose, Gemini verdicts
 
 > Design, 2026-09-06. Decided with the owner in this session; the numbers and mechanisms
-> below are their calls, not defaults. Architecture context:
+> below are their calls, not defaults.
+>
+> **Built the same day, tasks 1-9 of §6.** What shipped differs from this document in
+> three places, each noted inline below: the Mistral transport is reached by
+> overriding one method rather than by a second `ContentGenerator`; image-carrying
+> prompts stay on Gemini; and task 8 landed before task 4. Tasks 10-11 are open and
+> need a real run. Architecture context:
 > [`authored-curriculum.md`](authored-curriculum.md). Provider split:
 > [ADR-0090](../adr/0090-hybrid-gemini-mistral-generation.md).
 
@@ -80,6 +86,22 @@ Per ADR-0090, unchanged: **verdicts on the thinker, prose on the generator.**
 | Transport | raw `httpx`, `POST /v1/chat/completions` | ADR-0090; avoids a new LangChain dependency and a new banned-api entry |
 | Structured output | `response_format: {type: json_schema, strict: true}` | Proven by the probe across 646 calls at 12k tokens |
 | Parsing | existing `_LenientWireModel` Pydantic models | No second parsing path |
+
+**How it is actually wired.** `HybridContentGenerator` **subclasses**
+`GeminiContentGenerator` and overrides `_invoke_with_retry` -- the one method every
+call already funnels through, carrying the ladder (`"generator"` / `"thinking"`) that
+IS ADR-0090's routing table. So the table is not a second hand-written list that can
+drift from the ladder; it is the ladder, read once. Every prompt, wire model, parse
+and `BatchResult` failure path is inherited verbatim -- there is no second copy of
+`generate_cards`'s prompt selection to keep in step.
+
+**One deviation from the routing table, and it is a capability fact rather than a
+preference.** `repair_card_structure` (ADR-0076) sends the card's rendered PNG as a
+multimodal part and `ministral-8b` is text-only, so any image-carrying prompt stays on
+Gemini. A repair that silently lost the image it was asked to look at would produce a
+plausible fix for something the model never saw. `stream_topic_answer` stays on Gemini
+for the reason the ADR already gives, and does so by construction -- it streams and
+never reaches `_invoke_with_retry`.
 
 **What is deliberately *not* built:** no key pool, no box leasing, no quota ledger, no load
 balancer, no send-gap pacing, no rung ladder. ADR-0090 warns explicitly against porting the
@@ -172,6 +194,14 @@ immediately makes every subsequent experiment cheaper to lose.
 
 Task 4 before task 8 on purpose — prove the authored path on a real topic before deleting the
 generated one.
+
+**That ordering was not kept.** Tasks 1-3 and 5-9 were built in one pass on the owner's
+instruction to finish the build; task 4 (authoring Rust) is the owner's work and had not
+happened. What the ordering was protecting against — discovering, on a real topic, that
+the authored format cannot express something the generated path could — is now a loud
+refusal at the start of a run (`resolve_and_plan_topic` raises for a topic with no
+projected curriculum) rather than a corpus generated from a shape nobody checked. The
+format is a file and the projection is a plain upsert, so both stay cheap to change.
 
 ## The open question task 10 answers
 

@@ -20,6 +20,7 @@ from unittest.mock import ANY, AsyncMock, Mock, call, patch
 import pytest
 from google.genai.errors import ClientError, ServerError
 from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import BaseModel
 
 from spoin.core.config import Settings
 from spoin.domain.enums import Difficulty
@@ -27,10 +28,7 @@ from spoin.generation.base import (
     CardCorrectionQuery,
     CardPlan,
     CardVerificationQuery,
-    CurriculumDraft,
     FetchedAsciiScene,
-    SubtopicGroupDraft,
-    SubtopicTierDraft,
 )
 from spoin.generation.langchain_impl import (
     _ASCII_MAX_WIDTH,
@@ -154,6 +152,25 @@ def _settings(**overrides: object) -> Settings:
     }
     values.update(overrides)
     return Settings(**values)  # type: ignore[arg-type]
+
+
+class _ThinkingProbe(BaseModel):
+    """A stand-in schema for driving `_invoke_with_retry` on the thinking ladder.
+
+    The retry, rotation, cooldown and recovery-probe tests below are about that
+    machinery, not about any one call's prompt. They used `generate_curriculum` as
+    their vehicle until ADR-0007 deleted it (the curriculum is authored, not
+    generated), so they now call `_invoke_with_retry` directly -- which is what they
+    were always testing, and no longer couples them to whichever real method happens
+    to sit on the thinking ladder this week.
+    """
+
+    ok: bool = True
+
+
+#: The prompt those tests send. Its content is irrelevant -- every runnable they build
+#: is mocked -- so it is deliberately minimal rather than a realistic one.
+_PROBE_PROMPT: list[tuple[str, object]] = [("human", "probe")]
 
 
 def _mock_structured(return_value: object, side_effect: object = None) -> AsyncMock:
@@ -400,22 +417,11 @@ async def test_invoke_with_retry_falls_through_to_next_cell_on_real_429() -> Non
     )
     lb.on_rate_limited = Mock()  # type: ignore[method-assign]
 
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
+    draft = _ThinkingProbe()
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(side_effect=[_rpd_429(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        result = await generator.generate_curriculum("Topic", "desc")
+        result = await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     assert result is draft
     lb.on_rate_limited.assert_called_once_with(ANY, now=ANY, per_minute=False)
@@ -441,7 +447,7 @@ async def test_invoke_with_retry_raises_once_the_whole_grid_429s() -> None:
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
         pytest.raises(QuotaExhaustedError),
     ):
-        await generator.generate_curriculum("Topic", "desc")
+        await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     assert lb.on_rate_limited.call_count == 2
 
@@ -607,22 +613,11 @@ async def test_per_minute_429_cools_the_cell_without_spending_it() -> None:
     lb.mark_exhausted = Mock()  # type: ignore[method-assign]
     lb.on_rate_limited = Mock()  # type: ignore[method-assign]
 
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
+    draft = _ThinkingProbe()
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(side_effect=[_rpm_429(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        result = await generator.generate_curriculum("Topic", "desc")
+        result = await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     assert result is draft
     lb.mark_exhausted.assert_not_called()
@@ -644,23 +639,12 @@ async def test_per_minute_429s_do_not_burn_the_grids_attempt_budget() -> None:
     lb.mark_exhausted = Mock()  # type: ignore[method-assign]
     lb.on_rate_limited = Mock()  # type: ignore[method-assign]
 
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
+    draft = _ThinkingProbe()
     runnable = AsyncMock()
     # 3 throttles is under the 2x2 grid_size of 4, so the streak never trips.
     runnable.ainvoke = AsyncMock(side_effect=[_rpm_429(), _rpm_429(), _rpm_429(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        result = await generator.generate_curriculum("Topic", "desc")
+        result = await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     assert result is draft
     assert lb.on_rate_limited.call_count == 3
@@ -695,7 +679,7 @@ async def test_sustained_throttling_at_the_rpm_floor_stops_the_retry_loop() -> N
         patch.object(lb, "on_rate_limited", Mock()),
         pytest.raises(AllCellsThrottledError) as excinfo,
     ):
-        await generator.generate_curriculum("Topic", "desc")
+        await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     assert not isinstance(excinfo.value, DailyQuotaExhaustedError)
     assert "not exhaustion" in str(excinfo.value)
@@ -718,18 +702,7 @@ async def test_a_success_resets_the_floored_throttle_streak() -> None:
     for key_index in (0, 1):
         lb._cells[(key_index, _THINKING_MODEL)].learned_rpm = 1.0
 
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
+    draft = _ThinkingProbe()
     runnable = AsyncMock()
     # One short of the 2-cell grid's bound, then a success, then one more --
     # which would trip the bound only if the streak had survived the success.
@@ -738,8 +711,12 @@ async def test_a_success_resets_the_floored_throttle_streak() -> None:
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
         patch.object(lb, "on_rate_limited", Mock()),
     ):
-        assert await generator.generate_curriculum("Topic", "desc") is draft
-        assert await generator.generate_curriculum("Topic", "desc") is draft
+        assert (
+            await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT) is draft
+        )
+        assert (
+            await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT) is draft
+        )
 
 
 async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same_cell() -> None:
@@ -759,22 +736,11 @@ async def test_invoke_with_retry_excludes_model_on_timeout_without_retrying_same
     )
     lb.mark_exhausted = Mock()  # type: ignore[method-assign]
 
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
+    draft = _ThinkingProbe()
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(side_effect=[_real_504(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        result = await generator.generate_curriculum("Topic", "desc")
+        result = await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     assert result is draft
     lb.mark_exhausted.assert_not_called()
@@ -800,22 +766,11 @@ async def test_invoke_with_retry_starts_a_recovery_probe_on_timeout() -> None:
 
     generator._probe_model = _fake_probe  # type: ignore[method-assign]
 
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
+    draft = _ThinkingProbe()
     runnable = AsyncMock()
     runnable.ainvoke = AsyncMock(side_effect=[_real_504(), draft])
     with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        result = await generator.generate_curriculum("Topic", "desc")
+        result = await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
         await asyncio.wait_for(probe_started.wait(), timeout=1)
 
     assert result is draft
@@ -908,7 +863,7 @@ async def test_invoke_with_retry_reraises_non_429_client_errors_immediately() ->
         patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable),
         pytest.raises(ClientError),
     ):
-        await generator.generate_curriculum("Topic", "desc")
+        await generator._invoke_with_retry("thinking", _ThinkingProbe, _PROBE_PROMPT)
 
     lb.mark_exhausted.assert_not_called()
     assert cast(AsyncMock, lb.assign).await_count == 1
@@ -1294,39 +1249,6 @@ async def test_generate_questions_drops_duplicate_card_index() -> None:
     assert result.items[0].stem == "First question, correctly attached."
     assert len(result.failures) == 1
     assert "duplicate card_index" in result.failures[0]
-
-
-async def test_generate_curriculum_threads_existing_subtopics_into_prompt() -> None:
-    from spoin.generation.base import CurriculumDraft, SubtopicGroupDraft, SubtopicTierDraft
-
-    generator = _generator()
-    draft = CurriculumDraft(
-        subtopics=[
-            SubtopicGroupDraft(
-                title="G",
-                tiers=[
-                    SubtopicTierDraft(
-                        difficulty=Difficulty.BEGINNER, description="d", target_cards=10
-                    )
-                ],
-            )
-        ]
-    )
-    captured_prompt: list[object] = []
-
-    async def _capture(prompt: object) -> CurriculumDraft:
-        captured_prompt.append(prompt)
-        return draft
-
-    runnable = AsyncMock()
-    runnable.ainvoke = _capture
-    with patch.object(ChatGoogleGenerativeAI, "with_structured_output", return_value=runnable):
-        await generator.generate_curriculum(
-            "Topic", "desc", existing_subtopics=["Existing Subtopic One :: some description"]
-        )
-
-    prompt_text = str(captured_prompt[0])
-    assert "Existing Subtopic One" in prompt_text
 
 
 async def test_match_topics_batches_every_query_in_one_call() -> None:

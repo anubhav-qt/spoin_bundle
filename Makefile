@@ -6,7 +6,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup dev seed test lint fmt types check migrate migration \
         universe-migrate universe-migration corpus-check corpus-ingest \
-        worker api-types down clean
+        curriculum-check curriculum-ingest curriculum-project worker api-types down clean
 
 COMPOSE := docker compose
 API     := $(COMPOSE) run --rm --no-deps api
@@ -74,6 +74,22 @@ corpus-check: ## Validate the corpus against the ingestion contract; writes noth
 
 corpus-ingest: ## Ingest the corpus into the_spoin_universe (GPU; run universe-migrate first)
 	$(COMPOSE) --profile frog run --rm frog
+
+# The authored curriculum: validate, and ingest into the_spoin_universe. Both reuse the
+# `frog` service (which already mounts the corpus and holds SPOIN_UNIVERSE_DATABASE_URL)
+# with its entrypoint overridden -- the same trick `universe-migration` uses. `--check`
+# is pure (no GPU, no database, no model); the bare form needs the universe database, so
+# run `make universe-migrate` first.
+curriculum-check: ## Validate docs/the_spoin_universe/curricula against the contract; writes nothing
+	$(COMPOSE) --profile frog run --rm --entrypoint python frog -m frog.curriculum --check
+
+curriculum-ingest: ## Ingest curricula into the_spoin_universe (run universe-migrate first)
+	$(COMPOSE) --profile frog run --rm --entrypoint python frog -m frog.curriculum
+
+# The deterministic projection into spoin_db_2 -- no GPU, no model, needs both databases,
+# so it runs in the `api` image (not `--no-deps`: it needs `db` up).
+curriculum-project: ## Project ingested curricula into Topic/Subtopic in spoin_db_2
+	$(COMPOSE) run --rm api python -m spoin.curriculum
 
 worker: ## Run one batch pass of the worker, then exit
 	$(COMPOSE) --profile worker run --rm worker

@@ -17,7 +17,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from spoin.domain.enums import Difficulty, EngagementKind
 
-GeneratorBackend = Literal["fake", "gemini", "local"]
+GeneratorBackend = Literal["fake", "gemini", "hybrid", "local"]
 #: `frog`'s ingester takes exactly these two (`frog/ingest/__main__.py --embedder`).
 #: Spelled the same on purpose: the corpus is queried by whatever ingested it, and a
 #: third name here would be a way for the two to disagree. There was a separate
@@ -125,6 +125,43 @@ class Settings(BaseSettings):
     #: the next (key, model) cell, and the request never resolves. Bounds a
     #: single attempt so a stall degrades the same way a 429/503 already does.
     gemini_request_timeout_seconds: float = 180.0
+
+    # -- Mistral (ADR-0090, generation-pipeline-v2.md) -------------------------
+    # Prose on the generator ladder runs here; verdicts stay on Gemini. Read by
+    # `generation/mistral.py` and reached only through `SPOIN_GENERATOR=hybrid`.
+    #
+    # Comma-separated, same variable the committed probe already uses
+    # (`spoin/probes/mistral_probe.py`). One key is the current reality; the client
+    # takes a list and round-robins, so adding a second is a config change.
+    mistral_api_keys: str = ""
+    mistral_base_url: str = "https://api.mistral.ai/v1"
+    #: The dated snapshot, not the `ministral-8b` alias: the mistral-saga's findings
+    #: table only vouches for model ids a direct call returned 200 with real
+    #: `x-ratelimit-limit-*` headers for, and this is that id. Measured post-RAG
+    #: prompts are p50 ~3.1k tokens / max ~5.9k, and 8b only drops below target rate
+    #: above ~18k -- real headroom, including for ADR-0099's taller scenes.
+    mistral_model: str = "ministral-8b-2512"
+    #: The sweep's proven ceiling with no wall (ADR-0090). This is THE number task 10
+    #: exists to check against real grounded prompts rather than synthetic filler --
+    #: the per-run JSONL records `in_flight_at_send` on every call for exactly that.
+    mistral_max_in_flight: int = 5
+    #: Matches the probe's `REQUEST_TIMEOUT_S`. Generous on purpose: a slow response
+    #: is data, a hung one is not.
+    mistral_timeout_seconds: float = 180.0
+    #: Attempts per call, not retries after the first. Three because we are going in
+    #: blind: enough to ride out a throttle or one malformed structured response,
+    #: few enough that a real outage surfaces as an outage in minutes rather than
+    #: being absorbed into latency. Revisit from the task-10 JSONL, not from taste.
+    mistral_max_attempts: int = 3
+    #: Doubles per attempt with jitter (2s, 4s), unless the response carries its own
+    #: `Retry-After`, which always wins.
+    mistral_backoff_base_seconds: float = 2.0
+    mistral_max_output_tokens: int = 8192
+    mistral_temperature: float = 0.7
+    #: Where the per-run JSONL lands. A file rather than stdout: full response bodies
+    #: on every call would drown the pipeline log a human is actually watching.
+    mistral_log_dir: str = "logs/mistral"
+
     local_generator_base_url: str = "http://localhost:11434/v1"
     local_generator_model: str = "qwen3:14b"
     #: How many keys one topic gets for its whole generation run (ADR-0082).
@@ -560,6 +597,10 @@ class Settings(BaseSettings):
     @property
     def gemini_api_key_list(self) -> list[str]:
         return [key.strip() for key in self.gemini_api_keys.split(",") if key.strip()]
+
+    @property
+    def mistral_api_key_list(self) -> list[str]:
+        return [key.strip() for key in self.mistral_api_keys.split(",") if key.strip()]
 
     @property
     def gemini_pool_size(self) -> int:

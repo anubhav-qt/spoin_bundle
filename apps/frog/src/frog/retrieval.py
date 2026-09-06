@@ -31,7 +31,7 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from frog.embeddings import Embedder
-from frog.universe.models import Chunk, Document, DocumentKind
+from frog.universe.models import Chunk, Document, DocumentKind, Image, ImageLicence
 
 #: Candidates per query when the caller does not say. Deliberately larger than what a
 #: prompt will actually carry: packing downstream cuts to a token budget, and a reranker
@@ -259,3 +259,124 @@ async def corpus_version(session: AsyncSession) -> str:
         await session.execute(select(func.count(Document.id), func.max(Document.ingested_at)))
     ).one()
     return f"{documents}@{ingested.isoformat() if ingested is not None else 'empty'}"
+
+
+@dataclass(frozen=True)
+class ImageHit:
+    """One retrieved catalog image, with everything needed to attach and display it.
+
+    Separate from `Hit` rather than a variant of it. A chunk and an image are retrieved
+    by the same mechanism but are not the same kind of thing: a chunk is evidence a card
+    is written FROM and cites by id, an image is an asset a card SHOWS and must
+    attribute. Sharing one dataclass would mean half its fields being null for every
+    row, which is the shape ADR-0088 already rejected for the tables themselves.
+    """
+
+    image_id: uuid.UUID
+
+    #: Cosine similarity in [-1, 1], same convention and same reason as `Hit.score`.
+    #: Recorded per assignment so the similarity floor task 0040 wants can be set from
+    #: a measured distribution rather than from taste.
+    score: float
+
+    title: str
+    description: str
+
+    #: Where the renderer loads the image from. `cloudinary_url` when an upload has
+    #: happened, `source_url` until then — resolved HERE rather than at each call site,
+    #: so the day uploads land no renderer needs to learn about the fallback.
+    display_url: str
+
+    source_url: str
+    source_page: str
+    licence: ImageLicence
+
+    #: Must be displayed. CC BY and CC BY-SA make it a licence condition, so this is
+    #: carried on the hit rather than looked up later: a renderer that has to fetch
+    #: attribution separately is a renderer that will ship without it once.
+    attribution: str
+
+    category: str
+    sub_category: str | None
+    topic_tags: list[str]
+
+
+async def search_images(
+    session: AsyncSession,
+    embedder: Embedder,
+    query: str,
+    *,
+    k: int = DEFAULT_K,
+    categories: Collection[str] | None = None,
+    min_score: float | None = None,
+    exclude_image_ids: Collection[uuid.UUID] | None = None,
+) -> list[ImageHit]:
+    """Top-`k` catalog images for one query, most similar first (ADR-0095).
+
+    The query is a drafted card's own text, embedded on the QUERY side — the catalog
+    embedded its descriptions on the passage side, and swapping them is the silent
+    recall loss ADR-0092's two-method interface exists to prevent.
+
+    **`exclude_image_ids` is how uniqueness works, and it is a query rather than
+    caller-held state.** Task 0040: two cards drafted concurrently in the same run
+    cannot collide, because the second one simply asks for the next best image. A set
+    threaded through the pipeline would have to be locked to get the same guarantee.
+
+    `categories` filters before ranking. Unlike prose retrieval, which is deliberately
+    cross-topic (ADR-0088) because an unexpected supporting passage is a feature, an
+    unexpected PHOTOGRAPH is not: a card about stellar nucleosynthesis illustrated with
+    a Renaissance painting is not serendipity, it is a wrong image that looks sourced.
+    """
+
+    embedding = (await embedder.aembed_query([query]))[0]
+    distance = Image.embedding.cosine_distance(embedding)
+    statement = select(Image, (1.0 - distance).label("score")).order_by(distance).limit(k)
+    if categories is not None:
+        statement = statement.where(Image.category.in_(list(categories)))
+    if exclude_image_ids:
+        statement = statement.where(Image.id.not_in(list(exclude_image_ids)))
+
+    rows = (await session.execute(statement)).all()
+    hits = [
+        ImageHit(
+            image_id=image.id,
+            score=float(score),
+            title=image.title,
+            description=image.description,
+            display_url=image.cloudinary_url or image.source_url,
+            source_url=image.source_url,
+            source_page=image.source_page,
+            licence=image.licence,
+            attribution=image.attribution,
+            category=image.category,
+            sub_category=image.sub_category,
+            topic_tags=list(image.topic_tags),
+        )
+        for image, score in rows
+    ]
+    if min_score is not None:
+        hits = [hit for hit in hits if hit.score >= min_score]
+    return hits
+
+
+async def count_images(
+    session: AsyncSession,
+    *,
+    categories: Collection[str] | None = None,
+    exclude_image_ids: Collection[uuid.UUID] | None = None,
+) -> int:
+    """How many images are available to assign — the CEILING the planner reads.
+
+    Task 0040 Phase 4 is the reason this exists as its own query rather than being
+    inferred from a search: **a card planned as an image card whose image cannot be
+    resolved gets rejected and regenerated** (ADR-0066), which plans another image card,
+    which fails again. Capping the plan at real availability is what makes that loop
+    unreachable, and a cap has to come from a count rather than from a top-k.
+    """
+
+    statement = select(func.count()).select_from(Image)
+    if categories is not None:
+        statement = statement.where(Image.category.in_(list(categories)))
+    if exclude_image_ids:
+        statement = statement.where(Image.id.not_in(list(exclude_image_ids)))
+    return int((await session.execute(statement)).scalar_one())

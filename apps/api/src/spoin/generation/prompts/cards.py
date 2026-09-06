@@ -88,6 +88,17 @@ else got.
 Write directions, not content. Do not draft body text, do not write the \
 explanation, do not draw the art. A brief that already contains the card leaves \
 the writer nothing to do but reformat it, and reformatting is not writing.
+
+DIFFICULTY CALIBRATION:
+The batch is planned for a specific difficulty tier (beginner, intermediate, or advanced). \
+Plan concepts and angles that genuinely match that tier:
+- beginner: Foundational concepts, intuitive mental models, basic definitions, \
+observable phenomena, and everyday analogies. Do not plan highly technical derivations \
+or niche edge cases for beginners.
+- intermediate: Underlying physical mechanisms, cause-and-effect processes, quantitative \
+relationships, forces in balance, and how measurements are made.
+- advanced: Edge cases, mathematical limits, boundary conditions, theoretical tensions, \
+second-order effects, and advanced domain mechanisms.
 """
     #: The planner is the call that decides which cards exist, so it is the one
     #: that most needs to know what the corpus can actually support. No
@@ -206,6 +217,23 @@ whose ordering is itself the joke, a chart made of hashes, an object doing
 something absurd, or pure typography. Pick whatever form makes THIS idea
 land. Faces like (o_o) (-_-) (>_<) are available when a reaction is the gag;
 they are one option among many, never an obligation.
+
+SHAPE OF THE FIELD (MANDATORY -- read this before drawing).
+`ascii_art` is ONE JSON string holding a MULTI-LINE drawing. Every line break
+inside it must be written as the two characters backslash-n, because a raw
+newline is not legal inside a JSON string.
+
+- A scene is AT LEAST 3 lines. One line is not a scene, it is a fragment, and
+  it is thrown away -- the card then ships with no art at all.
+- Every line is at most 40 characters, counting leading spaces.
+- Height is free. A label that will not fit beside a figure goes on its own
+  line above or below it. Never shorten a label to save columns.
+- Draw the WHOLE scene in `ascii_art`. Do not put any of it in `body`, and do
+  not stop after the first line.
+
+Correct: "  10kg\n [==|==]\n  (>_<)\n  WEEK 1"
+Wrong:   "  10kg"        <- one line, discarded
+Wrong:   "  ____"        <- a fragment of a drawing that never arrived
 
 SELF-CONTAINED. The scene renders left-aligned in a box directly under the
 title, standing in for the usual one-line hook -- and when the card is
@@ -432,6 +460,24 @@ a factual error, drifting off-topic. Fix THAT, don't just reword the same card.
 If cards from a LOWER difficulty tier of this same subtopic are shown below \
 ("builds on"), these new cards should genuinely build on them — assume the \
 reader already knows that material, and go deeper rather than re-explaining it.
+
+LENGTH DISCIPLINE (MANDATORY): A card is an atomic, bite-sized learning unit read in a \
+few seconds and swiped past in an endless vertical feed. The prose text of `body` (excluding \
+embedded Mermaid diagrams and ASCII art slots) MUST be concise, punchy, and tight — strictly \
+between 300 and 800 characters (max 150 words). NEVER write multi-paragraph essays, extensive \
+preambles, or text walls. Any card whose explanatory prose exceeds 1000 characters is an \
+immediate defect.
+
+NON-TECHNICAL TOPIC DISCIPLINE: If this topic is non-technical (natural science, astronomy, \
+history, philosophy, psychology), code blocks and programming syntax (e.g. ```python, \
+```plaintext, ```bash) are STRICTLY FORBIDDEN (code: 0). Never write code snippets to explain \
+physical or natural science concepts.
+
+DIFFICULTY AND READING LEVEL (MANDATORY): Strictly observe the requested difficulty \
+named below (beginner, intermediate, or advanced) per the READING LEVEL section. Beginner cards \
+MUST use simple, accessible, plain English with everyday analogies and short punchy sentences. \
+Intermediate and advanced cards must progressively introduce domain mechanisms, quantitative \
+relationships, and rigorous scientific substance.
 """
     + sources.WRITER_SOURCES
     + sources.TIER_LANGUAGE

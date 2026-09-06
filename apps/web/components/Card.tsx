@@ -654,15 +654,24 @@ export function Card({
   const archetype = getPrimaryArchetype(card.archetype);
   // ASCII scene (ADR-0021, or a model-drawn one on the free-form generation
   // testing branch — see lib/api.ts).
-  const rawArt = card.visual_id !== null ? card.visual_slots?.art : undefined;
+  const rawArt =
+    card.visual_id !== null && card.visual_kind === "ascii" ? card.visual_slots?.art : undefined;
   const asciiArt = rawArt !== undefined && rawArt.trim() !== "" ? stripFenceWrapper(rawArt) : null;
+  // A catalog photograph (ADR-0095). Gated on `display_url` rather than on
+  // `visual_kind` alone: the id crosses a database boundary by value with no
+  // foreign key behind it (ADR-0088), so a card CAN name an image that no
+  // longer exists. That must render as a card without one, never as an error.
+  const cardImage =
+    card.visual_kind === "image" && card.visual_slots?.display_url
+      ? card.visual_slots
+      : null;
   // The card's ONE lead visual. Rendered right after the title at full
   // height — collapsed and expanded alike — and suppressed from the body
   // render via `skipFenceKey`, so a diagram/code/art card never shows the
   // same block twice (see `resolveHero`).
   const hero = useMemo(
-    () => resolveHero(archetype, card.body, asciiArt),
-    [archetype, card.body, asciiArt],
+    () => resolveHero(archetype, card.body, asciiArt, cardImage),
+    [archetype, card.body, asciiArt, cardImage],
   );
 
   return (
@@ -737,7 +746,12 @@ export function Card({
           <div className="card-reveal" data-open={expanded} inert={!expanded}>
             <div className="card-reveal-body">
               <div className="card-body">
-                <Markdown source={card.body} skipFenceKey={hero?.skipKey ?? null} />
+                {/* An image hero has no `skipKey`: it never appears in `body`, so
+                    there is no duplicate copy for `Markdown` to drop. */}
+                <Markdown
+                  source={card.body}
+                  skipFenceKey={hero !== null && hero.kind !== "image" ? hero.skipKey : null}
+                />
               </div>
             </div>
           </div>
@@ -1194,6 +1208,9 @@ type HeroVisualBlock = { captioned?: boolean } & (
   | { kind: "ascii"; content: string; skipKey: string }
   | { kind: "diagram"; lang: string; content: string; skipKey: string }
   | { kind: "code"; lang: string; content: string; skipKey: string }
+  /** A catalog photograph (ADR-0095). No `skipKey`: the image is never in
+   *  `body`, so there is no duplicate copy for `Markdown` to drop. */
+  | { kind: "image"; slots: Record<string, string> }
 );
 
 /** Picks the single block that leads the card, and nothing else — a card
@@ -1214,7 +1231,18 @@ function resolveHero(
   archetype: ArchetypeTag | "combo" | "default",
   body: string,
   art: string | null,
+  image: Record<string, string> | null,
 ): HeroVisualBlock | null {
+  // An assigned photograph wins outright, before any fence reasoning. The
+  // server decided this card carries one (ADR-0095's post-draft assignment),
+  // and a card never carries both an image and an ASCII gag (owner,
+  // 2026-09-05) — so there is no ranking to do, unlike the art-vs-fence case
+  // below where two slots can hold redraws of the same scene.
+  // NOT `captioned`: `HeroVisual` appends its caption after the whole block, which
+  // for an image would put it below the attribution line. `CardImage` renders the
+  // same `.card-visual-caption` itself, between the picture and its credit.
+  if (image !== null) return { kind: "image", slots: image };
+
   const kind =
     archetype === "combo" || archetype === "code"
       ? "code"
@@ -1268,7 +1296,9 @@ function resolveHero(
  *  since `alt` describes the art slot, not it. */
 function HeroVisual({ hero, alt }: { hero: HeroVisualBlock; alt: string | undefined }) {
   const visual =
-    hero.kind === "ascii" ? (
+    hero.kind === "image" ? (
+      <CardImage slots={hero.slots} alt={alt} />
+    ) : hero.kind === "ascii" ? (
       <AsciiArt art={hero.content} alt={alt} />
     ) : hero.kind === "diagram" ? (
       <DiagramBlock lang={hero.lang} content={hero.content} />
@@ -1280,6 +1310,61 @@ function HeroVisual({ hero, alt }: { hero: HeroVisualBlock; alt: string | undefi
       {visual}
       {hero.captioned && alt ? <p className="card-visual-caption">{alt}</p> : null}
     </>
+  );
+}
+
+/** A catalog photograph, at the card's full width with its natural aspect
+ *  ratio and NO height limit — the same posture ADR-0099 settled for ASCII
+ *  scenes, and for the same reason: the image IS the content here, so cropping
+ *  a wide field composite or a tall spacecraft shot destroys the thing the
+ *  card is about. `width: 100%` + `height: auto` is the whole sizing rule.
+ *
+ *  Served straight from `display_url` (the original file) because the
+ *  Cloudinary upload step is deliberately unbuilt — the constraint it solves
+ *  is bandwidth at user scale and there are no users (task 0040). Those
+ *  originals run to several MB, so the placeholder below is not decoration:
+ *  it is what stops a multi-megabyte load reading as a broken card mid-scroll.
+ *
+ *  `attribution` is rendered unconditionally. CC BY and CC BY-SA make
+ *  displaying it a licence CONDITION, so it is never behind a check on which
+ *  licence this particular image carries — a renderer that decides is a
+ *  renderer that gets one licence wrong. */
+function CardImage({ slots, alt }: { slots: Record<string, string>; alt: string | undefined }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  //: The `alt` ATTRIBUTE, which is what a screen reader announces. The visible
+  //: caption is `HeroVisual`'s job, the same split as `AsciiArt`.
+  const altText = alt || slots.title || "A photograph illustrating this card";
+
+  // A dead URL renders as a card with no image, not as a broken-image icon or
+  // an error: the catalog lives in another database and this reference has no
+  // foreign key behind it (ADR-0088).
+  if (failed) return null;
+
+  return (
+    <figure className="card-image">
+      <div className={`card-image-frame${loaded ? " is-loaded" : ""}`}>
+        <img
+          src={slots.display_url}
+          alt={altText}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
+      </div>
+      {altText ? <p className="card-visual-caption">{altText}</p> : null}
+      <figcaption className="card-image-credit">
+        {slots.source_page ? (
+          <a href={slots.source_page} target="_blank" rel="noopener noreferrer">
+            {slots.attribution}
+          </a>
+        ) : (
+          slots.attribution
+        )}
+        {slots.licence ? <span className="card-image-licence">{slots.licence}</span> : null}
+      </figcaption>
+    </figure>
   );
 }
 

@@ -67,13 +67,43 @@ When no source material appears below, judge as you otherwise would.
 #: precision is a constraint and lives in the corpus, tone is taste and lives here.
 TIER_LANGUAGE = """\
 
-READING LEVEL:
-The source material is written at reference density for every difficulty tier. Pitch \
-the LANGUAGE at the requested tier — a beginner card explains a term the moment it \
-uses one, prefers a short sentence, and reaches for a concrete example; an advanced \
-card can assume the vocabulary and spend its words on the substance instead.
+READING LEVEL & DIFFICULTY CALIBRATION (MANDATORY):
+The source material in our corpus is written at reference density for every difficulty \
+tier. You MUST pitch the LANGUAGE, VOCABULARY, TONE, and EXPLANATORY DEPTH at the \
+requested tier (beginner, intermediate, or advanced):
 
-Pitch the language, never the facts. Simplifying wording is the job; simplifying a \
-claim until it is no longer true is not, and a beginner card is held to exactly the \
-same standard of correctness as an advanced one.
+1. BEGINNER (`beginner`):
+   - Language: Simple, accessible, plain English. Crystal clear, conversational, and welcoming. \
+NEVER use dense academic jargon or unexplained specialized terms. If a technical term is essential \
+(e.g., "orbit", "gravity", "nebula"), define it immediately with an intuitive explanation.
+   - Framing: Ground every concept in everyday real-world analogies, intuitive visual \
+mental models, and observable phenomena (e.g., comparing planetary orbits to swinging a \
+ball on a string, or light bending to looking through curved glass). Assume zero prior \
+background in the subject.
+   - Sentence structure: Short, punchy, active sentences. One clear idea per sentence. \
+Keep the reading experience breezy and effortless.
+
+2. INTERMEDIATE (`intermediate`):
+   - Language: Moderately complex, professional, and precise. Use standard domain \
+terminology comfortably (e.g., hydrostatic equilibrium, escape velocity, Doppler shift, \
+orbital resonance) with concise contextual clarity.
+   - Framing: Focus on underlying mechanisms, cause-and-effect processes, and quantitative \
+relationships (e.g., how mass relates to gravitational pull, inverse-square laws, energy \
+conservation). Explain *how* things work and *why* they happen, not just what they are.
+   - Sentence structure: Structured, informative, connecting physical drivers to observable \
+outcomes.
+
+3. ADVANCED (`advanced`):
+   - Language: Rigorous, sophisticated, compact domain language. Assumes strong scientific \
+literacy and fluency with foundational physics and mathematics without needing basic concepts \
+re-explained.
+   - Framing: Focus on boundary conditions, mathematical limits, second-order effects, \
+relativistic or quantum constraints, theoretical tensions, observational nuances, and \
+cutting-edge paradigms.
+   - Sentence structure: Densely packed with precise scientific substance, nuanced \
+tradeoffs, and formal mechanics.
+
+Pitch the language, never the facts. Simplifying wording is the job; simplifying a claim \
+until it is no longer true is not, and a beginner card is held to exactly the same standard \
+of correctness as an advanced one.
 """

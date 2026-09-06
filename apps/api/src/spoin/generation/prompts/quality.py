@@ -44,8 +44,13 @@ there to calibrate what "beginner" vs "advanced" writing generally looks like, \
 not to tell you this specific card's tier.
 
 If a card needs no changes, return it EXACTLY as given with was_edited=false. \
-If you change anything, set was_edited=true and give a one-line note on what \
-you fixed. Never reject a card here — that only happens in a later pass.
+If you change anything, set was_edited=true and put your one-line note on what \
+you fixed in the separate 'note' field. Never reject a card here — that only \
+happens in a later pass.
+
+CRITICAL EDITORIAL RULE: NEVER append your note, "Source Note:", "Key Correction:", \
+or any meta-commentary inside the 'body' text itself! The 'body' field is rendered \
+directly to learners in the mobile application. Put your explanation ONLY in 'note'.
 """
     + sources.JUDGE_SOURCES
 )
@@ -77,6 +82,7 @@ content that still doesn't belong to its topic. Give a short reason whenever \
 accepted=false.
 """
     + sources.JUDGE_SOURCES
+    + sources.TIER_LANGUAGE
 )
 
 VERIFICATION_USER = """\

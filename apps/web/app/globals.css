@@ -1036,6 +1036,100 @@ body {
   text-align: left;
 }
 
+/* A catalog photograph (ADR-0095). Sits exactly where `.card-ascii` sits and
+   plays the same role: the lead visual, directly after the title, standing in
+   for the collapsed hook rather than sitting alongside it.
+
+   Deliberately no `max-height`, no `aspect-ratio` and no `object-fit: cover` —
+   the width is fixed to the card and the HEIGHT IS FREE, which is the rule
+   ADR-0099 already settled for ASCII scenes. Cropping is what a fixed ratio
+   would buy, and it is the wrong trade here: these images are the content, so
+   a center-crop cuts the fragment train out of a Shoemaker-Levy 9 composite to
+   win a tidier feed rhythm. */
+.card-image {
+  margin: 0 0 10px;
+}
+
+/* The frame carries the placeholder, not the <img>: a transparent PNG or a
+   slow-decoding JPEG would otherwise show the page background through it and
+   read as a layout hole while several megabytes arrive. */
+.card-image-frame {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
+  /* Only while unloaded. `min-height` rather than a fixed box so the frame
+     collapses to the image's real height the moment it lands — a fixed
+     placeholder height would jump twice, once to the placeholder and once to
+     the truth. */
+  min-height: 140px;
+  animation: card-image-pulse 1.4s ease-in-out infinite;
+}
+
+.card-image-frame.is-loaded {
+  min-height: 0;
+  animation: none;
+}
+
+.card-image-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.card-image-frame.is-loaded img {
+  opacity: 1;
+}
+
+@keyframes card-image-pulse {
+  0%,
+  100% {
+    background: color-mix(in srgb, var(--fg) 5%, var(--bg-2));
+  }
+  50% {
+    background: color-mix(in srgb, var(--fg) 9%, var(--bg-2));
+  }
+}
+
+/* Respecting this is not a nicety: a pulsing block behind every photograph in
+   a swipe feed is exactly the kind of motion the setting exists to stop. */
+@media (prefers-reduced-motion: reduce) {
+  .card-image-frame {
+    animation: none;
+  }
+  .card-image-frame img {
+    transition: none;
+  }
+}
+
+/* Attribution. Always rendered — CC BY and CC BY-SA make displaying it a
+   licence condition, so it is not styled as optional chrome that a later
+   redesign might quietly drop. */
+.card-image-credit {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--fg-3);
+}
+
+.card-image-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.card-image-licence {
+  margin-left: auto;
+  font-variant: all-small-caps;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
 /* One-line "what this is showing" under a card's visual (task F3). Named
    generically, not `.card-ascii-caption` — ASCII art is the only source that
    has caption text today (`visual_slots.alt`, ADR-0021), but an in-body
@@ -1195,6 +1289,8 @@ body {
      inside a card that is already inside the feed's scroller, so a long body
      read as a card cut off mid-sentence -- and a tall ASCII scene pushed the
      prose it explains into that hidden region. Owner call, 2026-09-05. */
+}
+
 .card-body::-webkit-scrollbar-thumb:hover { background: var(--fg-3); }
 
 .card-body strong {

@@ -20,6 +20,7 @@ from spoin.domain.enums import (
     EngagementKind,
     RepairMode,
     RepairStatus,
+    VisualKind,
 )
 
 
@@ -131,9 +132,26 @@ class CardOut(BaseModel):
     #: everything else, and as the entire collapsed/preview face when present
     #: (in place of the usual text teaser).
     visual_id: str | None = None
-    #: {"art": <raw ascii>, "alt": <one-sentence alt text>}, or null together
-    #: with `visual_id`. Never markdown, never inside `body` — a dedicated
-    #: monospace box the renderer owns (ADR-0021).
+    #: Which KIND of asset `visual_id` names, and therefore which renderer the
+    #: client uses. Null exactly when `visual_id` is (a CHECK constraint on
+    #: `card` enforces the pair).
+    #:
+    #: Sent rather than inferred: an image `visual_id` is a UUID and an ASCII
+    #: scene id is not, so a client *could* tell them apart by string shape —
+    #: and would then be depending on an implicit format rule that nothing
+    #: guarantees (ADR-0102). A card never carries both an image and an ASCII
+    #: gag (owner, 2026-09-05), so this is one value, not a set.
+    visual_kind: VisualKind | None = None
+    #: For an ASCII scene: `{"art": <raw ascii>, "alt": <one-sentence alt
+    #: text>}`. For an image: `{"title", "attribution", "display_url",
+    #: "source_page", "licence"}` (ADR-0095). Null together with `visual_id`.
+    #: Never markdown, never inside `body` — a dedicated box the renderer owns
+    #: (ADR-0021).
+    #:
+    #: `attribution` is not optional for the client to render. CC BY and CC
+    #: BY-SA make displaying it a licence CONDITION, which is why it travels
+    #: on the card rather than being fetched: a renderer that has to go and
+    #: get it is a renderer that ships without it once.
     visual_slots: dict[str, str] | None = None
     created_at: datetime
     #: This user's private `CardNote.body`, or null if they never wrote one.

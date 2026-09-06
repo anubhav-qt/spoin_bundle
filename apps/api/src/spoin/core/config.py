@@ -50,6 +50,11 @@ class Settings(BaseSettings):
     #: and the failure would arrive as a confusing SQL error rather than as
     #: "no corpus configured". Empty means generation runs ungrounded (ADR-0089).
     universe_database_url: str = ""
+    #: Cosine similarity floor for catalog image assignment (ADR-0095, ADR-0102).
+    #: Image cards scoring below this floor are not assigned an image and fall back.
+    #: Initial calibration run sets this to 0.0 so all candidate similarity scores
+    #: are recorded without rejecting drafts.
+    image_similarity_floor: float = 0.0
     #: Comma-separated. Deliberately a plain string rather than a list: a list-typed
     #: setting makes pydantic-settings JSON-parse the env var, so a perfectly
     #: ordinary `SPOIN_CORS_ORIGINS=http://localhost:3000` fails to start the app.
@@ -141,10 +146,24 @@ class Settings(BaseSettings):
     #: prompts are p50 ~3.1k tokens / max ~5.9k, and 8b only drops below target rate
     #: above ~18k -- real headroom, including for ADR-0099's taller scenes.
     mistral_model: str = "ministral-8b-2512"
-    #: The sweep's proven ceiling with no wall (ADR-0090). This is THE number task 10
-    #: exists to check against real grounded prompts rather than synthetic filler --
-    #: the per-run JSONL records `in_flight_at_send` on every call for exactly that.
-    mistral_max_in_flight: int = 5
+    #: The thinking ladder's model (ADR-0103). Bigger than `mistral_model` above on
+    #: purpose: the gate is the one place a weak judge is silently expensive, since it
+    #: re-rates difficulty and verifies factual claims, and a bad verdict there ships
+    #: as a good card (ADR-0030).
+    mistral_thinker_model: str = "ministral-14b-2512"
+    #: Route the thinking ladder to Mistral as well, not just the generator ladder.
+    #:
+    #: **This reverses ADR-0090's routing table**, whose split existed because this
+    #: account had no reasoning-capable Mistral model at all -- everything
+    #: Small/Medium/Magistral returned a permanent `x-ratelimit-limit-req-minute: 0`.
+    #: `ministral-14b` is on the ladder this account CAN call and judges well enough,
+    #: which is the weaker claim that survived (ADR-0103).
+    #:
+    #: The win is not throughput for its own sake: it takes the two gate passes off
+    #: Gemini's thinking rungs (`rpd 20 / rpm 5`), which were the scarcest resource in
+    #: a run and the usual reason a tier stalled. A prompt carrying an image still goes
+    #: to Gemini regardless of this flag -- image input is not on this Mistral tier.
+    mistral_as_thinker: bool = True
     #: Matches the probe's `REQUEST_TIMEOUT_S`. Generous on purpose: a slow response
     #: is data, a hung one is not.
     mistral_timeout_seconds: float = 180.0

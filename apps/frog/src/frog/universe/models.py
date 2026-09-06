@@ -80,6 +80,32 @@ class DocumentScope(StrEnum):
     TOPIC = "topic"
 
 
+class ImageLicence(StrEnum):
+    """The licences an image may carry, as a closed vocabulary.
+
+    A real Postgres enum for ADR-0088's reason for `DocumentKind`, but with more force
+    behind it: an unretrieved row is a quality problem, whereas a typo'd licence is a
+    **legal** one — it would let material Spoin may not use commercially look
+    indistinguishable from material it may (task 0040, Phase 2).
+
+    Two exclusions are worth stating here rather than only in the contract, because both
+    are counter-intuitive enough to be "fixed" by someone reading this list:
+
+    - **NC (NonCommercial)** is absent because Spoin is commercial (owner, 2026-09-05).
+    - **ND (NoDerivatives)** is absent because serving an image at card width crops and
+      resizes it, which produces a derivative work. ND is disqualified by the
+      architecture, not by policy — it cannot be re-admitted by deciding to be careful.
+    """
+
+    CC0 = "cc0"
+    PUBLIC_DOMAIN = "public-domain"
+    CC_BY = "cc-by"
+    CC_BY_SA = "cc-by-sa"
+    UNSPLASH = "unsplash"
+    PEXELS = "pexels"
+    PIXABAY = "pixabay"
+
+
 class Document(Base, UUIDPrimaryKey, CreatedAt):
     """One authored source file, and enough provenance to cite it.
 
@@ -241,4 +267,109 @@ class Chunk(Base, UUIDPrimaryKey, CreatedAt):
         #: cross-topic retrieval scores, and turning the filter on should not then
         #: require a migration to be usable.
         Index("ix_chunk_topic_tags", "topic_tags", postgresql_using="gin"),
+    )
+
+
+class Image(Base, UUIDPrimaryKey, CreatedAt):
+    """One open-licensed photograph a card may carry (ADR-0095, task 0040).
+
+    **Not a `Document`, despite arriving as a manifest file.** A document is chunked and
+    retrieved as prose that grounds what a card *says*; an image is retrieved whole as
+    something a card *shows*, and it carries obligations prose does not — an attribution
+    that must be displayed, and a licence that decides whether it may be used at all.
+    Folding it into `document` would put both of those in nullable columns that only one
+    kind of row ever fills, which is the shape ADR-0088 rejected for `author`/`licence`
+    in the first place.
+
+    **The model never sees this table.** Assignment is a server-side retrieval query run
+    after a card is drafted (ADR-0095): the writer is not told images exist, so it can
+    neither request one nor hallucinate a reference to one.
+    """
+
+    __tablename__ = "image"
+
+    #: The manifest this entry was delivered in, mirroring `document.source_path`.
+    #: Not unique — one manifest carries many images — but indexed with the entry's
+    #: identity below so re-ingesting a manifest can find its rows in one scan.
+    manifest_path: Mapped[str] = mapped_column(String(1000), nullable=False)
+
+    #: The image's IDENTITY, and why re-ingestion is idempotent without a per-file
+    #: hash: a manifest is a list, so a document-style whole-file hash would rebuild
+    #: all 76 rows because one description was reworded, and every rebuilt row would
+    #: need re-embedding on a GPU. Unique globally rather than per manifest — the same
+    #: photograph delivered under two subjects is one catalog entry, not two, and
+    #: assignment's "not already used in this topic" filter depends on that being true.
+    source_url: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+
+    #: sha256 of the entry's own fields. Unchanged hash, skip; changed hash, update the
+    #: row and re-embed. The same reasoning as `document.content_hash`, applied one
+    #: level down because the unit of delivery and the unit of meaning differ here.
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    #: Shown when a card cites the image. Human-readable, not an identifier.
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+
+    #: **The highest-leverage field in the catalog**: it is what gets embedded, and
+    #: what a drafted card's text is matched against. Not alt text and not a caption —
+    #: "Saturn's rings backlit by the sun, photographed by Cassini from within the
+    #: planet's shadow" matches a card about ring composition; "Saturn" matches nothing
+    #: in particular. The contract says so at length, because getting it wrong fails
+    #: silently as mediocre assignments rather than loudly as an error.
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+
+    #: The page the image was found on — what a human re-checks the licence against.
+    #: Distinct from `source_url`, which is the file itself: a direct file URL usually
+    #: states no licence at all, so storing only it would make the claim unverifiable.
+    source_page: Mapped[str] = mapped_column(Text, nullable=False)
+
+    licence: Mapped[ImageLicence] = mapped_column(
+        Enum(
+            ImageLicence,
+            name="image_licence",
+            values_callable=lambda e: [member.value for member in e],
+        ),
+        nullable=False,
+    )
+
+    #: The exact string to display. NOT NULL even for `cc0` and `public-domain`, where
+    #: it is "public domain" rather than empty: CC BY and CC BY-SA make display a
+    #: licence condition, and a renderer that has to decide whether attribution is
+    #: required is a renderer that will get it wrong for one licence.
+    attribution: Mapped[str] = mapped_column(Text, nullable=False)
+
+    #: Same normalized hierarchy as `document` (ADR-0091), inherited from the manifest
+    #: header rather than repeated per entry. NOT NULL, unlike on `document`: there is
+    #: no image equivalent of `spoin_canon` sitting outside the subject hierarchy, so
+    #: the exemption that forces those columns nullable does not apply here.
+    category: Mapped[str] = mapped_column(String(120), nullable=False)
+    sub_category: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
+    topic_tags: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False, server_default="{}")
+
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
+
+    #: Which model produced `embedding`, for `chunk.embedding_model`'s reason — a
+    #: catalog embedded with `HashEmbedder` assigns uniformly irrelevant images and
+    #: looks completely normal doing it (task 0039).
+    embedding_model: Mapped[str] = mapped_column(String(120), nullable=False)
+
+    #: Where the image is actually served from once uploaded, or NULL while it is still
+    #: served from `source_url`.
+    #:
+    #: Nullable because the upload step is deliberately NOT built yet: the constraint
+    #: Cloudinary exists to solve is bandwidth at user scale (task 0040), and there are
+    #: no users. Adding the column now means the upload lands later as a backfill
+    #: rather than as a migration plus a full re-ingest, which would re-embed the whole
+    #: catalog on a GPU to write one URL per row.
+    cloudinary_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        #: Assignment filters by the topic's category before ranking, so this is the
+        #: index that query actually uses.
+        Index("ix_image_category_sub_category", "category", "sub_category"),
+        #: Re-ingesting one manifest reads back exactly its own rows.
+        Index("ix_image_manifest_path", "manifest_path"),
+        Index("ix_image_topic_tags", "topic_tags", postgresql_using="gin"),
     )

@@ -1,8 +1,11 @@
 # Task 0040: An open-licensed image catalog, and photographs on cards
 
-> **Status: Phase 1 done** (2026-09-05) — the manifest contract is written and the
-> sourcing run is handed to the authoring track. Phases 2-5 not started.
-> Written 2026-09-05.
+> **Status: Phases 1–4 done** (2026-09-06) — the manifest contract is written, 76 Astronomy images
+> ingested into `the_spoin_universe`, `VisualKind` and `card.visual_kind` schema added to `spoin_db_2`,
+> server-side assignment module built (`spoin.generation.images`), planner ceiling loop guard wired,
+> and `_card_matches_type` tightened. Cloudinary upload unbuilt as planned (serves `source_url` directly;
+> `cloudinary_url` is nullable). Phase 5 (rendering) ready.
+> Written 2026-09-05, updated 2026-09-06.
 >
 > **The contract is § 10 of
 > [`docs/handoff/antigravity-corpus-authoring.md`](../handoff/antigravity-corpus-authoring.md)**,

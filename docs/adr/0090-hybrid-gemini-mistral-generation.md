@@ -1,8 +1,16 @@
 # ADR-0090: One `HybridContentGenerator` routes generator-ladder calls to Mistral over raw `httpx` and keeps thinking-ladder calls on Gemini
 
-- **Status:** Accepted (revised same-session — see "The routing table")
+- **Status:** Accepted, then **partly superseded** by
+  [ADR-0103](0103-mistral-runs-the-thinkers-too.md) (2026-09-07)
 - **Date:** 2026-09-04
 - **Deciders:** project owner, implementing session
+
+> ⚠️ **The routing table below is no longer what runs.** ADR-0103 moved the thinking
+> ladder to Mistral too (`ministral-14b-2512`) and deleted `mistral_max_in_flight`.
+> Only a prompt carrying a non-text part still goes to Gemini. What remains live in
+> this ADR is its *reasoning* — the measurements, why a hybrid was right at the time,
+> and the no-cross-provider-fallback rule, which is unchanged. Read ADR-0103 before
+> trusting any routing claim here.
 
 ## Context
 

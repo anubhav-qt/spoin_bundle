@@ -80,7 +80,7 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from spoin.content.ascii_library import AsciiLibraryEntry, top_candidates
 from spoin.core.config import Settings
-from spoin.domain.enums import CardType, Difficulty
+from spoin.domain.enums import CardType, Difficulty, VisualKind
 from spoin.generation import prompts
 from spoin.generation.base import (
     AsciiFetchQuery,
@@ -748,6 +748,25 @@ _FENCE_BLOCK = re.compile(r"```[a-zA-Z0-9_-]*\n.*?```\n?", re.DOTALL)
 _FENCE = re.compile(r"```([a-zA-Z0-9_-]*)\n(.*?)```", re.DOTALL)
 
 
+def _is_stub_scene(art: str) -> bool:
+    """Whether `art` is a fragment rather than a drawing.
+
+    **One non-blank line is not a scene.** ADR-0099 requires every scene to carry
+    labels naming its parts AND at least one line of dialogue or caption, so a single
+    line cannot satisfy the rule even in principle -- and the corpus shows the failure
+    is real rather than theoretical: 48 of 471 ASCII cards from the first Mistral run
+    shipped art like `    ____` or `Sun -> Jupiter` beside a full, correct `alt`
+    describing a drawing that never arrived. The weaker drafting model (ADR-0090
+    routes prose to `ministral-8b`) emits the first line and stops.
+
+    Checked structurally rather than by a character minimum: a line count is a fact
+    about the drawing, whereas any character threshold would be a guess, and a narrow
+    two-line scene is legitimate (the corpus averages 23 of its 40 columns).
+    """
+
+    return len([line for line in art.splitlines() if line.strip()]) < 2
+
+
 def _strip_duplicate_scene_from_body(body: str, art: str) -> str:
     """Removes the FIRST fenced block in `body` whose content loosely matches
     `art` -- the prompt (ASCII_INSTRUCTIONS) tells the model not to redraw its
@@ -770,6 +789,19 @@ def _strip_duplicate_scene_from_body(body: str, art: str) -> str:
         return re.sub(r"\n{3,}", "\n\n", result).strip()
 
     return body
+
+
+_TRAILING_EDITORIAL_NOTE_RE = re.compile(
+    r"\n+\s*(?:\*+|#{1,4}\s*)?"
+    r"(?:Source Note|Key Correction|Correction Note|Notes? on Correction|Correction)"
+    r"(?:\*+|:|\b).*$",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _strip_trailing_editorial_notes(body: str) -> str:
+    """Strip editorial audit notes accidentally appended to body by correction models."""
+    return _TRAILING_EDITORIAL_NOTE_RE.sub("", body).rstrip()
 
 
 def _finalize_ascii_fields(
@@ -1934,6 +1966,11 @@ class GeminiContentGenerator(ContentGenerator):
                         fetched.label, fetched.art, fetched.alt, src_id=fetched.src_id
                     )
                 elif i in resolved_art:
+                    #: The scene the ADR-0066 redraw pass resolved for this card --
+                    #: unchanged if it already fit 40 columns, redrawn if it did not.
+                    #: Read from that pass rather than from `wire_card.ascii_art`
+                    #: directly, or a redrawn scene would be assembled from the
+                    #: over-budget original the redraw exists to replace.
                     label, art, alt = resolved_art[i]
                     # The prompt tells the model not to redraw its own scene a
                     # second time into `body` (ASCII_INSTRUCTIONS), but a card
@@ -1941,9 +1978,23 @@ class GeminiContentGenerator(ContentGenerator):
                     # duplicate copy deterministically rather than shipping the
                     # same picture twice.
                     body = _strip_duplicate_scene_from_body(body, art)
-                    visual_id, visual_slots = _finalize_ascii_fields(label, art, alt)
+                    if _is_stub_scene(art):
+                        #: Dropped, NOT rejected -- the same posture the over-budget
+                        #: redraw path ends in. A rejected card regenerates (ADR-0066),
+                        #: so failing the card here would spend a fresh drafting call on
+                        #: every scene the weak model fumbles; the card itself is fine
+                        #: and simply ships without art.
+                        logger.info(
+                            "ascii: dropping stub scene for %r (%d chars, one line)",
+                            wire_card.canonical_title or wire_card.title,
+                            len(art),
+                        )
+                        visual_id, visual_slots = None, None
+                    else:
+                        visual_id, visual_slots = _finalize_ascii_fields(label, art, alt)
                 else:
                     visual_id, visual_slots = None, None
+                visual_kind = VisualKind.ASCII if visual_id is not None else None
                 items.append(
                     CardDraft(
                         title=wire_card.title,
@@ -1955,6 +2006,7 @@ class GeminiContentGenerator(ContentGenerator):
                         body=body,
                         difficulty=difficulty,
                         visual_id=visual_id,
+                        visual_kind=visual_kind,
                         visual_slots=visual_slots,
                         # NEVER read from the wire model, same reasoning as
                         # `difficulty` above -- is_hero is entirely a fact
@@ -2023,7 +2075,7 @@ class GeminiContentGenerator(ContentGenerator):
                         title=wire_correction.title,
                         canonical_title=wire_correction.canonical_title,
                         summary=wire_correction.summary,
-                        body=wire_correction.body,
+                        body=_strip_trailing_editorial_notes(wire_correction.body),
                         was_edited=wire_correction.was_edited,
                         note=wire_correction.note,
                     )

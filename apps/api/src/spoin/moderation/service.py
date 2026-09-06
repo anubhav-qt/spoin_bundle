@@ -38,6 +38,7 @@ def _repair_card_out(card: Card) -> RepairCardOut:
         body=card.body,
         archetype=card.archetype,
         visual_id=card.visual_id,
+        visual_kind=card.visual_kind,
         visual_slots=card.visual_slots,
     )
 

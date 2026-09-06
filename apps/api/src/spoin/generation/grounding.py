@@ -338,37 +338,46 @@ class Grounding:
             async with universe_session_scope() as session:
                 rows = (
                     await session.execute(
-                        select(Chunk, Document)
+                        select(
+                            Chunk.id,
+                            Chunk.text,
+                            Chunk.ordinal,
+                            Chunk.topic_tags,
+                            Document.id.label("document_id"),
+                            Document.title,
+                            Document.source,
+                            Document.source_path,
+                            Document.kind,
+                            Document.category,
+                            Document.sub_category,
+                        )
                         .join(Document, Document.id == Chunk.document_id)
                         .where(Chunk.id.in_(list(dict.fromkeys(chunk_ids))))
                     )
                 ).all()
+                hits = [
+                    Hit(
+                        chunk_id=row.id,
+                        document_id=row.document_id,
+                        score=0.0,
+                        text=row.text,
+                        ordinal=row.ordinal,
+                        topic_tags=list(row.topic_tags),
+                        document_title=row.title,
+                        source=row.source,
+                        source_path=row.source_path,
+                        kind=row.kind,
+                        category=row.category,
+                        sub_category=row.sub_category,
+                    )
+                    for row in rows
+                ]
         except UniverseNotConfiguredError:
             return ""
         except SQLAlchemyError:
             logger.exception("grounding: could not read back the drafters' passages")
             return ""
 
-        #: `score` is meaningless here -- nothing was ranked, these chunks were
-        #: chosen by the drafter's own retrieval -- so it is zero rather than
-        #: invented. `render_block` does not show it.
-        hits = [
-            Hit(
-                chunk_id=chunk.id,
-                document_id=document.id,
-                score=0.0,
-                text=chunk.text,
-                ordinal=chunk.ordinal,
-                topic_tags=list(chunk.topic_tags),
-                document_title=document.title,
-                source=document.source,
-                source_path=document.source_path,
-                kind=document.kind,
-                category=document.category,
-                sub_category=document.sub_category,
-            )
-            for chunk, document in rows
-        ]
         return render_block(hits)
 
     async def _scope_for(

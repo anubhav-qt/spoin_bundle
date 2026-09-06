@@ -60,9 +60,21 @@ class HybridContentGenerator(GeminiContentGenerator):
     def __init__(self, settings: Settings) -> None:
         super().__init__(settings)
         self._mistral = MistralClient(settings)
+        if settings.mistral_as_thinker:
+            self._mistral_thinker: MistralClient | None = MistralClient(
+                settings, model=settings.mistral_thinker_model
+            )
+            logger.info(
+                "HybridContentGenerator: thinker routed to Mistral (%s)",
+                settings.mistral_thinker_model,
+            )
+        else:
+            self._mistral_thinker = None
 
     async def aclose(self) -> None:
         await self._mistral.aclose()
+        if self._mistral_thinker is not None:
+            await self._mistral_thinker.aclose()
 
     async def _invoke_with_retry(
         self,
@@ -70,16 +82,16 @@ class HybridContentGenerator(GeminiContentGenerator):
         schema: type[_SchemaT],
         prompt: list[tuple[str, Any]],
     ) -> _SchemaT:
-        if kind != "generator" or _has_image(prompt):
-            #: Gemini's whole apparatus -- box leasing, the load balancer, the rung
-            #: ladder, the 429 classification -- is untouched and still schedules
-            #: every call that lands here. ADR-0084 remains what runs the thinkers.
+        if _has_image(prompt):
             return await super()._invoke_with_retry(kind, schema, prompt)
 
-        #: Mistral's admission control is the client's semaphore and nothing else.
-        #: No box is claimed, no cell is assigned, no quota row is written -- the
-        #: sweep measured no concurrency wall to defend against (ADR-0090).
-        return await self._mistral.invoke(schema, prompt)
+        if kind == "generator":
+            return await self._mistral.invoke(schema, prompt)
+
+        if kind == "thinking" and self._mistral_thinker is not None:
+            return await self._mistral_thinker.invoke(schema, prompt)
+
+        return await super()._invoke_with_retry(kind, schema, prompt)
 
 
 def _has_image(prompt: list[tuple[str, Any]]) -> bool:

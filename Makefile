@@ -6,7 +6,8 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup dev seed test lint fmt types check migrate migration \
         universe-migrate universe-migration corpus-check corpus-ingest \
-        curriculum-check curriculum-ingest curriculum-project worker api-types down clean
+        curriculum-check curriculum-ingest curriculum-project \
+        image-check image-ingest worker api-types down clean
 
 COMPOSE := docker compose
 API     := $(COMPOSE) run --rm --no-deps api
@@ -85,6 +86,12 @@ curriculum-check: ## Validate docs/the_spoin_universe/curricula against the cont
 
 curriculum-ingest: ## Ingest curricula into the_spoin_universe (run universe-migrate first)
 	$(COMPOSE) --profile frog run --rm --entrypoint python frog -m frog.curriculum
+
+image-check: ## Validate docs/the_spoin_universe/images against the contract; writes nothing
+	$(COMPOSE) --profile frog run --rm --entrypoint python frog -m frog.images --check
+
+image-ingest: ## Ingest image manifests into the_spoin_universe (GPU; run universe-migrate first)
+	$(COMPOSE) --profile frog run --rm --entrypoint python frog -m frog.images
 
 # The deterministic projection into spoin_db_2 -- no GPU, no model, needs both databases,
 # so it runs in the `api` image (not `--no-deps`: it needs `db` up).

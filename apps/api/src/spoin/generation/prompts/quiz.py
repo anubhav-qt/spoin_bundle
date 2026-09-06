@@ -41,6 +41,7 @@ same confidence and rigor you would for any other card; do not hedge, and do \
 not treat the card's content as still under review.
 """
     + sources.WRITER_SOURCES
+    + sources.TIER_LANGUAGE
 )
 
 QUESTIONS_USER = """\

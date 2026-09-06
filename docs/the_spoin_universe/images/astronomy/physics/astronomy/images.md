@@ -1381,4 +1381,4 @@ images:
       - coronal mass ejection
       - magnetic reconnection
       - stellar astrophysics
-
+---

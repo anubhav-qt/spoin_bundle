@@ -181,3 +181,17 @@ class CardType(StrEnum):
     DIAGRAM = "diagram"
     COMPARISON = "comparison"
     ASCII = "ascii"
+
+
+class VisualKind(StrEnum):
+    """The kind of visual asset attached to a card (task 0040 Phase 3).
+
+    Not inferred from `visual_id`'s string shape: an image visual_id is a UUID and
+    an ASCII scene id is not, so the kind is technically recoverable by inspecting
+    the string — and doing that would make rendering depend on an implicit format
+    rule, which is the class of hidden constraint this codebase enforces against
+    rather than relies on (task 0040 Phase 3).
+    """
+
+    ASCII = "ascii"
+    IMAGE = "image"

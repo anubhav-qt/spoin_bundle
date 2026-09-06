@@ -17,6 +17,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
+    Enum,
     Float,
     ForeignKey,
     Index,
@@ -40,6 +41,7 @@ from spoin.domain.enums import (
     RejectionStage,
     RepairMode,
     RepairStatus,
+    VisualKind,
 )
 from spoin.domain.models.topic import Subtopic
 
@@ -83,6 +85,12 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
         CheckConstraint(
             "(content_embedding IS NULL) = (embedding_model IS NULL)",
             name="embedding_names_its_model",
+        ),
+        #: A visual asset must always state its kind, and kind without an asset
+        #: is meaningless (task 0040 Phase 3).
+        CheckConstraint(
+            "(visual_id IS NULL) = (visual_kind IS NULL)",
+            name="visual_kind_accompanies_visual_id",
         ),
     )
 
@@ -211,6 +219,12 @@ class Card(Base, UUIDPrimaryKey, CreatedAt):
     #: on purpose: adding it later would mean a data migration and regenerating the
     #: corpus to backfill it (the "do the schema half now" reasoning in CLAUDE.md).
     visual_id: Mapped[str | None] = mapped_column(String(64))
+    #: The kind of visual asset attached to the card (task 0040 Phase 3).
+    #: Stored explicitly rather than inferred from visual_id's string format.
+    visual_kind: Mapped[VisualKind | None] = mapped_column(
+        Enum(VisualKind, name="visual_kind", values_callable=lambda e: [m.value for m in e]),
+        nullable=True,
+    )
     #: {slot_name: text} for the scene named by `visual_id`. Null together with it.
     visual_slots: Mapped[dict[str, str] | None] = mapped_column(
         JSONB().with_variant(JSON(), "sqlite")

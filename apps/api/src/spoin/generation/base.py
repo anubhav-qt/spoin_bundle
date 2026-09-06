@@ -23,7 +23,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
-from spoin.domain.enums import CardType, Difficulty
+from spoin.domain.enums import CardType, Difficulty, VisualKind
 from spoin.generation.quota import KeyBox
 
 
@@ -87,6 +87,10 @@ class CardDraft(BaseModel):
     #: reverting this branch's diff is enough; nothing outside `generate_cards`
     #: and this docstring needs to change back.
     visual_id: str | None = None
+    #: Stored asset kind. Deliberately NOT exposed on the LLM wire schema (_WireCard):
+    #: ADR-0095 says the model emits no image reference at any point; it is not told
+    #: images exist. Assigned server-side post-drafting.
+    visual_kind: VisualKind | None = None
     visual_slots: dict[str, str] | None = None
     #: True for at most one card per subtopic-tier (task 0006 / ADR-0018's
     #: real hero mechanism, replacing the fixture seeder's "first card

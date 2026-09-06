@@ -82,6 +82,8 @@ switch ($Target) {
     # Both reuse the `frog` service with its entrypoint overridden.
     'curriculum-check'  { Invoke-Compose @('--profile', 'frog', 'run', '--rm', '--entrypoint', 'python', 'frog', '-m', 'frog.curriculum', '--check') }
     'curriculum-ingest' { Invoke-Compose @('--profile', 'frog', 'run', '--rm', '--entrypoint', 'python', 'frog', '-m', 'frog.curriculum') }
+    'image-check'       { Invoke-Compose @('--profile', 'frog', 'run', '--rm', '--entrypoint', 'python', 'frog', '-m', 'frog.images', '--check') }
+    'image-ingest'      { Invoke-Compose @('--profile', 'frog', 'run', '--rm', '--entrypoint', 'python', 'frog', '-m', 'frog.images') }
     # Deterministic projection into spoin_db_2 -- api image, needs `db` up.
     'curriculum-project' { Invoke-Compose @('run', '--rm', 'api', 'python', '-m', 'spoin.curriculum') }
     'worker'    { Invoke-Compose @('--profile', 'worker', 'run', '--rm', 'worker') }
@@ -112,6 +114,8 @@ switch ($Target) {
             'curriculum-check    Validate docs/the_spoin_universe/curricula against the contract'
             'curriculum-ingest   Ingest curricula into the_spoin_universe'
             'curriculum-project  Project ingested curricula into Topic/Subtopic in spoin_db_2'
+            'image-check         Validate docs/the_spoin_universe/images against the contract'
+            'image-ingest        Ingest image manifests into the_spoin_universe (GPU)'
             'api-types   Regenerate packages/api-types from the live OpenAPI schema'
             'down        Stop everything'
             'clean       Stop everything and delete the database volume'

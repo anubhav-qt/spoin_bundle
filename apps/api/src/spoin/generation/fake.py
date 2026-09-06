@@ -14,7 +14,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import AsyncIterator
 
-from spoin.domain.enums import CardType, Difficulty
+from spoin.domain.enums import CardType, Difficulty, VisualKind
 from spoin.generation.base import (
     AsciiFetchQuery,
     AsciiFetchResult,
@@ -281,6 +281,7 @@ class FakeContentGenerator(ContentGenerator):
                     ),
                     difficulty=difficulty,
                     visual_id=visual_id,
+                    visual_kind=VisualKind.ASCII if visual_id is not None else None,
                     visual_slots=visual_slots,
                     is_hero=want_hero,
                 )

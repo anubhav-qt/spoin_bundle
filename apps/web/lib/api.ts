@@ -32,6 +32,10 @@ export type Difficulty = "beginner" | "intermediate" | "advanced";
  *  the collapsed teaser only, the expanded view always shows everything. */
 export type ArchetypeTag = "code" | "diagram" | "comparison";
 
+/** Which kind of visual asset a card carries. Mirrors `spoin.domain.enums.
+ *  VisualKind`; a card never carries both (owner, 2026-09-05). */
+export type VisualKind = "ascii" | "image";
+
 export interface Card {
   id: string;
   topic_id: string;
@@ -52,9 +56,20 @@ export interface Card {
    *  Renders at the TOP of the card, above the title, and as the entire
    *  collapsed/preview face when present — see `visual_slots`. */
   visual_id: string | null;
-  /** {"art": <raw ascii, newline-separated>, "alt": <one sentence>}, or null
-   *  together with `visual_id`. Never markdown — rendered in a dedicated
-   *  monospace box, not through the body's Markdown parser. */
+  /** Which kind of asset `visual_id` names, and therefore which renderer runs.
+   *  Null exactly when `visual_id` is. Sent by the server rather than inferred
+   *  from the id's shape: an image id is a UUID and an ASCII scene id is not,
+   *  so we COULD tell them apart by string format and would then depend on an
+   *  implicit rule nothing guarantees (ADR-0102). A card never carries both. */
+  visual_kind: VisualKind | null;
+  /** For `visual_kind === "ascii"`: {"art": <raw ascii, newline-separated>,
+   *  "alt": <one sentence>}. For `"image"`: {"title", "attribution",
+   *  "display_url", "source_page", "licence"} (ADR-0095). Null together with
+   *  `visual_id`. Never markdown — rendered in a dedicated box, not through
+   *  the body's Markdown parser.
+   *
+   *  `attribution` is not optional to render: CC BY and CC BY-SA make
+   *  displaying it a licence condition. */
   visual_slots: Record<string, string> | null;
   created_at: string;
   /** This user's private note on this card, or null if they never wrote one. */
@@ -920,6 +935,7 @@ export interface RepairCard {
   body: string;
   archetype: ArchetypeTag[];
   visual_id: string | null;
+  visual_kind: VisualKind | null;
   visual_slots: Record<string, string> | null;
 }
 

@@ -16,12 +16,14 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any, cast
 
+from frog.embeddings import normalize_topic_text
 from langgraph.types import Command, Send
 from sqlalchemy import func, select
 from sqlalchemy import update as sa_update
 
 from spoin.content.archetype import classify_archetype
 from spoin.content.difficulty_examples import get_difficulty_examples
+from spoin.core.db import universe_session_scope
 from spoin.domain.enums import (
     CardStatus,
     CardType,
@@ -42,6 +44,12 @@ from spoin.generation.base import (
 from spoin.generation.dedup import find_batch_duplicate, find_corpus_duplicate
 from spoin.generation.gate import passes_minimal_gate
 from spoin.generation.grounding import CardGrounding, GroundingContext
+from spoin.generation.images import (
+    ImageAssignmentReport,
+    assign_images,
+    count_available_images,
+    topic_used_image_ids,
+)
 from spoin.generation.load_balancer import estimate_tokens, pack_by_tokens
 from spoin.generation.pipeline.persistence import (
     _current_question_stems,
@@ -375,6 +383,72 @@ async def _fetch_ascii_for_plans(
     )
 
 
+def _resolve_image_categories(topic_name: str, tier: SubtopicPlan) -> list[str]:
+    """Which catalog categories this tier's images may come from.
+
+    Derived from the leading path segment of the tier's grounding refs, because the
+    corpus tree and the image tree mirror each other -- an image sits beside the
+    subject it illustrates (task 0040 Phase 1).
+
+    **Through `normalize_topic_text`, never a hand-rolled lowercase.** `image.category`
+    is WRITTEN by that normalizer, which folds non-alphanumerics to spaces, so a path
+    segment `computer-science` only matches the stored category `computer science`
+    after the same normalization. Doing it by hand here would match for a one-word
+    category and silently miss for every hyphenated one -- and the miss is invisible:
+    the scope matches nothing, the ceiling reads zero available, and the tier quietly
+    becomes all-prose while logging exactly what a topic with no imagery logs. One
+    normalizer across tags, categories and topic names is ADR-0093's whole point.
+    """
+
+    categories: set[str] = set()
+    for ref in tier.get("grounding_refs") or []:
+        parts = [part for part in ref.strip("/").split("/") if part]
+        if parts:
+            categories.add(normalize_topic_text(parts[0]))
+    if not categories and topic_name:
+        #: No declared scope to read a category from, so the topic's own name is the
+        #: best available guess. A guess it remains: a topic whose name is not its
+        #: corpus category retrieves nothing, which the ceiling then reports as zero
+        #: availability rather than as a bad lookup.
+        fallback = normalize_topic_text(topic_name)
+        if fallback:
+            categories.add(fallback)
+    return sorted(categories)
+
+
+async def _assign_images(
+    runtime: _Runtime,
+    *,
+    topic_name: str,
+    tier: SubtopicPlan,
+    drafts: list[CardDraft],
+) -> ImageAssignmentReport:
+    """Assign open-licensed images from the universe catalog to IMAGE card drafts (ADR-0095)."""
+    categories = _resolve_image_categories(topic_name, tier)
+    async with runtime.session_lock:
+        report = await assign_images(
+            universe_session_scope,
+            runtime.embedder,
+            topic_id=uuid.UUID(tier["topic_id"]),
+            categories=categories,
+            drafts=drafts,
+            min_score=runtime.settings.image_similarity_floor,
+            db_session=runtime.session,
+        )
+    logger.info(
+        "subtopic '%s' [%s]: image assignment -- assigned=%d, no_candidate=%d, "
+        "below_floor=%d, unavailable=%d, scores=%s",
+        tier["title"],
+        tier["difficulty"],
+        report.assigned,
+        report.no_candidate,
+        report.below_floor,
+        report.unavailable,
+        [round(s, 3) for s in report.scores],
+    )
+    return report
+
+
 def _take_plans(pool: list[CardPlan], card_type: str | None, count: int) -> list[CardPlan]:
     """Pull up to `count` briefs for the type this round is writing, REMOVING
     them from `pool` so no brief is ever written twice.
@@ -450,6 +524,7 @@ async def _persist_drafts(
             body=_clean_null_bytes(draft.body),
             archetype=classify_archetype(_clean_null_bytes(draft.body)),
             visual_id=_clean_null_bytes(draft.visual_id[:64]) if draft.visual_id else None,
+            visual_kind=draft.visual_kind,
             visual_slots=_clean_null_bytes(draft.visual_slots),
             is_hero=draft.is_hero,
             #: Recorded HERE, at draft time, not at acceptance -- retrieval is
@@ -732,6 +807,38 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
                 scaled[biggest] = max(0, scaled[biggest] + drift)
             tier_quotas = scaled
 
+        # ADR-0095 / ADR-0102 / Task 0040: Cap the IMAGE card quota at real catalog
+        # availability. A planned image card that cannot resolve an image would be
+        # rejected and regenerated (ADR-0066 loop risk). The planner is trusted for
+        # taste, not constraints (CLAUDE.md). Any shortfall is reassigned to PROSE
+        # so sum(tier_quotas.values()) still equals `want`.
+        if tier_quotas.get(CardType.IMAGE.value, 0) > 0:
+            categories = _resolve_image_categories(job["topic_name"], tier)
+            async with runtime.session_lock:
+                used_image_ids = await topic_used_image_ids(
+                    runtime.session, uuid.UUID(tier["topic_id"])
+                )
+            available = await count_available_images(
+                universe_session_scope,
+                categories=categories,
+                exclude_image_ids=used_image_ids,
+            )
+            requested_image_quota = tier_quotas[CardType.IMAGE.value]
+            capped_image_quota = min(requested_image_quota, available)
+            if capped_image_quota < requested_image_quota:
+                shortfall = requested_image_quota - capped_image_quota
+                tier_quotas[CardType.IMAGE.value] = capped_image_quota
+                logger.info(
+                    "subtopic '%s' [%s]: capped image quota from %d to %d (available=%d); "
+                    "dropping unresolvable %d image card(s) (never shifted to prose)",
+                    tier["title"],
+                    tier["difficulty"],
+                    requested_image_quota,
+                    capped_image_quota,
+                    available,
+                    shortfall,
+                )
+
         # The pre-processing gate (ADR-0059): plan the whole deficit in one
         # call before any of it is written, so the writer rounds below are
         # each handed a brief instead of re-inventing the tier's coverage from
@@ -945,6 +1052,10 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             failures.extend(result.failures)
             if not result.items:
                 break  # no usable progress this round -- stop
+            if chosen_type == CardType.IMAGE.value:
+                await _assign_images(
+                    runtime, topic_name=job["topic_name"], tier=tier, drafts=result.items
+                )
             drafts.extend(result.items)
             draft_card_ids.extend(
                 await _persist_drafts(
@@ -1821,6 +1932,7 @@ async def _process_gate_item(
                 #: card that no longer exists (ADR-0017).
                 "archetype": classify_archetype(_clean_null_bytes(draft.body)),
                 "visual_id": (_clean_null_bytes(draft.visual_id[:64]) if draft.visual_id else None),
+                "visual_kind": draft.visual_kind,
                 "visual_slots": _clean_null_bytes(draft.visual_slots),
                 "content_embedding": embedding,
                 "embedding_model": runtime.embedder.model_name,
@@ -2153,7 +2265,7 @@ async def _gate_and_persist_results(
         #: mismatch means a drafting path forgot to persist, and the gate would then
         #: silently drop cards -- loud is the only safe failure here.
         for card_id, draft in zip(result["draft_card_ids"], result["drafts"], strict=True):
-            ok, reason = passes_minimal_gate(draft)
+            ok, reason = passes_minimal_gate(draft, topic_name=topic_name)
             if ok:
                 survivors.append((card_id, draft))
             else:

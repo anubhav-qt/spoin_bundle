@@ -115,13 +115,23 @@ def _strictify(node: Any) -> None:
 
 
 class MistralClient:
-    """One in-flight cap, one key rotation, one retry policy, one JSONL log.
+    """One key rotation, one retry policy, one JSONL log, one model.
 
-    Constructed once per process and shared: the semaphore is the whole admission
-    control, so two clients would silently double the concurrency the sweep measured.
+    **There is no in-flight cap.** The semaphore this class was built around is gone:
+    a real run found no 429s at all without it (owner, 2026-09-06), which is the
+    opposite of the Gemini result the caution was inherited from -- Google's free-tier
+    edge sheds on concurrency with a hard wall between 3 and 4, and Mistral simply does
+    not. ADR-0090's `mistral_max_in_flight` went with it.
+
+    What still bounds concurrency is `httpx.Limits(max_connections=128)` below, per
+    client. **One client per model, so a hybrid run with a Mistral thinker has two**,
+    and the real ceiling is their sum rather than 128. That is a deliberate consequence
+    rather than an oversight -- the two ladders have different models and different
+    retry histories to keep apart -- but it means the ceiling nobody has measured is
+    256, not 128.
     """
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, model: str | None = None) -> None:
         self._keys = settings.mistral_api_key_list
         if not self._keys:
             raise ValueError(
@@ -129,35 +139,29 @@ class MistralClient:
                 "(one key is fine; the client round-robins over however many it has)."
             )
         self._base_url = settings.mistral_base_url.rstrip("/")
-        self._model = settings.mistral_model
+        self._model = model or settings.mistral_model
         self._timeout = settings.mistral_timeout_seconds
         self._max_attempts = settings.mistral_max_attempts
         self._backoff_base = settings.mistral_backoff_base_seconds
         self._max_tokens = settings.mistral_max_output_tokens
         self._temperature = settings.mistral_temperature
 
-        max_in_flight = settings.mistral_max_in_flight
-        #: THE constant task 10 exists to check. The sweep found no wall through
-        #: N=5 on synthetic 12k-token prompts; a real grounded prompt has different
-        #: structure and different token accounting, and the JSONL is what turns
-        #: "5 is fine" from an assumption into a measurement.
-        self._semaphore = asyncio.Semaphore(max_in_flight)
+        #: Tracked but never gated on: `in_flight_at_send` is what the JSONL records
+        #: on every call, and it is the only evidence that the no-semaphore decision
+        #: keeps holding as batch sizes grow.
         self._in_flight = 0
         self._state_lock = asyncio.Lock()
         self._key_cursor = 0
 
-        limits = httpx.Limits(
-            max_connections=max_in_flight + 4, max_keepalive_connections=max_in_flight + 4
-        )
+        limits = httpx.Limits(max_connections=128, max_keepalive_connections=64)
         self._client = httpx.AsyncClient(timeout=self._timeout, limits=limits)
 
         self._log_path = _run_log_path(settings.mistral_log_dir)
         self._log_lock = asyncio.Lock()
         logger.info(
-            "mistral: model=%s keys=%d in_flight_cap=%d log=%s",
+            "mistral: model=%s keys=%d in_flight_cap=none (conn_pool=128) log=%s",
             self._model,
             len(self._keys),
-            max_in_flight,
             self._log_path,
         )
 
@@ -246,52 +250,50 @@ class MistralClient:
             key = self._keys[self._key_cursor % len(self._keys)]
             key_index = self._key_cursor % len(self._keys)
             self._key_cursor += 1
+            self._in_flight += 1
+            in_flight_at_send = self._in_flight
 
-        async with self._semaphore:
+        started = time.monotonic()
+        try:
+            response = await self._client.post(
+                f"{self._base_url}{_CHAT_PATH}",
+                headers={
+                    "Authorization": f"Bearer {key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+        except httpx.TimeoutException as exc:
+            latency = time.monotonic() - started
+            await self._log(
+                call=call_name,
+                attempt=attempt,
+                key_index=key_index,
+                status=None,
+                latency_s=latency,
+                in_flight_at_send=in_flight_at_send,
+                prompt_chars=prompt_chars,
+                outcome="timeout",
+                detail=type(exc).__name__,
+            )
+            return None, self._backoff(attempt, None), f"timeout after {latency:.1f}s"
+        except httpx.HTTPError as exc:
+            latency = time.monotonic() - started
+            await self._log(
+                call=call_name,
+                attempt=attempt,
+                key_index=key_index,
+                status=None,
+                latency_s=latency,
+                in_flight_at_send=in_flight_at_send,
+                prompt_chars=prompt_chars,
+                outcome="transport",
+                detail=f"{type(exc).__name__}: {exc}",
+            )
+            return None, self._backoff(attempt, None), f"transport error {type(exc).__name__}"
+        finally:
             async with self._state_lock:
-                self._in_flight += 1
-                in_flight_at_send = self._in_flight
-            started = time.monotonic()
-            try:
-                response = await self._client.post(
-                    f"{self._base_url}{_CHAT_PATH}",
-                    headers={
-                        "Authorization": f"Bearer {key}",
-                        "Content-Type": "application/json",
-                    },
-                    json=payload,
-                )
-            except httpx.TimeoutException as exc:
-                latency = time.monotonic() - started
-                await self._log(
-                    call=call_name,
-                    attempt=attempt,
-                    key_index=key_index,
-                    status=None,
-                    latency_s=latency,
-                    in_flight_at_send=in_flight_at_send,
-                    prompt_chars=prompt_chars,
-                    outcome="timeout",
-                    detail=type(exc).__name__,
-                )
-                return None, self._backoff(attempt, None), f"timeout after {latency:.1f}s"
-            except httpx.HTTPError as exc:
-                latency = time.monotonic() - started
-                await self._log(
-                    call=call_name,
-                    attempt=attempt,
-                    key_index=key_index,
-                    status=None,
-                    latency_s=latency,
-                    in_flight_at_send=in_flight_at_send,
-                    prompt_chars=prompt_chars,
-                    outcome="transport",
-                    detail=f"{type(exc).__name__}: {exc}",
-                )
-                return None, self._backoff(attempt, None), f"transport error {type(exc).__name__}"
-            finally:
-                async with self._state_lock:
-                    self._in_flight -= 1
+                self._in_flight -= 1
 
         latency = time.monotonic() - started
         status = response.status_code

@@ -26,7 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from spoin.content.archetype import classify_archetype
 from spoin.core.config import Settings
-from spoin.domain.enums import CardType, Difficulty, RejectionStage
+from spoin.domain.enums import CardType, Difficulty, RejectionStage, VisualKind
 from spoin.domain.models import RejectedCard
 from spoin.generation.base import CardDraft, ContentGenerator
 from spoin.generation.grounding import Grounding
@@ -149,14 +149,14 @@ def _card_matches_type(draft: CardDraft, card_type: str, *, topic_name: str | No
             return False
         return "code" in classify_archetype(draft.body)
     if card_type == CardType.ASCII.value:
-        return draft.visual_id is not None or bool(draft.visual_slots)
+        return draft.visual_kind is VisualKind.ASCII
     tags = classify_archetype(draft.body)
     if card_type == CardType.DIAGRAM.value:
         return "diagram" in tags
     if card_type == CardType.COMPARISON.value:
         return "comparison" in tags
     if card_type == CardType.IMAGE.value:
-        return not tags and draft.visual_id is None
+        return not tags and draft.visual_kind is VisualKind.IMAGE
     if card_type == CardType.PROSE.value:
         return not tags and draft.visual_id is None
     return False

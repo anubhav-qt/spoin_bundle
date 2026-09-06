@@ -116,6 +116,7 @@ async def _mint_new_version(
         body=body,
         archetype=classify_archetype(body),
         visual_id=old.visual_id,
+        visual_kind=old.visual_kind,
         visual_slots=visual_slots,
         is_hero=old.is_hero,
         content_embedding=embedding,

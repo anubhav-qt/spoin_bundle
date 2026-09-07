@@ -1,0 +1,4 @@
+# The seeded canvas is a build artifact: ~2.5MB of editor bundle around a
+# design that lives in Main.dc.html. Regenerate it with the design skill --
+# see README.md.
+ascii-art-review.html

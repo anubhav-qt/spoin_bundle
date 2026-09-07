@@ -819,6 +819,22 @@ export const api = {
       return requestForm<RepairEnqueued>(`/admin/repairs/${cardId}/remake`, form);
     },
   },
+
+  // -- Admin: ASCII scene review (ADR-0104, dev-only) ---------------------
+  adminAscii: {
+    list: (topicSlug: string) =>
+      request<AsciiScene[]>(`/admin/ascii/${encodeURIComponent(topicSlug)}`),
+    keep: (cardId: string, art: string, alt: string) =>
+      request<AsciiSceneAction>(`/admin/ascii/scene/${cardId}/keep`, {
+        method: "POST",
+        body: JSON.stringify({ art, alt }),
+      }),
+    reject: (cardId: string, note?: string) =>
+      request<AsciiSceneAction>(`/admin/ascii/scene/${cardId}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ note: note ?? null }),
+      }),
+  },
 };
 
 // -- Report a card ------------------------------------------------------
@@ -969,6 +985,35 @@ export interface RepairEnqueued {
   card_id: string;
   action: "deleted" | "fix_enqueued" | "remake_enqueued" | "dismissed" | "reverted";
   job_id: string | null;
+}
+
+export interface AsciiScene {
+  card_id: string;
+  title: string;
+  canonical_title: string;
+  summary: string;
+  difficulty: Difficulty;
+  subtopic_title: string | null;
+  /** The composed scene as it currently ships: library drawing + overlay lines. */
+  art: string;
+  alt: string;
+  /** The curated-library entry id, or null for a card predating library sourcing. */
+  src_id: string | null;
+  library_title: string | null;
+  /**
+   * The drawing as the library holds it, before any overlay or operator edit.
+   * ADR-0104 makes this the answer to "was it always like this" -- the first
+   * question a reviewer asks when a scene looks wrong.
+   */
+  library_art: string | null;
+  /** Reported, never enforced: an operator's deliberate over-budget line stands. */
+  widest_line: number;
+  max_width: number;
+}
+
+export interface AsciiSceneAction {
+  card_id: string;
+  action: "kept" | "sent_to_repairs";
 }
 
 export interface UserProfileUpdateIn {

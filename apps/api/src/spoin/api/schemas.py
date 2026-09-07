@@ -736,6 +736,48 @@ class RepairQueueItemOut(BaseModel):
     state: Literal["open", "resolved"]
 
 
+class AsciiSceneOut(BaseModel):
+    """One reviewable ASCII scene in a topic (ADR-0104).
+
+    `library_art` is the entry the scene was composed from, sent alongside the
+    current `art` so the page can show what the drawing looked like before
+    anyone touched it -- the question a reviewer asks first when a scene looks
+    wrong. `None` when the card predates library sourcing or its `src_id` is no
+    longer in the library.
+    """
+
+    card_id: UUID
+    title: str
+    canonical_title: str
+    summary: str
+    difficulty: Difficulty
+    subtopic_title: str | None
+    art: str
+    alt: str
+    src_id: str | None
+    library_title: str | None
+    library_art: str | None
+    #: Reported rather than enforced -- see `AsciiReviewService.keep`.
+    widest_line: int
+    max_width: int
+
+
+class AsciiSceneKeepIn(BaseModel):
+    """The operator's edit. `art` is written verbatim, over-budget lines included."""
+
+    art: str
+    alt: str
+
+
+class AsciiSceneRejectIn(BaseModel):
+    note: str | None = None
+
+
+class AsciiSceneActionOut(BaseModel):
+    card_id: UUID
+    action: Literal["kept", "sent_to_repairs"]
+
+
 class RepairEnqueuedOut(BaseModel):
     """Result of an action on `/admin/repairs/{card_id}`."""
 

@@ -150,36 +150,28 @@ For each card:
    card could use (a genuinely different subject, not merely an imperfect one).
    Refusing (matched=false) should be rare.
 
-2. ADAPT the chosen art into the final scene, under the box rule above.
+2. WRITE THE TEXT that turns that drawing into THIS card's scene.
 
-   **What you add is TEXT. Only text.** Labels, dialogue, a caption, a stage
-   direction. That is the entire adaptation.
+   **You never reproduce, redraw, adapt or edit the drawing itself.** It is
+   copied from the library exactly as it is, by the server, after you answer.
+   Do not return it. Do not quote it back. Do not describe changes to it.
+   Spatial alignment is the one thing a language model cannot preserve, and a
+   retyped drawing arrives with its columns skewed and its backslashes eaten.
 
-   - Keep its drawing intact. Trim lines or elements only if the whole scene does
-     not need them.
-   - **Do not draw anything new.** No extra figures, no added boxes or borders, no
-     frame around the scene, no second panel, no decorative characters padding it
-     out. If the concept seems to need a picture the candidate does not contain,
-     say it in a caption line instead of drawing it. Every original stroke a model
-     adds to hand-verified art is a stroke nobody checked, and it is where the
-     columns skew.
-   - Never redraw a line that is already there to "improve" or "fix" it.
-   - ADD TEXT TO THE SCENE. This is required, not optional: art with no words
-     is unreadable to someone who cannot decode the picture, and the scene is
-     the card's hook, so it has to carry meaning on its own. Every scene you
-     return ships with BOTH:
-       * labels naming what the parts are -- which figure is the king, which
-         box is the heap, what the arrow is doing. A label sits beside the
-         thing it names, or directly under it.
-       * at least one line of dialogue, a stage direction, or a caption that
-         lands the gag for THIS card -- drawn from asset_direction and
-         content_direction, in the card's voice, and funny. The joke has to
-         work for this concept, not the candidate's original one.
-   - Count the columns after adapting. If a label or line of dialogue does not
-     fit beside the figure, MOVE IT to its own line above or below the art --
-     there is no height limit, so that always works. Never shorten it to
-     nothing and never drop it to save columns.
-   - No surrounding ``` fence -- the art field holds the drawing only.
+   Your text is returned as `overlay_lines`: a list of short lines that print
+   BELOW the drawing, in order. Between two and four of them, and together they
+   must carry BOTH:
+     * labels naming what the parts of the drawing are, in terms of this card --
+       which figure is the compiler, which box is the heap, what the arrow is
+       doing. Write these as "figure on the left = the borrow checker" style
+       lines, since you cannot place text inside the picture.
+     * one line that lands the gag for THIS concept -- drawn from
+       asset_direction and content_direction, in the card's voice, and funny.
+       The joke has to work for this concept, not the candidate's original one.
+
+   Each line is at most 40 characters. A longer line is wrapped for you rather
+   than cut, so never shorten a line to nothing to save columns -- but a line
+   that fits reads better than one that wraps.
 
 3. Return for each card:
    - index: the card's number, exactly as given -- this is how the scene is
@@ -187,11 +179,13 @@ For each card:
    - matched: true if you picked one, false if you refused.
    - src_id: the EXACT ID of the candidate you picked (empty when matched=false).
    - ascii_label: a short slug for the finished scene (empty when matched=false).
-   - ascii_art: the adapted drawing, newline-separated (empty when matched=false).
+   - overlay_lines: the lines described in step 2 (empty when matched=false).
    - ascii_alt: the caption printed under the scene. Say what the drawing is
      showing and what the joke is, in one plain sentence, so a reader who
-     cannot make sense of the art still gets both. Not a list of shapes: name
-     the thing being depicted and the point it makes.
+     cannot make sense of the art still gets both. Describe THE CANDIDATE YOU
+     PICKED -- its title tells you what it depicts -- never a scene you wish it
+     were. A caption naming a magnifying glass the drawing does not contain is
+     worse than no caption.
 """
 )
 
@@ -206,186 +200,33 @@ keyed by its index.
 {cards_block}"""
 
 
-#: The pinned canon preamble carries the gag rule and the box rule (`_ASCII_GAG`,
-#: `_ASCII_BOX`); this block used to state both again in its own words, and two of the
-#: other three ascii prompts stated them a third and fourth time. What survives here is
-#: what canon has nothing to say about: that this is the FALLBACK path, that the scene
-#: doubles as the collapsed-card thumbnail, the seven worked examples, and the output
-#: contract for the three ascii fields.
+#: ADR-0104 emptied this block out. It used to be the FALLBACK path -- the
+#: free-draw instructions, seven worked examples, and the output contract for the
+#: three ascii fields -- because a brief with no library match was drawn by the
+#: writer. There is no such brief any more (an unmatched one becomes prose), so
+#: what is left is the single instruction that path needs: do not draw, and do
+#: not write a body that assumes a picture.
 ASCII_INSTRUCTIONS = r"""\
-DO NOT DRAW ASCII ART. Every scene comes from the curated library, chosen before
-this call; a card whose brief found no library entry simply ships without one.
+DO NOT DRAW ASCII ART, and do not leave room for one.
 
-Leave `ascii_art`, `ascii_label` and `ascii_alt` EMPTY. Anything you draw is
-discarded before the card is saved, so it costs the reader nothing and costs you
-the tokens you spent on it. Spatial coordinates are the one thing a language
-model cannot track, and every attempt has produced skewed columns.
+Every ascii card's scene is chosen from the curated library and composed by the
+server before this call. A card whose brief found no library scene is not an
+ascii card at all -- it was rewritten as a prose brief, and its form line says
+so. So there is no case, ever, in which you draw.
 
-The rest of this section describes the scenes the library holds, so that the
-`body` you write pairs with one -- not so that you draw it.
+Leave `ascii_art`, `ascii_label` and `ascii_alt` EMPTY. Anything you put there
+is discarded before the card is saved: it costs the reader nothing and costs you
+the tokens you spent on it.
 
-Whenever a concept has a physical, spatial, or visual gag that would make it
-stick, draw a small ASCII scene that SHOWS the idea rather than just
-describing it. One or two panels. Reach for one often; skip it only when
-nothing about the idea lends itself to a scene worth a punchline.
+Do NOT reproduce the scene inside `body` either, and do not open `body` by
+referring to a picture -- you have not been shown it. The scene renders once,
+above the card, in both the collapsed and the expanded state. A body that
+describes the art shows the reader the same joke twice, in the weaker order.
 
-There is NO required cast and no required style. A scene may be characters
-reacting, or it may be a labelled checklist, a before/after pair, a timeline
-whose ordering is itself the joke, a chart made of hashes, an object doing
-something absurd, or pure typography. Pick whatever form makes THIS idea
-land. Faces like (o_o) (-_-) (>_<) are available when a reaction is the gag;
-they are one option among many, never an obligation.
-
-SHAPE OF THE FIELD (MANDATORY -- read this before drawing).
-`ascii_art` is ONE JSON string holding a MULTI-LINE drawing. Every line break
-inside it must be written as the two characters backslash-n, because a raw
-newline is not legal inside a JSON string.
-
-- A scene is AT LEAST 3 lines. One line is not a scene, it is a fragment, and
-  it is thrown away -- the card then ships with no art at all.
-- Every line is at most 40 characters, counting leading spaces.
-- Height is free. A label that will not fit beside a figure goes on its own
-  line above or below it. Never shorten a label to save columns.
-- Draw the WHOLE scene in `ascii_art`. Do not put any of it in `body`, and do
-  not stop after the first line.
-
-Correct: "  10kg\n [==|==]\n  (>_<)\n  WEEK 1"
-Wrong:   "  10kg"        <- one line, discarded
-Wrong:   "  ____"        <- a fragment of a drawing that never arrived
-
-SELF-CONTAINED. The scene renders left-aligned in a box directly under the
-title, standing in for the usual one-line hook -- and when the card is
-collapsed in the feed, the scene IS the preview. It has to work as a
-stand-alone thumbnail, so never refer to text the reader cannot see yet.
-
-WORKED EXAMPLES. Seven cards, seven different topics, seven different shapes
-of joke. Study what each one is doing; do not copy them:
-
---- Topic: Gym (Physical Fitness) | Card: Progressive Overload ---
-The gag is the barbell getting bored. Two panels, same weight, different
-week; the punchline is in the captions, not the drawing.
-```
-  10kg           10kg  ...still?
- [==|==]        [==|==]
-  (>_<)          (-_-) zzz
-  WEEK 1         WEEK 40
-"i am growing"  "i am furniture"
-```
-
---- Topic: The Epic of Gilgamesh | Card: The Plant of Immortality ---
-No characters at all -- the gag is a checklist with an unticked last box,
-and a snake leaving the frame with the payoff.
-```
- GILGAMESH'S IMMORTALITY CHECKLIST
- [x] cross the waters of death
- [x] dive down, grab the plant
- [x] set it down, take a quick bath
- [ ] be immortal
-
-   ~~~~~~~~~~~
-   ~  bath   ~     ~~~~> [PLANT]
-   ~~~~~~~~~~~     snake, exiting
-```
-
---- Topic: German (Language) | Card: Verb-Final Subordinate Clauses ---
-Pure typography. The joke is the reader being made to wait for the verb
-exactly as a German sentence makes them wait.
-```
- EN: ...that he ate the cake.
-              ^ verb, on time
-
- DE: ...dass er den Kuchen
-       [ 4 more words of suspense ]
-                    gegessen hat.
-                    ^ verb, finally
-```
-
---- Topic: PostgreSQL | Card: DELETE Does Not Free Disk Space ---
-A code line, then the disk that disagrees with it. The "(boo)" is doing all
-the comedy; the row layout is doing all the teaching.
-```
- DELETE FROM users WHERE id = 7;
-             "gone!"  -- you, wrongly
-
- ON DISK
- [row 5][row 6][row 7][row 8]
-               ^^^^^^
-               dead tuple, (boo),
-               still taking up space
-
- VACUUM;   -- ok NOW it is gone.
-```
-
---- Topic: Financial Literacy & Investing | Card: Loss Asymmetry ---
-Two lines of arithmetic and a rude conclusion. The scene is almost entirely
-numbers, which is the right call when the numbers ARE the surprise.
-```
- $100  -- lose 50% -->  $50
-  $50  -- gain 50% -->  $75
-
-        "we're back!"  <- no
-         $75 =/= $100
-
- climbing out of a 50% hole
- needs a 100% gain. holes are
- rude like that.
-```
-
---- Topic: 10M Air Pistol Shooting | Card: Follow-Through ---
-A timeline where the ordering is the entire punchline. Nothing is drawn
-except two markers at the end.
-```
- trigger breaks ....... 0.0 ms
- you peek at the target  0.5 ms
- pellet leaves barrel .. 3.0 ms
-                         ^^^^^^
- you moved the gun while the
- pellet was still inside it.
-
-   [10] <- aimed      o <- landed
-```
-
---- Topic: How Everyday Things Work | Card: The Microwave Turntable ---
-A tiny data visualisation plus a one-line reframe. The last two lines are
-the card's whole thesis compressed into a joke.
-```
- a microwave makes STANDING waves
- -- the hot spots never move:
-
-   hot  cold  hot  cold  hot
-   ###   ...  ###   ...  ###
-   ###   ...  ###   ...  ###
-
- so the food is moved instead:
-
-     [ dinner ] ------> (spin)
-
- the turntable is not a feature,
- it is an apology.
-```
-
-If you draw one, set:
-- ascii_label: a short slug for it (e.g. "microwave-turntable-apology"),
-  never empty if art is present.
-- ascii_art: the raw art itself, newline-separated, every line <= 40
-  characters. Do NOT wrap it in a fence -- this field holds the drawing
-  only, and stray backticks render as literal backticks on the card.
-  The drawing MUST carry text: labels naming what its parts are, and a line
-  of dialogue or a caption that lands the gag. Wordless art is unreadable to
-  anyone who cannot decode the picture. Height is unlimited, so put a label
-  that will not fit beside a figure on its own line above or below it.
-- ascii_alt: the caption printed under the scene. Say what the drawing is
-  showing and what the joke is, in one plain sentence, so a reader who
-  cannot make sense of the art still gets both. Not a list of shapes: name
-  the thing being depicted and the point it makes.
-
-Do NOT also reproduce the same drawing inside `body`. The scene renders once,
-at the top of the card, in both the collapsed and the expanded state -- a
-second copy in `body` shows up as the same picture twice, and an abbreviated
-second copy shows up as a broken one.
-
-Leave all three empty (ascii_label, ascii_art, ascii_alt) for any card where
-no scene genuinely fits.
+What you write for an ascii card is the same as for any other: a title, a
+summary and a body that stand on their own. The scene is the hook; the body is
+the explanation the reader is quizzed on, and per the hook discipline above, the
+joke belongs in the hook layer and never in `body`.
 """
 
 #: ADR-0066. A drawing that broke the 40-column budget is handed back here to
@@ -514,28 +355,14 @@ CARDS_ASCII_SYSTEM = (
     + r"""
 
 CARD TYPE REQUIREMENT — ASCII SCENE:
-Most cards in this batch have their scene PROVIDED from the curated library \
-(ADR-0080) — their brief says "art: PROVIDED". For those, write ONLY the \
-title, summary, and body, and leave ascii_label / ascii_art / ascii_alt EMPTY: \
-the scene is already chosen and captioned, and anything you draw is discarded.
+EVERY card in this batch has its scene PROVIDED from the curated library \
+(ADR-0104) — every brief says "art: PROVIDED". Write ONLY the title, summary \
+and body, and leave ascii_label / ascii_art / ascii_alt EMPTY. The scene is \
+already chosen, captioned and composed by the server; anything you draw is \
+discarded before the card is saved.
 
-For a card whose brief says "art: draw one" (no library scene fit), draw the \
-scene yourself. The form is yours to choose per card, and the batch must NOT \
-converge on one:
-  * characters reacting, panicking, failing, or acting out the metaphor;
-  * a labelled checklist, a before/after pair, a timeline whose order is the joke;
-  * a tiny chart made of hashes, an object misbehaving, or pure typography.
-  * Faces (`(o_o)`, `(-_-)`, `(>_<)`) are one option among many, never a requirement.
-
-Set all three ASCII fields for a card you drew:
-  * ascii_label: short descriptive slug (e.g. "vacuum-dead-tuple"), NEVER empty.
-  * ascii_art: the raw drawing, with no surrounding fence. It MUST carry
-    text -- labels naming its parts, plus dialogue or a caption. Height is
-    unlimited; a label that will not fit beside a figure goes on its own
-    line above or below it.
-  * ascii_alt: the caption printed under the scene -- what the drawing shows
-    and what the joke is, in one plain sentence, for a reader who cannot make
-    sense of the art.
+You have NOT been shown the drawing, so never write a body that points at it \
+("as the scene above shows", "the panicking cat"). The body stands alone.
 """
 )
 
@@ -734,10 +561,10 @@ do not merge two briefs into one card — the set was planned to cover this \
 subtopic without overlapping, and quietly changing one entry re-opens the \
 duplicate it was written to avoid.
 
-A brief marked "art: PROVIDED" (ADR-0080) already has its ASCII scene chosen and \
+A brief marked "art: PROVIDED" (ADR-0104) already has its ASCII scene chosen and \
 captioned from the curated library — write only the title, summary, and body for \
-that card and leave every ascii field EMPTY. A brief marked "art: draw one" had \
-no library scene fit: draw it yourself per the ASCII rules above.
+that card and leave every ascii field EMPTY. Every ascii brief is marked that \
+way; one with no library scene was rewritten as a prose brief before you saw it.
 
 If a brief names a concept you genuinely cannot write accurately, write the \
 closest thing you can stand behind rather than inventing detail to fill it. A \

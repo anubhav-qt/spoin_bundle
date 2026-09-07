@@ -9876,3 +9876,559 @@ body[data-reduced-motion="1"] *::after {
   font-size: 11px;
   color: var(--fg-3);
 }
+
+/* ── /admin/[topic]/ascii-art — operator review of a topic's ASCII scenes
+   (ADR-0104). Source of truth for the visual design:
+   docs/design/mockups/ascii-art-review/. Shares the `.repairs-*` vocabulary
+   (same page family, same dev-tool register) but keeps its own prefix: the
+   stack, the drag transform and the column ruler have no counterpart there,
+   and folding them into `.repairs-*` would make one of the two pages own
+   rules the other never uses. ───────────────────────────────────────────── */
+
+.aa-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 34px 48px;
+}
+
+.aa-top {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.aa-top h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.aa-spacer {
+  flex-grow: 1;
+}
+
+.aa-devtag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+}
+
+.aa-progress,
+.aa-lede {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+}
+
+.aa-lede {
+  margin: 6px 0 4px;
+  font-size: 12px;
+}
+
+.aa-error {
+  margin: 10px 0;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.aa-rail {
+  display: flex;
+  gap: 3px;
+  margin: 14px 0 22px;
+}
+
+.aa-pip {
+  height: 3px;
+  flex-grow: 1;
+  border-radius: var(--r-cell);
+  background: var(--line);
+  transition: background var(--dur-1) var(--ease);
+}
+
+.aa-pip[data-verdict="kept"] {
+  background: var(--good);
+}
+
+.aa-pip[data-verdict="sent"] {
+  background: var(--accent);
+}
+
+.aa-pip[data-current="true"] {
+  background: var(--fg-3);
+}
+
+.aa-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 292px;
+  gap: 26px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .aa-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aa-stack {
+  position: relative;
+}
+
+.aa-peek {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 240px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+}
+
+.aa-card {
+  position: relative;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  padding: 18px 20px 20px;
+  box-shadow: 0 2px 14px var(--shadow);
+  cursor: grab;
+  transition: transform var(--dur-2) var(--ease);
+}
+
+/* No transition while a pointer owns the card — the tween fights the drag
+   and the card lags the cursor by a frame. */
+.aa-card[data-dragging="true"] {
+  cursor: grabbing;
+  transition: none;
+}
+
+.aa-wash {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-card);
+  pointer-events: none;
+  transition: opacity 0.12s linear;
+}
+
+.aa-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.aa-card-titles {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.aa-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.aa-card-canon {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-3);
+  margin-top: 3px;
+}
+
+.aa-chip {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--fg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.aa-ruler-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 5px;
+}
+
+.aa-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+/* Same font stack and size as `.aa-art`, so a column here lines up with a
+   column of the drawing below it — that alignment is the whole point of
+   printing a ruler rather than a number. */
+.aa-ruler {
+  flex-grow: 1;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 11px;
+  color: var(--fg-3);
+  opacity: 0.4;
+  white-space: pre;
+  overflow: hidden;
+}
+
+.aa-width {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+
+.aa-width[data-over="true"] {
+  color: var(--accent);
+}
+
+.aa-art {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 13px;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre;
+  overflow-x: auto;
+  min-height: 132px;
+  color: var(--fg-2);
+  cursor: text;
+}
+
+.aa-art-source {
+  margin-top: 9px;
+  min-height: 0;
+  border-style: dashed;
+  color: var(--fg-3);
+  cursor: default;
+}
+
+/* An editable surface that LOOKS like the thing it replaces. Same font, size,
+   line-height, padding, border and ground as the read-only render, so the
+   scene never visibly swaps modes -- the reviewer types into the picture
+   rather than into a box that took its place. Only the focus ring changes. */
+.aa-edit {
+  display: block;
+  width: 100%;
+  color: var(--fg-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.aa-edit:focus {
+  border-color: var(--accent-syntax);
+  color: var(--fg);
+}
+
+.aa-art-edit {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre;
+  overflow-x: auto;
+  padding: 11px 13px;
+  tab-size: 2;
+  min-height: 132px;
+}
+
+/* The caption is prose in the card, so its editor is prose too -- invisible
+   until hovered, sized to its content, growing rather than scrolling. */
+.aa-alt-edit {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.45;
+  padding: 3px 7px;
+  border-color: transparent;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+}
+
+.aa-alt-edit:hover {
+  border-color: var(--line);
+}
+
+.aa-eyebrow-alt {
+  padding-top: 6px;
+}
+
+.aa-editrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.aa-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-3);
+}
+
+.aa-meta {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.aa-meta-row {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+}
+
+.aa-alt {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--fg-2);
+}
+
+.aa-src {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--accent-syntax);
+}
+
+.aa-src-title {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-3);
+}
+
+.aa-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.aa-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--fg-2);
+  border-radius: var(--r-pill);
+  padding: 7px 15px;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+
+.aa-btn:hover {
+  border-color: var(--fg-3);
+  color: var(--fg);
+}
+
+.aa-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.aa-btn[data-tone="accept"]:hover:not(:disabled) {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.aa-btn[data-tone="repair"]:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.aa-btn[data-active="true"] {
+  border-color: var(--accent-syntax);
+  color: var(--accent-syntax);
+}
+
+.aa-kbd {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-cell);
+  padding: 1px 5px;
+  color: var(--fg-3);
+}
+
+.aa-kbd[data-tone="accept"] {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.aa-kbd[data-tone="repair"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.aa-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aa-panel {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 11px 13px;
+  background: var(--bg-2);
+}
+
+.aa-side-h {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: 8px;
+}
+
+.aa-side-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.aa-side-row {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--fg-2);
+}
+
+.aa-side-row code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.aa-side-row a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.aa-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.aa-stats > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.aa-stats span:first-child {
+  color: var(--fg-3);
+}
+
+.aa-stats span:last-child {
+  color: var(--fg-2);
+}
+
+.aa-stats [data-tone="accept"] {
+  color: var(--good);
+}
+
+.aa-stats [data-tone="repair"] {
+  color: var(--accent);
+}
+
+.aa-stats-total {
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.aa-next {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.aa-next-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.aa-next-num {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--fg-3);
+}
+
+.aa-next-title {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fg-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aa-done {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  background: var(--bg-2);
+  padding: 42px 30px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.aa-done pre {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--fg-3);
+  margin: 0 0 18px;
+  white-space: pre;
+}
+
+.aa-done-h {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.aa-done-sub {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--fg-3);
+  margin-top: 7px;
+}
+
+.aa-done-actions {
+  display: flex;
+  gap: 9px;
+  justify-content: center;
+  margin-top: 20px;
+}

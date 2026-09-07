@@ -1,0 +1,476 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #c1442b; } a:hover { color: #a83a24; }
+    .aa-root {
+      --bg: #edf0ea; --bg-2: #e2e7de; --bg-3: #d6ddd1;
+      --fg: #262a22; --fg-2: #565f51; --fg-3: #838c7d;
+      --accent: #c1442b; --accent-2: #a83a24; --accent-syntax: #2f6b78;
+      --line: rgba(38, 42, 34, 0.14); --line-strong: rgba(38, 42, 34, 0.26);
+      --good: #4c7a5a; --shadow: rgba(38, 42, 34, 0.18);
+      --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(38,42,34,0.05)' stroke-width='1'/%3E%3C/svg%3E");
+      --font-sans: "Literata", ui-serif, Georgia, "Times New Roman", serif;
+      --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+      --r-card: 14px; --r-pill: 999px; --r-cell: 4px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .aa-root[data-theme="dark"] {
+      --bg: #12141a; --bg-2: #191c24; --bg-3: #22262f;
+      --fg: #e8eaf0; --fg-2: #a8adba; --fg-3: #6e7484;
+      --accent: #7c9eff; --accent-2: #ff9d7c; --accent-syntax: #ff9d7c;
+      --line: rgba(232, 234, 240, 0.12); --line-strong: rgba(232, 234, 240, 0.24);
+      --good: #83d9a3; --shadow: rgba(0, 0, 0, 0.5);
+      --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M22 0H0V22' fill='none' stroke='rgba(232,234,240,0.045)' stroke-width='1'/%3E%3C/svg%3E");
+    }
+    .aa-root {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      background-image: var(--texture);
+      color: var(--fg);
+      min-height: 100%;
+      box-sizing: border-box;
+      padding: 30px 34px 40px;
+    }
+    .aa-root *, .aa-root *::before, .aa-root *::after { box-sizing: border-box; }
+    .aa-stack-wrap { position: relative; }
+    .aa-peek {
+      position: absolute; left: 0; right: 0; top: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-card);
+      background: var(--bg-2);
+      height: 240px;
+    }
+    .aa-live { position: relative; }
+    .aa-art {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 0;
+      color: var(--fg-2);
+    }
+    /* An editable surface that LOOKS like the thing it replaces. Same font,
+       size, line-height, padding, border and ground as the read-only render,
+       so the scene never visibly swaps modes -- the reviewer just types into
+       the picture. The border only warms up on focus. */
+    .aa-edit {
+      display: block;
+      width: 100%;
+      color: var(--fg-2);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      resize: vertical;
+      transition: border-color .15s var(--ease);
+    }
+    .aa-edit:focus {
+      border-color: var(--accent-syntax);
+      color: var(--fg);
+    }
+    .aa-art-edit {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: pre;
+      overflow-x: auto;
+      padding: 11px 13px;
+      tab-size: 2;
+      min-height: 132px;
+    }
+    .aa-alt-edit {
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      line-height: 1.45;
+      padding: 3px 7px;
+      border-color: transparent;
+      background: transparent;
+      resize: none;
+      overflow: hidden;
+    }
+    .aa-alt-edit:hover { border-color: var(--line); }
+    .aa-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.02em;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      color: var(--fg-2);
+      border-radius: var(--r-pill);
+      padding: 7px 15px;
+      cursor: pointer;
+      transition: border-color var(--dur-1, .15s) var(--ease), color .15s var(--ease);
+    }
+    .aa-btn:hover { border-color: var(--fg-3); color: var(--fg); }
+    .aa-btn[data-tone="accept"]:hover { border-color: var(--good); color: var(--good); }
+    .aa-btn[data-tone="repair"]:hover { border-color: var(--accent); color: var(--accent); }
+    .aa-kbd {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-cell);
+      padding: 1px 5px;
+      color: var(--fg-3);
+    }
+  </style>
+</helmet>
+
+<div class="aa-root" data-theme="{{theme}}">
+
+  <!-- ── header ─────────────────────────────────────────────── -->
+  <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--fg)">ascii art review</h1>
+    <span style="font-family: var(--font-mono); font-size: 10px; color: var(--fg-3); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 2px 8px">dev only</span>
+    <span style="flex-grow: 1"></span>
+    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--fg-3)">{{done}} of {{total}} reviewed</span>
+  </div>
+  <p style="margin: 6px 0 4px; font-family: var(--font-mono); font-size: 12px; color: var(--fg-3)">
+    /admin/{{topicSlug}}/ascii-art &nbsp;·&nbsp; library art is copied verbatim; you are editing the composed scene
+  </p>
+
+  <!-- progress rail -->
+  <div style="display: flex; gap: 3px; margin: 14px 0 22px">
+    <sc-for list="{{pips}}" as="pip" hint-placeholder-count="8">
+      <div style="height: 3px; flex-grow: 1; border-radius: var(--r-cell); background: {{pip.fill}}"></div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{hasCard}}" hint-placeholder-val="{{ true }}">
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 292px; gap: 26px; align-items: start">
+
+    <!-- ── the stack ───────────────────────────────────────── -->
+    <div class="aa-stack-wrap">
+      <div class="aa-peek" style="transform: translateY(16px) scale(0.972); opacity: 0.5"></div>
+      <div class="aa-peek" style="transform: translateY(8px) scale(0.986); opacity: 0.75"></div>
+
+      <div class="aa-live"
+           style="border: 1px solid var(--line-strong); border-radius: var(--r-card); background: var(--bg-2); padding: 18px 20px 20px; box-shadow: 0 2px 14px var(--shadow); transform: translateX({{card.dx}}px) rotate({{card.rot}}deg); transition: {{card.tween}}; cursor: {{card.cursor}}"
+           onMouseDown="{{ onGrab }}">
+
+        <!-- verdict wash -->
+        <div style="position: absolute; inset: 0; border-radius: var(--r-card); pointer-events: none; background: {{card.wash}}; opacity: {{card.washOn}}; transition: opacity .12s linear"></div>
+
+        <!-- title block -->
+        <div style="display: flex; align-items: flex-start; gap: 12px">
+          <div style="flex-grow: 1; min-width: 0">
+            <div style="font-size: 17px; font-weight: 600; line-height: 1.3; color: var(--fg)">{{card.title}}</div>
+            <div style="font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-3); margin-top: 3px">{{card.canonical}}</div>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 9.5px; color: var(--fg-3); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px 9px; white-space: nowrap">{{card.difficulty}}</span>
+        </div>
+
+        <!-- 40-column ruler -->
+        <div style="display: flex; align-items: center; gap: 8px; margin: 16px 0 5px">
+          <span style="font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3)">scene</span>
+          <div style="flex-grow: 1; position: relative; height: 11px">
+            <div style="position: absolute; inset: 0; font-family: var(--font-mono); font-size: 12px; line-height: 11px; color: var(--fg-3); opacity: 0.4; white-space: pre; overflow: hidden">{{ruler}}</div>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 9.5px; color: {{card.widthTone}}">{{card.widthNote}}</span>
+        </div>
+
+        <!-- The scene: ALWAYS editable, and styled to be indistinguishable from
+             the rendered art. No edit mode, so nothing swaps out from under the
+             reviewer and the picture never disappears to be edited. -->
+        <textarea class="aa-edit aa-art-edit" rows="{{card.rows}}"
+                  spellcheck="false" value="{{card.art}}"
+                  onChange="{{ onArt }}" onMouseDown="{{ stopDrag }}"></textarea>
+
+        <!-- caption + provenance -->
+        <div style="margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 7px">
+          <div style="display: flex; gap: 9px; align-items: flex-start">
+            <span style="font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); white-space: nowrap; padding-top: 4px">alt</span>
+            <textarea class="aa-edit aa-alt-edit" rows="{{card.altRows}}"
+                      value="{{card.alt}}"
+                      onChange="{{ onAlt }}" onMouseDown="{{ stopDrag }}"></textarea>
+          </div>
+          <div style="display: flex; gap: 9px; align-items: baseline">
+            <span style="font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); white-space: nowrap">src</span>
+            <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--accent-syntax)">{{card.srcId}}</span>
+            <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-3)">{{card.srcTitle}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- actions -->
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 78px">
+        <button class="aa-btn" data-tone="repair" onClick="{{ onReject }}"
+                style="padding: 9px 18px">← send to repairs</button>
+        <span style="flex-grow: 1"></span>
+        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--fg-3)">drag the card, or</span>
+        <span class="aa-kbd">←</span><span class="aa-kbd">→</span><span class="aa-kbd">U</span>
+        <span style="flex-grow: 1"></span>
+        <button class="aa-btn" data-tone="accept" onClick="{{ onAccept }}"
+                style="padding: 9px 18px">keep as new →</button>
+      </div>
+    </div>
+
+    <!-- ── side rail ───────────────────────────────────────── -->
+    <div style="display: flex; flex-direction: column; gap: 14px">
+
+      <div style="border: 1px solid var(--line); border-radius: 9px; padding: 11px 13px; background: var(--bg-2)">
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 8px">what the swipes do</div>
+        <div style="display: flex; flex-direction: column; gap: 9px">
+          <div style="display: flex; gap: 9px; align-items: baseline">
+            <span class="aa-kbd" style="border-color: var(--good); color: var(--good)">→</span>
+            <span style="font-size: 12px; line-height: 1.45; color: var(--fg-2)">Writes the scene and the caption as they now stand back to the card. Both are live — just type in them.</span>
+          </div>
+          <div style="display: flex; gap: 9px; align-items: baseline">
+            <span class="aa-kbd" style="border-color: var(--accent); color: var(--accent)">←</span>
+            <span style="font-size: 12px; line-height: 1.45; color: var(--fg-2)">Hands the card to <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent)">/admin/repairs</span> as an <span style="font-family: var(--font-mono); font-size: 11px">art</span> report.</span>
+          </div>
+          <div style="display: flex; gap: 9px; align-items: baseline">
+            <span class="aa-kbd">U</span>
+            <span style="font-size: 12px; line-height: 1.45; color: var(--fg-2)">Undoes the last decision and puts the card back on top.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); border-radius: 9px; padding: 11px 13px; background: var(--bg-2)">
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 8px">this session</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 11px">
+          <div style="display: flex; justify-content: space-between"><span style="color: var(--fg-3)">kept</span><span style="color: var(--good)">{{kept}}</span></div>
+          <div style="display: flex; justify-content: space-between"><span style="color: var(--fg-3)">to repairs</span><span style="color: var(--accent)">{{sent}}</span></div>
+          <div style="display: flex; justify-content: space-between"><span style="color: var(--fg-3)">edited</span><span style="color: var(--fg-2)">{{edited}}</span></div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px"><span style="color: var(--fg-3)">remaining</span><span style="color: var(--fg-2)">{{remaining}}</span></div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); border-radius: 9px; padding: 11px 13px; background: var(--bg-2)">
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 7px">up next</div>
+        <div style="display: flex; flex-direction: column; gap: 7px">
+          <sc-for list="{{upNext}}" as="n" hint-placeholder-count="3">
+            <div style="display: flex; gap: 8px; align-items: baseline">
+              <span style="font-family: var(--font-mono); font-size: 9.5px; color: var(--fg-3)">{{n.num}}</span>
+              <span style="font-size: 12px; line-height: 1.4; color: var(--fg-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{n.title}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ── done state ─────────────────────────────────────────── -->
+  <sc-if value="{{allDone}}" hint-placeholder-val="{{ false }}">
+    <div style="border: 1px solid var(--line-strong); border-radius: var(--r-card); background: var(--bg-2); padding: 42px 30px; text-align: center; margin-top: 8px">
+      <pre style="font-family: var(--font-mono); font-size: 12px; line-height: 1.35; color: var(--fg-3); margin: 0 0 18px; white-space: pre">      /\_/\
+     ( -.- )   all reviewed.
+      > ^ <</pre>
+      <div style="font-size: 16px; font-weight: 600; color: var(--fg)">Nothing left in this topic</div>
+      <div style="font-family: var(--font-mono); font-size: 11.5px; color: var(--fg-3); margin-top: 7px">{{kept}} kept · {{sent}} sent to repairs · {{edited}} edited</div>
+      <div style="display: flex; gap: 9px; justify-content: center; margin-top: 20px">
+        <button class="aa-btn" onClick="{{ restart }}">review again</button>
+        <button class="aa-btn" data-tone="repair">open /admin/repairs</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{
+  "theme": {"editor": "enum", "options": ["light", "dark"], "default": "light", "section": "Display"}
+}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { i: 0, dx: 0, dragging: false, log: [], arts: {}, alts: {} };
+    this._onKey = this._onKey.bind(this);
+    this._onMove = this._onMove.bind(this);
+    this._onUp = this._onUp.bind(this);
+  }
+
+  deck() {
+    return [
+      { title: 'The Invisible Duplicate', canonical: 'Misconception: Slicing Copies the Underlying Data',
+        difficulty: 'beginner', srcId: '55524d5eaa832c8b', srcTitle: 'Cat peeking over a fence rail',
+        alt: 'A cat peers over a fence at a string it did not actually copy.',
+        art: [
+          '                       /)',
+          '              /\\___/\\ ((',
+          '              \\`@_@\'/  ))',
+          '              {_:Y:.}_//',
+          '   ----------{_}^-\'{_}----------',
+          '',
+          'the cat = your &str slice',
+          'the fence = the original buffer',
+          'it never took a single byte with it'
+        ].join('\n') },
+      { title: 'The Ghost in the Machine', canonical: 'Zero Runtime Overhead of Generics',
+        difficulty: 'beginner', srcId: '83187fc3cd145d28', srcTitle: 'Dumb looking cat',
+        alt: 'A cat that has quietly produced one copy of itself per concrete type.',
+        art: [
+          ' .       .',
+          ' |\\_---_/|',
+          '/   o_o   \\',
+          '|    U    |',
+          '\\  ._I_.  /',
+          ' `-_____-\'',
+          '',
+          'the cat = your generic fn',
+          'the compiler made one per type',
+          'and charged you nothing at runtime'
+        ].join('\n') },
+      { title: 'Decoding the Wall of Red', canonical: 'Compiler Error Interpretation for Generics',
+        difficulty: 'beginner', srcId: 'f53b52445fcd7f1e', srcTitle: 'Uncle looking kitten',
+        alt: 'A kitten squinting at a trait-bound error it is about to understand.',
+        art: [
+          '      /\\_/\\',
+          ' /\\  / o o \\',
+          '//\\\\ \\~(*)~/',
+          '`  \\/   ^ /',
+          '   | \\|| ||',
+          '',
+          'the kitten = you, on line 1 of 200',
+          'the answer is always the same line:',
+          '"the trait ... is not implemented"'
+        ].join('\n') }
+    ];
+  }
+
+  componentDidMount() { document.addEventListener('keydown', this._onKey); }
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this._onKey);
+    this._detach();
+  }
+
+  _onKey(e) {
+    // Never swallow the editor's own undo/redo, and stay out of the textarea.
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); this._decide('kept'); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); this._decide('sent'); }
+    else if (e.key === 'u' || e.key === 'U') { e.preventDefault(); this._undo(); }
+  }
+
+  _artOf(idx) {
+    const d = this.deck();
+    return this.state.arts[idx] !== undefined ? this.state.arts[idx] : (d[idx] ? d[idx].art : '');
+  }
+
+  _altOf(idx) {
+    const d = this.deck();
+    return this.state.alts[idx] !== undefined ? this.state.alts[idx] : (d[idx] ? d[idx].alt : '');
+  }
+
+  _decide(verdict) {
+    const d = this.deck();
+    if (this.state.i >= d.length) return;
+    this.setState({
+      log: this.state.log.concat([{ idx: this.state.i, verdict: verdict }]),
+      i: this.state.i + 1, dx: 0
+    });
+  }
+
+  _undo() {
+    if (!this.state.log.length) return;
+    const log = this.state.log.slice(0, -1);
+    this.setState({ log: log, i: this.state.log[this.state.log.length - 1].idx, dx: 0 });
+  }
+
+  _detach() {
+    document.removeEventListener('mousemove', this._onMove);
+    document.removeEventListener('mouseup', this._onUp);
+  }
+
+  _onMove(e) {
+    if (!this.state.dragging) return;
+    this.setState({ dx: e.clientX - this._x0 });
+  }
+
+  _onUp() {
+    this._detach();
+    const dx = this.state.dx;
+    this.setState({ dragging: false });
+    if (dx > 120) this._decide('kept');
+    else if (dx < -120) this._decide('sent');
+    else this.setState({ dx: 0 });
+  }
+
+  renderVals() {
+    const d = this.deck();
+    const i = this.state.i;
+    const cur = d[i];
+    const dx = this.state.dx;
+    const kept = this.state.log.filter(function (l) { return l.verdict === 'kept'; }).length;
+    const sent = this.state.log.filter(function (l) { return l.verdict === 'sent'; }).length;
+    const self = this;
+
+    const art = cur ? this._artOf(i) : '';
+    const alt = cur ? this._altOf(i) : '';
+    const widest = art ? Math.max.apply(null, art.split('\n').map(function (l) { return l.length; })) : 0;
+    const over = widest > 40;
+    const touched = Object.keys(this.state.arts).length + Object.keys(this.state.alts).length;
+
+    return {
+      theme: this.props.theme || 'light',
+      topicSlug: 'rust',
+      total: d.length,
+      done: this.state.log.length,
+      kept: kept, sent: sent, edited: touched,
+      remaining: d.length - this.state.log.length,
+      hasCard: !!cur,
+      allDone: !cur,
+      ruler: '....|....10...|....20...|....30...|....40',
+      pips: d.map(function (_, n) {
+        const l = self.state.log.find(function (x) { return x.idx === n; });
+        return { fill: !l ? 'var(--line)' : (l.verdict === 'kept' ? 'var(--good)' : 'var(--accent)') };
+      }),
+      upNext: d.slice(i + 1, i + 4).map(function (c, n) {
+        return { num: String(i + n + 2).padStart(2, '0'), title: c.title };
+      }),
+      card: cur ? {
+        title: cur.title, canonical: cur.canonical, difficulty: cur.difficulty,
+        alt: alt, srcId: cur.srcId, srcTitle: cur.srcTitle, art: art,
+        //: The editor grows with its content -- a scene is as tall as it is,
+        //: and a textarea that scrolls internally hides the lines a reviewer
+        //: is here to look at.
+        rows: Math.max(art.split('\n').length, 8),
+        altRows: Math.max(Math.ceil(alt.length / 64), 2),
+        dx: dx, rot: dx * 0.035,
+        tween: this.state.dragging ? 'none' : 'transform .28s var(--ease)',
+        cursor: this.state.dragging ? 'grabbing' : 'grab',
+        wash: dx > 0 ? 'var(--good)' : 'var(--accent)',
+        washOn: Math.min(Math.abs(dx) / 380, 0.16),
+        widthNote: over ? (widest + ' cols — over budget') : (widest + ' / 40 cols'),
+        widthTone: over ? 'var(--accent)' : 'var(--fg-3)'
+      } : {},
+      onGrab: function (e) {
+        self._x0 = e.clientX;
+        self.setState({ dragging: true });
+        document.addEventListener('mousemove', self._onMove);
+        document.addEventListener('mouseup', self._onUp);
+      },
+      // A mousedown inside either editor must not start a drag, or selecting
+      // a run of text throws the card off the stack.
+      stopDrag: function (e) { e.stopPropagation(); },
+      onAccept: function () { self._decide('kept'); },
+      onReject: function () { self._decide('sent'); },
+      onArt: function (e) {
+        const arts = Object.assign({}, self.state.arts);
+        arts[self.state.i] = e.target.value;
+        self.setState({ arts: arts });
+      },
+      onAlt: function (e) {
+        const alts = Object.assign({}, self.state.alts);
+        alts[self.state.i] = e.target.value;
+        self.setState({ alts: alts });
+      },
+      restart: function () { self.setState({ i: 0, log: [], arts: {}, alts: {}, dx: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

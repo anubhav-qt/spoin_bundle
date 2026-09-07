@@ -15,6 +15,13 @@
 
 > **Amended by [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** a scene must now carry text on it — labels naming its parts and a line of dialogue or a caption — because the scene is the hook and wordless art cannot be read. `visual_slots.alt` is now the reader-facing caption printed under the drawing, not screen-reader alt text.
 
+> **Superseded in part by [ADR-0104](0104-the-library-owns-the-drawing.md) (2026-09-07).**
+> The fetch step and its per-topic uniqueness stand. The ADAPTATION step does not:
+> the model no longer returns `ascii_art` at all. It picks a `src_id` and writes
+> `overlay_lines`; the server copies the library drawing byte for byte. The
+> free-draw fallback described below is deleted -- an unmatched brief becomes a
+> prose brief. Reason: 2 of 31 shipped cards matched their library source.
+
 ## Context
 
 Since [ADR-0042](0042-freeform-ascii-and-real-hero-mechanism.md) the writer call

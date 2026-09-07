@@ -17,6 +17,7 @@ from sqlalchemy import text
 
 from spoin.api.middleware import RequestContextMiddleware
 from spoin.api.routers import (
+    admin_ascii,
     admin_repairs,
     ask,
     auth,
@@ -94,6 +95,7 @@ def create_app() -> FastAPI:
     if settings.env != "production":
         app.include_router(dev.router)
         app.include_router(admin_repairs.router)
+        app.include_router(admin_ascii.router)
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, Any]:

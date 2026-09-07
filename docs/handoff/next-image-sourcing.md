@@ -7,6 +7,16 @@
 > [`antigravity-corpus-authoring.md`](antigravity-corpus-authoring.md)** — this document
 > does not restate it. What is here is the run: who does what, which subjects, and the
 > prompt to hand over.
+>
+> **Amended 2026-09-07.** The backfill described below — "fill images for all subjects
+> already in the corpus" — was a one-off catch-up and is not the standing procedure any
+> more. For any topic from here on, images are sourced **after** its curriculum exists and
+> **against the `image_needs` that curriculum declares**
+> ([ADR-0105](../adr/0105-the-photograph-is-chosen-before-the-card.md), and the sequence in
+> [`antigravity-curriculum-authoring.md`](antigravity-curriculum-authoring.md)). The
+> per-subject target counts in the table below are therefore a ceiling to plan capacity
+> against, never a quota to fill: source what the curriculum asked for, and say plainly
+> when a subject cannot supply it.
 
 ## What this is
 

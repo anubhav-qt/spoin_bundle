@@ -6,6 +6,12 @@
 - **Continues:** [ADR-0095](0095-open-licensed-image-catalog.md) (open-licensed image catalog)
 - **Amends:** [ADR-0059](0059-card-planning-pass-and-prompt-versioning.md) (card type quotas), [ADR-0066](0066-redraw-over-budget-ascii-art.md) (regeneration loops)
 
+> **Largely retired by [ADR-0105](0105-the-photograph-is-chosen-before-the-card.md) (2026-09-07).**
+> The planner ceiling existed so a card could not be planned as an image card and
+> then find no image. Reservation makes that unreachable: a brief that cannot claim
+> a photograph becomes a prose brief before the writer sees it. `image_similarity_floor`
+> still applies to the repair flow, and is still uncalibrated -- see task 0042.
+
 ## Context
 
 Astronomy is the first authored curriculum in Spoin: 10 subtopics, 30 subtopic-tiers, 568 cards, of which 76 are planned as `image` cards. ADR-0095 delivered Phase 1 of the image catalog with exactly 76 open-licensed, human-verified images for Astronomy in `the_spoin_universe`.

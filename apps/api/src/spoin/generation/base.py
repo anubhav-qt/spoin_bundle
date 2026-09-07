@@ -23,8 +23,13 @@ from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
+from spoin.content.normalize import humanize_canonical_title, normalize_card_body
 from spoin.domain.enums import CardType, Difficulty, VisualKind
 from spoin.generation.quota import KeyBox
+
+
+def _strip_null_bytes(val: str) -> str:
+    return val.replace("\x00", "")
 
 
 def _sanitize_null_bytes(val: Any) -> Any:
@@ -102,24 +107,116 @@ class CardDraft(BaseModel):
     #: I'm the hero" would just echo back whatever the prompt implied.
     is_hero: bool = False
 
+    @model_validator(mode="after")
+    def _normalize_text(self) -> CardDraft:
+        """Repair transport damage on EVERY draft, on every path into the system.
+
+        A validator rather than a call in the pipeline because there are three
+        producers of a `CardDraft` -- drafting, repair (ADR-0076) and
+        correction -- and a normalizer wired into one of them is a normalizer
+        that two paths silently skip. `spoin.content.normalize` explains what is
+        being repaired and why none of it can be asked for in a prompt.
+
+        Null bytes go too: Postgres rejects `\\x00` in a text column outright, so
+        one reaching the insert takes down a whole batch's transaction.
+        """
+
+        object.__setattr__(self, "body", normalize_card_body(_strip_null_bytes(self.body)))
+        object.__setattr__(
+            self,
+            "canonical_title",
+            humanize_canonical_title(_strip_null_bytes(self.canonical_title)),
+        )
+        object.__setattr__(self, "title", _strip_null_bytes(self.title))
+        object.__setattr__(self, "summary", _strip_null_bytes(self.summary))
+        if self.visual_slots is not None:
+            object.__setattr__(self, "visual_slots", _sanitize_null_bytes(self.visual_slots))
+        return self
+
 
 class FetchedAsciiScene(BaseModel):
-    """The ASCII fetcher's resolved scene for one planned `ascii` card (ADR-0080).
+    """The ASCII fetcher's resolved scene for one planned `ascii` card (ADR-0104).
 
     Rides on `CardPlan` from the fetch sub-step of planning. `src_id` is the
-    curated-library entry the art was adapted from -- recorded on the card at
-    `visual_slots["src_id"]` so it is filtered out of every later candidate
-    search in the same topic. A plan whose fetch came back `no_match` carries no
-    `fetched_scene` at all; that card falls through to the writer's free-draw
-    path (`ASCII_INSTRUCTIONS`). This is a retrieved-and-captioned asset, not
-    model-authored card content -- ADR-0059's "a plan is a brief, not a draft"
-    still holds; the writer is simply told to leave this card's art alone.
+    curated-library entry -- recorded on the card at `visual_slots["src_id"]` so
+    it is filtered out of every later candidate search in the same topic.
+
+    **`art` is copied from the library, never from the model** (ADR-0104,
+    superseding ADR-0080's adaptation step). Of 31 library-sourced cards in the
+    corpus on 2026-09-07, TWO survived the model retyping their art: the rest
+    lost lines, lost the backslashes that ASCII art is drawn out of, or grew a
+    16-line scene into 69. Whitespace-exact art through a JSON string field is
+    transport the model cannot do, and CLAUDE.md's "trusted for taste, never for
+    constraints" says to stop asking -- picking a scene is taste, transcribing
+    340 characters of alignment is a constraint.
+
+    `overlay_lines` is the model's whole contribution to the drawing: labels and
+    the gag line, appended BELOW the art as their own lines, each verified
+    server-side against the column budget. That keeps the "a scene must say
+    something" requirement ADR-0079 added, at a place where a miscount is
+    checkable rather than silently shipped.
     """
 
     src_id: str
     label: str
     art: str
     alt: str
+    #: Composed onto `art` by `compose_scene`, not stored separately -- kept as a
+    #: field so the composition is testable and the admin editor can show what
+    #: the model contributed apart from what the library provided.
+    overlay_lines: list[str] = Field(default_factory=list)
+
+
+class ReservedImage(BaseModel):
+    """A catalog photograph claimed for one planned `image` card (ADR-0105).
+
+    **The retrieval direction is inverted from ADR-0095/0102.** That design drafted
+    the card first and then went looking for a photograph matching its text, which
+    cannot work: the query was ~1,200 characters of abstract explanation, the corpus
+    was 76 photo descriptions, and `image_similarity_floor` was 0.0, so every image
+    card took its top-1 neighbour no matter how bad. Mercury's atmospheric loss got
+    a photograph of Venus; the E0-E7 galaxy classification got a nebula.
+
+    Reserving FIRST and writing the card from the photograph's own description makes
+    relevance true by construction rather than hoped for: the card is about what the
+    picture shows, so there is no gap for a similarity score to fall through. It also
+    removes the failure ADR-0102 papered over with a planner ceiling -- a card can no
+    longer be planned as an image card and then find no image.
+
+    `description` is the retrieval surface the catalog authored (several hundred
+    characters of scene inventory) and is what the writer is briefed with; `title`
+    is the human caption that ships on the card.
+    """
+
+    image_id: str
+    title: str
+    description: str
+    score: float
+    attribution: str
+    display_url: str
+    source_page: str
+    licence: str
+
+    def visual_slots(self) -> dict[str, str]:
+        """Everything the renderer needs, carried on the card.
+
+        `attribution` is a licence CONDITION under CC BY and CC BY-SA, so it travels
+        with the card rather than being fetched at render time -- a renderer that has
+        to go and get it is one that ships without it once. `alt` uses the same key an
+        ASCII scene does, so the renderer captions both visuals through one path
+        instead of learning a second field name. The catalog TITLE is the caption:
+        `description` is the retrieval surface and runs to several hundred characters
+        of scene inventory.
+        """
+
+        return {
+            "title": self.title,
+            "alt": self.title,
+            "attribution": self.attribution,
+            "display_url": self.display_url,
+            "source_page": self.source_page,
+            "licence": self.licence,
+        }
 
 
 class AsciiFetchQuery(BaseModel):
@@ -137,20 +234,23 @@ class AsciiFetchQuery(BaseModel):
 
 
 class AsciiFetchResult(BaseModel):
-    """The fetcher's verdict for one `AsciiFetchQuery` (ADR-0080).
+    """The fetcher's verdict for one `AsciiFetchQuery` (ADR-0104).
 
     `matched=False` -- no candidate represented the card, the rare case -- means
-    `src_id`/`label`/`art`/`alt` are empty and the card free-draws instead.
-    `src_id` MUST be one of the candidate ids the query was shown; a value that
-    isn't is treated as `no_match` by the caller.
+    every other field is empty and the card is rewritten as PROSE rather than
+    free-drawn. `src_id` MUST be one of the candidate ids the query was shown; a
+    value that isn't is treated as `no_match` by the caller.
+
+    Note the field that is absent: **`art`**. The model picks and captions; the
+    art itself is read from the library by `src_id`. See `FetchedAsciiScene`.
     """
 
     index: int
     matched: bool = False
     src_id: str = ""
     label: str = ""
-    art: str = ""
     alt: str = ""
+    overlay_lines: list[str] = Field(default_factory=list)
 
 
 class CardPlan(BaseModel):
@@ -197,9 +297,16 @@ class CardPlan(BaseModel):
     content_direction: str = ""
     #: ADR-0080: the ASCII fetcher's resolved scene, set in the fetch sub-step
     #: of planning for an `ascii` plan the fetcher matched to a curated library
-    #: entry. `None` for every non-ascii plan and for an ascii plan the fetcher
-    #: returned `no_match` -- the writer draws those. See `FetchedAsciiScene`.
+    #: entry. `None` for every non-ascii plan; an ascii plan the fetcher returned
+    #: `no_match` for is rewritten as a prose plan rather than left with `None`
+    #: (ADR-0104). See `FetchedAsciiScene`.
     fetched_scene: FetchedAsciiScene | None = None
+    #: ADR-0105: set by the reservation sub-step of planning for an `image` plan,
+    #: BEFORE the card is written -- the card is then written about this
+    #: photograph. `None` for every non-image plan; an image plan that could not
+    #: reserve one becomes a prose plan, the same way an unmatched ascii plan
+    #: does. See `ReservedImage`.
+    reserved_image: ReservedImage | None = None
 
 
 class TopicMatchCandidate(BaseModel):

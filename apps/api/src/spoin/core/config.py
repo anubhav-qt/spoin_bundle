@@ -55,6 +55,30 @@ class Settings(BaseSettings):
     #: Initial calibration run sets this to 0.0 so all candidate similarity scores
     #: are recorded without rejecting drafts.
     image_similarity_floor: float = 0.0
+    #: Flesch-Kincaid grade ceiling for a card body, the SAME at all three tiers
+    #: (ADR-0104) -- difficulty is what a card covers, never how hard it reads.
+    #:
+    #: **0.0 disables the check, and that is the shipped default, deliberately.**
+    #: Measured against the corpus on 2026-09-07 a ceiling of 12.0 would have
+    #: rejected 80% of it and 11.0 would have rejected 91%, so switching this on
+    #: at a guessed value is not a quality gate, it is ADR-0066's
+    #: reject-and-regenerate-forever loop with a budget attached. The number has
+    #: to come from a real run under the ADR-0104 prompt, not from the corpus
+    #: that the OLD prompt produced.
+    #:
+    #: Calibration is task 0044, and it is a real task rather than a note here
+    #: because `image_similarity_floor` below is what happens otherwise: it was
+    #: also set to 0.0 "for the initial calibration run", the run happened, and
+    #: nobody turned it back on -- which is why every image card in the corpus
+    #: accepted its top-1 match no matter how bad.
+    #:
+    #: Note when calibrating: grade is a poor lone signal, because it folds
+    #: sentence length (a register choice) together with syllables per word
+    #: (partly the subject's own vocabulary). Across the corpus sentence length
+    #: barely moved by tier (18.7 -> 20.1) while syllables per word did the
+    #: climbing (1.66 -> 1.98 within Rust alone). The tier escalation is a
+    #: vocabulary choice, so calibrate per topic, not globally.
+    register_max_grade: float = 0.0
     #: Comma-separated. Deliberately a plain string rather than a list: a list-typed
     #: setting makes pydantic-settings JSON-parse the env var, so a perfectly
     #: ordinary `SPOIN_CORS_ORIGINS=http://localhost:3000` fails to start the app.

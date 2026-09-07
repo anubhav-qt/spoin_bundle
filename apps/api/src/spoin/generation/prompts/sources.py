@@ -65,43 +65,68 @@ When no source material appears below, judge as you otherwise would.
 #:
 #: This is CLAUDE.md's trusted-for-taste-never-for-constraints split, drawn exactly:
 #: precision is a constraint and lives in the corpus, tone is taste and lives here.
+#:
+#: ADR-0104 rewrote this block. It used to tie REGISTER to tier -- advanced asked
+#: for "rigorous, sophisticated, compact domain language" that is "densely packed"
+#: -- and the corpus obeyed: Flesch-Kincaid climbed 11.4 -> 13.3 -> 15.4 across
+#: Rust's tiers while second-person address collapsed 37.8 -> 12.5 -> 4.4 per 1k
+#: words. That is the model doing what it was told. Difficulty and reading level
+#: are now two axes and only the first one moves with the tier.
+#:
+#: The instruction alone is not the fix -- the previous version also said "do not
+#: inherit the source's register" and Astronomy inherited it anyway at every tier
+#: (0.5 second-person per 1k, flat). `spoin.content.readability` is the check that
+#: makes this stick, per CLAUDE.md's "a rule stated only in a doc is a wish".
 TIER_LANGUAGE = """\
 
 READING LEVEL & DIFFICULTY CALIBRATION (MANDATORY):
-The source material in our corpus is written at reference density for every difficulty \
-tier. You MUST pitch the LANGUAGE, VOCABULARY, TONE, and EXPLANATORY DEPTH at the \
-requested tier (beginner, intermediate, or advanced):
 
-1. BEGINNER (`beginner`):
-   - Language: Simple, accessible, plain English. Crystal clear, conversational, and welcoming. \
-NEVER use dense academic jargon or unexplained specialized terms. If a technical term is essential \
-(e.g., "orbit", "gravity", "nebula"), define it immediately with an intuitive explanation.
-   - Framing: Ground every concept in everyday real-world analogies, intuitive visual \
-mental models, and observable phenomena (e.g., comparing planetary orbits to swinging a \
-ball on a string, or light bending to looking through curved glass). Assume zero prior \
+The source material in our corpus is written at reference density for every tier, \
+for accuracy rather than for a reader. Do not inherit its voice.
+
+**THE READING LEVEL IS THE SAME AT ALL THREE TIERS. Only the SUBJECT changes.**
+
+This is the rule most likely to be got wrong, so it is stated first and \
+absolutely: the tier tells you WHICH IDEA to teach. It never tells you to write \
+harder prose. There is no tier at which dense, formal or "sophisticated" \
+language is the assignment. An advanced card about the neutron-star equation of \
+state and a beginner card about why stars twinkle are written in the same plain, \
+direct, welcoming voice, by the same person, for the same curious reader.
+
+THE VOICE, AT EVERY TIER:
+   - Plain, conversational English. Short active sentences, one clear idea each. \
+Past roughly 25 words, split it in two.
+   - **Talk to the reader. Say "you".** "You would expect the core to cool \
+first" beats "one would expect initial core cooling". A card that never says \
+"you" has stopped teaching and started cataloguing.
+   - Every technical term is earned: name it, then say what it means in ordinary \
+words, once, however advanced the card. An expert loses nothing to a clear \
+definition; a reader without it is simply stopped.
+   - Concrete nouns and active verbs. "The star sheds its outer layers", not \
+"envelope ejection occurs". "Astronomers measure", not "measurements are obtained".
+   - Say quantities the way a person says them: "about 8 times the Sun's mass", \
+not raw notation. Use a formula only when the formula is the thing being taught, \
+and then say in words what it means.
+   - Open with something concrete — a puzzle, a consequence, a correction. Never \
+open with a definition or a throat-clearing summary of the field.
+
+WHAT THE TIER ACTUALLY SELECTS — the idea, and nothing else:
+
+1. BEGINNER: foundational concepts, intuitive mental models, observable \
+phenomena, and the everyday analogies that make them stick. Assume no prior \
 background in the subject.
-   - Sentence structure: Short, punchy, active sentences. One clear idea per sentence. \
-Keep the reading experience breezy and effortless.
 
-2. INTERMEDIATE (`intermediate`):
-   - Language: Moderately complex, professional, and precise. Use standard domain \
-terminology comfortably (e.g., hydrostatic equilibrium, escape velocity, Doppler shift, \
-orbital resonance) with concise contextual clarity.
-   - Framing: Focus on underlying mechanisms, cause-and-effect processes, and quantitative \
-relationships (e.g., how mass relates to gravitational pull, inverse-square laws, energy \
-conservation). Explain *how* things work and *why* they happen, not just what they are.
-   - Sentence structure: Structured, informative, connecting physical drivers to observable \
-outcomes.
+2. INTERMEDIATE: the mechanism underneath — cause and effect, what balances what, \
+how the quantity is actually measured. Explain *how* and *why*, not just *what*.
 
-3. ADVANCED (`advanced`):
-   - Language: Rigorous, sophisticated, compact domain language. Assumes strong scientific \
-literacy and fluency with foundational physics and mathematics without needing basic concepts \
-re-explained.
-   - Framing: Focus on boundary conditions, mathematical limits, second-order effects, \
-relativistic or quantum constraints, theoretical tensions, observational nuances, and \
-cutting-edge paradigms.
-   - Sentence structure: Densely packed with precise scientific substance, nuanced \
-tradeoffs, and formal mechanics.
+3. ADVANCED: edge cases, limits, second-order effects, competing explanations, \
+open questions, and where the simple story stops being true. Assume the reader \
+has met the foundations — but still WRITE them plainly, and still define the \
+terms you use.
+
+An advanced card earns its tier by the difficulty of the IDEA it lands, never by \
+the difficulty of the sentences it lands it in. If an advanced card could be made \
+clearer without losing an ounce of its content, it is not yet finished.
 
 Pitch the language, never the facts. Simplifying wording is the job; simplifying a claim \
 until it is no longer true is not, and a beginner card is held to exactly the same standard \

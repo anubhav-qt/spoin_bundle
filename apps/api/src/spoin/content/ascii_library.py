@@ -30,6 +30,7 @@ from __future__ import annotations
 import asyncio
 import math
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
@@ -69,6 +70,75 @@ class AsciiLibraryEntry:
     category: str
     subcategory: str
     art: str
+
+
+#: The phone column budget (ADR-0021). Stated once, here, next to the art it
+#: constrains -- the gate imports it rather than repeating the number.
+ASCII_MAX_WIDTH = 40
+
+
+def compose_scene(art: str, overlay_lines: Sequence[str]) -> str:
+    """Library art, verbatim, with the model's text appended below it (ADR-0104).
+
+    The art is never re-emitted by a model and so is over-budget-proof by
+    construction: every library entry was hand-verified at <= 40 columns, and
+    copying bytes cannot widen them. Only `overlay_lines` can break the budget,
+    which is why they are the only thing measured.
+
+    An overlay line that does not fit is WRAPPED, never dropped and never
+    truncated: it carries the joke for this specific card, and a scene that
+    loses it is a picture with no point. Wrapping at a word boundary keeps it
+    readable; a single word longer than the budget is hard-split because there
+    is nothing else to do with it.
+    """
+
+    kept: list[str] = []
+    for line in overlay_lines:
+        text = line.rstrip()
+        if not text.strip():
+            continue
+        kept.extend(_wrap_overlay(text))
+    if not kept:
+        return art.rstrip("\n")
+    return "\n".join([art.rstrip("\n"), "", *kept])
+
+
+def _wrap_overlay(line: str) -> list[str]:
+    if len(line) <= ASCII_MAX_WIDTH:
+        return [line]
+    out: list[str] = []
+    current = ""
+    for word in line.split(" "):
+        while len(word) > ASCII_MAX_WIDTH:
+            if current:
+                out.append(current)
+                current = ""
+            out.append(word[:ASCII_MAX_WIDTH])
+            word = word[ASCII_MAX_WIDTH:]
+        candidate = f"{current} {word}".strip()
+        if len(candidate) > ASCII_MAX_WIDTH:
+            out.append(current)
+            current = word
+        else:
+            current = candidate
+    if current:
+        out.append(current)
+    return out
+
+
+@lru_cache
+def entry_by_id(src_id: str) -> AsciiLibraryEntry | None:
+    """One library entry by id, or `None` when the id is not in the library.
+
+    `None` is the caller's cue to treat the pick as a no-match -- a model
+    returning an id that was never in its candidate list is the same fact as a
+    refusal, and both end with the card becoming prose.
+    """
+
+    for entry in load_library():
+        if entry.id == src_id:
+            return entry
+    return None
 
 
 @lru_cache

@@ -178,11 +178,23 @@ _DIFFICULTY_AND_REGISTER = """\
 Difficulty is a property of the card, not of the reader: the role of a database index \
 is beginner material, B-tree page-split concurrency is advanced, whoever is reading.
 
-Your grounding material is written dense and precise for accuracy, not for a reader at \
-this tier. **Do not inherit its register.** At beginner, unpack the vocabulary the \
-source takes for granted and earn every term you keep. At intermediate, assume that \
-vocabulary and spend the space on mechanism. At advanced, compress what the source \
-explains and go past where it stops. Precision is the corpus's job; pitch is yours."""
+**Difficulty is WHAT the card covers. It is never how hard the card is to read.** \
+Two axes, and only the first one moves with the tier. A beginner card explains the \
+role of an index; an advanced card explains B-tree page-split concurrency — in the \
+same plain, direct, welcoming voice. Advanced means a harder idea, not denser \
+sentences, not more jargon, not more compression, and never less of the reader. \
+There is no tier at which showing off is the assignment.
+
+So at every tier: short active sentences, "you" rather than "one", every technical \
+term earned where it first appears, concrete nouns over abstractions ("the star \
+sheds its outer layers", not "envelope ejection occurs").
+
+Your grounding material is written dense and precise for accuracy, not for a reader \
+at all. **Do not inherit its register.** This is the most common way a card goes \
+wrong: paraphrasing preserves voice, so a card written close to an academic source \
+comes out sounding like one. Read what the source says, then look away and say it \
+to a curious friend. Precision is the corpus's job; pitch is yours, and pitch does \
+not change between tiers."""
 
 _MERMAID = """\
 Every diagram is Mermaid inside a ```mermaid fence, rendered client-side as an SVG. \
@@ -269,12 +281,21 @@ CARDS_CANON = _preamble(
 
 CARDS_DIAGRAM_CANON = _preamble(CARDS_CANON, _MERMAID)
 
-CARDS_ASCII_CANON = _preamble(CARDS_CANON, _ASCII_GAG, _ASCII_BOX)
+#: ADR-0104 dropped `_ASCII_BOX` from the WRITER's preamble. The box rule is a rule
+#: about drawing, and this call no longer draws: the scene is chosen, composed and
+#: stamped on server-side, and anything the writer emits in an ascii field is
+#: discarded. What it still needs is `_ASCII_GAG` -- not to draw the scene, but to
+#: know what kind of card it is writing the prose for.
+#:
+#: This is also what brought the preamble back under the 1200-token ceiling
+#: `test_canon_preambles` enforces: it was the largest of the nine at ~1326, and
+#: 300 of that was a rule for an operation that no longer happens here.
+CARDS_ASCII_CANON = _preamble(CARDS_CANON, _ASCII_GAG)
 
-#: The fetch call ADAPTS a library scene rather than drawing one, which is exactly the
-#: operation the box rule governs — so it gets `_ASCII_BOX` too. Pinning only the gag
-#: rule here would leave the one call that edits existing artwork without the rule
-#: about editing existing artwork.
+#: The fetch call still gets `_ASCII_BOX`, and is now the ONLY card-side call that
+#: does. It no longer adapts the drawing (ADR-0104), but it writes the overlay lines
+#: composed beneath it, and those are measured against the same 40-column budget --
+#: so the call that produces text for the box still needs the rule about the box.
 ASCII_FETCH_CANON = _preamble(_ASCII_GAG, _ASCII_BOX)
 
 #: The gate. Deliberately the narrowest card-side preamble: verification runs on the

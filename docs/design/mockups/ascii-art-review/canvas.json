@@ -1,0 +1,29 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1180, "h": 900, "title": "ascii-art review (interactive)", "is_interactive": true }
+  ],
+  "annotations": [
+    {
+      "id": "how-to-try",
+      "x": -330,
+      "y": 0,
+      "w": 250,
+      "text": "This one is live — try it.\n\nDrag the card sideways, or use\n← → to decide, E to edit the art,\nU to undo.\n\nThe art shown is real: three entries\nlifted from use_for_gags.txt with\noverlay lines composed under them,\nwhich is exactly what ADR-0104\nships."
+    },
+    {
+      "id": "why-editable",
+      "x": -330,
+      "y": 300,
+      "w": 250,
+      "text": "The 40-column readout is live off\nthe textarea, and it FLAGS rather\nthan cuts — a line that runs long\nis the operator's call, not the\npage's.\n\nThe drawing itself can now only be\nwrong because a human made it\nwrong; the model can no longer\ntouch it."
+    },
+    {
+      "id": "left-swipe",
+      "x": -330,
+      "y": 585,
+      "w": 250,
+      "text": "Swipe left files an `art` report\nagainst the card, which is the\nreason type /admin/repairs already\nhas. So this page adds a queue,\nnot a second repair system."
+    }
+  ],
+  "launch": { "view": "focused", "file": "Main.dc.html" }
+}

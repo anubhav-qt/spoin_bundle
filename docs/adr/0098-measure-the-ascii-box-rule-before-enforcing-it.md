@@ -6,6 +6,13 @@
 
 > **See also [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (2026-09-05):** it applies this ADR's measure-first posture to the neighbouring question of text ON the art, and adds to `_ASCII_BOX` the one fact the box rule never stated — that height is unbounded, so a caption that will not fit beside a figure moves to its own line instead of being cut.
 
+> **Answered by [ADR-0104](0104-the-library-owns-the-drawing.md) (2026-09-07).**
+> The byte diff this ADR asked for was taken across all 31 library-sourced cards:
+> 2 intact, 11 having lost backslashes, one 14-line scene shipped as 1 line and one
+> 4-line scene as 89. The box rule itself was never violated (0 of 45 cards over 40
+> columns), so what changed was not an enforcement mechanism at all -- the model
+> stopped emitting art.
+
 ## Context
 
 `ASCII_INSTRUCTIONS` rule 3 (BOX INTEGRITY, STRICT) says the art is a rigid box:

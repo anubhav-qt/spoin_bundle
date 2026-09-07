@@ -18,6 +18,8 @@ from __future__ import annotations
 import re
 
 from spoin.content.archetype import classify_archetype
+from spoin.content.readability import flesch_kincaid_grade
+from spoin.core.config import get_settings
 from spoin.domain.enums import VisualKind
 from spoin.generation.base import CardDraft
 from spoin.generation.pipeline.state import is_technical_topic
@@ -77,6 +79,28 @@ def passes_minimal_gate(
     prose_body = re.sub(r"```[\s\S]*?```", "", draft.body).strip()
     if len(prose_body) > 1200:
         return False, f"body is a text wall ({len(prose_body)} prose chars > 1200 max)"
+
+    #: Register discipline (ADR-0104). The SAME ceiling at all three tiers, because
+    #: difficulty is what a card covers and never how hard it reads. Rejected here
+    #: rather than merely asked for in the prompt: the canon has told the writer not
+    #: to inherit its grounding material's register for as long as grounding has
+    #: existed, and Astronomy's cards came out at college register at every tier
+    #: anyway. A prompt rule with no check is a wish (CLAUDE.md).
+    #:
+    #: The reason lands in `rejection_feedback` and is shown to the next attempt, so
+    #: this is a correcting signal rather than a wall.
+    #: `<= 0` means "not calibrated yet" and skips the check entirely -- see the
+    #: setting's own comment for why shipping a guessed ceiling is worse than
+    #: shipping none.
+    ceiling = get_settings().register_max_grade
+    grade = flesch_kincaid_grade(draft.body) if ceiling > 0 else None
+    if grade is not None and grade > ceiling:
+        return (
+            False,
+            f"reads at grade {grade:.1f}, above the grade {ceiling:.1f} ceiling that applies "
+            f"at every tier -- shorter sentences, plainer words, address the reader as "
+            f"'you'; an advanced idea is still written plainly",
+        )
 
     # Non-technical topic rule: code blocks are strictly forbidden (code: 0)
     if topic_name is not None and not is_technical_topic(topic_name):

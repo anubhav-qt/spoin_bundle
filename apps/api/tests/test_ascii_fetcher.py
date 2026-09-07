@@ -83,15 +83,22 @@ def _ascii_plan(fetched: FetchedAsciiScene | None) -> CardPlan:
     )
 
 
-def test_format_plans_marks_provided_vs_draw() -> None:
+def test_format_plans_marks_every_ascii_brief_as_provided() -> None:
+    """ADR-0104: there is no "draw one" disposition any more.
+
+    An ascii brief the fetcher could not match is rewritten as a PROSE brief by
+    `_fetch_ascii_for_plans` before this renders, so a writer is never asked for
+    ASCII art on any path. The old assertion here was that a scene-less ascii
+    plan said "art: draw one"; that branch is gone, and its absence is the
+    behaviour worth pinning.
+    """
+
     provided = _format_plans(
         [_ascii_plan(FetchedAsciiScene(src_id="art_1", label="l", art="  o", alt="a"))]
     )
     assert "art: PROVIDED" in provided
     assert "leave ascii_label / ascii_art / ascii_alt EMPTY" in provided
-
-    free = _format_plans([_ascii_plan(None)])
-    assert "art: draw one" in free
+    assert "draw one" not in provided
 
 
 def test_finalize_ascii_fields_carries_src_id() -> None:

@@ -528,11 +528,28 @@ shooter's stance, a photograph is the densest thing that could occupy that space
 already making the expensive judgment — *does this picture actually illustrate this idea* —
 while you research, and currently throwing it away.
 
-**The generation model is never told images exist.** It emits no image reference at any
-point. A photograph reaches a card by retrieval against your `description`, server-side,
-after the card is drafted. That is the fact every rule below inherits: your description is
-the only thing standing between a card and a confidently irrelevant picture, and there is
-no later human step that catches a bad one.
+**The generation model is never told to choose an image.** It emits no image reference at
+any point.
+
+**Amended 2026-09-07 ([ADR-0105](../adr/0105-the-photograph-is-chosen-before-the-card.md)):**
+a photograph no longer reaches a card by retrieval *after* the card is drafted. It is
+**reserved for a subtopic before the card is written**, and your `description` is handed to
+the writer as the brief — the card is written about the picture. Two things follow, and they
+change how you write a manifest:
+
+- **Your `description` is now read by a model that is writing a card from it**, not only
+  matched against. It has to say what is actually in the frame, in enough detail to teach
+  from: what is shown, what is notable about it, what a viewer should look at. A description
+  that reads like a search keyword produces a card written from a search keyword.
+- **Sourcing now runs AFTER the curriculum**, against the `image_needs` it declares
+  (see [`antigravity-curriculum-authoring.md`](antigravity-curriculum-authoring.md)). You are
+  no longer guessing what a topic might want; you are filling a list. Astronomy was sourced
+  the old way and produced 76 photographs of which roughly one in seven landed on a card it
+  belonged to — not because the pictures were bad, but because nobody had yet decided what
+  the topic would teach.
+
+What has NOT changed: there is still no later human step that catches a picture that does
+not illustrate what it claims to. The judgement is yours, at sourcing time.
 
 ### Layout
 

@@ -10,6 +10,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $scriptPath = Join-Path $PSScriptRoot "backup_to_neon.ps1"
+$vbsPath = Join-Path $PSScriptRoot "run_backup_silent.vbs"
 
 if ($Unregister) {
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
@@ -18,8 +19,8 @@ if ($Unregister) {
 }
 
 $action = New-ScheduledTaskAction `
-    -Execute "powershell.exe" `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Quiet" `
+    -Execute "wscript.exe" `
+    -Argument "`"$vbsPath`"" `
     -WorkingDirectory $repoRoot
 
 # One-time trigger (starting now) repeating every $IntervalHours, indefinitely -- no idle

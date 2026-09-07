@@ -78,7 +78,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
-from spoin.content.ascii_library import AsciiLibraryEntry, top_candidates
+from spoin.content.ascii_library import AsciiLibraryEntry, entry_by_id, top_candidates
+from spoin.content.normalize import normalize_card_body
 from spoin.core.config import Settings
 from spoin.domain.enums import CardType, Difficulty, VisualKind
 from spoin.generation import prompts
@@ -421,8 +422,11 @@ class _WireAsciiFetch(_LenientWireModel):
     matched: bool = False
     src_id: str = ""
     ascii_label: str = ""
-    ascii_art: str = ""
     ascii_alt: str = ""
+    #: ADR-0104: the model's ONLY contribution to the drawing. `ascii_art` is
+    #: deliberately gone from this schema -- a field the model cannot fill
+    #: correctly is a field it must not be offered.
+    overlay_lines: list[str] = Field(default_factory=list)
 
 
 class _WireAsciiFetchBatch(BaseModel):
@@ -592,10 +596,10 @@ def _format_plans(plans: list[CardPlan]) -> str:
     unplanned (the hero call, or a planning failure) so `CARDS_USER` renders
     exactly as it did before the planning stage existed.
 
-    ADR-0080: an `ascii` brief carries its art disposition -- "PROVIDED" when the
-    fetcher matched it to a curated-library scene (the writer leaves the ascii
-    fields empty; the pipeline attaches the scene after this call), or "draw
-    one" when no scene fit (the writer free-draws per ASCII_INSTRUCTIONS)."""
+    ADR-0104: an `ascii` brief ALWAYS has its scene already chosen -- the fetch
+    step rewrites an unmatched brief as prose before this renders, so there is
+    no "draw one" disposition any more and no path by which a writer produces
+    ASCII art."""
 
     if not plans:
         return ""
@@ -617,8 +621,22 @@ def _format_plans(plans: list[CardPlan]) -> str:
             lines.append(
                 "art: PROVIDED — a curated scene is already chosen and captioned for "
                 "this card; leave ascii_label / ascii_art / ascii_alt EMPTY"
-                if plan.fetched_scene is not None
-                else "art: draw one — no library scene fit; draw a gag per the ASCII rules"
+            )
+        #: ADR-0105: the photograph is chosen BEFORE the card, so the brief carries
+        #: what it shows and the card is written about that. This is the whole
+        #: mechanism -- a card written from this description cannot be irrelevant to
+        #: the picture beside it, which is what the post-hoc matching could not
+        #: guarantee.
+        if plan.reserved_image is not None:
+            lines.append(
+                "photograph (ALREADY CHOSEN — this card runs beside it): "
+                f"{plan.reserved_image.title}. {plan.reserved_image.description}"
+            )
+            lines.append(
+                "Teach the concept this photograph actually shows, and make the card "
+                "worth reading next to it. Do NOT describe the photograph, do not say "
+                "'pictured above', and do not mention that an image exists — the reader "
+                "can see it. Leave every ascii field EMPTY."
             )
         blocks.append("\n".join(lines))
     return (
@@ -1758,11 +1776,16 @@ class GeminiContentGenerator(ContentGenerator):
                 if picked is None or not picked.matched or picked.src_id not in allowed_ids:
                     items.append(AsciiFetchResult(index=q.index, matched=False))
                     continue
-                art = _strip_ascii_fence_wrapper(picked.ascii_art)
-                if not art.strip():
+                #: ADR-0104: the pick is resolved against the library HERE, so a
+                #: `src_id` that survived the allow-list check but has since been
+                #: removed from the library still cannot produce a card with no
+                #: art. There is nothing to validate about the drawing itself --
+                #: it was hand-verified when it was curated and is copied byte
+                #: for byte.
+                if entry_by_id(picked.src_id) is None:
                     items.append(AsciiFetchResult(index=q.index, matched=False))
                     failures.append(
-                        f"card {q.index}: picked {picked.src_id} but returned empty art"
+                        f"card {q.index}: src_id {picked.src_id!r} is not in the library"
                     )
                     continue
                 items.append(
@@ -1771,8 +1794,10 @@ class GeminiContentGenerator(ContentGenerator):
                         matched=True,
                         src_id=picked.src_id,
                         label=picked.ascii_label,
-                        art=art,
                         alt=picked.ascii_alt,
+                        overlay_lines=[
+                            line for line in picked.overlay_lines if line and line.strip()
+                        ],
                     )
                 )
         return BatchResult(items=items, failures=failures)
@@ -1950,7 +1975,14 @@ class GeminiContentGenerator(ContentGenerator):
             plan = plans[i] if plans is not None and i < len(plans) else None
             fetched = plan.fetched_scene if plan is not None else None
 
-            body = wire_card.body
+            #: Normalized BEFORE the mermaid check, not after (`CardDraft`'s own
+            #: validator would be too late). Most of what that check calls a
+            #: malformed diagram is transport damage the normalizer repairs --
+            #: a four-backtick fence, a `graph TD` stranded in the info string,
+            #: an unquoted paren in a label. Checking first would reject a card
+            #: for a defect that no longer exists by the time it is stored, and
+            #: bill a regeneration for it.
+            body = normalize_card_body(wire_card.body)
 
             # Any ```mermaid fence in the body is a genuine content defect if
             # it fails the structural check, not a call failure -- the model
@@ -2008,6 +2040,17 @@ class GeminiContentGenerator(ContentGenerator):
                         body = _strip_duplicate_scene_from_body(body, wire_card.ascii_art)
                     visual_id, visual_slots = None, None
                 visual_kind = VisualKind.ASCII if visual_id is not None else None
+
+                #: ADR-0105: the photograph was reserved before this card was
+                #: written, so it is stamped on here rather than searched for
+                #: afterwards. Checked after the ascii branch because a plan is
+                #: one type or the other and never both -- an image plan carries
+                #: no `fetched_scene`, so nothing it sets is overwritten.
+                reserved = plan.reserved_image if plan is not None else None
+                if reserved is not None:
+                    visual_id = reserved.image_id
+                    visual_kind = VisualKind.IMAGE
+                    visual_slots = reserved.visual_slots()
                 items.append(
                     CardDraft(
                         title=wire_card.title,

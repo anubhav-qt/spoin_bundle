@@ -22,6 +22,7 @@ from sqlalchemy import func, select
 from sqlalchemy import update as sa_update
 
 from spoin.content.archetype import classify_archetype
+from spoin.content.ascii_library import compose_scene, entry_by_id
 from spoin.content.difficulty_examples import get_difficulty_examples
 from spoin.core.db import universe_session_scope
 from spoin.domain.enums import (
@@ -46,8 +47,10 @@ from spoin.generation.gate import passes_minimal_gate
 from spoin.generation.grounding import CardGrounding, GroundingContext
 from spoin.generation.images import (
     ImageAssignmentReport,
+    ImageReservationReport,
     assign_images,
     count_available_images,
+    reserve_images_for_plans,
     topic_used_image_ids,
 )
 from spoin.generation.load_balancer import estimate_tokens, pack_by_tokens
@@ -293,8 +296,11 @@ async def _fetch_ascii_for_plans(
     """ADR-0080: the fetch sub-step of planning. For each `ascii` brief in
     `plan_pool`, pick a curated-library scene and attach it
     (`CardPlan.fetched_scene`), so the writer leaves that card's art alone and
-    the pipeline stamps the fetched scene on the draft. A brief the fetcher
-    can't match keeps `fetched_scene=None` and free-draws.
+    the pipeline stamps the fetched scene on the draft.
+
+    ADR-0104: the scene's art is copied from the library rather than returned by
+    the model, and a brief the fetcher can't match is REWRITTEN AS PROSE rather
+    than free-drawn -- see the downgrade at the end of this function.
 
     Never fails the tier: a fetch error or empty result just means every ascii
     card free-draws, exactly the pre-ADR-0080 path. `QuotaExhaustedError`
@@ -374,14 +380,41 @@ async def _fetch_ascii_for_plans(
                     item.src_id,
                 )
                 continue
+            #: ADR-0104: the art is READ FROM THE LIBRARY here, byte for byte,
+            #: and composed with the model's overlay lines. This is the line
+            #: that makes "the art always renders" true by construction rather
+            #: than by the model having been careful.
+            entry = entry_by_id(item.src_id)
+            if entry is None:
+                continue
             ascii_plans[item.index].fetched_scene = FetchedAsciiScene(
                 src_id=item.src_id,
                 label=item.label,
-                art=item.art,
+                art=compose_scene(entry.art, item.overlay_lines),
                 alt=item.alt,
+                overlay_lines=list(item.overlay_lines),
             )
             topic_used.add(item.src_id)
             matched += 1
+
+    #: ADR-0104: an ascii brief with no library scene becomes a PROSE brief.
+    #:
+    #: It used to free-draw, and free-drawn art was the worst content in the
+    #: corpus -- 14 of 45 ascii cards on 2026-09-07, including a "wizard" that
+    #: was five rows of unaligned brackets over a caption describing a scene
+    #: nobody could see. With 853 curated entries and top-10 retrieval a genuine
+    #: no-match means this concept has no scene worth drawing, which is a reason
+    #: to write prose, not a reason to draw badly.
+    unmatched = [p for p in ascii_plans if p.fetched_scene is None]
+    for plan in unmatched:
+        plan.card_type = CardType.PROSE.value
+    if unmatched:
+        logger.info(
+            "subtopic '%s' [%s]: %d ascii brief(s) matched no library scene -- rewritten as prose",
+            subtopic_title,
+            difficulty.value,
+            len(unmatched),
+        )
 
     logger.info(
         "subtopic '%s' [%s]: ascii fetch -- %d/%d card(s) matched a curated scene",
@@ -456,6 +489,68 @@ async def _assign_images(
         [round(s, 3) for s in report.scores],
     )
     return report
+
+
+async def _reserve_images_for_plans(
+    runtime: _Runtime,
+    *,
+    topic_name: str,
+    tier: SubtopicPlan,
+    difficulty: Difficulty,
+    plan_pool: list[CardPlan],
+) -> None:
+    """ADR-0105: claim a photograph for each `image` brief before writing.
+
+    Never fails the tier: an unreachable catalog, or one with nothing left in
+    scope, just means those briefs become prose briefs -- exactly what an
+    unmatched ascii brief does, and for the same reason. An image card with no
+    image is the card that gets rejected and regenerated forever (ADR-0066).
+    """
+
+    image_plans = [p for p in plan_pool if p.card_type.strip().lower() == CardType.IMAGE.value]
+    if not image_plans:
+        return
+
+    categories = _resolve_image_categories(topic_name, tier)
+    try:
+        async with runtime.session_lock:
+            report = await reserve_images_for_plans(
+                universe_session_scope,
+                runtime.embedder,
+                topic_id=uuid.UUID(tier["topic_id"]),
+                subtopic_title=tier["title"],
+                subtopic_description=tier.get("description", "") or "",
+                categories=categories,
+                plans=image_plans,
+                db_session=runtime.session,
+            )
+    except QuotaExhaustedError:
+        raise
+    except Exception as exc:
+        logger.warning(
+            "subtopic '%s' [%s]: image reservation raised (%s) -- %d image brief(s) become prose",
+            tier["title"],
+            difficulty.value,
+            exc,
+            len(image_plans),
+        )
+        report = ImageReservationReport(unavailable=len(image_plans))
+
+    unreserved = [p for p in image_plans if p.reserved_image is None]
+    for plan in unreserved:
+        plan.card_type = CardType.PROSE.value
+
+    logger.info(
+        "subtopic '%s' [%s]: image reservation -- reserved=%d, no_candidate=%d, "
+        "unavailable=%d, rewritten_as_prose=%d, scores=%s",
+        tier["title"],
+        difficulty.value,
+        report.reserved,
+        report.no_candidate,
+        report.unavailable,
+        len(unreserved),
+        [round(s, 3) for s in report.scores],
+    )
 
 
 def _take_plans(pool: list[CardPlan], card_type: str | None, count: int) -> list[CardPlan]:
@@ -876,14 +971,27 @@ async def _generate_subtopic_cards(runtime: _Runtime, job: SubtopicGroupPlan) ->
             grounding=tier_grounding.block,
         )
 
-        # ADR-0080: pick a curated-library scene for each ascii brief before any
-        # writing. Mutates plan_pool in place (sets `fetched_scene`); a brief it
-        # can't match stays None and free-draws.
+        # ADR-0080/0104: pick a curated-library scene for each ascii brief before
+        # any writing. Mutates plan_pool in place (sets `fetched_scene`); a brief
+        # it can't match is rewritten as a prose brief.
         await _fetch_ascii_for_plans(
             runtime,
             topic_id=tier["topic_id"],
             topic_name=job["topic_name"],
             subtopic_title=tier["title"],
+            difficulty=difficulty,
+            plan_pool=plan_pool,
+        )
+
+        # ADR-0105: claim a photograph for each image brief before any writing,
+        # so the card is written ABOUT the picture instead of the picture being
+        # hunted for after the card exists. Same shape as the ascii fetch above,
+        # and for the same reason -- both make the asset's relevance true by
+        # construction rather than by a similarity score being lucky.
+        await _reserve_images_for_plans(
+            runtime,
+            topic_name=job["topic_name"],
+            tier=tier,
             difficulty=difficulty,
             plan_pool=plan_pool,
         )

@@ -14,6 +14,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import AsyncIterator
 
+from spoin.content.ascii_library import load_library
 from spoin.domain.enums import CardType, Difficulty, VisualKind
 from spoin.generation.base import (
     AsciiFetchQuery,
@@ -171,26 +172,37 @@ class FakeContentGenerator(ContentGenerator):
         difficulty: Difficulty,
         exclude_ids: frozenset[str],
     ) -> BatchResult[AsciiFetchResult]:
-        """Deterministic stand-in (ADR-0080): "matches" every query to a stable
-        fake library id and hands back a tiny captioned scene, so the planned-
-        ascii path (fetcher owns the art) is what tests exercise by default.
-        Honours `exclude_ids` so a test can assert per-topic non-repetition --
-        an id already used yields `no_match` for that query instead."""
+        """Deterministic stand-in (ADR-0080, ADR-0104): "matches" every query to a
+        stable library id and hands back overlay lines, so the planned-ascii path
+        is what tests exercise by default. Honours `exclude_ids` so a test can
+        assert per-topic non-repetition -- an id already used yields `no_match`
+        for that query instead.
 
+        Returns a REAL library id rather than a made-up one, because the caller
+        now resolves the id against the library to get the art (ADR-0104) and a
+        `fake-lib-N` would resolve to nothing and look like a total no-match."""
+
+        library = load_library()
         items: list[AsciiFetchResult] = []
         for q in queries:
-            src_id = f"fake-lib-{_stable_index(q.canonical_title, modulo=997)}"
-            if src_id in exclude_ids:
+            if not library:
+                items.append(AsciiFetchResult(index=q.index, matched=False))
+                continue
+            entry = library[_stable_index(q.canonical_title, modulo=len(library))]
+            if entry.id in exclude_ids:
                 items.append(AsciiFetchResult(index=q.index, matched=False))
                 continue
             items.append(
                 AsciiFetchResult(
                     index=q.index,
                     matched=True,
-                    src_id=src_id,
+                    src_id=entry.id,
                     label=f"fake-scene-{q.index}",
-                    art=f'  o    "{q.asset_direction[:24] or "gag"}"\n /|\\\n / \\',
                     alt=f"Stick figure acting out: {q.canonical_title}",
+                    overlay_lines=[
+                        f"the figure = {q.asset_direction[:24] or 'the gag'}",
+                        f"caption for {q.canonical_title[:20]}",
+                    ],
                 )
             )
         return BatchResult(items=items)

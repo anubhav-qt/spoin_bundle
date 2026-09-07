@@ -25,6 +25,22 @@ const ONBOARDING_PATH = "/onboarding";
 //: point, not just after finishing the topic picker.
 const REDIRECT_EXEMPT_PATHS = new Set(["/claim"]);
 
+//: The operator pages (`/admin/repairs`, `/admin/[topic]/ascii-art`) sit outside
+//: the learner flow entirely -- they are dev-only surfaces reached by typing a
+//: URL, and an operator has no reason to have finished the topic picker. Without
+//: this they bounce to onboarding and are simply unreachable on a fresh session,
+//: which is what `/admin/repairs` has quietly been doing.
+//:
+//: A prefix rather than a Set entry because `/admin/[topic]/ascii-art` has no
+//: fixed path to enumerate. Auth itself is unaffected -- an unauthenticated
+//: visitor still gets sent to /signup above; this exempts the ONBOARDING
+//: redirect only.
+const ADMIN_PATH_PREFIX = "/admin/";
+
+function isRedirectExempt(pathname: string): boolean {
+  return REDIRECT_EXEMPT_PATHS.has(pathname) || pathname.startsWith(ADMIN_PATH_PREFIX);
+}
+
 interface AuthContextValue {
   user: User | null;
   /** Re-fetches `/auth/me` AND re-runs the route gate — call after
@@ -93,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const me = await api.me();
       setUser(me);
-      const exempt = REDIRECT_EXEMPT_PATHS.has(pathname);
+      const exempt = isRedirectExempt(pathname);
       if (!me.onboarding_complete && pathname !== ONBOARDING_PATH && !exempt) {
         router.replace(ONBOARDING_PATH);
         return;

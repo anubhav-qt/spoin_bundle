@@ -10,6 +10,12 @@
   [ADR-0066](0066-redraw-over-budget-ascii-art.md) (a bad visual rejects its card)
 - **Implemented by:** [task 0040](../tasks/0040-open-licensed-image-catalog.md)
 
+> **Retrieval direction inverted by [ADR-0105](0105-the-photograph-is-chosen-before-the-card.md) (2026-09-07).**
+> The catalog, the licence rules and attribution-on-the-card all stand. Assignment
+> AFTER drafting does not: the photograph is now reserved before the card is written
+> and its description briefs the writer. `assign_images` survives only for the repair
+> flow. Reason: post-hoc top-1 matching gave a Venus photo to a card about Mercury.
+
 ## Context
 
 The visual layer of a card is currently ASCII art and mermaid diagrams. ASCII is

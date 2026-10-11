@@ -1,0 +1,47 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": [
+      "apps/server/**",
+      "packages/shared/**",
+      "packages/frog/**",
+      "packages/pi-ai/**",
+      "packages/pi-agent/**",
+      "!**/drizzle/meta",
+      "!**/dist",
+      "!**/package-lock.json"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "style": {
+        "noNestedTernary": "error",
+        "noNonNullAssertion": "error",
+        "useConst": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/pi-ai/**", "packages/pi-agent/**"],
+      "formatter": { "enabled": false },
+      "linter": { "enabled": false }
+    }
+  ]
+}

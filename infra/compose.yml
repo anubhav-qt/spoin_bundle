@@ -1,0 +1,60 @@
+# The Hono stack (ADR-0106). Its OWN project and its OWN volume: nothing here can reach
+# the old `spoin` project's `db-data`, which holds spoin_db_2. Host ports are offset
+# (5434, 8001) so both stacks can run side by side.
+#
+#   npm run stack        build and start
+#   npm run stack:down   stop (the volume is kept)
+#
+# Never `docker compose down -v` here either: it is cheap today, it won't be once the
+# tadpoles have written a universe into it.
+name: spoin-hono
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.1-pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: spoin
+      POSTGRES_PASSWORD: spoin
+      POSTGRES_DB: spoin
+    ports:
+      - "5434:5432"
+    volumes:
+      - hono-db:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/10-universe.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spoin -d spoin"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: { context: .., dockerfile: apps/server/Dockerfile }
+    command: ["node", "--enable-source-maps", "dist/migrate.js"]
+    environment: &server-env
+      NODE_ENV: development
+      DATABASE_URL: postgres://spoin:spoin@db:5432/spoin
+      UNIVERSE_DATABASE_URL: postgres://spoin:spoin@db:5432/the_spoin_universe
+      AUTH_SECRET: spoin-local-development-secret-change-me
+      ALLOWED_ORIGINS: http://localhost:3000
+      PUBLIC_URL: http://localhost:8001
+      EMBEDDER: ${EMBEDDER:-hash}
+      MODEL_CACHE_DIR: /models
+      DEV_ROUTES: "true"
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: { context: .., dockerfile: apps/server/Dockerfile }
+    restart: unless-stopped
+    environment: *server-env
+    ports:
+      - "8001:8000"
+    volumes:
+      - hono-models:/models
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+volumes:
+  hono-db:
+  hono-models:

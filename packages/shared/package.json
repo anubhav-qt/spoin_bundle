@@ -1,0 +1,18 @@
+{
+  "name": "@spoin/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The wire contract: zod schemas and the domain enums every client and the server share",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./enums": "./src/enums.ts",
+    "./api": "./src/api.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}

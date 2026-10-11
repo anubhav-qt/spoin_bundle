@@ -1,0 +1,36 @@
+{
+  "name": "@spoin/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The single source of truth for every client: the Hono API, the worker and the migrator, one image",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=../../infra/dev.env src/api.ts",
+    "migrate": "tsx --env-file=../../infra/dev.env src/migrate.ts",
+    "build": "node build.mjs",
+    "db:generate": "drizzle-kit generate",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.4",
+    "@hono/swagger-ui": "0.6.1",
+    "@hono/zod-openapi": "1.6.3",
+    "@spoin/frog": "0.1.0",
+    "@spoin/shared": "0.1.0",
+    "better-auth": "1.7.7",
+    "drizzle-orm": "0.45.4",
+    "hono": "4.13.13",
+    "pg": "8.23.1",
+    "pino": "10.4.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/pg": "8.23.1",
+    "drizzle-kit": "0.31.11",
+    "esbuild": "0.28.2",
+    "pino-pretty": "13.2.0",
+    "tsx": "4.23.15",
+    "vitest": "5.0.3"
+  }
+}

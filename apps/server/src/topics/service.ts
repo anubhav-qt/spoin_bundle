@@ -8,7 +8,7 @@ import type {
   TopicOut,
   TopicStatsOut,
 } from "@spoin/shared";
-import type { Difficulty } from "@spoin/shared/enums";
+import { type Difficulty, isTierless } from "@spoin/shared/enums";
 import { and, asc, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import type { Deps } from "../context.ts";
 import type { Db, Tx } from "../db/client.ts";
@@ -29,7 +29,7 @@ import {
 import { HttpError, notFound } from "../lib/errors.ts";
 import { iso } from "../lib/wire.ts";
 import { assignAccentHue, defaultHuePositional, NO_TOPIC_COLOR } from "./accent.ts";
-import { entryTierUnlock, loadProgress, progressSnapshot, tierQuizPassed } from "./progress.ts";
+import { entryTierUnlock, loadProgress, progressSnapshot, shownTier, tierQuizPassed } from "./progress.ts";
 
 /*
  * Topic subscriptions, discovery and per-topic stats. The feed's cached interleave
@@ -45,14 +45,15 @@ const DISCOVER_LIMIT = 5;
 const toTopicOut = (
   t: Topic,
   ut: { displayName: string; isCustom: boolean; accentHue: number | null },
-  tier: Difficulty,
+  storedTier: Difficulty | null | undefined,
 ): TopicOut => ({
   id: t.id,
   // The user's own label, never the canonical name (ADR-0004).
   display_name: ut.displayName,
   slug: t.slug,
   is_custom: ut.isCustom,
-  current_difficulty: tier,
+  scope: t.scope,
+  current_difficulty: shownTier(t.scope, storedTier),
   accent_hue: ut.accentHue,
 });
 
@@ -90,7 +91,7 @@ export async function listSubscribed(db: Db, userId: string): Promise<TopicOut[]
     )
     .where(eq(userTopic.userId, userId))
     .orderBy(asc(userTopic.createdAt));
-  return rows.map((r) => toTopicOut(r.t, r.ut, r.tier ?? "beginner"));
+  return rows.map((r) => toTopicOut(r.t, r.ut, r.tier));
 }
 
 /** The latest generate job per topic, in one round trip; repair jobs are not a topic's status. */
@@ -308,6 +309,7 @@ export async function stats(ctx: Ctx, userId: string, topicId: string): Promise<
   const kinds = new Map(events.map((e) => [e.kind, e.n]));
   return {
     topic_id: topicId,
+    scope: snap.scope,
     current_difficulty: snap.tier,
     coverage: snap.coverage,
     quiz_unlocked: snap.unlocked,
@@ -395,7 +397,10 @@ export async function pickHues(
   return hues;
 }
 
-/** The subscription, its progress row and the subscriber count, together. Null if already following. */
+/**
+ * The subscription, its progress row and the subscriber count, together. Null if
+ * already following. A tierless topic has no tier to enter at, so its entry is ignored.
+ */
 export async function followTopic(
   tx: Tx,
   userId: string,
@@ -415,13 +420,14 @@ export async function followTopic(
     .returning();
   if (!ut) return null;
   await bumpSubscribers(tx, t.id, 1);
+  const entry = isTierless(t.scope) ? "beginner" : opts.entry;
   await tx.insert(userTopicProgress).values({
     userId,
     topicId: t.id,
-    currentDifficulty: opts.entry,
-    tierUnlocked: entryTierUnlock(opts.entry),
+    currentDifficulty: entry,
+    tierUnlocked: entryTierUnlock(entry),
   });
-  return toTopicOut(t, ut, opts.entry);
+  return toTopicOut(t, ut, entry);
 }
 
 export async function subscribe(
@@ -526,5 +532,5 @@ export async function setColor(
   const [ut] = await ctx.db.update(userTopic).set({ accentHue }).where(eq(userTopic.id, sub.id)).returning();
   if (!ut) throw notFound("Subscription");
   const progress = await loadProgress(ctx.db, userId, topicId);
-  return toTopicOut(t, ut, progress?.currentDifficulty ?? "beginner");
+  return toTopicOut(t, ut, progress?.currentDifficulty);
 }

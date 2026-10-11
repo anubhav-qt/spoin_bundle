@@ -1,6 +1,6 @@
 # ADR-0106: Spoin moves to TypeScript on Hono, and a 24/7 pi harness authors the universe and its cards
 
-- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0006, 0025, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
+- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0006, 0007, 0009, 0010, 0025, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
 - **Date:** 2026-10-11
 - **Deciders:** owner (every decision below is the owner's, asked one by one), Claude
 
@@ -68,7 +68,8 @@ its prompts, canon and validators are reused.
   versioned record.
 - The chats are called **tadpoles**; the manager is **toad_sage**:
   - **toad_sage** (the manager): takes a topic off the queue and does the intake the
-    procedure's Phase A asked the owner for: category, sub-category, survey or topic.
+    procedure's Phase A asked the owner for: category, sub-category, and the topic's
+    scope and card count (see "Scope" below).
   - **Curriculum**: writes the topic's curriculum against the corpus.
   - **One chat per topic**: runs that topic's pipeline (research, corpus, images) and
     then its data generation (cards and questions).
@@ -92,6 +93,21 @@ its prompts, canon and validators are reused.
     set, so the repeat is announced rather than silent (ADR-0006). The web's notices
     that promise more cards on the way (short page, second pass, end of feed) are
     rewritten in the web rewire.
+  - **Scope: survey, topic or one-shot.** `is_survey` becomes one enum, `scope`, in
+    both databases: the app's `topic.scope` and the corpus's `document_scope` (on
+    `document` and `curriculum`), equal by value because frog does not import the
+    app's contract. Only `topic` keeps three tiers (ADR-0009). A survey and a one-shot
+    are **tierless**: the feed serves their cards easy to advanced with no mix
+    (ADR-0010), and a card scrolled past comes back only once the whole topic has
+    nothing unseen; progress is the weakest subtopic's coverage across the whole
+    topic; and one mastery quiz, its MCQs split evenly across difficulties with a short
+    difficulty topped up from the others, unlocks at the usual 80% gate. Passing it
+    masters the topic. The quiz is recorded in the advanced slot of the per-tier
+    progress arrays, so content-model.md's "mastered" keeps one definition, and a
+    tierless topic ignores the follower's entry tier and always shows `beginner`.
+  - **The harness picks each topic's scope and card count** from the data and the
+    instructions it is given. 125-750 cards per topic is one of those instructions;
+    no code rejects a topic outside it.
   - **Records live in Postgres, not in context.** Everything any agent flags or judges
     (report verdicts, safe or suspicious reporters, failures, lessons) is a row. Agents
     look past records up through tools when they need them instead of carrying them in

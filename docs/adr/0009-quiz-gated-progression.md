@@ -6,6 +6,10 @@
 - **Deciders:** Anubhav
 - **Amends:** [content-model.md](../architecture/content-model.md) -- difficulty is earned,
   not chosen
+- **Amended by:** [ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md) -- tier
+  progression now applies only to a topic whose `scope` is `topic`. A survey or one-shot
+  is tierless: one mastery quiz behind 80% of every subtopic in the whole topic, recorded
+  in the advanced slot so the mastery definition is unchanged.
 - **Amended by:** [ADR-0027](0027-self-selected-entry-tier.md) -- the `placement` row below
   no longer gates entry. Entry tier is now trusted unconditionally at subscribe time;
   `placement`-kind attempts are unlimited practice retries that never change

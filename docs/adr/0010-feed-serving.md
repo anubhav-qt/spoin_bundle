@@ -16,6 +16,10 @@
   `exhausted = True` just because a topic's slate ran dry -- it now recycles via
   `_all_active_cards`, and only reports exhausted when a topic in the plan has zero
   active cards in the database, period.
+- **Amended by:** [ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md) -- the
+  difficulty mix applies only to a topic with tiers. A tierless topic (survey, one-shot)
+  fills its slate from the strata in order, easy first, and turns a difficulty's cycle
+  over only once the whole topic has nothing unseen.
 - **Amended by:** [ADR-0055](0055-session-scoped-topic-shares.md) -- the interleave
   plan is no longer weighted by `UserTopicAffinity`. It is weighted by a
   session-scoped engagement signal that resets after 30 minutes of inactivity, with

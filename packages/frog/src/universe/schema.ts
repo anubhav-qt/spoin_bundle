@@ -8,7 +8,6 @@
  */
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   check,
   index,
   integer,
@@ -34,8 +33,12 @@ const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull(
  */
 export const documentKind = pgEnum("document_kind", ["spoin_canon", "topic_source"]);
 
-/** Breadth (a field toured) or depth (a subject taught). Mirrors `topic.is_survey` by value (ADR-0007). */
-export const documentScope = pgEnum("document_scope", ["survey", "topic"]);
+/**
+ * A field toured (ADR-0007), a subject taught in three tiers, or something small
+ * taught in one pass. Mirrors the app's `topic_scope` by value: frog does not import
+ * `@spoin/shared`, so the two lists are kept equal by hand (ADR-0106).
+ */
+export const documentScope = pgEnum("document_scope", ["survey", "topic", "one_shot"]);
 
 /**
  * A closed vocabulary because a typo'd licence is a legal problem, not a quality one.
@@ -169,7 +172,7 @@ export const curriculum = pgTable("curriculum", {
   /** The projection's match key against `topic.canonical_name`, by value. */
   topicName: varchar("topic_name", { length: 500 }).notNull(),
   description: text("description").notNull(),
-  isSurvey: boolean("is_survey").notNull(),
+  scope: documentScope("scope").notNull(),
   ingestedAt: timestamp("ingested_at", { withTimezone: true }).notNull(),
 });
 

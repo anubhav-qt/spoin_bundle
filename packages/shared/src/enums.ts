@@ -84,6 +84,17 @@ export type QuestionStatus = (typeof QUESTION_STATUSES)[number];
 export const QUIZ_KINDS = ["placement", "promotion", "mastery"] as const;
 export type QuizKind = (typeof QUIZ_KINDS)[number];
 
+/**
+ * A survey tours a field (ADR-0007), a topic teaches one subject in three tiers, a
+ * one-shot teaches something small in one pass. Only `topic` has tiers: the other two
+ * serve their cards easy to advanced and end in one mastery quiz (ADR-0106). The
+ * corpus's `document_scope` mirrors these values; frog does not import this package.
+ */
+export const TOPIC_SCOPES = ["survey", "topic", "one_shot"] as const;
+export type TopicScope = (typeof TOPIC_SCOPES)[number];
+
+export const isTierless = (scope: TopicScope): boolean => scope !== "topic";
+
 export const TOPIC_EDGE_KINDS = ["deep_dive"] as const;
 export type TopicEdgeKind = (typeof TOPIC_EDGE_KINDS)[number];
 

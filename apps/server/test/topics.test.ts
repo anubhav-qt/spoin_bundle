@@ -164,6 +164,53 @@ describe("progression (ADR-0009)", () => {
     expect(after.quiz_unlocked).toBe(true);
   });
 
+  test("a tierless topic ignores the entry tier and gates on every subtopic at every difficulty", async () => {
+    const { c, id } = await reader();
+    const { topic: t, subtopics, cards } = await makeTopic({ scope: "one_shot", cardsPerSubtopic: 5 });
+    const r = await c.post(`/topics/${t.id}/subscribe?entry_difficulty=advanced`);
+    expect(r.body).toMatchObject({ scope: "one_shot", current_difficulty: "beginner" });
+    expect(await progressRow(id, t.id)).toMatchObject({
+      currentDifficulty: "beginner",
+      tierUnlocked: [false, false, false],
+    });
+
+    // Every beginner and intermediate card read, three of five advanced: the advanced subtopic governs.
+    for (const s of subtopics) {
+      const inS = cards.filter((k) => k.subtopicId === s.id);
+      for (const k of inS.slice(0, s.difficulty === "advanced" ? 3 : 5)) await markSeen(id, k);
+    }
+    expect((await c.get(`/topics/${t.id}/progress`)).body).toMatchObject({
+      scope: "one_shot",
+      current_difficulty: "beginner",
+      coverage: 0.6,
+      quiz_unlocked: false,
+    });
+
+    const fourth = cards.filter((k) => k.difficulty === "advanced")[3];
+    if (!fourth) throw new Error("the fixture has five advanced cards");
+    await markSeen(id, fourth);
+    expect((await c.get(`/topics/${t.id}/progress`)).body).toMatchObject({
+      coverage: 0.8,
+      quiz_unlocked: true,
+    });
+    // The one quiz is the advanced slot's.
+    expect((await progressRow(id, t.id))?.tierUnlocked).toEqual([false, false, true]);
+    expect((await c.get(`/topics/${t.id}/stats`)).body).toMatchObject({ scope: "one_shot", coverage: 0.8 });
+  });
+
+  test("a topic made tierless after it was followed shows no tier", async () => {
+    const { c } = await reader();
+    const { topic: t } = await makeTopic();
+    await c.post(`/topics/${t.id}/subscribe?entry_difficulty=intermediate`);
+    // A requested topic is followed at the requester's entry tier before the harness picks its scope.
+    await db.update(topic).set({ scope: "survey" }).where(eq(topic.id, t.id));
+    expect((await c.get("/topics")).body[0]).toMatchObject({
+      scope: "survey",
+      current_difficulty: "beginner",
+    });
+    expect((await c.get(`/topics/${t.id}/progress`)).body.current_difficulty).toBe("beginner");
+  });
+
   test("the curriculum lists every subtopic in authoring order with its own coverage", async () => {
     const { c, id } = await reader();
     const { topic: t, cards } = await makeTopic({ cardsPerSubtopic: 5 });

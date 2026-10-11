@@ -24,7 +24,8 @@ export function quizRoutes(deps: Deps) {
         method: "post",
         path: "/topics/{topic_id}/quiz/start",
         tags: ["quiz"],
-        summary: "Open an attempt: placement below the current tier, promotion at it, mastery at advanced",
+        summary:
+          "Open an attempt: placement below the current tier, promotion at it, mastery at advanced; a tierless topic's one quiz is mastery",
         request: { params: ids("topic_id"), ...body(QuizStartIn) },
         responses: {
           201: json(QuizStartOut, "Created"),

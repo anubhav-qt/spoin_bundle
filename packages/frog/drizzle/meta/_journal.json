@@ -8,6 +8,13 @@
       "when": 1791721521523,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791725844465,
+      "tag": "0001_curriculum_scope",
+      "breakpoints": true
     }
   ]
 }

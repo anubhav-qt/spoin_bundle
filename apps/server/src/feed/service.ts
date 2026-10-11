@@ -1,4 +1,4 @@
-import { DIFFICULTIES, type Difficulty } from "@spoin/shared/enums";
+import { DIFFICULTIES, type Difficulty, isTierless } from "@spoin/shared/enums";
 import { and, asc, eq, gt, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import type { Db, Tx } from "../db/client.ts";
 import {
@@ -16,11 +16,11 @@ import {
   userTopicDifficultyProgress,
 } from "../db/schema.ts";
 import type { Env } from "../env.ts";
-import { loadProgress } from "../topics/progress.ts";
+import { loadProgress, topicScope } from "../topics/progress.ts";
 import { buildPlan, filterKey } from "./interleave.ts";
 import { type Candidate, diversify, type Rng, rank, shuffle } from "./ranking.ts";
 import { clampShares, rawWeight, shareFingerprint } from "./session-profile.ts";
-import { dynamicMix, resolveMix, served as servedOf } from "./strata.ts";
+import { dynamicMix, resolveInOrder, resolveMix, served as servedOf } from "./strata.ts";
 
 /*
  * Feed serving (ADR-0010).
@@ -33,6 +33,10 @@ import { dynamicMix, resolveMix, served as servedOf } from "./strata.ts";
  * that precomputes a column. Rule two: no aggregation at request time. Every score
  * input is a column kept current elsewhere (ADR-0011), which is what keeps this under
  * 100ms with no cache layer.
+ *
+ * A tierless topic (survey, one-shot; ADR-0106) has no mix: its slate serves the strata
+ * easy to advanced, and a card scrolled past comes back only once the whole topic has
+ * nothing unseen left.
  */
 
 type Plan = typeof feedPlan.$inferSelect;
@@ -225,6 +229,7 @@ export async function buildSlate(
 ): Promise<Slate | null> {
   const { rng = Math.random, exclude = new Set<string>() } = opts;
   const now = new Date();
+  const tierless = isTierless(await topicScope(db, topicId));
   const tier = (await loadProgress(db, userId, topicId))?.currentDifficulty ?? "beginner";
   const [previous] = await db
     .select({ degraded: feedSlate.degraded })
@@ -239,7 +244,7 @@ export async function buildSlate(
     let found = await candidates(db, env, { userId, topicId, difficulty: d, affinity, eligibleOnly: true });
     // Empty: either the difficulty has nothing, or everything is DEFERRED waiting for
     // the cycle to turn over. Only the second advances it.
-    if (found.length === 0 && (await maybeAdvanceCycle(db, userId, topicId, d)))
+    if (found.length === 0 && (await maybeAdvanceCycle(db, userId, topicId, d, { topicWide: tierless })))
       found = await candidates(db, env, { userId, topicId, difficulty: d, affinity, eligibleOnly: true });
     byTier.set(
       d,
@@ -268,30 +273,39 @@ export async function buildSlate(
     recycled = new Set(DIFFICULTIES.filter((d) => (cycles.get(d) ?? 0) > 0));
   }
 
-  const outcome = resolveMix(env.SLATE_SIZE, tier, new Map([...byTier].map(([d, c]) => [d, c.length])), {
+  const available = new Map([...byTier].map(([d, c]) => [d, c.length]));
+  const hysteresis = {
     wasDegraded: previous?.degraded ?? false,
     poolLow: env.POOL_LOW,
     poolHigh: env.POOL_HIGH,
-    mix: dynamicMix(tier, await tierReadFraction(db, userId, topicId, tier), {
-      start: env.MIX_RAMP_START,
-      end: env.MIX_RAMP_END,
-    }),
-  });
+  };
+  const outcome = tierless
+    ? resolveInOrder(env.SLATE_SIZE, available, hysteresis)
+    : resolveMix(env.SLATE_SIZE, tier, available, {
+        ...hysteresis,
+        mix: dynamicMix(tier, await tierReadFraction(db, userId, topicId, tier), {
+          start: env.MIX_RAMP_START,
+          end: env.MIX_RAMP_END,
+        }),
+      });
 
-  const picked: Candidate[] = [];
+  const picked: Candidate[][] = [];
   for (const fill of outcome.fills) {
     const pool = byTier.get(fill.difficulty) ?? [];
     const n = servedOf(fill);
     // A repeat pass: ranking's inputs have stopped meaning anything (coverage need is
     // ~0 everywhere, and quality and recency give the same order every cycle), so a
     // re-read would feel like a replay. Shuffle; `diversify` still stops clumping.
-    if (recycled.has(fill.difficulty)) picked.push(...shuffle([...pool], rng).slice(0, n));
-    else picked.push(...rank(pool, env, { now, limit: n, rng }));
+    if (recycled.has(fill.difficulty)) picked.push(shuffle([...pool], rng).slice(0, n));
+    else picked.push(rank(pool, env, { now, limit: n, rng }));
   }
-  if (picked.length === 0) return null;
+  // A mix is meant to interleave its strata. A tierless slate keeps them in order, so
+  // variety is spread within each one rather than pulling a harder card forward.
+  const ordered = tierless ? picked.flatMap((stratum) => diversify(stratum)) : diversify(picked.flat());
+  if (ordered.length === 0) return null;
 
   const values = {
-    cardIds: diversify(picked).map((c) => c.cardId),
+    cardIds: ordered.map((c) => c.cardId),
     position: 0,
     degraded: outcome.degraded,
     expiresAt: new Date(now.getTime() + env.SLATE_TTL_SECONDS * 1000),
@@ -382,21 +396,33 @@ async function cyclesOf(db: Db | Tx, userId: string, topicId: string): Promise<M
  * are required: nothing UNSEEN left (fresh material always outranks a repeat), and
  * something deferred at the current cycle (otherwise the difficulty is starved, not
  * finished, and bumping the counter would hide a pool that should be filled).
+ * `topicWide` widens the first to the whole topic, which a tierless topic serves in
+ * order: a skipped easy card would otherwise come back ahead of fresh harder ones.
  * Called only when a stratum came back empty, so two EXISTS on a path about to serve nothing.
  */
-async function maybeAdvanceCycle(db: Db | Tx, userId: string, topicId: string, d: Difficulty) {
+async function maybeAdvanceCycle(
+  db: Db | Tx,
+  userId: string,
+  topicId: string,
+  d: Difficulty,
+  opts: { topicWide: boolean },
+) {
   const current = (await cyclesOf(db, userId, topicId)).get(d) ?? 0;
-  const base = (state: ReturnType<typeof and>) =>
+  const base = (where: ReturnType<typeof and>, state: ReturnType<typeof and>) =>
     db
       .select({ id: card.id })
       .from(card)
       .leftJoin(userCardState, and(eq(userCardState.cardId, card.id), eq(userCardState.userId, userId)))
-      .where(and(active(topicId, d), state))
+      .where(and(where, state))
       .limit(1);
 
-  const [unseen] = await base(or(isNull(userCardState.state), eq(userCardState.state, "unseen")));
+  const [unseen] = await base(
+    opts.topicWide ? and(eq(card.topicId, topicId), eq(card.status, "active")) : active(topicId, d),
+    or(isNull(userCardState.state), eq(userCardState.state, "unseen")),
+  );
   if (unseen) return false;
   const [deferred] = await base(
+    active(topicId, d),
     and(eq(userCardState.state, "deferred"), lte(userCardState.deferredCycle, current)),
   );
   if (!deferred) return false;

@@ -92,13 +92,38 @@ export function resolveMix(
   size: number,
   tier: Difficulty,
   available: Map<Difficulty, number>,
-  opts: { wasDegraded: boolean; poolLow: number; poolHigh: number; mix?: Mix },
+  opts: Hysteresis & { mix?: Mix },
 ): MixOutcome {
   const fills = [...allocate(size, tier, opts.mix)].map(([difficulty, requested]) => ({
     difficulty,
     requested,
     available: available.get(difficulty) ?? 0,
   }));
+  return { fills, degraded: degraded(fills, opts) };
+}
+
+type Hysteresis = { wasDegraded: boolean; poolLow: number; poolHigh: number };
+
+const degraded = (fills: StratumFill[], opts: Hysteresis) => {
   const total = fills.reduce((sum, f) => sum + f.available, 0);
-  return { fills, degraded: opts.wasDegraded ? total < opts.poolHigh : total < opts.poolLow };
+  return opts.wasDegraded ? total < opts.poolHigh : total < opts.poolLow;
+};
+
+/**
+ * A tierless topic's slate (ADR-0106): no mix and no tier to anchor one, so the strata
+ * fill in order, easy first, each asked for what the ones before it left. Degraded on
+ * the same hysteresis as a mix.
+ */
+export function resolveInOrder(
+  size: number,
+  available: Map<Difficulty, number>,
+  opts: Hysteresis,
+): MixOutcome {
+  let left = size;
+  const fills = DIFFICULTIES.map((difficulty) => {
+    const fill = { difficulty, requested: left, available: available.get(difficulty) ?? 0 };
+    left -= served(fill);
+    return fill;
+  });
+  return { fills, degraded: degraded(fills, opts) };
 }

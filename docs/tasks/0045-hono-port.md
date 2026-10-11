@@ -31,7 +31,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz, reports, admin repairs and ASCII review, dev routes done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz, reports, admin repairs and ASCII review, dev routes, topic scope done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
@@ -87,6 +87,22 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **`/dev/*` never runs in production** (2026-10-11): mounted only with `DEV_ROUTES` and outside
   production, checked by a test. `/dev/reset` unfollows through the same path as the button, so
   subscriber counts stay true (the Python deleted the rows directly).
+- **Topic scope; surveys and one-shots are tierless** (2026-10-11). `is_survey` is replaced by
+  `scope` = `survey | topic | one_shot`, in the app DB (`topic_scope`) and the corpus DB
+  (`document_scope` gains `one_shot`; `curriculum.is_survey` becomes `curriculum.scope`).
+  Both `0001` migrations carry their old flag over. Only `topic` keeps three tiers. A
+  tierless topic's feed fills its slate from the strata in order, easy first, each one
+  diversified on its own so no harder card is pulled forward; a skipped card's cycle turns
+  over only once the whole topic has nothing unseen. Its progress is the weakest subtopic's
+  coverage across the whole topic. Its one quiz is mastery: `difficulty` is optional and
+  ignored (a topic with tiers answers 422 without it), the MCQs split evenly across
+  difficulties (any remainder to the hardest, a short difficulty topped up from the rest)
+  and are asked easy to advanced, the free-text question comes from any difficulty, and
+  the attempt is recorded in the advanced slot, so `QuizStartOut.difficulty` reads
+  `advanced` and a pass sets `tier_quiz_passed[2]` and `mastered_at`. Following a tierless
+  topic ignores the entry tier, and reads show `beginner` whatever is stored. `scope` is on
+  `TopicOut`, `ProgressOut` and `TopicStatsOut`. The harness picks each topic's scope and
+  card count; 125-750 cards per topic is an instruction to it, never a check in code.
 
 ## Asked when we get there
 
@@ -98,6 +114,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   balancer.
 - What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card
   `repair` job itself, or the frog reading open reports. Today only the operator enqueues it.
+- Whether the curriculum front matter's `is_survey: bool` becomes `scope:` when Phase 6 ports
+  the curriculum contract. The corpus column already is `scope`.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

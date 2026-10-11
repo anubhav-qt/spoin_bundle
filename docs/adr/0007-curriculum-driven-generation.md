@@ -10,6 +10,10 @@
   coalesce. Curriculum-driven generation itself (the subtopic model, the card budget, the
   tier/survey/deep-dive structure) is unaffected. The body below is left as originally
   written; read ADR-0026 alongside it.
+- **Amended by:** [ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md) --
+  `is_survey` became `scope` (survey, topic or one-shot), and a survey is now tierless:
+  its cards are served easy to advanced and it ends in one mastery quiz. Only a `topic`
+  keeps three tiers.
 
 ## Context
 

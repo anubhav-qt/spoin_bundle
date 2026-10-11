@@ -229,6 +229,11 @@ discovery tool: *here is exactly what you did not know, and here is where to lea
 mastered = tier_content_complete[advanced] AND tier_quiz_passed[advanced]
 ```
 
+A **tierless** topic (survey or one-shot, [ADR-0106](../adr/0106-typescript-on-hono-and-the-authoring-harness.md))
+has no tiers to climb: its one quiz is the mastery quiz, unlocked by 80% of every
+subtopic across the whole topic and recorded in the advanced slot, so the definition
+above holds for it unchanged.
+
 Content completion alone triggers the *prompt* to take the mastery quiz. The mastery quiz
 stays available after passing, with fresh questions each time; **mastery is permanent** and
 never revoked by a later failed attempt.

@@ -208,7 +208,7 @@ what is in it.
 
 ```
 curriculum                     one per authored topic
-  ├─ topic_name, description, is_survey
+  ├─ topic_name, description, scope   survey | topic | one_shot (ADR-0106)
   ├─ source_path (unique), content_hash, ingested_at
 curriculum_subtopic
   ├─ curriculum_id FK, ordinal
@@ -246,7 +246,7 @@ the same obligation to tolerate a dangling reference.
 2. VALIDATE   --check: fields, vocabulary, DAG, sources exist
 3. INGEST     upsert curriculum tables by content hash    (skip if unchanged)
 4. PROJECT    for each curriculum:
-                 upsert Topic (canonical_name, description, is_survey)
+                 upsert Topic (canonical_name, description, scope)
                  for each subtopic × tier:
                      upsert Subtopic, matched on (topic, title, difficulty)
                      set target_cards, min_cards, source_document_ids

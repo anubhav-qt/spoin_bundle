@@ -10,7 +10,7 @@ import {
   shareFingerprint,
   squash,
 } from "../src/feed/session-profile.ts";
-import { allocate, DIFFICULTY_MIX, resolveMix, served } from "../src/feed/strata.ts";
+import { allocate, DIFFICULTY_MIX, resolveInOrder, resolveMix, served } from "../src/feed/strata.ts";
 import { seeded } from "./fixtures.ts";
 import { env } from "./helpers.ts";
 
@@ -231,6 +231,55 @@ describe("the difficulty mix is exact (ADR-0010)", () => {
 
   test("the pool thresholds have a gap", () => {
     expect(env.POOL_LOW).toBeLessThan(env.POOL_HIGH);
+  });
+});
+
+describe("a tierless slate fills in order (ADR-0106)", () => {
+  const hysteresis = { wasDegraded: false, poolLow: 5, poolHigh: 15 };
+  const servedBy = (o: ReturnType<typeof resolveInOrder>) => o.fills.map((f) => [f.difficulty, served(f)]);
+
+  test("easy first, each stratum taking what the ones before it left", () => {
+    const o = resolveInOrder(
+      10,
+      new Map([
+        ["beginner", 4],
+        ["intermediate", 3],
+        ["advanced", 9],
+      ]),
+      hysteresis,
+    );
+    expect(servedBy(o)).toEqual([
+      ["beginner", 4],
+      ["intermediate", 3],
+      ["advanced", 3],
+    ]);
+  });
+
+  test("a full first stratum leaves nothing to the harder ones", () => {
+    const o = resolveInOrder(
+      10,
+      new Map([
+        ["beginner", 12],
+        ["advanced", 5],
+      ]),
+      hysteresis,
+    );
+    expect(servedBy(o)).toEqual([
+      ["beginner", 10],
+      ["intermediate", 0],
+      ["advanced", 0],
+    ]);
+  });
+
+  test("degraded on the whole pool, with the same hysteresis as a mix", () => {
+    const degraded = (available: number, wasDegraded: boolean) =>
+      resolveInOrder(10, new Map([["advanced", available]]), { ...hysteresis, wasDegraded }).degraded;
+    expect([degraded(4, false), degraded(10, false), degraded(10, true), degraded(16, true)]).toEqual([
+      true,
+      false,
+      true,
+      false,
+    ]);
   });
 });
 

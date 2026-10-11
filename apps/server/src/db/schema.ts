@@ -19,6 +19,7 @@ import {
   REPAIR_STATUSES,
   SEEN_STATES,
   TOPIC_EDGE_KINDS,
+  TOPIC_SCOPES,
   VISUAL_KINDS,
 } from "@spoin/shared/enums";
 import { sql } from "drizzle-orm";
@@ -69,6 +70,7 @@ export const questionKind = pgEnum("question_kind", QUESTION_KINDS);
 export const questionStatus = pgEnum("question_status", QUESTION_STATUSES);
 export const quizKind = pgEnum("quiz_kind", QUIZ_KINDS);
 export const topicEdgeKind = pgEnum("topic_edge_kind", TOPIC_EDGE_KINDS);
+export const topicScope = pgEnum("topic_scope", TOPIC_SCOPES);
 export const visualKind = pgEnum("visual_kind", VISUAL_KINDS);
 
 // --------------------------------------------------------------- accounts --
@@ -181,8 +183,11 @@ export const topic = pgTable(
     embedding: vector("embedding", { dimensions: EMBEDDING_DIM }),
     embeddingModel: varchar("embedding_model", { length: 120 }),
     isSeeded: boolean("is_seeded").notNull().default(false),
-    /** A survey gets a breadth curriculum and deep-dive edges; the completion copy differs (ADR-0007). */
-    isSurvey: boolean("is_survey").notNull().default(false),
+    /**
+     * Survey (breadth, ADR-0007), topic (three tiers) or one-shot. Only `topic` has
+     * tier gates; the other two are tierless (ADR-0106). The harness picks it.
+     */
+    scope: topicScope("scope").notNull().default("topic"),
     /** When an authored curriculum was last projected onto this topic. */
     curriculumGeneratedAt: tz("curriculum_generated_at"),
     /** The corpus version that projection ran against, so "the corpus moved" is a comparison. */

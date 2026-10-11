@@ -1,12 +1,14 @@
 import type { QuizStartOut, QuizSubmitFreeTextOut, QuizSubmitMcqOut } from "@spoin/shared";
 import {
+  DIFFICULTIES,
   type Difficulty,
   difficultyRank,
+  isTierless,
   nextTier,
   type QuestionKind,
   type QuizKind,
 } from "@spoin/shared/enums";
-import { and, count, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, eq, gte, inArray, notInArray, sql } from "drizzle-orm";
 import type { Db, Tx } from "../db/client.ts";
 import {
   card,
@@ -28,12 +30,38 @@ import { combinedScore, referencesQuestion } from "./grading.ts";
  * and the tier state machine. Two calls submit an attempt: the MCQ half is graded at
  * once, and the free-text half is the one call that waits on a model, and the one that
  * writes progression, once both halves of the score are known.
+ *
+ * A tierless topic (ADR-0106) has one quiz: mastery across every difficulty, behind
+ * the same coverage gate, recorded in the advanced slot (see topics/progress.ts).
  */
 
 type Progress = NonNullable<Snapshot["progress"]>;
 
+/**
+ * content-model.md: mastered = tier_content_complete[advanced] AND
+ * tier_quiz_passed[advanced]. Opening a mastery quiz is the one place that coverage is
+ * checked, so it latches here, the same pattern `ensureUnlockLatched` uses.
+ */
+async function latchContentComplete(db: Db, progress: Progress, rank: number) {
+  if (progress.tierContentComplete[rank]) return;
+  const complete = [...progress.tierContentComplete];
+  complete[rank] = true;
+  await db
+    .update(userTopicProgress)
+    .set({ tierContentComplete: complete })
+    .where(
+      and(eq(userTopicProgress.userId, progress.userId), eq(userTopicProgress.topicId, progress.topicId)),
+    );
+}
+
 /** Which of the three attempt kinds this request is, or a 403. */
 async function resolveKind(db: Db, difficulty: Difficulty, snap: Snapshot & { progress: Progress }) {
+  if (isTierless(snap.scope)) {
+    if (!snap.unlocked) throw new HttpError(403, "Not enough coverage yet");
+    await latchContentComplete(db, snap.progress, difficultyRank(snap.quizTier));
+    return "mastery" satisfies QuizKind;
+  }
+
   const rank = difficultyRank(difficulty);
   const tierRank = difficultyRank(snap.tier);
   if (rank > tierRank) throw new HttpError(403, "Tier not reached yet");
@@ -47,22 +75,7 @@ async function resolveKind(db: Db, difficulty: Difficulty, snap: Snapshot & { pr
 
   if (difficulty === "advanced") {
     if (!snap.unlocked) throw new HttpError(403, "Not enough advanced-tier coverage yet");
-    // content-model.md: mastered = tier_content_complete[advanced] AND
-    // tier_quiz_passed[advanced]. This is the one place advanced coverage is checked,
-    // so it latches here, the same pattern `ensureUnlockLatched` uses.
-    if (!snap.progress.tierContentComplete[rank]) {
-      const complete = [...snap.progress.tierContentComplete];
-      complete[rank] = true;
-      await db
-        .update(userTopicProgress)
-        .set({ tierContentComplete: complete })
-        .where(
-          and(
-            eq(userTopicProgress.userId, snap.progress.userId),
-            eq(userTopicProgress.topicId, snap.progress.topicId),
-          ),
-        );
-    }
+    await latchContentComplete(db, snap.progress, rank);
     return "mastery" satisfies QuizKind;
   }
 
@@ -72,24 +85,32 @@ async function resolveKind(db: Db, difficulty: Difficulty, snap: Snapshot & { pr
 
 /**
  * Questions this reader hasn't seen first, then repeats when the bank is thin (task
- * 0011): never fail a quiz because everything available was asked before.
+ * 0011): never fail a quiz because everything available was asked before. A null
+ * `difficulty` samples the whole topic.
  */
 const sample = (
   tx: Tx,
   userId: string,
   topicId: string,
-  difficulty: Difficulty,
+  difficulty: Difficulty | null,
   kind: QuestionKind,
   n: number,
+  exclude: string[] = [],
 ) =>
   tx
-    .select({ id: question.id, stem: question.stem, options: question.options })
+    .select({
+      id: question.id,
+      stem: question.stem,
+      options: question.options,
+      difficulty: question.difficulty,
+    })
     .from(question)
     .innerJoin(subtopic, eq(subtopic.id, question.subtopicId))
     .where(
       and(
         eq(subtopic.topicId, topicId),
-        eq(question.difficulty, difficulty),
+        difficulty ? eq(question.difficulty, difficulty) : undefined,
+        exclude.length ? notInArray(question.id, exclude) : undefined,
         eq(question.kind, kind),
         eq(question.status, "active"),
       ),
@@ -106,24 +127,58 @@ const sample = (
     )
     .limit(n);
 
+/** `n` split evenly across difficulties, any remainder to the hardest first: a mastery quiz leans hard. */
+const evenSplit = (n: number): [Difficulty, number][] => {
+  const k = DIFFICULTIES.length;
+  return DIFFICULTIES.map((d, i) => [d, Math.floor(n / k) + (i >= k - (n % k) ? 1 : 0)]);
+};
+
+/**
+ * A tierless topic's MCQs: an even split across difficulties, a short stratum topped
+ * up from the rest, so a bank heavy in one difficulty cannot decide what a mastery
+ * quiz tests. Asked easy to advanced, the order the feed served them in.
+ */
+async function sampleAcrossDifficulties(tx: Tx, userId: string, topicId: string, n: number) {
+  const picked = [];
+  for (const [d, share] of evenSplit(n)) picked.push(...(await sample(tx, userId, topicId, d, "mcq", share)));
+  if (picked.length < n) {
+    const ids = picked.map((q) => q.id);
+    picked.push(...(await sample(tx, userId, topicId, null, "mcq", n - picked.length, ids)));
+  }
+  return picked.sort((a, b) => difficultyRank(a.difficulty) - difficultyRank(b.difficulty));
+}
+
 /** Gate, sample, and open an attempt. `snap` comes from `ensureUnlockLatched`, already latched. */
 export async function start(
   db: Db,
   env: Env,
   userId: string,
   topicId: string,
-  difficulty: Difficulty,
+  requested: Difficulty | undefined,
   snap: Snapshot,
 ): Promise<QuizStartOut> {
   const { progress } = snap;
   if (!progress) throw new HttpError(404, "Not subscribed to this topic");
+  const tierless = isTierless(snap.scope);
+  const difficulty = tierless ? snap.quizTier : requested;
+  if (!difficulty) throw new HttpError(422, "Pick a difficulty: this topic has tiers");
   const kind = await resolveKind(db, difficulty, { ...snap, progress });
 
   return db.transaction(async (tx) => {
-    const mcq = await sample(tx, userId, topicId, difficulty, "mcq", env.QUIZ_MCQ_COUNT);
-    const [freeText] = await sample(tx, userId, topicId, difficulty, "free_text", env.QUIZ_FREE_TEXT_COUNT);
+    const mcq = tierless
+      ? await sampleAcrossDifficulties(tx, userId, topicId, env.QUIZ_MCQ_COUNT)
+      : await sample(tx, userId, topicId, difficulty, "mcq", env.QUIZ_MCQ_COUNT);
+    const [freeText] = await sample(
+      tx,
+      userId,
+      topicId,
+      tierless ? null : difficulty,
+      "free_text",
+      env.QUIZ_FREE_TEXT_COUNT,
+    );
     if (mcq.length < env.QUIZ_MCQ_COUNT || !freeText) {
-      throw new HttpError(409, "Not enough questions generated yet for this tier — check back soon");
+      const what = tierless ? "this topic" : "this tier";
+      throw new HttpError(409, `Not enough questions generated yet for ${what} — check back soon`);
     }
     const asked = [...mcq, freeText];
     await tx

@@ -143,6 +143,53 @@ describe("building a slate", () => {
   });
 });
 
+describe("a tierless topic (ADR-0106)", () => {
+  /**
+   * Four cards at each difficulty, all in one subtopic: diversified across strata, a
+   * slate would pull a harder card in between two of the same subtopic.
+   */
+  async function oneShot() {
+    const c = await signedUp();
+    const userId = await userIdOf(c);
+    const made = await makeTopic({ scope: "one_shot", cardsPerSubtopic: 4 });
+    await follow(userId, made.topic.id, "Once");
+    const of = (d: string) => made.cards.filter((k) => k.difficulty === d).map((k) => k.id);
+    return {
+      userId,
+      topic: made.topic,
+      beginners: of("beginner"),
+      harder: [...of("intermediate"), ...of("advanced")],
+    };
+  }
+  const k = knobs({ SLATE_SIZE: 12 });
+
+  test("serves easy to advanced, with no mix", async () => {
+    const { userId, topic } = await oneShot();
+    const slate = await buildSlate(db, k, userId, topic.id, { rng: seeded(1) });
+    expect(await difficulties(slate?.cardIds ?? [])).toEqual([
+      ...Array(4).fill("beginner"),
+      ...Array(4).fill("intermediate"),
+      ...Array(4).fill("advanced"),
+    ]);
+  });
+
+  test("a skipped card comes back only once the whole topic has nothing unseen", async () => {
+    const { userId, topic, beginners, harder } = await oneShot();
+    const [skipped, ...rest] = beginners as [string, ...string[]];
+    await engage(userId, [skipped], "skip");
+    await engage(userId, rest, "explicit_complete");
+    // Every other beginner card read, but harder ones are still fresh: they come first.
+    const before = await buildSlate(db, k, userId, topic.id, { rng: seeded(1) });
+    expect(before?.cardIds).not.toContain(skipped);
+    expect(await cycleOf(userId, topic.id)).toBeUndefined();
+
+    await engage(userId, harder, "explicit_complete");
+    const after = await buildSlate(db, k, userId, topic.id, { rng: seeded(1) });
+    expect(after?.cardIds).toContain(skipped);
+    expect(await cycleOf(userId, topic.id)).toBe(1);
+  });
+});
+
 describe("paging", () => {
   test("a page is the page size, with no card twice", async () => {
     const { userId } = await corpus();

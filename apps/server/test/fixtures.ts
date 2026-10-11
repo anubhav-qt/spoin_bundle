@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { Difficulty } from "@spoin/shared/enums";
+import type { Difficulty, TopicScope } from "@spoin/shared/enums";
 import {
   card,
   engagementEvent,
@@ -21,13 +21,13 @@ const { db } = deps;
 let topics = 0;
 
 export async function makeTopic(
-  opts: { name?: string; subtopicsPerTier?: number; cardsPerSubtopic?: number } = {},
+  opts: { name?: string; subtopicsPerTier?: number; cardsPerSubtopic?: number; scope?: TopicScope } = {},
 ) {
   topics += 1;
   const name = opts.name ?? `Topic ${topics} ${randomUUID().slice(0, 6)}`;
   const [t] = await db
     .insert(topic)
-    .values({ slug: name.toLowerCase().replaceAll(/\W+/g, "-"), canonicalName: name })
+    .values({ slug: name.toLowerCase().replaceAll(/\W+/g, "-"), canonicalName: name, scope: opts.scope })
     .returning();
   if (!t) throw new Error("topic insert returned nothing");
 

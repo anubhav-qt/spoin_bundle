@@ -13,6 +13,7 @@ import {
   QUIZ_KINDS,
   REPAIR_MODES,
   REPAIR_STATUSES,
+  TOPIC_SCOPES,
   VISUAL_KINDS,
 } from "./enums.ts";
 
@@ -22,6 +23,8 @@ export const VisualKind = z.enum(VISUAL_KINDS);
 export const CardReportReason = z.enum(CARD_REPORT_REASONS);
 export const RepairMode = z.enum(REPAIR_MODES);
 export const RepairStatus = z.enum(REPAIR_STATUSES);
+/** Only `topic` has tiers. Survey and one-shot are tierless: cards easy to advanced, one mastery quiz (ADR-0106). */
+export const TopicScope = z.enum(TOPIC_SCOPES);
 
 const Uuid = z.uuid();
 /** ISO-8601, as the server serializes a timestamp. */
@@ -41,6 +44,8 @@ export const TopicOut = z
     display_name: z.string(),
     slug: z.string(),
     is_custom: z.boolean(),
+    scope: TopicScope,
+    /** Always `beginner` on a tierless topic, which has no tiers to climb. */
     current_difficulty: Difficulty,
     /** 0-359, -1 opts out of topic colour (ADR-0051), null uses the deterministic default (ADR-0034). */
     accent_hue: z.int().nullable().default(null),
@@ -133,11 +138,16 @@ export const GenerationProgressOut = z
 export const ProgressOut = z
   .object({
     topic_id: Uuid,
+    scope: TopicScope,
     current_difficulty: Difficulty,
-    /** Fraction seen in the thinnest subtopic of the current tier: the gate is per subtopic. */
+    /**
+     * Fraction seen in the thinnest subtopic of the current tier, or of the whole topic
+     * when it is tierless: the gate is per subtopic.
+     */
     coverage: z.number(),
     /** Latched: background generation can never revoke it. */
     quiz_unlocked: z.boolean(),
+    /** A tierless topic's one quiz is recorded in the advanced slot. */
     tier_quiz_passed: z.array(z.boolean()),
     mastered: z.boolean(),
   })
@@ -146,6 +156,7 @@ export const ProgressOut = z
 export const TopicStatsOut = z
   .object({
     topic_id: Uuid,
+    scope: TopicScope,
     current_difficulty: Difficulty,
     coverage: z.number(),
     quiz_unlocked: z.boolean(),
@@ -261,7 +272,11 @@ export const EngagementAck = z
 
 // ------------------------------------------------------------------------ quiz --
 
-export const QuizStartIn = z.object({ difficulty: Difficulty }).meta({ id: "QuizStartIn" });
+/**
+ * `difficulty` picks the tier on a topic with tiers, where leaving it out is a 422. A
+ * tierless topic has one quiz, so it is ignored there.
+ */
+export const QuizStartIn = z.object({ difficulty: Difficulty.optional() }).meta({ id: "QuizStartIn" });
 
 /** Never `correct_index`: that would let the client grade itself. */
 export const QuizMcqQuestionOut = z
@@ -276,6 +291,7 @@ export const QuizStartOut = z
   .object({
     attempt_id: Uuid,
     topic_id: Uuid,
+    /** `advanced` on a tierless topic, whose one quiz is a mastery quiz across every difficulty. */
     difficulty: Difficulty,
     kind: z.enum(QUIZ_KINDS),
     mcq: z.array(QuizMcqQuestionOut),

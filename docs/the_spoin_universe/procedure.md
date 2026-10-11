@@ -30,8 +30,8 @@ The whole thing exists so that a small, fast model can *restate* a fact instead 
 ```
 category                 Mathematics, Science, Computer Science, History, ...
 └── sub_category         (optional)  Science → Biology, Physics, Chemistry
-    └── survey  OR  topic
-        └── subtopic     a curriculum slot, at a difficulty tier
+    └── survey  OR  topic  OR  one-shot
+        └── subtopic     a curriculum slot, at a difficulty
             └── cards    what the user actually reads
 ```
 
@@ -44,7 +44,7 @@ and which you are authoring *into*.
 |---|---|---|
 | **category** | `document.category` in `the_spoin_universe` ([ADR-0091](../adr/0091-corpus-category-hierarchy.md)). **Corpus-side only — no column in the product database.** | **You**, in front matter |
 | **sub_category** | `document.sub_category`. Optional, same status. | **You**, in front matter |
-| **survey / topic** | `topic` table, distinguished by the `is_survey` flag | The product, when a user requests a subject |
+| **survey / topic / one-shot** | `topic` table, distinguished by its `scope`: `survey`, `topic` or `one_shot` | The product, when a user requests a subject |
 | **subtopic** | `subtopic` table — a curriculum slot with a difficulty tier | **You**, in the topic's `curriculum.md` — see [Phase I](#phase-i--curriculum-the-teaching-structure). Generated curricula are being removed |
 | **cards** | `card` table | The generation pipeline, grounded in *your* corpus |
 
@@ -64,7 +64,7 @@ Two consequences for you:
   query against this column. An inconsistent value you write today proposes itself to
   the owner as an option forever.
 
-### Survey versus topic — the distinction that changes your research
+### Survey, topic or one-shot — the distinction that changes your research
 
 This is not a labelling detail. It changes what you go and fetch.
 
@@ -78,6 +78,14 @@ to go deeper."*
 of one subject across all three difficulty tiers, and its completion state is *"you
 know this."*
 
+**A one-shot is a single pass.** It teaches one subject once, easy to advanced, and its
+completion state is also *"you know this."*
+
+**Only a topic has tiers.** A survey and a one-shot are tierless: the reader is served
+their cards from easy to advanced with no tier gates, and takes one quiz at the end, a
+mastery quiz across every difficulty, once they have read 80% of every subtopic. A topic
+is climbed tier by tier, a quiz between each.
+
 So:
 
 - **Survey → research for BREADTH.** Every major branch, how they relate, what
@@ -87,7 +95,7 @@ So:
   are hard, contested, version-specific, or commonly misunderstood. You are surveying
   a single site down to bedrock.
 
-**Both go from zero to mastery.** Neither is "the beginner version". A survey covers
+**All three go from zero to mastery.** None is "the beginner version". A survey covers
 its whole field from a first-day framing to what a specialist would say about how the
 branches connect; a topic covers its subject from first principles to the edge cases
 an expert argues about. The difference is the *axis* you extend along, not how far
@@ -109,7 +117,7 @@ A wrong card is wrong for every reader who ever encounters it, forever, until so
 notices and reports it.
 
 **Progress is quiz-gated.** After reading a tier's cards, the user answers questions
-about them before the next tier unlocks. A card is not decoration — it is material
+about them before the next tier unlocks; a tierless subject has one quiz, at the end. A card is not decoration — it is material
 someone will be *tested on*. If your source material is subtly wrong, the user is
 tested on the wrong thing and told they are correct.
 
@@ -161,9 +169,9 @@ Science → Databases" is useful; "History → History" is noise. If the categor
 already narrow enough that a sub-category would just restate it, say so and offer
 "none" as an option.
 
-#### A3. Is this a survey or a topic?
+#### A3. Is this a survey, a topic or a one-shot?
 
-Ask directly, and give the owner the two definitions from §1 alongside the question
+Ask directly, and give the owner the three definitions from §1 alongside the question
 rather than assuming they have this document open. Include your own recommendation
 and the reason for it — "I'd call this a survey: it names a whole field and I can
 list at least six distinct sub-fields under it" — but **the owner decides**.
@@ -470,7 +478,7 @@ topic_tags:
 | `kind` | **yes** | `topic_source` for subject matter, `spoin_canon` for how Spoin itself works. Exactly one of the two — a typo is a hard error, not a silent third kind. |
 | `category` | **yes** for `topic_source` | As agreed in Phase A. Normalized on ingestion. Omit for `spoin_canon`, which sits outside the subject hierarchy. |
 | `sub_category` | only if one was chosen | Omit the field entirely when there is none — its absence is a statement, not missing data. |
-| `scope` | **yes** for `topic_source` | `survey` or `topic`, as agreed in Phase A. Omit for `spoin_canon`. |
+| `scope` | **yes** for `topic_source` | `survey`, `topic` or `one_shot`, as agreed in Phase A. Omit for `spoin_canon`. |
 | `source` | **yes** | URL, or an origin description for canon. This is what a card cites. |
 | `source_date` | strongly preferred | When the **source material** is from — not when you wrote the file. **`YYYY-MM-DD`, `YYYY-MM` or `YYYY`**; shorter forms widen to the first of the period. Use a full date when the source has one, and a bare year when it genuinely does not — accumulated practitioner experience or a body of postmortems has no single date, and inventing one would be a false precision. Anything else fails the document. |
 | `topic_tags` | **yes** for `topic_source` | Normalized on ingestion: lowercased, non-alphanumerics become spaces, whitespace collapses. Write naturally; prefer full names over abbreviations (`kubernetes`, not `k8s`). Tag for what a document *is about*, not where you want it retrieved — retrieval is cross-topic by default. |

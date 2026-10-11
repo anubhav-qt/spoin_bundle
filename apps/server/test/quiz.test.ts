@@ -1,8 +1,8 @@
-import type { Difficulty } from "@spoin/shared/enums";
+import { type Difficulty, difficultyRank, type TopicScope } from "@spoin/shared/enums";
 import { and, eq, inArray } from "drizzle-orm";
 import { afterEach, describe, expect, test } from "vitest";
 import { card, question, quizAttempt, quizAttemptQuestion, userTopicProgress } from "../src/db/schema.ts";
-import { addQuestions, makeTopic } from "./fixtures.ts";
+import { addQuestions, makeTopic, markSeen } from "./fixtures.ts";
 import { grader } from "./grader.ts";
 import { type Client, deps, env, signedUp, userIdOf } from "./helpers.ts";
 
@@ -191,6 +191,13 @@ describe("submitting an attempt", () => {
     expect((await c.get(`/topics/${topicId}/progress`)).body.mastered).toBe(true);
   });
 
+  test("a topic with tiers needs a difficulty", async () => {
+    const topicId = await bank();
+    const { c } = await reader(topicId);
+    const r = await c.post(`/topics/${topicId}/quiz/start`, {});
+    expect([r.status, r.body.detail]).toEqual([422, "Pick a difficulty: this topic has tiers"]);
+  });
+
   test("MCQ answers must cover the attempt exactly, once, and only its owner may send them", async () => {
     const topicId = await bank();
     const { c } = await reader(topicId, "intermediate");
@@ -317,5 +324,106 @@ describe("submitting an attempt", () => {
 
     grader.reset();
     expect((await write(c, start)).status).toBe(200);
+  });
+});
+
+describe("a tierless topic's one quiz (ADR-0106)", () => {
+  /** Five cards in every subtopic, so 80% of one is four. The entry tier is sent and ignored. */
+  async function tierless(
+    scope: TopicScope = "one_shot",
+    n: (d: Difficulty) => { mcq: number; freeText: number } = () => ({
+      mcq: env.QUIZ_MCQ_COUNT,
+      freeText: 1,
+    }),
+  ) {
+    const made = await makeTopic({ scope, cardsPerSubtopic: 5 });
+    for (const s of made.subtopics) {
+      await addQuestions(
+        s,
+        made.cards.filter((k) => k.subtopicId === s.id),
+        n(s.difficulty),
+      );
+    }
+    return { ...made, ...(await reader(made.topic.id, "advanced")) };
+  }
+
+  const difficultiesOf = async (ids: string[]) => {
+    const rows = await db
+      .select({ id: question.id, d: question.difficulty })
+      .from(question)
+      .where(inArray(question.id, ids));
+    const by = new Map(rows.map((r) => [r.id, r.d]));
+    return ids.map((id) => by.get(id) as Difficulty);
+  };
+
+  test("opens without a difficulty once 80% of every subtopic, at every difficulty, is read", async () => {
+    const { c, userId, topic, subtopics, cards } = await tierless();
+    const start = (body: object) => c.post(`/topics/${topic.id}/quiz/start`, body);
+    const gated = await start({});
+    expect([gated.status, gated.body.detail]).toEqual([403, "Not enough coverage yet"]);
+
+    // Four of five everywhere but the advanced subtopic, which has three: the thinnest governs.
+    for (const s of subtopics) {
+      const inS = cards.filter((k) => k.subtopicId === s.id);
+      for (const k of inS.slice(0, s.difficulty === "advanced" ? 3 : 4)) await markSeen(userId, k);
+    }
+    expect((await start({})).status).toBe(403);
+
+    const last = cards.filter((k) => k.difficulty === "advanced")[3];
+    if (!last) throw new Error("the fixture has five advanced cards");
+    await markSeen(userId, last);
+    // A difficulty sent anyway is ignored: there is one quiz.
+    const r = await start({ difficulty: "beginner" });
+    expect(r.status).toBe(201);
+    expect(r.body).toMatchObject({ topic_id: topic.id, difficulty: "advanced", kind: "mastery" });
+
+    const p = await progressOf(userId, topic.id);
+    expect(p?.currentDifficulty).toBe("beginner");
+    expect(p?.tierUnlocked).toEqual([false, false, true]);
+    expect(p?.tierContentComplete).toEqual([false, false, true]);
+  });
+
+  test("the MCQs split evenly across difficulties, asked easy to advanced", async () => {
+    const { c, userId, topic } = await tierless("survey");
+    await setProgress(userId, topic.id, { tierUnlocked: [false, false, true] });
+    const r = await c.post(`/topics/${topic.id}/quiz/start`, {});
+    const third = env.QUIZ_MCQ_COUNT / 3;
+    expect(await difficultiesOf(r.body.mcq.map((m: { question_id: string }) => m.question_id))).toEqual([
+      ...Array(third).fill("beginner"),
+      ...Array(third).fill("intermediate"),
+      ...Array(third).fill("advanced"),
+    ]);
+  });
+
+  test("a short difficulty is topped up from the others", async () => {
+    const { c, userId, topic } = await tierless("one_shot", (d) => ({
+      mcq: d === "advanced" ? 1 : env.QUIZ_MCQ_COUNT,
+      freeText: 1,
+    }));
+    await setProgress(userId, topic.id, { tierUnlocked: [false, false, true] });
+    const r = await c.post(`/topics/${topic.id}/quiz/start`, {});
+    expect(r.status).toBe(201);
+    const ds = await difficultiesOf(r.body.mcq.map((m: { question_id: string }) => m.question_id));
+    expect(ds).toHaveLength(env.QUIZ_MCQ_COUNT);
+    expect(ds.filter((d) => d === "advanced")).toHaveLength(1);
+    expect(ds.map(difficultyRank)).toEqual(ds.map(difficultyRank).sort());
+  });
+
+  test("passing it masters the topic", async () => {
+    const { c, userId, topic } = await tierless();
+    await setProgress(userId, topic.id, { tierUnlocked: [false, false, true] });
+    const start = await c.post(`/topics/${topic.id}/quiz/start`, {});
+    await answer(c, start.body);
+    expect((await write(c, start.body)).body).toMatchObject({ passed: true, progressed: true });
+
+    const p = await progressOf(userId, topic.id);
+    expect(p?.masteredAt).toBeInstanceOf(Date);
+    expect(p?.tierQuizPassed).toEqual([false, false, true]);
+    expect((await c.get(`/topics/${topic.id}/progress`)).body).toMatchObject({
+      scope: "one_shot",
+      current_difficulty: "beginner",
+      tier_quiz_passed: [false, false, true],
+      mastered: true,
+    });
   });
 });

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Difficulty } from "@spoin/shared/enums";
-import { card, engagementEvent, subtopic, topic, userTopic } from "../src/db/schema.ts";
+import { card, engagementEvent, subtopic, topic, userCardState, userTopic } from "../src/db/schema.ts";
 import { deps } from "./helpers.ts";
 
 /*
@@ -22,7 +22,7 @@ export async function makeTopic(
     .returning();
   if (!t) throw new Error("topic insert returned nothing");
 
-  const subs: (typeof subtopic.$inferSelect)[] = [];
+  const subs: Subtopic[] = [];
   const cards: (typeof card.$inferSelect)[] = [];
   for (const difficulty of ["beginner", "intermediate", "advanced"] as Difficulty[]) {
     for (let i = 0; i < (opts.subtopicsPerTier ?? 1); i++) {
@@ -40,27 +40,33 @@ export async function makeTopic(
         .returning();
       if (!s) throw new Error("subtopic insert returned nothing");
       subs.push(s);
-      for (let k = 0; k < (opts.cardsPerSubtopic ?? 3); k++) {
-        const [c] = await db
-          .insert(card)
-          .values({
-            familyId: randomUUID(),
-            status: "active",
-            topicId: t.id,
-            subtopicId: s.id,
-            difficulty,
-            title: `${s.title} card ${k}`,
-            canonicalTitle: `${s.title} concept ${k}`,
-            summary: "A hook.",
-            body: `The body of ${s.title} card ${k}.`,
-          })
-          .returning();
-        if (!c) throw new Error("card insert returned nothing");
-        cards.push(c);
-      }
+      cards.push(...(await addCards(s, opts.cardsPerSubtopic ?? 3)));
     }
   }
   return { topic: t, subtopics: subs, cards };
+}
+
+type Subtopic = typeof subtopic.$inferSelect;
+
+/** Active cards in a subtopic, numbered after any it already has. */
+export async function addCards(s: Subtopic, n: number, from = 0) {
+  if (n === 0) return [];
+  return db
+    .insert(card)
+    .values(
+      Array.from({ length: n }, (_, i) => ({
+        familyId: randomUUID(),
+        status: "active" as const,
+        topicId: s.topicId,
+        subtopicId: s.id,
+        difficulty: s.difficulty,
+        title: `${s.title} card ${from + i}`,
+        canonicalTitle: `${s.title} concept ${from + i}`,
+        summary: "A hook.",
+        body: `The body of ${s.title} card ${from + i}.`,
+      })),
+    )
+    .returning();
 }
 
 export async function follow(userId: string, topicId: string, displayName = "My topic") {
@@ -82,5 +88,18 @@ export async function read(
     subtopicId: c.subtopicId,
     kind,
     occurredAt: at,
+  });
+}
+
+/** The seen-state row the coverage gate counts (ADR-0010). */
+export async function markSeen(userId: string, c: typeof card.$inferSelect) {
+  await db.insert(userCardState).values({
+    userId,
+    cardId: c.id,
+    topicId: c.topicId,
+    subtopicId: c.subtopicId,
+    state: "seen",
+    seenAt: new Date(),
+    completedVia: "explicit_complete",
   });
 }

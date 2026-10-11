@@ -42,3 +42,6 @@ export function connectUniverse(
   const pool = makePool(url, { name: "universe", max: opts.max ?? 3, readOnly: opts.readOnly });
   return { pool, db: drizzle(pool, { schema: universeSchema }) };
 }
+
+/** A transaction handle; services that compose take `Db | Tx`. */
+export type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];

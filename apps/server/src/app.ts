@@ -8,6 +8,7 @@ import { authRoutes } from "./routes/auth.ts";
 import { healthRoutes } from "./routes/health.ts";
 import { notesRoutes } from "./routes/notes.ts";
 import { profileRoutes } from "./routes/profile.ts";
+import { topicsRoutes } from "./routes/topics.ts";
 
 /** Any device on the owner's network, so the phone can reach a dev server on the laptop. */
 const LOCAL_NETWORK =
@@ -45,6 +46,7 @@ export function makeApp(deps: Deps) {
 
   app.route("/", profileRoutes(deps));
   app.route("/", notesRoutes(deps));
+  app.route("/", topicsRoutes(deps));
 
   // The contract for clients that aren't TypeScript (the mobile app's codegen).
   app.doc31("/openapi.json", {

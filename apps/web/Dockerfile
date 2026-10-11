@@ -7,6 +7,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/frog/package.json packages/frog/
+COPY packages/pi-ai/package.json packages/pi-ai/
+COPY packages/pi-agent/package.json packages/pi-agent/
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
 RUN npm ci --workspace @spoin/web --include-workspace-root=false --no-audit --no-fund

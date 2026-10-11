@@ -1,0 +1,18 @@
+{
+  "name": "@spoin/pi-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Trotter's hard fork of pi-agent-core (earendil-works/pi, MIT), copied as is for spoin (task 0045): the agent loop, tool execution and its events",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@spoin/pi-ai": "0.1.0",
+    "typebox": "1.3.27"
+  }
+}

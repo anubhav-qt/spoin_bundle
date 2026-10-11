@@ -1,0 +1,12 @@
+{
+  // The fork is kept as Trotter has it (task 0045), so it compiles under Trotter's options:
+  // spoin's base adds four checks that upstream pi was never written for.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false
+  },
+  "include": ["src", "test"]
+}

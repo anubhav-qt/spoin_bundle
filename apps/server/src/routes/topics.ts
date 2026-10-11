@@ -5,16 +5,21 @@ import {
   GenerationProgressOut,
   OnboardingCompleteIn,
   ProgressOut,
+  TopicBatchIn,
+  TopicBatchOut,
   TopicColorIn,
   TopicCurriculumOut,
   TopicDiscoverOut,
   TopicOut,
+  TopicRequestIn,
+  TopicRequestOut,
   TopicStatsOut,
 } from "@spoin/shared";
 import type { Deps } from "../context.ts";
 import { needUser } from "../lib/http.ts";
 import { body, errors, ids, json, router } from "../lib/openapi.ts";
 import { ensureUnlockLatched, toProgressOut } from "../topics/progress.ts";
+import { requestTopic, requestTopics } from "../topics/request.ts";
 import * as topics from "../topics/service.ts";
 
 const TopicId = ids("topic_id");
@@ -23,6 +28,46 @@ const TopicId = ids("topic_id");
 export function topicsRoutes(deps: Deps) {
   const { db, env } = deps;
   return router()
+    .openapi(
+      createRoute({
+        method: "post",
+        path: "/topics",
+        tags: ["topics"],
+        summary: "Ask for a topic by name: an exact match subscribes, a new name is queued for toad_sage",
+        request: body(TopicRequestIn),
+        responses: {
+          201: json(TopicRequestOut, "Subscribed, or queued"),
+          401: errors[401],
+          403: errors[403],
+          409: errors[409],
+          422: errors[422],
+        },
+      }),
+      async (c) => {
+        const caller = needUser(c);
+        return c.json(await requestTopic(deps, caller.id, c.req.valid("json"), caller.isGuest), 201);
+      },
+    )
+    .openapi(
+      createRoute({
+        method: "post",
+        path: "/topics/batch",
+        tags: ["topics"],
+        summary: "Several names at once; each row reports its own outcome (task 0032)",
+        request: body(TopicBatchIn),
+        responses: {
+          201: json(TopicBatchOut, "Per-row outcomes"),
+          401: errors[401],
+          403: errors[403],
+          422: errors[422],
+        },
+      }),
+      async (c) => {
+        const caller = needUser(c);
+        const results = await requestTopics(deps, caller.id, c.req.valid("json").items, caller.isGuest);
+        return c.json({ results }, 201);
+      },
+    )
     .openapi(
       createRoute({
         method: "get",

@@ -1,6 +1,6 @@
 # ADR-0106: Spoin moves to TypeScript on Hono, and a 24/7 pi harness authors the universe and its cards
 
-- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
+- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0025, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
 - **Date:** 2026-10-11
 - **Deciders:** owner (every decision below is the owner's, asked one by one), Claude
 
@@ -74,11 +74,18 @@ its prompts, canon and validators are reused.
     then its data generation (cards and questions).
   - **Feedback**, as in Trotter: an Auditor that reads every run, and lessons kept from
     every failure and fed back into the chats' instructions.
+  - **Frogs**: a topic's tadpole becomes its frog once the topic's first generation is
+    live in production. Later updates and feedback-driven improvements to that topic run
+    in its frog. (Not `packages/frog`, the retrieval library of ADR-0087: same word,
+    different thing.)
 - **Nothing waits on the owner.** Before anything goes live, a separate model call runs a
   verification checklist written with the owner. What passes goes live; the owner
   audits afterwards.
-- Topics come from a queue the owner fills in admin. User requests feed the same queue
-  later.
+- Topics come from a queue the owner fills in admin, and user requests feed the same
+  queue from the start. A name with no exact alias match becomes a pending topic, the
+  requester's custom subscription and a generate job; toad_sage then validates it,
+  merges it into an existing topic, or rejects it with a reason the user sees. No model
+  runs inside the request, which amends ADR-0025's synchronous name check.
 
 **Operations.** All admin lives in the Next.js app behind the admin role, status included.
 The new system starts from empty databases in its own compose project and its own

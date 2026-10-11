@@ -1,3 +1,4 @@
+import type { Embedder } from "@spoin/frog/embeddings";
 import type {
   CustomTopicStatusOut,
   GenerationProgressOut,
@@ -361,13 +362,14 @@ export async function curriculum(ctx: Ctx, userId: string, topicId: string): Pro
  * topics and from the ones before it in the run. Picked before the write transaction,
  * so no connection is held while the embedder runs.
  */
-async function pickHues(
-  ctx: Ctx,
+export async function pickHues(
+  db: Db | Tx,
+  embedder: Embedder,
   userId: string,
   topics: Topic[],
   excluding?: string,
 ): Promise<(number | null)[]> {
-  const rows = await ctx.db
+  const rows = await db
     .select({ topicId: userTopic.topicId, hue: userTopic.accentHue })
     .from(userTopic)
     .where(and(eq(userTopic.userId, userId), excluding ? ne(userTopic.topicId, excluding) : undefined))
@@ -380,7 +382,7 @@ async function pickHues(
   });
   const hues: (number | null)[] = [];
   for (const [i, t] of topics.entries()) {
-    const hue = await assignAccentHue(ctx.embedder, {
+    const hue = await assignAccentHue(embedder, {
       topicId: t.id,
       topicName: t.canonicalName,
       topicEmbedding: t.embedding,
@@ -394,7 +396,7 @@ async function pickHues(
 }
 
 /** The subscription, its progress row and the subscriber count, together. Null if already following. */
-async function follow(
+export async function followTopic(
   tx: Tx,
   userId: string,
   t: Topic,
@@ -431,10 +433,15 @@ export async function subscribe(
   const t = await loadTopic(ctx.db, topicId);
   if (!t) throw new HttpError(404, "Unknown topic");
   if (await loadSubscription(ctx.db, userId, topicId)) throw new HttpError(409, "Already subscribed");
-  const [hue = null] = await pickHues(ctx, userId, [t]);
+  const [hue = null] = await pickHues(ctx.db, ctx.embedder, userId, [t]);
   return ctx.db.transaction(async (tx) => {
     // No rename UI yet, so the label starts as the canonical name.
-    const out = await follow(tx, userId, t, { displayName: t.canonicalName, isCustom: false, entry, hue });
+    const out = await followTopic(tx, userId, t, {
+      displayName: t.canonicalName,
+      isCustom: false,
+      entry,
+      hue,
+    });
     if (!out) throw new HttpError(409, "Already subscribed");
     await dropFeedPlan(tx, userId);
     return out;
@@ -482,13 +489,13 @@ export async function completeOnboarding(
     : [];
   // In the order the user picked them, which is the order hues are dealt in.
   const ordered = [...wanted.keys()].flatMap((id) => found.filter((t) => t.id === id));
-  const hues = await pickHues(ctx, userId, ordered);
+  const hues = await pickHues(ctx.db, ctx.embedder, userId, ordered);
 
   return ctx.db.transaction(async (tx) => {
     const out: TopicOut[] = [];
     for (const [i, t] of ordered.entries()) {
       const entry = wanted.get(t.id) ?? "beginner";
-      const followed = await follow(tx, userId, t, {
+      const followed = await followTopic(tx, userId, t, {
         displayName: t.canonicalName,
         isCustom: false,
         entry,
@@ -515,7 +522,7 @@ export async function setColor(
   const sub = await loadSubscription(ctx.db, userId, topicId);
   const t = sub && (await loadTopic(ctx.db, topicId));
   if (!sub || !t) throw new HttpError(404, "Not subscribed to this topic");
-  const accentHue = hue ?? (await pickHues(ctx, userId, [t], topicId))[0] ?? null;
+  const accentHue = hue ?? (await pickHues(ctx.db, ctx.embedder, userId, [t], topicId))[0] ?? null;
   const [ut] = await ctx.db.update(userTopic).set({ accentHue }).where(eq(userTopic.id, sub.id)).returning();
   if (!ut) throw notFound("Subscription");
   const progress = await loadProgress(ctx.db, userId, topicId);

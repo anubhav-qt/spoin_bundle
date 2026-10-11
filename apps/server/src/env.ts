@@ -128,6 +128,16 @@ const Env = z.object({
   /** How many results each of the chat's search tools returns: cards, and corpus passages. */
   ASK_AI_CONTEXT_NEIGHBOURS: int(4),
 
+  // -- models (task 0045, Phase 8) ---------------------------------------------
+  /** CLIProxyAPI, which serves Gemini from the owner's Antigravity sign-ins. */
+  CLIPROXY_URL: z.string().url().default("http://127.0.0.1:8318"),
+  /** Unset means no Gemini: the proxy refuses every call without it. */
+  CLIPROXY_API_KEY: z.string().optional(),
+  /** The proxy's management API, which the model accounts page reads. */
+  CLIPROXY_MANAGEMENT_KEY: z.string().optional(),
+  /** NVIDIA's free API, shared with breader. Unset means no NIM leg. */
+  NVIDIA_NIM_API_KEY: z.string().optional(),
+
   /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */
   DEV_ROUTES: bool.default(false),
 });

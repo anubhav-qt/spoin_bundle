@@ -15,6 +15,13 @@
       "when": 1791725810381,
       "tag": "0001_topic_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791748257709,
+      "tag": "0002_model_call",
+      "breakpoints": true
     }
   ]
 }

@@ -17,10 +17,11 @@
   "scripts": {
     "check": "biome check . && npm run typecheck && npm test",
     "fix": "biome check --write .",
-    "typecheck": "tsc --noEmit -p apps/server && tsc --noEmit -p packages/frog && tsc --noEmit -p packages/shared && tsc --noEmit -p packages/pi-ai && tsc --noEmit -p packages/pi-agent && npm run typecheck -w @spoin/web",
+    "typecheck": "npm run types && tsc --noEmit -p apps/server && tsc --noEmit -p packages/frog && tsc --noEmit -p packages/shared && tsc --noEmit -p packages/pi-ai && tsc --noEmit -p packages/pi-agent && npm run typecheck -w @spoin/web",
     "test": "npm test -w @spoin/pi-ai -w @spoin/frog -w @spoin/server",
     "stack": "docker compose -f infra/compose.yml up -d --build",
-    "stack:down": "docker compose -f infra/compose.yml down"
+    "stack:down": "docker compose -f infra/compose.yml down",
+    "types": "npm run types -w @spoin/pi-ai -w @spoin/pi-agent"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",

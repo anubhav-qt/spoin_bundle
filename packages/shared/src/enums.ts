@@ -107,3 +107,12 @@ export type CardType = (typeof CARD_TYPES)[number];
  */
 export const VISUAL_KINDS = ["ascii", "image"] as const;
 export type VisualKind = (typeof VISUAL_KINDS)[number];
+
+/**
+ * Why a model call failed, breader's kinds (task 0045), which decide what the balancer does next:
+ * `rate` 429; `busy` 5xx or "overloaded"; `slow` 504, a timeout, a dropped stream; `empty` an
+ * answer with no text and no tool call; `cut` the answer hit max_tokens; `bad` another 4xx, the
+ * request itself is wrong; `gone` 401, 403 or 404, the model isn't open to the key.
+ */
+export const MODEL_CALL_FAILURES = ["rate", "busy", "slow", "empty", "cut", "bad", "gone"] as const;
+export type ModelCallFailure = (typeof MODEL_CALL_FAILURES)[number];

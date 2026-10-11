@@ -70,3 +70,7 @@ docs/the_spoin_universe/temp/*
 
 # CLIProxyAPI's sign-ins for the spoin-hono stack (copies of Trotter's; task 0045)
 infra/.cliproxy/
+
+# The pi fork's declarations, emitted by `npm run types` for the stricter packages that import it
+packages/pi-ai/types/
+packages/pi-agent/types/

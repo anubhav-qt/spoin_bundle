@@ -455,9 +455,12 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   is tests of that path, not a port.
 - **The balancer is for NIM only** (2026-10-12). It is the stream function of a chat on NIM:
   each model call takes the best free rung (Kimi K3 primary, Nemotron 3 Ultra while it is down,
-  24 calls at once each, as breader), is buffered until it completes, and on failure cools that
-  model and is retried there or on the next rung before the chat sees it, so a writer can move
-  to Nemotron mid-run. Its state is per process, as breader's. Gemini calls go straight to
+  24 calls at once each), is buffered until it completes, and on failure cools that model and is
+  retried there or on the next rung before the chat sees it, so a writer can move to Nemotron
+  mid-run. The limits are breader's `origin/dev` as of `e3a3bce` (2026-10-11): each rung answers in
+  at most 130,000 tokens, since NVIDIA capped Kimi K3 at 131,072 and Kimi counts the prompt in a
+  limit of its own, and a call refused for asking too much is asked again for what the refusal
+  allows. Its state is per process, as breader's. Gemini calls go straight to
   CLIProxyAPI, which rotates the two accounts, with pi's own retries on 429 and 5xx.
 - **Every model call is a `model_call` row** (2026-10-12), Gemini and NIM alike: the model, ok
   or the failure kind and its reason, seconds to the first token, total seconds, prompt and

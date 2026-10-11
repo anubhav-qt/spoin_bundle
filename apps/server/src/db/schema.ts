@@ -11,6 +11,7 @@ import {
   CARD_STATUSES,
   DIFFICULTIES,
   ENGAGEMENT_KINDS,
+  MODEL_CALL_FAILURES,
   QUESTION_KINDS,
   QUESTION_STATUSES,
   QUIZ_KINDS,
@@ -66,6 +67,7 @@ export const cardSource = pgEnum("card_source", CARD_SOURCES);
 export const rejectionStage = pgEnum("rejection_stage", REJECTION_STAGES);
 export const seenState = pgEnum("seen_state", SEEN_STATES);
 export const engagementKind = pgEnum("engagement_kind", ENGAGEMENT_KINDS);
+export const modelCallFailure = pgEnum("model_call_failure", MODEL_CALL_FAILURES);
 export const questionKind = pgEnum("question_kind", QUESTION_KINDS);
 export const questionStatus = pgEnum("question_status", QUESTION_STATUSES);
 export const quizKind = pgEnum("quiz_kind", QUIZ_KINDS);
@@ -889,3 +891,31 @@ export const jobRuns = pgTable("job_runs", {
   lastErrorAt: tz("last_error_at"),
   detail: jsonb("detail").$type<Record<string, unknown>>(),
 });
+
+/**
+ * One row per model call, every try included, Gemini and NIM alike (task 0045): timings and token
+ * counts, never text. The model accounts page reads it. A failed call is never an ok one with a
+ * reason, so the two are counted apart (CLAUDE.md).
+ */
+export const modelCall = pgTable(
+  "model_call",
+  {
+    id: id(),
+    startedAt: tz("started_at").notNull(),
+    /** pi's provider: CLIProxyAPI's channel (`antigravity`) or `nvidia`. */
+    provider: varchar("provider", { length: 32 }).notNull(),
+    model: varchar("model", { length: 128 }).notNull(),
+    ok: boolean("ok").notNull(),
+    failure: modelCallFailure("failure"),
+    reason: text("reason"),
+    /** Thinking included: on NIM, mostly time in NVIDIA's queue. */
+    firstTokenMs: integer("first_token_ms"),
+    totalMs: integer("total_ms").notNull(),
+    promptTokens: integer("prompt_tokens"),
+    outputTokens: integer("output_tokens"),
+  },
+  (t) => [
+    index("ix_model_call_model_started").on(t.model, t.startedAt),
+    check("ck_model_call_failure", sql`ok = (failure IS NULL)`),
+  ],
+);

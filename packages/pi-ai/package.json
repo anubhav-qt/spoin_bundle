@@ -6,9 +6,13 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.ts"
+    }
   },
   "scripts": {
+    "types": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
   },

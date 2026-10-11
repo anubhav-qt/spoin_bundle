@@ -1,0 +1,13 @@
+{
+  // Declarations only, for the packages that import the fork: their stricter typecheck reads
+  // these instead of following the imports into source written for Trotter's options.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "types"
+  },
+  "include": ["src"]
+}

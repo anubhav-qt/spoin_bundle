@@ -14,6 +14,7 @@ RUN npm ci --workspace @spoin/server --include-workspace-root=false --ignore-scr
 COPY tsconfig.base.json ./
 COPY packages/shared packages/shared
 COPY packages/frog packages/frog
+COPY packages/pi-ai packages/pi-ai
 COPY apps/server apps/server
 RUN npm run build -w @spoin/server
 

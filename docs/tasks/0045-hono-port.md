@@ -114,6 +114,12 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   server keeps the 200-a-day cap and the `OFF_TOPIC` sentinel (any reply that starts with
   it, however chunked); the embedding pre-check and `ASK_AI_TOPIC_SIMILARITY_FLOOR` are gone.
   A refused turn counts against the cap; a failed or empty one does not.
+- **Tool errors teach** (2026-10-11). A wrong tool call throws `ToolError`, one short line on
+  what was wrong and how to call it right, which the harness returns to the agent as the
+  call's result; any other failure is logged and reaches the agent as a short line. A
+  half-good call returns what it could plus a `note`: AskAI's `read()` returns the cards it
+  found and names the ids it left out, and errors only when none was found. Phase 9's tools
+  follow the same rule, and its tool wrapper keeps argument-validation errors short too.
 
 ## Asked when we get there
 

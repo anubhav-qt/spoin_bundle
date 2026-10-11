@@ -126,6 +126,12 @@ its prompts, canon and validators are reused.
     look past records up through tools when they need them instead of carrying them in
     their context, so a judgment rests on what was actually recorded, never on a
     remembered or invented history.
+  - **Tool errors teach.** Every error an agent gets back from a tool is one short line
+    saying what was wrong and how to call it right, so a failed call is followed by a
+    good one. A tool reports a wrong call by throwing `ToolError`, and the harness hands
+    its message back as the call's result; any other failure is logged in full and the
+    agent gets a short line, never a stack trace. A call that half-succeeds returns what
+    it could, with a note naming what it couldn't.
 - **Nothing waits on the owner.** Before anything goes live, a separate model call runs a
   verification checklist written with the owner. What passes goes live; the owner
   audits afterwards.

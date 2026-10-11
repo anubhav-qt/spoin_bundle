@@ -6,7 +6,7 @@ import { askConversation, askMessage, askUsage, topic } from "../db/schema.ts";
 import { notFound } from "../lib/errors.ts";
 import { iso } from "../lib/wire.ts";
 import { log } from "../log.ts";
-import { topicTools } from "./tools.ts";
+import { activeCards, topicTools } from "./tools.ts";
 
 /*
  * AskAI (ADR-0077, amended by ADR-0106): one persistent thread per reader per topic,
@@ -170,7 +170,7 @@ export async function* answer(
   const conversationId = await openConversation(db, userId, t.id);
   const tools = topicTools(db, ctx.embedder, t.id, { searchLimit: env.ASK_AI_CONTEXT_NEIGHBOURS });
   // Any card that is not an active one of this topic is no hint at all.
-  const [card] = cardId ? await tools.read([cardId]) : [];
+  const [card] = cardId ? await activeCards(db, t.id, [cardId]) : [];
   // Written first, so the question survives a stream that dies mid-answer.
   await db.insert(askMessage).values({ conversationId, role: "user", content: question });
 

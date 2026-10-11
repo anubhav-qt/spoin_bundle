@@ -3,7 +3,7 @@ import { asc, eq } from "drizzle-orm";
 import { afterEach, describe, expect, test } from "vitest";
 import { noAskChat } from "../src/ask/chat.ts";
 import { answer } from "../src/ask/service.ts";
-import { topicTools } from "../src/ask/tools.ts";
+import { ToolError, topicTools } from "../src/ask/tools.ts";
 import { askConversation, askMessage, askUsage, card } from "../src/db/schema.ts";
 import { askChat } from "./ask-chat.ts";
 import { makeTopic } from "./fixtures.ts";
@@ -271,7 +271,7 @@ describe("the chat's tools read one topic's public material only", () => {
     ]);
   });
 
-  test("cards and read leave out other topics, retired cards and ids a model made up", async () => {
+  test("cards and read leave out other topics and retired cards", async () => {
     const { topic, subtopics, cards } = await makeTopic();
     const other = await makeTopic();
     const [s] = subtopics;
@@ -284,11 +284,63 @@ describe("the chat's tools read one topic's public material only", () => {
     const tools = toolsFor(topic.id);
 
     expect((await tools.cards(s?.id ?? "")).map((k) => k.id).sort()).toEqual(live.map((k) => k.id).sort());
-    expect(await tools.cards(other.subtopics[0]?.id ?? "")).toEqual([]);
-    expect(await tools.cards("subtopic-1")).toEqual([]);
+    // A real subtopic with nothing active is an answer, not an error.
+    await db
+      .update(card)
+      .set({ status: "retired" })
+      .where(eq(card.subtopicId, subtopics[1]?.id ?? ""));
+    expect(await tools.cards(subtopics[1]?.id ?? "")).toEqual([]);
 
-    const read = await tools.read([live[0]?.id ?? "", retired?.id ?? "", other.cards[0]?.id ?? "", "card-7"]);
-    expect(read).toEqual([expect.objectContaining({ id: live[0]?.id, body: live[0]?.body })]);
+    expect(await tools.read([live[0]?.id ?? "", live[0]?.id ?? ""])).toEqual({
+      cards: [expect.objectContaining({ id: live[0]?.id, body: live[0]?.body })],
+    });
+    const partial = await tools.read([
+      live[0]?.id ?? "",
+      retired?.id ?? "",
+      other.cards[0]?.id ?? "",
+      "card-7",
+    ]);
+    expect(partial).toEqual({
+      cards: [expect.objectContaining({ id: live[0]?.id })],
+      note: `Left out, not active cards in this topic: "${retired?.id}", "${other.cards[0]?.id}", "card-7".`,
+    });
+  });
+
+  test("a wrong call is one short line saying how to call it right", async () => {
+    const { topic } = await makeTopic();
+    const other = await makeTopic();
+    const tools = toolsFor(topic.id);
+    const otherSubtopic = other.subtopics[0]?.id ?? "";
+    const runaway = "x".repeat(5000);
+
+    await expect(tools.cards("subtopic-1")).rejects.toThrow(
+      new ToolError(`"subtopic-1" is not a subtopic id. outline() lists this topic's subtopics.`),
+    );
+    await expect(tools.cards(otherSubtopic)).rejects.toThrow(
+      new ToolError(`No subtopic ${otherSubtopic} in this topic. outline() lists them.`),
+    );
+    await expect(tools.read([])).rejects.toThrow(
+      new ToolError("Give at least one card id. search() and cards() list them."),
+    );
+    await expect(tools.read(["a", "b", "c", "d", "e"])).rejects.toThrow(
+      new ToolError(
+        `No active card in this topic has id "a", "b", "c" and 2 more. search() and cards() list them.`,
+      ),
+    );
+    await expect(tools.search("  ")).rejects.toThrow(
+      new ToolError("Give a query: what to look for, in words."),
+    );
+    await expect(toolsFor(crypto.randomUUID()).outline()).rejects.toThrow(
+      new ToolError("This topic no longer exists."),
+    );
+
+    // Whatever the model sends, the error stays one short line.
+    for (const call of [tools.cards(runaway), tools.read([runaway, runaway.repeat(2)])]) {
+      const err = await call.catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(ToolError);
+      expect((err as Error).message.length).toBeLessThan(200);
+      expect((err as Error).message).not.toContain("\n");
+    }
   });
 
   test("search ranks this topic's active cards by meaning, in the embedder's own space", async () => {

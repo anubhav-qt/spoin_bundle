@@ -17,6 +17,7 @@ export interface AskTurn {
   question: string;
   /** The card the reader is on, already checked to be an active card of this topic. */
   card: CardFull | null;
+  /** A `ToolError`'s message goes back to the chat as that call's result, so it can call again right. */
   tools: TopicTools;
 }
 

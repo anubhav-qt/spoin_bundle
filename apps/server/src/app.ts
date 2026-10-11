@@ -6,6 +6,7 @@ import { REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts"
 import { router } from "./lib/openapi.ts";
 import { adminRoutes } from "./routes/admin.ts";
 import { authRoutes } from "./routes/auth.ts";
+import { devRoutes } from "./routes/dev.ts";
 import { engagementRoutes } from "./routes/engagement.ts";
 import { feedRoutes } from "./routes/feed.ts";
 import { healthRoutes } from "./routes/health.ts";
@@ -57,6 +58,8 @@ export function makeApp(deps: Deps) {
   app.route("/", quizRoutes(deps));
   app.route("/", reportsRoutes(deps));
   app.route("/", adminRoutes(deps));
+  // Never in production, whatever the flag says: it rewrites the caller's whole progress.
+  if (env.DEV_ROUTES && env.NODE_ENV !== "production") app.route("/", devRoutes(deps));
 
   // The contract for clients that aren't TypeScript (the mobile app's codegen).
   app.doc31("/openapi.json", {

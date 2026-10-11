@@ -128,7 +128,7 @@ const Env = z.object({
   ASK_AI_TOPIC_SIMILARITY_FLOOR: num(0.18),
   ASK_AI_CONTEXT_NEIGHBOURS: int(4),
 
-  /** Opens `/dev/*` and the OpenAPI UI outside production. */
+  /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */
   DEV_ROUTES: bool.default(false),
 });
 

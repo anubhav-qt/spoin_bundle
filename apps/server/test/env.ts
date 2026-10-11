@@ -9,4 +9,5 @@ export const testEnv: Record<string, string> = {
   // helpers.ts gives each simulated client its own address in this header.
   CLIENT_IP_HEADER: "x-forwarded-for",
   EMBEDDER: "hash",
+  DEV_ROUTES: "true",
 };

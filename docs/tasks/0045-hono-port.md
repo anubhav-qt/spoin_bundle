@@ -31,7 +31,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz, reports, admin repairs and ASCII review done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz, reports, admin repairs and ASCII review, dev routes done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
@@ -84,6 +84,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   tests write a landed repair directly. The gag library is copied to
   `apps/server/src/content/ascii-library/` and `build.mjs` puts it beside the bundle; a missing
   file throws instead of loading an empty library, because it is committed.
+- **`/dev/*` never runs in production** (2026-10-11): mounted only with `DEV_ROUTES` and outside
+  production, checked by a test. `/dev/reset` unfollows through the same path as the button, so
+  subscriber counts stay true (the Python deleted the rows directly).
 
 ## Asked when we get there
 

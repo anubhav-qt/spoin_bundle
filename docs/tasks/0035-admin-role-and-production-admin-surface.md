@@ -1,5 +1,9 @@
 # Task 0035: A real admin-role gate for `/admin/*` (and `/dev/*`)
 
+> **Closed on the `hono` branch by [task 0045](0045-hono-port.md) (2026-10-11).** `/admin/*` needs
+> the admin role in every environment (ADR-0106); `/dev/*` is mounted only outside production and
+> only with `DEV_ROUTES`. The Python keeps its `env` gate until it is deleted.
+
 **Owner:** unassigned
 **Blocked on:** nothing (but low priority until there's a reason to run an
 admin surface in production; B14's repair queue makes that more likely than

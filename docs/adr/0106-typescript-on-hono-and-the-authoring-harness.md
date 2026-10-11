@@ -1,0 +1,124 @@
+# ADR-0106: Spoin moves to TypeScript on Hono, and a 24/7 pi harness authors the universe and its cards
+
+- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
+- **Date:** 2026-10-11
+- **Deciders:** owner (every decision below is the owner's, asked one by one), Claude
+
+## Context
+
+On 2026-10-11 the system had never been deployed. The v1 finish-line plan was still
+"proposed, not started", `/admin/*` and `/dev/*` existed only outside production because
+there was no admin role (task 0035), generation was a manual run on the owner's GPU
+(ADR-0094), and the corpus was authored by hand by another agent (Antigravity) following
+`docs/the_spoin_universe/procedure.md`.
+
+Meanwhile every other project the owner runs had converged on one shape, and it works in
+production:
+
+- **breader**: Hono + Drizzle + Better Auth + zod, npm workspaces, one image with `api`,
+  `worker` and `migrate` entrypoints, a token-gated status page fed by a `job_runs`
+  table, and a 24/7 AI marker on NVIDIA NIM behind a small balancer that was itself
+  adapted from spoin's ADR-0084.
+- **POM's Seelie and Trotter**: a hard fork of pi (`pi-ai` + `pi-agent`) reaching the
+  owner's subscriptions through CLIProxyAPI, long-running chats with compaction, a
+  wake queue in the database, versioned records, an Auditor and a Lessons chat.
+
+About half of `apps/api` (12.5k of 26.5k lines) was the generation write path:
+LangGraph, LangChain, the Gemini quota machinery, the Mistral client. A pi harness
+replaces all of it, which made a port mostly a port of the read path.
+
+The target is Oracle Cloud's free tier: one ARM machine with 12 GB of RAM and no GPU,
+holding all the data for now. Everything is tested in local Docker first.
+
+## Decision
+
+**The stack.**
+
+- Everything is TypeScript on Node 24. npm workspaces, breader-style:
+  `apps/server` (Hono: the API, the worker and the migrator as entrypoints of one image),
+  `apps/web` (Next.js, unchanged except `lib/api.ts` and login),
+  `packages/shared` (the zod wire contract), `packages/frog` (the corpus library),
+  `packages/pi-ai` and `packages/pi-agent` (the harness fork).
+- The contract is zod in `packages/shared`, used by both sides. The server declares routes
+  with `@hono/zod-openapi` and serves an OpenAPI document, which is what a non-TS client
+  (the React Native app) generates from. This replaces `packages/api-types` (ADR-0001).
+- The HTTP surface is ported 1:1: same paths, same JSON field names, errors as
+  `{detail}`. The web app keeps working without a rewrite.
+- Drizzle + `pg`. **Two databases stay** (ADR-0088): the app's and `the_spoin_universe`,
+  each with its own migrations folder. frog still never imports spoin.
+- Auth is Better Auth: email and password, Google, anonymous guests linked on claim,
+  bearer tokens for the mobile client, and an admin role (which closes task 0035).
+- Embeddings run in-process: `Qwen3-Embedding-0.6B` as ONNX on the CPU, ARM64 included.
+  The model is unchanged and every vector is re-embedded once, because ONNX output is not
+  byte-identical to sentence-transformers' and ADR-0097 allows one vector space.
+- Background work is our own queue table plus `job_runs`, no job library.
+- Biome lints and formats; vitest runs against real Postgres, keeping the existing rule
+  that the database's own behaviour is tested against the database.
+
+**The harness.** Generation is rebuilt, not ported. The LangGraph pipeline is deleted and
+its prompts, canon and validators are reused.
+
+- Built on Trotter's pi fork with image input added back, because sourcing an image means
+  looking at it.
+- Models come from CLIProxyAPI (Gemini through the owner's Antigravity sign-ins) and
+  NVIDIA NIM, behind a breader-style balancer. The accounts are shared with breader,
+  Seelie and Trotter.
+- Every chat is long-running and Trotter-shaped: woken from a queue in the database,
+  compacted when full, every run's messages and tool calls stored, every change a
+  versioned record.
+- The chats are called **tadpoles**; the manager is **toad_sage**:
+  - **toad_sage** (the manager): takes a topic off the queue and does the intake the
+    procedure's Phase A asked the owner for: category, sub-category, survey or topic.
+  - **Curriculum**: writes the topic's curriculum against the corpus.
+  - **One chat per topic**: runs that topic's pipeline (research, corpus, images) and
+    then its data generation (cards and questions).
+  - **Feedback**, as in Trotter: an Auditor that reads every run, and lessons kept from
+    every failure and fed back into the chats' instructions.
+- **Nothing waits on the owner.** Before anything goes live, a separate model call runs a
+  verification checklist written with the owner. What passes goes live; the owner
+  audits afterwards.
+- Topics come from a queue the owner fills in admin. User requests feed the same queue
+  later.
+
+**Operations.** All admin lives in the Next.js app behind the admin role, status included.
+The new system starts from empty databases in its own compose project and its own
+volume, so nothing it does can touch `spoin_db_2`. The Python code is deleted once the TS
+server passes its ported tests; git history keeps it.
+
+## Consequences
+
+- One language and one contract from the database to the browser, and the owner's
+  proven ops patterns apply directly.
+- The production server stops being "minimal" (ADR-0094 is superseded): it runs the
+  harness, the embedder and CLIProxyAPI. 12 GB has to hold Postgres, Node, a 0.6B ONNX
+  model and the proxy, so memory caps per container are part of the compose file, not
+  an afterthought.
+- No GPU anywhere in production. Bulk embedding is CPU-bound and slower. That is
+  acceptable for a corpus measured in thousands of chunks, not millions.
+- Every test guarantee the Python suite gave is gone until its TS port lands. Tests are
+  ported with each package, not after.
+- Using subscriptions through CLIProxyAPI may go against the providers' terms and can be
+  blocked (Trotter's ADR 0005 says the same). NIM is the second leg, and a paid key is
+  the fallback that needs no code change.
+- CLAUDE.md's rule still binds: **measure a provider's concurrency behaviour before
+  building on it.** Neither CLIProxyAPI-Gemini nor NIM has been measured from spoin.
+- Today's 605 cards stay in `spoin_db_2` and its Neon copy; the new system does not
+  carry them over.
+
+## Alternatives considered
+
+- **Keep the Python API and add only a TS harness.** Faster to production, but two
+  languages and two schema systems (Pydantic and zod) forever, and torch on the server.
+  The owner chose one stack.
+- **Hono RPC (`hc<AppType>`) instead of OpenAPI.** End-to-end types with no codegen, but
+  it ties every client to TypeScript, and type-checking slows as routes grow.
+- **Port the LangGraph pipeline 1:1 and add the harness later.** Less redesign up front,
+  but it ports 12.5k lines that the harness then replaces.
+- **pg-boss for jobs.** Proven, but the queue the harness needs is the one Trotter
+  already shows: one table we can read in admin.
+
+## Revisit when
+
+- A provider through CLIProxyAPI blocks the accounts, or NIM's free API changes terms.
+- The 12 GB machine runs out of memory under the harness plus the API.
+- The corpus grows past what CPU embedding re-embeds in an acceptable time.

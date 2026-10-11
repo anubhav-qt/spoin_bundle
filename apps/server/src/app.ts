@@ -6,6 +6,7 @@ import { REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts"
 import { router } from "./lib/openapi.ts";
 import { authRoutes } from "./routes/auth.ts";
 import { healthRoutes } from "./routes/health.ts";
+import { profileRoutes } from "./routes/profile.ts";
 
 /** Any device on the owner's network, so the phone can reach a dev server on the laptop. */
 const LOCAL_NETWORK =
@@ -40,6 +41,8 @@ export function makeApp(deps: Deps) {
   // Before Better Auth's catch-all, so these paths are answered by our own routes.
   app.route("/", authRoutes(deps));
   app.on(["GET", "POST"], "/auth/*", (c) => deps.auth.handler(c.req.raw));
+
+  app.route("/", profileRoutes(deps));
 
   // The contract for clients that aren't TypeScript (the mobile app's codegen).
   app.doc31("/openapi.json", {

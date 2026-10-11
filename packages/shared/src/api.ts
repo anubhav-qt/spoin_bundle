@@ -357,7 +357,8 @@ export const PreferencesOut = z
 export const PreferencesUpdateIn = z
   .object({
     palette: z.string().min(1).max(64),
-    custom_palettes: z.array(CustomPalette).max(50),
+    // A generous ceiling: the picker scrolls well before this, and the column has no business holding hundreds.
+    custom_palettes: z.array(CustomPalette).max(50, "At most 50 saved themes."),
     font: z.string().min(1).max(64),
   })
   .meta({ id: "PreferencesUpdateIn" });
@@ -580,8 +581,80 @@ export const AskConversationOut = z
   })
   .meta({ id: "AskConversationOut" });
 
+// -------------------------------------------------------------- types --
+// One type per schema, named the same: the value is the validator, the type is its output.
+
+export type Difficulty = z.infer<typeof Difficulty>;
+export type EngagementKind = z.infer<typeof EngagementKind>;
+export type VisualKind = z.infer<typeof VisualKind>;
+export type CardReportReason = z.infer<typeof CardReportReason>;
+export type RepairMode = z.infer<typeof RepairMode>;
+export type RepairStatus = z.infer<typeof RepairStatus>;
+export type ErrorOut = z.infer<typeof ErrorOut>;
 export type TopicOut = z.infer<typeof TopicOut>;
+export type TopicColorIn = z.infer<typeof TopicColorIn>;
+export type TopicRequestIn = z.infer<typeof TopicRequestIn>;
+export type TopicRequestOut = z.infer<typeof TopicRequestOut>;
+export type TopicBatchIn = z.infer<typeof TopicBatchIn>;
+export type TopicBatchItemOut = z.infer<typeof TopicBatchItemOut>;
+export type TopicBatchOut = z.infer<typeof TopicBatchOut>;
+export type TopicDiscoverOut = z.infer<typeof TopicDiscoverOut>;
+export type CustomTopicStatusOut = z.infer<typeof CustomTopicStatusOut>;
+export type GenerationSubtopicProgressOut = z.infer<typeof GenerationSubtopicProgressOut>;
+export type GenerationProgressOut = z.infer<typeof GenerationProgressOut>;
+export type ProgressOut = z.infer<typeof ProgressOut>;
+export type TopicStatsOut = z.infer<typeof TopicStatsOut>;
+export type SubtopicProgressOut = z.infer<typeof SubtopicProgressOut>;
+export type TopicCurriculumOut = z.infer<typeof TopicCurriculumOut>;
+export type OnboardingTopicChoice = z.infer<typeof OnboardingTopicChoice>;
+export type OnboardingCompleteIn = z.infer<typeof OnboardingCompleteIn>;
 export type CardOut = z.infer<typeof CardOut>;
 export type FeedOut = z.infer<typeof FeedOut>;
-export type UserOut = z.infer<typeof UserOut>;
+export type LikedCardOut = z.infer<typeof LikedCardOut>;
+export type SavedCardOut = z.infer<typeof SavedCardOut>;
+export type CollectionSort = z.infer<typeof CollectionSort>;
+export type EngagementEventIn = z.infer<typeof EngagementEventIn>;
+export type EngagementBatchIn = z.infer<typeof EngagementBatchIn>;
+export type EngagementAck = z.infer<typeof EngagementAck>;
+export type QuizStartIn = z.infer<typeof QuizStartIn>;
+export type QuizMcqQuestionOut = z.infer<typeof QuizMcqQuestionOut>;
+export type QuizFreeTextQuestionOut = z.infer<typeof QuizFreeTextQuestionOut>;
+export type QuizStartOut = z.infer<typeof QuizStartOut>;
+export type McqAnswerIn = z.infer<typeof McqAnswerIn>;
+export type QuizSubmitMcqIn = z.infer<typeof QuizSubmitMcqIn>;
+export type McqResultOut = z.infer<typeof McqResultOut>;
+export type QuizSubmitMcqOut = z.infer<typeof QuizSubmitMcqOut>;
+export type QuizSubmitFreeTextIn = z.infer<typeof QuizSubmitFreeTextIn>;
+export type QuizFreeTextResultOut = z.infer<typeof QuizFreeTextResultOut>;
+export type RemediationCardOut = z.infer<typeof RemediationCardOut>;
+export type QuizSubmitFreeTextOut = z.infer<typeof QuizSubmitFreeTextOut>;
+export type CustomPalette = z.infer<typeof CustomPalette>;
+export type ImportedFontOut = z.infer<typeof ImportedFontOut>;
 export type PreferencesOut = z.infer<typeof PreferencesOut>;
+export type PreferencesUpdateIn = z.infer<typeof PreferencesUpdateIn>;
+export type UserOut = z.infer<typeof UserOut>;
+export type ClaimIn = z.infer<typeof ClaimIn>;
+export type GoogleClaimIn = z.infer<typeof GoogleClaimIn>;
+export type NoteIn = z.infer<typeof NoteIn>;
+export type NoteOut = z.infer<typeof NoteOut>;
+export type NoteWithCardOut = z.infer<typeof NoteWithCardOut>;
+export type UserProfileUpdateIn = z.infer<typeof UserProfileUpdateIn>;
+export type DailyActivityOut = z.infer<typeof DailyActivityOut>;
+export type ProfileStatsOut = z.infer<typeof ProfileStatsOut>;
+export type DailyGoalOut = z.infer<typeof DailyGoalOut>;
+export type ExportedCardRefOut = z.infer<typeof ExportedCardRefOut>;
+export type ExportedNoteOut = z.infer<typeof ExportedNoteOut>;
+export type ExportedTopicOut = z.infer<typeof ExportedTopicOut>;
+export type ProfileExportOut = z.infer<typeof ProfileExportOut>;
+export type CardReportIn = z.infer<typeof CardReportIn>;
+export type RepairReportOut = z.infer<typeof RepairReportOut>;
+export type RepairAttemptOut = z.infer<typeof RepairAttemptOut>;
+export type RepairCardOut = z.infer<typeof RepairCardOut>;
+export type RepairQueueItemOut = z.infer<typeof RepairQueueItemOut>;
+export type RepairEnqueuedOut = z.infer<typeof RepairEnqueuedOut>;
+export type AsciiSceneOut = z.infer<typeof AsciiSceneOut>;
+export type AsciiSceneKeepIn = z.infer<typeof AsciiSceneKeepIn>;
+export type AsciiSceneRejectIn = z.infer<typeof AsciiSceneRejectIn>;
+export type AsciiSceneActionOut = z.infer<typeof AsciiSceneActionOut>;
+export type AskMessageOut = z.infer<typeof AskMessageOut>;
+export type AskConversationOut = z.infer<typeof AskConversationOut>;

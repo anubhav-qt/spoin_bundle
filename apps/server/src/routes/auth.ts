@@ -8,6 +8,7 @@ import { appUser, authAccount } from "../db/schema.ts";
 import { HttpError, notFound, pgCode, UNIQUE_VIOLATION } from "../lib/errors.ts";
 import { needUser } from "../lib/http.ts";
 import { body, errors, json, router } from "../lib/openapi.ts";
+import { me } from "../profile/service.ts";
 import { toUserOut } from "../users/out.ts";
 
 /**
@@ -64,7 +65,7 @@ export function authRoutes(deps: Deps) {
       async (c) => {
         const caller = needUser(c);
         // Preferences ride on this payload so the client can reconcile its pre-paint cache on load (ADR-0070).
-        return c.json(toUserOut(await load(caller.id)), 200);
+        return c.json(await me(db, caller.id, true), 200);
       },
     )
     .openapi(

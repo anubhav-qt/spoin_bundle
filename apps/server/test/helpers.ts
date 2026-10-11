@@ -21,27 +21,39 @@ export function client(opts: { origin?: string | null } = {}) {
   addresses += 1;
   const ip = `10.0.${Math.floor(addresses / 250)}.${addresses % 250}`;
   let token: string | null = null;
-  const send = async (method: string, path: string, body?: unknown): Promise<Res> => {
+  /** The unparsed response, for binary bodies and multipart requests. */
+  const raw = async (method: string, path: string, body?: RequestInit["body"], contentType?: string) => {
     const headers = new Headers({ "x-forwarded-for": ip });
     if (opts.origin !== null) headers.set("origin", opts.origin ?? "http://localhost:3000");
     if (token) headers.set("authorization", `Bearer ${token}`);
-    if (body !== undefined) headers.set("content-type", "application/json");
-    const res = await app.request(path, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
+    if (contentType) headers.set("content-type", contentType);
+    const res = await app.request(path, { method, headers, body });
     const issued = res.headers.get("set-auth-token");
     if (issued) token = issued;
+    return res;
+  };
+  const parsed = async (res: Response): Promise<Res> => {
     const text = await res.text();
     return { status: res.status, body: text ? JSON.parse(text) : null, headers: res.headers };
   };
+  const send = async (method: string, path: string, body?: unknown): Promise<Res> =>
+    parsed(
+      await raw(
+        method,
+        path,
+        body === undefined ? undefined : JSON.stringify(body),
+        body === undefined ? undefined : "application/json",
+      ),
+    );
   return {
     get: (path: string) => send("GET", path),
     post: (path: string, body?: unknown) => send("POST", path, body ?? {}),
     patch: (path: string, body?: unknown) => send("PATCH", path, body ?? {}),
     put: (path: string, body?: unknown) => send("PUT", path, body ?? {}),
     delete: (path: string) => send("DELETE", path),
+    /** A multipart POST; the boundary header comes from the FormData itself. */
+    upload: async (path: string, form: FormData) => parsed(await raw("POST", path, form)),
+    raw,
     get token() {
       return token;
     },

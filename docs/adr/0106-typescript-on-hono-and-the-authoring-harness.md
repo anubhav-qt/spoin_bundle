@@ -78,6 +78,12 @@ its prompts, canon and validators are reused.
     live in production. Later updates and feedback-driven improvements to that topic run
     in its frog. (Not `packages/frog`, the retrieval library of ADR-0087: same word,
     different thing.)
+  - **User feedback goes to the frogs.** The card reports of ADR-0076 are kept as they
+    are and routed automatically to the frog of the card's topic. The frog first judges
+    whether a report is genuine, comparing it with earlier reports in a similar style or
+    from the same usernames to tell safe from suspicious. A genuine one it implements:
+    a new version of the card in the same family, which replaces the old one in
+    production.
 - **Nothing waits on the owner.** Before anything goes live, a separate model call runs a
   verification checklist written with the owner. What passes goes live; the owner
   audits afterwards.

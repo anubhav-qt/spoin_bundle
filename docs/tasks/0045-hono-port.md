@@ -52,6 +52,11 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **Tadpoles become frogs** (2026-10-11). A topic's tadpole becomes its frog once the topic's
   first generation is live in production; later updates and feedback-driven improvements
   run in the frog. Unrelated to `packages/frog`.
+- **Reports go to the frogs** (2026-10-11). Card reports keep their ADR-0076 shape and their
+  `repair` job, coalesced per card; in Phase 9 that job is routed to the frog of the card's
+  topic. The frog sorts safe from suspicious by comparing with earlier reports of a similar
+  style or from the same usernames, implements a genuine one as a new card version in the
+  same family, and that version replaces the old one in production.
 
 ## Asked when we get there
 

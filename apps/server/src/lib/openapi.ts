@@ -1,6 +1,5 @@
-import { type Hook, OpenAPIHono } from "@hono/zod-openapi";
+import { type Hook, OpenAPIHono, z } from "@hono/zod-openapi";
 import { ErrorOut } from "@spoin/shared";
-import type { z } from "zod";
 import type { AppEnv } from "../context.ts";
 
 /**
@@ -43,3 +42,7 @@ export const json = <T extends z.ZodType>(schema: T, description = "OK") => ({
 export const body = <T extends z.ZodType>(schema: T) => ({
   body: { content: { "application/json": { schema } }, required: true },
 });
+
+/** Path parameters that are ids: a malformed one is a 422, never a Postgres cast error. */
+export const ids = <K extends string>(...names: K[]) =>
+  z.object(Object.fromEntries(names.map((n) => [n, z.uuid()])) as Record<K, z.ZodUUID>);

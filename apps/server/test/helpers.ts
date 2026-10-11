@@ -78,3 +78,5 @@ export async function signedUp(address = email()): Promise<Client> {
   if (r.status !== 200) throw new Error(`sign-up failed: ${r.status} ${JSON.stringify(r.body)}`);
   return c;
 }
+
+export const userIdOf = async (c: Client): Promise<string> => (await c.get("/auth/me")).body.id;

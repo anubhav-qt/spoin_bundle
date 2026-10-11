@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { describe, expect, test } from "vitest";
 import { follow, makeTopic, read } from "./fixtures.ts";
-import { type Client, client, guest, signedUp } from "./helpers.ts";
+import { client, guest, signedUp, userIdOf } from "./helpers.ts";
 
 const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, ...new Array(64).fill(0)]);
 const WOFF2 = new Uint8Array([..."wOF2"].map((ch) => ch.charCodeAt(0)).concat(new Array(64).fill(0)));
@@ -24,8 +24,6 @@ function form(data: Uint8Array, fields: Record<string, string> = {}) {
   for (const [k, v] of Object.entries(fields)) f.set(k, v);
   return f;
 }
-
-const userId = async (c: Client): Promise<string> => (await c.get("/auth/me")).body.id;
 
 const prefs = (font: string, palette = "notebook", custom_palettes: unknown[] = []) => ({
   palette,
@@ -204,7 +202,7 @@ const daysAgo = (n: number) => new Date(Date.now() - n * DAY);
 describe("stats", () => {
   test("totals count distinct cards, streaks are runs of UTC days, the month is a heatmap", async () => {
     const c = await signedUp();
-    const id = await userId(c);
+    const id = await userIdOf(c);
     const { cards } = await makeTopic();
     const [a, b, d] = cards as [(typeof cards)[0], (typeof cards)[0], (typeof cards)[0]];
 
@@ -234,7 +232,7 @@ describe("stats", () => {
 
   test("a run that ended before yesterday is not current", async () => {
     const c = await signedUp();
-    const id = await userId(c);
+    const id = await userIdOf(c);
     const { cards } = await makeTopic();
     await read(id, cards[0] as (typeof cards)[0], daysAgo(3));
     const r = await c.get("/profile/me/stats?year=2025&month=1");
@@ -259,7 +257,7 @@ describe("today", () => {
   test("two completions on one card count once, and the goal rides along", async () => {
     const c = await signedUp();
     await c.patch("/profile/me", { daily_card_goal: 25 });
-    const id = await userId(c);
+    const id = await userIdOf(c);
     const { cards } = await makeTopic();
     const card = cards[0] as (typeof cards)[0];
     await read(id, card, new Date(), "dwell_complete");
@@ -269,7 +267,7 @@ describe("today", () => {
 
   test("the day boundary moves with the caller's offset", async () => {
     const c = await signedUp();
-    const id = await userId(c);
+    const id = await userIdOf(c);
     const { cards } = await makeTopic();
     const ist = 5 * 60 + 30;
     // One minute before the later of the two midnights: today under exactly one offset.
@@ -286,7 +284,7 @@ describe("today", () => {
 describe("export", () => {
   test("the user's own relationship to the corpus, no card bodies", async () => {
     const c = await signedUp();
-    const id = await userId(c);
+    const id = await userIdOf(c);
     const { topic, cards } = await makeTopic();
     await follow(id, topic.id, "Mine");
     await read(id, cards[0] as (typeof cards)[0], new Date("2025-06-01T12:00:00Z"));

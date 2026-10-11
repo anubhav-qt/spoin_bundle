@@ -3,11 +3,12 @@ import { makeApp } from "../src/app.ts";
 import { appUser } from "../src/db/schema.ts";
 import { makeDeps } from "../src/deps.ts";
 import { loadEnv } from "../src/env.ts";
+import { askChat } from "./ask-chat.ts";
 import { testEnv } from "./env.ts";
 import { grader } from "./grader.ts";
 
 export const env = loadEnv({ ...process.env, ...testEnv });
-export const deps = { ...makeDeps(env), grader };
+export const deps = { ...makeDeps(env), grader, askChat };
 export const app = makeApp(deps);
 
 let addresses = 0;

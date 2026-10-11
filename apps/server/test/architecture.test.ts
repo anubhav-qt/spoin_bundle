@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { describe, expect, expectTypeOf, test } from "vitest";
+import type { AskChat } from "../src/ask/chat.ts";
 import type { Grader } from "../src/quiz/grader.ts";
 
 /*
@@ -82,5 +83,7 @@ describe("architecture", () => {
   test("every model-facing method takes a collection (ADR-0005)", () => {
     // Checked by the typechecker: an offending method's name shows up in the error.
     expectTypeOf<SingleItem<Grader>>().toEqualTypeOf<never>();
+    // ADR-0077's one sanctioned exception: a streamed AskAI turn is one reader at their own time.
+    expectTypeOf<SingleItem<AskChat>>().toEqualTypeOf<"turn">();
   });
 });

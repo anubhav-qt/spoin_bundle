@@ -461,8 +461,7 @@ export const askConversation = pgTable(
     updatedAt: updatedAt(),
     userId: userRef().notNull(),
     topicId: topicRef().notNull(),
-    /** 'active' | 'archived'. */
-    status: varchar("status", { length: 16 }).notNull().default("active"),
+    status: varchar("status", { length: 16 }).$type<"active" | "archived">().notNull().default("active"),
     lastMessageAt: tz("last_message_at"),
   },
   (t) => [uniqueIndex("uq_ask_conversation_active").on(t.userId, t.topicId).where(sql`status = 'active'`)],
@@ -476,8 +475,7 @@ export const askMessage = pgTable(
     conversationId: uuid("conversation_id")
       .notNull()
       .references(() => askConversation.id, { onDelete: "cascade" }),
-    /** 'user' | 'assistant'. */
-    role: varchar("role", { length: 16 }).notNull(),
+    role: varchar("role", { length: 16 }).$type<"user" | "assistant">().notNull(),
     content: text("content").notNull(),
     /** Assistant rows: false when refused, and `content` is the server-built hint, never model prose. */
     onTopic: boolean("on_topic").notNull().default(true),
@@ -485,7 +483,7 @@ export const askMessage = pgTable(
   (t) => [index("ix_ask_message_conversation").on(t.conversationId, t.createdAt)],
 );
 
-/** AskAI turns that reached a model, per user per UTC day. Refusals cost nothing and are not counted. */
+/** AskAI turns that reached the model, answered or refused, per user per UTC day (ADR-0106). */
 export const askUsage = pgTable(
   "ask_usage",
   {

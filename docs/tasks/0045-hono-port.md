@@ -31,11 +31,11 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz, reports, admin repairs and ASCII review, dev routes, topic scope done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
-| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist | |
+| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat` | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login | |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Oracle Cloud free tier deploy | later |
@@ -103,6 +103,17 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   topic ignores the entry tier, and reads show `beginner` whatever is stored. `scope` is on
   `TopicOut`, `ProgressOut` and `TopicStatsOut`. The harness picks each topic's scope and
   card count; 125-750 cards per topic is an instruction to it, never a check in code.
+- **AskAI: a chat per reader per topic** (2026-10-11). `GET /topics/{id}/ask`, the streamed
+  `POST /topics/{id}/ask` and `POST /topics/{id}/ask/reset` keep ADR-0077's wire shape, so the
+  web's `askStream` is unchanged. The answer comes from `Deps.askChat`, an injected `AskChat`:
+  `noAskChat` until Phase 9 plugs the pi chat in (every turn ends in `error`, cause `empty`),
+  and a stand-in in the tests. A turn hands the chat the conversation id (its memory is its
+  own), the question, the card hint and `topicTools`: read-only, one topic, active cards
+  only, with no user id or database handle; the corpus tool waits for Phase 6's retrieval.
+  `turn` is the one single-item model method, pinned in `test/architecture.test.ts`. The
+  server keeps the 200-a-day cap and the `OFF_TOPIC` sentinel (any reply that starts with
+  it, however chunked); the embedding pre-check and `ASK_AI_TOPIC_SIMILARITY_FLOOR` are gone.
+  A refused turn counts against the cap; a failed or empty one does not.
 
 ## Asked when we get there
 

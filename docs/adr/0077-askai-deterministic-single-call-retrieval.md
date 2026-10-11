@@ -1,6 +1,11 @@
 # ADR-0077: AskAI — a topic-scoped, persistent, streamed conversation over deterministic retrieval
 
 - **Status:** Accepted
+- **Amended by:** [ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md) -- AskAI
+  becomes a pi chat per reader per topic that keeps its own memory and reads the topic
+  through read-only tools, not one call over server-assembled context. The embedding
+  pre-check is gone, and a refused turn now counts against the 200 a day. The thread,
+  the SSE events, the card hint, the cap and the `OFF_TOPIC` sentinel are kept.
 - **Date:** 2026-08-30
 - **Deciders:** Anubhav
 

@@ -1,5 +1,6 @@
 import type { Embedder } from "@spoin/frog/embeddings";
 import type pg from "pg";
+import type { AskChat } from "./ask/chat.ts";
 import type { Auth } from "./auth.ts";
 import type { Db, UniverseDb } from "./db/client.ts";
 import type { Env } from "./env.ts";
@@ -16,6 +17,8 @@ export interface Deps {
   embedder: Embedder;
   /** Grades quiz answers; the request path's one model call besides AskAI. */
   grader: Grader;
+  /** Answers AskAI turns, a chat per reader per topic. */
+  askChat: AskChat;
 }
 
 /** The signed-in caller, as the auth middleware resolves it. */

@@ -1,4 +1,5 @@
 import { type Embedder, HashEmbedder, Qwen3OnnxEmbedder } from "@spoin/frog/embeddings";
+import { noAskChat } from "./ask/chat.ts";
 import { makeAuth } from "./auth.ts";
 import type { Deps } from "./context.ts";
 import { connectApp, connectUniverse } from "./db/client.ts";
@@ -25,6 +26,7 @@ export function makeDeps(env: Env): Deps & { close: () => Promise<void> } {
     auth: makeAuth(env, app.db),
     embedder: makeEmbedder(env),
     grader: noGrader,
+    askChat: noAskChat,
     close: async () => {
       await Promise.all([app.pool.end(), universe?.pool.end()]);
     },

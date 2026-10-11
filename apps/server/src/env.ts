@@ -122,10 +122,10 @@ const Env = z.object({
   QUIZ_FREE_TEXT_GRADES_PER_USER_PER_DAY: int(20),
   QUIZ_FREE_TEXT_ANSWER_MAX_CHARS: int(12_000),
 
-  // -- AskAI (ADR-0077) -------------------------------------------------------
+  // -- AskAI (ADR-0077, amended by ADR-0106) ---------------------------------
+  /** Turns per reader per UTC day that reach the model, answered or refused. */
   ASK_AI_DAILY_LIMIT: int(200),
-  /** UNCALIBRATED: refuses plainly off-topic questions without a model call. Ignored under `hash`. */
-  ASK_AI_TOPIC_SIMILARITY_FLOOR: num(0.18),
+  /** How many cards the chat's search tool returns. */
   ASK_AI_CONTEXT_NEIGHBOURS: int(4),
 
   /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */

@@ -1,6 +1,6 @@
 # ADR-0106: Spoin moves to TypeScript on Hono, and a 24/7 pi harness authors the universe and its cards
 
-- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0006, 0007, 0009, 0010, 0025, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
+- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0006, 0007, 0009, 0010, 0025, 0077, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
 - **Date:** 2026-10-11
 - **Deciders:** owner (every decision below is the owner's, asked one by one), Claude
 
@@ -108,6 +108,19 @@ its prompts, canon and validators are reused.
   - **The harness picks each topic's scope and card count** from the data and the
     instructions it is given. 125-750 cards per topic is one of those instructions;
     no code rejects a topic outside it.
+  - **AskAI is a chat of its own per reader per topic** (amends ADR-0077). The single
+    streamed call over server-assembled context becomes a long-running pi chat, one
+    per `ask_conversation`, that keeps its own transcript and compaction, so the server
+    no longer resends the thread. It reads the topic through read-only tools the server
+    hands it with each turn: the topic and its subtopics, this topic's active cards,
+    and a search over them by embedding (the corpus joins through frog retrieval). It
+    is given no user id and no database handle, so ADR-0077's invariant holds: a
+    successful injection buys an off-topic answer, never data. The server keeps the
+    thread the reader sees, the SSE events, the card hint (an active card of this
+    topic, otherwise none), the 200 turns a day and the `OFF_TOPIC` sentinel. The
+    embedding pre-check is dropped, so every turn reaches the chat, and a refused turn
+    counts against the 200 like an answered one; a failed turn does not. The search
+    tool still embeds on the request path, so ADR-0092's CPU embedder stays.
   - **Records live in Postgres, not in context.** Everything any agent flags or judges
     (report verdicts, safe or suspicious reporters, failures, lessons) is a row. Agents
     look past records up through tools when they need them instead of carrying them in

@@ -592,10 +592,35 @@ export const AskConversationOut = z
   .object({
     conversation_id: Uuid.nullable(),
     messages: z.array(AskMessageOut),
+    /** Turns that reached the model today (UTC), answered or refused. */
     spent: z.int(),
     limit: z.int(),
   })
   .meta({ id: "AskConversationOut" });
+
+export const AskIn = z
+  .object({
+    question: z.string().min(1).max(1000),
+    /** The card the reader is on: a hint, not the scope. Ignored unless it is an active card of this topic. */
+    card_id: Uuid.nullable().optional(),
+  })
+  .meta({ id: "AskIn" });
+
+/**
+ * One event of a streamed turn. On the wire `event:` names it and `data:` is the rest as
+ * JSON. An `error` is never folded into `off_topic`: one is a failure, the other a verdict.
+ */
+export const AskEventOut = z
+  .discriminatedUnion("event", [
+    z.object({ event: z.literal("delta"), text: z.string() }),
+    z.object({ event: z.literal("done") }),
+    /** `hint` is written by the server, never the model's prose. */
+    z.object({ event: z.literal("off_topic"), hint: z.string() }),
+    z.object({ event: z.literal("limit") }),
+    /** `cause` is a short code for logs and support, not copy to show. */
+    z.object({ event: z.literal("error"), cause: z.string() }),
+  ])
+  .meta({ id: "AskEventOut" });
 
 // -------------------------------------------------------------- types --
 // One type per schema, named the same: the value is the validator, the type is its output.
@@ -674,3 +699,5 @@ export type AsciiSceneRejectIn = z.infer<typeof AsciiSceneRejectIn>;
 export type AsciiSceneActionOut = z.infer<typeof AsciiSceneActionOut>;
 export type AskMessageOut = z.infer<typeof AskMessageOut>;
 export type AskConversationOut = z.infer<typeof AskConversationOut>;
+export type AskIn = z.infer<typeof AskIn>;
+export type AskEventOut = z.infer<typeof AskEventOut>;

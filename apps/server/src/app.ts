@@ -5,6 +5,7 @@ import { onError } from "./lib/errors.ts";
 import { REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts";
 import { router } from "./lib/openapi.ts";
 import { adminRoutes } from "./routes/admin.ts";
+import { askRoutes } from "./routes/ask.ts";
 import { authRoutes } from "./routes/auth.ts";
 import { devRoutes } from "./routes/dev.ts";
 import { engagementRoutes } from "./routes/engagement.ts";
@@ -57,6 +58,7 @@ export function makeApp(deps: Deps) {
   app.route("/", feedRoutes(deps));
   app.route("/", quizRoutes(deps));
   app.route("/", reportsRoutes(deps));
+  app.route("/", askRoutes(deps));
   app.route("/", adminRoutes(deps));
   // Never in production, whatever the flag says: it rewrites the caller's whole progress.
   if (env.DEV_ROUTES && env.NODE_ENV !== "production") app.route("/", devRoutes(deps));

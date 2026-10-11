@@ -16,16 +16,22 @@ the ones ADR-0106 decided: auth (Better Auth), generation (rebuilt as the harnes
 The new stack runs as its own compose project with its own volume. Nothing in this task points at
 `spoin_db_2`, its volume, or the old `.env` database URLs.
 
+That stack is `infra/compose.yml` (project `spoin-hono`, volume `hono-db`), Postgres on host port
+5434 and the API on 8001; 5432 and 5433 belong to other projects on this machine. `npm run stack`
+starts it; `npm test` runs against `spoin_test` and `the_spoin_universe_test` there, and the
+global setup refuses any database name that doesn't end in `_test`. Local settings live in
+`infra/dev.env`, committed because nothing in it is real.
+
 ## Phases
 
 | # | Phase | Status |
 |---|---|---|
 | 0 | ADR-0106, this doc, branch `hono` | done |
-| 1 | Workspace: root `package.json`, Biome, `tsconfig.base.json`; `packages/shared`, `packages/frog`, `apps/server` skeletons | in progress |
-| 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | |
-| 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | |
-| 4 | Better Auth: email + password, Google, anonymous guests linked on claim, bearer plugin, admin role | |
-| 5 | Read path, each with its tests: topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | |
+| 1 | Workspace: root `package.json`, Biome, `tsconfig.base.json`; `packages/shared`, `packages/frog`, `apps/server` skeletons | done |
+| 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
+| 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
+| 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |

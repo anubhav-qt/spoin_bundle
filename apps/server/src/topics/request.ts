@@ -26,8 +26,11 @@ type Request = TopicRequestIn;
 /** A real user waiting outranks speculative work. */
 const USER_REQUEST_PRIORITY = 10;
 
+/** How a new name is queued: its job's priority, and who decided its alias. */
+export type Queueing = { priority: number; decidedBy: string };
+
 /** The word-count rule is a constraint, so code enforces it; null when the name passes. */
-function nameProblem(ctx: Ctx, name: string): string | null {
+export function nameProblem(ctx: Pick<Deps, "env">, name: string): string | null {
   if (!name) return "Topic name is required";
   const max = ctx.env.CUSTOM_TOPIC_MAX_WORDS;
   if (name.split(/\s+/u).length > max) return `Keep it short: ${max} words or fewer`;
@@ -48,10 +51,11 @@ async function byAlias(tx: Tx, normalized: string): Promise<Topic | null> {
  * same new name arriving twice at once: the loser of the alias insert adopts the
  * winner's topic and drops its own.
  */
-async function resolve(
+export async function resolve(
   tx: Tx,
   name: string,
   description: string,
+  queueing: Queueing,
 ): Promise<{ topic: Topic; created: boolean }> {
   const normalized = normalizeTopicText(name);
   const known = await byAlias(tx, normalized);
@@ -71,7 +75,7 @@ async function resolve(
 
   const [alias] = await tx
     .insert(topicAlias)
-    .values({ normalizedText: normalized, rawText: name, topicId: minted.id, decidedBy: "request" })
+    .values({ normalizedText: normalized, rawText: name, topicId: minted.id, decidedBy: queueing.decidedBy })
     .onConflictDoNothing({ target: topicAlias.normalizedText })
     .returning();
   if (!alias) {
@@ -87,7 +91,7 @@ async function resolve(
       topicId: minted.id,
       kind: "generate",
       status: "pending",
-      priority: USER_REQUEST_PRIORITY,
+      priority: queueing.priority,
       progress: { topic_name: name },
     })
     .onConflictDoNothing();
@@ -111,7 +115,10 @@ async function requestAll(ctx: Ctx, userId: string, items: Request[], guest: boo
         out.push({ request_index: index, status: "rejected", topic: null, detail: problem });
         continue;
       }
-      const { topic: t, created } = await resolve(tx, name, item.description?.trim() ?? "");
+      const { topic: t, created } = await resolve(tx, name, item.description?.trim() ?? "", {
+        priority: USER_REQUEST_PRIORITY,
+        decidedBy: "request",
+      });
       const [hue = null] = await pickHues(tx, ctx.embedder, userId, [t]);
       // The user's own words become their label for it, whichever topic it resolved to.
       const followed: TopicOut | null = await followTopic(tx, userId, t, {

@@ -33,7 +33,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
 | 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
-| 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | next |
+| 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | done |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
 | 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
@@ -164,6 +164,14 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **The job status page** (2026-10-11) shows each background job's last success and last
   error from `job_runs`, the generate and repair queue counted by status, and every failed
   job with its `last_error`.
+- **Topics move through the queue by drag** (2026-10-11). On `/admin/queue` the owner drags a
+  waiting topic to where it should run; the page sends only where it was dropped (just ahead
+  of which job, or last), and the server sets the priorities: the moved job takes one from its
+  new neighbours, and jobs above it that no longer run first are lifted a tie at a time, so
+  nothing below the drop changes and jobs that tied still tie (`apps/server/src/jobs/order.ts`).
+  The claim order is `priority desc, created_at, id`, in `QUEUE_ORDER`, which Phase 9's
+  worker claims by. Built with framer-motion's `Reorder`, already a web dependency, from a
+  handle, so a phone can still scroll the list. `/admin/jobs` is the job status page.
 - **The web in the workspace** (2026-10-11). `apps/web` joins the npm workspace and
   `npm run check` typechecks it; Biome stays off it, so the UI keeps its own style
   (ADR-0106: the web changes only where the API did). In development it runs as the `web`

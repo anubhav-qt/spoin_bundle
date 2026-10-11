@@ -35,6 +35,7 @@ import type {
   GenerationProgressOut,
   GenerationSubtopicProgressOut,
   ImportedFontOut,
+  JobStatusOut,
   LikedCardOut,
   McqResultOut,
   NoteOut,
@@ -44,6 +45,7 @@ import type {
   ProfileExportOut,
   ProfileStatsOut,
   ProgressOut,
+  QueuedTopicOut,
   QuizFreeTextQuestionOut,
   QuizFreeTextResultOut,
   QuizMcqQuestionOut,
@@ -127,6 +129,8 @@ export type RepairQueueItem = RepairQueueItemOut;
 export type RepairEnqueued = RepairEnqueuedOut;
 export type AsciiScene = AsciiSceneOut;
 export type AsciiSceneAction = AsciiSceneActionOut;
+export type QueuedTopic = QueuedTopicOut;
+export type JobStatus = JobStatusOut;
 
 /** The content shapes the collapsed teaser knows how to render. `Card.archetype`
  *  is derived server-side from the body (ADR-0017); a tag outside this list
@@ -606,6 +610,30 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ note: note ?? null }),
       }),
+  },
+
+  // -- Admin: the topic queue and job status (task 0045) -------------------
+  /** Every action answers with the whole queue, in the order it will run. */
+  adminQueue: {
+    list: () => request<QueuedTopic[]>("/admin/queue"),
+    add: (name: string, description?: string) =>
+      request<QueuedTopic[]>("/admin/queue", {
+        method: "POST",
+        body: JSON.stringify({ name, description: description?.trim() || null }),
+      }),
+    /** Runs `jobId` just ahead of `beforeJobId`, or after every waiting job when null. */
+    move: (jobId: string, beforeJobId: string | null) =>
+      request<QueuedTopic[]>(`/admin/queue/${jobId}/move`, {
+        method: "POST",
+        body: JSON.stringify({ before_job_id: beforeJobId }),
+      }),
+    retry: (jobId: string) =>
+      request<QueuedTopic[]>(`/admin/queue/${jobId}/retry`, { method: "POST" }),
+    cancel: (jobId: string) =>
+      request<QueuedTopic[]>(`/admin/queue/${jobId}/cancel`, { method: "POST" }),
+  },
+  adminJobs: {
+    status: () => request<JobStatus>("/admin/jobs"),
   },
 };
 

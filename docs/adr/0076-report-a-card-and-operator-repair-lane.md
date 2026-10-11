@@ -210,5 +210,8 @@ allowed to direct a prose change, and the owner's review is the check.
   leaving only the ambiguous reports for a human.
 - Task 0035's admin role lands — the `env` gate on `/admin/repairs` comes off and
   the destructive endpoints move behind the role check.
+  > **Done 2026-10-11** ([ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md),
+  > task 0045): every `/admin/*` route answers 403 without the admin role, in every
+  > environment.
 - If PNG-in-Postgres shows up as a real size problem, move `source_image` to the
   same object store B7 introduces for uploaded material.

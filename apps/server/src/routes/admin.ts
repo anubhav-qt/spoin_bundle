@@ -4,10 +4,16 @@ import {
   AsciiSceneKeepIn,
   AsciiSceneOut,
   AsciiSceneRejectIn,
+  JobStatusOut,
+  QueuedTopicOut,
   RepairEnqueuedOut,
   RepairQueueItemOut,
+  TopicQueueAddIn,
+  TopicQueueMoveIn,
 } from "@spoin/shared";
 import type { Deps } from "../context.ts";
+import { jobStatus } from "../jobs/status.ts";
+import { addTopic, cancelTopic, listQueue, moveJob, retryJob } from "../jobs/topic-queue.ts";
 import { HttpError } from "../lib/errors.ts";
 import { needAdmin } from "../lib/http.ts";
 import { body, errors, ids, json, multipart, router } from "../lib/openapi.ts";
@@ -16,9 +22,9 @@ import * as moderation from "../moderation/service.ts";
 import { AVATAR_MAX_BYTES, sniffImage, uploadLimit } from "../profile/uploads.ts";
 
 /*
- * The operator's pages: the repair queue (ADR-0076) and ASCII scene review (ADR-0104).
- * Behind the admin role (ADR-0106), which closes task 0035: these retire cards, edit
- * live content and queue model work.
+ * The operator's pages: the repair queue (ADR-0076), ASCII scene review (ADR-0104), the
+ * topic queue and job status (task 0045). Behind the admin role (ADR-0106), which closes
+ * task 0035: these retire cards, edit live content and queue model work.
  *
  * The card is rendered to a PNG by the admin page, with the same call the share button
  * uses, and uploaded here; nothing on the server renders.
@@ -55,9 +61,19 @@ const done = {
   422: errors[422],
 };
 
+const queued = {
+  200: json(z.array(QueuedTopicOut)),
+  401: errors[401],
+  403: errors[403],
+  404: errors[404],
+  409: errors[409],
+  422: errors[422],
+};
+
 export function adminRoutes(deps: Deps) {
   const { db } = deps;
   const CardId = ids("card_id");
+  const JobId = ids("job_id");
   const r = router();
 
   r.use("/admin/*", async (c, next) => {
@@ -211,5 +227,74 @@ export function adminRoutes(deps: Deps) {
           await sendToRepairs(db, c.req.valid("param").card_id, needAdmin(c).id, c.req.valid("json").note),
           200,
         ),
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        path: "/admin/queue",
+        tags: ["admin"],
+        summary:
+          "Topics not live yet with their generate jobs: running, then waiting in run order, then failed",
+        responses: { 200: json(z.array(QueuedTopicOut)), 401: errors[401], 403: errors[403] },
+      }),
+      async (c) => c.json(await listQueue(db), 200),
+    )
+    .openapi(
+      createRoute({
+        method: "post",
+        path: "/admin/queue",
+        tags: ["admin"],
+        summary: "Add a topic by name: a reader's request without the subscription, at the owner's priority",
+        request: body(TopicQueueAddIn),
+        responses: queued,
+      }),
+      async (c) => {
+        const { name, description } = c.req.valid("json");
+        return c.json(await addTopic(deps, name.trim(), description?.trim() ?? ""), 200);
+      },
+    )
+    .openapi(
+      createRoute({
+        method: "post",
+        path: "/admin/queue/{job_id}/move",
+        tags: ["admin"],
+        summary: "Run a waiting job just ahead of another, or last",
+        request: { params: JobId, ...body(TopicQueueMoveIn) },
+        responses: queued,
+      }),
+      async (c) =>
+        c.json(await moveJob(db, c.req.valid("param").job_id, c.req.valid("json").before_job_id), 200),
+    )
+    .openapi(
+      createRoute({
+        method: "post",
+        path: "/admin/queue/{job_id}/retry",
+        tags: ["admin"],
+        summary: "Put a failed job back in the queue",
+        request: { params: JobId },
+        responses: queued,
+      }),
+      async (c) => c.json(await retryJob(db, c.req.valid("param").job_id), 200),
+    )
+    .openapi(
+      createRoute({
+        method: "post",
+        path: "/admin/queue/{job_id}/cancel",
+        tags: ["admin"],
+        summary: "Cancel a topic that is not live and not being written, with its requesters' subscriptions",
+        request: { params: JobId },
+        responses: queued,
+      }),
+      async (c) => c.json(await cancelTopic(db, c.req.valid("param").job_id), 200),
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        path: "/admin/jobs",
+        tags: ["admin"],
+        summary: "Each background job's last run, the queues by status, and every failed job",
+        responses: { 200: json(JobStatusOut), 401: errors[401], 403: errors[403] },
+      }),
+      async (c) => c.json(await jobStatus(db), 200),
     );
 }

@@ -577,6 +577,79 @@ export const AsciiSceneActionOut = z
   .object({ card_id: Uuid, action: z.enum(["kept", "sent_to_repairs"]) })
   .meta({ id: "AsciiSceneActionOut" });
 
+// ------------------------------------------------- the topic queue and job status --
+
+export const JobKind = z.enum(["generate", "repair"]);
+export const JobStatus = z.enum(["pending", "running", "completed", "failed"]);
+
+/** A topic that is not live yet, with its generate job. */
+export const QueuedTopicOut = z
+  .object({
+    job_id: Uuid,
+    topic_id: Uuid,
+    /** The name as it was typed, until toad_sage gives the topic its canonical one. */
+    name: z.string(),
+    slug: z.string(),
+    status: JobStatus.exclude(["completed"]),
+    /** Higher runs first, ties oldest first. Readers' requests start at 10, the owner's at 0. */
+    priority: z.int(),
+    attempts: z.int(),
+    last_error: z.string().nullable(),
+    /** Readers who asked for it and follow it; 0 for a topic the owner added. */
+    requesters: z.int(),
+    created_at: DateTime,
+  })
+  .meta({ id: "QueuedTopicOut" });
+
+/** A reader's request without the subscription. */
+export const TopicQueueAddIn = z
+  .object({ name: z.string().min(1).max(120), description: z.string().nullable().optional() })
+  .meta({ id: "TopicQueueAddIn" });
+
+export const TopicQueueMoveIn = z
+  .object({
+    /** The waiting job this one should run just ahead of; null to run after every waiting job. */
+    before_job_id: Uuid.nullable(),
+  })
+  .meta({ id: "TopicQueueMoveIn" });
+
+export const JobRunOut = z
+  .object({
+    name: z.string(),
+    last_ok_at: DateTime.nullable(),
+    last_error: z.string().nullable(),
+    last_error_at: DateTime.nullable(),
+    detail: z.record(z.string(), z.unknown()).nullable(),
+  })
+  .meta({ id: "JobRunOut" });
+
+export const JobQueueCountsOut = z
+  .object({ kind: JobKind, pending: z.int(), running: z.int(), completed: z.int(), failed: z.int() })
+  .meta({ id: "JobQueueCountsOut" });
+
+export const FailedJobOut = z
+  .object({
+    job_id: Uuid,
+    kind: JobKind,
+    topic_id: Uuid,
+    topic_name: z.string(),
+    /** A repair's card; null for a generate job. */
+    card_id: Uuid.nullable(),
+    attempts: z.int(),
+    last_error: z.string().nullable(),
+    failed_at: DateTime,
+  })
+  .meta({ id: "FailedJobOut" });
+
+export const JobStatusOut = z
+  .object({
+    /** Every background job's last success and last error. */
+    runs: z.array(JobRunOut),
+    queues: z.array(JobQueueCountsOut),
+    failed: z.array(FailedJobOut),
+  })
+  .meta({ id: "JobStatusOut" });
+
 // ------------------------------------------------------- AskAI (ADR-0077, revised) --
 
 export const AskMessageOut = z
@@ -698,6 +771,15 @@ export type AsciiSceneOut = z.infer<typeof AsciiSceneOut>;
 export type AsciiSceneKeepIn = z.infer<typeof AsciiSceneKeepIn>;
 export type AsciiSceneRejectIn = z.infer<typeof AsciiSceneRejectIn>;
 export type AsciiSceneActionOut = z.infer<typeof AsciiSceneActionOut>;
+export type JobKind = z.infer<typeof JobKind>;
+export type JobStatus = z.infer<typeof JobStatus>;
+export type QueuedTopicOut = z.infer<typeof QueuedTopicOut>;
+export type TopicQueueAddIn = z.infer<typeof TopicQueueAddIn>;
+export type TopicQueueMoveIn = z.infer<typeof TopicQueueMoveIn>;
+export type JobRunOut = z.infer<typeof JobRunOut>;
+export type JobQueueCountsOut = z.infer<typeof JobQueueCountsOut>;
+export type FailedJobOut = z.infer<typeof FailedJobOut>;
+export type JobStatusOut = z.infer<typeof JobStatusOut>;
 export type AskMessageOut = z.infer<typeof AskMessageOut>;
 export type AskConversationOut = z.infer<typeof AskConversationOut>;
 export type AskIn = z.infer<typeof AskIn>;

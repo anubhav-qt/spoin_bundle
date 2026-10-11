@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * B14 / ADR-0076 — operator triage for reported cards. Dev-only: the
- * `/admin/repairs` endpoints are `env`-gated on the API (task 0035 is the real
- * admin-role gate). A plain Next route reached by URL, no nav entry — same
+ * B14 / ADR-0076 — operator triage for reported cards. Admin only: the
+ * `/admin/repairs` endpoints answer 403 to anyone without the admin role
+ * (ADR-0106). A plain Next route reached by URL, no nav entry — same
  * spirit as the archived `/admin/quota` page.
  *
  * The card is rendered here and screenshotted client-side with `html-to-image`
@@ -326,7 +326,7 @@ export default function AdminRepairsPage() {
     <main className="repairs-page">
       <div className="repairs-top">
         <h1>Repair queue</h1>
-        <span className="repairs-devtag">/admin/repairs · dev only</span>
+        <span className="repairs-devtag">/admin/repairs · admin</span>
       </div>
       {error ? <p className="repairs-error">{error}</p> : null}
       {items === null ? (

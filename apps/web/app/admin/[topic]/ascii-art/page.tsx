@@ -3,9 +3,9 @@
 /**
  * ADR-0104 — operator review of one topic's ASCII scenes, as a card stack.
  *
- * Dev-only: the `/admin/ascii` endpoints are `env`-gated on the API (task 0035
- * is the real admin-role gate). A plain Next route reached by URL, no nav
- * entry -- the same spirit as `/admin/repairs`, which this page hands its
+ * Admin only: the `/admin/ascii` endpoints answer 403 to anyone without the
+ * admin role (ADR-0106). A plain Next route reached by URL, no nav entry --
+ * the same spirit as `/admin/repairs`, which this page hands its
  * rejections to rather than growing a second repair path.
  *
  * Why a stack and not a table: ADR-0104 made the drawing structurally correct
@@ -201,7 +201,7 @@ export default function AsciiArtReviewPage() {
     <div className="aa-page">
       <div className="aa-top">
         <h1>ascii art review</h1>
-        <span className="aa-devtag">dev only</span>
+        <span className="aa-devtag">admin</span>
         <span className="aa-spacer" />
         <span className="aa-progress">
           {log.length} of {scenes.length} reviewed

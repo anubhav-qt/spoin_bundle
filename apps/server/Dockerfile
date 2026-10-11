@@ -7,6 +7,7 @@ COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/frog/package.json packages/frog/
 COPY apps/server/package.json apps/server/
+COPY apps/web/package.json apps/web/
 RUN npm ci --workspace @spoin/server --include-workspace-root=false --ignore-scripts --no-audit --no-fund
 COPY tsconfig.base.json ./
 COPY packages/shared packages/shared

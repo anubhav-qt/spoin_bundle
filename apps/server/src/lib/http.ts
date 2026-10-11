@@ -8,6 +8,21 @@ import { HttpError } from "./errors.ts";
 
 export const REQUEST_ID_HEADER = "X-Request-ID";
 
+/** Any device on the owner's network, so the phone can reach a dev server on the laptop. */
+const LOCAL_NETWORK =
+  /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/;
+
+/**
+ * Whether a page at `origin` may call the API: a listed origin, or outside production any
+ * device on the owner's network. CORS and Better Auth's origin check both ask this, so a
+ * page that can call the API can also sign in to it.
+ */
+export function originAllowed(env: Env, origin: string): boolean {
+  return (
+    env.ALLOWED_ORIGINS.includes(origin) || (env.NODE_ENV !== "production" && LOCAL_NETWORK.test(origin))
+  );
+}
+
 /** Health is polled continuously; logging every hit would drown everything else. */
 const QUIET_PATHS = new Set(["/health"]);
 

@@ -5,6 +5,7 @@ import { admin, anonymous, bearer } from "better-auth/plugins";
 import type { Db } from "./db/client.ts";
 import { appUser, authAccount, authSession, authVerification } from "./db/schema.ts";
 import type { Env } from "./env.ts";
+import { originAllowed } from "./lib/http.ts";
 import { log } from "./log.ts";
 
 const DAY = 86_400;
@@ -33,7 +34,11 @@ export function makeAuth(env: Env, db: Db) {
     baseURL: env.PUBLIC_URL ?? `http://localhost:${env.PORT}`,
     basePath: "/auth",
     secret: env.AUTH_SECRET,
-    trustedOrigins: env.ALLOWED_ORIGINS,
+    // CORS's rule (lib/http.ts), so a phone on the owner's network can sign in to a dev server.
+    trustedOrigins: (request) => {
+      const origin = request?.headers.get("origin");
+      return origin && originAllowed(env, origin) ? [...env.ALLOWED_ORIGINS, origin] : env.ALLOWED_ORIGINS;
+    },
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: { user: appUser, session: authSession, account: authAccount, verification: authVerification },
@@ -72,6 +77,8 @@ export function makeAuth(env: Env, db: Db) {
     advanced: {
       database: { generateId: () => randomUUID() },
       ipAddress: ipHeader ? { ipAddressHeaders: [ipHeader] } : undefined,
+      // Better Auth drops the origin check under NODE_ENV=test; kept on so tests run production's.
+      disableOriginCheck: false,
     },
     telemetry: { enabled: false },
     logger: {

@@ -12,6 +12,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { isTierless } from "@spoin/shared/enums";
+
 import { ApiError, api, type Difficulty, type TopicDiscover } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemePicker } from "@/components/ThemePicker";
@@ -208,19 +210,22 @@ export default function OnboardingPage() {
               return (
                 <div key={topicId} className="onboarding-selected-row">
                   <span className="onboarding-selected-name">{topic?.display_name ?? "Topic"}</span>
-                  <div className="onboarding-difficulty-row onboarding-difficulty-row-compact">
-                    {DIFFICULTIES.map((d) => (
-                      <button
-                        key={d.value}
-                        type="button"
-                        className={`onboarding-topic-chip${difficulty === d.value ? " selected" : ""}`}
-                        onClick={() => setTopicDifficulty(topicId, d.value)}
-                        disabled={loading}
-                      >
-                        {d.label}
-                      </button>
-                    ))}
-                  </div>
+                  {/* A survey or a one-shot has no tiers to enter at. */}
+                  {topic !== undefined && isTierless(topic.scope) ? null : (
+                    <div className="onboarding-difficulty-row onboarding-difficulty-row-compact">
+                      {DIFFICULTIES.map((d) => (
+                        <button
+                          key={d.value}
+                          type="button"
+                          className={`onboarding-topic-chip${difficulty === d.value ? " selected" : ""}`}
+                          onClick={() => setTopicDifficulty(topicId, d.value)}
+                          disabled={loading}
+                        >
+                          {d.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

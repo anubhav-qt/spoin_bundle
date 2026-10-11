@@ -7,10 +7,15 @@
  * - Interactive Tier Quiz Cards (Beginner, Intermediate, Advanced with unlock states & take quiz CTA).
  * - Clean 4-stat engagement bar (likes, saves, notes, shares).
  * - Interactive Curriculum Roadmap tree.
+ *
+ * A tierless topic (a survey or a one-shot, ADR-0106) has no tiers to show: one
+ * mastery quiz across the whole topic, and its subtopics in one list.
  */
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+
+import { isTierless } from "@spoin/shared/enums";
 
 import { api, type Difficulty, type SubtopicProgress, type TopicStats } from "@/lib/api";
 import { defaultTopicHue, NO_TOPIC_COLOR } from "@/lib/topicColor";
@@ -61,7 +66,7 @@ export function TopicStatsModal({
 }: Props) {
   const [stats, setStats] = useState<TopicStats | null>(null);
   const [subtopics, setSubtopics] = useState<SubtopicProgress[] | null>(null);
-  const [quizDifficulty, setQuizDifficulty] = useState<Difficulty | null>(null);
+  const [quiz, setQuiz] = useState<Difficulty | "mastery" | null>(null);
   const [unfollowing, setUnfollowing] = useState(false);
   const [confirmingUnfollow, setConfirmingUnfollow] = useState(false);
 
@@ -112,6 +117,7 @@ export function TopicStatsModal({
   const totalCardsInTopic = subtopics ? subtopics.reduce((acc, s) => acc + s.total_cards, 0) : 0;
   const totalCardsSeenInTopic = subtopics ? subtopics.reduce((acc, s) => acc + s.seen_cards, 0) : 0;
   const completedSubtopicsCount = subtopics ? subtopics.filter((s) => s.covered).length : 0;
+  const tierless = stats !== null && isTierless(stats.scope);
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
@@ -221,16 +227,18 @@ export function TopicStatsModal({
         ) : (
           <div className="topic-stats-body">
             {/* Top Overview Cards */}
-            <div className="topic-stats-overview-grid">
-              <div className="topic-overview-card">
-                <span className="overview-card-label mono">Current Tier</span>
-                <span className="overview-card-value">{DIFFICULTY_LABEL[stats.current_difficulty]}</span>
-                <span className="overview-card-hint mono">
-                  {stats.tier_quiz_passed[TIER_ORDER.indexOf(stats.current_difficulty)]
-                    ? "Tier Quiz Passed ✓"
-                    : "Quiz Incomplete"}
-                </span>
-              </div>
+            <div className="topic-stats-overview-grid" data-tierless={tierless}>
+              {tierless ? null : (
+                <div className="topic-overview-card">
+                  <span className="overview-card-label mono">Current Tier</span>
+                  <span className="overview-card-value">{DIFFICULTY_LABEL[stats.current_difficulty]}</span>
+                  <span className="overview-card-hint mono">
+                    {stats.tier_quiz_passed[TIER_ORDER.indexOf(stats.current_difficulty)]
+                      ? "Tier Quiz Passed ✓"
+                      : "Quiz Incomplete"}
+                  </span>
+                </div>
+              )}
 
               <div className="topic-overview-card">
                 <span className="overview-card-label mono">Topic Coverage</span>
@@ -254,68 +262,11 @@ export function TopicStatsModal({
               </div>
             </div>
 
-            {/* Quiz Tier Progression Section */}
-            <div className="topic-quizzes-section">
-              <div className="topic-section-header">
-                <span className="topic-section-title mono">Tier Certification Quizzes</span>
-                <span className="topic-section-subtitle mono">Requires 80% coverage in tier</span>
-              </div>
-
-              <div className="topic-quizzes-grid">
-                {TIERS.map(({ key, label, desc }, i) => {
-                  const passed = stats.tier_quiz_passed[i] ?? false;
-                  const isCurrent = stats.current_difficulty === key;
-                  const canTake = isCurrent && stats.quiz_unlocked;
-
-                  return (
-                    <div
-                      key={key}
-                      className="topic-quiz-card"
-                      data-passed={passed}
-                      data-current={isCurrent}
-                    >
-                      <div className="topic-quiz-card-head">
-                        <div className="topic-quiz-card-title-row">
-                          <span className="topic-quiz-badge mono">Level {i + 1}</span>
-                          {passed ? (
-                            <span className="topic-quiz-status passed mono">✓ Passed</span>
-                          ) : isCurrent ? (
-                            <span className="topic-quiz-status active mono">Active</span>
-                          ) : (
-                            <span className="topic-quiz-status locked mono">Locked</span>
-                          )}
-                        </div>
-                        <span className="topic-quiz-card-name">{label}</span>
-                        <p className="topic-quiz-card-desc">{desc}</p>
-                      </div>
-
-                      <div className="topic-quiz-card-footer">
-                        {passed ? (
-                          <button
-                            type="button"
-                            className="topic-quiz-action-btn passed mono"
-                            onClick={() => setQuizDifficulty(key)}
-                          >
-                            Retake Quiz
-                          </button>
-                        ) : isCurrent ? (
-                          <button
-                            type="button"
-                            className="topic-quiz-action-btn active mono"
-                            disabled={!stats.quiz_unlocked}
-                            onClick={() => setQuizDifficulty(key)}
-                          >
-                            {stats.quiz_unlocked ? "Start Quiz →" : "Reach 80% to Unlock"}
-                          </button>
-                        ) : (
-                          <span className="topic-quiz-locked-note mono">Complete Level {i} First</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            {tierless ? (
+              <MasteryQuizSection stats={stats} onStart={() => setQuiz("mastery")} />
+            ) : (
+              <TierQuizSection stats={stats} onStart={setQuiz} />
+            )}
 
             {/* Engagement Metrics Bar */}
             <div className="topic-stats-engagement-bar">
@@ -358,7 +309,15 @@ export function TopicStatsModal({
                 </div>
               ) : (
                 <div className="curriculum-tree-root">
-                  {TIER_ORDER.map((tier, tierIdx) => {
+                  {tierless ? (
+                    <div className="curriculum-tree-tier" data-passed={stats.mastered}>
+                      <div className="curriculum-tree-branches">
+                        <div className="curriculum-tree-trunk-line" aria-hidden="true" />
+                        <SubtopicLeaves subtopics={subtopics} />
+                      </div>
+                    </div>
+                  ) : null}
+                  {tierless ? null : TIER_ORDER.map((tier, tierIdx) => {
                     const tierSubtopics = subtopics.filter((s) => s.difficulty === tier);
                     if (tierSubtopics.length === 0) return null;
                     const tierPassed = stats.tier_quiz_passed[tierIdx] ?? false;
@@ -404,65 +363,7 @@ export function TopicStatsModal({
                         {/* Branch Trunk & Subtopic Leaf Nodes */}
                         <div className="curriculum-tree-branches">
                           <div className="curriculum-tree-trunk-line" aria-hidden="true" />
-                          <div className="curriculum-tree-leaves">
-                            {tierSubtopics.map((s) => {
-                              const isComplete = s.covered;
-                              const inProgress = !s.covered && s.seen_cards > 0;
-                              const pct = Math.min(s.coverage, 1) * 100;
-
-                              return (
-                                <div
-                                  key={s.subtopic_id}
-                                  className="curriculum-leaf-node"
-                                  data-status={isComplete ? "complete" : inProgress ? "in-progress" : "unstarted"}
-                                >
-                                  {/* Branch Elbow Connector */}
-                                  <div className="curriculum-branch-elbow" aria-hidden="true" />
-
-                                  {/* Subtopic Status Dot */}
-                                  <div
-                                    className="curriculum-leaf-dot"
-                                    data-status={isComplete ? "complete" : inProgress ? "in-progress" : "unstarted"}
-                                  >
-                                    {isComplete ? (
-                                      <svg viewBox="0 0 16 16" className="leaf-check-svg">
-                                        <path
-                                          d="M3.5 8.5l3 3L12.5 4.5"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        />
-                                      </svg>
-                                    ) : inProgress ? (
-                                      <span className="leaf-pulse-dot" />
-                                    ) : null}
-                                  </div>
-
-                                  {/* Subtopic Card Box */}
-                                  <div className="curriculum-leaf-card">
-                                    <div className="curriculum-leaf-header">
-                                      <span className="curriculum-leaf-title">{s.title}</span>
-                                      <span className="curriculum-leaf-cards mono">
-                                        {s.total_cards === 0 ? "generating" : `${s.seen_cards}/${s.total_cards}`}
-                                      </span>
-                                    </div>
-                                    <div className="curriculum-leaf-meter-wrap">
-                                      <div className="curriculum-leaf-meter">
-                                        <div
-                                          className="curriculum-leaf-fill"
-                                          data-complete={isComplete}
-                                          style={{ width: `${pct}%` }}
-                                        />
-                                      </div>
-                                      <span className="curriculum-leaf-pct mono">{Math.round(pct)}%</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <SubtopicLeaves subtopics={tierSubtopics} />
                         </div>
                       </div>
                     );
@@ -474,16 +375,196 @@ export function TopicStatsModal({
         )}
       </div>
 
-      {quizDifficulty !== null ? (
+      {quiz !== null ? (
         <QuizModal
           topicId={topicId}
           topicName={topicName}
-          difficulty={quizDifficulty}
-          onClose={() => setQuizDifficulty(null)}
+          difficulty={quiz === "mastery" ? undefined : quiz}
+          onClose={() => setQuiz(null)}
           onGraded={onQuizGraded}
         />
       ) : null}
     </div>,
     document.body,
+  );
+}
+
+/** One certification quiz per tier, unlocked one tier at a time. */
+function TierQuizSection({
+  stats,
+  onStart,
+}: {
+  stats: TopicStats;
+  onStart: (difficulty: Difficulty) => void;
+}) {
+  return (
+    <div className="topic-quizzes-section">
+      <div className="topic-section-header">
+        <span className="topic-section-title mono">Tier Certification Quizzes</span>
+        <span className="topic-section-subtitle mono">Requires 80% coverage in tier</span>
+      </div>
+
+      <div className="topic-quizzes-grid">
+        {TIERS.map(({ key, label, desc }, i) => {
+          const passed = stats.tier_quiz_passed[i] ?? false;
+          const isCurrent = stats.current_difficulty === key;
+          const canTake = isCurrent && stats.quiz_unlocked;
+
+          return (
+            <div
+              key={key}
+              className="topic-quiz-card"
+              data-passed={passed}
+              data-current={isCurrent}
+            >
+              <div className="topic-quiz-card-head">
+                <div className="topic-quiz-card-title-row">
+                  <span className="topic-quiz-badge mono">Level {i + 1}</span>
+                  {passed ? (
+                    <span className="topic-quiz-status passed mono">✓ Passed</span>
+                  ) : isCurrent ? (
+                    <span className="topic-quiz-status active mono">Active</span>
+                  ) : (
+                    <span className="topic-quiz-status locked mono">Locked</span>
+                  )}
+                </div>
+                <span className="topic-quiz-card-name">{label}</span>
+                <p className="topic-quiz-card-desc">{desc}</p>
+              </div>
+
+              <div className="topic-quiz-card-footer">
+                {passed ? (
+                  <button
+                    type="button"
+                    className="topic-quiz-action-btn passed mono"
+                    onClick={() => onStart(key)}
+                  >
+                    Retake Quiz
+                  </button>
+                ) : isCurrent ? (
+                  <button
+                    type="button"
+                    className="topic-quiz-action-btn active mono"
+                    disabled={!stats.quiz_unlocked}
+                    onClick={() => onStart(key)}
+                  >
+                    {stats.quiz_unlocked ? "Start Quiz →" : "Reach 80% to Unlock"}
+                  </button>
+                ) : (
+                  <span className="topic-quiz-locked-note mono">Complete Level {i} First</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** A tierless topic's one quiz: every subtopic, every difficulty. */
+function MasteryQuizSection({ stats, onStart }: { stats: TopicStats; onStart: () => void }) {
+  return (
+    <div className="topic-quizzes-section">
+      <div className="topic-section-header">
+        <span className="topic-section-title mono">Mastery Quiz</span>
+        <span className="topic-section-subtitle mono">Requires 80% coverage in every subtopic</span>
+      </div>
+
+      <div className="topic-quizzes-grid" data-tierless="true">
+        <div className="topic-quiz-card" data-passed={stats.mastered} data-current={!stats.mastered}>
+          <div className="topic-quiz-card-head">
+            <div className="topic-quiz-card-title-row">
+              <span className="topic-quiz-badge mono">Whole topic</span>
+              {stats.mastered ? (
+                <span className="topic-quiz-status passed mono">✓ Passed</span>
+              ) : stats.quiz_unlocked ? (
+                <span className="topic-quiz-status active mono">Active</span>
+              ) : (
+                <span className="topic-quiz-status locked mono">Locked</span>
+              )}
+            </div>
+            <span className="topic-quiz-card-name">Mastery Quiz</span>
+            <p className="topic-quiz-card-desc">One quiz across every subtopic</p>
+          </div>
+
+          <div className="topic-quiz-card-footer">
+            <button
+              type="button"
+              className={`topic-quiz-action-btn ${stats.mastered ? "passed" : "active"} mono`}
+              disabled={!stats.mastered && !stats.quiz_unlocked}
+              onClick={onStart}
+            >
+              {stats.mastered ? "Retake Quiz" : stats.quiz_unlocked ? "Start Quiz →" : "Reach 80% to Unlock"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** A subtopic per leaf: the cards seen against the cards written. */
+function SubtopicLeaves({ subtopics }: { subtopics: SubtopicProgress[] }) {
+  return (
+    <div className="curriculum-tree-leaves">
+      {subtopics.map((s) => {
+        const isComplete = s.covered;
+        const inProgress = !s.covered && s.seen_cards > 0;
+        const pct = Math.min(s.coverage, 1) * 100;
+
+        return (
+          <div
+            key={s.subtopic_id}
+            className="curriculum-leaf-node"
+            data-status={isComplete ? "complete" : inProgress ? "in-progress" : "unstarted"}
+          >
+            {/* Branch Elbow Connector */}
+            <div className="curriculum-branch-elbow" aria-hidden="true" />
+
+            {/* Subtopic Status Dot */}
+            <div
+              className="curriculum-leaf-dot"
+              data-status={isComplete ? "complete" : inProgress ? "in-progress" : "unstarted"}
+            >
+              {isComplete ? (
+                <svg viewBox="0 0 16 16" className="leaf-check-svg">
+                  <path
+                    d="M3.5 8.5l3 3L12.5 4.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : inProgress ? (
+                <span className="leaf-pulse-dot" />
+              ) : null}
+            </div>
+
+            {/* Subtopic Card Box */}
+            <div className="curriculum-leaf-card">
+              <div className="curriculum-leaf-header">
+                <span className="curriculum-leaf-title">{s.title}</span>
+                <span className="curriculum-leaf-cards mono">
+                  {s.total_cards === 0 ? "generating" : `${s.seen_cards}/${s.total_cards}`}
+                </span>
+              </div>
+              <div className="curriculum-leaf-meter-wrap">
+                <div className="curriculum-leaf-meter">
+                  <div
+                    className="curriculum-leaf-fill"
+                    data-complete={isComplete}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="curriculum-leaf-pct mono">{Math.round(pct)}%</span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

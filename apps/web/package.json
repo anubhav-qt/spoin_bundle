@@ -6,23 +6,23 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@types/katex": "^0.16.8",
-    "framer-motion": "^11.15.0",
-    "html-to-image": "^1.11.13",
-    "katex": "^0.18.4",
-    "mermaid": "^11.17.2",
-    "next": "^15.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "@spoin/shared": "*",
+    "better-auth": "1.7.7",
+    "framer-motion": "11.18.2",
+    "html-to-image": "1.11.13",
+    "katex": "0.18.4",
+    "mermaid": "11.17.2",
+    "next": "15.5.23",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
+    "@types/katex": "0.16.8",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "typescript": "5.9.3"
   }
 }

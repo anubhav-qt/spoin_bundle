@@ -2,7 +2,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import type { Deps } from "./context.ts";
 import { onError } from "./lib/errors.ts";
-import { REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts";
+import { originAllowed, REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts";
 import { router } from "./lib/openapi.ts";
 import { adminRoutes } from "./routes/admin.ts";
 import { askRoutes } from "./routes/ask.ts";
@@ -17,10 +17,6 @@ import { quizRoutes } from "./routes/quiz.ts";
 import { reportsRoutes } from "./routes/reports.ts";
 import { topicsRoutes } from "./routes/topics.ts";
 
-/** Any device on the owner's network, so the phone can reach a dev server on the laptop. */
-const LOCAL_NETWORK =
-  /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/;
-
 /**
  * The HTTP surface. The single source of truth for every client: the web app today,
  * the mobile app later, both over HTTP with no privileged access. If the web client can
@@ -28,15 +24,13 @@ const LOCAL_NETWORK =
  */
 export function makeApp(deps: Deps) {
   const { env } = deps;
-  const allowed = new Set(env.ALLOWED_ORIGINS);
   const app = router();
 
   app.use("*", requestContext(env));
   app.use(
     "*",
     cors({
-      origin: (origin) =>
-        allowed.has(origin) || (env.NODE_ENV !== "production" && LOCAL_NETWORK.test(origin)) ? origin : null,
+      origin: (origin) => (originAllowed(env, origin) ? origin : null),
       allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       allowHeaders: ["Content-Type", "Authorization", REQUEST_ID_HEADER],
       // Better Auth's bearer plugin hands the session token back in this header.

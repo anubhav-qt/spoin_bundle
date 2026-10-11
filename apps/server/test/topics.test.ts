@@ -293,6 +293,17 @@ describe("discovery (ADR-0038, ADR-0053)", () => {
     expect(ids.length).toBeLessThanOrEqual(5);
     expect((await c.get("/topics/discover?mode=sideways")).status).toBe(422);
   });
+
+  test("a discovered topic carries its scope, so onboarding offers no tiers on a survey", async () => {
+    const { c } = await reader();
+    const survey = await makeTopic({ scope: "survey" });
+    await db.update(topic).set({ subscriberCount: 2_000_000 }).where(eq(topic.id, survey.topic.id));
+
+    const row = (await c.get("/topics/discover?mode=for_you")).body.find(
+      (t: { topic_id: string }) => t.topic_id === survey.topic.id,
+    );
+    expect(row).toMatchObject({ scope: "survey" });
+  });
 });
 
 describe("requested topics", () => {

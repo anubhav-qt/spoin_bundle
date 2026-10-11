@@ -253,6 +253,7 @@ export async function listAll(ctx: Ctx, userId: string): Promise<TopicDiscoverOu
     .map((t) => ({
       topic_id: t.id,
       display_name: t.canonicalName,
+      scope: t.scope,
       subscriber_count: t.subscriberCount,
       followed: followed.has(t.id),
     }));
@@ -278,6 +279,7 @@ export async function discover(ctx: Ctx, userId: string): Promise<TopicDiscoverO
     .map((t) => ({
       topic_id: t.id,
       display_name: t.canonicalName,
+      scope: t.scope,
       subscriber_count: t.subscriberCount,
       followed: false,
     }));

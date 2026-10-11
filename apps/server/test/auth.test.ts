@@ -30,8 +30,8 @@ describe("the shell", () => {
   });
 
   it("lets the web app's origin read the session token header", async () => {
-    const res = await app.request("/health", { headers: { origin: "http://localhost:3000" } });
-    expect(res.headers.get("access-control-allow-origin")).toBe("http://localhost:3000");
+    const res = await app.request("/health", { headers: { origin: "http://localhost:3001" } });
+    expect(res.headers.get("access-control-allow-origin")).toBe("http://localhost:3001");
     const other = await app.request("/health", { headers: { origin: "https://evil.example" } });
     expect(other.headers.get("access-control-allow-origin")).toBeNull();
   });
@@ -61,6 +61,16 @@ describe("accounts", () => {
     expect(r.status).toBe(200);
     expect(mobile.token).toBeTruthy();
     expect((await mobile.get("/auth/me")).body.email).toBe(address);
+  });
+
+  it("lets a phone on the owner's network sign in to a dev server, and no other page", async () => {
+    const address = email();
+    await signedUp(address);
+    const credentials = { email: address, password: PASSWORD };
+    const phone = client({ origin: "http://192.168.1.20:3001" });
+    expect((await phone.post("/auth/sign-in/email", credentials)).status).toBe(200);
+    const stranger = client({ origin: "https://evil.example" });
+    expect((await stranger.post("/auth/sign-in/email", credentials)).status).toBe(403);
   });
 
   it("claims a guest in place, keeping the user id and the session", async () => {

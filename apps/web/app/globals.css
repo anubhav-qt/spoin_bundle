@@ -4979,6 +4979,11 @@ body.custom-cursor-active textarea {
   gap: 8px;
 }
 
+/* A tierless topic has no "Current Tier" card. */
+.topic-stats-overview-grid[data-tierless="true"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .topic-overview-card {
   display: flex;
   flex-direction: column;
@@ -5060,6 +5065,11 @@ body.custom-cursor-active textarea {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+
+/* A tierless topic's one mastery quiz. */
+.topic-quizzes-grid[data-tierless="true"] {
+  grid-template-columns: 1fr;
 }
 
 .topic-quiz-card {

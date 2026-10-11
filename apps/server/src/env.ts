@@ -37,7 +37,7 @@ const Env = z.object({
   AUTH_SECRET: z.string().min(32),
   /** This server's own address, where Google sends a reader back after login. */
   PUBLIC_URL: z.string().url().optional(),
-  ALLOWED_ORIGINS: list.default(["http://localhost:3000"]),
+  ALLOWED_ORIGINS: list.default(["http://localhost:3001"]),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   /**

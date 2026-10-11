@@ -19,6 +19,8 @@
 
 import { useState } from "react";
 
+import { isTierless } from "@spoin/shared/enums";
+
 import type { Difficulty, Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
 import { TopicStatsModal } from "./TopicStatsModal";
@@ -132,9 +134,11 @@ function TopicProgressRow({
           <span className="progress-row-name">{topic.display_name}</span>
           <div className="progress-row-meta-right">
             <span className="progress-row-pct mono">{pct}%</span>
-            <span className="progress-row-difficulty mono" data-tier={difficulty}>
-              {DIFFICULTY_LABEL[difficulty]}
-            </span>
+            {isTierless(topic.scope) ? null : (
+              <span className="progress-row-difficulty mono" data-tier={difficulty}>
+                {DIFFICULTY_LABEL[difficulty]}
+              </span>
+            )}
           </div>
         </div>
         <div className="progress-row-meter-wrap">

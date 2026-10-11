@@ -4,20 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ApiError, api, type AuthTokens } from "@/lib/api";
+import { ApiError, api } from "@/lib/api";
 import { useAuth } from "@/components/AuthProvider";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { SpoinWave } from "@/components/SpoinWave";
 
-function storeTokens(tokens: AuthTokens) {
-  localStorage.setItem("spoin_access_token", tokens.access_token);
-  localStorage.setItem("spoin_refresh_token", tokens.refresh_token);
-}
-
 function describeError(err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 401) return "That email or password doesn't look right.";
-    if (err.status === 409) return "An account with that email already exists.";
+    // A claim answers 409; Better Auth's sign-up answers 422 with this code.
+    if (err.status === 409 || err.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL")
+      return "An account with that email already exists.";
     if (err.status === 429) return "Too many attempts. Try again in a minute.";
     return err.message;
   }
@@ -50,11 +47,11 @@ export function AuthForm({ mode }: Props) {
 
     try {
       if (mode === "login") {
-        storeTokens(await api.login({ email, password }));
+        await api.signIn({ email, password });
       } else if (claiming) {
-        storeTokens(await api.claim({ email, password, display_name: name }));
+        await api.claim({ email, password, display_name: name });
       } else {
-        storeTokens(await api.register({ email, password, display_name: name }));
+        await api.signUp({ email, password, display_name: name });
       }
       await refresh();
       router.push("/");
@@ -69,7 +66,7 @@ export function AuthForm({ mode }: Props) {
     setError("");
     setLoading(true);
     try {
-      storeTokens(await api.guest());
+      await api.guest();
       await refresh();
       router.push("/");
     } catch (err) {
@@ -79,11 +76,26 @@ export function AuthForm({ mode }: Props) {
     }
   };
 
+  // A signed-in guest keeps their progress by claiming in place. If that
+  // Google account (or its email) already has a Spoin account, they sign in
+  // to it instead, leaving the guest behind -- what signing in has always meant.
+  const googleSignIn = async (idToken: string) => {
+    if (user?.is_guest) {
+      try {
+        await api.claimGoogle(idToken);
+        return;
+      } catch (err) {
+        if (!(err instanceof ApiError && err.status === 409)) throw err;
+      }
+    }
+    await api.googleSignIn(idToken);
+  };
+
   const handleGoogleToken = async (idToken: string) => {
     setError("");
     setLoading(true);
     try {
-      storeTokens(await api.googleAuth(idToken));
+      await googleSignIn(idToken);
       await refresh();
       router.push("/");
     } catch (err) {

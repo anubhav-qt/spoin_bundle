@@ -28,7 +28,7 @@ export function client(opts: { origin?: string | null } = {}) {
   /** The unparsed response, for binary bodies and multipart requests. */
   const raw = async (method: string, path: string, body?: RequestInit["body"], contentType?: string) => {
     const headers = new Headers({ "x-forwarded-for": ip });
-    if (opts.origin !== null) headers.set("origin", opts.origin ?? "http://localhost:3000");
+    if (opts.origin !== null) headers.set("origin", opts.origin ?? "http://localhost:3001");
     if (token) headers.set("authorization", `Bearer ${token}`);
     if (contentType) headers.set("content-type", contentType);
     const res = await app.request(path, { method, headers, body });

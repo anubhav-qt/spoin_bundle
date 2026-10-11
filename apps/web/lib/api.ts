@@ -7,158 +7,244 @@
  * cannot be reached from mobile or has to be written twice. That is the most
  * common way "we'll add mobile later" projects rot.
  *
- * The types below are hand-written placeholders. They are replaced by
- * `packages/api-types`, generated from the OpenAPI schema — run `make api-types`
- * with the API up. CI fails the build on drift (ADR-0001).
+ * The wire types are `@spoin/shared`'s, the contract the server validates
+ * against and generates its OpenAPI document from (ADR-0106). The names below
+ * are this app's names for those same types; never hand-write one.
+ *
+ * Accounts are Better Auth's (`/auth/*`), reached through its client. A
+ * session is one bearer token, read from the `set-auth-token` header of the
+ * sign-in that opened it. There is no refresh token: a session lasts 90 days
+ * and is extended as it is used.
  */
 
-export function getBaseUrl(): string {
-  if (typeof window !== "undefined") {
-    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
-      return envUrl;
-    }
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:8000`;
-  }
-  return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
-}
+import type {
+  AskConversationOut,
+  AskEventOut,
+  AskMessageOut,
+  AsciiSceneActionOut,
+  AsciiSceneOut,
+  CardOut,
+  CardReportReason,
+  ClaimIn,
+  CustomTopicStatusOut,
+  DailyGoalOut,
+  Difficulty,
+  EngagementAck,
+  EngagementEventIn,
+  FeedOut,
+  GenerationProgressOut,
+  GenerationSubtopicProgressOut,
+  ImportedFontOut,
+  LikedCardOut,
+  McqResultOut,
+  NoteOut,
+  NoteWithCardOut,
+  PreferencesOut,
+  PreferencesUpdateIn,
+  ProfileExportOut,
+  ProfileStatsOut,
+  ProgressOut,
+  QuizFreeTextQuestionOut,
+  QuizFreeTextResultOut,
+  QuizMcqQuestionOut,
+  QuizStartOut,
+  QuizSubmitFreeTextOut,
+  QuizSubmitMcqOut,
+  RemediationCardOut,
+  RepairAttemptOut,
+  RepairCardOut,
+  RepairEnqueuedOut,
+  RepairQueueItemOut,
+  RepairReportOut,
+  SavedCardOut,
+  SubtopicProgressOut,
+  TopicBatchItemOut,
+  TopicBatchOut,
+  TopicCurriculumOut,
+  TopicDiscoverOut,
+  TopicOut,
+  TopicRequestOut,
+  TopicStatsOut,
+  UserOut,
+  UserProfileUpdateIn,
+} from "@spoin/shared";
+import { createAuthClient } from "better-auth/client";
+import { anonymousClient } from "better-auth/client/plugins";
 
-export type Difficulty = "beginner" | "intermediate" | "advanced";
+export type {
+  CardReportReason,
+  CustomPalette,
+  DailyActivityOut,
+  Difficulty,
+  EngagementKind,
+  ProfileStatsOut,
+  UserProfileUpdateIn,
+  VisualKind,
+} from "@spoin/shared";
+export type { TopicScope } from "@spoin/shared/enums";
 
-/** Content shapes present in a card's `body`, derived server-side from the
- *  markdown itself (never client-guessed) — see content/archetype.py on the
- *  API. A card can carry more than one; rendering picks a priority order for
- *  the collapsed teaser only, the expanded view always shows everything. */
+export type Card = CardOut;
+export type Feed = FeedOut;
+export type Topic = TopicOut;
+export type EngagementEvent = EngagementEventIn;
+export type User = UserOut;
+export type ImportedFont = ImportedFontOut;
+export type Preferences = PreferencesOut;
+export type PreferencesUpdate = PreferencesUpdateIn;
+export type Progress = ProgressOut;
+export type TopicDiscover = TopicDiscoverOut;
+export type TopicRequestResult = TopicRequestOut;
+export type TopicBatchItemResult = TopicBatchItemOut;
+export type TopicBatchResult = TopicBatchOut;
+export type TopicStats = TopicStatsOut;
+export type SubtopicProgress = SubtopicProgressOut;
+export type TopicCurriculum = TopicCurriculumOut;
+export type CustomTopicStatus = CustomTopicStatusOut;
+export type GenerationSubtopicProgress = GenerationSubtopicProgressOut;
+export type GenerationProgress = GenerationProgressOut;
+export type QuizMcqQuestion = QuizMcqQuestionOut;
+export type QuizFreeTextQuestion = QuizFreeTextQuestionOut;
+export type QuizStart = QuizStartOut;
+export type McqResult = McqResultOut;
+export type QuizMcqSubmitResult = QuizSubmitMcqOut;
+export type QuizFreeTextResult = QuizFreeTextResultOut;
+export type QuizFreeTextSubmitResult = QuizSubmitFreeTextOut;
+export type RemediationCard = RemediationCardOut;
+export type Note = NoteOut;
+export type NoteWithCard = NoteWithCardOut;
+export type LikedCard = LikedCardOut;
+export type SavedCard = SavedCardOut;
+export type ProfileExport = ProfileExportOut;
+export type DailyGoal = DailyGoalOut;
+export type AskMessage = AskMessageOut;
+export type AskConversation = AskConversationOut;
+/** One SSE event from `POST /topics/{id}/ask`. */
+export type AskEvent = AskEventOut;
+export type RepairCard = RepairCardOut;
+export type RepairReport = RepairReportOut;
+export type RepairAttempt = RepairAttemptOut;
+export type RepairQueueItem = RepairQueueItemOut;
+export type RepairEnqueued = RepairEnqueuedOut;
+export type AsciiScene = AsciiSceneOut;
+export type AsciiSceneAction = AsciiSceneActionOut;
+
+/** The content shapes the collapsed teaser knows how to render. `Card.archetype`
+ *  is derived server-side from the body (ADR-0017); a tag outside this list
+ *  renders as a plain card. */
 export type ArchetypeTag = "code" | "diagram" | "comparison";
 
-/** Which kind of visual asset a card carries. Mirrors `spoin.domain.enums.
- *  VisualKind`; a card never carries both (owner, 2026-09-05). */
-export type VisualKind = "ascii" | "image";
+export type DiscoverMode = "popular" | "for_you";
 
-export interface Card {
-  id: string;
-  topic_id: string;
-  subtopic_id: string;
-  /** The curriculum slot's title — used as the station label when filtered to one topic. */
-  subtopic_title: string;
-  difficulty: Difficulty;
-  title: string;
-  /** The collapsed-state hook — a purpose-written line, not a truncation of body. */
-  summary: string;
-  body: string;
-  archetype: ArchetypeTag[];
-  /** At most one true per subtopic (ADR-0017) — the client renders this card
-   *  never-collapsed with anchor styling; it does not decide for itself. */
-  is_hero: boolean;
-  /** ASCII scene reference (ADR-0021), or a model-given label for freehand
-   *  art on the free-form generation testing branch. Null for most cards.
-   *  Renders at the TOP of the card, above the title, and as the entire
-   *  collapsed/preview face when present — see `visual_slots`. */
-  visual_id: string | null;
-  /** Which kind of asset `visual_id` names, and therefore which renderer runs.
-   *  Null exactly when `visual_id` is. Sent by the server rather than inferred
-   *  from the id's shape: an image id is a UUID and an ASCII scene id is not,
-   *  so we COULD tell them apart by string format and would then depend on an
-   *  implicit rule nothing guarantees (ADR-0102). A card never carries both. */
-  visual_kind: VisualKind | null;
-  /** For `visual_kind === "ascii"`: {"art": <raw ascii, newline-separated>,
-   *  "alt": <one sentence>}. For `"image"`: {"title", "attribution",
-   *  "display_url", "source_page", "licence"} (ADR-0095). Null together with
-   *  `visual_id`. Never markdown — rendered in a dedicated box, not through
-   *  the body's Markdown parser.
-   *
-   *  `attribution` is not optional to render: CC BY and CC BY-SA make
-   *  displaying it a licence condition. */
-  visual_slots: Record<string, string> | null;
-  created_at: string;
-  /** This user's private note on this card, or null if they never wrote one. */
-  note: string | null;
-  /** True iff this user has already marked this card SEEN (ADR-0010) —
-   *  server-authoritative so collections that re-show the same card across
-   *  page loads (saved, liked, notes) don't reset it to unmarked on reload. */
-  seen: boolean;
+export interface TopicBatchEntry {
+  name: string;
+  /** 1–2 sentences on what the reader wants from this topic — optional,
+   *  threaded to the curriculum as context (task 0032). */
+  description?: string;
+  entryDifficulty?: Difficulty;
 }
 
-export interface Feed {
-  cards: Card[];
-  next_position: number;
-  /** The pool could not satisfy the difficulty mix, so this page is short by design. */
-  degraded: boolean;
-  /** True end of feed. Show "more coming soon" — never an indefinite spinner. */
-  exhausted: boolean;
-  /** This page includes a repeat pass — everything at some difficulty has been
-   *  shown once and is being served again in a fresh order. */
-  recycling: boolean;
+/** The API when nothing configures it: the Hono stack's port (infra/compose.yml). */
+const DEFAULT_API_BASE_URL = "http://localhost:8001";
+
+export function getBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL;
+  if (typeof window === "undefined") return configured;
+  const url = new URL(configured);
+  // A localhost API means "the machine serving this page". On a phone reaching
+  // the dev server over the LAN, localhost is the phone, so the page's own host
+  // stands in for it and the configured port is kept.
+  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+    url.hostname = window.location.hostname;
+  }
+  return url.origin;
 }
 
-export interface Topic {
-  id: string;
-  /** Always this user's own name for the topic (ADR-0004). */
-  display_name: string;
-  slug: string;
-  is_custom: boolean;
-  current_difficulty: Difficulty;
-  /** 0-359, -1 to opt out of topic color entirely (ADR-0051, follow the
-   *  theme's own accent), or null to use the deterministic default
-   *  (ADR-0034). Read through `topicHue()`/`explicitTopicHue()`
-   *  (`lib/topicColor.ts`), never directly -- the sentinel renders as a real
-   *  (red) hue if fed straight into `oklch()`. */
-  accent_hue: number | null;
+// -- The session --------------------------------------------------------------
+
+const SESSION_KEY = "spoin_session_token";
+
+function sessionToken(): string | null {
+  return typeof window === "undefined" ? null : localStorage.getItem(SESSION_KEY);
 }
 
-export type EngagementKind =
-  | "impression"
-  | "expand"
-  | "collapse"
-  | "dwell"
-  | "skip"
-  | "like"
-  | "unlike"
-  | "bookmark"
-  | "unbookmark"
-  | "note"
-  | "share"
-  | "ask_ai"
-  /** User tapped "Got it". A deliberate claim of comprehension. */
-  | "explicit_complete"
-  /** Dwell threshold passed. Weaker: they may have been making tea. */
-  | "dwell_complete";
-
-export interface EngagementEvent {
-  /** Client-generated, and the idempotency key. Retries must collide, not inflate. */
-  id: string;
-  card_id: string;
-  kind: EngagementKind;
-  dwell_ms?: number;
-  client_occurred_at?: string;
-  session_id?: string;
+export function hasSession(): boolean {
+  return sessionToken() !== null;
 }
+
+/** Forgets the session on this device only; `api.signOut` also ends it on the server. */
+export function clearSession(): void {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+function authHeaders(): Record<string, string> {
+  const token = sessionToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function makeAuthClient() {
+  return createAuthClient({
+    baseURL: getBaseUrl(),
+    basePath: "/auth",
+    plugins: [anonymousClient()],
+    fetchOptions: {
+      // Bearer only. A cookie sent along would make Better Auth treat the
+      // request as a cookie session, and the API doesn't allow credentials.
+      credentials: "omit",
+      auth: { type: "Bearer", token: () => sessionToken() ?? undefined },
+      onSuccess: ({ response }) => {
+        const token = response.headers.get("set-auth-token");
+        if (token) localStorage.setItem(SESSION_KEY, token);
+      },
+    },
+  });
+}
+
+let authClient: ReturnType<typeof makeAuthClient> | null = null;
+
+/** Made on first use, in the browser: the base URL depends on the page's host. */
+function auth() {
+  authClient ??= makeAuthClient();
+  return authClient;
+}
+
+/** Better Auth answers `{data, error}` rather than throwing; this makes its errors ours. */
+async function settled(
+  call: Promise<{ error: { status: number; message?: string; code?: string } | null }>,
+): Promise<void> {
+  const { error } = await call;
+  if (error) throw new ApiError(error.status, error.message ?? "Request failed", error.code);
+}
+
+// -- Requests -----------------------------------------------------------------
 
 /** Carries the HTTP status so callers that need to branch on it (409 already
- *  subscribed vs. 403 limit reached, say) don't have to parse the message. */
+ *  subscribed vs. 403 limit reached, say) don't have to parse the message.
+ *  `code` is Better Auth's error code, on its endpoints only. */
 export class ApiError extends Error {
   status: number;
+  code?: string;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
-async function request<T>(path: string, init?: RequestInit, retry = true): Promise<T> {
+async function failure(response: Response, fallback: string): Promise<ApiError> {
+  const detail = await response
+    .json()
+    .then((body: { detail?: string }) => body.detail)
+    .catch(() => undefined);
+  return new ApiError(response.status, detail ?? fallback);
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers);
   if (!headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-
-  // Inject token
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("spoin_access_token");
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
-  }
+  for (const [name, value] of Object.entries(authHeaders())) headers.set(name, value);
 
   const response = await fetch(`${getBaseUrl()}${path}`, {
     ...init,
@@ -166,39 +252,18 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
     cache: "no-store",
   });
 
-  if (response.status === 401 && retry && typeof window !== "undefined" && !path.startsWith("/auth/")) {
-    const refreshToken = localStorage.getItem("spoin_refresh_token");
-    if (refreshToken) {
-      try {
-        const refreshResp = await fetch(`${getBaseUrl()}/auth/refresh`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: refreshToken })
-        });
-        if (refreshResp.ok) {
-          const data = await refreshResp.json();
-          localStorage.setItem("spoin_access_token", data.access_token);
-          localStorage.setItem("spoin_refresh_token", data.refresh_token);
-          // Retry original request
-          return request<T>(path, init, false);
-        }
-      } catch (e) {}
-    }
-    // Refresh failed or no refresh token, log out. A hard reload rather than
-    // client-side navigation: AuthProvider isn't reachable from this module
-    // (it's a transport layer, see the file header), so this is the fallback
-    // for a session that expires mid-use, not the normal signed-out path.
-    localStorage.removeItem("spoin_access_token");
-    localStorage.removeItem("spoin_refresh_token");
+  if (response.status === 401 && typeof window !== "undefined" && !path.startsWith("/auth/")) {
+    // The session is over: expired, or signed out somewhere else. A hard
+    // reload rather than client-side navigation: AuthProvider isn't reachable
+    // from this module (it's a transport layer, see the file header), so this
+    // is the fallback for a session that ends mid-use, not the normal
+    // signed-out path.
+    clearSession();
     window.location.href = "/signup";
   }
 
   if (!response.ok) {
-    const detail = await response
-      .json()
-      .then((body: { detail?: string }) => body.detail)
-      .catch(() => undefined);
-    throw new ApiError(response.status, detail ?? `${init?.method ?? "GET"} ${path} failed`);
+    throw await failure(response, `${init?.method ?? "GET"} ${path} failed`);
   }
 
   if (response.status === 204) {
@@ -208,311 +273,74 @@ async function request<T>(path: string, init?: RequestInit, retry = true): Promi
   return (await response.json()) as T;
 }
 
-export interface AuthTokens {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
+async function requestForm<T>(path: string, form: FormData): Promise<T> {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: form,
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw await failure(response, `POST ${path} failed`);
+  }
+  return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
 }
 
-export interface User {
-  id: string;
-  /** null for a guest — see api/routers/auth.py's `_user_out`. */
-  email: string | null;
-  display_name: string;
-  is_guest: boolean;
-  onboarding_complete: boolean;
-  age?: number | null;
-  gender?: string | null;
-  avatar_icon?: string | null;
-  has_avatar_image?: boolean;
-  /** Cards-per-day target. Rides on this payload rather than a separate
-   *  preferences fetch — see UserOut in api/schemas.py. */
-  daily_card_goal?: number;
-  /** Palette, saved themes, font, and imported-font metadata (ADR-0070).
-   *  Populated ONLY on `/auth/me` — the payload AuthProvider reads on load,
-   *  where the client reconciles its pre-paint `localStorage` cache against
-   *  the server. Absent on PATCH /profile/me and avatar responses. */
-  preferences?: Preferences;
-}
-
-/** One user-saved theme (ADR-0070). The four colours everything else derives
- *  from via `globals.css`'s `[data-palette="custom"]` `color-mix` rules, plus a
- *  name and a client-generated id referenced as `custom:<id>`. */
-export interface CustomPalette {
-  id: string;
-  name: string;
-  bg: string;
-  fg: string;
-  accent: string;
-  accent2: string;
-}
-
-/** Metadata for an imported font. The bytes are fetched separately from
- *  `GET /profile/me/fonts/{id}` and registered as an `@font-face` client-side. */
-export interface ImportedFont {
-  id: string;
-  name: string;
-  format: string;
-  byte_size: number;
-}
-
-export interface Preferences {
-  /** A built-in palette key (`notebook`…) or `custom:<id>`. */
-  palette: string;
-  custom_palettes: CustomPalette[];
-  /** A built-in font key (`literata`…) or `import:<id>`. */
-  font: string;
-  imported_fonts: ImportedFont[];
-}
-
-/** Whole-object replace (PUT), not PATCH — the client always holds the full
- *  picture. Adding/removing a font goes through its own endpoints. */
-export interface PreferencesUpdate {
-  palette: string;
-  custom_palettes: CustomPalette[];
-  font: string;
-}
-
-export interface Progress {
-  topic_id: string;
-  current_difficulty: Difficulty;
-  /** Coverage of the weakest subtopic in the current tier — the 80% gate. */
-  coverage: number;
-  /** Latched server-side: once earned it is never recomputed. */
-  quiz_unlocked: boolean;
-  tier_quiz_passed: boolean[];
-  mastered: boolean;
-}
-
-export interface TopicDiscover {
-  topic_id: string;
-  /** canonical_name, not a personal label — see ADR-0015. */
-  display_name: string;
-  subscriber_count: number;
-  /** Always false from `discoverTopics`. Set per-topic from `allTopics`
-   *  (ADR-0038) so the modal can grey out Follow on a topic already
-   *  followed instead of offering a second subscribe. */
-  followed: boolean;
-}
-
-export type DiscoverMode = "popular" | "for_you";
-
-export interface TopicRequestResult {
-  topic: Topic;
-  /** "generating" means a brand-new topic was minted and generation was just
-   *  enqueued — no cards yet, could take a while (ADR-0003: free-tier
-   *  generation is minutes-to-hours, never synchronous). "subscribed" means
-   *  the name matched an existing topic, which may already have cards. */
-  status: "subscribed" | "generating";
-}
-
-export interface TopicBatchEntry {
-  name: string;
-  /** 1–2 sentences on what the reader wants from this topic — optional,
-   *  threaded to the curriculum/card prompts as context (task 0032). */
-  description?: string;
-  entryDifficulty?: Difficulty;
-}
-
-export interface TopicBatchItemResult {
-  /** Index into the submitted entries, so each result pairs back to its
-   *  row (ADR-0025's `request_index` convention). */
-  request_index: number;
-  /** "generating" / "subscribed" — as `TopicRequestResult.status`.
-   *  "already_subscribed" — the name resolved to a topic already followed;
-   *  nothing minted. "rejected" — failed the word-count rule or the name
-   *  validator; `detail` carries the reason for this row. */
-  status: "generating" | "subscribed" | "already_subscribed" | "rejected";
-  topic: Topic | null;
-  detail: string | null;
-}
-
-export interface TopicBatchResult {
-  results: TopicBatchItemResult[];
-}
-
-export interface TopicStats {
-  topic_id: string;
-  current_difficulty: Difficulty;
-  coverage: number;
-  quiz_unlocked: boolean;
-  mastered: boolean;
-  tier_quiz_passed: boolean[];
-  likes: number;
-  saves: number;
-  notes: number;
-  shares: number;
-}
-
-export interface SubtopicProgress {
-  subtopic_id: string;
-  title: string;
-  difficulty: Difficulty;
-  total_cards: number;
-  seen_cards: number;
-  coverage: number;
-  covered: boolean;
-}
-
-export interface TopicCurriculum {
-  topic_id: string;
-  subtopics: SubtopicProgress[];
-}
-
-export interface CustomTopicStatus {
-  topic_id: string;
-  display_name: string;
-  slug: string;
-  /** null when the requested name matched an existing, already-generated
-   *  topic and no job was ever enqueued — nothing to poll for that one. */
-  generation_status: "pending" | "running" | "completed" | "failed" | null;
-  requested_at: string;
-}
-
-export interface GenerationSubtopicProgress {
-  subtopic_id: string;
-  group_title: string;
-  difficulty: Difficulty;
-  cards_target: number;
-  cards_done: number;
-  /** Null until the cards phase has committed for this tier — see the API's
-   *  GenerationSubtopicProgressOut docstring. */
-  questions_target: number | null;
-  questions_done: number;
-}
-
-export interface GenerationProgress {
-  status: "pending" | "running" | "completed" | "failed";
-  stage: "curriculum" | "cards" | "done" | null;
-  topic_name: string | null;
-  subtopics: GenerationSubtopicProgress[];
-  error: string | null;
-  /** Crossed ADR-0053's live-coverage threshold -- the same moment this
-   *  topic starts appearing in Topics/Discover for users who didn't request
-   *  it. A separate, usually-earlier milestone than `status === "completed"`. */
-  topic_live: boolean;
-}
-
-export interface QuizMcqQuestion {
-  question_id: string;
-  stem: string;
-  /** Never `correct_index` — the client can't grade itself. */
-  options: string[];
-}
-
-export interface QuizFreeTextQuestion {
-  question_id: string;
-  stem: string;
-}
-
-export interface QuizStart {
-  attempt_id: string;
-  topic_id: string;
-  difficulty: Difficulty;
-  kind: "placement" | "promotion" | "mastery";
-  mcq: QuizMcqQuestion[];
-  free_text: QuizFreeTextQuestion;
-}
-
-export interface McqResult {
-  question_id: string;
-  correct: boolean;
-  correct_index: number;
-  explanation: string;
-}
-
-export interface QuizMcqSubmitResult {
-  attempt_id: string;
-  results: McqResult[];
-  /** Fraction correct, 0-1. Final score isn't known until free text is graded too. */
-  mcq_score: number;
-}
-
-export interface QuizFreeTextResult {
-  question_id: string;
-  /** 0-3 rubric level. */
-  rubric_level: number;
-  correct: boolean;
-  justification: string;
-}
-
-export interface RemediationCard {
-  card_id: string;
-  title: string;
-  subtopic_title: string;
-}
-
-export interface Note {
-  card_id: string;
-  body: string;
-  updated_at: string;
-}
-
-/** One row of the "all my notes" view -- the note plus enough card/topic
- *  context to render a full card without a per-note follow-up request. */
-export interface NoteWithCard {
-  note: Note;
-  card: Card;
-  /** This user's own name for the card's topic (ADR-0004). */
-  topic_name: string;
-}
-
-/** One row of the liked collection -- the card the user hearted, the user's
- *  own name for its topic (ADR-0004), and when they liked it for sorting. */
-export interface LikedCard {
-  card: Card;
-  topic_name: string;
-  /** ISO 8601 server timestamp from `card_like.created_at`. */
-  liked_at: string;
-}
-
-/** One row of the saved (bookmarked) collection -- the card the user bookmarked,
- *  the user's own topic name, and when they saved it for sorting. */
-export interface SavedCard {
-  card: Card;
-  topic_name: string;
-  /** ISO 8601 server timestamp from `card_bookmark.created_at`. */
-  saved_at: string;
-}
-
-export interface QuizFreeTextSubmitResult {
-  attempt_id: string;
-  free_text: QuizFreeTextResult;
-  /** Weighted 70% MCQ / 30% free text. */
-  score: number;
-  passed: boolean;
-  /** Empty unless `passed` is false. */
-  remediation: RemediationCard[];
-  /** True only if this attempt actually advanced the tier or conferred mastery. */
-  progressed: boolean;
+/** A protected file as an object URL. A bare `<img src>` or `url()` sends no
+ *  Authorization header and would 401, since the token lives in localStorage,
+ *  not a cookie. The caller owns the URL and MUST `revokeObjectURL` it. */
+async function objectUrl(path: string, what: string): Promise<string> {
+  const response = await fetch(`${getBaseUrl()}${path}`, { headers: authHeaders() });
+  if (!response.ok) {
+    throw new ApiError(response.status, `Could not load ${what}`);
+  }
+  return URL.createObjectURL(await response.blob());
 }
 
 export const api = {
   // -- Auth -----------------------------------------------------------------
-  login: (credentials: { email: string; password: string }) =>
-    request<AuthTokens>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(credentials),
-    }),
+  // Each sign-in stores the session token it is answered with.
+  signIn: (credentials: { email: string; password: string }) =>
+    settled(auth().signIn.email(credentials)),
 
-  register: (details: { email: string; password: string; display_name: string }) =>
-    request<AuthTokens>("/auth/register", {
+  signUp: (details: { email: string; password: string; display_name: string }) =>
+    settled(
+      auth().signUp.email({
+        email: details.email,
+        password: details.password,
+        name: details.display_name,
+      }),
+    ),
+
+  /** A guest is a real, anonymous user from the first card (ADR-0033). */
+  guest: () => settled(auth().signIn.anonymous()),
+
+  /** An ID token from the page's own Google Sign-In; the API never runs the
+   *  redirect flow itself. */
+  googleSignIn: (idToken: string) =>
+    settled(auth().signIn.social({ provider: "google", idToken: { token: idToken } })),
+
+  /** Ends the session on the server too. The token is forgotten here at once,
+   *  whatever the server says, so it rides along explicitly: the client reads
+   *  its own token only after an await. */
+  signOut: async () => {
+    const headers = authHeaders();
+    clearSession();
+    await settled(auth().signOut({ fetchOptions: { headers } }));
+  },
+
+  /** The caller's own guest account gains an email and password in place
+   *  (ADR-0033): same user, same session. */
+  claim: (details: ClaimIn) =>
+    request<User>("/auth/claim", {
       method: "POST",
       body: JSON.stringify(details),
     }),
 
-  /** Mints a fresh anonymous user + token pair — see docs/adr on guest identity. */
-  guest: () => request<AuthTokens>("/auth/guest", { method: "POST" }),
-
-  /** Attaches email/password to the CALLER's own guest account in place. */
-  claim: (details: { email: string; password: string; display_name: string }) =>
-    request<AuthTokens>("/auth/claim", {
-      method: "POST",
-      body: JSON.stringify(details),
-    }),
-
-  googleAuth: (idToken: string) =>
-    request<AuthTokens>("/auth/google", {
+  /** The same with Google. A 409 means that Google account, or its email,
+   *  already has a Spoin account: sign in with it instead. */
+  claimGoogle: (idToken: string) =>
+    request<User>("/auth/claim/google", {
       method: "POST",
       body: JSON.stringify({ id_token: idToken }),
     }),
@@ -559,9 +387,9 @@ export const api = {
       }),
     }),
 
-  /** Several custom topics in one submission — ADR-0025's batched matcher runs
-   *  once for the whole list (task 0032). A partly-rejected batch still
-   *  resolves; read each row's `status`/`detail`, don't treat it as a failure. */
+  /** Several custom topics in one submission (task 0032). A partly-rejected
+   *  batch still resolves; read each row's `status`/`detail`, don't treat it
+   *  as a failure. */
   requestTopics: (entries: TopicBatchEntry[]) =>
     request<TopicBatchResult>("/topics/batch", {
       method: "POST",
@@ -583,9 +411,9 @@ export const api = {
   generationProgress: (topicId: string) =>
     request<GenerationProgress>(`/topics/${topicId}/generation-progress`),
 
-  /** Only works while the job is still "pending" (not yet claimed by a
-   *  worker) -- 409s otherwise. Removes the job, the caller's own
-   *  subscription, and the topic itself if nobody else was following it. */
+  /** Only works while the job is still "pending" -- 409s otherwise. Removes
+   *  the job, the caller's own subscription, and the topic itself if nobody
+   *  else was following it. */
   cancelGeneration: (topicId: string) =>
     request<void>(`/topics/${topicId}/generation-job`, { method: "DELETE" }),
 
@@ -595,21 +423,23 @@ export const api = {
       body: JSON.stringify({ hue }),
     }),
 
-  /** Dev-only (see api/routers/dev.py) — resets this user's progress and
+  /** Dev-only (the server's `DEV_ROUTES`) — resets this user's progress and
    *  unfollows a couple of topics back to Discover. Returns the refreshed
    *  topic list. */
   resetDemo: () => request<Topic[]>("/dev/reset", { method: "POST" }),
 
   sendEvents: (events: EngagementEvent[]) =>
-    request<{ accepted: number; duplicates: number; rejected: number }>(
-      "/engagement/events",
-      { method: "POST", body: JSON.stringify({ events }) },
-    ),
+    request<EngagementAck>("/engagement/events", {
+      method: "POST",
+      body: JSON.stringify({ events }),
+    }),
 
-  startQuiz: (topicId: string, difficulty: Difficulty) =>
+  /** `difficulty` picks the tier on a topic with tiers. A tierless topic has
+   *  one quiz, so it is left out there. */
+  startQuiz: (topicId: string, difficulty?: Difficulty) =>
     request<QuizStart>(`/topics/${topicId}/quiz/start`, {
       method: "POST",
-      body: JSON.stringify({ difficulty }),
+      body: JSON.stringify(difficulty === undefined ? {} : { difficulty }),
     }),
 
   submitMcq: (attemptId: string, answers: { question_id: string; selected_index: number }[]) =>
@@ -662,37 +492,19 @@ export const api = {
    *  the reader's calendar day. */
   today: (tzOffsetMinutes: number) =>
     request<DailyGoal>(`/profile/me/today?tz_offset_minutes=${tzOffsetMinutes}`),
-    
-  updateProfile: (updates: UserProfileUpdateIn) => 
+
+  updateProfile: (updates: UserProfileUpdateIn) =>
     request<User>("/profile/me", {
       method: "PATCH",
       body: JSON.stringify(updates),
     }),
-    
-  uploadAvatar: async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-  
-    const token = localStorage.getItem("spoin_access_token");
-    const response = await fetch(`${getBaseUrl()}/profile/me/avatar`, {
-      method: "POST",
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: formData,
-    });
-  
-    if (!response.ok) {
-      const detail = await response
-        .json()
-        .then((body: any) => body.detail)
-        .catch(() => undefined);
-      throw new ApiError(response.status, detail ?? `POST /profile/me/avatar failed`);
-    }
-  
-    return response.json() as Promise<User>;
+
+  uploadAvatar: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return requestForm<User>("/profile/me/avatar", form);
   },
-  
+
   deleteAvatar: () =>
     request<User>("/profile/me/avatar", {
       method: "DELETE",
@@ -714,43 +526,19 @@ export const api = {
 
   /** Import a font file. Format is sniffed from magic bytes server-side (not
    *  the multipart type), size capped at 2MB. Returns the new row's metadata. */
-  uploadFont: async (file: File, name: string) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("name", name);
-    const token = localStorage.getItem("spoin_access_token");
-    const response = await fetch(`${getBaseUrl()}/profile/me/fonts`, {
-      method: "POST",
-      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: formData,
-    });
-    if (!response.ok) {
-      const detail = await response
-        .json()
-        .then((body: { detail?: string }) => body.detail)
-        .catch(() => undefined);
-      throw new ApiError(response.status, detail ?? "POST /profile/me/fonts failed");
-    }
-    return response.json() as Promise<ImportedFont>;
+  uploadFont: (file: File, name: string) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("name", name);
+    return requestForm<ImportedFont>("/profile/me/fonts", form);
   },
 
   deleteFont: (id: string) =>
     request<void>(`/profile/me/fonts/${id}`, { method: "DELETE" }),
 
-  /** The font bytes as an object URL, for a client `@font-face` `src`. Same
-   *  reason as `avatarObjectUrl`: the endpoint is behind a Bearer token, so a
-   *  bare `url()` would 401. The caller owns the returned URL and should
-   *  `revokeObjectURL` it when the font is removed. */
-  fontObjectUrl: async (id: string) => {
-    const token = localStorage.getItem("spoin_access_token");
-    const response = await fetch(`${getBaseUrl()}/profile/me/fonts/${id}`, {
-      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    });
-    if (!response.ok) {
-      throw new ApiError(response.status, "Could not load font file");
-    }
-    return URL.createObjectURL(await response.blob());
-  },
+  /** The font bytes as an object URL, for a client `@font-face` `src`. Revoke
+   *  it when the font is removed. */
+  fontObjectUrl: (id: string) => objectUrl(`/profile/me/fonts/${id}`, "font file"),
 
   /** The user's own data as JSON (Settings -> Data & Privacy). Serving-layer
    *  read only — no generation. */
@@ -758,26 +546,10 @@ export const api = {
 
   /** The avatar bytes as an object URL.
    *
-   * `/profile/me/avatar/image` sits behind `UserDep` -> `HTTPBearer`
-   * (api/deps.py), and the access token lives in localStorage, not a cookie.
-   * A bare `<img src={...}>` therefore sends no Authorization header and the
-   * endpoint 401s -- every uploaded avatar silently failed to render. Fetching
-   * it here lets the token ride along on a real request; the caller gets a
-   * blob: URL an <img> can use, and MUST revokeObjectURL it when done.
-   *
    * Callers are responsible for cache-busting by re-calling after an upload
    * or delete -- deliberately not a `?t=` on the URL, which (evaluated in a
    * render) re-fetched the image on every single re-render. */
-  avatarObjectUrl: async () => {
-    const token = localStorage.getItem("spoin_access_token");
-    const response = await fetch(`${getBaseUrl()}/profile/me/avatar/image`, {
-      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    });
-    if (!response.ok) {
-      throw new ApiError(response.status, "Could not load avatar image");
-    }
-    return URL.createObjectURL(await response.blob());
-  },
+  avatarObjectUrl: () => objectUrl("/profile/me/avatar/image", "avatar image"),
 
   // -- Report a card (B14 / ADR-0076) --------------------------------------
   /** Flag a live card as structurally broken. Idempotent per user+card. */
@@ -797,7 +569,7 @@ export const api = {
       request<void>(`/topics/${topicId}/ask/reset`, { method: "POST" }),
   },
 
-  // -- Admin: card repair queue (B14, dev-only) --------------------------
+  // -- Admin: card repair queue (B14) ------------------------------------
   adminRepairs: {
     list: () => request<RepairQueueItem[]>("/admin/repairs"),
     delete: (cardId: string) =>
@@ -820,7 +592,7 @@ export const api = {
     },
   },
 
-  // -- Admin: ASCII scene review (ADR-0104, dev-only) ---------------------
+  // -- Admin: ASCII scene review (ADR-0104) -------------------------------
   adminAscii: {
     list: (topicSlug: string) =>
       request<AsciiScene[]>(`/admin/ascii/${encodeURIComponent(topicSlug)}`),
@@ -837,40 +609,6 @@ export const api = {
   },
 };
 
-// -- Report a card ------------------------------------------------------
-
-export type CardReportReason =
-  | "art"
-  | "diagram"
-  | "code_block"
-  | "formatting"
-  | "other";
-
-// -- AskAI conversation ----------------------------------------------
-
-export interface AskMessage {
-  role: "user" | "assistant";
-  content: string;
-  /** assistant rows only: false = a refused turn, `content` is the hint. */
-  on_topic: boolean;
-  created_at: string;
-}
-
-export interface AskConversation {
-  conversation_id: string | null;
-  messages: AskMessage[];
-  spent: number;
-  limit: number;
-}
-
-/** One SSE event from `POST /topics/{id}/ask`. */
-export type AskEvent =
-  | { event: "delta"; text: string }
-  | { event: "done" }
-  | { event: "off_topic"; hint: string }
-  | { event: "limit" }
-  | { event: "error"; cause: string };
-
 /** Stream an AskAI turn. Yields parsed SSE events until the stream closes.
  *  A network/HTTP failure yields a single synthetic `error` event rather
  *  than throwing, so the caller has one code path. */
@@ -878,16 +616,11 @@ export async function* askStream(
   topicId: string,
   body: { question: string; card_id?: string | null },
 ): AsyncGenerator<AskEvent> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("spoin_access_token") : null;
   let response: Response;
   try {
     response = await fetch(`${getBaseUrl()}/topics/${topicId}/ask`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
       cache: "no-store",
     });
@@ -922,136 +655,4 @@ export async function* askStream(
       yield { event: ev, ...payload } as AskEvent;
     }
   }
-}
-
-async function requestForm<T>(path: string, form: FormData): Promise<T> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("spoin_access_token") : null;
-  const response = await fetch(`${getBaseUrl()}${path}`, {
-    method: "POST",
-    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: form,
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    const detail = await response.json().catch(() => ({}));
-    throw new ApiError(response.status, detail?.detail ?? `Request failed (${response.status})`);
-  }
-  return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
-}
-
-// -- Admin: card repair queue -------------------------------------------
-
-export interface RepairCard {
-  card_id: string;
-  version: number;
-  title: string;
-  canonical_title: string;
-  summary: string;
-  body: string;
-  archetype: ArchetypeTag[];
-  visual_id: string | null;
-  visual_kind: VisualKind | null;
-  visual_slots: Record<string, string> | null;
-}
-
-export interface RepairReport {
-  reason: CardReportReason;
-  note: string | null;
-  created_at: string;
-}
-
-export interface RepairAttempt {
-  mode: "fix" | "remake";
-  status: "pending" | "running" | "done" | "failed";
-  error: string | null;
-  created_at: string;
-}
-
-export interface RepairQueueItem {
-  card_id: string;
-  topic_id: string;
-  family_id: string;
-  difficulty: Difficulty;
-  before: RepairCard;
-  after: RepairCard | null;
-  report_count: number;
-  reports: RepairReport[];
-  latest_repair: RepairAttempt | null;
-  state: "open" | "resolved";
-}
-
-export interface RepairEnqueued {
-  card_id: string;
-  action: "deleted" | "fix_enqueued" | "remake_enqueued" | "dismissed" | "reverted";
-  job_id: string | null;
-}
-
-export interface AsciiScene {
-  card_id: string;
-  title: string;
-  canonical_title: string;
-  summary: string;
-  difficulty: Difficulty;
-  subtopic_title: string | null;
-  /** The composed scene as it currently ships: library drawing + overlay lines. */
-  art: string;
-  alt: string;
-  /** The curated-library entry id, or null for a card predating library sourcing. */
-  src_id: string | null;
-  library_title: string | null;
-  /**
-   * The drawing as the library holds it, before any overlay or operator edit.
-   * ADR-0104 makes this the answer to "was it always like this" -- the first
-   * question a reviewer asks when a scene looks wrong.
-   */
-  library_art: string | null;
-  /** Reported, never enforced: an operator's deliberate over-budget line stands. */
-  widest_line: number;
-  max_width: number;
-}
-
-export interface AsciiSceneAction {
-  card_id: string;
-  action: "kept" | "sent_to_repairs";
-}
-
-export interface UserProfileUpdateIn {
-  display_name?: string | null;
-  age?: number | null;
-  gender?: string | null;
-  avatar_icon?: string | null;
-  daily_card_goal?: number | null;
-}
-
-export interface ProfileExport {
-  exported_at: string;
-  schema_version: number;
-  profile: User;
-  topics: unknown[];
-  notes: unknown[];
-  liked_cards: unknown[];
-  saved_cards: unknown[];
-  daily_activity: DailyActivityOut[];
-}
-
-export interface DailyActivityOut {
-  date: string;
-  cards_read: number;
-}
-
-export interface ProfileStatsOut {
-  current_streak: number;
-  longest_streak: number;
-  total_cards_read: number;
-  total_topics: number;
-  monthly_activity: DailyActivityOut[];
-}
-
-/** `GET /profile/me/today` (ADR-0062). `cards_read` is distinct cards
- *  completed within the caller's LOCAL day — the client sends its own UTC
- *  offset so the ring resets at the reader's midnight, not UTC's. */
-export interface DailyGoal {
-  cards_read: number;
-  goal: number;
 }

@@ -285,7 +285,9 @@ export function Feed({ topics, selected, onCardSeen, active = true }: Props) {
           </>
         ) : null}
 
-        {!loading && cards.length === 0 && error === null ? <EmptyFeed /> : null}
+        {!loading && cards.length === 0 && error === null ? (
+          topics.length === 0 ? <EmptyFeed /> : <EndOfFeed />
+        ) : null}
 
         {stations.map((station, index) => (
           <section key={stationKey(station, index)}>
@@ -327,7 +329,6 @@ export function Feed({ topics, selected, onCardSeen, active = true }: Props) {
         {loadingMore ? <CardSkeleton /> : null}
         {showRecycling && !loading ? <RecyclingNotice /> : null}
         {degraded && !loading ? <DegradedNotice /> : null}
-        {exhausted && cards.length > 0 && !degraded ? <EndOfFeed /> : null}
 
         <div ref={sentinel} className="sentinel" />
       </main>

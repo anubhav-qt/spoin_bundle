@@ -33,10 +33,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
 | 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
-| 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | |
+| 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | next |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
 | 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
-| 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | next |
+| 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
 | 13 | Host spoin on the ThinkPad | later |
@@ -161,6 +161,30 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **The job status page** (2026-10-11) shows each background job's last success and last
   error from `job_runs`, the generate and repair queue counted by status, and every failed
   job with its `last_error`.
+- **The web in the workspace** (2026-10-11). `apps/web` joins the npm workspace and
+  `npm run check` typechecks it; Biome stays off it, so the UI keeps its own style
+  (ADR-0106: the web changes only where the API did). In development it runs as the `web`
+  service of `infra/compose.yml` on host port 3001, next to the API on 8001. The root
+  `docker-compose.yml`'s `web` service (the old stack, port 3000) no longer runs this web;
+  Phase 11 deletes it.
+- **The lockfile is written by npm 10** (2026-10-11). npm 11 prunes other platforms' optional
+  entries (`@esbuild/*`, `@rolldown/*`, `lightningcss-*`, `fsevents`, and the musl builds of
+  swc and sharp the web image needs), which breaks `npm ci` in the Linux images. Never
+  `npm install` with npm 11; regenerate with `npx -y npm@10.9.4 install --package-lock-only`,
+  then `npm ci`.
+- **The web signs in through Better Auth** (2026-10-11). `lib/api.ts` speaks the `@spoin/shared`
+  types; a sign-in keeps the one bearer token from `set-auth-token` (no refresh). A guest's
+  Google sign-in claims in place and falls back to a plain sign-in when the Google account
+  already has a user (409). Outside production, CORS and Better Auth's origin check share one
+  rule (`originAllowed`), so a phone on the owner's network can sign in to a dev server.
+- **The web follows `scope`** (2026-10-11). A survey or one-shot shows no tier labels or
+  gates; its one quiz starts without a difficulty and reads as a mastery quiz across the
+  whole topic, unlocked at 80% of every subtopic. Cards keep their difficulty marks.
+  `TopicDiscoverOut` gains `scope`, so discovery's tier picker knows too.
+- **The feed notices say what is true** (2026-10-11). Cards are written once, so no notice
+  promises more: a second pass says nothing new is on the way, take the quiz or pick another
+  topic; `exhausted` means the feed's topics have no cards yet, because a topic is written
+  in full before its first card appears.
 
 ## Asked when we get there
 

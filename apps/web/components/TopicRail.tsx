@@ -19,6 +19,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { isTierless } from "@spoin/shared/enums";
+
 import type { Difficulty, Topic } from "@/lib/api";
 import type { TopicProgress } from "@/lib/types";
 
@@ -105,7 +107,7 @@ export function TopicRail({ topics, selected, onToggle, progress }: Props) {
               <span className="topic-chip-name">{topic.display_name}</span>
               <span className="topic-chip-meta">
                 <span>{pct}%</span>
-                <span>{DIFFICULTY_ABBR[difficulty]}</span>
+                {isTierless(topic.scope) ? null : <span>{DIFFICULTY_ABBR[difficulty]}</span>}
               </span>
               <span className="topic-chip-track" aria-hidden="true">
                 <span style={{ width: `${pct}%` }} />

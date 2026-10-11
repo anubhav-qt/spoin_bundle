@@ -8,14 +8,14 @@
  *   token, onboarding pending  -> /onboarding
  *   token, onboarding done     -> away from /signup, /login, /onboarding
  *
- * Tokens live in localStorage (see lib/api.ts), which only exists client-side
- * — this is why the gate is a client component doing a real `api.me()` round
- * trip on navigation, not middleware.ts reading a cookie.
+ * The session token lives in localStorage (see lib/api.ts), which only exists
+ * client-side — this is why the gate is a client component doing a real
+ * `api.me()` round trip on navigation, not middleware.ts reading a cookie.
  */
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { api, type User } from "@/lib/api";
+import { api, clearSession, hasSession, type User } from "@/lib/api";
 import { SpoinWave } from "./SpoinWave";
 
 const PUBLIC_PATHS = new Set(["/login", "/signup"]);
@@ -68,9 +68,8 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
-function clearTokens() {
-  localStorage.removeItem("spoin_access_token");
-  localStorage.removeItem("spoin_refresh_token");
+function forgetUser() {
+  clearSession();
   // Not this user's generations to watch anymore -- GenerationTrackerProvider
   // re-reads this key lazily on next mount, so clearing it directly here
   // (rather than threading a second context in) is enough.
@@ -84,7 +83,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const logout = useCallback(() => {
-    clearTokens();
+    // Ends the session on the server as well; never blocks leaving.
+    void api.signOut().catch(() => undefined);
+    forgetUser();
     setUser(null);
     router.push("/signup");
   }, [router]);
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // for one frame before a redirect below actually lands.
     setLoading(true);
 
-    if (!localStorage.getItem("spoin_access_token")) {
+    if (!hasSession()) {
       setUser(null);
       if (!PUBLIC_PATHS.has(pathname)) {
         router.replace("/signup");
@@ -125,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setLoading(false);
     } catch {
-      clearTokens();
+      forgetUser();
       setUser(null);
       if (!PUBLIC_PATHS.has(pathname)) {
         router.replace("/signup");

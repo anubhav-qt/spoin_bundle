@@ -94,6 +94,7 @@ export const TopicDiscoverOut = z
     topic_id: Uuid,
     /** `canonical_name`: a topic surfaced here has no personal label yet (ADR-0004). */
     display_name: z.string(),
+    scope: TopicScope,
     subscriber_count: z.int(),
     followed: z.boolean().default(false),
   })

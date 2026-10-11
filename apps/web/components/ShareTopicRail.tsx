@@ -10,6 +10,8 @@
 
 import { useEffect, useState } from "react";
 
+import { isTierless } from "@spoin/shared/enums";
+
 import { api, type Difficulty, type Topic, type TopicCurriculum, type TopicStats } from "@/lib/api";
 import { DiscoverBox } from "./DiscoverBox";
 import { FocusToggle } from "./FocusToggle";
@@ -108,12 +110,14 @@ export function ShareTopicRail({
 
         {stats ? (
           <div className="share-topic-meta">
-            <div className="share-topic-meta-row">
-              <span className="share-topic-meta-label">Entry tier</span>
-              <span className="share-topic-meta-value">
-                {DIFFICULTY_LABEL[stats.current_difficulty]}
-              </span>
-            </div>
+            {isTierless(stats.scope) ? null : (
+              <div className="share-topic-meta-row">
+                <span className="share-topic-meta-label">Entry tier</span>
+                <span className="share-topic-meta-value">
+                  {DIFFICULTY_LABEL[stats.current_difficulty]}
+                </span>
+              </div>
+            )}
             {curriculum ? (
               <div className="share-topic-meta-row">
                 <span className="share-topic-meta-label">Curriculum</span>

@@ -2,7 +2,7 @@
 # the old `spoin` project's `db-data`, which holds spoin_db_2. Host ports are offset
 # (5434, 8001) so both stacks can run side by side.
 #
-#   npm run stack        build and start
+#   npm run stack        build and start (the web on 3001, the API on 8001)
 #   npm run stack:down   stop (the volume is kept)
 #
 # Never `docker compose down -v` here either: it is cheap today, it won't be once the
@@ -36,7 +36,7 @@ services:
       DATABASE_URL: postgres://spoin:spoin@db:5432/spoin
       UNIVERSE_DATABASE_URL: postgres://spoin:spoin@db:5432/the_spoin_universe
       AUTH_SECRET: spoin-local-development-secret-change-me
-      ALLOWED_ORIGINS: http://localhost:3000
+      ALLOWED_ORIGINS: http://localhost:3001
       PUBLIC_URL: http://localhost:8001
       EMBEDDER: ${EMBEDDER:-hash}
       MODEL_CACHE_DIR: /models
@@ -54,6 +54,25 @@ services:
       - hono-models:/models
     depends_on:
       migrate: { condition: service_completed_successfully }
+
+  web:
+    build: { context: .., dockerfile: apps/web/Dockerfile }
+    environment:
+      # The browser resolves this, not the container, so it is the host's port.
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8001
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      # Windows bind mounts deliver no file events; poll for them.
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3001:3000"
+    # The sources only: the image's node_modules and .next stay the container's own.
+    volumes:
+      - ../apps/web/app:/app/apps/web/app
+      - ../apps/web/components:/app/apps/web/components
+      - ../apps/web/lib:/app/apps/web/lib
+      - ../apps/web/public:/app/apps/web/public
+      - ../packages/shared/src:/app/packages/shared/src
+    depends_on: [api]
 
 volumes:
   hono-db:

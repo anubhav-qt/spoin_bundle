@@ -6,7 +6,8 @@
   "workspaces": [
     "packages/shared",
     "packages/frog",
-    "apps/server"
+    "apps/server",
+    "apps/web"
   ],
   "engines": {
     "node": ">=24"
@@ -14,7 +15,7 @@
   "scripts": {
     "check": "biome check . && npm run typecheck && npm test",
     "fix": "biome check --write .",
-    "typecheck": "tsc --noEmit -p apps/server && tsc --noEmit -p packages/frog && tsc --noEmit -p packages/shared",
+    "typecheck": "tsc --noEmit -p apps/server && tsc --noEmit -p packages/frog && tsc --noEmit -p packages/shared && npm run typecheck -w @spoin/web",
     "test": "npm test -w @spoin/frog -w @spoin/server",
     "stack": "docker compose -f infra/compose.yml up -d --build",
     "stack:down": "docker compose -f infra/compose.yml down"

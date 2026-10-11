@@ -1053,7 +1053,7 @@ export function Card({
  *  here (ADR-0017). "combo" is a teaser-only category: a card tagged both
  *  code and diagram gets a stacked teaser showing a line of each, rather
  *  than picking one and hiding the other from the preview entirely. */
-function getPrimaryArchetype(tags: ArchetypeTag[]): ArchetypeTag | "combo" | "default" {
+function getPrimaryArchetype(tags: readonly string[]): ArchetypeTag | "combo" | "default" {
   if (tags.includes("code") && tags.includes("diagram")) return "combo";
   if (tags.includes("code")) return "code";
   if (tags.includes("diagram")) return "diagram";

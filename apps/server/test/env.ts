@@ -5,7 +5,7 @@ export const testEnv: Record<string, string> = {
   DATABASE_URL: "postgres://spoin:spoin@localhost:5434/spoin_test",
   UNIVERSE_DATABASE_URL: "postgres://spoin:spoin@localhost:5434/the_spoin_universe_test",
   AUTH_SECRET: "spoin-test-secret-0123456789abcdef0123456789",
-  ALLOWED_ORIGINS: "http://localhost:3000",
+  ALLOWED_ORIGINS: "http://localhost:3001",
   // helpers.ts gives each simulated client its own address in this header.
   CLIENT_IP_HEADER: "x-forwarded-for",
   EMBEDDER: "hash",

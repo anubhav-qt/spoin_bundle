@@ -32,7 +32,8 @@ import { SpoinWave } from "./SpoinWave";
 interface Props {
   topicId: string;
   topicName: string;
-  difficulty: Difficulty;
+  /** Omitted on a tierless topic, whose one quiz is a mastery quiz across the whole topic. */
+  difficulty?: Difficulty;
   onClose: () => void;
   /** Fired once an attempt is fully graded, so the caller can refresh stats
    *  (tier badges, mastery, unlock state) without a full page reload. */
@@ -143,7 +144,10 @@ export function QuizModal({ topicId, topicName, difficulty, onClose, onGraded }:
     await gradeFreeText(quiz.attempt_id);
   };
 
-  const title = `${DIFFICULTY_LABEL[difficulty]} quiz · ${topicName}`;
+  const title =
+    difficulty === undefined
+      ? `Mastery quiz · ${topicName}`
+      : `${DIFFICULTY_LABEL[difficulty]} quiz · ${topicName}`;
 
   return createPortal(
     <div
@@ -197,6 +201,11 @@ export function QuizModal({ topicId, topicName, difficulty, onClose, onGraded }:
             onRetryGrading={() => void gradeFreeText(quiz.attempt_id)}
             onRetry={startQuiz}
             onClose={onClose}
+            progressedNote={
+              difficulty === undefined
+                ? "Progress saved — this topic is recorded as mastered."
+                : "Progress saved — this tier is recorded as passed."
+            }
           />
         ) : null}
       </div>
@@ -220,6 +229,7 @@ function QuizBody({
   onRetryGrading,
   onRetry,
   onClose,
+  progressedNote,
 }: {
   quiz: QuizStart;
   phase: Phase;
@@ -235,6 +245,7 @@ function QuizBody({
   onRetryGrading: () => void;
   onRetry: () => void;
   onClose: () => void;
+  progressedNote: string;
 }) {
   const locked = mcqResults !== null;
 
@@ -247,7 +258,7 @@ function QuizBody({
         </div>
 
         {final.progressed ? (
-          <p className="quiz-progressed mono">Progress saved — this tier is recorded as passed.</p>
+          <p className="quiz-progressed mono">{progressedNote}</p>
         ) : null}
 
         <div className="quiz-freetext-result" data-correct={final.free_text.correct}>

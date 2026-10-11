@@ -10,21 +10,23 @@ prohibits commercial use, and we intend to monetize).
 
 ## Does not own
 
-**Any business logic.** Zero. It calls `apps/api` over HTTP exactly as the future React
+**Any business logic.** Zero. It calls `apps/server` over HTTP exactly as the future React
 Native app will. If logic creeps in here, the mobile app either can't reach it or we end
 up maintaining two divergent implementations. This is the most common way
 "we'll add mobile later" projects rot.
 
 ## API types
 
-Generated from the API's OpenAPI schema, never hand-written:
+Never hand-written: `lib/api.ts` imports the wire contract from `@spoin/shared`
+(`packages/shared/src/api.ts`), the zod schemas the server validates with, so a contract
+change the web doesn't follow fails `npm run typecheck`. See
+[ADR-0106](../../docs/adr/0106-typescript-on-hono-and-the-authoring-harness.md).
 
-```bash
-npx openapi-typescript http://localhost:8000/openapi.json -o packages/api-types/schema.d.ts
-```
+## Running it
 
-This runs in CI. A Pydantic model change that breaks the frontend fails the build.
-See [ADR-0001](../../docs/adr/0001-python-fastapi-over-node.md).
+`npm run stack` from the repository root starts the web on http://localhost:3001 beside the
+API on http://localhost:8001 (`infra/compose.yml`). The sources are bind-mounted, so edits
+reload; a dependency change needs the image rebuilt (`npm run stack` again).
 
 ## Status
 
@@ -45,9 +47,9 @@ built and responsive across the full breakpoint ladder
 - **Defaults stay Notebook + Literata** (ADR-0012 / ADR-0037). The Theme and Font pickers
   carry a small accent-dot **"developer's pick"** marker on **Obsidian** and **Space
   Grotesk** — a signposted recommendation only; nothing is pre-selected.
-- Auth: email/password, Google OAuth, guest sessions
-  ([ADR-0033](../../docs/adr/0033-jwt-auth-and-guest-identity.md)); onboarding (topic pick
-  + theme pick).
+- Auth through Better Auth: email/password, Google, guest sessions that claim in place
+  (ADR-0106, keeping [ADR-0033](../../docs/adr/0033-jwt-auth-and-guest-identity.md)'s guest
+  rules); onboarding (topic pick + theme pick).
 
 **Being finalized next:** the standalone pages and sections around the feed — Profile,
 Settings, Liked, Saved / "Revisit"

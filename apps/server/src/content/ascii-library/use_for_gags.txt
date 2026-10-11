@@ -1,0 +1,3573 @@
+# SPOIN ASCII REFERENCE LIBRARY — USE FOR GAGS & SCENE HOOKS
+# Total High-Clarity Curated Artwork Cards: 853
+# Width Limit: <= 40 monospace characters (phone card safe)
+# Every TITLE describes what the art actually SHOWS, and is unique.
+# Best for: Comedic character reactions, silly animals, facial expressions, memes, punchy hooks
+# Format: Header with explicit TITLE followed by triple-backtick fenced ASCII art
+
+=== ID: art_52_5 | TITLE: Boxer man in boxing stance (9'-')9 | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 7x1 ===
+```
+(9'-')9
+```
+
+=== ID: art_52_8 | TITLE: Cheering happy face with raised arms (\ (^_^) /) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 9x1 ===
+```
+\ (^_^) /
+```
+
+=== ID: art_52_12 | TITLE: Hypnotized face with swirling spiral eyes ((@_@)) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(@_@)
+```
+
+=== ID: art_52_15 | TITLE: Excited cheering face with raised arms (\^o^/) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+\^o^/
+```
+
+=== ID: art_52_33 | TITLE: Unimpressed tired face with closed eyes (-_-) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(-_-)
+```
+
+=== ID: art_52_38 | TITLE: Weeping face shedding tears of sorrow ((;_;)) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: actions | SIZE: 5x1 ===
+```
+(;_;)
+```
+
+=== ID: art_52_0 | TITLE: Robot reaction face (emotionless) [o_o] | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 23x1 ===
+```
+[o_o]
+```
+
+=== ID: art_52_7-2 | TITLE: Knocked out face with X eyes (x__x) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: faces | SIZE: 4x1 ===
+```
+x__x
+```
+
+=== ID: art_52_13 | TITLE: Weird round character dancing with arms left, up, then right with absolutely no facial expression | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: kirby | SIZE: 23x1 ===
+```
+<('-'<) ^('-')^ (>'-')>
+```
+
+=== ID: art_52_25 | TITLE: Sad character looking down at floor ((._.)) | ARTIST: unknown | CATEGORY: one-line | SUBCATEGORY: expressions | SIZE: 5x1 ===
+```
+(._.)
+```
+
+=== ID: b480e13c6a6bda86 | TITLE: Barney the purple dinosaur standing with a creepy smile and waving an arm at you | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: barney | SIZE: 27x21 ===
+```
+          _.-"""-._
+         /  _   _  \
+        /  (9) (9)  \
+       /_,         ,_\
+       | \         / |
+_      \  \._____./  /  __
+\`\     \   \___/   / _|  \
+ \ `\   /\         /\ \   /
+  |  `\/ /`'-----'`\ \/  /
+  |_|\/ /           \   /
+  /    /|           |\_/
+  \___/ |           | \
+   \ .  |           |  \
+    \|  |           |  |
+     |  `.         .'  |
+     \    `-.___.-'    /
+     `\       |       /'
+       `\     |     /'
+    .-.-.`\   |   /'.-.-.
+   (,(,(,`^   |   ^`,),),)
+    '-'-'-----`-----'-'-'
+```
+
+=== ID: 242555b90414d8fa | TITLE: Star Wars Man looking at you intimidatingly | ARTIST: Shanaka Dias | CATEGORY: movies | SUBCATEGORY: star-wars | SIZE: 40x22 ===
+```
+                       .-.
+                      |_:_|
+                     /(_Y_)\
+.                   ( \/M\/ )
+ '.               _.'-/'-'\-'._
+   ':           _/.--'[[[[]'--.\_
+     ':        /_'  : |::"| :  '.\
+       ':     //   ./ |oUU| \.'  :\
+         ':  _:'..' \_|___|_/ :   :|
+           ':.  .'  |_[___]_|  :.':\
+            [::\ |  :  | |  :   ; : \
+             '-'   \/'.| |.' \  .;.' |
+             |\_    \  '-'   :       |
+             |  \    \ .:    :   |   |
+             |   \    | '.   :    \  |
+             /       \   :. .;       |
+            /     |   |  :__/     :  \\
+           |  |   |    \:   | \   |   ||
+          /    \  : :  |:   /  |__|   /|
+          |     : : :_/_|  /'._\  '--|_\
+          /___.-/_|-'   \  \
+                         '-'
+```
+
+=== ID: 942e4d84e91e90dc | TITLE: Expressionless man standing in some service uniform with a hat and a bag, staring at you with his flat face and button eyes | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: soldiers | SIZE: 18x20 ===
+```
+       .---.
+      /_____\
+      ( '.' )
+       \_-_/_
+    .-"`'V'//-.
+   / ,   |// , \
+  / /|Ll //Ll|\ \
+ / / |__//   | \_\
+ \ \/---|[]==| / /
+  \/\__/ |   \/\/
+   |/_   | Ll_\|
+     |`^"""^`|
+     |   |   |
+     |   |   |
+     |   |   |
+     |   |   |
+     L___l___J
+      |_ | _|
+     (___|___)
+      ^^^ ^^^
+```
+
+=== ID: 60110fdd1044bebb | TITLE: Expressionless man standing in some service uniform with a hat and a bag, staring at you with his flat face and button eyes and giving you a salute | ARTIST: Joan G. Stark (Spunk) | CATEGORY: weapons | SUBCATEGORY: soldiers | SIZE: 18x20 ===
+```
+       .---.
+  ___ /_____\
+ /\.-`( '.' )
+/ /    \_-_/_
+\ `-.-"`'V'//-.
+ `.__,   |// , \
+     |Ll //Ll|\ \
+     |__//   | \_\
+    /---|[]==| / /
+    \__/ |   \/\/
+    /_   | Ll_\|
+     |`^"""^`|
+     |   |   |
+     |   |   |
+     |   |   |
+     |   |   |
+     L___l___J
+      |_ | _|
+     (___|___)
+      ^^^ ^^^
+```
+
+=== ID: 64f4d9d0328c6009 | TITLE: Mermaid lying on her side, inviting you with a smile to have a good time | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: mermaids | SIZE: 37x9 ===
+```
+                           .-""-.
+                          (___/\ \
+        ,                 (|^ ^ ) )
+       /(                _)_\=_/  (
+ ,..__/ `\          ____(_/_ ` \   )
+  `\    _/        _/---._/(_)_  `\ (
+    '--\ `-.__..-'    /.    (_), |  )
+        `._        ___\_____.'_| |__/
+           `~----"`   `-.........'
+```
+
+
+=== ID: 2af0b45d0e201abf | TITLE: Minimally drawn unicorn silhoutte facing right | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 22x12 ===
+```
+                    /
+               ,.. /
+             ,'   ';
+  ,,.__    _,' /';  .
+ :','  ~~~~    '. '~
+:' (   )         )::,
+'. '. .=----=..-~  .;'
+ '  ;'  ::   ':.  '"
+   (:   ':    ;)
+    \\   '"  ./
+     '"      '"
+
+```
+
+=== ID: 627363361eda1a20 | TITLE: Large detailed unicorn, staring expressionlessly inside your soul | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 33x21 ===
+```
+                              /
+                   __       //
+                   -\= \=\ //
+                 --=_\=---//=--
+               -_==/  \/ //\/--
+                ==/   /O   O\==--
+   _ _ _ _     /_/    \  ]  /--
+  /\ ( (- \    /       ] ] ]==-
+ (\ _\_\_\-\__/     \  (,_,)--
+(\_/                 \     \-
+\/      /       (   ( \  ] /)
+/      (         \   \_ \./ )
+(       \         \      )  \
+(       /\_ _ _ _ /---/ /\_  \
+ \     / \     / ____/ /   \  \
+  (   /   )   / /  /__ )   (  )
+  (  )   / __/ '---`       / /
+  \  /   \ \             _/ /
+  ] ]     )_\_         /__\/
+  /_\     ]___\
+ (___)
+```
+
+=== ID: da852d3b9eff3c8a | TITLE: Dumb unicorn cluelessly staring at the rigth empty space wondering who ate all the grass | ARTIST: R.B.Cleary | CATEGORY: mythology | SUBCATEGORY: unicorns | SIZE: 26x21 ===
+```
+         .
+        /'
+       //
+   .  //
+   |\//7
+  /' " \
+ .   . .
+ | (    \     '._
+ |  '._  '    '. '
+ /    \'-'_---. ) )
+.              :.'
+|               \
+| .    .   .     .
+' .    |  |      |
+ \^   /_-':     /
+ / | |    '\  .'
+/ /| |     \\  |
+\ \( )     // /
+ \ | |    // /
+  L! !   // / 
+   [_]  L[_|  
+```
+
+=== ID: c9a66d2a8996d14e | TITLE: Two people throwing their balls at each other | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: balls | SIZE: 15x5 ===
+```
+        o
+    o      o
+ O/   o  o  \O
+ |-o       o-|
+/ \         / \
+```
+
+=== ID: 628e7b732a7cfd24 | TITLE: Juggler tossing three balls above a wide braced stance | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 11x5 ===
+```
+    o
+       o
+   o O
+  `\/Y\/~
+____/_\____
+```
+
+=== ID: ae7d51a76d56144e | TITLE: Minimal egyptian person dancing with mystical sand particles floating around him | ARTIST: unknown | CATEGORY: sports-and-outdoors | SUBCATEGORY: dance | SIZE: 5x6 ===
+```
+  .
+    .
+. O _
+_/=/
+  |
+_/ \_
+```
+
+=== ID: 833e7f216b43481c | TITLE: Fire bender throwing fireball at right | ARTIST: unknown | CATEGORY: magic | SUBCATEGORY: fireball | SIZE: 8x7 ===
+```
+      ~
+  \  /
+   ~   /
+~  O  ~
+ \/|\
+  / \\
+ /   \~
+```
+
+=== ID: 05f77786bf16517f | TITLE: Mystical man with orbs floating around him | ARTIST: unknown | CATEGORY: magic | SUBCATEGORY: orbs | SIZE: 8x8 ===
+```
+     /
+o   o
+ \
+   0   o
+  /#\ /
+ + # +
+  / \
+ =   =
+```
+
+=== ID: fd3a2fd6c1d78341 | TITLE: Minimally designed stickman catching snow during snowfall | ARTIST: unknown | CATEGORY: winter | SUBCATEGORY: snowfall | SIZE: 6x10 ===
+```
+  ..
+  . .
+  ..
+ .  .
+  . .
+ .   .
+. O _
+_/=/
+  |
+ / \
+```
+
+=== ID: 5a0726a5b51ebfae | TITLE: Juggler on a balance beam tossing six balls in a high arc | ARTIST: Veronica Karlsson | CATEGORY: sports-and-outdoors | SUBCATEGORY: juggling | SIZE: 33x11 ===
+```
+             o
+          o     o
+
+         o       o
+             O
+         o__/|\__o
+             |
+             |\
+  |__________|_\______________|
+ /|                           |\
+/_|     o                    o|_\
+```
+
+
+=== ID: 48fb729669bc989c | TITLE: Grim Reaper in a hooded cloak holding a long scythe, staring right at you | ARTIST: Dustin Slater | CATEGORY: mythology | SUBCATEGORY: grim-reapers | SIZE: 23x17 ===
+```
+             ___
+            /   \\
+       /\\ | . . \\
+     ////\\|     ||
+   ////   \\ ___//\
+  ///      \\      \
+ ///       |\\      |
+//         | \\  \   \
+/          |  \\  \   \
+           |   \\ /   /
+           |    \/   /
+           |     \\/|
+           |      \\|
+           |       \\
+           |        |
+           |_________\
+    
+```
+
+=== ID: efcffe8389cd8bd9 | TITLE: Devil with a sword, plotting world domination | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: devil | SIZE: 23x15 ===
+```
+                 /\
+                 ||
+   ____ (((+))) _||_
+  /.--.\  .-.  /.||.\
+ /.,   \\(0.0)// || \\
+/;`";/\ \\|m|//  ||  ;\
+|:   \ \__`:`____||__:|
+|:    \__ \T/ (@~)(~@)|
+|:    _/|     |\_\/  :|
+|:   /  |     |  \   :|
+|'  /   |     |   \  '|
+ \_/    |     |    \_/
+        |     |
+        |_____|
+        |_____|
+```
+
+=== ID: 512999c4ffb07bd4 | TITLE: Row of five faceless paper-doll figures holding hands in a chain | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: dolls | SIZE: 32x5 ===
+```
+       _    _    _    _    _
+    __( )__( )__( )__( )__( )__
+   '--. .--. .--. .--. .--. .--'
+     / _ \/ _ \/ _ \/ _ \/ _ \
+     (/ \)(/ \)(/ \)(/ \)(/ \)
+```
+
+=== ID: cf8b4c657eb1c3e9 | TITLE: Minimal puppet being controlled by strings | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: toys | SUBCATEGORY: marionettes | SIZE: 14x6 ===
+```
+       ___+___
+       :  :  :
+       :  o  :
+       :_/|\/
+          /\
+         / /
+```
+
+=== ID: a9d948c007682106 | TITLE: A creepy face looking side-eyed towards left with a big smile on it | ARTIST: unknown | CATEGORY: faces | SUBCATEGORY: creepy-faces | SIZE: 29x14 ===
+```
+       ,,,,,,,,,,,,,,,
+    ,(((((((((())))))))),
+  ,((((((((((()))))))))))),
+ ,(((((((((\\\|///))))))))),
+,((((((((((///|\\\)))))))))),
+((((((((//////^\\\\\\))))))))
+((((((' .-""-   -""-. '))))))
+(((((  `\.-.     .-./`  )))))
+((((( -=(0) )   (0) )=- )))))
+'((((   /'-'     '-'\   ))))'
+ ((((\   _,   A  ,_    /))))
+ '((((\    \     /    /))))'
+   '((('.   `-o-'   .')))'
+         '-.,___,.-'
+```
+
+=== ID: 80c90fbd73cd8011 | TITLE: Wolf howling with its muzzle raised, drawn in outline | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: wolves | SIZE: 24x11 ===
+```
+                     .
+                    / V\
+                  / `  /
+                 <<   |
+                 /    |
+               /      |
+             /        |
+           /    \  \ /
+          (      ) | |
+  ________|   _/_  | |
+<__________\______)\__)
+```
+
+=== ID: 3fda5a87949f0a2a | TITLE: Dog eagerly looking in your direction, after mishearing you say 'food' | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 31x15 ===
+```
+                        ,     ,
+                        |\---/|
+                       /  , , |
+                  __.-'|  / \ /
+         __ ___.-'        ._O|
+      .-'  '        :      _/
+     / ,    .        .     |
+    :  ;    :        :   _/
+    |  |   .'     __:   /
+    |  :   /'----'| \  |
+    \  |\  |      | /| |
+     '.'| /       || \ |
+     | /|.'       '.l \\_
+     || ||             '-'
+     '-''-'
+```
+
+=== ID: 97db44c87b98b17f | TITLE: Sonic the Hedgehog full body with side-eye look towards right | ARTIST: Han J. Lee | CATEGORY: video-games | SUBCATEGORY: sonic-the-hedgehog | SIZE: 32x15 ===
+```
+       ___------__
+ |\__-- /\       _-
+ |/    __      -
+ //\  /  \    /__
+ |  o|  0|__     --_
+ \\____-- __ \   ___-
+ (@@    __/  / /_
+    -_____---   --_
+     //  \ \\   ___-
+   //|\__/  \\  \
+   \_-\_____/  \-\
+        // \\--\|
+   ____//  ||_
+  /_____\ /___\
+______________________
+```
+
+=== ID: 59d98bfcd6eba87a | TITLE: Weird mushroom just hanging around | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 31x6 ===
+```
+  _,---._  - weird mushroom
+,' _____ `.
+'-( \ / )-'
+   \(_)/
+    ) (
+    """
+```
+
+=== ID: 292ec438f885f77d | TITLE: Weird mushroom wearing French beret hat | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 35x6 ===
+```
+  _,---._
+,' _____/   - weird French hat mushroom
+'-( . . )
+   \(_)/
+    )-(
+    """
+```
+
+=== ID: 4c561460fa871748 | TITLE: Weird holiday mushroom wearing Christmas pom-pom hat | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: mushroom | SIZE: 34x6 ===
+```
+ _,---._
+(______ `.  - weird christmas mushroom
+ ( . . )-'*
+  \(_)/
+   ) (
+   """
+```
+
+=== ID: 386fffc9a15d41bc | TITLE: Donald Duck's head front-on staring at you | ARTIST: Kristian Kirsfeldt | CATEGORY: cartoons | SUBCATEGORY: other | SIZE: 24x10 ===
+```
+   .------._
+  /         \.-.
+  \_-_:===='; _.)
+   .'/''..''\', \\
+  | '   ||   '.|
+  | |   ||   | |
+  | | 0 || 0 | |
+ .'_ __.--.__ _'.
+(__. _.----._ .__)
+   `--======--'      
+```
+
+=== ID: 5f92f05d2f00dd96 | TITLE: A small bone | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 15x3 ===
+```
+ _       _
+(_'-----'_)
+(_.'""""._) 
+```
+
+=== ID: 9b2a9b2141fa1944 | TITLE: A big bone | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: bones | SIZE: 27x5 ===
+```
+    .-.               .-.
+    (   `-._________.-'   )
+     >=     _______     =<
+    (   ,-'`       `'-,   )
+     `-'               `-'
+```
+
+=== ID: c1923f91b1fa1cb4 | TITLE: Two weird creatures facing each other, suddenly causing a staring contest | ARTIST: Joan G. Stark (Spunk) | CATEGORY: miscellaneous | SUBCATEGORY: weird creatures | SIZE: 27x12 ===
+```
+     .-. .-.       .-. .-.
+    (   Y   )     (   Y   )
+     `|   |`       `|   |`
+      | 00|_       _|00 |
+      |  ,__)     (__,  |
+      |,_|           L_,|
+      ||               ||
+      | \_,         ,_/ |
+      |   |         |   |
+      |   |         |   |
+    (`  A  `)     (`  A  `)
+     '-' '-'       '-' '-'
+```
+
+=== ID: bd35b685f237aa77 | TITLE: Fred Flintstone looking at right with a worried face | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: flintstones | SIZE: 23x14 ===
+```
+  \/________________
+ /     _____________)
+/     /     /   \ |
+\/\/\/     (O) (O)|
+  |           ------,
+  |  _       ______/
+  | (_      /   \  \
+  |        /  ___\_ \
+  |        \      / /
+__|_________\______/
+\______________\./__\
+ /     .       | \  |
+ \    /_\   .  |  \ |\
+ |`\       /_\ |   \| \
+```
+
+=== ID: 112cd18ba0c3a3a2 | TITLE: Frog sitting front-on, looking straight at you | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 26x6 ===
+```
+            _     _
+           (')-=-(')
+         __(   "   )__
+        / _/'-----'\_ \
+     ___\\ \\     // //___
+     >____)/_\---/_\(____<
+```
+
+=== ID: 034027c43ea0078a | TITLE: Frog looking down on you while judging you | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 24x7 ===
+```
+            _   _
+           (.)_(.)
+        _ (   _   ) _
+       / \/`-----'\/ \
+     __\ ( (     ) ) /__
+     )   /\ \._./ /\   (
+      )_/ /|\   /|\ \_(
+```
+
+=== ID: 76c1f94ebef26083 | TITLE: Dumb large frog just sitting there, existing | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: frogs | SIZE: 31x12 ===
+```
+           .--._.--.
+          ( O     O )
+          /   . .   \
+         .`._______.'.
+        /(           )\
+      _/  \  \   /  /  \_
+   .~   `  \  \ /  /  '   ~.
+  {    -.   \  V  /   .-    }
+_ _`.    \  |  |  |  /    .'_ _
+>_       _} |  |  | {_       _<
+ /. - ~ ,_-'  .^.  `-_, ~ - .\
+         '-'|/   \|`-`
+```
+
+=== ID: 961fe3d4196f31a1 | TITLE: Lara Croft standing front-on looking at you | ARTIST: lgbeard | CATEGORY: video-games | SUBCATEGORY: lara-croft | SIZE: 23x18 ===
+```
+      _ _
+     /.-.`.
+    //o;o\ \
+    \\_-_/)/
+    _`) ( _\\
+ .`) '-.-' ( `.
+/ `/   .   \`. \
+\ \\___A___/_` /
+ '-)|)=@=(|(-'`\
+   |/\   /\|  )/
+   /__\_/__\
+  '---' '---'
+   \ /   \ /
+   ( )   ( )
+   /_\   /_\
+  '---' '---'
+   \ /   \ /
+   /_\   /_\
+```
+
+=== ID: 1fba18d030bdd0f1 | TITLE: A girl dancing | ARTIST: Shanaka Dias | CATEGORY: females | SUBCATEGORY: dancing | SIZE: 19x19 ===
+```
+       ,~~;,
+       a,a)\9
+       \= ,6
+       _/'(_8,
+      /(__/\]\
+     (_,,__) \\
+     //\  ;/  \\
+    //  )__\   \|_
+  _'/  |[]__L,  ,>}
+ /t}  / ,   [|
+6    /-.|=._|/
+    /  .'`-/`
+   ( .' | /
+   \ |  ( |
+    \_)  \_).
+     \ \  \ |
+      \ >  >|
+     /.'  / /
+         '-'
+```
+
+=== ID: dff446e42927ebd0 | TITLE: Pirate flag flying from a pole with a skull and crossbones | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: jolly-roger | SIZE: 29x13 ===
+```
+    ___
+    \_/
+     |._
+     |'."-._.-""--.-"-.__.-'/
+     |  \       .-.        (
+     |   |     (@.@)        )
+     |   |   '=.|m|.='     /
+     |  /    .='`"``=.    /
+     |.'                 (
+     |.-"-.__.-""-.__.-"-.)
+     |
+     |
+     |
+```
+
+=== ID: 495363fc8e89c778 | TITLE: Silly little cow standing in the middle of a grass field, staring at you | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 22x5 ===
+```
+\|/          (__)
+     `\------(oo)
+       ||    (__)
+       ||w--||     \|/
+   \|/
+```
+
+=== ID: c78088c9153d6cec | TITLE: Chill cow smoking a cigarette while standing on two legs | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cows | SIZE: 35x21 ===
+```
+              (      )
+              ~(^^^^)~
+               ) @@ \~_          |\
+              /     | \        \~ /
+             ( 0  0  ) \        | |
+              ---___/~  \       | |
+               /'__/ |   ~-_____/ |
+o          _   ~----~      ___---~
+  O       //     |         |
+         ((~\  _|         -|
+   o  O //-_ \/ |        ~  |
+        ^   \_ /         ~  |
+               |          ~ |
+               |     /     ~ |
+               |     (       |
+                \     \      /\
+               / -_____-\   \ ~~-*
+               |  /       \  \
+               / /         / /
+             /~  |       /~  |
+             ~~~~        ~~~~
+```
+
+=== ID: 88a91f644f99f451 | TITLE: Small and dumb looking monkey looking at the right | ARTIST: Keely M. Swenson | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 6x5 ===
+```
+  /~\
+ C oo
+ _( ^)
+/   ~\
+```
+
+=== ID: 31e2fb956b7018ff | TITLE: Monkey holding a branch with one hand how people hold train handles in the subway | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 19x8 ===
+```
+          __
+     w  c(..)o   (
+      \__(-)    __)
+          /\   (
+         /(_)___)
+         w /|
+          | \
+          m  m
+```
+
+=== ID: 15a9c553faa91bbb | TITLE: Monkey seated beside a toaster, toasting bread | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 38x12 ===
+```
+                        .="=.
+                      _/.-.-.\_     _
+                     ( ( o o ) )    ))
+                      |/  "  \|    //
+      .-------.        \'---'/    //
+     _|~~ ~~  |_       /`"""`\\  ((
+   =(_|_______|_)=    / /_,_\ \\  \\
+     |:::::::::|      \_\\_'__/ \  ))
+     |:::::::[]|       /`  /`~\  |//
+     |o=======.|      /   /    \  /
+     `"""""""""`  ,--`,--'\/\    /
+                   '-- "--'  '--'
+```
+
+=== ID: 7bd20997998dafcb | TITLE: Monkey with a smug grin on its face, looking side-eyed to the left | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 32x13 ===
+```
+               ',
+            .-`-,\__
+              ."`   `,
+            .'_.  ._  `;.
+        __ / `      `  `.\ .--.
+       /--,| 0)   0)     )`_.-,)
+      |    ;.-----.__ _-');   /
+       '--./         `.`/  `"`
+          :   '`      |.
+          | \     /  //
+           \ '---'  /'
+            `------' \
+            _/       `--...
+```
+
+=== ID: 1a33d995c9781651 | TITLE: Monkey trying to pose like a body builder | ARTIST: Joris Bellenger | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 29x15 ===
+```
+                  __
+                 / _,\
+                 \_\
+      ,,,,    _,_)  #      /)
+     (= =)D__/    __/     //
+    C/^__)/     _(    ___//
+      \_,/  -.   '-._/,--'
+_\\_,  /           -//.
+ \_ \_/  -,._ _     ) )
+   \/    /    )    / /
+   \-__,/    (    ( (
+              \.__,-)\_
+               )\_ / -(
+              / -(////
+             ////
+```
+
+=== ID: 50a95ac752876c9f | TITLE: Monkey hanging from a vertical rope by one hand, looking to the right | ARTIST: Faux_Pseudo | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 22x17 ===
+```
+         ||
+         ||
+        _;|
+       /__3
+      / /||
+     / / // .--.
+     \ \// / (OO)
+      \//  |( _ )
+      // \__/`-'\__
+     // \__      _ \
+ _.-'/    | ._._.|\ \
+(_.-'     |      \ \ \
+   .-._   /    o ) / /
+  /_ \ \ /   \__/ / /
+    \ \_/   / /  E_/
+     \     / /
+      `-._/-' 
+```
+
+=== ID: 06551242c7e6621c | TITLE: Monkey hanging from a branch above with a hang-in-there caption to the left of it | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: monkeys | SIZE: 38x20 ===
+```
+_______AAAA____j_o_a_n____AAAA________
+       VVVV               VVVV
+       (__)               (__)
+        \ \               / /
+         \ \   \\|||//   / /
+          > \   _   _   / <
+ hang      > \ / \ / \ / <
+  in        > \\_o_o_// <
+  there...   > ( (_) ) <
+              >|     |<
+             / |\___/| \
+             / (_____) \
+             /         \
+              /   o   \
+               ) ___ (
+              / /   \ \
+             ( /     \ )
+             ><       ><
+            ///\     /\\\
+            '''       '''
+```
+
+=== ID: 57048db289a8ea7e | TITLE: Spider with eight splayed legs plotting world domination | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 12x4 ===
+```
+ /\ \  / /\
+//\\ .. //\\
+//\((  ))/\\
+/  < `' >  \
+```
+
+=== ID: d3665c1b7a9100ac | TITLE: Small and cute spider | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 8x4 ===
+```
+ ||  ||
+ \\()//
+//(__)\\
+||    ||
+```
+
+=== ID: a8723302c7086b32 | TITLE: Cool looking spider with a round face | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 12x4 ===
+```
+  / _ \
+\_\(_)/_/
+ _//o\\_ 
+  /   \
+```
+
+=== ID: ac6d200e334edba2 | TITLE: Cool looking spider with just 2 dotted eyes | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 13x4 ===
+```
+  / _ \
+\_\(_)/_/
+ _//"\\_ 
+  /   \
+```
+
+=== ID: ca225967ff036d30 | TITLE: Symmetrical spider web | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 21x10 ===
+```
+     \_______/
+ `.,-'\_____/`-.,'
+  /`..'\ _ /`.,'\
+ /  /`.,' `.,'\  \
+/__/__/     \__\__\__
+\  \  \     /  /  /
+ \  \,'`._,'`./  /
+  \,'`./___\,'`./
+ ,'`-./_____\,-'`.
+     /       \
+```
+
+=== ID: 4a6d088cff7d1bdf | TITLE: Large hairy spider hanging down from a thin web strand | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: spiders | SIZE: 26x14 ===
+```
+              (
+               )
+              (
+        /\  .-"""-.  /\
+       //\\/  ,,,  \//\\
+       |/\| ,;;;;;, |/\|
+       //\\\;-"""-;///\\
+      //  \/   .   \/  \\
+     (| ,-_| \ | / |_-, |)
+       //`__\.-.-./__`\\
+      // /.-(() ())-.\ \\
+     (\ |)   '---'   (| /)
+      ` (|           |) `
+        \)           (/
+```
+
+=== ID: ab2e908684e55cf3 | TITLE: Scooby-Doo sitting happily | ARTIST: lgbeard | CATEGORY: television | SUBCATEGORY: other | SIZE: 31x16 ===
+```
+                      |\ /|
+                      |  OO)_..
+                      /  .  '.'
+                      | ( '_.'
+                      \  `-.'
+        .             /`-._|
+      .''          _.' `-._|
+     ((      __..-'-_)     '
+      ''..-'   ,'          |
+       `.  `--'      ()    '
+       /      .--.  <.   .'
+       |     '   )`- | | |
+        `.  / .-`    | | |
+          ) | |_     | | |
+       .-'  ..__)  _.' ' `-.
+       '._.'      '._.-^---'
+```
+
+=== ID: 284feaac62c3b785 | TITLE: Minimal stick figure holding on to a string to prevent falling | ARTIST: Blazej Kozlowski | CATEGORY: stickman | SUBCATEGORY: stickman | SIZE: 17x11 ===
+```
+               :
+               ;
+              :
+              ;
+             /
+           o/
+         ._/\___,
+             \
+             /
+             `
+
+```
+
+=== ID: e17e5f05b1d85ab3 | TITLE: Anteater going to the right | ARTIST: Veronica Karlsson | CATEGORY: animals | SUBCATEGORY: anteater | SIZE: 29x7 ===
+```
+       _.---._    /\\
+    ./'       "--`\//
+  ./              o \
+ /./\  )______   \__ \
+./  / /\ \   | \ \  \ \
+   / /  \ \  | |\ \  \7
+    "     "    "  "        
+```
+
+=== ID: 7e59b22c32a4c7fa | TITLE: Girl with a big head and a wide grin, staring intently at you | ARTIST: Elissa Potier | CATEGORY: people | SUBCATEGORY: women | SIZE: 19x17 ===
+```
+ /////////////\\\\
+(((((((((((((( \\\\
+))) ~~      ~~  (((
+((( (*)     (*) )))
+)))     <       (((
+((( '\______/`  )))
+)))\___________/(((
+       _) (_
+      / \_/ \
+     /(     )\
+    // )___( \\
+    \\(     )//
+     (       )
+      |  |  |
+       | | |
+       | | |
+      _|_|_|_
+```
+
+=== ID: aad1ca74d789365d | TITLE: A queen, standing tall with a crown and a long gown | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: queen | SIZE: 20x20 ===
+```
+        w*W*W*W*w
+         \"."."/
+          //`\\
+         (/a a\)
+         (\_-_/)
+        .-~'='~-.
+       /`~`"Y"`~`\
+      / /(_ * _)\ \
+     / /  )   (  \ \
+     \ \_/\\_//\_/ /
+      \/_) '*' (_\/
+        |       |
+        |       |
+        |       |
+        |       |
+        |       |
+        |       |
+        |       |
+        |       |
+        w*W*W*W*w
+```
+
+=== ID: f2291f993a23cb1f | TITLE: Fish skeleton with ribs, skull and tail fin | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 30x5 ===
+```
+|\    \ \ \ \ \ \ \      __
+|  \    \ \ \ \ \ \ \   | O~-_
+|   >----|-|-|-|-|-|-|--|  __/
+|  /    / / / / / / /   |__\
+|/     / / / / / / /
+```
+
+=== ID: 7e81019444443695 | TITLE: Baby fish following mama fish | ARTIST: Linda Ball | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 19x5 ===
+```
+               O  o
+          _\_   o
+>('>   \\/  o\ .
+       //\___=
+          ''
+```
+
+=== ID: 8a13045b87f7f6bb | TITLE: Minimal looking shark swimming to the right | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: shark | SIZE: 13x5 ===
+```
+      .
+\_____)\_____
+/--v____ __`<
+        )/
+        '
+```
+
+=== ID: af9728b371525f12 | TITLE: Fish swimming to the left | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 19x6 ===
+```
+      /`·.¸
+     /¸...¸`:·
+ ¸.·´  ¸   `·.¸.·´)
+: © ):´;      ¸  {
+ `·.¸ `·  ¸.·´\`·¸)
+     `\\´´\¸.·´
+```
+
+=== ID: ded1c74345581414 | TITLE: Whale swimming on top of the sea, blowing water from its nose | ARTIST: Riitta Rasimus | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 25x6 ===
+```
+       .
+      ":"
+    ___:____     |"\/"|
+  ,'        `.    \  /
+  |  O        \___/  |
+~^~^~^~^~^~^~^~^~^~^~^~^~
+```
+
+=== ID: a9febaf01c8bfebe | TITLE: Swordfish with a long swordlike nose, swimming to the left | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 23x7 ===
+```
+o           //        +
+ o        //////    ++
+  .    @))))))))))+++
+   .}:<<)))))))))))++
+       <<\\)))))) +++
+          \\   \\   ++
+                      +
+```
+
+=== ID: cde2fe837ee33953 | TITLE: Angular fish outline with a small button round eye | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 13x7 ===
+```
+     |\    o
+    |  \    o
+|\ /    .\ o
+| |       (
+|/ \     /
+    |  /
+     |/
+```
+
+=== ID: 5b1847994f2a3b3a | TITLE: Fish swimming and blowing bubbles underwater | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: fish | SIZE: 24x7 ===
+```
+O     O           ,
+  o o          .:/
+    o      ,,///;,   ,;/
+      o   o)::::::;;///
+         >::::::::;;\\\
+           ''\\\\\'" ';\
+              ';\
+```
+
+=== ID: 479b9cd7cf906e98 | TITLE: Dumb looking seahorse | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: seahorse | SIZE: 15x9 ===
+```
+      \/)/)
+    _'  oo(_.-.
+  /'.     .---'
+/'-./    (
+)     ; __\
+\_.'\ : __|
+     )  _/
+    (  (,.
+  mrf'-.-'
+```
+
+=== ID: f7914bbb849fa012 | TITLE: Winnie the Pooh bear smiling and looking at the right | ARTIST: Joan G. Stark (Spunk) | CATEGORY: books | SUBCATEGORY: winnie-the-pooh | SIZE: 35x16 ===
+```
+                    .--,
+     .-.    __,,,__/    |
+    /   \-'`        `-./_
+    |    |               `)
+     \   `             `\ ;
+    /       ,        ,    |
+    |      /         : O /_
+    |          O  .--;__   '.
+    |                (  )`.  |
+    \                 `-` /  |
+     \          ,_  _.-./`  /
+      \          \``-.(    /
+      |           `---'   /--.
+    ,--\___..__        _.'   /--.
+    \          `-._  _`/    '    '.
+    .' ` ' .       ``    '        .
+```
+
+=== ID: a7e7f019de9e89ca | TITLE: Creepy doll laughing with speech bubble saying HEE HEE | ARTIST: Brian T. Odom | CATEGORY: toys | SUBCATEGORY: doll | SIZE: 32x13 ===
+```
+   ,------.
+   `-____-'        ,-----------.
+    ,i--i.         |           |
+   / @  @ \       /  HEE HEE!  |
+  | -.__.- | ___-'             J
+   \.    ,/ """"""""""""""""""'
+   ,\""""/.
+ ,'  `--'  `.
+(_,i'    `i._)
+   |      |
+   |  ,.  |
+   | |  | |      
+   `-'  `-'
+```
+
+=== ID: c30fe67530c2aee1 | TITLE: Fairy with a smile on her face, flying with a magic wand, going to the right while looking at you | ARTIST: Ojosh!ro | CATEGORY: mythology | SUBCATEGORY: fairies | SIZE: 39x15 ===
+```
+ __       __          .--.
+(  ""--__(  ""-_    ,' .-.\        *
+ "-_ __  ""--__ "-_(  (^_^))      /
+    (  """--___""--__" )-'(      /
+     "-__      ""---/ ,(., )__o-/,
+         """----___(.'.   /--"--'
+                   ("-_"/(    /
+                    \   \ \
+                     `.  \ |
+                       \  \/
+                       ||  \
+                     ,-'/`. \
+                     ) /   ) \  
+                     |/    `-.\
+                              `\
+```
+
+=== ID: da44f9978352d6b5 | TITLE: A serious looking man in a suit, staring at you with his dotted eyes | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: men | SIZE: 22x14 ===
+```
+          .---.
+         / __ /\
+        | /  `\ |
+        \| . . |/
+        (   _\  )
+         |  -  |
+         \  .  /
+         |'---'|
+        /'. _ .'\
+     .-`-._|_|_.-`-.
+    /`    \   /     `\
+           `|'
+           -|-
+            |
+```
+
+=== ID: d01ce0e40fb3ef5e | TITLE: A priest standing while holding his big wooden staff | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: priests | SIZE: 13x15 ===
+```
+          /
+     /\   |
+    /  \  |/
+   |    | |>
+   \____/ |
+   ( .. ) |
+   /\__/\ |
+  /\ qp /\|
+ /  |  |  |
+/|  |db| /\`\
+| \ |  | \|_|
+\  \|qp|  |
+ \__/  |  |
+ |/||db|  |
+ |  |  |  |
+```
+
+=== ID: ab63195bb514b7b3 | TITLE: A religious figure giving a speech on a podium | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: preachers | SIZE: 26x22 ===
+```
+           .---.
+         /` ___|`\
+         |_/    \|
+         (  -/-  )
+          \_ - _/
+         .-'|_|'-.
+        /         \
+       /     O     \
+      / _____!_____ \
+     /.-------------.\
+     \|     ,;,     |/
+      |     ;;;     |
+      |  ;;;;;;;;;  |
+      |   `';;;'`   |
+      |     ;;;     |
+      |     ;;;     |
+      |     :::     |
+      |     ';'     |
+      |             |
+     _| _  __   __ _|_
+   _/ _  __  ___  __ _\_
+ _/ __  ___  _ ___ __ _ \_
+```
+
+=== ID: b97ddb547f76897a | TITLE: Slinky coiled toy spring stepping down a staircase | ARTIST: unknown | CATEGORY: toys | SUBCATEGORY: other | SIZE: 31x18 ===
+```
+          ..   ..
+     __   ; `.'  :
+    |  +. :  ;   :   __
+  .-+\   `:  ;   ,,-'  :
+  `.  `.  `\ ;  :'   ,'
+ ,-+`+. `. \.;.:  _,' `-.
+ `.__  "-.::||::.:'___-+'
+ -"  `--..::::::_____.IIHb
+`-:______.:; `::,,...,;:HB\
+ .+         \ ::,,...,;:HB \
+'-.______.:+ \`+.,...,;:P'  \
+.-'\   \
+`-.______.:+   \______________\
+.-::::::::,     BBBBBBBBBBBBBBB
+::,,...,;:HB    BBB         BBB
+::,,...,;:HB    BBB SLiNkEY BBB
+::,,...,;:HB\   BBB         BBB
+::,,...,;:HB \  BBBBBBBBBBBBBBB
+```
+
+=== ID: 48762a50bab95b0e | TITLE: Two canoeists paddling together in a canoe on rippling water | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: native-americans | SIZE: 34x4 ===
+```
+            O__,     O__,
+        /'._|\/______|\_/.'\
+        \    /             /
+~^~^~^~^^`~^~^~^~^~~^~^~^~^~^~^
+```
+
+=== ID: c13dfc524cee6749 | TITLE: Carved wooden totem pole with stacked ceremonial animal faces | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: native-americans | SIZE: 22x20 ===
+```
+       \\\\////
+        |.)(.|
+        | || |
+        \(__)/
+        |-..-|
+        |o\/o|
+   .----\    /----.
+  / / / |~~~~| \ \ \
+ / / / /|::::|\ \ \ \
+'-'-'-'-|::::|-'-'-'-'
+       (((^^)))
+        >>><<<
+        ||||||
+        (o)(o)
+        | /\ |
+        (====)
+        |_/\_|
+        (_/\_)
+       _|_,__|_
+      (___\____)
+```
+
+=== ID: 3629814ffafda20e | TITLE: Two oval party balloons floating side by side on wavy strings | ARTIST: Joan G. Stark (Spunk) | CATEGORY: toys | SUBCATEGORY: balloons | SIZE: 24x11 ===
+```
+    .-'"'-.
+   / #     \
+  : #       :  .-'"'-.
+   \       /  / #     \
+    \     /  : #       :
+     `'q'`    \       /
+       (       \     /
+        )       `'p'`
+       (          )
+        )        (
+                  )
+```
+
+=== ID: 39542b196e417d9d | TITLE: Pac-Man character opening mouth facing a retro arcade ghost monster | ARTIST: unknown | CATEGORY: video-games | SUBCATEGORY: pacman | SIZE: 16x4 ===
+```
+  __        ___
+ / o\      /o o\
+|   <      |   |
+ \__/      |,,,|
+```
+
+=== ID: aa0fe965fc517e0b | TITLE: Stick of dynamite with a burning spark fuse labeled TNT | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 32x4 ===
+```
+ ___________________    . , ; .
+(___________________|~~~~~X.;' .
+                      ' `" ' `
+            TNT
+```
+
+=== ID: d6a060aedeb9cd94 | TITLE: Spherical black bomb with a sparkling star fuse wick | ARTIST: Harry Mason (Hajoma) | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 14x6 ===
+```
+        ,--.!,
+     __/   -*-
+   ,d08b.  '|`
+   0088MM
+   `9MMP'
+hjm
+```
+
+=== ID: 54b24d9f6d71e995 | TITLE: Mushroom cloud explosion billowing smoke upward from the ground | ARTIST: unknown | CATEGORY: weapons | SUBCATEGORY: explosives | SIZE: 33x8 ===
+```
+          _ ._  _ , _ ._
+        (_ ' ( `  )_  .__)
+      ( (  (    )   `)  ) _)
+     (__ (_   (_ . _) _) ,__)
+         `~~`\ ' . /`~~`
+              ;   ;
+              /   \
+_____________/_ __ \_____________
+```
+
+=== ID: 436b4147d81882cc | TITLE: Cookie Monster muppet face with googly eyes and wide smiling mouth | ARTIST: unknown | CATEGORY: television | SUBCATEGORY: sesame-street | SIZE: 14x7 ===
+```
+    (o)(o)
+  w"      "w
+ W  -====-  W
+  "w      w"
+ w""""""""""w
+W            W
+Cookie Monster
+```
+
+=== ID: 66731cfd4b97fd98 | TITLE: Large robot face, looking to the right with eyes full of feeling superior | ARTIST: Silver Saks | CATEGORY: television | SUBCATEGORY: robotic | SIZE: 32x18 ===
+```
+      _
+     ( )
+      H
+      H
+     _H_
+  .-'-.-'-.
+ /         \
+|           |
+|   .-------'._
+|  / /  '.' '. \
+|  \ \ @   @ / /
+|   '---------'
+|    _______|
+|  .'-+-+-+|
+|  '.-+-+-+|         
+|    """""" |
+'-.__   __.-'
+     """
+```
+
+=== ID: 3b4966cb2dbf8f58 | TITLE: Shaun the sheep looking at you | ARTIST: Joan G. Stark (Spunk) | CATEGORY: television | SUBCATEGORY: shaun the sheep | SIZE: 31x15 ===
+```
+    ."'=-,     ,.,.,_
+   (_____ )."=`      `"=,
+  ./_ _  \`\             `;..
+ / (o(o) |\=\              ; `;
+(_/|     | \ |             ;`"`
+   |     |  `             ;
+   \ ..  /`,_          _.'
+    `---'   `#"#""'"#'#^
+             # #    # #
+             # #    # #
+             # #    # #
+             # #    # #
+             # #    # #
+            /#|#\  /#|#\
+            `"`"`  `"`"`
+```
+
+=== ID: bf7a549a43f43554 | TITLE: Silhoutte of an angel | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 13x7 ===
+```
+   -=-
+(\  _  /)
+( \( )/ )
+(       )
+ `>   <'
+ /     \  
+ `-._.-'
+```
+
+=== ID: a3a69f7e102352da | TITLE: Large, detailed angel standing front on, with a smile on her face | ARTIST: Ojosh!ro | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 31x18 ===
+```
+             .---.
+            / ,-- \
+    .--.   ( (^_^) )   .--.
+  ,'    \  (.-`-'(_)  /    `.
+ /       `-/ \ `.  \-'       \
+: (_,' .  / (.\_ ") \  . `._) :
+|   `-'(_,\ \     / /._)`-'   |
+|       .  `.\,O,'.'  .   :   |
+|   . : !   /\_  /\   ! . !   |
+| ! |-'-|  : ""T"" :  |-'-| | |
+| |-'   `-'|   H   |`-'   `-| |
+`-'        |   H .:|        `-'
+           | . H !||
+           | : H :!|
+           | ! H !||
+           | | H |||
+           | | H |||  
+           /_,'V.L|.\
+```
+
+=== ID: d59eec3828257c38 | TITLE: Large cupid of love with three hearts floating to the right of it | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cupid | SUBCATEGORY: cupid | SIZE: 35x19 ===
+```
+    .--,.-,
+   /.-',\:.\  .===.    ,;;,;;,
+  /;    \\:.\/    _)  ;;;;;;;;;
+  |'     \\:(  _,`'>   ';;;;;'
+  |;      \\(_/ ._=      ';'
+  |;       ;/ /`|\
+  /,      _/  |-' `\
+ /;    __//(  \_,;;,;;,
+|;  __/  /  \  /);;;;;;)
+| _/|/  /    \/`';;;;;'    ,;;,;;,
+|/     /      (   ';'     ;;;;;;;;;
+      (    .-, \           ';;;;;'
+       )  /`\ ) \            ';'
+      '._/|/| |.'
+        _//  \|
+       | /   ||
+       |/   / |
+            `\|
+              '
+```
+
+=== ID: 0b98e0c9c1ca6496 | TITLE: A grand, kind looking angel | ARTIST: Joan G. Stark (Spunk) | CATEGORY: religion | SUBCATEGORY: angels | SIZE: 39x21 ===
+```
+                   _
+                 *"_"*
+        _..._    /`_`\    _..._
+      .'     '. | / \ | .'     '.
+,    /         ')\^_^/('         \    ,
+\`--'  .--.    (_.> <._)    .--.  '--`/
+ '.__.'    '._/   \_/   \_.'    '.__.'
+             /     _     \
+             \  \_/|\_/  /
+              \  //^\\  /
+               \/`   `\/
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                |     |
+                \_.__./
+```
+
+=== ID: 0d45d2ac2f14ac62 | TITLE: Mickey Mouse head portrait in three-quarter profile with round ears | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: mickey-mouse | SIZE: 20x9 ===
+```
+         .-"""-.
+        /       \
+        \       /
+ .-"""-.-`.-.-.<  _
+/      _,-\ ()()_/:)
+\     / ,  `     `|
+ '-..-| \-.,___,  /
+       \ `-.__/  /
+        `-.__.-'`
+```
+
+=== ID: 9a308d3d385ac808 | TITLE: Mona Lisa framed portrait sketch with signature enigmatic smile | ARTIST: Joan G. Stark (Spunk) | CATEGORY: art-and-design | SUBCATEGORY: mona-lisa | SIZE: 26x21 ===
+```
+ ________________________
+|.----------------------.|
+||                      ||
+||       ______         ||
+||     .;;;;;;;;.       ||
+||    /;;;;;;;;;;;\     ||
+||   /;/`    `-;;;;; . .||
+||   |;|__  __  \;;;|   ||
+||.-.|;| e`/e`  |;;;|   ||
+||   |;|  |     |;;;|'--||
+||   |;|  '-    |;;;|   ||
+||   |;;\ --'  /|;;;|   ||
+||   |;;;;;---'\|;;;|   ||
+||   |;;;;|     |;;;|   ||
+||   |;;.-'     |;;;|   ||
+||'--|/`        |;;;|--.||
+||;;;;    .     ;;;;.\;;||
+||;;;;;-.;_    /.-;;;;;;||
+||;;;;;;;;;;;;;;;;;;;;;;||
+||   ;;;;;;;;;;;;;;;;;;;||
+'------------------------'
+```
+
+=== ID: 665b14cb6bfc2915 | TITLE: A couple standing together who just got married in a church | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: couples | SIZE: 19x8 ===
+```
+           _
+    mMm  _[_]_
+   /(_)\  (_)
+  //)^(\\//:\\
+ /(/&@&\)\|~|/
+/ /-~`~-\ |||
+`/       \|||
+`--------'-'--  
+```
+
+=== ID: aad11d579031cf7b | TITLE: Couple standing close together, both creepily staring at you | ARTIST: Peter Bier | CATEGORY: people | SUBCATEGORY: couples | SIZE: 19x16 ===
+```
+          ///"\
+          |6 6|
+          \ - /
+   .@@@. __) (__
+   @6 6@/  \./  \
+   @ = @ :  :  : \
+   _) (_'|  :  |) )
+ /' \./ '\  :  |_/
+/ /\ _ /\ \=o==|)
+\ \ )  (/ /%|%%'
+ '7/    \7%%|%%'
+   |    |`%%|%%'
+   |    |`%%|%%'
+   |    | %%|%%
+   |_.._| /_|_\
+    Peter Bier
+```
+
+=== ID: 93447ab3a0233637 | TITLE: Cute kitten face with pointed ears and front paws touching together | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 7x3 ===
+```
+ /\_/\
+( o.o )
+ > ^ <
+```
+
+=== ID: ab4709c404160f65 | TITLE: Cat lying flat along a horizontal shelf with curved tail upright | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 18x3 ===
+```
+    |\__/,|   (`\
+  _.|o o  |_   ) )
+-(((---(((--------
+```
+
+=== ID: 4e009cc7c3ae1d49 | TITLE: Cat sleeping contentedly with closed eyes and tucked front paws | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 15x4 ===
+```
+ |\__/,|   (`\
+ |_ _  |.--.) )
+ ( T   )     /
+(((^_(((/(((_/
+```
+
+=== ID: a776850c8d433165 | TITLE: Cat lounging stretched out full length on its stomach with tail out | ARTIST: Julie Rhodes | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 40x4 ===
+```
+    /\_/\           ___
+   = o_o =_______    \ \ 
+    __^      __(  \.__) )
+(@)<_____>__(_____)____/
+```
+
+=== ID: 1939d7cfa2cd18cd | TITLE: Small fluffy cat sitting upright with curved upright tail | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 11x4 ===
+```
+  ^~^  ,
+ ('Y') )
+ /   \/
+(\|||/)
+```
+
+=== ID: 92a2f147411288ea | TITLE: Large wild feline puma crouching low and stalking forward | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 33x5 ===
+```
+("`-''-/").___..--''"`-._
+ `6_ 6  )   `-.  (     ).`-.__.`)
+ (_Y_.)'  ._   )  `._ `. ``-..-'
+   _..`--'_..-_/  /--'_.'
+  ((((.-''  ((((.'  (((.-'
+```
+
+=== ID: 837960fd3689bc1d | TITLE: Cat crouching low in playful hunting stance with tail perked up | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 16x5 ===
+```
+   |\__/,|   (`\
+   |o o  |__ _)
+ _.( T   )  `  /
+((_ `^--' /_<  \
+`` `-'(((/  (((/
+```
+
+=== ID: 55524d5eaa832c8b | TITLE: Cat peeking head and front paws over a horizontal fence rail | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 33x5 ===
+```
+                       /)
+              /\___/\ ((
+              \`@_@'/  ))
+              {_:Y:.}_//
+   ----------{_}^-'{_}----------
+```
+
+=== ID: 83187fc3cd145d28 | TITLE: Dumb looking cat | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 11x6 ===
+```
+ .       .
+ |\_---_/|
+/   o_o   \
+|    U    |
+\  ._I_.  /
+ `-_____-'
+```
+
+=== ID: f53b52445fcd7f1e | TITLE: Uncle looking kitten | ARTIST: Lara Allen | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 18x7 ===
+```
+      /\_/\
+ /\  / o o \
+//\\ \~(*)~/
+`  \/   ^ /
+   | \|| || 
+   \ '|| || 
+    \)()-())
+```
+
+=== ID: dacc020d3a1b26c5 | TITLE: Fluffy long-haired Persian cat with wide round concentric eyes | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 12x7 ===
+```
+   _='`'=_
+  //(@_@)\\
+  |||(Y)|||
+  \\\\ ////
+   / )`( \
+<\(  )'(  )
+ (__w)_(w__)
+```
+
+=== ID: 918346b180e39896 | TITLE: Chubby cat sitting front-on with round body and tucked paws | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 17x7 ===
+```
+    /\_____/\
+   /  o   o  \
+  ( ==  ^  == )
+   )         (
+  (           )
+ ( (  )   (  ) )
+(__(__)___(__)__)
+```
+
+=== ID: e416ee6927976f74 | TITLE: Cat sitting upright with straight posture and curling side tail | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 15x8 ===
+```
+    .       .
+    \`-"'"-'/
+     } 6 6 {
+    =.  Y  ,=
+      /^^^\  .
+     /     \  )
+    (  )-(  )/
+     ""   ""
+```
+=== ID: 0068b8d81b977b74 | TITLE: Cat with round triangular body sitting with vertical tail behind | ARTIST: Berton Corson | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 20x9 ===
+```
+  /\ ___ /\
+ (  o   o  )
+  \  >#<  /
+  /       \
+ /         \       ^
+|           |     //
+ \         /    //
+  ///  ///   --
+
+```
+
+=== ID: 8c5113000921d06a | TITLE: Cat going inside a cardboard box | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 29x11 ===
+```
+  ,-.       _,---._ __  / \
+ /  )    .-'       `./ /   \
+(  (   ,'            `/    /|
+ \  `-"             \'\   / |
+  `.              ,  \ \ /  |
+   /`.          ,'-`----Y   |
+  (            ;        |   '
+  |  ,-.    ,-'         |  /
+  |  | (   |            | /
+  )  |  \  `.___________|/
+  `--'   `--'
+```
+
+=== ID: 6bb20bf12b2a1891 | TITLE: Cat sitting and saying Meow in speech label | ARTIST: Audrey Ming Hwang | CATEGORY: animals | SUBCATEGORY: cats | SIZE: 38x11 ===
+```
+    /\___/\
+   /       \
+  l  u   u  l
+--l----*----l--
+   \   w   /     - Meow!
+     ======
+   /       \ __
+   l        l\ \
+   l        l/ / 
+   l  l l   l /
+   \ ml lm /_/
+```
+
+=== ID: 728a8fcbb1e748d6 | TITLE: Surprised face with wide open eyes reacting to a sudden slap | ARTIST: Elissa Potier | CATEGORY: people | SUBCATEGORY: faces | SIZE: 12x6 ===
+```
+///-\\\
+|^   ^|
+|O   O|
+|  ~ *slap*!
+ \ O /
+  | |
+```
+
+=== ID: ca2d79d22bad9eff | TITLE: Camel face, weirdly staring at you | ARTIST: unknown | CATEGORY: camel | SUBCATEGORY: faces | SIZE: 11x12 ===
+```
+   _____
+ _/ _ _ \_
+(o / | \ o)
+ || o|o ||
+ | \_|_/ |
+ |  ___  |
+ | (___) |
+ |\_____/|
+ | \___/ |
+ \       /
+  \__ __/
+     U
+```
+
+=== ID: c70bc1d83e64179b | TITLE: Cute baby taking his pet toy duck for a walk | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: babies | SIZE: 37x6 ===
+```
+   ,=""=,
+  c , _,{
+  /\  @ )                 __
+ /  ^~~^\          <=.,__/ '}=
+(_/ ,, ,,)          \_ _>_/~
+ ~\_(/-\)'-,_,_,_,-'(_)-(_) 
+```
+
+=== ID: 4576b6d74f986046 | TITLE: Garfield the cat looking at the screen with unmotivated look on his face | ARTIST: Joan G. Stark (Spunk) | CATEGORY: comics | SUBCATEGORY: garfield | SIZE: 26x13 ===
+```
+       .-.,     ,.-.
+ '-.  /:::\\   //:::\  .-'
+ '-.\|':':' `"` ':':'|/.-'
+ `-./`. .-=-. .-=-. .`\.-`
+   /=- /     |     \ -=\
+  ;   |      |      |   ;
+  |=-.|______|______|.-=|
+  |==  \  0 /_\ 0  /  ==|
+  |=   /'---( )---'\   =|
+   \   \:   .'.   :/   /
+    `\= '--`   `--' =/'
+      `-=._     _.=-'
+           `"""`
+```
+
+=== ID: ce5d921aac85ac3a | TITLE: Stethoscope | ARTIST: Joan G. Stark (Spunk) | CATEGORY: med | SUBCATEGORY: stethoscope | SIZE: 13x9 ===
+```
+   _    _
+  /_]  [_\
+ //      \\
+ \\      //
+  \`-..-'/
+   `\  /`
+     ||    _
+     ||   ( )
+     \\___/
+```
+
+=== ID: 265374fc913ba9bf | TITLE: Scorpion just hanging around alone | ARTIST: Max Srtandberg, Aqua Max | CATEGORY: animals | SUBCATEGORY: scorpions | SIZE: 13x13 ===
+```
+ ___    ___
+( _<    >_ )
+//        \\
+\\___..___//
+ `-(    )-'
+   _|__|_
+  /_|__|_\
+  /_|__|_\
+  /_\__/_\
+   \ || /  _)
+     ||   ( )
+     \\___//
+      `---'
+```
+
+=== ID: 19c4ac317d4d0e69 | TITLE: Intimidating looking monster staring at you | ARTIST: Veronica Karlsson | CATEGORY: mythology | SUBCATEGORY: monsters | SIZE: 34x18 ===
+```
+      -. -. `.  / .-' _.'  _
+     .--`. `. `| / __.-- _' `
+    '.-.  \  \ |  /   _.' `_
+    .-. \  `  || |  .' _.-' `.
+  .' _ \ '  -    -'  - ` _.-.
+   .' `. %%%%%   | %%%%% _.-.`-
+ .' .-. ><(@)> ) ( <(@)>< .-.`.
+   (("`(   -   | |   -   )'"))
+  / \\#)\    (.(_).)    /(#//\
+ ' / ) ((  /   | |   \  )) (`.`.
+ .'  (.) \ .md88o88bm. / (.) \)
+   / /| / \ `Y88888Y' / \ | \ \
+ .' / O  / `.   -   .' \  O \ \\
+  / /(O)/ /| `.___.' | \\(O) \
+   / / / / |  |   |  |\  \  \ \
+   / / // /|  |   |  |  \  \ \  VK
+ _.--/--/'( ) ) ( ) ) )`\-\-\-._
+( ( ( ) ( ) ) ( ) ) ( ) ) ) ( ) )
+```
+
+=== ID: 527e0135b624f4f3 | TITLE: Minimalist bunny rabbit face with upright ears and round eyes | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 10x4 ===
+```
+ __    __
+/ \\..// \
+  ( oo )
+   \__/
+```
+
+=== ID: fa30cd4349f066c3 | TITLE: Bunny rabbit looking at the right while sitting down | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 25x6 ===
+```
+               ((`\
+            ___ \\ '--._
+         .'`   `'    o  )
+        /    \   '. __.'
+       _|    /_  \ \_\_
+      {_\______\-'\__\_\
+```
+
+=== ID: 29294bc3b1db42d0 | TITLE: Detailed bunny rabbit resting in profile with long upright ears | ARTIST: Blazej Kozlowski | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 32x15 ===
+```
+                              __
+                     /\    .-" /
+                    /  ; .'  .'
+                   :   :/  .'
+                    \  ;-.'
+       .--""""--..__/     `.
+     .'           .'    `o  \
+    /                    `   ;
+   :                  \      :
+ .-;        -.         `.__.-'
+:  ;          \     ,   ;
+'._:           ;   :   (
+    \/  .__    ;    \   `-.
+     ;     "-,/_..--"`-..__)
+     '""--.._:
+```
+
+=== ID: c025a22fc2eea153 | TITLE: Bunny rabbit face drawn with asterisk stars and one bent ear | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 27x18 ===
+```
+   ***
+  ** **
+ **   **
+ **   **         ****
+ **   **       **   ****
+ **  **       *   **   **
+  **  *      *  **  ***  **
+   **  *    *  **     **  *
+    ** **  ** **        **
+    **   **  **
+   *           *
+  *             *
+ *    0     0    *
+ *   /   @   \   *
+ *   \__/ \__/   *
+   *     W     *
+     **     **
+       *****
+```
+
+=== ID: 4ac53317cb2fac38 | TITLE: Bunny rabbit face with long upright ears (one is bent) and round cheeks | ARTIST: Scott C. Sullivan | CATEGORY: animals | SUBCATEGORY: rabbits | SIZE: 21x21 ===
+```
+     / \
+    / _ \
+   | / \ |
+   ||   || _______
+   ||   || |\     \
+   ||   || ||\     \
+   ||   || || \    |
+   ||   || ||  \__/
+   ||   || ||   ||
+    \\_/ \_/ \_//
+   /   _     _   \
+  /               \
+  |    O     O    |
+  |   \  ___  /   |
+ /     \ \_/ /     \
+/  -----  |  -----  \
+|     \__/|\__/     |
+\       |_|_|       /
+ \_____       _____/
+       \     /
+       |     |
+```
+
+=== ID: b661ef8f78a6e1b1 | TITLE: Plush teddy bear full body, staring at the screen | ARTIST: R. Elizabeth A | CATEGORY: toys | SUBCATEGORY: teddy-bears | SIZE: 14x7 ===
+```
+   /\___/\
+   | o o |
+  __\_^_/__
+ (__/   \__)
+  _|  .  |_
+ (__\___/__)
+
+```
+
+=== ID: 995655eba63f0bc0 | TITLE: Toy Story three-eyed green alien character standing in space suit | ARTIST: Joan G. Stark (Spunk) | CATEGORY: movies | SUBCATEGORY: toy-story | SIZE: 21x11 ===
+```
+          O
+         _|_
+   ,_.-_' _ '_-._,
+    \ (')(.)(') /
+ _,  `\_-===-_/`  ,_
+>  |----"""""----|  <
+`""`--/   _-@-\--`""`
+     |===L_I===|
+      \       /
+      _\__|__/_
+     `""""`""""`
+```
+
+=== ID: 83ccd6b7d8c8b718 | TITLE: Dinosaur toy from toy story, standing tall, looking friendly | ARTIST: Joan G. Stark (Spunk) | CATEGORY: movies | SUBCATEGORY: toy-story | SIZE: 37x17 ===
+```
+                              _.-.
+                             /  99\
+                            (      `\
+                            |\\ ,  ,|
+                    __      | \\____/
+              ,.--"`-.".   /   `---'
+          _.-'          '-/      |
+      _.-"   |   '-.             |_/_
+,__.-'  _,.--\      \      ((    /-\
+',_..--'      `\     \      \\_ /
+                `-,   )      |\'
+                  |   |-.,,-" (
+                  |   |   `\   `',_
+                  )    \    \,(\(\-'
+                  \     `-,_
+                   \_(\-(\`-`
+                      "  "
+```
+
+=== ID: 819bc8d4a11193dc | TITLE: Mr. Potato Head from toy story, staring at you with an unimpressed look on his face | ARTIST: Joan G. Stark (Spunk) | CATEGORY: movies | SUBCATEGORY: toy-story | SIZE: 35x18 ===
+```
+              .-"'"-.
+             |       |
+           (`-._____.-')
+        ..  `-._____.-'  ..
+      .', :./'.== ==.`\.: ,`.
+     : (  :   ___ ___   :  ) ;
+     '._.:    |0| |0|    :._.'
+        /     `-'_`-'     \
+      _.|       / \       |._
+    .'.-|      (   )      |-.`.
+   //'  |  .-"`"`-'"`"-.  |  `\\
+  ||    |  `~":-...-:"~`  |    ||
+  ||     \.    `---'    ./     ||
+  ||       '-._     _.-'       ||
+ /  \       _/ `~:~` \_       /  \
+||||\)   .-'    / \    `-.   (/||||
+\|||    (`.___.')-(`.___.')    |||/
+ '"'     `-----'   `-----'     '"'
+```
+
+=== ID: 86149524b7c7e254 | TITLE: Piggy bank (Hamm) from toy story  | ARTIST: Joan G. Stark (Spunk) | CATEGORY: movies | SUBCATEGORY: toy-story | SIZE: 35x19 ===
+```
+             _
+            (,)
+            _/
+        .--"_"--.
+      ."   |I|   ".
+     /     |I|     \
+    /      |I|      \
+   ;       |I|       ;
+   |   _   '"'   _   |  WAY TO GO
+  /|  |\\_,...,_//|  |\    ID-A-HO!
+ / |  |-" 0   0 "-|  | \
+(//| /             \ |\\)
+ ^ \ |    _..._    | / ^
+    '|  .'     '.  |'
+     \  | () () |  /
+    / '.`.     .'.' \
+   /' / `\`"""`/` \ `\
+  (/ /    `"""`    \ \)
+   ^`               `^
+```
+
+=== ID: a9485321bfcbedac | TITLE: Two strange human faces, both looking at the right | ARTIST: Sebastian Stoecker | CATEGORY: comics | SUBCATEGORY: peanuts | SIZE: 36x9 ===
+```
+     _____              .---...-.
+   ,'  -. `.          ,' _____...'
+  /   - _ - \        : .' _   _ \\
+ :    ' _)'  :       | :-(_).(_)::
+(_           ;)      | |    -'  ||
+  \     _   /        ; |    _   ||
+   `..___..'         `-'..____.'`'
+      ;._:               _; :_
+     /    \            ,'  `' `. 
+```
+
+=== ID: 16b5cd95f61fd82b | TITLE: Dog sitting on top of a mountain, looking at the view while contemplating the meaning of life | ARTIST: Sebastian Stoecker | CATEGORY: animals | SUBCATEGORY: dog | SIZE: 27x9 ===
+```
+            ,-.
+          .:\ '`-.
+          |:|  __ b
+           `;-(
+          ,'  |
+         ( \|||_
+  ,-----(.-''--``-------.
+ /_______`'______________\
+/                         \
+```
+
+=== ID: 9a5ee9a3fe937148 | TITLE: Dog impersonating snoop dog (the rapper) | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dog | SIZE: 23x13 ===
+```
+             .----.
+          _.'__    `.
+      .--(#)(##)---/#\
+    .' @          /###\
+    :         ,   #####
+     `-..__.-' _.-\###/
+           `;_:    `"'
+         .'"""""`.
+        /,  JOE  ,\
+       //  COOL!  \\
+       `-._______.-'
+       ___`. | .'___
+      (______|______)
+```
+
+=== ID: a2a4536554dd9e6e | TITLE: Shy boy standing and blushing | ARTIST: Win Kang | CATEGORY: people | SUBCATEGORY: boy | SIZE: 23x14 ===
+```
+         / _
+    `_--/-/_ _
+ ~\/        /
+  |  . _ .   |--\
+ _| # (    #  )
+/  \   _  # /
+     -_  _-~
+      -'--`-_
+     /     . |
+     |     |~|
+     |-----,,)
+     --------
+       |_|_|
+     _~__~__\        
+```
+
+=== ID: 6cd8433b14d4742a | TITLE: Simpsons man looking with expressionless face and wide eyes to the right | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 10x9 ===
+```
+ |\/\/\/|
+ |      |
+ |      |
+ | (o)(o)
+ C      _)
+  | ,___|
+  |   /
+ /____\
+/      \
+```
+
+=== ID: 43e419e1dcdf517b | TITLE: Simpsons man looking down on someone | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x11 ===
+```
+         &
+      .-"`"-.
+     /       \
+     |   __  _|
+     |  /  \/ \
+    WW  \_o/_o/
+    (        _)
+     |   .----\
+     ;  | '----'
+      \__'--;`
+      |___/\|
+```
+
+=== ID: c8566f9b4b4329dc | TITLE: Dumb looking simpsons man, just chilling (looking left) | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 18x12 ===
+```
+    |\/\  ,.
+    /   `' |,-,
+   /         /_
+ _/            /
+(.-,--.       /
+/o/  o \     /
+\_\    /   _/
+(__`--'    _)
+ /         |
+(_____,'    \  
+   \_       _\
+     `._..-'
+```
+
+=== ID: b27fe5339b95297b | TITLE: Dumb looking simpsons man, just chilling (looking right) | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 16x14 ===
+```
+    ___
+   //_\\_
+ ."\\    ".
+/          \
+|           \_
+|       ,--.-.)
+ \     /  o \o\
+ /\/\  \    /_/
+  (_.   `--'__)
+   |     .-'  \
+   |  .-'.     )
+   | (  _/--.-'
+   |  `.___.'
+         (
+```
+
+=== ID: 137f3725ae4b2c40 | TITLE: Simpsons man with a side-eye look | ARTIST: Matthew Kurth | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 15x14 ===
+```
+  |\/\/\/\/\/|
+  |          |
+  |          |
+  |          |
+  |    __  __|
+  |   /  \/  \
+  |  (o   )o  )
+ /c   \__/ --.
+ \_   ,     -'
+  |  '\_______)
+  |      _)
+  |     |
+ /`-----'\
+/         \
+```
+
+=== ID: cc390e436e3c5a95 | TITLE: Simpsons woman in big hairdo staring at you | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 19x16 ===
+```
+            (####)
+          (#######)
+        (#########)
+       (#########)
+      (#########)
+     (#########)
+    (#########)
+   (#########)
+  (#########)
+   (o)(o)(##)
+ ,_C     (##)
+/___,   (##)
+  \     (#)
+   |    |
+   OOOOOO
+  /      \
+```
+
+=== ID: 9b2b3f600020f509 | TITLE: Simpsons man cursing at something | ARTIST: Rowan Crawford | CATEGORY: cartoons | SUBCATEGORY: simpsons | SIZE: 34x17 ===
+```
+   ___  _____
+ .'/,-Y"     "~-.
+ l.Y             ^.
+ /\               _\_      "Ewww"
+i            ___/"   "\
+|          /"   "\   o !
+l         ]     o !__./
+ \ _  _    \.___./    "~\
+  X \/ \            ___./
+ ( \ ___.   _..--~~"   ~`-.
+  ` Z,--   /               \
+    \__.  (   /       ______)
+      \   l  /-----~~" /      
+       Y   \          /
+       |    "x______.^
+       |           \
+       j            Y
+```
+
+=== ID: d5f31d200022ed72 | TITLE: Minimal walrus head with long downward pointing white tusks and whiskers | ARTIST: Harry Mason (Hajoma) | CATEGORY: animals | SUBCATEGORY: walrus | SIZE: 12x4 ===
+```
+       ___
+      /  .\
+     /  =__|
+    /    ||
+```
+
+=== ID: 4e83b729d50775af | TITLE: Sea otter floating on its back in water with paws on chest playing with its shells | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: otter | SIZE: 28x10 ===
+```
+  .-"""-.
+ /      o\
+|    o   0).-.
+|       .-;(_/     .-.
+ \     /  /)).---._|  `\   ,
+  '.  '  /((       `'-./ _/|
+    \  .'  )        .-.;`  /
+     '.             |  `\-'
+       '._        -'    /
+          ``""--`------`
+```
+
+=== ID: a26b9a172d0b5129 | TITLE: Small minimalist swan floating peacefully on calm water | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: swan | SIZE: 6x3 ===
+```
+   (@_
+\\\_\
+<____)
+```
+
+=== ID: 79802752bbded889 | TITLE: Three small ducklings swimming in a row on water to the left | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: duck | SIZE: 25x3 ===
+```
+  _      _      _
+>(.)__ <(.)__ =(.)__
+ (___/  (___/  (___/
+```
+
+=== ID: 2999faf9e6270787 | TITLE: Rubber duck floating leftward alone | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: duck | SIZE: 13x4 ===
+```
+  __
+<(o )___
+ ( ._> /
+  `---' 
+```
+
+=== ID: e96696f77022f398 | TITLE: Rubber duck floating rightward alone | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: duck | SIZE: 12x4 ===
+```
+    __
+___( o)>
+\ <_. )
+ `---'  
+```
+
+=== ID: 66d4ed1791b61e62 | TITLE: Small minimalist penguin standing upright looking at the right | ARTIST: Donovan Baker | CATEGORY: animals | SUBCATEGORY: penguin | SIZE: 5x4 ===
+```
+ __
+( o>
+///\
+\V_/_
+```
+
+=== ID: 611e9edc4a1bfcd1 | TITLE: Penguin standing in leftward side-profile | ARTIST: Shanaka Dias | CATEGORY: animals | SUBCATEGORY: penguin | SIZE: 17x6 ===
+```
+         __
+      -=(o '.
+         '.-.\
+         /|  \\
+         '|  ||
+          _\_):,_
+```
+
+=== ID: 9c7cb4565bbb176b | TITLE: Cartoon human skeleton standing straight | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: human | SUBCATEGORY: skeletons | SIZE: 13x14 ===
+```
+      .-.
+     (o.o)
+      |=|
+     __|__
+   //.=|=.\\
+  // .=|=. \\
+  \\ .=|=. //
+   \\(_=_)//
+    (:| |:)
+     || ||
+     () ()
+     || ||
+     || ||
+    ==' '==
+```
+
+=== ID: ad3acd9fa303fd9f | TITLE: Batman classic spread-wing bat chest emblem silhouette | ARTIST: Lukasz Tyrala | CATEGORY: comics | SUBCATEGORY: batman | SIZE: 37x10 ===
+```
+          _____       _____
+     ,-'``_.-'` \   / `'-._``'-.
+   ,`   .'      |`-'|      `.   `.
+ ,`    (    /\  |   |  /\    )    `.
+/       `--'  `-'   `-'  `--'       \
+|                                   |
+\      .--.  ,--.   ,--.  ,--.      /
+ `.   (    \/ lt.\ /    \/    )   ,'
+   `._ `--.___    V    ___.--' _,'
+      `'----'`         `'----'`
+```
+
+=== ID: c66a8f083b837bc2 | TITLE: Shaded typography Batman bat logo symbol with spread wings | ARTIST: unknown | CATEGORY: comics | SUBCATEGORY: batman | SIZE: 31x10 ===
+```
+       _,    _   _    ,_
+  .o888P     Y8o8Y     Y888o.
+ d88888      88888      88888b
+d888888b_  _d88888b_  _d888888b
+8888888888888888888888888888888
+8888888888888888888888888888888
+Y   8P"Y888P"Y888P"Y888P"Y8888P
+ Y888   '8'   Y8P   '8'   888Y
+  '8o          V          o8'
+    `                     `
+```
+
+=== ID: 59a93c84f7c5a9f6 | TITLE: Batman standing tall, while looing at right | ARTIST: Shanaka Dias | CATEGORY: comics | SUBCATEGORY: batman | SIZE: 24x22 ===
+```
+          .  .
+          |\_|\
+          | a_a\
+          | | "]
+      ____| '-\___
+     /.----.___.-'\
+    //        _    \
+   //   .-. (~v~) /|
+  |'|  /\:  .--  / \
+ // |-/  \_/____/\/~|
+|/  \ |  []_|_|_] \ |
+| \  | \ |___   _\ ]_}
+| |  '-' /   '.'  |
+| |     /    /|:  |
+| |     |   / |:  /\
+| |     /  /  |  /  \
+| |    |  /  /  |    \
+\ |    |/\/  |/|/\    \
+ \|\ |\|  |  | / /\/\__\
+  \ \| | /   | |__
+       / |   |____)
+       |_/
+```
+
+=== ID: 5ad84b33a58cb735 | TITLE: Bid, detailed birthday cake with candles | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: birthdays | SIZE: 39x17 ===
+```
+             ,   ,   ,   ,
+           , |_,_|_,_|_,_| ,
+       _,-=|;  |,  |,  |,  |;=-_
+     .-_| , | , | , | , | , |  _-.
+     |:  -|:._|___|___|__.|:=-  :|
+     ||*:  :    .     .    :  |*||
+     || |  | *  |  *  |  * |  | ||
+ _.-=|:*|  |    |     |    |  |*:|=-._
+-    `._:  | *  |  *  |  * |  :_.'    -
+ =_      -=:.___:_____|___.: =-     _=
+    - . _ __ ___  ___  ___ __ _ . -
+```
+
+=== ID: df9b67c53f2381fa | TITLE: Random old man saying hi by waving his hand | ARTIST: unknown | CATEGORY: human | SUBCATEGORY: random-old-man | SIZE: 14x17 ===
+```
+   _____
+  /     \
+/- (*) |*)\
+|/\.  _>/\|
+    \__/    |\
+   _| |_   \-/
+  /|\__|\  //
+ |/|   |\\//
+ |||   | ~'
+ ||| __|
+ /_\| ||
+ \_/| ||
+   |7 |7
+   || ||
+   || ||
+   /\ \ \  
+  ^^^^ ^^^
+```
+
+=== ID: 7f5bab3fd9ecf572 | TITLE: worried bear holding a glass of beer | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: bears | SIZE: 21x12 ===
+```
+     (()__(()
+     /       \
+    ( /    \  \
+     \ o o    /
+     (_()_)__/ \
+    / _,==.____ \
+   (   |--|      )
+   /\_.|__|'-.__/\_
+  / (        /     \
+  \  \      (      /
+   )  '._____)    /
+(((____.--(((____/
+```
+
+=== ID: 27de7e77b49142ba | TITLE: Classy woman holding an open umbrella | ARTIST: Joan G. Stark (Spunk) | CATEGORY: human | SUBCATEGORY: woman | SIZE: 17x17 ===
+```
+           _
+        .-' '-.
+       /       \
+      |,-,-,-,-,|
+     ___   |
+    _)_(_  |
+    (/ \)  |
+    _\_/_  /)
+   / \_/ \//
+   |(   )\/
+   ||)_(
+   |/   \
+   n|   |
+  / \   |
+  |_|___|
+     \|/
+    _/L\_
+```
+
+=== ID: 9518c176c497963c | TITLE: Hairy zombie looking rightward | ARTIST: H P Barmario (Morfina) | CATEGORY: human | SUBCATEGORY: zombie | SIZE: 19x17 ===
+```
+        .WWWW.
+       WWWW""'
+     .WWWW O O
+  .WWWW"WW.'-.
+ WWWWWWWWWWWWW.
+WWWWWWWWWWWWWWW
+"WWWWWWWWWW"'\___
+ /  /__ __/\___( \
+(____( \X(     /||\
+   / /||\ \
+   \______/
+    \ | \ |
+     )|  \|
+    (_|  /|
+    |X| (X|
+    |X| |X'._
+   (__| (____)
+```
+
+=== ID: 40aef84c2447fc5e | TITLE: Halloween pumpkin jack-o-lantern | ARTIST: unknown | CATEGORY: holiday-and-events | SUBCATEGORY: halloween | SIZE: 27x9 ===
+```
+          ___
+       ___)__|_
+  .-*'          '*-,
+ /      /|   |\     \
+;      /_|   |_\     ;
+;   |\           /|  ;
+;   | ''--...--'' |  ;
+ \  ''---.....--''  /
+  ''*-.,_______,.-*'    
+```
+
+=== ID: b323e6f51af43d4d | TITLE: Minimal small bat flying towards the sky with spread scalloped wings | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 21x4 ===
+```
+        _   ,_,   _
+       / `'=) (='` \
+      /.-.-.\ /.-.-.\
+      `      "      `
+```
+
+=== ID: bc9ffe9f70e74a09 | TITLE: Detailed Large Bat staring at you | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: bats | SIZE: 31x7 ===
+```
+    =/\                 /\=
+    / \'._   (\_/)   _.'/ \
+   / .''._'--(o.o)--'_.''. \
+  /.' _/ |`'=/ " \='`| \_ `.\
+ /` .' `\;-,'\___/',-;/` '. '\
+/.-'       `\(-V-)/`       `-.\
+`            "   "            `
+```
+
+=== ID: 7dab8ffbd8d5206d | TITLE: Round faced, dumb looking boy, staring front-on | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: boy | SIZE: 11x6 ===
+```
+   _www_
+  /-o-o-\
+(|   -   |)
+  \ -=- /
+  /`---'\
+
+```
+
+=== ID: 0492ed176e340f8c | TITLE: Kermit the Frog staring front-on | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: frog | SIZE: 8x7 ===
+```
+ (+)(+)
+/      \
+\ -==- /
+ \    /
+<\/\/\/>
+/      \
+ Kermit
+```
+
+=== ID: aab13286f589ed37 | TITLE: Boxy man standing front-on | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: random-people | SIZE: 9x8 ===
+```
+  wWWWw
+  |o o|
+  | O |
+  |(")|
+ / \X/ \
+|   V   |
+|   |   |
+
+```
+
+=== ID: 5d54788f6ffdee8c | TITLE: Kermit the Frog smiling head portrait with round eyes on stalks | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: frog | SIZE: 29x13 ===
+```
+       .---.     .---.
+      ( -o- )---( -o- )
+      ;-...-`   `-...-;
+     /                 \
+    /                   \
+   | /_               _\ |
+   \`'.`'"--.....--"'`.'`/
+    \  '.   `._.`   .'  /
+ _.-''.  `-.,,_,,.-`  .''-._
+`--._  `'-.,_____,.-'`  _.--`
+     /                 \
+    /.-'`\   .'.   /`'-.\
+   `      '.'   '.'
+```
+
+=== ID: 60dd623ced892fc4 | TITLE: Dragon standing on two legs, going to the right | ARTIST: Gunnar Z. | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 32x11 ===
+```
+                __        _
+              _/  \    _(\(o
+             /     \  /  _  ^^^o
+            /   !   \/  ! '!!!v'
+           !  !  \ _' ( \____
+           ! . \ _!\   \===^\)
+            \ \_!  / __!
+             \!   /    \
+       (\_      _/   _\ )
+        \ ^^--^^ __-^ /(__
+         ^^----^^    "^--v'
+```
+
+=== ID: 4088048994bf9a28 | TITLE: Cartoon dragon sitting with ribbed belly scales and long tail | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 26x11 ===
+```
+                \||/
+                |  @___oo
+      /\  /\   / (__,,,,|
+     ) /^\) ^\/ _)
+     )   /^\/   _)
+     )   _ /  / _)
+ /\  )/\/ ||  | )_)
+<  >      |(,,) )__)
+ ||      /    \)___)\
+ | \____(      )___) )___
+  \______(_______;;; __;;;
+```
+
+=== ID: 376a59d7692b8079 | TITLE: Flying dragon | ARTIST: Shanaka Dias | CATEGORY: mythology | SUBCATEGORY: dragons | SIZE: 39x15 ===
+```
+ <>=======()
+(/\___   /|\\          ()==========<>_
+      \_/ | \\        //|\   ______/ \)
+        \_|  \\      // | \_/
+          \|\/|\_   //  /\/
+           (oo)\ \_//  /
+          //_/\_\/ /  |
+         @@/  |=\  \  |
+              \_=\_ \ |
+                \==\ \|\_ 
+             __(\===\(  )\
+            (((~) __(_/   |
+                 (((~) \  /
+                 ______/ /
+                 '------'
+```
+
+=== ID: 9b96580bcfdb14c4 | TITLE: Random wise man smoking pipe while sitting at the edge of a cliff, looking left towards the scenery | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: smoking | SIZE: 19x11 ===
+```
+          .-.
+       __/   (
+     , '-.____\
+      u=='/  \
+         /_/  \
+       .-''   |
+      (  ____/_____
+      _>_/.--------
+      \///
+       //
+      //
+```
+
+=== ID: 7a4c93ab6c221ff6 | TITLE: Eric Cartman from South Park saying I am not fat I am festively plump | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: south-park | SIZE: 35x18 ===
+```
+               _._
+           __.{,_.).__
+        .-"           "-.
+      .'  __.........__  '.
+     /.-'`___.......___`'-.\
+    /_.-'` /   \ /   \ `'-._\
+    |     |   '/ \'   |     |
+    |      '-'     '-'      |
+    ;                       ;
+    _\         ___         /_
+   /  '.'-.__  ___  __.-'.'  \
+ _/_    `'-..._____...-'`    _\_
+/   \           .           /   \
+\____)         .           (____/
+    \___________.___________/
+      \___________________/
+     (_____________________)
+"I`m not fat, I`m festively plump!"
+```
+
+=== ID: 70d7eb57df511044 | TITLE: Person sleeping inside a cardboard shelter box with ZZZ snoring text | ARTIST: Krogg Zothommog | CATEGORY: people | SUBCATEGORY: sleeping | SIZE: 39x6 ===
+```
+  /"""""/|
+ /     /#|---(ZZZZZZzzzzZZZZZzzzzzzzzz)
+/_____/##|_____
+|     |##/    /
+|     |#/    /
+|_____|/____/
+```
+
+=== ID: c539ee03a1f0ebd7 | TITLE: Woman with a side-eye look, judging everyone around her | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: woman | SIZE: 29x15 ===
+```
+         .-""',.-"""-.
+   ,_  .'.--. /_.---. `-.__.,
+   '\`'-'  _ /___    `-._.-/
+     '-..-'_'` _ `'-._  _.;
+     .'   /_   _      \`  \
+    /    /(_9 (_9  .   |   \
+    ;  _/   (      \`-'    /
+     `(_\  .===,    '.___.'
+         '. `""`     _(_)
+           '-.   .-'`
+    .====="""|   |""======,
+    '.       |   |      .'
+      `-.    |_.-'   .-'
+         `-. `   _.-'
+            '-.-'
+```
+
+=== ID: 4f0415c06acebd57 | TITLE: Robot standing on two legs, with a lifeless face, showing thumbs up with its left hand | ARTIST: unknown | CATEGORY: electronics | SUBCATEGORY: robots | SIZE: 22x9 ===
+```
+         __
+ _(\    |@@|
+(__/\__ \--/ __
+   \___|----|  |   __
+       \ }{ /\ )_ / _\
+       /\__/\ \__O (__
+      (--/\--)    \__/
+      _)(  )(_
+     `---''---`
+```
+
+=== ID: aba05047e26eec94 | TITLE: Weird looking Steve Jobs | ARTIST: Mark Moir | CATEGORY: people | SUBCATEGORY: steve-jobs | SIZE: 35x14 ===
+```
+       _______
+     _/       \_
+    / |       | \
+   /  |__   __|  \
+  |__/((o| |o))\__|
+  |      | |      |
+  |\     |_|     /|
+  | \           / |
+   \| /  ___  \ |/
+    \ | / _ \ | /
+     \_________/
+      _|_____|_
+ ____|_________|____
+/                   \  - Steve Jobs
+```
+
+=== ID: 8bfca50cd189c3ed | TITLE: Floating sheet ghost drifting leftward | ARTIST: Joan G. Stark (Spunk) | CATEGORY: mythology | SUBCATEGORY: ghosts | SIZE: 32x13 ===
+```
+     .-.
+   .'   `.
+   :g g   :
+   : o    `.
+  :         ``.
+ :             `.
+:  :         .   `.
+:   :          ` . `.
+ `.. :            `. ``;
+    `:;             `:'
+       :              `.
+        `.              `.     .
+          `'`'`'`---..,___`;.-'
+```
+
+=== ID: d984df627fab6edf | TITLE: Small cartoon pig with snout, ears, and curly spiral tail | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: pig | SIZE: 11x4 ===
+```
+    _____
+^..^     \9
+(oo)_____/
+   WW  WW
+```
+
+=== ID: b4913cd57eda3bcf | TITLE: Two little hedgehogs with prickly spines touching noses together | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: hedgehogs | SIZE: 36x4 ===
+```
+  .::::::::..          ..::::::::.
+ :::::::::::::        :::::::::::::
+:::::::::::' .\      /. `:::::::::::
+`::::::::::_,__o    o__,_::::::::::'
+```
+
+=== ID: e6cdd4b77c245bda | TITLE: Porcupine moving rightward with no care in the world | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: porcupine | SIZE: 22x5 ===
+```
+   .\\Y\\\\Y\\Y\\\\\.
+ .\\\Y\X\Y\\\X\\'_ _)
+,\\\\\\\\\XY\\\' ' '_
+X\\X\\\Y\\\\X\___ ,__@
+ ''\(,,,)\Y\\(,,,)--'
+```
+
+=== ID: 3ecb319c52c81240 | TITLE: Small gremlin looking creature with a confused pair of eyes | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: gremlin | SIZE: 9x6 ===
+```
+  |\_/|
+=( o O )=
+ /\ " /\
+| |\_/| |
+\_>---<_/
+(___|___)
+```
+
+=== ID: 93473923548fb81b | TITLE: Hippopotamus standing in left side-profile | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: hippo | SIZE: 25x7 ===
+```
+      c~~p ,---------.
+ ,---'oo  )           \
+( O O                  )/
+ `=^='                 /
+       \    ,     .   /
+       \\  |-----'|  /
+       ||__|    |_|__|
+```
+
+=== ID: 877a52f3a926bb19 | TITLE: Small baby giraffe standing upright with long neck and spotted body | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: giraffe | SIZE: 13x7 ===
+```
+     .-",
+     `~||
+       ||___
+       (':.)`
+       || ||
+       || ||
+       ^^ ^^
+```
+
+=== ID: 75780685a865303a | TITLE: Two fluffy sheep standing side by side with woolly fleeces | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: sheep | SIZE: 33x9 ===
+```
+        __  _
+    .-.'  `; `-._  __  _
+   (_,         .-:'  `; `-._
+ ,'o"(        (_,           )
+(__,-'      ,'o"(            )>
+   (       (__,-'            )
+    `-'._.--._(             )
+       |||  |||`-'._.--._.-'
+                  |||  |||  
+```
+
+=== ID: 96784e23d616c126 | TITLE: Zebra standing and chilling | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: zebra | SIZE: 19x9 ===
+```
+  \\/),
+ ,'.' /,
+(_)- / /,
+   /\_/ |__..--,  *
+  (\___/\ \ \ / ).'
+   \____/ / (_ //
+    \\_ ,'--'\_(
+    )_)_/ )_/ )_)
+   (_(_.'(_.'(_.'
+```
+
+=== ID: f4d4a676b5382514 | TITLE: Fox standing on its two hind legs, with an excited look | ARTIST: H P Barmario (Morfina) | CATEGORY: animals | SUBCATEGORY: fox | SIZE: 22x9 ===
+```
+   /|_/|
+  / ^ ^(_o
+ /    __.'
+ /     \
+(_) (_) '._
+  '.__     '. .-''-'.
+     ( '.   ('.____.''
+     _) )'_, )mrf
+    (__/ (__/
+```
+
+=== ID: db404ec8608ac2da | TITLE: Portrait of the wisest goat on the planet | ARTIST: Horroroso | CATEGORY: animals | SUBCATEGORY: goat | SIZE: 27x16 ===
+```
+             ,--._,--.
+           ,'  ,'   ,-`.
+(`-.__    /  ,'   /
+ `.   `--'        \__,--'-.
+   `--/       ,-.  ______/
+     (o-.     ,o- /
+      `. ;        \
+       |:          \
+      ,'`       ,   \
+     (o o ,  --'     :
+      \--','.        ;
+       `;;  :       /
+        ;'  ;  ,' ,'
+        ,','  :  '
+        \ \   :
+         `
+```
+
+=== ID: d8aab96ca7356a67 | TITLE: Hello Kitty mascot standing full body with bow on ear and overalls | ARTIST: Joan G. Stark (Spunk) | CATEGORY: logos | SUBCATEGORY: hello-kitty | SIZE: 18x12 ===
+```
+     .-. __ _ .-.
+     |  `  / \  |
+     /     '.()--\
+    |         '._/
+   _| O   _   O |_
+   =\    '-'    /=
+     '-._____.-'
+     /`/\___/\`\
+    /\/o     o\/\
+   (_|         |_)
+     |____,____|
+     (____|____)
+```
+
+=== ID: ec31d1ecabd3efd1 | TITLE: Large detailed rooster standing looking rightward | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: animals | SUBCATEGORY: bird | SIZE: 31x17 ===
+```
+      ,~.
+   ,-'__ `-,
+  {,-'  `. }              ,')
+ ,( a )   `-.__         ,',')~,
+<=.) (         `-.__,==' ' ' '}
+  (   )                      /
+   `-'\   ,                  )
+       |  \        `~.      /
+       \   `._        \    /
+        \     `._____,'   /
+         `-.            ,'
+            `-.      ,-'
+               `~~~~'
+               //_||
+            __//--'/`   
+          ,--'/`  '
+             '
+```
+
+=== ID: bd877ce5bea61178 | TITLE: Pink Panther cartoon face with a side-eye look to the right | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: pink-panther | SIZE: 23x11 ===
+```
+  .--.            .--.
+ ( (`\\."--``--".//`) )
+  '-.   __   __    .-'
+   /   /__\ /__\   \
+  |    \ 0/ \ 0/    |
+  \     `/   \`     /
+   `-.  /-"""-\  .-`
+     /  '.___.'  \
+     \     I     /
+      `;--'`'--;`
+        '.___.'
+```
+
+=== ID: ca820571e0f6e656 | TITLE: Koala bear's face | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: koala | SIZE: 34x11 ===
+```
+    __                      __
+ .-'  `'.._...-----..._..-'`  '-.
+/                                \
+|  ,   ,'                '.   ,  |
+ \  '-/                    \-'  /
+  '._|          _           |_.'
+     |    /\   / \    /\    |
+     |    \/   | |    \/    |
+      \        \"/         /
+       '.    =='^'==     .'
+         `'------------'`
+```
+
+=== ID: ad84ac9b2b0607c3 | TITLE: Koala bear on a tree, looking at you in hopes for food | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: koala | SIZE: 30x20 ===
+```
+             |       :     . |
+             | '  :      '   |
+             |  .  |   '  |  |
+   .--._ _...:.._ _.--. ,  ' |
+  (  ,  `        `  ,  )   . |
+   '-/              \-'  |   |
+     |  o   /\   o  |       :|
+     \     _\/_     / :  '   |
+     /'._   ^^   _.;___      |
+   /`    `""""""`      `\=   |
+ /`                     /=  .|
+;             '--,-----'=    |
+|                 `\  |    . |
+\                   \___ :   |
+/'.                     `\=  |
+\_/`--......_            /=  |
+            |`-.        /= : |
+            | : `-.__ /` .   |
+            |    .   ` |    '|
+            |  .  : `   . |  |
+```
+
+=== ID: d0be96be9cce1fa2 | TITLE: Beaver chewing the base of a tall tree trunk with sharp teeth | ARTIST: Christian Garbs | CATEGORY: animals | SUBCATEGORY: beavers | SIZE: 33x13 ===
+```
+                   |    :|
+                   |     |
+                   |    .|
+               ____|    .|
+             .' .  ).   ,'
+           .' c   '7 ) (
+       _.-"       |.'   `.
+     .'           "8E   :|
+     |          _}""    :|
+     |         (   |     |
+    .'         )   |    :|
+.odCG8o_.---.__8E  |    .|
+`Y8MMP""       ""  `-...-'   
+```
+
+=== ID: 1bcef7344a81ff76 | TITLE: Silly looking small devil standing amidst fire all around him | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 26x6 ===
+```
+             (_)L|J
+      )      (") |     (
+      ,(. A `/ \-|   (,`)
+     )' (' \/\ / |  ) (.
+    (' ),).  _W_ | (,)' )
+   ^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+=== ID: 7c5699804de7847a | TITLE: Detailed, intimidating looking devil standing amidst fire all around him | ARTIST: unknown | CATEGORY: mythology | SUBCATEGORY: devils | SIZE: 40x15 ===
+```
+   , ,, ,
+   | || |    ,/  _____  \.
+   \_||_/    ||_/     \_||
+     ||       \_| . . |_/
+     ||         |  L  |
+    ,||         |`==='|
+    |>|      ___`>  -<'___
+    |>|\    /             \
+    \>| \  /  ,    .    .  |
+     ||  \/  /| .  |  . |  |
+     ||\  ` / | ___|___ |  |     (
+  (( || `--'  | _______ |  |     ))  (
+(  )\|| (  )\ | - --- - | -| (  ( \  ))
+(\/  || ))/ ( | -- - -- |  | )) )  \((
+ ( ()||((( ())|         |  |( (( () )
+```
+
+=== ID: b5d3e39e2617f53a | TITLE: Meowth (Pokemon) standing with an uninterested face, wanting to go home | ARTIST: Joan G. Stark (Spunk) | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 26x12 ===
+```
+         .-. \_/ .-.
+         \.-\/=\/.-/
+      '-./___|=|___\.-'
+     .--| \|/`"`\|/ |--.
+    (((_)\  .---.  /(_)))
+     `\ \_`-.   .-'_/ /`_
+       '.__       __.'(_))
+           /     \     //
+          |       |__.'/
+          \       /--'`
+      .--,-' .--. '----.
+     '----`--'  '--`----'
+```
+
+=== ID: ae81a937456fbb3d | TITLE: Deformed, ugly, dumb pikachu that noone loves | ARTIST: Joan G. Stark (Spunk) | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 25x13 ===
+```
+`;-.          ___,
+  `.`\_...._/`.-"`
+    \        /      ,
+    /()   () \    .' `-._
+   |)  .    ()\  /   _.'
+   \  -'-     ,; '. <
+    ;.__     ,;|   > \
+   / ,    / ,  |.-'.-'
+  (_/    (_/ ,;|.<`
+    \    ,     ;-`
+     >   \    /
+    (_,-'`> .'
+         (_,'
+```
+
+=== ID: bce6c6738005dded | TITLE: Cute looking Pikachu | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 26x13 ===
+```
+       \:.             .:/
+        \``._________.''/
+         \             /
+ .--.--, / .':.   .':. \
+/__:  /  | '::' . '::' |
+   / /   |`.   ._.   .'|
+  / /    |.'         '.|
+ /___-_-,|.\  \   /  /.|
+      // |''\.;   ;,/ '|
+      `==|:=         =:|
+         `.          .'
+           :-._____.-:
+          `''       `''
+```
+
+=== ID: 739849bd4a803c7d | TITLE: Bulbasaur chilling in the grass | ARTIST: Ultramarine Rain, Lunatic 42 | CATEGORY: video-games | SUBCATEGORY: pokemon | SIZE: 38x17 ===
+```
+             `;,;.;,;.;.'
+              ..:;:;::;:
+        ..--''' '' ' ' '''--.
+      /' .   .'        '.   .`\
+     | /    /            \   '.|
+     | |   :             :    :|
+   .'| |   :             :    :|
+ ,: /\ \.._\ __..===..__/_../ /`.
+|'' |  :.|  `'          `'  |.'  ::.
+|   |  ''|    :'';          | ,  `''\
+|.:  \/  | /'-.`'   ':'.-'\ |  \,   |
+| '  /  /  | / |...   | \ |  |  |';'|
+ \ _ |:.|  |_\_|`.'   |_/_|  |.:| _ |
+/,.,.|' \__       . .      __/ '|.,.,\
+     | ':`.`----._____.---'.'   |
+      \   `:"""-------'""' |   |
+       ',-,-',             .'-=,=,
+```
+
+=== ID: 491b7f288951bae9 | TITLE: Small long dog, going rightward | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x4 ===
+```
+            __
+(\,--------'()'--o
+ (_    ___    /~"
+  (_)_)  (_)_)
+```
+
+=== ID: f691ba8f588314ef | TITLE: Small dog going looking leftward | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 11x4 ===
+```
+  __      _
+o'')}____//
+ `_/      )
+ (_(_/-(_/
+```
+
+=== ID: 204b4769db069528 | TITLE: Very long dog | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 40x5 ===
+```
+                                  .-.
+     (___________________________()6 `-,
+     (   ______________________   /''"`
+     //\\                      //\\
+     "" ""                     "" ""
+```
+
+=== ID: a78295823a488aff | TITLE: Cat and dog peeking side by side over a horizontal brick wall | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 38x5 ===
+```
+            |\_/|        D\___/\
+            (0_0)         (0_o)
+           ==(Y)==         (V)
+----------(u)---(u)----oOo--U--oOo---
+__|_______|_______|_______|_______|___
+```
+
+=== ID: ecdf88a2938a3a3e | TITLE: Fluffy puppy portrait with concentric round eyes | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 22x7 ===
+```
+   _='`'=_
+  //(@_@)\\
+  |||(Y)|||  
+  \\\\ ////  
+   / )`( \   
+<\(  )'(  )
+ (__w)_(w__)
+```
+
+=== ID: d953644028fac1af | TITLE: Silly looking dogs mating | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: dogs | SIZE: 18x9 ===
+```
+        __
+     __/o \_
+     \____  \
+         /   \
+   __   //\   \
+__/o \-//--\   \_/
+\____  ___  \  |
+     ||   \ |\ |
+    _||   _||_||
+```
+
+=== ID: 1795b7cd4e0c99b6 | TITLE: Prisoner infront of guillotine | ARTIST: Marcin  'StfoReK'  Glinski | CATEGORY: weapons | SUBCATEGORY: guillotines | SIZE: 38x11 ===
+```
+        ______
+       |\____/|,      _
+       |      | \    {\\,
+       |      |  `,__.'\`
+    ___|______|____""', :__.
+  /    | (__) |       / `,  `.
+ /     !______|       L\J'    `.
+:_______________________________i.
+|                                |
+|                                |
+!________________________________! 
+```
+
+=== ID: f2c11967f211bce2 | TITLE: Alien face trying to hypnotise you with swirly eyes | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 18x7 ===
+```
+       _________
+      /___   ___\
+     //@@@\ /@@@\\
+     \\@@@/ \@@@//
+      \___ " ___/
+         | - |
+          \_/
+```
+
+=== ID: ecfb339d354e22f9 | TITLE: Weird alien | ARTIST: Clyde W. Watson | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 27x7 ===
+```
+    .  .
+     \/
+    (@@)
+ g/\_)(_/\e
+g/\(=--=)/\e
+    //\\
+   _|  |_ 
+```
+
+=== ID: 050225dc9fb8fb09 | TITLE: UFO pulling a stickman human into the ship | ARTIST: unknown | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 13x9 ===
+```
+     ___
+ ___/   \___
+/   '---'   \
+'--_______--'
+     / \
+    /   \
+    /\O/\
+    / | \
+    // \\
+```
+
+=== ID: 667de1e87ed23453 | TITLE: Ugly alien face | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 20x10 ===
+```
+          (
+       __..)__
+     .'       `'.
+    / - -        `\
+   /(')(')         \
+   /  ^        )   |
+   \.--.           |
+    \--'          /
+     \__.-' __..''
+       /     |
+```
+
+=== ID: e471774a2ba624b0 | TITLE: Pair of alien heads looking at something strange | ARTIST: Joan G. Stark (Spunk) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 34x11 ===
+```
+       .-""""-.        .-""""-.
+      /        \      /        \
+     /_        _\    /_        _\
+    // \      / \\  // \      / \\
+    |\__\    /__/|  |\__\    /__/|
+     \    ||    /    \    ||    /
+      \        /      \        /
+       \  __  /        \  __  /
+        '.__.'          '.__.'
+         |  |            |  |
+         |  |            |  |
+```
+
+=== ID: 5ba3da68e1b3c391 | TITLE: Dumb looking alien | ARTIST: Genoveva Galarza | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 16x16 ===
+```
+     _____
+ ___/     \___
+`-._)     (_,-`
+    \O _ O/
+     \ - /
+      `-(
+       ||
+      _||_
+     |-..-|
+     |/. \|
+     |\__/|
+   ._|//\\|_,
+   `-((  ))-'
+    __\\//__ 
+    >_ /\ _<,
+      ''
+```
+
+=== ID: b6573eb40b34276a | TITLE: Alien steering a UFO | ARTIST: Hayley Jane Wakenshaw (Flump) | CATEGORY: space | SUBCATEGORY: aliens | SIZE: 37x17 ===
+```
+                _____
+             ,-"     "-.
+            / o       o \
+           /   \     /   \
+          /     )-"-(     \
+         /     ( 6 6 )     \
+        /       \ " /       \
+       /         )=(         \
+      /   o   .--"-"--.   o   \
+     /    I  /  -   -  \  I    \
+ .--(    (_}y/\       /\y{_)    )--.
+(    ".___l\/__\_____/__\/l___,"    )
+ \                                 /
+  "-._      o O o O o O o      _,-"
+      `--Y--.___________.--Y--'
+         |==.___________.==| 
+         `==.___________.==' 
+```
+
+=== ID: 248e9f395440a68f | TITLE: Superman iconic pentagonal S shield superhero chest emblem | ARTIST: Joan G. Stark (Spunk) | CATEGORY: comics | SUBCATEGORY: superman | SIZE: 20x9 ===
+```
+  ________________
+ /.,------------,.\
+///  .=^^^^^^^\__|\\
+\\\   `------.   .//
+ `\\`--...._  `;//'
+   `\\.-,___;.//'
+     `\\-..-//'
+       `\\//'
+         ""
+```
+
+=== ID: 017b8626dc7596d1 | TITLE: Superman superhero standing in cape with S shield on chest | ARTIST: Shanaka Dias | CATEGORY: comics | SUBCATEGORY: superman | SIZE: 30x18 ===
+```
+             .=.,
+            ;c =\
+          __|  _/
+        .'-'-._/-'-._
+       /..   ____    \
+      /' _  [<_->] )  \
+     (  / \--\_>/-/'._ )
+      \-;_/\__;__/ _/ _/
+       '._}|==o==\{_\/
+        /  /-._.--\  \_
+       // /   /|   \ \ \
+      / | |   | \;  |  \ \
+     / /  | :/   \: \   \_\
+    /  |  /.'|   /: |    \ \
+    |  |  |--| . |--|     \_\
+    / _/   \ | : | /___--._) \
+   |_(---'-| >-'-| |       '-'
+          /_/     \_\
+```
+
+=== ID: 243f9c29e63820d7 | TITLE: Big head baby peeking over a wall | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: other | SIZE: 36x5 ===
+```
+               ......
+            .:||||||||:.
+           /            \
+          (   o      o   )
+--@@@@----------:  :----------@@@@--
+```
+
+=== ID: 35df3a71006fa1c5 | TITLE: Scarecrow with a crow sitting on its shoulder in a field | ARTIST: Shanaka Dias | CATEGORY: people | SUBCATEGORY: scarecrows | SIZE: 28x11 ===
+```
+         __
+         | \      _
+      ==='=='==  (o>
+         \++/   / )
+__.-------------^^-.__
+   \----.  : .----/
+         \_/\|          ()
+         / _ \       _  \/()
+        / /|\ \     |/| | \/
+      _/_/ | \_\_     | |//
+     /_/   |   \_\    \_\|
+```
+
+=== ID: 6d656ba869d2ed42 | TITLE: Cool person riding a horse | ARTIST: Joris Bellenger | CATEGORY: people | SUBCATEGORY: cowboys | SIZE: 36x20 ===
+```
+                 ___,
+              __)____)__
+                -)- )))
+        ,       \=_/ \__
+     __/).          )_/=\
+    /6)   \      __((_\_/\
+   /   __/ \    /_/-\o____)
+  / ,_/|    \   \/  ))\\\\\
+  \_)o_'     _.-'  ,/:_/_\\    ___
+       '---`' \>__/   /\\---.,/_  \
+       (      /  /  /\\        \)  \
+       |        ('  \\\        (   /
+  _____/         )__\\ /       /\ (
+ / _______/,_____| |_,(       /  ) )
+/ (_     \  |   _/ o)  \     /_  |/
+\_ /     ( '| (___/     `.__  /  '
+          \ |        / _/ / _/
+           \(       / /  / /
+            )\     / (  ( <
+         ,./_(,, ,/_|    \_/,,._
+```
+
+=== ID: 96b567a4e87432ff | TITLE: Sexy woman with a gun standing in a weird pose | ARTIST: Al Tinsley (Dr. Stein) | CATEGORY: people | SUBCATEGORY: woman | SIZE: 27x22 ===
+```
+.            .--.
+\\          //\\ \
+.\\        ///_\\\\
+:/>`      /(| `|'\\\
+ Y/\      )))\_-_/((\
+  \ \    ./'_/ " \_`\)
+   \ \.-" ._ \   /   \
+    \ _.-" (_ \Y/ _) |
+     "      )" | ""/||
+         .-'  .'  / ||
+        /    `   /  ||
+       |    __  :   ||_
+       |   / \   \ '|\`
+       |  |   \   \
+       |  |    `.  \
+       |  |      \  \
+       |  |       \  \
+       |  |        \  \
+       |  |         \  \
+       /__\          |__\
+       /.|            |.\_
+      `-''            ``--'
+```
+
+=== ID: 6120a10f6f4a3111 | TITLE: Popeye the Sailor Man face side-profile with corncob pipe and sailor cap | ARTIST: Joan G. Stark (Spunk) | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 23x7 ===
+```
+         .-'-.
+       /`     |__
+     /`  _.--`-,-`
+     '-|`   a '<-.   []
+       \     _\__) \=`
+        C_  `    ,_/
+          | ;----'
+```
+
+=== ID: 67a4c03fdb4a8bd1 | TITLE: Popeye the Sailor Man standing in stance with muscular anchor arms | ARTIST: unknown | CATEGORY: cartoons | SUBCATEGORY: popeye | SIZE: 27x15 ===
+```
+          ____
+          \__/         # ##
+         `(  `^=_ p _###_
+          c   /  )  |   /
+   _____- //^---~  _c  3
+ /  ----^\ /^_\   / --,-
+(   |  |  O_| \\_/  ,/
+|   |  | / \|  `-- /
+(((G   |-----|
+      //-----\\
+     //       \\
+   /   |     |  ^|
+   |   |     |   |
+   |____|    |____|
+  /______)   (_____\
+```
+
+=== ID: ee2b5eb449af274c | TITLE: Minimalist ceramic bathroom toilet with flush tank | ARTIST: Randy Ransom | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 23x5 ===
+```
+     _
+    | |
+ ___| |
+(    .'
+ )  (  
+```
+
+=== ID: 7e94cf762dede368 | TITLE: A human sitting and chilling on a toilet | ARTIST: Joan G. Stark (Spunk) | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 15x6 ===
+```
+       O
+   |  /|
+   |_(__\
+    \  )\
+     )( /_
+ """"""""""""""
+```
+
+=== ID: cec78ba530a668d6 | TITLE: Architectural floor plan schematic of bathroom with toilet and shower | ARTIST: Veronica Karlsson | CATEGORY: buildings-and-places | SUBCATEGORY: furniture/toilets | SIZE: 25x13 ===
+```
+  +---------+-----------+
+  |   [_]   |  |     ,'\|
+  |  ((_))  |  | shower |
+  |   `-'   |  | ,',',' |
+  |         |   \_______|
+  | toilet \            |
+  |         \    sink .-|
+  +---------+        ( &|
+            |    \    `-|
+            |     \     |
+            +--    `----+
+
+```
+
+=== ID: db9330f7ffc4a202 | TITLE: The Beatles quartet faces caricatures of John, Paul, George, and Ringo | ARTIST: unknown | CATEGORY: music | SUBCATEGORY: musicians/beatles | SIZE: 40x5 ===
+```
+////\\     //||\\     //\|\\      ///||\
+/`O-O'     ` @ @\     //o o//       a a
+   ]          >        ) | (         _)
+   -          -          -           ~
+ John        Paul      George      Ringo
+```
+
+=== ID: 42a96e51761d76f0 | TITLE: 4 people walking on a road | ARTIST: Maria Pia | CATEGORY: people | SUBCATEGORY: other | SIZE: 36x7 ===
+```
+      /     |    \
+     /      |     \
+    /O   O  | O   O\
+   //|\ /|\  /|\ /|\\
+  /=/ \=/ \= / \=/ \=\
+ / ==  ==  ==  ==  == \
+/ ==   ==  ==  ==   == \  
+```
+
+=== ID: c2789336b8e8b28b | TITLE: Napoleon Bonaparte Portrait | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: famous/napoleon | SIZE: 27x19 ===
+```
+         ________
+        /        \
+     __/       (o)\__
+    /     ______\\   \
+    |____/__  __\____|
+       [  --~~--  ]
+        |(  L   )|
+  ___----\  __  /----___
+ /   |  < \____/ >   |   \
+/    |   < \--/ >    |    \
+||||||    \ \/ /     ||||||
+|          \  /   o       |
+|     |     \/   === |    |
+|     |      |o  ||| |    |
+|     \______|   +#* |    |
+|            |o      |    |
+ \           |      /     /
+ |\__________|o    /     /
+ |           |    /     /
+```
+
+=== ID: 693f758354959282 | TITLE: Silly looking king and queen staring at each other | ARTIST: Andre R. Mastel | CATEGORY: people | SUBCATEGORY: occupations/kings | SIZE: 29x12 ===
+```
+°   O   °       °\°/°
+|\_/-\_/|        |+|
+\+__+__+/       @@@@@
+@  (.).)       (.).)@@@
+ \ ,  >\        <   @@@
+  \\__ /         q   @@
+   \ .|          \   /G
+ __|   \__        | |
+/  \\  // \      /°°°\
+    \\//        /°°°°°\
+     \/
+     O                    
+```
+
+=== ID: 2689b9ac5db94bc6 | TITLE: Wise old king standing without any expressions, total calmness, with his wooden staff | ARTIST: unknown | CATEGORY: people | SUBCATEGORY: occupations/kings | SIZE: 30x18 ===
+```
+                      ____
+                     / ___`\
+         /|         ( (   \ \
+    |^v^v  V|        \ \/) ) )
+    \  ____ /         \_/ / /
+    ,Y`    `,            / /
+    ||  -  -)           { }
+    \\   _\ |           | |
+     \\ / _`\_         / /
+     / |  ~ | ``\     _|_|
+  ,-`  \    |  \ \  ,//(_}
+ /      |   |   | \/  \| |
+|       |   |   | '   ,\ \
+|     | \   /  /\  _/`  | |
+\     |  | |   | ``     | |
+ |    \  \ |   |        | |
+ |    |   |/   |        / /
+ |    |        |        | |
+```
+
+=== ID: 4326e27fbb09fc49 | TITLE: Snowman with top hat and outstretched branch arms | ARTIST: Joan G. Stark (Spunk) | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/snowmen | SIZE: 15x6 ===
+```
+         _
+       _[_]_
+        (")
+    `--( : )--'
+      (  :  )
+    ""`-...-'""
+```
+
+=== ID: f79549e5b707e174 | TITLE: Sexualised snowwoman | ARTIST: Veronica Karlsson | CATEGORY: holiday-and-events | SUBCATEGORY: snowwoman | SIZE: 32x17 ===
+```
+           _.----._
+ VK      .'        `.
+        /  _______   \
+       J  / *   * \   L
+       | |    *    |  |
+       | | *     * |  |
+       | \   * *   /  |
+   _|  J  `.     .'   L
+     \ \ .-'      `-. /   |__
+      |.'   /        `._.-'
+      `| *  |  *    |
+       \     \      |
+        `-    `-    |
+         |          |
+        '            `
+-.     |              |
+  `---.>   ***        <_.----.__
+```
+
+=== ID: 464d5c17d5ceb4c9 | TITLE: Minimal looking Santa Claus flying across sky in sleigh pulled by reindeer | ARTIST: Shanaka Dias | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 32x5 ===
+```
+__     _  __
+| \__ `\O/  `--  {}    \}    {/
+\    \_(~)/______/=____/=____/=*
+ \=======/    //\\  >\/> || \>
+----`---`---  `` `` 
+```
+
+=== ID: 9a923d808e292df7 | TITLE: A short and fat gnome, just standing there | ARTIST: unknown | CATEGORY: fantasy | SUBCATEGORY: gnomes | SIZE: 19x12 ===
+```
+       __
+    .-'  |
+   /   <\|
+  /     \'
+  |_.- o-o
+  / C  -._)\
+ /',        |
+|   `-,_,__,'
+(,,)====[_]=|
+  '.   ____/
+   | -|-|_
+   |____)_)  
+```
+
+=== ID: 0a3094db825b1830 | TITLE: Santa Claus carrying a heavy sack of presents over his shoulder | ARTIST: Shanaka Dias | CATEGORY: holiday-and-events | SUBCATEGORY: christmas/santa-claus | SIZE: 24x18 ===
+```
+       ____
+     {} _  \
+        |__ \
+       /_____\
+       \o o)\)_______
+       (<  ) /#######\
+     __{'~` }#########|
+    /  {   _}_/########|
+   /   {  / _|#/ )####|
+  /   \_~/ /_ \  |####|
+  \______\/  \ | |####|
+   \__________\|/#####|
+    |__[X]_____/ \###/
+    /___________\
+     |    |/    |
+     |___/ |___/
+    _|   /_|   /
+   (___,_(___,_)
+```
+
+=== ID: 149f7efe8cd17d2f | TITLE: Small and silly looking wizard in pointed star hat casting spell with magical wand | ARTIST: H P Barmario (Morfina) | CATEGORY: people | SUBCATEGORY: occupations/wizards | SIZE: 14x7 ===
+```
+     __/\__
+. _  \\''//
+-( )-/_||_\
+ .'. \_()_/
+  |   | . \
+  |   | .  \
+ .'. ,\_____'.
+```
+
+=== ID: 7ce3d3cd0f6dc5db | TITLE: Witch brewing a potion in a cauldron | ARTIST: Rowan Crawford | CATEGORY: people | SUBCATEGORY: occupations/witches | SIZE: 32x16 ===
+```
+                  .
+
+                   .
+         /^\     .
+    /\   "V"
+   /__\   I      O  o
+  //..\\  I     .
+  \].`[/  I
+  /l\/j\  (]    .  O
+ /. ~~ ,\/I          .
+ \\L__j^\/I       o
+  \/--v}  I     o   .
+  |    |  I   _________
+  |    |  I c(`       ')o
+  |    l  I   \.     ,/
+_/j  L l\_!  _//^---^\\_    
+```
+
+=== ID: 5bd2cd04f0816f9e | TITLE: Mystical wizard in star-patterned pointed cone hat and flowing robe | ARTIST: H P Barmario (Morfina) | CATEGORY: people | SUBCATEGORY: occupations/wizards | SIZE: 38x22 ===
+```
+                    ____
+                  .'* *.'
+               __/_*_*(_
+              / _______ \
+             _\_)/___\(_/_
+            / _((\- -/))_ \
+            \ \())(-)(()/ /
+             ' \(((()))/ '
+            / ' \)).))/ ' \
+           / _ \ - | - /_  \
+          (   ( .;''';. .'  )
+          _\"__ /    )\ __"/_
+            \/  \   ' /  \/
+             .'  '...' ' )
+              / /  |  \ \
+             / .   .   . \
+            /   .     .   \
+           /   /   |   \   \
+         .'   /    b    '.  '.
+     _.-'    /     Bb     '-. '-._
+ _.-'       |      BBb       '-.  '-.
+(________mrf\____.dBBBb.________)____)
+```
+
+=== ID: 5ec9dd7bcf426756 | TITLE: French street mime in striped shirt | ARTIST: Shanaka Dias | CATEGORY: people | SUBCATEGORY: occupations/mime | SIZE: 27x17 ===
+```
+            .--._
+           '---._)
+            Q Q )
+            c  /
+          .-;-'-,.__
+    \)) _/--o---o --)
+    (_(=   ,H---H --|
+      '----'\---))) |
+             \_=(_(/
+             /      )
+            /   \   \
+           /   / \   \
+          |   |   '.  '.
+          |___|     \___\
+           |_|         \_\
+          /  )         /  )
+          '-'          '-'
+```
+
+=== ID: 199107cd28327dc2 | TITLE: Mouse crawling forward with curly tail and two round ear loops | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 24x3 ===
+```
+       ____()()
+      /      @@
+`~~~~~\_;m__m._>o       
+```
+
+=== ID: d95b1d7d048157f5 | TITLE: Mouse looking at a wedge of cheese | ARTIST: Rowan Crawford | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 26x4 ===
+```
+ ()()         ____
+ (..)        /|o  |
+ /\/\       /o|  o|
+c\db/o...  /o_|_o_|  
+```
+
+=== ID: 457849e2e25c91fa | TITLE: Cat chasing a mouse | ARTIST: llizard | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 31x11 ===
+```
+                              #
+                             #
+                 /\_/\      #
+   _             (@.@ )_.-._#
+ (( )_ (         > C < .-.  )
+ <;___)_)            |/   |/
+   " "   .. .
+       __
+        /|
+       /
+mouse trail
+```
+
+=== ID: cbe02c0c1f152e24 | TITLE: Mouse climbing a ladder | ARTIST: Joan G. Stark (Spunk) | CATEGORY: animals | SUBCATEGORY: rodents/mice | SIZE: 13x12 ===
+```
+  \   (()
+\-'@_<"/  _,
+ \_.\` \ (
+  \ _`) \_)
+   \,(__/
+    \' \
+     \-'\
+      \.-\
+       \_.\
+        \  \
+         \- \
+          \
+```
+
+=== ID: f885f9d8821053f8 | TITLE: A minimal big dinosaur | ARTIST: unknown | CATEGORY: animals | SUBCATEGORY: reptiles/dinosaurs | SIZE: 18x6 ===
+```
+               __
+              / _)
+     _.----._/ /
+    /         /
+ __/ (  | (  |
+/__.-'|_|--|_|
+```
+
+
+=== ID: 58dcb5a09b47f93d | TITLE: Pair of detailed human eyes staring forward with round pupils | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: body-parts/eyes | SIZE: 34x4 ===
+```
+       _....,_         _,...._
+   _.-` _,..,_'.     .'_,..,_ `-._
+    _,-`/ o \ '.     .' / o \`-,_
+     '-.\___/.-`     `-.\___/.-'
+```
+
+=== ID: 6d0fa270d8f89e0e | TITLE: Elvis Presley dancing in a show | ARTIST: Shanaka Dias | CATEGORY: music | SUBCATEGORY: musicians/elvis-presley | SIZE: 18x9 ===
+```
+       G   __
+       \\  ,,)_
+        \'-\( /
+          \ | ,\
+           \|_/\\
+           / _ '.D
+          / / \ |
+         /_\  /_\
+        '-    '-
+```
+
+=== ID: 541372d2f3fb1a4b | TITLE: Pair of full human lips leaving a curved kiss mark impression | ARTIST: Joan G. Stark (Spunk) | CATEGORY: people | SUBCATEGORY: body-parts/lips | SIZE: 16x5 ===
+```
+       .. ..
+     .'  `  `.
+   .'_.-...-._`.
+    `.       .'
+      `-...-'
+```

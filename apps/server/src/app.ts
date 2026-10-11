@@ -4,6 +4,7 @@ import type { Deps } from "./context.ts";
 import { onError } from "./lib/errors.ts";
 import { REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts";
 import { router } from "./lib/openapi.ts";
+import { adminRoutes } from "./routes/admin.ts";
 import { authRoutes } from "./routes/auth.ts";
 import { engagementRoutes } from "./routes/engagement.ts";
 import { feedRoutes } from "./routes/feed.ts";
@@ -11,6 +12,7 @@ import { healthRoutes } from "./routes/health.ts";
 import { notesRoutes } from "./routes/notes.ts";
 import { profileRoutes } from "./routes/profile.ts";
 import { quizRoutes } from "./routes/quiz.ts";
+import { reportsRoutes } from "./routes/reports.ts";
 import { topicsRoutes } from "./routes/topics.ts";
 
 /** Any device on the owner's network, so the phone can reach a dev server on the laptop. */
@@ -53,6 +55,8 @@ export function makeApp(deps: Deps) {
   app.route("/", engagementRoutes(deps));
   app.route("/", feedRoutes(deps));
   app.route("/", quizRoutes(deps));
+  app.route("/", reportsRoutes(deps));
+  app.route("/", adminRoutes(deps));
 
   // The contract for clients that aren't TypeScript (the mobile app's codegen).
   app.doc31("/openapi.json", {

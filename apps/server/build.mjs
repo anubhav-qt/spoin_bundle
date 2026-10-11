@@ -1,3 +1,4 @@
+import { cpSync } from "node:fs";
 import { build } from "esbuild";
 
 // One self-contained file per entry point, so the runtime image needs next to no node_modules.
@@ -18,3 +19,6 @@ await build({
   },
   logLevel: "info",
 });
+
+// Data read at runtime beside the bundle, by the same relative URL as in the source tree.
+cpSync("src/content/ascii-library", "dist/ascii-library", { recursive: true });

@@ -31,7 +31,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz, reports, admin repairs and ASCII review done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
@@ -78,6 +78,12 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   again") and the tests stand the model in. No transaction stays open across the call; the
   attempt row is locked when the grade is written, so a double submit is graded once. ADR-0005's
   collection rule is checked by the typechecker in `test/architecture.test.ts`.
+- **The repair queue and ASCII review are behind the admin role** (2026-10-11), in every
+  environment, closing task 0035. They are ported as ADR-0076 has them: a report writes a row,
+  and the operator's fix or remake enqueues the `repair` job. The executor is the frog's, so the
+  tests write a landed repair directly. The gag library is copied to
+  `apps/server/src/content/ascii-library/` and `build.mjs` puts it beside the bundle; a missing
+  file throws instead of loading an empty library, because it is committed.
 
 ## Asked when we get there
 
@@ -87,6 +93,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - Backups and image hosting on Oracle.
 - Which model grades quiz answers and answers AskAI on the request path, through the Phase 8
   balancer.
+- What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card
+  `repair` job itself, or the frog reading open reports. Today only the operator enqueues it.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

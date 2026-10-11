@@ -12,7 +12,7 @@ import {
 import type { Deps } from "../context.ts";
 import { HttpError } from "../lib/errors.ts";
 import { needUser } from "../lib/http.ts";
-import { body, errors, json, router } from "../lib/openapi.ts";
+import { body, errors, json, multipart, router } from "../lib/openapi.ts";
 import {
   addFont,
   deleteFont,
@@ -36,20 +36,6 @@ const binary = (mediaTypes: string[], description: string) => ({
   content: Object.fromEntries(
     mediaTypes.map((t) => [t, { schema: { type: "string" as const, format: "binary" } }]),
   ),
-});
-
-const upload = (extra: Record<string, unknown> = {}) => ({
-  body: {
-    required: true,
-    content: {
-      "multipart/form-data": {
-        schema: {
-          type: "object" as const,
-          properties: { file: { type: "string" as const, format: "binary" }, ...extra },
-        },
-      },
-    },
-  },
 });
 
 const FontId = z.object({ font_id: z.string() });
@@ -94,7 +80,7 @@ export function profileRoutes(deps: Deps) {
         path: "/profile/me/avatar",
         tags: ["profile"],
         summary: "Upload an avatar; the format is sniffed from the bytes, never the declared type",
-        request: upload(),
+        request: multipart(),
         responses: { 200: json(UserOut), 400: errors[422], 401: errors[401], 413: errors[422] },
       }),
       async (c) => {
@@ -166,7 +152,7 @@ export function profileRoutes(deps: Deps) {
         path: "/profile/me/fonts",
         tags: ["profile"],
         summary: "Import a font; WOFF2, TTF or OTF by magic bytes, at most 2MB",
-        request: upload({ name: { type: "string", minLength: 1, maxLength: 80 } }),
+        request: multipart({ name: { type: "string", minLength: 1, maxLength: 80 } }),
         responses: {
           201: json(ImportedFontOut, "Created"),
           400: errors[422],

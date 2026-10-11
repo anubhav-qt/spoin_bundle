@@ -44,6 +44,22 @@ export const body = <T extends z.ZodType>(schema: T) => ({
   body: { content: { "application/json": { schema } }, required: true },
 });
 
+/** A multipart request body: a `file` part plus any text fields, for the OpenAPI doc. */
+export const multipart = (fields: Record<string, unknown> = {}, required: string[] = ["file"]) => ({
+  body: {
+    required: true,
+    content: {
+      "multipart/form-data": {
+        schema: {
+          type: "object" as const,
+          properties: { file: { type: "string" as const, format: "binary" }, ...fields },
+          required,
+        },
+      },
+    },
+  },
+});
+
 /** Path parameters that are ids: a malformed one is a 422, never a Postgres cast error. */
 export const ids = <K extends string>(...names: K[]) =>
   z.object(Object.fromEntries(names.map((n) => [n, z.uuid()])) as Record<K, z.ZodUUID>);

@@ -1,4 +1,6 @@
+import { eq } from "drizzle-orm";
 import { makeApp } from "../src/app.ts";
+import { appUser } from "../src/db/schema.ts";
 import { makeDeps } from "../src/deps.ts";
 import { loadEnv } from "../src/env.ts";
 import { testEnv } from "./env.ts";
@@ -81,3 +83,13 @@ export async function signedUp(address = email()): Promise<Client> {
 }
 
 export const userIdOf = async (c: Client): Promise<string> => (await c.get("/auth/me")).body.id;
+
+/** A signed-up reader given the admin role, the way the owner is made one. */
+export async function admin(): Promise<Client> {
+  const c = await signedUp();
+  await deps.db
+    .update(appUser)
+    .set({ role: "admin" })
+    .where(eq(appUser.id, await userIdOf(c)));
+  return c;
+}

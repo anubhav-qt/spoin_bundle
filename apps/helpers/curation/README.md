@@ -161,3 +161,11 @@ cd apps/api && python -m pytest tests/test_ascii_library.py -q
 
 That test asserts the width budget and non-empty titles/art across the whole packaged
 library, so it is the last gate before the curated library goes live.
+
+The TypeScript server (task 0045) keeps its own copy of the gag file, checked the same way;
+sync it too until the Python is deleted:
+
+```bash
+cp apps/helpers/use_for_gags.txt apps/server/src/content/ascii-library/
+cd apps/server && npx vitest run test/moderation.test.ts
+```

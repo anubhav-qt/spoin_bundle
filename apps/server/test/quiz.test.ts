@@ -213,10 +213,10 @@ describe("submitting an attempt", () => {
     const graded = await answer(c, start, (i) => i % 2 === 0);
     expect(graded.status).toBe(200);
     expect(graded.body.mcq_score).toBeCloseTo(5 / 9);
-    expect(graded.body.results[1]).toMatchObject({
-      correct: false,
-      explanation: expect.stringMatching(/^Option/),
-    });
+    const second = graded.body.results.find(
+      (r: { question_id: string }) => r.question_id === start.mcq[1]?.question_id,
+    );
+    expect(second).toMatchObject({ correct: false, explanation: expect.stringMatching(/^Option/) });
 
     const again = await answer(c, start);
     expect([again.status, again.body.detail]).toEqual([409, "MCQ answers already submitted"]);

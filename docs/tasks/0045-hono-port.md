@@ -33,10 +33,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
 | 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
-| 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
+| 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
 | 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
-| 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login | |
+| 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | next |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
 | 13 | Host spoin on the ThinkPad | later |
@@ -151,6 +151,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   2,200 (one section is one chunk, and nothing splits it); a `tips-and-tricks.md`; the image
   pass; then the curriculum. Each delivery passes frog's `corpus:check`, `images:check` and
   `curriculum:check` before it is ingested.
+- **The web is rewired before admin is built** (2026-10-11): Phase 10 runs before Phase 7, so
+  the admin pages sign in through the rewired web and nothing is built twice. The tadpole
+  runs page lands with Phase 9's tables and the model accounts page with Phase 8's.
+- **The topic queue page** (2026-10-11) lists pending topics with their generate jobs, the
+  owner's and readers' alike. The owner can add a topic by name (a reader's request without
+  the subscription), retry a failed job, cancel a pending topic (its placeholder, alias and
+  job go, and so do its requesters' subscriptions) and change a job's priority.
+- **The job status page** (2026-10-11) shows each background job's last success and last
+  error from `job_runs`, the generate and repair queue counted by status, and every failed
+  job with its `last_error`.
 
 ## Asked when we get there
 
@@ -171,6 +181,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   document carries them.
 - Where a run's raw research dump, the procedure's `temp/`, lives: versioned records in
   Postgres, as agents fetch their history, or files.
+- The priority a topic the owner adds to the queue gets; readers' requests run at 10.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

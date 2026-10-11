@@ -5,6 +5,7 @@ import {
   AsciiSceneOut,
   AsciiSceneRejectIn,
   JobStatusOut,
+  ModelAccountsOut,
   QueuedTopicOut,
   RepairEnqueuedOut,
   RepairQueueItemOut,
@@ -17,14 +18,15 @@ import { addTopic, cancelTopic, listQueue, moveJob, retryJob } from "../jobs/top
 import { HttpError } from "../lib/errors.ts";
 import { needAdmin } from "../lib/http.ts";
 import { body, errors, ids, json, multipart, router } from "../lib/openapi.ts";
+import { modelAccounts } from "../models/accounts.ts";
 import { keep, listScenes, sendToRepairs } from "../moderation/ascii-review.ts";
 import * as moderation from "../moderation/service.ts";
 import { AVATAR_MAX_BYTES, sniffImage, uploadLimit } from "../profile/uploads.ts";
 
 /*
  * The operator's pages: the repair queue (ADR-0076), ASCII scene review (ADR-0104), the
- * topic queue and job status (task 0045). Behind the admin role (ADR-0106), which closes
- * task 0035: these retire cards, edit live content and queue model work.
+ * topic queue, job status and model accounts (task 0045). Behind the admin role (ADR-0106),
+ * which closes task 0035: these retire cards, edit live content and queue model work.
  *
  * The card is rendered to a PNG by the admin page, with the same call the share button
  * uses, and uploaded here; nothing on the server renders.
@@ -296,5 +298,15 @@ export function adminRoutes(deps: Deps) {
         responses: { 200: json(JobStatusOut), 401: errors[401], 403: errors[403] },
       }),
       async (c) => c.json(await jobStatus(db), 200),
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        path: "/admin/models",
+        tags: ["admin"],
+        summary: "CLIProxyAPI's accounts and served models, and each model's calls over the last day",
+        responses: { 200: json(ModelAccountsOut), 401: errors[401], 403: errors[403] },
+      }),
+      async (c) => c.json(await modelAccounts(db, deps.env), 200),
     );
 }

@@ -460,8 +460,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   mid-run. The limits are breader's `origin/dev` as of `e3a3bce` (2026-10-11): each rung answers in
   at most 130,000 tokens, since NVIDIA capped Kimi K3 at 131,072 and Kimi counts the prompt in a
   limit of its own, and a call refused for asking too much is asked again for what the refusal
-  allows. Its state is per process, as breader's. Gemini calls go straight to
-  CLIProxyAPI, which rotates the two accounts, with pi's own retries on 429 and 5xx.
+  allows. Its state is per process, as breader's. Gemini calls go straight to CLIProxyAPI, which
+  rotates the two accounts and retries a failed call itself (3 tries across them, its default);
+  pi retries nothing, as Trotter runs it.
 - **Every model call is a `model_call` row** (2026-10-12), Gemini and NIM alike: the model, ok
   or the failure kind and its reason, seconds to the first token, total seconds, prompt and
   output tokens, never text. Phase 9 adds the chat run that made it. The model accounts page

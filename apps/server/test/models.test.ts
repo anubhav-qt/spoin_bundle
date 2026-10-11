@@ -7,7 +7,7 @@ import { modelCall } from "../src/db/schema.ts";
 import { Balancer } from "../src/models/balancer.ts";
 import { type CallOutcome, recordedStreamFn, recordTo, roomLeft, runCall } from "../src/models/calls.ts";
 import type { Rung } from "../src/models/nim.ts";
-import { deps } from "./helpers.ts";
+import { admin, deps, signedUp } from "./helpers.ts";
 
 /*
  * The model layer (task 0045, Phase 8) against a stand-in NVIDIA and a stand-in Gemini: how a
@@ -249,5 +249,46 @@ describe("the call log", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(calls).toHaveLength(1);
     expect(calls[0]?.outcome.failure).toBeNull();
+  });
+});
+
+describe("the model accounts page", () => {
+  test("shows each model's calls over the last day, and why the proxy couldn't be read", async () => {
+    const model = `test/page-${Date.now()}`;
+    const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000);
+    const row = { provider: "nvidia", model, totalMs: 1000 };
+    await deps.db.insert(modelCall).values([
+      { ...row, startedAt: at(30), ok: true, firstTokenMs: 100, promptTokens: 10, outputTokens: 2 },
+      { ...row, startedAt: at(20), ok: true, firstTokenMs: 300, promptTokens: 20, outputTokens: 4 },
+      { ...row, startedAt: at(15), ok: false, failure: "rate", reason: "429 too many" },
+      { ...row, startedAt: at(10), ok: false, failure: "busy", reason: "503 overloaded" },
+      // Outside the window: not counted.
+      { ...row, startedAt: at(60 * 25), ok: false, failure: "gone", reason: "404" },
+    ]);
+
+    const res = await (await admin()).get("/admin/models");
+    expect(res.status).toBe(200);
+    expect(res.body.proxy_error).toBe("CLIPROXY_API_KEY is not set.");
+    expect(res.body.window_hours).toBe(24);
+    const stats = res.body.stats.find((s: { model: string }) => s.model === model);
+    expect(stats).toMatchObject({
+      calls: 4,
+      ok: 2,
+      median_first_token_ms: 200,
+      prompt_tokens: 30,
+      output_tokens: 6,
+      last_failure: { kind: "busy", reason: "503 overloaded" },
+    });
+    expect(stats.failures).toEqual(
+      expect.arrayContaining([
+        { kind: "rate", count: 1 },
+        { kind: "busy", count: 1 },
+      ]),
+    );
+    expect(stats.failures).toHaveLength(2);
+  });
+
+  test("is for the admin only", async () => {
+    expect((await (await signedUp()).get("/admin/models")).status).toBe(403);
   });
 });

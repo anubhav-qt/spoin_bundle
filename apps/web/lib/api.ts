@@ -36,6 +36,7 @@ import type {
   GenerationSubtopicProgressOut,
   ImportedFontOut,
   JobStatusOut,
+  ModelAccountsOut,
   LikedCardOut,
   McqResultOut,
   NoteOut,
@@ -131,6 +132,7 @@ export type AsciiScene = AsciiSceneOut;
 export type AsciiSceneAction = AsciiSceneActionOut;
 export type QueuedTopic = QueuedTopicOut;
 export type JobStatus = JobStatusOut;
+export type ModelAccounts = ModelAccountsOut;
 
 /** The content shapes the collapsed teaser knows how to render. `Card.archetype`
  *  is derived server-side from the body (ADR-0017); a tag outside this list
@@ -634,6 +636,9 @@ export const api = {
   },
   adminJobs: {
     status: () => request<JobStatus>("/admin/jobs"),
+  },
+  adminModels: {
+    status: () => request<ModelAccounts>("/admin/models"),
   },
 };
 

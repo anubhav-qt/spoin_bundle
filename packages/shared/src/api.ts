@@ -10,6 +10,7 @@ import {
   CARD_REPORT_REASONS,
   DIFFICULTIES,
   ENGAGEMENT_KINDS,
+  MODEL_CALL_FAILURES,
   QUIZ_KINDS,
   REPAIR_MODES,
   REPAIR_STATUSES,
@@ -23,6 +24,7 @@ export const VisualKind = z.enum(VISUAL_KINDS);
 export const CardReportReason = z.enum(CARD_REPORT_REASONS);
 export const RepairMode = z.enum(REPAIR_MODES);
 export const RepairStatus = z.enum(REPAIR_STATUSES);
+export const ModelCallFailure = z.enum(MODEL_CALL_FAILURES);
 /** Only `topic` has tiers. Survey and one-shot are tierless: cards easy to advanced, one mastery quiz (ADR-0106). */
 export const TopicScope = z.enum(TOPIC_SCOPES);
 
@@ -650,6 +652,61 @@ export const JobStatusOut = z
   })
   .meta({ id: "JobStatusOut" });
 
+// ----------------------------------------------------- model accounts (task 0045) --
+
+export const ProxyAccountOut = z
+  .object({
+    /** The account's email, as CLIProxyAPI labels it. */
+    account: z.string(),
+    provider: z.string(),
+    status: z.string(),
+    status_message: z.string(),
+    disabled: z.boolean(),
+    unavailable: z.boolean(),
+    /** Calls since the proxy started. */
+    succeeded: z.int(),
+    failed: z.int(),
+  })
+  .meta({ id: "ProxyAccountOut" });
+
+export const ModelFailureCountOut = z
+  .object({ kind: ModelCallFailure, count: z.int() })
+  .meta({ id: "ModelFailureCountOut" });
+
+export const ModelStatsOut = z
+  .object({
+    provider: z.string(),
+    model: z.string(),
+    calls: z.int(),
+    ok: z.int(),
+    /** Only the kinds that happened. */
+    failures: z.array(ModelFailureCountOut),
+    last_ok_at: DateTime.nullable(),
+    last_failure_at: DateTime.nullable(),
+    last_failure: z.object({ kind: ModelCallFailure, reason: z.string().nullable() }).nullable(),
+    /** Over the calls that answered; thinking included. */
+    median_first_token_ms: z.int().nullable(),
+    prompt_tokens: z.int(),
+    output_tokens: z.int(),
+  })
+  .meta({ id: "ModelStatsOut" });
+
+export const ModelAccountsOut = z
+  .object({
+    /** Why CLIProxyAPI couldn't be read; null when it answered. */
+    proxy_error: z.string().nullable(),
+    accounts: z.array(ProxyAccountOut),
+    /** The model ids the proxy serves to the signed-in accounts. */
+    served: z.array(z.string()),
+    /** Whether NVIDIA_NIM_API_KEY is set, so the NIM leg is on. */
+    nim_configured: z.boolean(),
+    /** How far back `stats` reaches. */
+    window_hours: z.int(),
+    /** Per model, from `model_call`. */
+    stats: z.array(ModelStatsOut),
+  })
+  .meta({ id: "ModelAccountsOut" });
+
 // ------------------------------------------------------- AskAI (ADR-0077, revised) --
 
 export const AskMessageOut = z
@@ -780,6 +837,11 @@ export type JobRunOut = z.infer<typeof JobRunOut>;
 export type JobQueueCountsOut = z.infer<typeof JobQueueCountsOut>;
 export type FailedJobOut = z.infer<typeof FailedJobOut>;
 export type JobStatusOut = z.infer<typeof JobStatusOut>;
+export type ModelCallFailure = z.infer<typeof ModelCallFailure>;
+export type ProxyAccountOut = z.infer<typeof ProxyAccountOut>;
+export type ModelFailureCountOut = z.infer<typeof ModelFailureCountOut>;
+export type ModelStatsOut = z.infer<typeof ModelStatsOut>;
+export type ModelAccountsOut = z.infer<typeof ModelAccountsOut>;
 export type AskMessageOut = z.infer<typeof AskMessageOut>;
 export type AskConversationOut = z.infer<typeof AskConversationOut>;
 export type AskIn = z.infer<typeof AskIn>;

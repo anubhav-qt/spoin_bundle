@@ -1,6 +1,6 @@
 # ADR-0106: Spoin moves to TypeScript on Hono, and a 24/7 pi harness authors the universe and its cards
 
-- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0025, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
+- **Status:** Accepted (supersedes 0002, 0094; amends 0001, 0006, 0025, 0084, 0088, 0090, 0092, 0103, and the Antigravity authoring track)
 - **Date:** 2026-10-11
 - **Deciders:** owner (every decision below is the owner's, asked one by one), Claude
 
@@ -84,6 +84,14 @@ its prompts, canon and validators are reused.
     from the same usernames to tell safe from suspicious. A genuine one it implements:
     a new version of the card in the same family, which replaces the old one in
     production.
+  - **Cards are written once.** A topic's first generation is its whole set of cards
+    (ADR-0026's one-shot run, kept); after that the only rewrites are a frog's new
+    versions of reported cards. A reader masters a topic and moves on to the next, so
+    nothing writes more cards for a topic on demand and a short feed page enqueues
+    nothing. A reader who has read every card is served them again with `recycling`
+    set, so the repeat is announced rather than silent (ADR-0006). The web's notices
+    that promise more cards on the way (short page, second pass, end of feed) are
+    rewritten in the web rewire.
   - **Records live in Postgres, not in context.** Everything any agent flags or judges
     (report verdicts, safe or suspicious reporters, failures, lessons) is a row. Agents
     look past records up through tools when they need them instead of carrying them in

@@ -64,6 +64,12 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **The feed's filter key is a digest** (2026-10-11). The Python stored the sorted, joined topic
   ids in a 64-character column, so filtering the feed to two or more topics overflowed it and
   500'd. The port stores their SHA-1 instead; no schema change.
+- **Cards are written once; a finished topic is announced** (2026-10-11). A topic's first
+  generation is all the cards it gets; only reported cards are rewritten, by the frog. Readers
+  master a topic and move on, so nothing generates more on demand and a short feed page
+  enqueues nothing. When a reader has read everything, the feed serves the read cards again
+  and sets `recycling` (the Python repeated them silently). Phase 10 rewrites the web notices
+  that promise more cards are being written.
 - **Hard rule 1 is enforced twice** (2026-10-11): a Biome `noRestrictedImports` override on the
   read path's files, and `test/architecture.test.ts`, which follows imports transitively.
 

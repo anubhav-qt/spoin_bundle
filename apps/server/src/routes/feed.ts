@@ -32,8 +32,8 @@ export function feedRoutes(deps: Deps) {
           const q = c.req.valid("query");
           const topicFilter = q.topics === undefined ? undefined : [q.topics].flat();
           const p = await page(db, env, userId, { topicFilter, position: q.position });
-          // Starved strata would enqueue coalesced fill jobs here (ADR-0006, keyed per
-          // subtopic by ADR-0007); that waits for the job queue the tadpoles drain.
+          // A short page enqueues nothing: a topic's cards are written once, and only a
+          // reported card is rewritten, by its topic's frog (ADR-0106).
           return c.json(
             {
               cards: await hydrate(db, userId, p.cardIds),

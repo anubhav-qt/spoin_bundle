@@ -13,6 +13,10 @@
   feed-serving behavior described here (degraded mode, hysteresis, points 1/3/4 below)
   still applies during a topic's initial one-shot run -- see ADR-0026's "Open question."
   The body below is left as originally written; read ADR-0026 alongside it.
+  Further amended by [ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md) --
+  a topic's cards are written once and only reported cards are rewritten, so a starved
+  stratum is never filled; the feed still serves short rather than backfilling (point 1),
+  and a topic read to the end recycles its read cards with `recycling` set.
 
 ## Context
 

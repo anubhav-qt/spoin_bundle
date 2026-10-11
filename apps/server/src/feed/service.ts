@@ -95,7 +95,10 @@ export async function page(
     const topics = [...new Set(order)];
     // Short and nothing active anywhere in the plan: the true end, not a thin stretch.
     const exhausted = cardIds.length < env.PAGE_SIZE && !(await anyActive(tx, topics));
-    const recycling = await anyRecycling(tx, userId, topics);
+    // Either a tier has turned over, or a topic read to the end is serving its read
+    // cards again. Cards are written once (ADR-0106), so the second is where every
+    // finished topic ends up, and an unannounced repeat reads as a bug (ADR-0006).
+    const recycling = (await anyRecycling(tx, userId, topics)) || (await anyRead(tx, userId, cardIds));
 
     for (const s of slates.values())
       await tx.update(feedSlate).set({ position: s.position }).where(eq(feedSlate.id, s.id));
@@ -446,6 +449,22 @@ async function anyRecycling(tx: Tx, userId: string, topicIds: string[]): Promise
         eq(userTopicCycle.userId, userId),
         inArray(userTopicCycle.topicId, topicIds),
         gt(userTopicCycle.cycle, 0),
+      ),
+    )
+    .limit(1);
+  return hit !== undefined;
+}
+
+async function anyRead(tx: Tx, userId: string, cardIds: string[]): Promise<boolean> {
+  if (cardIds.length === 0) return false;
+  const [hit] = await tx
+    .select({ cardId: userCardState.cardId })
+    .from(userCardState)
+    .where(
+      and(
+        eq(userCardState.userId, userId),
+        inArray(userCardState.cardId, cardIds),
+        eq(userCardState.state, "seen"),
       ),
     )
     .limit(1);

@@ -194,6 +194,25 @@ describe("paging", () => {
   });
 });
 
+describe("a topic read to the end", () => {
+  test("serves its read cards again, and says so", async () => {
+    const userId = await userIdOf(await signedUp());
+    const { topic, subtopics } = await makeTopic({ cardsPerSubtopic: 0 });
+    const beginners = await addCards(subtopics[0] as (typeof subtopics)[0], 3);
+    await follow(userId, topic.id);
+    await engage(
+      userId,
+      beginners.map((b) => b.id),
+      "explicit_complete",
+    );
+    const p = await page(db, knobs({ PAGE_SIZE: 3 }), userId, { rng: seeded(1) });
+    expect(new Set(p.cardIds)).toEqual(new Set(beginners.map((b) => b.id)));
+    // Nothing deferred, so no tier turned over: the flag comes from the read cards themselves.
+    expect(await cycleOf(userId, topic.id)).toBeUndefined();
+    expect(p).toMatchObject({ recycling: true, exhausted: false });
+  });
+});
+
 describe("session shares in the plan (ADR-0055)", () => {
   /** Equally stocked topics, so any difference in the plan comes from the session signal. */
   async function topics(n: number) {

@@ -49,7 +49,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   subscription, an alias and a `generate` job at priority 10. In Phase 9 toad_sage takes
   those jobs and either rejects the name (job `failed`, `last_error` is the reason the user
   sees), merges it (repoint the subscriptions and the alias, drop the placeholder, complete
-  the job), or accepts it (canonical name and slug, category, then the curriculum tadpole).
+  the job), or accepts it (canonical name and slug, category, then the topic's tadpole).
 - **Tadpoles become frogs** (2026-10-11). A topic's tadpole becomes its frog once the topic's
   first generation is live in production; later updates and feedback-driven improvements
   run in the frog. `packages/frog`, the retrieval library, keeps its name: the owner is fine
@@ -197,25 +197,106 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   topic; `exhausted` means the feed's topics have no cards yet, because a topic is written
   in full before its first card appears.
 
+- **The harness tools are designed before Phase 8** (2026-10-11), one agent at a time, so the
+  pi fork's tool wrapper is built knowing every tool.
+- **The chats run corpus first, then curriculum** (2026-10-11). toad_sage accepts a topic; the
+  topic's tadpole does the coverage check, research, corpus, `tips-and-tricks.md` and images;
+  the curriculum chat writes the curriculum against that corpus; the topic's tadpole writes the
+  cards and questions; the verification checklist runs; the topic goes live and its tadpole
+  becomes its frog.
+- **One curriculum chat for every topic** (2026-10-11), not one per topic. When several topics
+  need a curriculum at once, it runs a helper agent per topic and stays the one orchestrator,
+  and it learns from feedback and experience, so its curricula get better over time.
+- **toad_sage plays the owner's part** (2026-10-11) at the procedure's approval points: the
+  coverage note, the curriculum proposal, every "insufficient evidence" and the closing report.
+  The tadpole or the curriculum chat hands each one over as a record, and toad_sage answers go
+  on or change this. toad_sage is one chat too, the orchestrator, running helper agents in
+  parallel for different tadpoles and frogs, and it learns from feedback and experience like
+  the curriculum chat.
+- **A helper acts, then reports** (2026-10-11). A helper agent is short-lived: one task (an
+  intake, a review, a curriculum), started by its main chat with a brief. It gets the main
+  chat's tools except starting helpers, acts directly, and ends by handing the main chat a
+  short report as a record. Its run is stored like any other, so the Auditor reads it.
+- **A topic has a category** (2026-10-11). toad_sage's accept writes the canonical name, slug,
+  scope, `category` and `sub_category` to the topic row: two new columns on the app's `topic`,
+  so the product can group and browse topics by category, normalized as the corpus normalizes
+  them (ADR-0091). The card count and what the topic should cover go in a versioned intake
+  record, which the topic's tadpole and the curriculum chat read.
+- **toad_sage merges into live and queued topics** (2026-10-11). A requested name can fold into
+  a topic that is still being written, so near-identical requests are written once and every
+  requester gets the topic when it goes live; a reader who already follows the target keeps
+  one subscription.
+- **A survey's spin-outs are queued when it goes live** (2026-10-11). toad_sage adds each topic
+  the survey introduces to the queue at the owner's priority (0), since it plays the owner's
+  part, with a `deep_dive` edge from the survey. The owner can drag them like any other topic.
+- **Topics link as `related` too** (2026-10-11). `topic_edge_kind` gains `related`, joining peer
+  topics that share material; `deep_dive` stays survey to topic. toad_sage writes them when a
+  topic goes live and adds more as newer topics arrive. A related edge is stored once and read
+  either way, so AskAI's `passages` reaches a peer's corpus too.
+- **The tool catalogue is `docs/architecture/harness-tools.md`** (2026-10-11), filled in one chat
+  at a time as the owner approves each set. Approved so far: toad_sage's, and a topic's
+  tadpole's research, corpus, images and report.
+- **A topic is a subject plus an angle** (2026-10-11): who it is for and how it is written.
+  "Rust" and "Rust in easy language" are two topics, and a homonym never merges into its
+  namesake. The intake record stores the angle; `find_topics` shows each match's subject,
+  angle, description and aliases, scoring the name and the meaning separately; toad_sage's
+  judgment decides a merge, stating both topics' subject and angle. The reader's optional
+  description is read by toad_sage and ero_sennin alike, and a merge record keeps the requested
+  name and description. ero_sennin reads every merge and can undo a wrong one, recreating the
+  topic and putting its job back in the queue.
+- **The Auditor is ero_sennin** (2026-10-11), after the toad sage Jiraiya.
+- **A description sends an exact match to toad_sage** (2026-10-11). A requested name that
+  matches an alias exactly still subscribes at once when it comes without a description. With
+  one, it is queued like a new name, with no alias of its own yet, and toad_sage merges it into
+  the existing topic if the description fits or accepts it as its own topic if not (Rust, the
+  video game). Lands in `topics/request.ts` with toad_sage in Phase 9.
+- **A similar topic reuses what was fetched** (2026-10-11). When a topic shares its subject
+  with one already written (Rust in easy language, after Rust), its tadpole works from the
+  existing corpus and the pages already fetched, reshaping that material to what the request
+  asks, and searches the web only for what the request needs and nothing stored covers.
+  toad_sage's intake record names the topics it builds on. So fetched pages are kept and
+  searchable after a run, not wiped like the procedure's `temp/`.
+- **The tadpoles search with our own SearXNG** (2026-10-11), a compose service querying Google,
+  Bing, DuckDuckGo and others at once, as Trotter does: no quota, any model. They read every
+  page themselves with our own fetch tool (article text from HTML, text from PDFs), keeping each
+  passage's URL and date.
+- **Fetched pages live on disk, indexed in Postgres** (2026-10-11). A page's content stays on
+  disk; Postgres keeps the pointer (URL, fetch date, source date, path, hash), and pgvector the
+  embeddings of its passages, so a later run finds them by meaning. Kept apart from the corpus
+  tables, so card writing and AskAI never retrieve an unvetted page. A run's notes and open
+  questions are records.
+- **The fetch tool falls back to a headless browser** (2026-10-11). Public pages only, never
+  past a login or paywall, paced per site, and a stored page is read from disk rather than
+  fetched again. A plain HTTP fetch comes first (article text from HTML, text from PDFs); a page
+  with no real text is loaded again in a headless Chromium, so docs sites that are JavaScript
+  apps are in reach.
+- **The fetch tool ignores robots.txt** (2026-10-11), as Trotter's tools do: every public page
+  is in reach, and pacing per site is the courtesy.
+- **A tadpole's run follows ADR-0100 in full** (2026-10-11). The tadpole writes the maps of
+  `docs/handoff/corpus-authoring-system.md` (A to J) as records before any prose, and toad_sage
+  approves them, playing the human co-curator. Claims carry their class, scope and confidence;
+  documents carry the epistemic front matter, and `corpus:check` enforces it. The auditing
+  roles (versions, false precision, the coverage matrix) run as separate calls that see the
+  drafts and the sources, never the author's reasoning. "Insufficient evidence" is a valid
+  result.
+- **A topic's tadpole runs helpers too** (2026-10-11), under the same rules: it stays its topic's
+  one author and starts helpers for parallel work, such as several research areas or maps at
+  once. The auditing calls stay ones it does not brief.
+- **A tadpole writes only its own topic's corpus** (2026-10-11). Stale material it notices in
+  another topic's goes in its closing report, and toad_sage routes it to that topic's frog. Its
+  drafts are ingested only once toad_sage says go on to the closing report, which is refused
+  until the latest drafts are audited, every finding is fixed or answered, and `corpus:check`
+  and `images:check` pass. The curriculum chat starts after ingestion.
+
 ## Asked when we get there
 
-- Web research tools for the tadpoles (Gemini search grounding through CLIProxyAPI, own fetch tools, or both).
-- Provider probes for CLIProxyAPI-Gemini and NIM before the harness depends on them (CLAUDE.md).
+- Provider probes for CLIProxyAPI-Gemini, NIM and SearXNG before the harness depends on them (CLAUDE.md).
 - The verification checklist's contents, written with the owner.
-- Backups and image hosting on the ThinkPad.
+- Backups and image hosting on the ThinkPad, fetched pages on disk included.
 - Which model grades quiz answers and answers AskAI on the request path, through the Phase 8
   balancer.
 - What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card
   `repair` job itself, or the frog reading open reports. Today only the operator enqueues it.
-- Who plays the owner's part at the procedure's approval points: the Phase B coverage note,
-  the Phase I curriculum proposal, every "insufficient evidence", the Phase G report.
-- Whether ADR-0100's epistemic front matter (`knowledge_kind`, `source_tier`, `applies_to`,
-  `verified_on`, `status`) and its split of roles (maps before prose, an auditor who is not
-  the author) become part of a tadpole's run. ADR-0100 is accepted and the authoring handoff
-  marks the fields required, but neither ingester ever checked them and no delivered
-  document carries them.
-- Where a run's raw research dump, the procedure's `temp/`, lives: versioned records in
-  Postgres, as agents fetch their history, or files.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

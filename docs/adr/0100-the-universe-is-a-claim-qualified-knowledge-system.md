@@ -1,6 +1,6 @@
 # ADR-0100: `the_spoin_universe` is a claim-qualified knowledge system, not a document collection
 
-- **Status:** Accepted
+- **Status:** Accepted (applied by ADR-0106's harness: every tadpole's run follows it in full, and toad_sage approves the maps in the owner's place, task 0045, 2026-10-11)
 - **Date:** 2026-09-05
 - **Deciders:** project owner
 

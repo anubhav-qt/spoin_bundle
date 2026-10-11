@@ -112,6 +112,9 @@ absent**, with the evidence for the mark. This is what replaces "we have nine do
 
 **14. Human co-curator.** The owner. Approves the maps before prose, resolves every
 "insufficient evidence", and is the only role that may declare a topic canonical.
+In the harness (ADR-0106, task 0045, 2026-10-11) toad_sage plays this role, so nothing waits
+on the owner, who audits afterwards; the auditing roles run as separate calls that never see
+the author's reasoning.
 
 ## The quality gate
 

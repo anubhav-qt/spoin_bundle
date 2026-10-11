@@ -77,7 +77,9 @@ its prompts, canon and validators are reused.
   - **One chat per topic**: runs that topic's pipeline (research, corpus, images) and
     then its data generation (cards and questions).
   - **Feedback**, as in Trotter: an Auditor that reads every run, and lessons kept from
-    every failure and fed back into the chats' instructions.
+    every failure and fed back into the chats' instructions. (Revised 2026-10-11: the
+    Auditor is named ero_sennin; every chat's tools are in
+    [harness-tools.md](../architecture/harness-tools.md).)
   - **Frogs**: a topic's tadpole becomes its frog once the topic's first generation is
     live in production. Later updates and feedback-driven improvements to that topic run
     in its frog. (Not `packages/frog`, the retrieval library of ADR-0087: same word,

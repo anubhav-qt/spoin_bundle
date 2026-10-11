@@ -115,7 +115,7 @@ could ground on it.
 ---
 topic: Rust
 description: Systems programming with ownership, borrowing, lifetimes and fearless concurrency
-is_survey: false
+scope: topic
 subtopics:
   - title: Ownership & Move Semantics
     description: Why a value has exactly one owner, and what a move actually costs
@@ -158,7 +158,7 @@ subtopics:
 |---|---|---|
 | `topic` | **yes** | The canonical topic name, as a learner would say it. |
 | `description` | **yes** | One sentence. Becomes `topic.description` and is seen by every generation call. |
-| `is_survey` | **yes** | `true` for a tour of a field that points at narrower topics, `false` for one subject taught to bedrock ([ADR-0007](../adr/0007-curriculum-driven-generation.md)). Should agree with the `scope` on the topic's corpus documents. |
+| `scope` | **yes** | `survey` for a tour of a field that points at narrower topics, `topic` for one subject taught to bedrock across tiers ([ADR-0007](../adr/0007-curriculum-driven-generation.md)), `one_shot` for one subject taught once, easy to advanced ([procedure.md](../the_spoin_universe/procedure.md#survey-topic-or-one-shot--the-distinction-that-changes-your-research)). Only `topic` keeps three tiers ([ADR-0106](../adr/0106-typescript-on-hono-and-the-authoring-harness.md)). Must agree with the `scope` on the topic's corpus documents. `is_survey` was replaced by this and now fails validation. |
 | `subtopics[].title` | **yes** | The unit a learner sees and progresses through. Stable — it is the projection's match key, so renaming one replaces it rather than editing it. |
 | `subtopics[].description` | **yes** | What this subtopic covers, in one or two sentences. This is what the card writer is briefed with, so vagueness here shows up in every card. |
 | `subtopics[].prerequisites` | **yes** (may be empty) | Titles of other subtopics **in this same file**. Must form a DAG. This is the ordering; document order is not. |

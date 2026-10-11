@@ -125,7 +125,7 @@ const Env = z.object({
   // -- AskAI (ADR-0077, amended by ADR-0106) ---------------------------------
   /** Turns per reader per UTC day that reach the model, answered or refused. */
   ASK_AI_DAILY_LIMIT: int(200),
-  /** How many cards the chat's search tool returns. */
+  /** How many results each of the chat's search tools returns: cards, and corpus passages. */
   ASK_AI_CONTEXT_NEIGHBOURS: int(4),
 
   /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */

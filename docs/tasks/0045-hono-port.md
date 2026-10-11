@@ -32,10 +32,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
 | 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
-| 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
+| 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
-| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat` | |
+| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login | |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
@@ -110,7 +110,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   `noAskChat` until Phase 9 plugs the pi chat in (every turn ends in `error`, cause `empty`),
   and a stand-in in the tests. A turn hands the chat the conversation id (its memory is its
   own), the question, the card hint and `topicTools`: read-only, one topic, active cards
-  only, with no user id or database handle; the corpus tool waits for Phase 6's retrieval.
+  only, with no user id or database handle, plus `passages` when a corpus is configured.
   `turn` is the one single-item model method, pinned in `test/architecture.test.ts`. The
   server keeps the 200-a-day cap and the `OFF_TOPIC` sentinel (any reply that starts with
   it, however chunked); the embedding pre-check and `ASK_AI_TOPIC_SIMILARITY_FLOOR` are gone.
@@ -124,6 +124,26 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   found and names the ids it left out, and errors only when none was found. Phase 9's tools
   follow the same rule, and its tool wrapper keeps argument-validation errors short too.
 
+- **frog on TypeScript** (2026-10-11). The corpus, curriculum and image contracts, their
+  runners and retrieval are in `packages/frog`, with `corpus:*`, `curriculum:*` and `images:*`
+  scripts (`--check` needs no database or model). frog importing the server or the shared
+  contract is caught twice, by a Biome override and `test/architecture.test.ts`; the values the
+  two sides share are mirrored, and `apps/server/test/frog-mirror.test.ts` keeps them equal.
+  The projection writes the app database, so it is the server's (`npm run curriculum:project`).
+  Two fixes over the Python: an image manifest that lost a `source_url` to another is skipped
+  rather than tripping the unique constraint, and a grounding ref whose heading repeats in a
+  document resolves to both sections.
+- **Curriculum front matter says `scope:`** (2026-10-11): `survey | topic | one_shot`, like the
+  corpus. A file still carrying `is_survey` fails with a line naming the replacement.
+- **The corpus is brand new** (2026-10-11). The tadpoles write it from Phase 9; the delivered
+  corpus, curricula and images are not carried over, and nothing is measured on them.
+- **The embedder stays q8 until Phase 9 measures it** (2026-10-11), on the first new topic's
+  corpus, against fp32; if fp32 wins, everything is re-embedded.
+- **AskAI's corpus tool** (2026-10-11). `passages(query)` searches the sections this topic's
+  subtopics are grounded in, and those of every topic joined to it by a `topic_edge`, either
+  way and of any kind. toad_sage decides those links in Phase 9. `ASK_AI_CONTEXT_NEIGHBOURS`
+  sets how many results it returns, as it does for card search.
+
 ## Asked when we get there
 
 - Web research tools for the tadpoles (Gemini search grounding through CLIProxyAPI, own fetch tools, or both).
@@ -134,8 +154,6 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   balancer.
 - What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card
   `repair` job itself, or the frog reading open reports. Today only the operator enqueues it.
-- Whether the curriculum front matter's `is_survey: bool` becomes `scope:` when Phase 6 ports
-  the curriculum contract. The corpus column already is `scope`.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

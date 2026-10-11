@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "tsx watch --env-file=../../infra/dev.env src/api.ts",
     "migrate": "tsx --env-file=../../infra/dev.env src/migrate.ts",
+    "curriculum:project": "tsx --env-file=../../infra/dev.env src/curriculum/project.ts",
     "build": "node build.mjs",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",

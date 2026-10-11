@@ -7,13 +7,24 @@
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/universe/schema.ts",
+    "./db": "./src/universe/db.ts",
     "./embeddings": "./src/embeddings.ts",
-    "./normalize": "./src/normalize.ts"
+    "./normalize": "./src/normalize.ts",
+    "./retrieval": "./src/retrieval.ts",
+    "./ingest/*": "./src/ingest/*.ts",
+    "./curriculum/*": "./src/curriculum/*.ts",
+    "./images/*": "./src/images/*.ts"
   },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p .",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "corpus:check": "node --env-file-if-exists=../../infra/dev.env src/ingest/cli.ts --check",
+    "corpus:ingest": "node --env-file-if-exists=../../infra/dev.env src/ingest/cli.ts",
+    "curriculum:check": "node --env-file-if-exists=../../infra/dev.env src/curriculum/cli.ts --check",
+    "curriculum:ingest": "node --env-file-if-exists=../../infra/dev.env src/curriculum/cli.ts",
+    "images:check": "node --env-file-if-exists=../../infra/dev.env src/images/cli.ts --check",
+    "images:ingest": "node --env-file-if-exists=../../infra/dev.env src/images/cli.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "4.3.1",

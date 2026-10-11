@@ -1,7 +1,7 @@
 ---
 topic: Astronomy
 description: The physics, mechanics, and observational architecture of the universe from planetary systems to cosmic large-scale structure
-is_survey: true
+scope: survey
 subtopics:
   - title: Electromagnetic Radiation & Astronomical Instrumentation
     description: How astronomers capture and decode cosmic light across wavebands using telescopes, optics, detectors, and spectroscopy

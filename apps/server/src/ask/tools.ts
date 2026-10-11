@@ -1,15 +1,17 @@
 import type { Embedder } from "@spoin/frog/embeddings";
+import { resolveGrounding, search as searchCorpus } from "@spoin/frog/retrieval";
 import type { Difficulty, TopicScope } from "@spoin/shared/enums";
-import { and, asc, cosineDistance, eq, inArray } from "drizzle-orm";
-import type { Db } from "../db/client.ts";
-import { card, subtopic, topic } from "../db/schema.ts";
+import { and, asc, cosineDistance, eq, inArray, isNotNull, or } from "drizzle-orm";
+import type { Db, UniverseDb } from "../db/client.ts";
+import { card, subtopic, topic, topicEdge } from "../db/schema.ts";
 import { isUuid } from "../lib/wire.ts";
 
 /*
  * What AskAI's chat may read: one topic's public material, read-only. No user rows, no
  * other topic, nothing retired. The scoping lives here, in server code, rather than in
  * the chat's configuration, so it holds whatever the chat is told (ADR-0077's invariant).
- * The corpus joins through frog retrieval once Phase 6 ports it.
+ * The corpus is public material too: the sections this topic and its related topics
+ * were written from.
  */
 
 export interface TopicOutline {
@@ -36,6 +38,13 @@ export interface CardFull extends CardBrief {
   body: string;
 }
 
+/** A corpus section. `text` opens with its document's title and heading, as it was embedded. */
+export interface Passage {
+  text: string;
+  /** Where the document came from, a URL or an origin, so the chat can cite it. */
+  source: string;
+}
+
 /**
  * A tool call the chat got wrong. The harness hands the message back to the chat as the
  * tool's result, so it is one short line saying what was wrong and how to call the tool
@@ -52,6 +61,13 @@ export interface TopicTools {
   read(cardIds: string[]): Promise<{ cards: CardFull[]; note?: string }>;
   /** The active cards nearest a query by meaning, nearest first. */
   search(query: string): Promise<CardBrief[]>;
+  /**
+   * The corpus sections this topic and its related topics were written from (their
+   * subtopics' grounding), nearest a query by meaning. Related topics are those joined
+   * to this one by a `topic_edge` either way, which toad_sage decides. Absent when the
+   * server has no corpus database.
+   */
+  passages?(query: string): Promise<Passage[]>;
 }
 
 const brief = {
@@ -82,15 +98,30 @@ export async function activeCards(db: Db, topicId: string, ids: string[]): Promi
     .where(and(eq(card.topicId, topicId), eq(card.status, "active"), inArray(card.id, valid)));
 }
 
-/** The tools for one topic. `searchLimit` is how many cards a search returns. */
+/** Every grounding reference of this topic and the topics joined to it by an edge, either way. */
+async function groundingOf(db: Db, topicId: string): Promise<string[]> {
+  const edges = await db
+    .select({ from: topicEdge.fromTopicId, to: topicEdge.toTopicId })
+    .from(topicEdge)
+    .where(or(eq(topicEdge.fromTopicId, topicId), eq(topicEdge.toTopicId, topicId)));
+  const topicIds = [topicId, ...edges.map((e) => (e.from === topicId ? e.to : e.from))];
+  const rows = await db
+    .select({ refs: subtopic.groundingRefs })
+    .from(subtopic)
+    .where(and(inArray(subtopic.topicId, topicIds), isNotNull(subtopic.groundingRefs)));
+  return [...new Set(rows.flatMap((r) => r.refs ?? []))];
+}
+
+/** The tools for one topic. `searchLimit` is how many results a search returns. */
 export function topicTools(
-  db: Db,
-  embedder: Embedder,
+  ctx: { db: Db; universe: UniverseDb | null; embedder: Embedder },
   topicId: string,
   opts: { searchLimit: number },
 ): TopicTools {
+  const { db, universe, embedder } = ctx;
   const live = and(eq(card.topicId, topicId), eq(card.status, "active"));
-  return {
+  const noQuery = "Give a query: what to look for, in words.";
+  const tools: TopicTools = {
     async outline() {
       const [t] = await db
         .select({ name: topic.canonicalName, description: topic.description, scope: topic.scope })
@@ -145,7 +176,7 @@ export function topicTools(
     },
 
     async search(query) {
-      if (!query.trim()) throw new ToolError("Give a query: what to look for, in words.");
+      if (!query.trim()) throw new ToolError(noQuery);
       const [vector] = await embedder.embedQuery([query]);
       if (!vector) return [];
       return (
@@ -157,6 +188,22 @@ export function topicTools(
           .orderBy(cosineDistance(card.contentEmbedding, vector))
           .limit(opts.searchLimit)
       );
+    },
+  };
+  if (!universe) return tools;
+  return {
+    ...tools,
+    async passages(query) {
+      if (!query.trim()) throw new ToolError(noQuery);
+      const refs = await groundingOf(db, topicId);
+      if (refs.length === 0) return [];
+      // A reference that no longer resolves just narrows the scope; an empty scope finds nothing.
+      const { chunkIds } = await resolveGrounding(universe, refs);
+      const hits = await searchCorpus(universe, embedder, query, {
+        k: opts.searchLimit,
+        includeChunkIds: chunkIds,
+      });
+      return hits.map((h) => ({ text: h.text, source: h.source }));
     },
   };
 }

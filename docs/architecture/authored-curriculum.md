@@ -151,7 +151,7 @@ Draft shape, one file per topic:
 ---
 topic: Rust
 description: Systems programming with ownership, borrowing and fearless concurrency
-is_survey: false
+scope: topic
 subtopics:
   - title: Ownership & Move Semantics
     description: Why a value has exactly one owner, and what a move costs

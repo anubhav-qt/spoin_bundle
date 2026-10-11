@@ -1,11 +1,13 @@
+import { chunk, document } from "@spoin/frog/schema";
 import type { AskEventOut } from "@spoin/shared";
 import { asc, eq } from "drizzle-orm";
 import { afterEach, describe, expect, test } from "vitest";
 import { noAskChat } from "../src/ask/chat.ts";
 import { answer } from "../src/ask/service.ts";
 import { ToolError, topicTools } from "../src/ask/tools.ts";
-import { askConversation, askMessage, askUsage, card } from "../src/db/schema.ts";
+import { askConversation, askMessage, askUsage, card, subtopic, topicEdge } from "../src/db/schema.ts";
 import { askChat } from "./ask-chat.ts";
+import { useCorpus } from "./corpus.ts";
 import { makeTopic } from "./fixtures.ts";
 import { type Client, client, deps, env, signedUp, userIdOf } from "./helpers.ts";
 
@@ -254,7 +256,7 @@ describe("what needs a status is answered before the stream", () => {
 
 describe("the chat's tools read one topic's public material only", () => {
   const toolsFor = (topicId: string) =>
-    topicTools(db, deps.embedder, topicId, { searchLimit: env.ASK_AI_CONTEXT_NEIGHBOURS });
+    topicTools(deps, topicId, { searchLimit: env.ASK_AI_CONTEXT_NEIGHBOURS });
 
   test("the outline lists the subtopics easy to advanced", async () => {
     const { topic, subtopics } = await makeTopic({ subtopicsPerTier: 2 });
@@ -373,6 +375,99 @@ describe("the chat's tools read one topic's public material only", () => {
     expect(found[0]?.id).toBe(best);
     const ids = found.map((k) => k.id);
     for (const excluded of [retired, foreign, other.cards[0]?.id]) expect(ids).not.toContain(excluded);
+  });
+});
+
+describe("the corpus tool reads what this topic and its related topics were written from", () => {
+  const corpus = useCorpus();
+  const toolsFor = (topicId: string) =>
+    topicTools(deps, topicId, { searchLimit: env.ASK_AI_CONTEXT_NEIGHBOURS });
+
+  /** One document per path, a section per heading, embedded as frog's ingester would. */
+  async function deliver(docs: Record<string, Record<string, string>>) {
+    for (const [i, [sourcePath, sections]] of Object.entries(docs).entries()) {
+      const [d] = await corpus
+        .insert(document)
+        .values({
+          title: sourcePath,
+          source: `https://example.invalid/${sourcePath}`,
+          sourcePath,
+          kind: "topic_source",
+          category: "computer science",
+          scope: "topic",
+          contentHash: String(i).padStart(64, "0"),
+          ingestedAt: new Date(),
+        })
+        .returning();
+      for (const [ordinal, [heading, body]] of Object.entries(sections).entries()) {
+        const text = `${sourcePath} — ${heading}\n\n${body}`;
+        const [v] = await deps.embedder.embedPassage([text]);
+        await corpus.insert(chunk).values({
+          documentId: (d as { id: string }).id,
+          ordinal,
+          text,
+          heading,
+          embedding: v as number[],
+          embeddingModel: deps.embedder.modelName,
+          topicTags: [],
+        });
+      }
+    }
+  }
+
+  async function grounded(refs: string[]) {
+    const made = await makeTopic();
+    await db
+      .update(subtopic)
+      .set({ groundingRefs: refs })
+      .where(eq(subtopic.id, made.subtopics[0]?.id ?? ""));
+    return made.topic;
+  }
+
+  test("it ranks the grounding of this topic and of topics joined to it either way", async () => {
+    await deliver({
+      "a.md": {
+        "Docker layers": "Docker layers are cached by content hash.",
+        Volumes: "Volumes outlive containers.",
+      },
+      "b.md": { "Build cache": "A build reuses cached layers until a step changes." },
+      "c.md": { Registries: "A registry stores images by digest." },
+      "d.md": { "Docker layers": "Docker layers are cached by content hash." },
+    });
+    const own = await grounded(["a.md#Docker layers"]);
+    const before = await grounded(["b.md#Build cache"]);
+    const after = await grounded(["c.md#Registries"]);
+    await grounded(["d.md#Docker layers"]);
+    await db.insert(topicEdge).values([
+      { fromTopicId: before.id, toTopicId: own.id },
+      { fromTopicId: own.id, toTopicId: after.id },
+    ]);
+
+    const found = await toolsFor(own.id).passages?.("how are docker layers cached");
+    expect(found?.[0]).toEqual({
+      text: "a.md — Docker layers\n\nDocker layers are cached by content hash.",
+      source: "https://example.invalid/a.md",
+    });
+    // Ungrounded sections and an unrelated topic's are out, however near the query.
+    expect(found?.map((p) => p.source).sort()).toEqual(
+      ["a.md", "b.md", "c.md"].map((p) => `https://example.invalid/${p}`),
+    );
+  });
+
+  test("no grounding, or grounding that no longer resolves, finds nothing", async () => {
+    await deliver({ "a.md": { "Docker layers": "Docker layers are cached by content hash." } });
+    const bare = await makeTopic();
+    expect(await toolsFor(bare.topic.id).passages?.("docker layers")).toEqual([]);
+    const stale = await grounded(["a.md#Renamed heading"]);
+    expect(await toolsFor(stale.id).passages?.("docker layers")).toEqual([]);
+  });
+
+  test("a wrong call is one short line, and no corpus means no tool", async () => {
+    const { topic } = await makeTopic();
+    await expect(toolsFor(topic.id).passages?.(" ")).rejects.toThrow(
+      new ToolError("Give a query: what to look for, in words."),
+    );
+    expect(topicTools({ ...deps, universe: null }, topic.id, { searchLimit: 4 }).passages).toBeUndefined();
   });
 });
 

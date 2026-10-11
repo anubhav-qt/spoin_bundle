@@ -14,7 +14,7 @@ import { activeCards, topicTools } from "./tools.ts";
  * cap and the refusal; the chat keeps its memory and reads the topic through tools.
  */
 
-type Ctx = Pick<Deps, "db" | "env" | "embedder" | "askChat">;
+type Ctx = Pick<Deps, "db" | "universe" | "env" | "embedder" | "askChat">;
 
 const OFF_TOPIC = "OFF_TOPIC";
 
@@ -168,7 +168,7 @@ export async function* answer(
   }
 
   const conversationId = await openConversation(db, userId, t.id);
-  const tools = topicTools(db, ctx.embedder, t.id, { searchLimit: env.ASK_AI_CONTEXT_NEIGHBOURS });
+  const tools = topicTools(ctx, t.id, { searchLimit: env.ASK_AI_CONTEXT_NEIGHBOURS });
   // Any card that is not an active one of this topic is no hint at all.
   const [card] = cardId ? await activeCards(db, t.id, [cardId]) : [];
   // Written first, so the question survives a stream that dies mid-answer.

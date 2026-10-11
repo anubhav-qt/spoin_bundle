@@ -116,7 +116,9 @@ its prompts, canon and validators are reused.
     per `ask_conversation`, that keeps its own transcript and compaction, so the server
     no longer resends the thread. It reads the topic through read-only tools the server
     hands it with each turn: the topic and its subtopics, this topic's active cards,
-    and a search over them by embedding (the corpus joins through frog retrieval). It
+    a search over them by embedding, and a search over the corpus sections this topic
+    and the topics joined to it by a `topic_edge` were grounded in, through frog
+    retrieval. It
     is given no user id and no database handle, so ADR-0077's invariant holds: a
     successful injection buys an off-topic answer, never data. The server keeps the
     thread the reader sees, the SSE events, the card hint (an active card of this

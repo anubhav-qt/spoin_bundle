@@ -7,6 +7,7 @@ import type { Tx } from "../db/client.ts";
 import { feedPlan, generationJob, topic, topicAlias } from "../db/schema.ts";
 import { HttpError } from "../lib/errors.ts";
 import { followTopic, pickHues } from "./service.ts";
+import { slugify } from "./slug.ts";
 
 /*
  * A user typing a topic by name. No model is called here: the request path only does
@@ -24,15 +25,6 @@ type Request = TopicRequestIn;
 
 /** A real user waiting outranks speculative work. */
 const USER_REQUEST_PRIORITY = 10;
-
-/** As the curriculum projection slugs, so a placeholder and an authored topic agree. */
-const slugify = (name: string) =>
-  name
-    .trim()
-    .toLowerCase()
-    .split(/\s+/u)
-    .join("-")
-    .replaceAll(/[^a-z0-9-]/g, "") || "topic";
 
 /** The word-count rule is a constraint, so code enforces it; null when the name passes. */
 function nameProblem(ctx: Ctx, name: string): string | null {

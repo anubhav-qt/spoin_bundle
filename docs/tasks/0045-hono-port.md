@@ -143,6 +143,14 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   subtopics are grounded in, and those of every topic joined to it by a `topic_edge`, either
   way and of any kind. toad_sage decides those links in Phase 9. `ASK_AI_CONTEXT_NEIGHBOURS`
   sets how many results it returns, as it does for card search.
+- **A requested topic's content is made the way the manual pipeline made it** (2026-10-11).
+  The topic's tadpole runs `docs/the_spoin_universe/procedure.md` phase by phase, toad_sage
+  doing Phase A's intake: a coverage check against the corpus already there; web research
+  from primary sources into a raw dump that keeps every passage's URL and date; curation
+  passage by passage into self-contained `##` sections, 1,000-2,000 characters and never over
+  2,200 (one section is one chunk, and nothing splits it); a `tips-and-tricks.md`; the image
+  pass; then the curriculum. Each delivery passes frog's `corpus:check`, `images:check` and
+  `curriculum:check` before it is ingested.
 
 ## Asked when we get there
 
@@ -154,6 +162,15 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   balancer.
 - What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card
   `repair` job itself, or the frog reading open reports. Today only the operator enqueues it.
+- Who plays the owner's part at the procedure's approval points: the Phase B coverage note,
+  the Phase I curriculum proposal, every "insufficient evidence", the Phase G report.
+- Whether ADR-0100's epistemic front matter (`knowledge_kind`, `source_tier`, `applies_to`,
+  `verified_on`, `status`) and its split of roles (maps before prose, an auditor who is not
+  the author) become part of a tadpole's run. ADR-0100 is accepted and the authoring handoff
+  marks the fields required, but neither ingester ever checked them and no delivered
+  document carries them.
+- Where a run's raw research dump, the procedure's `temp/`, lives: versioned records in
+  Postgres, as agents fetch their history, or files.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

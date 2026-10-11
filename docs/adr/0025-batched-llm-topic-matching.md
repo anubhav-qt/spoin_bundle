@@ -6,6 +6,9 @@
 - **Amends:** [ADR-0004](0004-topic-canonicalization.md) (replaces the "Matching is
   banded, not a single threshold" section; the canonical-topic/alias/shared-entity model
   ADR-0004 establishes is unchanged)
+- **Amended by:** [ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md): the name
+  check and the matching move out of the request into toad_sage; the request path only
+  matches exact aliases and queues the rest
 
 ## Context
 

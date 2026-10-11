@@ -31,7 +31,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
@@ -39,6 +39,19 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login | |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Oracle Cloud free tier deploy | later |
+
+## Decided during the port
+
+- **Asking for a topic by name** (2026-10-11). `POST /topics` and `/topics/batch` call no model.
+  Code checks the name (guests refused, word count); an exact alias match subscribes at once;
+  a miss mints a pending topic (no subtopics, so nobody else sees it), the requester's custom
+  subscription, an alias and a `generate` job at priority 10. In Phase 9 toad_sage takes
+  those jobs and either rejects the name (job `failed`, `last_error` is the reason the user
+  sees), merges it (repoint the subscriptions and the alias, drop the placeholder, complete
+  the job), or accepts it (canonical name and slug, category, then the curriculum tadpole).
+- **Tadpoles become frogs** (2026-10-11). A topic's tadpole becomes its frog once the topic's
+  first generation is live in production; later updates and feedback-driven improvements
+  run in the frog. Unrelated to `packages/frog`.
 
 ## Asked when we get there
 

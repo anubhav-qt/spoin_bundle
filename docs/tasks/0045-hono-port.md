@@ -158,6 +158,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   owner's and readers' alike. The owner can add a topic by name (a reader's request without
   the subscription), retry a failed job, cancel a pending topic (its placeholder, alias and
   job go, and so do its requesters' subscriptions) and change a job's priority.
+- **A topic the owner adds runs at priority 0** (2026-10-11): behind readers' requests (10),
+  ahead of repairs (-10); higher runs first. The owner moves topics through the queue from
+  the topic queue page itself.
 - **The job status page** (2026-10-11) shows each background job's last success and last
   error from `job_runs`, the generate and repair queue counted by status, and every failed
   job with its `last_error`.
@@ -205,7 +208,6 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   document carries them.
 - Where a run's raw research dump, the procedure's `temp/`, lives: versioned records in
   Postgres, as agents fetch their history, or files.
-- The priority a topic the owner adds to the queue gets; readers' requests run at 10.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

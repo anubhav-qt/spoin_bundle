@@ -38,7 +38,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat` | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login | |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
-| 12 | Oracle Cloud free tier deploy | later |
+| 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
+| 13 | Host spoin on the ThinkPad | later |
 
 ## Decided during the port
 
@@ -114,6 +115,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   server keeps the 200-a-day cap and the `OFF_TOPIC` sentinel (any reply that starts with
   it, however chunked); the embedding pre-check and `ASK_AI_TOPIC_SIMILARITY_FLOOR` are gone.
   A refused turn counts against the cap; a failed or empty one does not.
+- **spoin is hosted on the ThinkPad, not Oracle** (2026-10-11). Oracle Cloud's free tier takes
+  Paribelle instead, moved off the ThinkPad.
 - **Tool errors teach** (2026-10-11). A wrong tool call throws `ToolError`, one short line on
   what was wrong and how to call it right, which the harness returns to the agent as the
   call's result; any other failure is logged and reaches the agent as a short line. A
@@ -126,7 +129,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - Web research tools for the tadpoles (Gemini search grounding through CLIProxyAPI, own fetch tools, or both).
 - Provider probes for CLIProxyAPI-Gemini and NIM before the harness depends on them (CLAUDE.md).
 - The verification checklist's contents, written with the owner.
-- Backups and image hosting on Oracle.
+- Backups and image hosting on the ThinkPad.
 - Which model grades quiz answers and answers AskAI on the request path, through the Phase 8
   balancer.
 - What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card

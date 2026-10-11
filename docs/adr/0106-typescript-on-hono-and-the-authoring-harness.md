@@ -30,6 +30,9 @@ replaces all of it, which made a port mostly a port of the read path.
 The target is Oracle Cloud's free tier: one ARM machine with 12 GB of RAM and no GPU,
 holding all the data for now. Everything is tested in local Docker first.
 
+> **Revised 2026-10-11:** spoin is hosted on the owner's ThinkPad instead. Oracle's
+> free tier takes Paribelle, moved off the ThinkPad (task 0045, Phases 12-13).
+
 ## Decision
 
 **The stack.**

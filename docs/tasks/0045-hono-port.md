@@ -35,7 +35,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | done |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
-| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons, the verification checklist; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
+| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
@@ -200,10 +200,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **The harness tools are designed before Phase 8** (2026-10-11), one agent at a time, so the
   pi fork's tool wrapper is built knowing every tool.
 - **The chats run corpus first, then curriculum** (2026-10-11). toad_sage accepts a topic; the
-  topic's tadpole does the coverage check, research, corpus, `tips-and-tricks.md` and images;
-  the curriculum chat writes the curriculum against that corpus; the topic's tadpole writes the
-  cards and questions; the verification checklist runs; the topic goes live and its tadpole
-  becomes its frog.
+  topic's tadpole does the coverage check, research, corpus and `tips-and-tricks.md`;
+  the curriculum chat writes the curriculum against that corpus; visual_toad sources the images
+  against it (2026-10-12); the topic's tadpole writes the cards and questions; each tier goes
+  live once it passes the gate, and after the last one the tadpole becomes the topic's frog.
 - **One curriculum chat for every topic** (2026-10-11), not one per topic. When several topics
   need a curriculum at once, it runs a helper agent per topic and stays the one orchestrator,
   and it learns from feedback and experience, so its curricula get better over time.
@@ -217,6 +217,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   intake, a review, a curriculum), started by its main chat with a brief. It gets the main
   chat's tools except starting helpers, acts directly, and ends by handing the main chat a
   short report as a record. Its run is stored like any other, so the Auditor reads it.
+  (2026-10-12: a tier's writer helper starts its own pass-1 helper, and designer_toad and
+  visual_toad serve a tadpole's requests for its whole run.)
 - **A topic has a category** (2026-10-11). toad_sage's accept writes the canonical name, slug,
   scope, `category` and `sub_category` to the topic row: two new columns on the app's `topic`,
   so the product can group and browse topics by category, normalized as the corpus normalizes
@@ -234,8 +236,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   topic goes live and adds more as newer topics arrive. A related edge is stored once and read
   either way, so AskAI's `passages` reaches a peer's corpus too.
 - **The tool catalogue is `docs/architecture/harness-tools.md`** (2026-10-11), filled in one chat
-  at a time as the owner approves each set. Approved so far: toad_sage's, and a topic's
-  tadpole's research, corpus, images and report.
+  at a time as the owner approves each set. Complete on 2026-10-12: toad_sage's, a topic's
+  tadpole's research, corpus and report, the curriculum chat's, the tadpole's cards and
+  questions with their helpers, the frog's, ero_sennin's and wise_toad's.
 - **A topic is a subject plus an angle** (2026-10-11): who it is for and how it is written.
   "Rust" and "Rust in easy language" are two topics, and a homonym never merges into its
   namesake. The intake record stores the angle; `find_topics` shows each match's subject,
@@ -245,6 +248,30 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   name and description. ero_sennin reads every merge and can undo a wrong one, recreating the
   topic and putting its job back in the queue.
 - **The Auditor is ero_sennin** (2026-10-11), after the toad sage Jiraiya.
+- **The Lessons chat is wise_toad** (2026-10-12), Trotter's Lessons chat: lessons are versioned
+  records it writes, changes and retires, each citing its evidence. It learns from the owner's
+  reports once fixed (each one a lesson), ero_sennin's findings, the owner's rulings on
+  disputes, the gate's rejections (rejected cards and wrongly solved questions, with pass 2's
+  feedback), toad_sage's change verdicts, and readers' reports the frog acted on. Those last four
+  become lessons only when they repeat. Every input wakes it as it arrives, except the gate's
+  rejections, which wake it once per tier, together, when the tier is submitted. A lesson takes
+  effect as soon as it is written, as in Trotter; a bad one becomes an ero_sennin finding. Each
+  lesson names the chats it is for and the categories it applies to (none: every category), and
+  a chat reads only the lessons for it and its topic's category. A lesson from the owner's
+  report applies in every category.
+- **ero_sennin reads each run as it ends** (2026-10-12). Every finished run, helpers included,
+  queues a wake for it, so a wrong merge, retirement or verdict is caught while it is fresh.
+- **An ero_sennin finding goes to the chat and to wise_toad** (2026-10-12). Each finding is a
+  record that wakes the chat that ran (a helper's main chat, once the helper has ended), which
+  fixes it or answers why not. wise_toad gets every finding and turns the ones that repeat into
+  lessons. When ero_sennin still disagrees with an answer, toad_sage settles it with go on or
+  change. A dispute over toad_sage's own decision goes to the owner instead: the decision
+  stands meanwhile, the dispute is listed in admin with both sides, and the owner's ruling
+  wakes both chats and goes to wise_toad. ero_sennin never writes content: a live card it finds
+  wrong is a finding to the frog, which retires or rewrites it through the gate. It undoes only
+  three things itself, each with its finding: a merge, a suspicious mark, and a compaction
+  summary (putting back the earlier one with its cut point). Every other record is fixed by the
+  chat that wrote it.
 - **A description sends an exact match to toad_sage** (2026-10-11). A requested name that
   matches an alias exactly still subscribes at once when it comes without a description. With
   one, it is queued like a new name, with no alias of its own yet, and toad_sage merges it into
@@ -286,17 +313,133 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   another topic's goes in its closing report, and toad_sage routes it to that topic's frog. Its
   drafts are ingested only once toad_sage says go on to the closing report, which is refused
   until the latest drafts are audited, every finding is fixed or answered, and `corpus:check`
-  and `images:check` pass. The curriculum chat starts after ingestion.
+  passes (`images:check` moved to the end of image sourcing, 2026-10-12). The curriculum chat
+  starts after ingestion.
+- **Prompts are Nunjucks templates in `prompts/`** (2026-10-12): every chat's system
+  instructions and every fixed prompt live in their own directory, so the code does not grow
+  with them. Each one is written with the owner, one at a time: first a sentence or two on what
+  the prompt will be, then the owner's gist of what it should do, then the template.
+- **Every model output is checked in code first** (2026-10-12): validated right after it is
+  generated, before anything acts on it, and a rejection always carries the reason why.
+- **Gemini orchestrates and reviews, NIM writes** (2026-10-12). toad_sage, every main chat, the
+  research, the gate's two passes, designer_toad and visual_toad run on Gemini 3.8 Flash at
+  medium thinking through CLIProxyAPI. The heavy writing (corpus documents, curricula, cards,
+  questions) runs on NIM behind breader's balancer and its ladder: Kimi K3 as primary, Nemotron 3
+  Ultra while it is down, with breader's retries and overload handling.
+- **Compaction is Trotter's, copied exactly** (2026-10-12): `E:\trotter`'s ADRs 0014 and 0026,
+  `harness/src/compaction.ts`, `harness/src/wake-chat.ts`, `system-tools/compacting.ts`,
+  `packages/schemas/src/compaction.ts` and its prompts (`compaction.njk`,
+  `handovers/compaction-summary.njk`, `partials/summary.njk`, `tools/write-summary.njk`). A chat
+  compacts at 400,000 tokens or 60% of its model's window, whichever is smaller. A compaction
+  is a run of its own: the chat first stores what isn't stored, then `write_summary` writes a
+  summary of under 2,000 tokens in fixed sections (so far, learnings, feedback received, do's,
+  don'ts, next steps), folding in the earlier one. The summary is one versioned record per chat
+  with its cut point (`throughRun`), so an undo restores both; Trotter keeps no runs word for
+  word. A run that reaches the limit pauses at a step boundary, and a continuation run carries it
+  on. Only the names change: the feedback is ero_sennin's findings, toad_sage's reviews and
+  wise_toad's lessons, and the numbers left out are card counts, progress and targets, read
+  fresh from the tools.
+- **Every step is saved** (2026-10-12): plans, drafts, both gate passes, renders and picks are
+  records, so a restarted run never does finished work twice.
+- **A tadpole's documents are written by NIM helpers** (2026-10-12), one per document. The
+  tadpole researches and writes the maps on Gemini; the writer reads the maps and their passages
+  from the records and calls `write_document`. `audit_drafts` stays with the tadpole.
+- **The tadpole writes the cards through a helper per tier** (2026-10-12). The old writer prompts
+  become the helpers' instructions. The tadpole decides which tiers run at once; code refuses a
+  tier while a lower one in its group is unfinished, and a higher tier builds on the lower tiers'
+  card bodies, as the old pipeline did.
+- **The old two-pass gate stays, as helpers** (2026-10-12). Pass 1 (correction, difficulty
+  withheld) is a helper of each writer; code checks near-duplicates between the passes; pass 2
+  (verification, difficulty shown) is a helper the tadpole, and later the frog, starts with the
+  context it chooses, never the writer's or pass 1's reasoning. Accepted cards stay; a rejected
+  one becomes a `rejected_card` with its feedback, and the writer drafts again until the tier
+  reaches its `target_cards`. A tier finishes short only through an "insufficient evidence"
+  toad_sage approves. Structural faults are refused at write time and not stored, so the
+  `structural` rejection stage goes unused.
+- **designer_toad draws the ASCII art** (2026-10-12), one per tadpole, on Gemini: it gets the
+  writers' art requests and ideas for cards the gate accepted, looks up recent trends on the web,
+  draws, and renders the card on a phone to a screenshot in one tool call, improving the art
+  until the screenshot looks right. Code still enforces the 40 columns. A card goes live only
+  with its art. The curated scene library leaves generation (ADR-0021, ADR-0079, ADR-0080).
+- **visual_toad owns every photograph** (2026-10-12), one per tadpole: the tadpole's image tools
+  move to it, and it picks a manifest photo for each image card before the card is written
+  (ADR-0105).
+- **Images are sourced after the curriculum** (2026-10-12), keeping the owner's 2026-09-07 order
+  (`docs/handoff/antigravity-curriculum-authoring.md`): the curriculum writes each tier's
+  `image_needs`, and visual_toad sources against them, so the catalog answers what will be
+  taught. Astronomy, sourced first, had about one defensible photo in seven. The tier writers
+  start once `images:check` passes.
+- **Questions are written by the tier's writer and solved blind by pass 2** (2026-10-12), once
+  the tier reaches its target. Code checks their shape; pass 2 answers each MCQ without its key,
+  code compares, and a wrong or doubtful answer sends it back with feedback. Free-text rubrics
+  are checked against their cards.
+- **Each tier goes live as it finishes** (2026-10-12), as the old pipeline's groups did
+  (ADR-0041). The tadpole becomes the topic's frog once its last tier is live.
+- **No verification checklist** (2026-10-12). ADR-0106 planned a separate checklist call to
+  stand in for the owner's approval before anything went live, before the two-pass gate was
+  kept. With code's checks, pass 1, pass 2's verification and blind solving, and designer_toad's
+  rendered look, it would mostly repeat pass 2, so `submit_tier` and `submit_version` put cards
+  live once the gate has passed them. ero_sennin and readers' reports catch the rest afterwards.
+- **The owner's own reports become global lessons** (2026-10-12). The owner tests cards visually
+  from their own account, named by `OWNER_EMAIL` in the gitignored `.env` and never in the repo.
+  Its reports skip the frog's genuineness check, and once the frog has fixed and updated the
+  card, each one becomes a lesson every chat follows, across all topics. The frog hands the
+  report, the old and new card and what it changed to wise_toad, the Lessons chat, which
+  words the lesson and decides which chats' instructions it joins (2026-10-12).
+- **A curriculum goes to toad_sage as one checked file** (2026-10-12). The NIM writer writes the
+  whole curriculum through `write_curriculum`, code runs the full contract on it, the curriculum
+  chat reviews it quickly, and it goes to toad_sage with a paragraph of reasoning per major
+  decision; toad_sage answers go on or change. No separate proposal step before the file.
+- **`curriculum:check` checks `image_needs`** (2026-10-12), following "every model output is
+  checked in code first": a tier with an image quota above 0 must list its `image_needs`, one
+  entry per image card. The contract (`docs/handoff/antigravity-curriculum-authoring.md`) asked
+  for it, but no code checked it.
+- **After go-on, a curriculum only grows, and only on a frog's request** (2026-10-12). The
+  curriculum chat can add subtopics or tiers to a live topic when its frog asks; code refuses
+  removing or renaming a subtopic or tier that has cards, so the projection never deletes a live
+  card. The frog writes the new tiers' cards through the same gate.
+- **A report wakes the frog at once** (2026-10-12). Saving a card report queues a wake for the
+  frog of the card's topic; reports that arrive during a run are read in that run or the next,
+  and the frog looks earlier reports up through its tools to judge whether one is genuine.
+- **A tadpole handles reports on its live tiers** (2026-10-12). Tiers go live one at a time, so
+  once its first tier is live the tadpole gets the frog's report tools and handles reports
+  alongside the tiers it is still writing.
+- **The admin repairs page goes** (2026-10-12). The frog handles every report, and the owner
+  audits through ero_sennin and the status page. Phase 9 removes the page, its routes and the
+  operator's delete, fix and remake (ADR-0076's operator lane).
+- **The admin ASCII review page goes too** (2026-10-12). designer_toad draws every piece, so the
+  owner reports bad art from the feed with their own account, like any other card.
+- **A reported card's new version goes through the whole gate** (2026-10-12). The frog starts a
+  NIM writer helper with the card, its reports and the frog's verdict. The draft goes through
+  pass 1, the near-duplicate check, pass 2, and designer_toad or visual_toad when its visual
+  changes. The card's questions are checked against the new body and rewritten if they no
+  longer fit. Then the new version replaces the old one in its family.
+- **The frog can retire a card, then refills** (2026-10-12): a card that is wrong and cannot be
+  fixed from its grounding, or a duplicate. Retiring takes a reason and resolves the card's
+  reports; the row and its history stay. A tier left below its `target_cards` gets a
+  replacement through the gate, as for a rejected draft.
+- **Report verdicts, and suspicious reporters are muted** (2026-10-12). Every report gets one of
+  three verdicts, stored with its reason: acted on; honest, but the card is right; suspicious.
+  The frog marks a reporter safe or suspicious as a record with its reasons. Once an account is
+  marked suspicious, its reports are still stored but wake no frog, in any topic, until
+  ero_sennin lifts the mark; then the reports stored meanwhile wake their frogs. The owner's
+  account is never judged, so it is never marked.
+- **Stale material updates the corpus, then its cards** (2026-10-12). When toad_sage routes
+  stale material to a frog, it researches the change; its NIM writers rewrite the affected
+  documents, the audit and `corpus:check` run, toad_sage reviews it like a closing report, and
+  the documents are ingested again. Every live card grounded in a changed section then goes to
+  pass 2 against the new text, and one that no longer holds gets a new version through the gate.
+- **A frog checks its topic again when map J says so** (2026-10-12). Map J, the version audit,
+  gives each time-sensitive claim a date to check it again, and `write_map` refuses one
+  without it. When a date comes due, code wakes the frog, which checks those claims against
+  the web and, when they have changed, updates them as it does stale material.
 
 ## Asked when we get there
 
 - Provider probes for CLIProxyAPI-Gemini, NIM and SearXNG before the harness depends on them (CLAUDE.md).
-- The verification checklist's contents, written with the owner.
 - Backups and image hosting on the ThinkPad, fetched pages on disk included.
 - Which model grades quiz answers and answers AskAI on the request path, through the Phase 8
   balancer.
-- What hands a reader's report to the frog in Phase 9: the report enqueuing the per-card
-  `repair` job itself, or the frog reading open reports. Today only the operator enqueues it.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

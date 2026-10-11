@@ -80,6 +80,10 @@ its prompts, canon and validators are reused.
     every failure and fed back into the chats' instructions. (Revised 2026-10-11: the
     Auditor is named ero_sennin; every chat's tools are in
     [harness-tools.md](../architecture/harness-tools.md).)
+    (Revised 2026-10-12: Gemini 3.8 Flash orchestrates and reviews, and NIM writes; a
+    topic's tadpole writes through helpers, keeps the two-pass gate as helpers, and has
+    designer_toad for ASCII art and visual_toad for photographs. The Lessons chat is named
+    wise_toad. Task 0045 has the reasons.)
   - **Frogs**: a topic's tadpole becomes its frog once the topic's first generation is
     live in production. Later updates and feedback-driven improvements to that topic run
     in its frog. (Not `packages/frog`, the retrieval library of ADR-0087: same word,
@@ -141,7 +145,8 @@ its prompts, canon and validators are reused.
     it could, with a note naming what it couldn't.
 - **Nothing waits on the owner.** Before anything goes live, a separate model call runs a
   verification checklist written with the owner. What passes goes live; the owner
-  audits afterwards.
+  audits afterwards. (Revised 2026-10-12: no checklist. The two-pass gate, kept as helpers,
+  is what a card passes to go live; ero_sennin audits afterwards. Task 0045 has the reason.)
 - Topics come from a queue the owner fills in admin, and user requests feed the same
   queue from the start. A name with no exact alias match becomes a pending topic, the
   requester's custom subscription and a generate job; toad_sage then validates it,

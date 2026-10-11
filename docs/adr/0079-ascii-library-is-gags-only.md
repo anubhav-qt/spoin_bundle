@@ -1,6 +1,9 @@
 # ADR-0079: The ASCII art library is gags-only; every ASCII card is a joke
 
 - **Status:** Accepted
+- **Left out of the harness (2026-10-12, task 0045):** designer_toad draws every ASCII art
+  itself, and the curated library is no longer a source ([harness-tools.md](../architecture/harness-tools.md)). The
+  40-column invariant stands, enforced in code.
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md)

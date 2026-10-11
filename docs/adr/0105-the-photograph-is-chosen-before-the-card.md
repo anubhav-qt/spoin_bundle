@@ -1,6 +1,9 @@
 # ADR-0105: The photograph is chosen before the card, and the card is written about it
 
 - **Status:** Accepted (inverts 0095's retrieval direction; retires 0102's planner ceiling for generation)
+- **Carried into the harness (2026-10-12, task 0045):** visual_toad, viewing the images,
+  picks the photograph before the card is written, in place of the code's reservation
+  ([harness-tools.md](../architecture/harness-tools.md)).
 - **Date:** 2026-09-07
 - **Deciders:** owner, Claude
 

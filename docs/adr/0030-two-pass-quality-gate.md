@@ -1,6 +1,10 @@
 # ADR-0030: Two-pass, self-correcting quality gate
 
 - **Status:** Accepted
+- **Carried into the harness (2026-10-12, task 0045):** both passes stay, run as helpers
+  ([harness-tools.md](../architecture/harness-tools.md)). Pass 1 is a helper of each tier's writer; pass 2 is a helper
+  the tadpole (later the frog) starts with the context it chooses. Structural faults are
+  refused when a card is written, so the `structural` stage goes unused.
 - **Date:** 2026-08-17
 - **Amended by:** [ADR-0090](0090-hybrid-gemini-mistral-generation.md) — this ADR's two
   passes no longer run on the same model ladder. `verify_cards` returns a verdict and

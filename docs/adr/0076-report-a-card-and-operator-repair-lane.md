@@ -2,6 +2,10 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-30
+- **Operator lane replaced (2026-10-12, task 0045):** reports keep their shape, but each one
+  wakes the frog of the card's topic, which judges it and writes the new version
+  ([ADR-0106](0106-typescript-on-hono-and-the-authoring-harness.md)). The admin repairs page
+  and its delete, fix and remake go in Phase 9.
 - **Deciders:** Anubhav
 
 ## Context

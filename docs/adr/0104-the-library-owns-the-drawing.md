@@ -2,6 +2,10 @@
 
 - **Status:** Accepted (supersedes 0080's adaptation step; answers 0098's measurement; amends 0021, 0066, 0079, 0099)
 - **Date:** 2026-09-07
+- **Reversed in the harness (2026-10-12, task 0045):** designer_toad draws every ASCII art
+  itself, renders the card and improves the art from the screenshot; the library is no longer
+  a source ([harness-tools.md](../architecture/harness-tools.md)). The admin ASCII review
+  page goes with it; the owner reports bad art from the feed like any other card.
 - **Deciders:** owner, Claude
 
 ## Context

@@ -1,6 +1,9 @@
 # ADR-0066: Over-budget ASCII art is redrawn, then rejected with its card — never silently dropped
 
 - **Status:** Accepted
+- **Changed in the harness (2026-10-12, task 0045):** designer_toad draws a card's art after
+  the gate, renders it and improves it until it looks right; a card waits for its art rather
+  than being rejected over it ([harness-tools.md](../architecture/harness-tools.md)).
 - **Date:** 2026-08-27
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0042](0042-freeform-ascii-and-real-hero-mechanism.md) — replaces its

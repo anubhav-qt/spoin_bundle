@@ -1,6 +1,8 @@
 # ADR-0080: A dedicated ASCII fetcher node — retrieve, pick, caption, and never repeat an art within a topic
 
 - **Status:** Accepted
+- **Replaced in the harness (2026-10-12, task 0045):** no fetcher; designer_toad draws each
+  card's art from the writer's request ([harness-tools.md](../architecture/harness-tools.md)).
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0059](0059-card-planning-pass-and-prompt-versioning.md)

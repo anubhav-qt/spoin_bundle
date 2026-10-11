@@ -31,7 +31,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed, quiz done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
@@ -72,6 +72,12 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   that promise more cards are being written.
 - **Hard rule 1 is enforced twice** (2026-10-11): a Biome `noRestrictedImports` override on the
   read path's files, and `test/architecture.test.ts`, which follows imports transitively.
+- **The quiz grades through an injected `Grader`** (2026-10-11). Free-text grading is a model
+  call on the request path, and the model layer is Phase 8, so `Deps.grader` is an interface:
+  the server has `noGrader` until then (a written answer answers 502, "Grading failed, try
+  again") and the tests stand the model in. No transaction stays open across the call; the
+  attempt row is locked when the grade is written, so a double submit is graded once. ADR-0005's
+  collection rule is checked by the typechecker in `test/architecture.test.ts`.
 
 ## Asked when we get there
 
@@ -79,6 +85,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - Provider probes for CLIProxyAPI-Gemini and NIM before the harness depends on them (CLAUDE.md).
 - The verification checklist's contents, written with the owner.
 - Backups and image hosting on Oracle.
+- Which model grades quiz answers and answers AskAI on the request path, through the Phase 8
+  balancer.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

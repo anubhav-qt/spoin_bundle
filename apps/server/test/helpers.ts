@@ -2,9 +2,10 @@ import { makeApp } from "../src/app.ts";
 import { makeDeps } from "../src/deps.ts";
 import { loadEnv } from "../src/env.ts";
 import { testEnv } from "./env.ts";
+import { grader } from "./grader.ts";
 
 export const env = loadEnv({ ...process.env, ...testEnv });
-export const deps = makeDeps(env);
+export const deps = { ...makeDeps(env), grader };
 export const app = makeApp(deps);
 
 let addresses = 0;

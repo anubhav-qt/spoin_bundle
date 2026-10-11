@@ -1,6 +1,14 @@
 import { randomUUID } from "node:crypto";
 import type { Difficulty } from "@spoin/shared/enums";
-import { card, engagementEvent, subtopic, topic, userCardState, userTopic } from "../src/db/schema.ts";
+import {
+  card,
+  engagementEvent,
+  question,
+  subtopic,
+  topic,
+  userCardState,
+  userTopic,
+} from "../src/db/schema.ts";
 import type { Rng } from "../src/feed/ranking.ts";
 import { deps } from "./helpers.ts";
 
@@ -67,6 +75,41 @@ export async function addCards(s: Subtopic, n: number, from = 0) {
         body: `The body of ${s.title} card ${from + i}.`,
       })),
     )
+    .returning();
+}
+
+/**
+ * Active quiz questions in a subtopic, spread over its cards so a wrong answer points
+ * back at a particular one. MCQ `i` is right at option `i % 4`.
+ */
+export async function addQuestions(
+  s: Subtopic,
+  cards: (typeof card.$inferSelect)[],
+  n: { mcq: number; freeText: number },
+) {
+  const on = (i: number) => {
+    const c = cards[i % cards.length];
+    if (!c) throw new Error("questions need a card to point at");
+    return { subtopicId: s.id, cardId: c.id, difficulty: s.difficulty, status: "active" as const };
+  };
+  const mcq = Array.from({ length: n.mcq }, (_, i) => ({
+    ...on(i),
+    kind: "mcq" as const,
+    stem: `${s.title}: which option is right for question ${i}?`,
+    options: ["Alpha", "Bravo", "Charlie", "Delta"],
+    correctIndex: i % 4,
+    explanation: `Option ${i % 4} is right.`,
+  }));
+  const freeText = Array.from({ length: n.freeText }, (_, i) => ({
+    ...on(i),
+    kind: "free_text" as const,
+    stem: `Explain how container layer caching works (${s.title}, ${i}).`,
+    rubric: "3: complete and correct; 2: mostly; 1: partly; 0: wrong or missing.",
+    referenceAnswer: "Layers are content-addressed, so an unchanged layer is reused.",
+  }));
+  return db
+    .insert(question)
+    .values([...mcq, ...freeText])
     .returning();
 }
 

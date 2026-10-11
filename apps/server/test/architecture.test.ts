@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { describe, expect, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
+import type { Grader } from "../src/quiz/grader.ts";
 
 /*
  * Hard rules enforced twice: a Biome `noRestrictedImports` override stops a stray
@@ -55,6 +56,18 @@ function reach(roots: string[]) {
   return { files: seen, bare };
 }
 
+/**
+ * The methods of `T` whose first parameter is not a collection. ADR-0005: the free tiers
+ * meter requests, not tokens, so every model-facing method takes a batch.
+ */
+type SingleItem<T> = {
+  [K in keyof T]: T[K] extends (...args: infer P) => unknown
+    ? P[0] extends readonly unknown[]
+      ? never
+      : K
+    : never;
+}[keyof T];
+
 describe("architecture", () => {
   test("no model client anywhere the feed read path reaches (hard rule 1)", () => {
     const { files, bare } = reach(READ_PATH.flatMap(filesUnder));
@@ -64,5 +77,10 @@ describe("architecture", () => {
     expect(offenders, "The feed read path must never touch a model: precompute a column instead.").toEqual(
       [],
     );
+  });
+
+  test("every model-facing method takes a collection (ADR-0005)", () => {
+    // Checked by the typechecker: an offending method's name shows up in the error.
+    expectTypeOf<SingleItem<Grader>>().toEqualTypeOf<never>();
   });
 });

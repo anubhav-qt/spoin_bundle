@@ -10,6 +10,7 @@ import { feedRoutes } from "./routes/feed.ts";
 import { healthRoutes } from "./routes/health.ts";
 import { notesRoutes } from "./routes/notes.ts";
 import { profileRoutes } from "./routes/profile.ts";
+import { quizRoutes } from "./routes/quiz.ts";
 import { topicsRoutes } from "./routes/topics.ts";
 
 /** Any device on the owner's network, so the phone can reach a dev server on the laptop. */
@@ -51,6 +52,7 @@ export function makeApp(deps: Deps) {
   app.route("/", topicsRoutes(deps));
   app.route("/", engagementRoutes(deps));
   app.route("/", feedRoutes(deps));
+  app.route("/", quizRoutes(deps));
 
   // The contract for clients that aren't TypeScript (the mobile app's codegen).
   app.doc31("/openapi.json", {

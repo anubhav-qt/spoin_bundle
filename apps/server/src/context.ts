@@ -3,6 +3,7 @@ import type pg from "pg";
 import type { Auth } from "./auth.ts";
 import type { Db, UniverseDb } from "./db/client.ts";
 import type { Env } from "./env.ts";
+import type { Grader } from "./quiz/grader.ts";
 
 /** Everything a route needs, built once per process by the entrypoint and passed in. */
 export interface Deps {
@@ -13,6 +14,8 @@ export interface Deps {
   universe: UniverseDb | null;
   auth: Auth;
   embedder: Embedder;
+  /** Grades quiz answers; the request path's one model call besides AskAI. */
+  grader: Grader;
 }
 
 /** The signed-in caller, as the auth middleware resolves it. */

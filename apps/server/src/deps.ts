@@ -3,6 +3,7 @@ import { makeAuth } from "./auth.ts";
 import type { Deps } from "./context.ts";
 import { connectApp, connectUniverse } from "./db/client.ts";
 import type { Env } from "./env.ts";
+import { noGrader } from "./quiz/grader.ts";
 
 export function makeEmbedder(env: Env): Embedder {
   return env.EMBEDDER === "qwen3"
@@ -23,6 +24,7 @@ export function makeDeps(env: Env): Deps & { close: () => Promise<void> } {
     universe: universe?.db ?? null,
     auth: makeAuth(env, app.db),
     embedder: makeEmbedder(env),
+    grader: noGrader,
     close: async () => {
       await Promise.all([app.pool.end(), universe?.pool.end()]);
     },

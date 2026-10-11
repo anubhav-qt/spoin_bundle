@@ -30,6 +30,7 @@ export const errors = {
   409: { description: "Conflict", ...errorBody },
   422: { description: "Invalid request", ...errorBody },
   429: { description: "Too many requests", ...errorBody },
+  502: { description: "An upstream model failed", ...errorBody },
 } as const;
 
 /** A JSON response body, for `createRoute`'s `responses`. */

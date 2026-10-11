@@ -433,13 +433,48 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   gives each time-sensitive claim a date to check it again, and `write_map` refuses one
   without it. When a date comes due, code wakes the frog, which checks those claims against
   the web and, when they have changed, updates them as it does stale material.
+- **No provider probes before building** (2026-10-12). Phase 8 builds on breader's numbers for
+  NIM and lets the balancer's cooldowns absorb the limits; a provider is probed only once it
+  sheds. This sets aside CLAUDE.md's measure-first rule for the harness, by the owner's choice.
+- **spoin's CLIProxyAPI uses Trotter's sign-ins** (2026-10-12). The compose service reads copies
+  of the two Antigravity auth files from `E:\trotter\harness\.cliproxy\auths`, kept in the
+  gitignored `infra/.cliproxy/auths`; spoin has no login step of its own.
+- **The proxy runs from our own image** (2026-10-12): a Dockerfile that downloads CLIProxyAPI's
+  v8.0.23 Linux release, the version Trotter runs, and checks its checksum before installing it,
+  as Trotter's ADR 0005 did for the binary.
+- **The proxy is on the compose network and 127.0.0.1:8318** (2026-10-12): the api and worker
+  reach it by service name, and a script or curl on the owner's PC reaches it while building
+  (8317 is Trotter's). `CLIPROXY_API_KEY` and `CLIPROXY_MANAGEMENT_KEY` live in the gitignored
+  `infra/.env`, and the stack refuses to start without them. It routes round-robin across the two
+  accounts (Trotter's config fills the first account first), so parallel chats and the request
+  path split the load.
+- **Trotter's pi fork is copied as is** (2026-10-12): `packages/pi-ai` and `packages/pi-agent`
+  (upstream `e37cdc4` plus Trotter's changes, LICENSE kept), renamed `@spoin/pi-ai` and
+  `@spoin/pi-agent`, all four APIs kept. Trotter cut image generation, not image input: user
+  messages and tool results still carry images through Gemini and OpenAI chat, so "+ images"
+  is tests of that path, not a port.
+- **The balancer is for NIM only** (2026-10-12). It is the stream function of a chat on NIM:
+  each model call takes the best free rung (Kimi K3 primary, Nemotron 3 Ultra while it is down,
+  24 calls at once each, as breader), is buffered until it completes, and on failure cools that
+  model and is retried there or on the next rung before the chat sees it, so a writer can move
+  to Nemotron mid-run. Its state is per process, as breader's. Gemini calls go straight to
+  CLIProxyAPI, which rotates the two accounts, with pi's own retries on 429 and 5xx.
+- **Every model call is a `model_call` row** (2026-10-12), Gemini and NIM alike: the model, ok
+  or the failure kind and its reason, seconds to the first token, total seconds, prompt and
+  output tokens, never text. Phase 9 adds the chat run that made it. The model accounts page
+  reads it, and so can ero_sennin.
+- **The model accounts page** (2026-10-12) shows CLIProxyAPI's signed-in accounts and the models
+  it serves, read live from its management API, and per model from `model_call` over the last
+  24 hours: calls, failures by kind, last success, last failure with its reason, median seconds
+  to the first token, and tokens in and out.
+- **Grading and AskAI run on Gemini, then NIM** (2026-10-12). Both are on the request path: a
+  written quiz answer is graded, and an AskAI chat answers, on Gemini 3.8 Flash at medium
+  thinking through CLIProxyAPI; when that call fails, the same call goes to NIM through the
+  balancer, so a reader more often gets an answer, sometimes a slow one.
 
 ## Asked when we get there
 
-- Provider probes for CLIProxyAPI-Gemini, NIM and SearXNG before the harness depends on them (CLAUDE.md).
 - Backups and image hosting on the ThinkPad, fetched pages on disk included.
-- Which model grades quiz answers and answers AskAI on the request path, through the Phase 8
-  balancer.
 - A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
   loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
   one.

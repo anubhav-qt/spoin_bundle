@@ -28,6 +28,25 @@ services:
       timeout: 3s
       retries: 20
 
+  # Gemini through the owner's Antigravity sign-ins (task 0045). The auth files are copies of
+  # Trotter's, in the gitignored .cliproxy/auths; the keys are in the gitignored infra/.env, and
+  # nothing starts without them. 8317 on the host is Trotter's own proxy.
+  cliproxy:
+    build: ./cliproxy
+    restart: unless-stopped
+    environment:
+      CLIPROXY_API_KEY: ${CLIPROXY_API_KEY:?Set CLIPROXY_API_KEY in infra/.env}
+      CLIPROXY_MANAGEMENT_KEY: ${CLIPROXY_MANAGEMENT_KEY:?Set CLIPROXY_MANAGEMENT_KEY in infra/.env}
+    ports:
+      - "127.0.0.1:8318:8317"
+    volumes:
+      - ./.cliproxy/auths:/app/auths
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null -H \"Authorization: Bearer $$CLIPROXY_API_KEY\" http://127.0.0.1:8317/v1/models"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
   migrate:
     build: { context: .., dockerfile: apps/server/Dockerfile }
     command: ["node", "--enable-source-maps", "dist/migrate.js"]

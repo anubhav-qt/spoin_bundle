@@ -62,10 +62,12 @@ holding all the data for now. Everything is tested in local Docker first.
 its prompts, canon and validators are reused.
 
 - Built on Trotter's pi fork with image input added back, because sourcing an image means
-  looking at it.
+  looking at it. (Revised 2026-10-12: Trotter's fork kept image input and cut only image
+  generation, so it is copied as is and the image path gets tests.)
 - Models come from CLIProxyAPI (Gemini through the owner's Antigravity sign-ins) and
   NVIDIA NIM, behind a breader-style balancer. The accounts are shared with breader,
-  Seelie and Trotter.
+  Seelie and Trotter. (Revised 2026-10-12: the balancer covers NIM only; Gemini calls go
+  straight to CLIProxyAPI. Task 0045 has it.)
 - Every chat is long-running and Trotter-shaped: woken from a queue in the database,
   compacted when full, every run's messages and tool calls stored, every change a
   versioned record.
@@ -175,6 +177,9 @@ server passes its ported tests; git history keeps it.
   the fallback that needs no code change.
 - CLAUDE.md's rule still binds: **measure a provider's concurrency behaviour before
   building on it.** Neither CLIProxyAPI-Gemini nor NIM has been measured from spoin.
+  (Revised 2026-10-12: the owner chose to build without probes, on breader's numbers, with the
+  balancer's cooldowns absorbing the limits; a provider is probed once it sheds. Task 0045 has
+  it.)
 - Today's 605 cards stay in `spoin_db_2` and its Neon copy; the new system does not
   carry them over.
 

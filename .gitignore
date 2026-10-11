@@ -67,3 +67,6 @@ docs/the_spoin_universe/temp/*
 # Retrieval-eval working files (task 0038 Phase 3). Both rebuild from
 # scripts/eval/build_queries.py and scripts/eval/retrieve_pools.py; pools.json is ~1MB.
 .eval/
+
+# CLIProxyAPI's sign-ins for the spoin-hono stack (copies of Trotter's; task 0045)
+infra/.cliproxy/

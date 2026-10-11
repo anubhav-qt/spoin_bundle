@@ -6,6 +6,7 @@ import { REQUEST_ID_HEADER, requestContext, resolveCaller } from "./lib/http.ts"
 import { router } from "./lib/openapi.ts";
 import { authRoutes } from "./routes/auth.ts";
 import { engagementRoutes } from "./routes/engagement.ts";
+import { feedRoutes } from "./routes/feed.ts";
 import { healthRoutes } from "./routes/health.ts";
 import { notesRoutes } from "./routes/notes.ts";
 import { profileRoutes } from "./routes/profile.ts";
@@ -49,6 +50,7 @@ export function makeApp(deps: Deps) {
   app.route("/", notesRoutes(deps));
   app.route("/", topicsRoutes(deps));
   app.route("/", engagementRoutes(deps));
+  app.route("/", feedRoutes(deps));
 
   // The contract for clients that aren't TypeScript (the mobile app's codegen).
   app.doc31("/openapi.json", {

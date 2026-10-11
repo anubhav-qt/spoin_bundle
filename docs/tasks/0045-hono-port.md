@@ -31,7 +31,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 2 | Drizzle schemas: app DB (from `apps/api/src/spoin/domain`) and universe DB (from `apps/frog/src/frog/universe` + `curriculum/models.py`), first migrations, `migrate.ts`, the test-DB guard (name must end in `_test`) | done |
 | 3 | Hono app: env, logging, request id, errors as `{detail}`, CORS, OpenAPI doc, `/health` | done |
 | 4 | Better Auth: email + password, Google, anonymous guests, bearer plugin, admin role. A guest claims *in place* (`/auth/claim`, `/auth/claim/google`), same user id, as ADR-0033 | done |
-| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics done |
+| 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | profile, notes, topics, engagement, feed done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, tadpole runs, job status, model accounts | |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | |
@@ -51,7 +51,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   the job), or accepts it (canonical name and slug, category, then the curriculum tadpole).
 - **Tadpoles become frogs** (2026-10-11). A topic's tadpole becomes its frog once the topic's
   first generation is live in production; later updates and feedback-driven improvements
-  run in the frog. Unrelated to `packages/frog`.
+  run in the frog. `packages/frog`, the retrieval library, keeps its name: the owner is fine
+  with both being frogs.
 - **Reports go to the frogs** (2026-10-11). Card reports keep their ADR-0076 shape and their
   `repair` job, coalesced per card; in Phase 9 that job is routed to the frog of the card's
   topic. The frog sorts safe from suspicious by comparing with earlier reports of a similar
@@ -60,6 +61,11 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **Agents fetch their history, they don't remember it** (2026-10-11). Every record an agent
   flags or judges lives in Postgres, and agents read it through tools when they need it, never
   from their own context. Phase 9's tool set and schema are built around that.
+- **The feed's filter key is a digest** (2026-10-11). The Python stored the sorted, joined topic
+  ids in a 64-character column, so filtering the feed to two or more topics overflowed it and
+  500'd. The port stores their SHA-1 instead; no schema change.
+- **Hard rule 1 is enforced twice** (2026-10-11): a Biome `noRestrictedImports` override on the
+  read path's files, and `test/architecture.test.ts`, which follows imports transitively.
 
 ## Asked when we get there
 

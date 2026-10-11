@@ -42,6 +42,44 @@
       "includes": ["packages/pi-ai/**", "packages/pi-agent/**"],
       "formatter": { "enabled": false },
       "linter": { "enabled": false }
+    },
+    {
+      "includes": [
+        "apps/server/src/feed/**",
+        "apps/server/src/engagement/**",
+        "apps/server/src/cards/**",
+        "apps/server/src/routes/feed.ts",
+        "apps/server/src/routes/engagement.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "openai": "Hard rule 1: the feed read path never touches a model.",
+                  "ai": "Hard rule 1: the feed read path never touches a model."
+                },
+                "patterns": [
+                  {
+                    "group": [
+                      "@google/genai*",
+                      "@google/generative-ai*",
+                      "openai/*",
+                      "@anthropic-ai/*",
+                      "@ai-sdk/*",
+                      "@mariozechner/pi-*",
+                      "@spoin/pi-*"
+                    ],
+                    "message": "Hard rule 1: the feed read path never touches a model. Precompute a column instead."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

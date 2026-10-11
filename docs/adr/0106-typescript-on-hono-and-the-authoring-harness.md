@@ -84,6 +84,11 @@ its prompts, canon and validators are reused.
     from the same usernames to tell safe from suspicious. A genuine one it implements:
     a new version of the card in the same family, which replaces the old one in
     production.
+  - **Records live in Postgres, not in context.** Everything any agent flags or judges
+    (report verdicts, safe or suspicious reporters, failures, lessons) is a row. Agents
+    look past records up through tools when they need them instead of carrying them in
+    their context, so a judgment rests on what was actually recorded, never on a
+    remembered or invented history.
 - **Nothing waits on the owner.** Before anything goes live, a separate model call runs a
   verification checklist written with the owner. What passes goes live; the owner
   audits afterwards.

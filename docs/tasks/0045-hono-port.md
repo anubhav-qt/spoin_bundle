@@ -57,6 +57,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   topic. The frog sorts safe from suspicious by comparing with earlier reports of a similar
   style or from the same usernames, implements a genuine one as a new card version in the
   same family, and that version replaces the old one in production.
+- **Agents fetch their history, they don't remember it** (2026-10-11). Every record an agent
+  flags or judges lives in Postgres, and agents read it through tools when they need it, never
+  from their own context. Phase 9's tool set and schema are built around that.
 
 ## Asked when we get there
 
@@ -64,3 +67,6 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - Provider probes for CLIProxyAPI-Gemini and NIM before the harness depends on them (CLAUDE.md).
 - The verification checklist's contents, written with the owner.
 - Backups and image hosting on Oracle.
+- A per-user rate limit on `/engagement/events`. The Python left it as a to-do ("a buggy client
+  loop is indistinguishable from an attack", ADR-0011); the port has none until the owner picks
+  one.

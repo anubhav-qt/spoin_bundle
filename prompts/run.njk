@@ -1,4 +1,9 @@
 {% import "partials/macros.njk" as m %}
+{% if triggers[0].kind == "reader" %}
+{# A reader's turn in AskAI is only their message. #}
+{% set trigger = triggers[0] %}
+{% include "handovers/reader.njk" %}
+{% else %}
 It is {{ now }}, India time. You were woken by:
 
 {% for trigger in triggers %}
@@ -21,3 +26,4 @@ Your run {{ trigger.run }} paused when your chat reached its limit, and your cha
 {% endif %}
 
 {% endfor %}
+{% endif %}

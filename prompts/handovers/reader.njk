@@ -1,0 +1,15 @@
+{% if trigger.card %}
+The reader is on this card:
+
+<card>
+# {{ trigger.card.title }}
+
+{{ trigger.card.summary }}
+
+{{ trigger.card.body }}
+</card>
+
+{% endif %}
+<question>
+{{ trigger.question }}
+</question>

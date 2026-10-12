@@ -19,6 +19,12 @@ import { ToolError, type TopicTools } from "./tools.ts";
  * compaction runs' excepted. The chat reads the topic only through the turn's tools.
  */
 
+/**
+ * The tags `handovers/reader.njk` wraps around the turn. The reader's text can neither close its
+ * own <question> nor open a card of its own, so it stays inside the part marked as data.
+ */
+const DELIMITERS = /<\s*\/?\s*(?:question|card)\b[^>]*>/gi;
+
 export interface HarnessAskChatOptions {
   db: Db;
   prompts: Prompts;
@@ -79,7 +85,9 @@ async function* answer(options: HarnessAskChatOptions, turn: AskTurn): AsyncGene
     chat,
     model,
     thinkingLevel: options.thinkingLevel,
-    triggers: [{ kind: "reader", question: turn.question, card: turn.card?.id ?? null }],
+    triggers: [
+      { kind: "reader", question: turn.question.replace(DELIMITERS, ""), card: turn.card?.id ?? null },
+    ],
     apiKey: options.apiKey,
     tools: askTools(turn.tools, prompts),
     // It stores nothing but its summary.

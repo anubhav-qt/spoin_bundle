@@ -1,0 +1,9 @@
+{% if record.status != "active" %}
+Status: {{ record.status }}
+{% endif %}
+{% if record.reason %}
+Why version {{ record.version }}: {{ record.reason }}
+{% endif %}
+{% if record.revertsTo %}
+It puts back version {{ record.revertsTo }}.
+{% endif %}

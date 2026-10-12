@@ -168,5 +168,6 @@ export type ActionResult = Static<typeof ActionResult>;
 export type ChatAddress = Static<typeof ChatAddress>;
 export type QuestionRecord = Static<typeof QuestionRecord>;
 export type AnswerRecord = Static<typeof AnswerRecord>;
+export type SummarySections = Static<typeof SummarySections>;
 export type CompactionSummary = Static<typeof CompactionSummary>;
 export type CompactionSummaryRecord = Static<typeof CompactionSummaryRecord>;

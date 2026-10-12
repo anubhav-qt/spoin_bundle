@@ -1,0 +1,9 @@
+{% if summary %}
+
+## What you remember from earlier
+
+Your chat has compacted: everything before it is still stored, but you no longer see it. This is the summary you wrote then. Take every number fresh from your tools, never from here.
+
+{% set record = summary %}
+{% include "handovers/compaction_summary.njk" %}
+{% endif %}

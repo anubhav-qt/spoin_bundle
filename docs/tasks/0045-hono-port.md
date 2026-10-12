@@ -516,6 +516,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   its changes run one at a time in the order the model asked, while the reads go on. A tadpole
   fetching six pages waits for the slowest, not all six in turn. The model reads the results in the
   order it asked. `packages/pi-agent` carries Seelie's change to pi's parallel tool calls.
+- **A run opens with Trotter's message, in India time** (2026-10-13): `prompts/run.njk` gives the
+  date and time in India, then what woke the chat: its schedule, each record handed to it shown
+  through that record's own handover template, a compaction, or a run carrying on a paused one,
+  with what that run already stored so nothing is done twice.
 
 ## Asked when we get there
 

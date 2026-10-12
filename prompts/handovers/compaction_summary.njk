@@ -1,0 +1,35 @@
+{% import "partials/macros.njk" as m %}
+Compaction summary ({{ m.ref(record) }})
+Covers the chat through run {{ record.body.throughRun }}
+So far: {{ record.body.soFar }}
+Learnings:
+{% for item in record.body.learnings %}
+- {{ item }}
+{% else %}
+- none
+{% endfor %}
+Feedback received:
+{% for item in record.body.feedback %}
+- {{ item }}
+{% else %}
+- none
+{% endfor %}
+Do:
+{% for item in record.body.dos %}
+- {{ item }}
+{% else %}
+- none
+{% endfor %}
+Don't:
+{% for item in record.body.donts %}
+- {{ item }}
+{% else %}
+- none
+{% endfor %}
+Next steps:
+{% for item in record.body.nextSteps %}
+- {{ item }}
+{% else %}
+- none
+{% endfor %}
+{% include "partials/version.njk" %}

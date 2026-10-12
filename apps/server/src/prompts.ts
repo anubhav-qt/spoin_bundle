@@ -16,7 +16,8 @@ export interface Prompts {
   render(template: string, data: object): string;
 }
 
-export function loadPrompts(directory: string = PROMPTS_DIRECTORY): Prompts {
+/** `directory`: several are searched in order, so tests can put a template of their own first. */
+export function loadPrompts(directory: string | string[] = PROMPTS_DIRECTORY): Prompts {
   const environment = new nunjucks.Environment(new nunjucks.FileSystemLoader(directory), {
     // Prompts aren't HTML.
     autoescape: false,

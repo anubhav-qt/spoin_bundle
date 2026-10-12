@@ -1,0 +1,21 @@
+{% import "partials/macros.njk" as m %}
+It is {{ now }}, India time. You were woken by:
+
+{% for trigger in triggers %}
+{% if trigger.kind == "schedule" %}
+Your schedule: {{ trigger.schedule }}.
+{% elif trigger.kind == "record" %}
+{% set record = trigger.record %}
+{% if record.kind == "question" %}
+A question for you. Answer it with answer in this run, even if all you can say is that you don't know yet: the chat that asked is woken only by your answer.
+{% elif record.kind == "answer" %}
+The answer to a question you asked:
+{% endif %}
+{% include "handovers/" + record.kind + ".njk" %}
+{% elif trigger.kind == "compaction" %}
+{% include "compaction.njk" %}
+{% else %}
+Your run {{ trigger.run }} paused when your chat reached its limit, and your chat has compacted since. Before it paused, it stored: {{ m.refs(trigger.stored) }}. Carry it on from where your summary's next steps say you were, without redoing what it did. What woke that run follows.
+{% endif %}
+
+{% endfor %}

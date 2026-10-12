@@ -1,0 +1,6 @@
+Stored. The agents that read it will see:
+
+{% for record in records %}
+{% include "handovers/" + record.kind + ".njk" %}
+
+{% endfor %}

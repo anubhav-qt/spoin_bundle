@@ -12,6 +12,8 @@ A question for you. Answer it with answer in this run, even if all you can say i
 The answer to a question you asked:
 {% endif %}
 {% include "handovers/" + record.kind + ".njk" %}
+{% elif trigger.kind == "reader" %}
+{% include "handovers/reader.njk" %}
 {% elif trigger.kind == "compaction" %}
 {% include "compaction.njk" %}
 {% else %}

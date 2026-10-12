@@ -120,7 +120,8 @@ export type ModelCallFailure = (typeof MODEL_CALL_FAILURES)[number];
 /**
  * The harness's long-running chats (ADR-0106, task 0045). One each of toad_sage, the curriculum
  * chat, ero_sennin and wise_toad; a tadpole (its topic's frog once its last tier is live),
- * designer_toad and visual_toad per topic; a helper per task, under the chat that started it.
+ * designer_toad and visual_toad per topic; a helper per task, under the chat that started it; and
+ * an AskAI chat per reader's thread, deleted with it.
  */
 export const CHAT_ROLES = [
   "toad_sage",
@@ -131,6 +132,7 @@ export const CHAT_ROLES = [
   "ero_sennin",
   "wise_toad",
   "helper",
+  "ask_ai",
 ] as const;
 export type ChatRole = (typeof CHAT_ROLES)[number];
 /** The roles there is one chat of. */

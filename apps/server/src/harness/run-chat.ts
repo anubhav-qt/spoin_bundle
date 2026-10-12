@@ -31,7 +31,7 @@ export interface RunChatInput {
   /** Stops the run: the model stops and the run ends as stopped. */
   signal?: AbortSignal;
   /** Hears every event of the run once it's stored, so a caller can show the run as it happens. */
-  onEvent?: (event: AgentEvent) => void;
+  onEvent?: (event: AgentEvent, run: Run) => void;
   /** Once the chat's context reaches this many tokens, the run ends paused at its next step boundary, so the chat can compact. */
   pauseAtTokens?: number;
 }
@@ -82,7 +82,8 @@ export async function runChat(input: RunChatInput): Promise<Run> {
     },
   });
   agent.subscribe(recordEvents(db, run, outputs));
-  if (input.onEvent) agent.subscribe(input.onEvent);
+  const { onEvent } = input;
+  if (onEvent) agent.subscribe((event) => onEvent(event, run));
 
   const stop = () => agent.abort();
   input.signal?.addEventListener("abort", stop, { once: true });

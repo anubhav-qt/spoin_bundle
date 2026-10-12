@@ -36,6 +36,13 @@
       "when": 1791832806912,
       "tag": "0004_routed_record",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791833696764,
+      "tag": "0005_ask_ai_chat",
+      "breakpoints": true
     }
   ]
 }

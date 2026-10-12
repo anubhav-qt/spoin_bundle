@@ -928,8 +928,8 @@ export const modelCall = pgTable(
     totalMs: integer("total_ms").notNull(),
     promptTokens: integer("prompt_tokens"),
     outputTokens: integer("output_tokens"),
-    /** The harness run that made it; null on the request path (grading, AskAI). */
-    runId: uuid("run_id").references(() => chatRun.id),
+    /** The harness run that made it, AskAI's included; null for grading, and once an AskAI chat is deleted. */
+    runId: uuid("run_id").references(() => chatRun.id, { onDelete: "set null" }),
   },
   (t) => [
     index("ix_model_call_model_started").on(t.model, t.startedAt),
@@ -942,7 +942,8 @@ export const modelCall = pgTable(
 // Trotter's store (its ADRs 0023, 0024 and 0027) on Postgres, for the tadpole harness (ADR-0106,
 // task 0045). The transcript, the action log and every record version are only ever added to:
 // triggers in the migration refuse an UPDATE or DELETE, raw SQL included. Runs and wakes change
-// as they go.
+// as they go. The one exception is an AskAI chat, deleted with its reader's thread: its runs,
+// transcript, action log and summaries go with it, by cascade, and the triggers let them.
 
 /** A long-running chat. Its runs, transcript and records outlive any one process. */
 export const chat = pgTable(
@@ -954,6 +955,10 @@ export const chat = pgTable(
     topicId: uuid("topic_id").references(() => topic.id),
     /** A helper's main chat, whose tools it has except starting helpers. */
     parentId: uuid("parent_id").references((): AnyPgColumn => chat.id),
+    /** An AskAI chat's thread. Deleting the thread (its reader's account going) deletes the chat. */
+    askConversationId: uuid("ask_conversation_id")
+      .unique("uq_chat_ask_conversation")
+      .references(() => askConversation.id, { onDelete: "cascade" }),
     createdAt: createdAt(),
   },
   (t) => [
@@ -963,6 +968,8 @@ export const chat = pgTable(
     uniqueIndex("uq_chat_topic_role").on(t.topicId, t.role).where(sql`topic_id IS NOT NULL`),
     check("ck_chat_topic", sql`(topic_id IS NOT NULL) = (role IN (${sqlList(TOPIC_CHAT_ROLES)}))`),
     check("ck_chat_parent", sql`(parent_id IS NOT NULL) = (role = 'helper')`),
+    // As text: the migration adds the enum value in the same transaction, where it can't be used yet.
+    check("ck_chat_ask_conversation", sql`(ask_conversation_id IS NOT NULL) = (role::text = 'ask_ai')`),
   ],
 );
 
@@ -976,7 +983,7 @@ export const chatRun = pgTable(
     id: id(),
     chatId: uuid("chat_id")
       .notNull()
-      .references(() => chat.id),
+      .references(() => chat.id, { onDelete: "cascade" }),
     model: varchar("model", { length: 128 }).notNull(),
     status: runStatus("status").notNull().default("running"),
     /** What woke it: its wakes' triggers, a compaction, or the paused run it carries on. */
@@ -1001,11 +1008,11 @@ export const chatMessage = pgTable(
   {
     chatId: uuid("chat_id")
       .notNull()
-      .references(() => chat.id),
+      .references(() => chat.id, { onDelete: "cascade" }),
     seq: integer("seq").notNull(),
     runId: uuid("run_id")
       .notNull()
-      .references(() => chatRun.id),
+      .references(() => chatRun.id, { onDelete: "cascade" }),
     message: jsonb("message").notNull(),
   },
   (t) => [
@@ -1024,7 +1031,7 @@ export const actionLog = pgTable(
     id: id(),
     runId: uuid("run_id")
       .notNull()
-      .references(() => chatRun.id),
+      .references(() => chatRun.id, { onDelete: "cascade" }),
     toolCallId: varchar("tool_call_id", { length: 256 }).notNull(),
     at: tz("at").notNull().defaultNow(),
     tool: varchar("tool", { length: 64 }).notNull(),

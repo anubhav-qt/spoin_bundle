@@ -54,6 +54,14 @@ export function openChatAt(db: Conn, address: ChatAddress): Promise<Chat> {
   return "topic" in address ? openTopicChat(db, address.role, address.topic) : openChat(db, address.role);
 }
 
+/** The AskAI chat of a reader's thread, made on its first turn. */
+export async function openAskChat(db: Conn, askConversationId: string): Promise<Chat> {
+  await db.insert(chat).values({ role: "ask_ai", askConversationId }).onConflictDoNothing();
+  const [found] = await db.select().from(chat).where(eq(chat.askConversationId, askConversationId));
+  if (!found) throw new StoreError(`The AskAI chat of thread ${askConversationId} could not be made.`);
+  return found;
+}
+
 /** A new helper under the chat that starts it. A helper never starts helpers of its own. */
 export async function newHelperChat(db: Conn, parent: Chat): Promise<Chat> {
   if (parent.role === "helper") throw new StoreError("A helper can't start helpers of its own.");

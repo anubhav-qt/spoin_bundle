@@ -72,9 +72,15 @@ export function versionedRecord<Kind extends string, Body extends TSchema>(kind:
  */
 export const ScheduleTrigger = Type.Object({ kind: Type.Literal("schedule"), schedule: Text }, CLOSED);
 export const RecordTrigger = Type.Object({ kind: Type.Literal("record"), record: RecordRef }, CLOSED);
+/** A reader's turn in an AskAI thread: their question, untrusted, and the card they were on, if any. */
+export const ReaderTrigger = Type.Object(
+  { kind: Type.Literal("reader"), question: Text, card: Type.Union([Id, Type.Null()]) },
+  CLOSED,
+);
 export const RunTrigger = Type.Union([
   ScheduleTrigger,
   RecordTrigger,
+  ReaderTrigger,
   Type.Object({ kind: Type.Literal("compaction"), contextTokens: Type.Integer({ minimum: 0 }) }, CLOSED),
   Type.Object({ kind: Type.Literal("continuation"), run: Id }, CLOSED),
 ]);

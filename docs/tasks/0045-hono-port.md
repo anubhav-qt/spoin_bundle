@@ -528,6 +528,21 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   tried again 15 min later, three tries in all. It tracks the records it has routed by id
   (`routed_record`), not by a position in the log as Trotter does: Postgres can commit sequence
   numbers out of order, so a record committed late behind a later one would be skipped.
+- **AskAI chats live in the harness tables** (2026-10-13). Each reader's thread is an `ask_ai`
+  chat tied to its `ask_conversation`, and each turn is a run of it, woken by the reader's question
+  and the card they're on. So it keeps Trotter's transcript, action log and compaction, and its
+  calls' `model_call` rows name the run. It reads the topic through `outline`, `cards`, `read`,
+  `search` and `passages`, all reads. A turn runs on Gemini. A call that fails before its answer
+  starts goes to NIM (`apps/server/src/models/gemini-then-nim.ts`), and one that fails after it
+  has started fails the turn. Built in `apps/server/src/ask/harness-chat.ts`.
+- **The reader sees everything AskAI writes, as it's written** (2026-10-13), a paragraph per
+  message, including a line it writes before a tool call. Its compaction runs are never shown.
+  OFF_TOPIC still counts only at the very start, and a refused turn stops the run.
+- **A reader's AskAI chats are deleted with them** (2026-10-13). Deleting an `ask_conversation`
+  deletes its chat, runs, transcript, action log and compaction summaries; the calls' rows stay,
+  unlinked. That happens when its reader's account goes: a guest who signs in to an existing
+  account, or a user an admin removes. It is the one exception the add-only triggers make: only an
+  `ask_ai` chat can be deleted, and its rows go only with it.
 
 ## Asked when we get there
 

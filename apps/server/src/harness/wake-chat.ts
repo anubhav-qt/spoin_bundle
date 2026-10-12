@@ -35,8 +35,8 @@ export interface WakeChatInput {
   streamFn: (run: Run) => StreamFn;
   /** Stops the run going, and wakes no more. */
   signal?: AbortSignal;
-  /** Hears every event of every run once it's stored. */
-  onEvent?: (event: AgentEvent) => void;
+  /** Hears every event of every run once it's stored, with the run it's from. */
+  onEvent?: (event: AgentEvent, run: Run) => void;
 }
 
 /** A chat whose context is bigger than its model's window can neither run nor compact on that model. */

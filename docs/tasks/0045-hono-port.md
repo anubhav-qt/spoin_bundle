@@ -34,7 +34,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | done |
-| 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | in progress: proxy, fork, model layer and model accounts page done; the grader waits on its prompt's gist |
+| 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | in progress: proxy, fork, model layer, model accounts page and the grader's prompt done; wiring the grader is next |
 | 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
@@ -475,6 +475,15 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   written quiz answer is graded, and an AskAI chat answers, on Gemini 3.8 Flash at medium
   thinking through CLIProxyAPI; when that call fails, the same call goes to NIM through the
   balancer, so a reader more often gets an answer, sometimes a slow one.
+
+- **Prompts follow `docs/architecture/writing-prompts.md`** (2026-10-12): what current guidance from
+  Anthropic, Google and OpenAI and the research on model graders say makes a prompt work, condensed
+  for this harness. The grader's (`prompts/grader.njk`, `prompts/grader-answers.njk`) is the first
+  written to it. The owner gave no gist of their own, so it keeps the Python's shape: the 0-3
+  scale, the question's own rubric winning over it, credit only for what the reader wrote, and 0
+  for an answer that tells the grader how to grade. It adds a sharper line at the pass level (2), and
+  the reference answer winning over the model's own knowledge. The justification is written to
+  the reader, who sees it on the results screen.
 
 ## Asked when we get there
 

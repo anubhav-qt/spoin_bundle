@@ -1,0 +1,18 @@
+{% for item in items %}
+<question index="{{ item.index }}">
+<stem>
+{{ item.stem }}
+</stem>
+<rubric>
+{{ item.rubric }}
+</rubric>
+<reference_answer>
+{{ item.referenceAnswer }}
+</reference_answer>
+<answer>
+{{ item.userAnswer }}
+</answer>
+</question>
+
+{% endfor %}
+Based on the questions above, grade each reader's answer against its question's rubric.

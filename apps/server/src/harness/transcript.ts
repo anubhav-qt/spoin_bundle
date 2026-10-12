@@ -94,7 +94,15 @@ export async function appendActionLogEntry(db: Conn, entry: ActionLogEntry): Pro
   await db.insert(actionLog).values({ ...checked, arguments: checked.arguments ?? {} });
 }
 
+/** An entry as stored, with when its call finished. */
+export type StoredActionLogEntry = ActionLogEntry & { id: string; at: Date };
+
 /** A run's tool calls, in the order they finished. */
-export async function readActionLog(db: Conn, runId: string) {
-  return db.select().from(actionLog).where(eq(actionLog.runId, runId)).orderBy(asc(actionLog.at));
+export async function readActionLog(db: Conn, runId: string): Promise<StoredActionLogEntry[]> {
+  const rows = await db.select().from(actionLog).where(eq(actionLog.runId, runId)).orderBy(asc(actionLog.at));
+  return rows.map(({ id, at, ...entry }) => ({
+    id,
+    at,
+    ...checkValue(ActionLogEntry, entry, `Action log entry ${id}`),
+  }));
 }

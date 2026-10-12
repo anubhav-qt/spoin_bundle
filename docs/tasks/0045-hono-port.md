@@ -506,6 +506,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   minute. A sign-in turned away ends the run. The limits cover all of an account's Gemini models
   together, so an older Gemini would help only when Flash alone is overloaded (breader's harness
   does that; `docs/architecture/model-numbers.md`). Grading and AskAI still go to NIM instead.
+  Built in `apps/server/src/harness/gemini.ts` on breader's numbers (a limit cools from 60 s up to
+  30 min, a busy or slow server from 30 s up to 10 min), with the limits read in
+  `src/models/limits.ts`. A request Gemini refuses (another 4xx) ends the run too, since waiting
+  can't fix it.
+
+- **A chat's tool calls: reads at once, changes in order** (2026-10-13). Seelie's, not Trotter's
+  one at a time: each tool says whether it reads or changes. A reply's reads all start at once, and
+  its changes run one at a time in the order the model asked, while the reads go on. A tadpole
+  fetching six pages waits for the slowest, not all six in turn. The model reads the results in the
+  order it asked. `packages/pi-agent` carries Seelie's change to pi's parallel tool calls.
 
 ## Asked when we get there
 

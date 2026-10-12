@@ -64,6 +64,13 @@ export function roomLeft(text: string): number | undefined {
   return undefined;
 }
 
+/**
+ * A limit or a quota is a rate failure however it's worded and whatever status it comes with
+ * (breader's harness `failureOf`): Google says RESOURCE_EXHAUSTED, or "Server requested 30s retry
+ * delay", and an account out of its limit isn't a sign-in turned away.
+ */
+const QUOTA = /RESOURCE_EXHAUSTED|quota|Server requested \d+s retry delay/i;
+
 export function kindOf(status: number): ModelCallFailure {
   if (status === 429) return "rate";
   if (status === 401 || status === 403 || status === 404) return "gone";
@@ -161,9 +168,11 @@ export async function runCall(
   if (message.stopReason === "error") {
     const refused = status !== undefined && status >= 400 ? status : statusIn(text);
     const seconds = Number(retryAfter);
+    let failure: ModelCallFailure = refused !== undefined ? kindOf(refused) : streamFailure(text);
+    if (QUOTA.test(text)) failure = "rate";
     return {
       ...outcome,
-      failure: refused !== undefined ? kindOf(refused) : streamFailure(text),
+      failure,
       reason: text.replace(/\s+/g, " ").slice(0, 300),
       retryAfterS: seconds > 0 ? seconds : undefined,
       room: roomLeft(text),
@@ -185,12 +194,14 @@ export async function runCall(
 /** Writes a call's row. Logging never stops a call, so a failed insert is only logged. */
 export type RecordCall = (model: Model<Api>, outcome: CallOutcome) => void;
 
-export function recordTo(db: Db): RecordCall {
+/** `runId`: the harness run the calls are for, if they are. */
+export function recordTo(db: Db, runId: string | null = null): RecordCall {
   return (model, outcome) => {
     if (outcome.abandoned) return;
     const usage = outcome.message.usage;
     db.insert(modelCall)
       .values({
+        runId,
         startedAt: outcome.startedAt,
         provider: model.provider,
         model: model.id,
@@ -231,13 +242,18 @@ export function failedMessage(model: Model<Api>, errorMessage: string): Assistan
 /** A stream that plays back a call that has already ended. */
 export function replay(message: AssistantMessage): AssistantMessageEventStream {
   const stream = createAssistantMessageEventStream();
+  endWith(stream, message);
+  return stream;
+}
+
+/** Ends a stream with a call that has already ended. */
+export function endWith(stream: AssistantMessageEventStream, message: AssistantMessage): void {
   if (message.stopReason === "error" || message.stopReason === "aborted") {
     stream.push({ type: "error", reason: message.stopReason, error: message });
   } else {
     stream.push({ type: "done", reason: message.stopReason as "stop" | "length" | "toolUse", message });
   }
   stream.end();
-  return stream;
 }
 
 /**

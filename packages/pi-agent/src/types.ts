@@ -40,8 +40,9 @@ export type StreamFn = (
  * Configuration for how tool calls from a single assistant message are executed.
  *
  * - "sequential": each tool call is prepared, executed, and finalized before the next one starts.
- * - "parallel": tool calls are prepared sequentially, then allowed tools execute concurrently.
- *   `tool_execution_end` is emitted in tool completion order after each tool is finalized,
+ * - "parallel": every tool call is prepared (`beforeToolCall`) and executed at once; calls to
+ *   tools whose `executionMode` is "sequential" execute one at a time among themselves, in
+ *   source order, while the others go on. `tool_execution_end` is emitted in tool completion order after each tool is finalized,
  *   while tool-result message artifacts are emitted later in assistant source order.
  */
 export type ToolExecutionMode = "sequential" | "parallel";
@@ -308,7 +309,8 @@ export interface AgentLoopConfig extends SimpleStreamOptions {
 	/**
 	 * Tool execution mode.
 	 * - "sequential": execute tool calls one by one
-	 * - "parallel": preflight tool calls sequentially, then execute allowed tools concurrently;
+	 * - "parallel": preflight and execute tool calls concurrently (tools marked "sequential"
+	 *   execute one at a time among themselves, in source order);
 	 *   emit `tool_execution_end` in tool completion order after each tool is finalized,
 	 *   then emit tool-result message artifacts later in assistant source order
 	 *
@@ -490,7 +492,8 @@ export interface AgentTool<TParameters extends TSchema = TSchema, TDetails = any
 	replay?: "never" | "safe";
 	/**
 	 * Per-tool execution mode override.
-	 * - "sequential": this tool must execute one at a time with other tool calls.
+	 * - "sequential": this tool executes one at a time with other "sequential" calls of the same
+	 *   message, in source order (other tools still execute alongside).
 	 * - "parallel": this tool can execute concurrently with other tool calls.
 	 *
 	 * If omitted, the default execution mode applies.

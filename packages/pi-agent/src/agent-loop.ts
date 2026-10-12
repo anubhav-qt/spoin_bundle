@@ -513,10 +513,7 @@ async function executeToolCalls(
 	emit: AgentEventSink,
 ): Promise<ExecutedToolCallBatch> {
 	const toolCalls = assistantMessage.content.filter((c) => c.type === "toolCall");
-	const hasSequentialToolCall = toolCalls.some(
-		(tc) => currentContext.tools?.find((t) => t.name === tc.name)?.executionMode === "sequential",
-	);
-	if (config.toolExecution === "sequential" || hasSequentialToolCall) {
+	if (config.toolExecution === "sequential") {
 		return executeToolCallsSequential(currentContext, assistantMessage, toolCalls, config, signal, emit);
 	}
 	return executeToolCallsParallel(currentContext, assistantMessage, toolCalls, config, signal, emit);
@@ -583,6 +580,11 @@ async function executeToolCallsSequential(
 	};
 }
 
+/**
+ * Seelie's fork (task 0045): every call is prepared and run at once. Calls to tools marked
+ * "sequential" still run one at a time among themselves, in the order given, each once its own
+ * check has passed; the rest never wait for them.
+ */
 async function executeToolCallsParallel(
 	currentContext: AgentContext,
 	assistantMessage: AssistantMessage,
@@ -591,8 +593,6 @@ async function executeToolCallsParallel(
 	signal: AbortSignal | undefined,
 	emit: AgentEventSink,
 ): Promise<ExecutedToolCallBatch> {
-	const finalizedCalls: FinalizedToolCallEntry[] = [];
-
 	for (const toolCall of toolCalls) {
 		await emit({
 			type: "tool_execution_start",
@@ -600,51 +600,53 @@ async function executeToolCallsParallel(
 			toolName: toolCall.name,
 			args: toolCall.arguments,
 		});
-
-		const preparation = await prepareToolCall(currentContext, assistantMessage, toolCall, config, signal);
-		if (preparation.kind === "immediate") {
-			const finalized = {
-				toolCall,
-				result: preparation.result,
-				isError: preparation.isError,
-			} satisfies FinalizedToolCallOutcome;
-			await emitToolExecutionEnd(finalized, emit);
-			finalizedCalls.push(finalized);
-			if (signal?.aborted) {
-				break;
-			}
-			continue;
-		}
-
-		finalizedCalls.push(async () => {
-			if (signal?.aborted) {
-				const finalized = {
-					toolCall,
-					result: createErrorToolResult("Operation aborted"),
-					isError: true,
-				} satisfies FinalizedToolCallOutcome;
-				await emitToolExecutionEnd(finalized, emit);
-				return finalized;
-			}
-			const executed = await executePreparedToolCall(preparation, signal, emitToolExecutionUpdate(toolCall, emit));
-			const finalized = await finalizeExecutedToolCall(
-				currentContext,
-				assistantMessage,
-				preparation,
-				executed,
-				config,
-				signal,
-			);
-			await emitToolExecutionEnd(finalized, emit);
-			return finalized;
-		});
-		if (signal?.aborted) {
-			break;
-		}
 	}
 
+	const tools = currentContext.tools ?? [];
+	let turn: Promise<void> = Promise.resolve();
 	const orderedFinalizedCalls = await Promise.all(
-		finalizedCalls.map((entry) => (typeof entry === "function" ? entry() : Promise.resolve(entry))),
+		toolCalls.map(async (toolCall): Promise<FinalizedToolCallOutcome> => {
+			const inLine = tools.find((t) => t.name === toolCall.name)?.executionMode === "sequential";
+			const before = turn;
+			let done = () => {};
+			if (inLine) turn = new Promise<void>((resolve) => (done = resolve));
+			try {
+				const preparation = await prepareToolCall(currentContext, assistantMessage, toolCall, config, signal);
+				if (preparation.kind === "immediate") {
+					const finalized = {
+						toolCall,
+						result: preparation.result,
+						isError: preparation.isError,
+					} satisfies FinalizedToolCallOutcome;
+					await emitToolExecutionEnd(finalized, emit);
+					return finalized;
+				}
+				if (inLine) await before;
+				if (signal?.aborted) {
+					const finalized = {
+						toolCall,
+						result: createErrorToolResult("Operation aborted"),
+						isError: true,
+					} satisfies FinalizedToolCallOutcome;
+					await emitToolExecutionEnd(finalized, emit);
+					return finalized;
+				}
+				const executed = await executePreparedToolCall(preparation, signal, emitToolExecutionUpdate(toolCall, emit));
+				const finalized = await finalizeExecutedToolCall(
+					currentContext,
+					assistantMessage,
+					preparation,
+					executed,
+					config,
+					signal,
+				);
+				await emitToolExecutionEnd(finalized, emit);
+				return finalized;
+			} finally {
+				// The next in line goes after this one, and after every one before it.
+				if (inLine) void before.then(done);
+			}
+		}),
 	);
 	const messages: ToolResultMessage[] = [];
 	for (const finalized of orderedFinalizedCalls) {
@@ -684,8 +686,6 @@ type FinalizedToolCallOutcome = AgentToolCallOutcome;
 export type ToolCallHooks = Pick<AgentLoopConfig, "beforeToolCall" | "afterToolCall">;
 
 type ToolUpdateSink = (partialResult: AgentToolResult<any>) => Promise<void> | void;
-
-type FinalizedToolCallEntry = FinalizedToolCallOutcome | (() => Promise<FinalizedToolCallOutcome>);
 
 function shouldTerminateToolBatch(finalizedCalls: FinalizedToolCallOutcome[]): boolean {
 	return finalizedCalls.length > 0 && finalizedCalls.every((finalized) => finalized.result.terminate === true);

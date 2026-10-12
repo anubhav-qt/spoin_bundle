@@ -81,7 +81,8 @@ export const jitter = (n: number) => n * (0.5 + Math.random());
 export const backoffS = (strikes: number, base: number, cap: number) =>
   jitter(Math.min(cap, base * 2 ** (strikes - 1)));
 
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+/** Waits `ms`, or less if `signal` aborts. */
+export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
     const timer = setTimeout(resolve, ms);
     signal?.addEventListener(

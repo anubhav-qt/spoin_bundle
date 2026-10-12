@@ -85,7 +85,8 @@ specific to marking books.
   - spoin uses Trotter's: 400k tokens or 60% of the window, whichever is smaller, with no runs
     kept word for word.
 - **Tool calls:** Seelie starts every tool call in a reply at once. Reads run in parallel, and
-  changes run one at a time in the order asked. Trotter runs every call one at a time.
+  changes run one at a time in the order asked. Trotter runs every call one at a time. spoin does
+  as Seelie does (task 0045).
 
 ## breader's tests, against spoin's
 
@@ -105,9 +106,11 @@ breader also tests these, which spoin's balancer does but no spoin test checks:
 - three empty answers sending the call to the next model;
 - a patient process asking a refused key again an hour later.
 
-breader tests these, which spoin has no code for yet:
+breader tests these, which spoin had no code for on 2026-10-13. Since Phase 9's run loop,
+`harness-gemini.test.ts` covers all but the fallback:
 
 - a limit or quota is a rate failure however it's worded;
 - a sign-in turned away stops the run;
-- falling back across Gemini models;
+- falling back across Gemini models (spoin waits on Flash instead, by the owner's choice: task
+  0045);
 - reading each account's limits, and waiting for one to fill again.

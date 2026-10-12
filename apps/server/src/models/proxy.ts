@@ -38,12 +38,45 @@ export function proxyConfig(env: Env): ProxyConfig | null {
 }
 
 /** Reads one endpoint and checks its answer. `key` says which of the two keys it takes. */
-export async function getFromProxy<Schema extends z.ZodType>(
+export function getFromProxy<Schema extends z.ZodType>(
   config: ProxyConfig,
   path: string,
   key: "api" | "management",
   schema: Schema,
   fetchFn: typeof fetch = fetch,
+): Promise<z.infer<Schema>> {
+  return askProxy(config, path, key, schema, fetchFn);
+}
+
+/** Posts `body` as JSON to one endpoint and checks its answer. */
+export function postToProxy<Schema extends z.ZodType>(
+  config: ProxyConfig,
+  path: string,
+  key: "api" | "management",
+  schema: Schema,
+  body: unknown,
+  fetchFn: typeof fetch = fetch,
+): Promise<z.infer<Schema>> {
+  return askProxy(config, path, key, schema, fetchFn, body);
+}
+
+/** Whether anything answers at the proxy's address, whatever it says. */
+export async function proxyAnswers(config: ProxyConfig, fetchFn: typeof fetch = fetch): Promise<boolean> {
+  try {
+    await fetchFn(`${config.url}/v1/models`, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function askProxy<Schema extends z.ZodType>(
+  config: ProxyConfig,
+  path: string,
+  key: "api" | "management",
+  schema: Schema,
+  fetchFn: typeof fetch,
+  body?: unknown,
 ): Promise<z.infer<Schema>> {
   const token = key === "api" ? config.apiKey : config.managementKey;
   if (!token)
@@ -51,7 +84,11 @@ export async function getFromProxy<Schema extends z.ZodType>(
   let response: Response;
   try {
     response = await fetchFn(config.url + path, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+      },
+      ...(body === undefined ? {} : { method: "POST", body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (error) {

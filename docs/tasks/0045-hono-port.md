@@ -520,6 +520,14 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   date and time in India, then what woke the chat: its schedule, each record handed to it shown
   through that record's own handover template, a compaction, or a run carrying on a paused one,
   with what that run already stored so nothing is done twice.
+- **Every chat with a wake due runs at once** (2026-10-13): no limit on how many chats the worker
+  runs together, where Trotter capped it. A chat still runs once at a time, and a wake that comes
+  while it runs waits for its next run. NIM's calls are already spread by the balancer, and
+  Gemini's wait in each run. The scheduler is Trotter's otherwise (`apps/server/src/harness/
+  scheduler.ts`): it looks every 30 s and whenever a chat finishes, and a failed run's wakes are
+  tried again 15 min later, three tries in all. It tracks the records it has routed by id
+  (`routed_record`), not by a position in the log as Trotter does: Postgres can commit sequence
+  numbers out of order, so a record committed late behind a later one would be skipped.
 
 ## Asked when we get there
 

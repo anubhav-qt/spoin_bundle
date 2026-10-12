@@ -1048,7 +1048,7 @@ export const harnessRecord = pgTable(
   {
     id: uuid("id").notNull(),
     version: integer("version").notNull(),
-    /** Grows with every version written, so the scheduler routes what is new since it last looked. */
+    /** Grows with every version written: the order records were written in. */
     seq: bigserial("seq", { mode: "number" }).notNull(),
     kind: varchar("kind", { length: 64 }).notNull(),
     status: recordStatus("status").notNull(),
@@ -1094,8 +1094,18 @@ export const wake = pgTable(
   (t) => [index("ix_wake_status_due").on(t.status, t.dueAt), index("ix_wake_chat").on(t.chatId, t.status)],
 );
 
-/** How far the scheduler has got: the last record it routed, and each schedule's last slot. */
+/** How far the scheduler has got with each schedule: its last slot. */
 export const schedulerMark = pgTable("scheduler_mark", {
   name: varchar("name", { length: 64 }).primaryKey(),
   value: text("value").notNull(),
+});
+
+/**
+ * The records the scheduler has routed to the chats they wake. Trotter routes every record past a
+ * position in the log; Postgres can commit sequence numbers out of order, so a record that commits
+ * late behind a later one would be skipped. Tracked by id instead (task 0045).
+ */
+export const routedRecord = pgTable("routed_record", {
+  recordId: uuid("record_id").primaryKey(),
+  routedAt: tz("routed_at").notNull().defaultNow(),
 });

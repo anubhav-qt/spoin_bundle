@@ -42,10 +42,14 @@ async function topicOf(db: Db, chat: Chat): Promise<{ name: string; description:
   return found ?? null;
 }
 
-/** The run's opening message: the time in India, and what woke the chat, each record rendered from its own template. */
+/**
+ * The run's opening message: the time in India, and what woke the chat, each record rendered from
+ * its own template. An AskAI chat's is only the reader's turn, or its own compaction's.
+ */
 export async function openingMessageFor(
   db: Db,
   prompts: Prompts,
+  chat: Chat,
   triggers: RunTrigger[],
   now: Date,
 ): Promise<string> {
@@ -62,7 +66,7 @@ export async function openingMessageFor(
       return trigger;
     }),
   );
-  return prompts.render("run.njk", { now: indiaTime(now), triggers: woken });
+  return prompts.render("run.njk", { now: indiaTime(now), role: chat.role, triggers: woken });
 }
 
 /** The card a reader was on, as they saw it; null when they were on none, or it has gone since. */

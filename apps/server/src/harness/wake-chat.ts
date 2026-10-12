@@ -90,7 +90,7 @@ async function runOnce(
     thinkingLevel: input.thinkingLevel,
     triggers,
     systemPrompt: await systemPromptFor(db, prompts, chat),
-    prompt: await openingMessageFor(db, prompts, triggers, new Date()),
+    prompt: await openingMessageFor(db, prompts, chat, triggers, new Date()),
     tools,
     apiKey: input.apiKey,
     streamFn: input.streamFn,

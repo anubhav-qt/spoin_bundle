@@ -33,7 +33,7 @@ import { recordTo } from "../src/models/calls.ts";
 import { loadPrompts, PROMPTS_DIRECTORY } from "../src/prompts.ts";
 import { makeTopic } from "./fixtures.ts";
 import { deps, signedUp, userIdOf } from "./helpers.ts";
-import { reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
+import { counted, reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
 
 /*
  * AskAI's chat on the harness (task 0045, Phase 9): a reader's thread is an `ask_ai` chat and each
@@ -200,6 +200,39 @@ describe("AskAI's chat", () => {
     const second = scripted.requests[1] ?? [];
     expect(second.map((message) => message.role)).toEqual(["system", "user", "assistant", "user"]);
     expect(opening(second)).toMatch(/<question>\nAnd borrowing\?\n<\/question>/);
+  });
+
+  test("a long thread compacts on AskAI's own prompt, unseen by the reader, then goes on from its summary", async () => {
+    const { turn } = await thread();
+    const summary = {
+      soFar: "The reader asked what ownership is, and was told it moves values.",
+      learnings: ["They take a move for a copy."],
+      feedback: [],
+      dos: ["Give an example with every answer."],
+      donts: [],
+      nextSteps: [],
+    };
+    const scripted = scriptedModel([
+      counted(text("Ownership moves values."), 5_000),
+      calls("call-1", "write_summary", summary),
+      text("Summary written."),
+      text("Borrowing lends them."),
+    ]);
+    const askAi = chatOn(scripted.streamFn, { compaction: { atTokens: 4_000, atWindowShare: 0.6 } });
+
+    await collect(askAi.turn(turn("What is ownership?")));
+    const chunks = await collect(askAi.turn(turn("And borrowing?")));
+
+    expect(chunks).toEqual(["Borrowing lends them."]);
+    expect(opening(scripted.requests[1]).trim()).toMatch(
+      /^This thread has grown to about 5000 tokens, its limit, so it compacts now\./,
+    );
+    const next = scripted.requests[3] ?? [];
+    expect(next.map((message) => message.role)).toEqual(["system", "user"]);
+    const [instructions] = next;
+    if (instructions?.role !== "system") throw new Error("The first message isn't the instructions.");
+    expect(contentText(instructions.content)).toMatch(/So far: The reader asked what ownership is/);
+    expect(opening(next).trim()).toBe("<question>\nAnd borrowing?\n</question>");
   });
 
   test("the reader's text can't close its question or open a card of its own", async () => {

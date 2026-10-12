@@ -3,6 +3,9 @@
 {# A reader's turn in AskAI is only their message. #}
 {% set trigger = triggers[0] %}
 {% include "handovers/reader.njk" %}
+{% elif role == "ask_ai" and triggers[0].kind == "compaction" %}
+{% set trigger = triggers[0] %}
+{% include "ask_ai-compaction.njk" %}
 {% else %}
 It is {{ now }}, India time. You were woken by:
 

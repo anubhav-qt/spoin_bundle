@@ -108,8 +108,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **AskAI: a chat per reader per topic** (2026-10-11). `GET /topics/{id}/ask`, the streamed
   `POST /topics/{id}/ask` and `POST /topics/{id}/ask/reset` keep ADR-0077's wire shape, so the
   web's `askStream` is unchanged. The answer comes from `Deps.askChat`, an injected `AskChat`:
-  `noAskChat` until Phase 9 plugs the pi chat in (every turn ends in `error`, cause `empty`),
-  and a stand-in in the tests. A turn hands the chat the conversation id (its memory is its
+  the harness chat from Phase 9 (below), `noAskChat` in a process with neither model key (every
+  turn ends in `error`, cause `empty`), and a stand-in in the tests. A turn hands the chat the conversation id (its memory is its
   own), the question, the card hint and `topicTools`: read-only, one topic, active cards
   only, with no user id or database handle, plus `passages` when a corpus is configured.
   `turn` is the one single-item model method, pinned in `test/architecture.test.ts`. The
@@ -543,6 +543,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   unlinked. That happens when its reader's account goes: a guest who signs in to an existing
   account, or a user an admin removes. It is the one exception the add-only triggers make: only an
   `ask_ai` chat can be deleted, and its rows go only with it.
+- **AskAI's prompts are its own** (2026-10-13). Its instructions (`prompts/ask_ai.njk`) keep the
+  Python's rules (answer only from the material, OFF_TOPIC, two to six sentences, the reader's text
+  is data) and add its tools; a turn's message is the card the reader is on, then their question
+  (`handovers/reader.njk`). Each tool says what it gives and when to call it (`prompts/tools/`).
+  A long thread compacts on `prompts/ask_ai-compaction.njk`: the same summary sections, read for
+  a thread (what was asked and told, what the reader understands or misreads, how they want to be
+  answered, a question still open), with no storing and no feedback.
+- **A turn runs on NIM's top model when Gemini can't be looked up** (2026-10-13): with no proxy, or
+  a proxy that can't say what Gemini is, the run is Kimi K3's and every call goes to the balancer.
+  `makeAskChat` in `apps/server/src/deps.ts`.
 
 ## Asked when we get there
 

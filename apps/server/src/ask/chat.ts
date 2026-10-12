@@ -22,8 +22,8 @@ export interface AskTurn {
 }
 
 /**
- * AskAI's chat (ADR-0106 amending ADR-0077): a separate pi chat per reader per topic,
- * from Phase 9. It answers from the tools and the thread so far, or replies with
+ * AskAI's chat (ADR-0106 amending ADR-0077): a harness chat per reader per topic
+ * (`harness-chat.ts`). It answers from the tools and the thread so far, or replies with
  * exactly `OFF_TOPIC`, which the server turns into a refusal of its own wording.
  */
 export interface AskChat {
@@ -34,7 +34,7 @@ export interface AskChat {
   turn(turn: AskTurn): AsyncIterable<string>;
 }
 
-/** Until the pi chat lands (task 0045, Phase 9), nothing answers and every turn ends in `error`. */
+/** For a process with neither a proxy nor a NIM key: nothing answers, and every turn ends in `error`. */
 export const noAskChat: AskChat = {
   async *turn() {},
 };

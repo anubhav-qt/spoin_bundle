@@ -9,22 +9,30 @@ import {
   CARD_REPORT_REASONS,
   CARD_SOURCES,
   CARD_STATUSES,
+  CHAT_ROLES,
   DIFFICULTIES,
   ENGAGEMENT_KINDS,
   MODEL_CALL_FAILURES,
   QUESTION_KINDS,
   QUESTION_STATUSES,
   QUIZ_KINDS,
+  RECORD_STATUSES,
   REJECTION_STAGES,
   REPAIR_MODES,
   REPAIR_STATUSES,
+  RUN_STATUSES,
   SEEN_STATES,
+  SINGLE_CHAT_ROLES,
+  TOPIC_CHAT_ROLES,
   TOPIC_EDGE_KINDS,
   TOPIC_SCOPES,
   VISUAL_KINDS,
+  WAKE_STATUSES,
 } from "@spoin/shared/enums";
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
+  bigserial,
   boolean,
   check,
   customType,
@@ -74,6 +82,13 @@ export const quizKind = pgEnum("quiz_kind", QUIZ_KINDS);
 export const topicEdgeKind = pgEnum("topic_edge_kind", TOPIC_EDGE_KINDS);
 export const topicScope = pgEnum("topic_scope", TOPIC_SCOPES);
 export const visualKind = pgEnum("visual_kind", VISUAL_KINDS);
+export const chatRole = pgEnum("chat_role", CHAT_ROLES);
+export const runStatus = pgEnum("run_status", RUN_STATUSES);
+export const wakeStatus = pgEnum("wake_status", WAKE_STATUSES);
+export const recordStatus = pgEnum("record_status", RECORD_STATUSES);
+
+/** `'a', 'b'`, for a CHECK or a partial index over enum values. */
+const sqlList = (values: readonly string[]) => sql.raw(values.map((value) => `'${value}'`).join(", "));
 
 // --------------------------------------------------------------- accounts --
 // Better Auth's four tables (ADR-0106). The JS property names are the ones Better
@@ -913,9 +928,174 @@ export const modelCall = pgTable(
     totalMs: integer("total_ms").notNull(),
     promptTokens: integer("prompt_tokens"),
     outputTokens: integer("output_tokens"),
+    /** The harness run that made it; null on the request path (grading, AskAI). */
+    runId: uuid("run_id").references(() => chatRun.id),
   },
   (t) => [
     index("ix_model_call_model_started").on(t.model, t.startedAt),
+    index("ix_model_call_run").on(t.runId),
     check("ck_model_call_failure", sql`ok = (failure IS NULL)`),
   ],
 );
+
+// ---------------------------------------------------------------- harness --
+// Trotter's store (its ADRs 0023, 0024 and 0027) on Postgres, for the tadpole harness (ADR-0106,
+// task 0045). The transcript, the action log and every record version are only ever added to:
+// triggers in the migration refuse an UPDATE or DELETE, raw SQL included. Runs and wakes change
+// as they go.
+
+/** A long-running chat. Its runs, transcript and records outlive any one process. */
+export const chat = pgTable(
+  "chat",
+  {
+    id: id(),
+    role: chatRole("role").notNull(),
+    /** A tadpole's, designer_toad's or visual_toad's topic. */
+    topicId: uuid("topic_id").references(() => topic.id),
+    /** A helper's main chat, whose tools it has except starting helpers. */
+    parentId: uuid("parent_id").references((): AnyPgColumn => chat.id),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex("uq_chat_single_role")
+      .on(t.role)
+      .where(sql`role IN (${sqlList(SINGLE_CHAT_ROLES)})`),
+    uniqueIndex("uq_chat_topic_role").on(t.topicId, t.role).where(sql`topic_id IS NOT NULL`),
+    check("ck_chat_topic", sql`(topic_id IS NOT NULL) = (role IN (${sqlList(TOPIC_CHAT_ROLES)}))`),
+    check("ck_chat_parent", sql`(parent_id IS NOT NULL) = (role = 'helper')`),
+  ],
+);
+
+/**
+ * One wake of a chat (Trotter's ADR 0024): what woke it, the model, and the instructions it was
+ * given, which are rebuilt for every run and so kept here, not in the transcript.
+ */
+export const chatRun = pgTable(
+  "chat_run",
+  {
+    id: id(),
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chat.id),
+    model: varchar("model", { length: 128 }).notNull(),
+    status: runStatus("status").notNull().default("running"),
+    /** What woke it: its wakes' triggers, a compaction, or the paused run it carries on. */
+    triggers: jsonb("triggers").notNull(),
+    systemPrompt: text("system_prompt").notNull(),
+    startedAt: tz("started_at").notNull().defaultNow(),
+    endedAt: tz("ended_at"),
+    error: text("error"),
+  },
+  (t) => [
+    uniqueIndex("uq_chat_run_running").on(t.chatId).where(sql`status = 'running'`),
+    index("ix_chat_run_chat_started").on(t.chatId, t.startedAt),
+    index("ix_chat_run_started").on(t.startedAt),
+    check("ck_chat_run_ended", sql`(status = 'running') = (ended_at IS NULL)`),
+    check("ck_chat_run_error", sql`(status = 'failed') = (error IS NOT NULL)`),
+  ],
+);
+
+/** A chat's transcript, every message in order, as pi's message when it ended. */
+export const chatMessage = pgTable(
+  "chat_message",
+  {
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chat.id),
+    seq: integer("seq").notNull(),
+    runId: uuid("run_id")
+      .notNull()
+      .references(() => chatRun.id),
+    message: jsonb("message").notNull(),
+  },
+  (t) => [
+    primaryKey({ name: "pk_chat_message", columns: [t.chatId, t.seq] }),
+    index("ix_chat_message_run").on(t.runId),
+  ],
+);
+
+/**
+ * Every tool call, enough to judge it later (Trotter's ADR 0024): what was called, the model's own
+ * words before it, what came back, and the records it read and wrote.
+ */
+export const actionLog = pgTable(
+  "action_log",
+  {
+    id: id(),
+    runId: uuid("run_id")
+      .notNull()
+      .references(() => chatRun.id),
+    toolCallId: varchar("tool_call_id", { length: 256 }).notNull(),
+    at: tz("at").notNull().defaultNow(),
+    tool: varchar("tool", { length: 64 }).notNull(),
+    arguments: jsonb("arguments").notNull(),
+    reasoning: text("reasoning").notNull(),
+    /** `{ ok: true, value }` or `{ ok: false, error }`. */
+    result: jsonb("result").notNull(),
+    dataSeen: jsonb("data_seen").notNull(),
+    recordsWritten: jsonb("records_written").notNull(),
+  },
+  (t) => [index("ix_action_log_run").on(t.runId, t.at)],
+);
+
+/**
+ * Every version of every record an agent, code or the owner writes (Trotter's ADR 0023). A change,
+ * a retirement or an undo is a new version that follows the latest, and its body is checked
+ * against its kind's schema on the way in and out (`harness/records.ts`).
+ */
+export const harnessRecord = pgTable(
+  "harness_record",
+  {
+    id: uuid("id").notNull(),
+    version: integer("version").notNull(),
+    /** Grows with every version written, so the scheduler routes what is new since it last looked. */
+    seq: bigserial("seq", { mode: "number" }).notNull(),
+    kind: varchar("kind", { length: 64 }).notNull(),
+    status: recordStatus("status").notNull(),
+    writtenAt: tz("written_at").notNull().defaultNow(),
+    /** A chat (with its run and model), code, or the owner. */
+    author: jsonb("author").notNull(),
+    /** Why this version changed the one before it. */
+    reason: text("reason"),
+    /** On an undo, the earlier version this one puts back. */
+    revertsTo: integer("reverts_to"),
+    body: jsonb("body").notNull(),
+  },
+  (t) => [
+    primaryKey({ name: "pk_harness_record", columns: [t.id, t.version] }),
+    unique("uq_harness_record_seq").on(t.seq),
+    index("ix_harness_record_kind").on(t.kind, t.id),
+    check("ck_harness_record_version", sql`version >= 1`),
+    check("ck_harness_record_reason", sql`version = 1 OR reason IS NOT NULL`),
+    check("ck_harness_record_reverts", sql`reverts_to IS NULL OR (reverts_to >= 1 AND reverts_to < version)`),
+  ],
+);
+
+/**
+ * One reason to wake one chat, due at a time (Trotter's ADR 0027). A chat wakes once with every
+ * wake due for it; one that comes while it runs waits for the next run.
+ */
+export const wake = pgTable(
+  "wake",
+  {
+    id: id(),
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chat.id),
+    status: wakeStatus("status").notNull().default("waiting"),
+    dueAt: tz("due_at").notNull(),
+    /** A schedule's slot, or the record the chat should read. */
+    trigger: jsonb("trigger").notNull(),
+    /** Runs that took it and failed. */
+    tries: integer("tries").notNull().default(0),
+    error: text("error"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("ix_wake_status_due").on(t.status, t.dueAt), index("ix_wake_chat").on(t.chatId, t.status)],
+);
+
+/** How far the scheduler has got: the last record it routed, and each schedule's last slot. */
+export const schedulerMark = pgTable("scheduler_mark", {
+  name: varchar("name", { length: 64 }).primaryKey(),
+  value: text("value").notNull(),
+});

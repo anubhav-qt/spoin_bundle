@@ -116,3 +116,47 @@ export type VisualKind = (typeof VISUAL_KINDS)[number];
  */
 export const MODEL_CALL_FAILURES = ["rate", "busy", "slow", "empty", "cut", "bad", "gone"] as const;
 export type ModelCallFailure = (typeof MODEL_CALL_FAILURES)[number];
+
+/**
+ * The harness's long-running chats (ADR-0106, task 0045). One each of toad_sage, the curriculum
+ * chat, ero_sennin and wise_toad; a tadpole (its topic's frog once its last tier is live),
+ * designer_toad and visual_toad per topic; a helper per task, under the chat that started it.
+ */
+export const CHAT_ROLES = [
+  "toad_sage",
+  "curriculum",
+  "tadpole",
+  "designer_toad",
+  "visual_toad",
+  "ero_sennin",
+  "wise_toad",
+  "helper",
+] as const;
+export type ChatRole = (typeof CHAT_ROLES)[number];
+/** The roles there is one chat of. */
+export const SINGLE_CHAT_ROLES = ["toad_sage", "curriculum", "ero_sennin", "wise_toad"] as const;
+/** The roles with one chat per topic. */
+export const TOPIC_CHAT_ROLES = ["tadpole", "designer_toad", "visual_toad"] as const;
+
+/**
+ * Trotter's run statuses (its ADR 0024, 0026): `paused` ended at a step boundary because the
+ * chat's context reached its limit, and a continuation run carries it on once it has compacted;
+ * `interrupted` was cut off when the worker stopped.
+ */
+export const RUN_STATUSES = ["running", "done", "failed", "stopped", "interrupted", "paused"] as const;
+export type RunStatus = (typeof RUN_STATUSES)[number];
+
+/**
+ * A wake (Trotter's ADR 0027): `waiting` until due, `taken` while its chat runs on it, then `done`,
+ * `given_up` when every try failed, or `dropped` when what it was for no longer stands.
+ */
+export const WAKE_STATUSES = ["waiting", "taken", "done", "given_up", "dropped"] as const;
+export type WakeStatus = (typeof WAKE_STATUSES)[number];
+
+/**
+ * A record version's status (Trotter's ADR 0023): `active` in force; `retired` no longer in force,
+ * with its reason; `rejected` undone or found wrong, kept for history; `disputed` not used until
+ * it is settled.
+ */
+export const RECORD_STATUSES = ["active", "retired", "rejected", "disputed"] as const;
+export type RecordStatus = (typeof RECORD_STATUSES)[number];

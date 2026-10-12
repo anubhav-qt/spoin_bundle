@@ -23,11 +23,13 @@
     "better-auth": "1.7.7",
     "drizzle-orm": "0.45.4",
     "hono": "4.13.13",
+    "nunjucks": "3.2.4",
     "pg": "8.23.1",
     "pino": "10.4.0",
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@types/nunjucks": "3.2.6",
     "@types/pg": "8.23.1",
     "drizzle-kit": "0.31.11",
     "esbuild": "0.28.2",

@@ -21,11 +21,12 @@ export interface FreeTextGrade {
 
 /**
  * The only model call on the request path besides AskAI. Takes a collection, like every
- * model-facing method (ADR-0005), even though a quiz grades one answer at a time.
+ * model-facing method (ADR-0005), even though a quiz grades one answer at a time. A grade
+ * left out of the result failed; `signal` aborts when the reader leaves before it is back.
  */
 export interface Grader {
-  gradeFreeText(queries: FreeTextGradeQuery[]): Promise<FreeTextGrade[]>;
+  gradeFreeText(queries: FreeTextGradeQuery[], signal?: AbortSignal): Promise<FreeTextGrade[]>;
 }
 
-/** Until the model layer lands (task 0045, Phase 8), nothing grades and a submission answers 502. */
+/** A process with no model keys grades nothing, and a submission answers 502. */
 export const noGrader: Grader = { gradeFreeText: async () => [] };

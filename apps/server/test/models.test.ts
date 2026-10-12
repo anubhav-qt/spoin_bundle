@@ -1,5 +1,3 @@
-import { createServer, type Server } from "node:http";
-import type { AddressInfo } from "node:net";
 import { type Api, type Message, type Model, normalizeContext } from "@spoin/pi-ai";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
@@ -8,6 +6,7 @@ import { Balancer } from "../src/models/balancer.ts";
 import { type CallOutcome, recordedStreamFn, recordTo, roomLeft, runCall } from "../src/models/calls.ts";
 import type { Rung } from "../src/models/nim.ts";
 import { admin, deps, signedUp } from "./helpers.ts";
+import { answer, chunk, modelStandIn, type Reply, refuse } from "./model-stand-in.ts";
 
 /*
  * The model layer (task 0045, Phase 8) against a stand-in NVIDIA and a stand-in Gemini: how a
@@ -15,42 +14,11 @@ import { admin, deps, signedUp } from "./helpers.ts";
  * `model_call` row every call leaves.
  */
 
-type Reply = { status: number; body: string; headers?: Record<string, string> };
-/** What the stand-in answers each request with, in order, and every request it was sent. */
-let replies: Reply[] = [];
-let requests: { url: string; body: Record<string, unknown> }[] = [];
-let server: Server;
-let base = "";
+const standIn = modelStandIn();
+const { start } = standIn;
+beforeAll(standIn.listen);
+afterAll(standIn.close);
 
-beforeAll(async () => {
-  server = createServer((request, response) => {
-    let raw = "";
-    request.on("data", (chunk) => {
-      raw += chunk;
-    });
-    request.on("end", () => {
-      requests.push({ url: request.url ?? "", body: JSON.parse(raw) });
-      const reply = replies.shift() ?? { status: 500, body: "no reply set" };
-      response.writeHead(reply.status, { "Content-Type": "text/event-stream", ...reply.headers });
-      response.end(reply.body);
-    });
-  });
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-  base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-});
-
-afterAll(async () => {
-  await new Promise((resolve) => server.close(resolve));
-});
-
-const chunk = (delta: Record<string, unknown>, finish: string | null = null) =>
-  `data: ${JSON.stringify({ id: "c", object: "chat.completion.chunk", created: 0, model: "m", choices: [{ index: 0, delta, finish_reason: finish }] })}\n\n`;
-const usage = `data: ${JSON.stringify({ id: "c", object: "chat.completion.chunk", created: 0, model: "m", choices: [], usage: { prompt_tokens: 12, completion_tokens: 3, total_tokens: 15 } })}\n\n`;
-
-const answer = (text = "ok"): Reply => ({
-  status: 200,
-  body: `${chunk({ role: "assistant", content: text })}${chunk({}, "stop")}${usage}data: [DONE]\n\n`,
-});
 const thinkingOnly: Reply = {
   status: 200,
   body: `${chunk({ role: "assistant", reasoning_content: "hmm" })}${chunk({}, "stop")}data: [DONE]\n\n`,
@@ -59,12 +27,6 @@ const cutShort: Reply = {
   status: 200,
   body: `${chunk({ role: "assistant", content: "a long" })}${chunk({}, "length")}data: [DONE]\n\n`,
 };
-const refuse = (status: number, message: string, headers?: Record<string, string>): Reply => ({
-  status,
-  body: JSON.stringify({ error: { message } }),
-  headers: { "Content-Type": "application/json", ...headers },
-});
-
 let models = 0;
 /** A NIM model on the stand-in, with an id of its own so no other test's cooldown reaches it. */
 function nimModel(name: string): Model<"openai-completions"> {
@@ -74,7 +36,7 @@ function nimModel(name: string): Model<"openai-completions"> {
     name,
     api: "openai-completions",
     provider: "nvidia",
-    baseUrl: `${base}/v1`,
+    baseUrl: `${standIn.base}/v1`,
     input: ["text"],
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
     reasoning: false,
@@ -93,11 +55,6 @@ function recorder() {
     calls,
     record: (model: Model<Api>, outcome: CallOutcome) => calls.push({ model: model.id, outcome }),
   };
-}
-
-function start(answers: Reply[]) {
-  replies = [...answers];
-  requests = [];
 }
 
 describe("one call", () => {
@@ -180,7 +137,7 @@ describe("the balancer", () => {
       await new Balancer([{ model: capped, maxInFlight: 1 }], "k", record).stream(ask())
     ).result();
     expect(message.stopReason).toBe("stop");
-    expect(requests.map((r) => r.body.max_tokens)).toEqual([130_000, 1000]);
+    expect(standIn.requests.map((r) => r.body.max_tokens)).toEqual([130_000, 1000]);
     expect(calls.filter((c) => c.model === capped.id)).toHaveLength(2);
   });
 
@@ -199,8 +156,8 @@ describe("the balancer", () => {
     const model = { ...nimModel("kimi"), samplingParams: { reasoning_effort: "high" } };
     start([answer()]);
     await (await new Balancer([{ model, maxInFlight: 1 }], "k", () => {}).stream(ask())).result();
-    expect(requests[0]?.body.reasoning_effort).toBe("high");
-    expect(requests[0]?.body.max_tokens).toBe(130_000);
+    expect(standIn.requests[0]?.body.reasoning_effort).toBe("high");
+    expect(standIn.requests[0]?.body.max_tokens).toBe(130_000);
   });
 });
 
@@ -228,7 +185,7 @@ describe("the call log", () => {
       name: "Gemini",
       api: "google-generative-ai",
       provider: "antigravity",
-      baseUrl: `${base}/v1beta`,
+      baseUrl: `${standIn.base}/v1beta`,
       input: ["text", "image"],
       cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
       reasoning: false,

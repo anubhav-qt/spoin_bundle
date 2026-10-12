@@ -34,7 +34,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 5 | Read path, each with its tests (`/auth/me` gains `preferences` here): topics, feed (interleave, strata, ranking, session profile), engagement, quiz, notes, profile (preferences, fonts, avatar), reports, AskAI | done |
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | done |
-| 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | in progress: proxy, fork, model layer, model accounts page and the grader's prompt done; wiring the grader is next |
+| 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | done |
 | 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
@@ -75,8 +75,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   read path's files, and `test/architecture.test.ts`, which follows imports transitively.
 - **The quiz grades through an injected `Grader`** (2026-10-11). Free-text grading is a model
   call on the request path, and the model layer is Phase 8, so `Deps.grader` is an interface:
-  the server has `noGrader` until then (a written answer answers 502, "Grading failed, try
-  again") and the tests stand the model in. No transaction stays open across the call; the
+  the server had `noGrader` until then (a written answer answers 502, "Grading failed, try
+  again") and the tests stand the model in. Since Phase 8 it is `modelGrader` (below); `noGrader`
+  is left for a process with no model keys. No transaction stays open across the call; the
   attempt row is locked when the grade is written, so a double submit is graded once. ADR-0005's
   collection rule is checked by the typechecker in `test/architecture.test.ts`.
 - **The repair queue and ASCII review are behind the admin role** (2026-10-11), in every
@@ -484,6 +485,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   for an answer that tells the grader how to grade. It adds a sharper line at the pass level (2), and
   the reference answer winning over the model's own knowledge. The justification is written to
   the reader, who sees it on the results screen.
+
+- **A grade comes back as a call of the `grade` tool** (2026-10-12). Gemini is made to call it
+  (function calling in mode ANY, limited to `grade`, set on the request since pi's simple options
+  name only auto and none). NIM is offered it as auto: Kimi K3 refuses a forced tool choice while
+  it thinks, with a 400. Code requires the call and checks it, a level from 0 to 3 and one grade
+  for every answer; an answer that fails is a failed call and goes to NIM, and the quiz answers
+  502 when both fail. A reader's answer can't open or close the template's tags (they are stripped
+  from it), and a reader who leaves aborts the call (`apps/server/src/quiz/model-grader.ts`).
+  Templates load from `prompts/` through `apps/server/src/prompts.ts`, Trotter's loader; the image
+  copies the folder and sets `PROMPTS_DIR`.
 
 ## Asked when we get there
 

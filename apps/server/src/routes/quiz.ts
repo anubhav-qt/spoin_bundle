@@ -89,6 +89,7 @@ export function quizRoutes(deps: Deps) {
             needUser(c).id,
             c.req.valid("param").attempt_id,
             c.req.valid("json").answer,
+            c.req.raw.signal,
           ),
           200,
         ),

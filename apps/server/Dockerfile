@@ -39,6 +39,8 @@ COPY --from=build /app/apps/server/dist ./dist
 COPY --from=build /app/apps/server/drizzle ./drizzle
 COPY --from=build /app/packages/frog/drizzle ./universe-drizzle
 ENV UNIVERSE_MIGRATIONS_DIR=/app/universe-drizzle
+COPY prompts ./prompts
+ENV PROMPTS_DIR=/app/prompts
 USER node
 EXPOSE 8000
 ENTRYPOINT ["/usr/bin/tini", "--"]

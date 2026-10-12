@@ -289,16 +289,20 @@ async function grade(
   grader: Grader,
   q: Awaited<ReturnType<typeof attemptQuestions>>[number],
   answer: string,
+  signal?: AbortSignal,
 ) {
-  const [graded] = await grader.gradeFreeText([
-    {
-      index: 0,
-      stem: q.stem,
-      rubric: q.rubric ?? "",
-      referenceAnswer: q.referenceAnswer ?? "",
-      userAnswer: answer,
-    },
-  ]);
+  const [graded] = await grader.gradeFreeText(
+    [
+      {
+        index: 0,
+        stem: q.stem,
+        rubric: q.rubric ?? "",
+        referenceAnswer: q.referenceAnswer ?? "",
+        userAnswer: answer,
+      },
+    ],
+    signal,
+  );
   if (!graded) throw new HttpError(502, "Grading failed, try again");
   if (referencesQuestion(graded.justification, q.stem, q.referenceAnswer ?? "", answer)) {
     return { rubricLevel: graded.rubricLevel, justification: graded.justification };
@@ -355,6 +359,7 @@ export async function submitFreeText(
   userId: string,
   attemptId: string,
   raw: string,
+  signal?: AbortSignal,
 ): Promise<QuizSubmitFreeTextOut> {
   const attempt = await loadAttempt(db, userId, attemptId);
   if (!attempt.submittedAt) throw new HttpError(409, "Submit MCQ answers first");
@@ -371,7 +376,7 @@ export async function submitFreeText(
   if (!q) throw new HttpError(404, "No free-text question on this attempt");
 
   // No transaction is open across the model call; the lock below settles a race.
-  const { rubricLevel, justification } = await grade(grader, q, answer);
+  const { rubricLevel, justification } = await grade(grader, q, answer, signal);
   const correct = rubricLevel >= env.QUIZ_FREE_TEXT_PASS_LEVEL;
 
   return db.transaction(async (tx) => {

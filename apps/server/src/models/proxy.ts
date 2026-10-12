@@ -1,4 +1,4 @@
-import type { Api, Model, ModelThinkingLevel, ThinkingLevelMap } from "@spoin/pi-ai";
+import type { Api, Model, ModelThinkingLevel, ThinkingLevel, ThinkingLevelMap } from "@spoin/pi-ai";
 import { z } from "zod";
 import type { Env } from "../env.ts";
 
@@ -133,6 +133,28 @@ export function findModel(models: Model<Api>[], id: string): Model<Api> {
   throw new ProxyError(
     `CLIProxyAPI doesn't serve ${id} to the signed-in accounts. It serves: ${ids || "nothing"}.`,
   );
+}
+
+/**
+ * Gemini 3.8 Flash at medium thinking: toad_sage, the main chats, research, the gate, and on the
+ * request path grading and AskAI (task 0045). The proxy names it `-high`, but it takes low, medium
+ * and high, and each call says which.
+ */
+export const GEMINI_ID = "gemini-3.8-flash-high";
+export const GEMINI_THINKING: ThinkingLevel = "medium";
+
+/** Looks Gemini up once per process. A failed lookup isn't kept, so the next call asks again. */
+export function geminiFrom(config: ProxyConfig, fetchFn: typeof fetch = fetch): () => Promise<Model<Api>> {
+  let found: Promise<Model<Api>> | null = null;
+  return () => {
+    if (!found) {
+      found = loadModels(config, fetchFn).then((models) => findModel(models, GEMINI_ID));
+      found.catch(() => {
+        found = null;
+      });
+    }
+    return found;
+  };
 }
 
 function describeModel(

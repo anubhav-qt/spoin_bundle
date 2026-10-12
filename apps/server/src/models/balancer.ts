@@ -48,7 +48,7 @@ export interface BalancerOptions {
   patient?: boolean;
 }
 
-const DEFAULTS: BalancerOptions = { waitForTopS: 300, strikesToFall: 3, maxTries: 12 };
+export const BALANCER_DEFAULTS: BalancerOptions = { waitForTopS: 300, strikesToFall: 3, maxTries: 12 };
 
 /** First cooldown and cap, in seconds, per kind of failure that cools a model. */
 const COOL: Partial<Record<ModelCallFailure, [number, number]>> = {
@@ -103,7 +103,7 @@ export class Balancer {
   /** The top rungs: the primary ones at the start of the ladder, or just the first. */
   private readonly top: Rung[];
 
-  constructor(ladder: Rung[], apiKey: string, record: RecordCall, opts: BalancerOptions = DEFAULTS) {
+  constructor(ladder: Rung[], apiKey: string, record: RecordCall, opts: BalancerOptions = BALANCER_DEFAULTS) {
     this.ladder = ladder;
     this.apiKey = apiKey;
     this.record = record;

@@ -437,6 +437,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **No provider probes before building** (2026-10-12). Phase 8 builds on breader's numbers for
   NIM and lets the balancer's cooldowns absorb the limits; a provider is probed only once it
   sheds. This sets aside CLAUDE.md's measure-first rule for the harness, by the owner's choice.
+  What breader and Seelie found out about both providers is in
+  `docs/architecture/model-numbers.md` (2026-10-13).
 - **spoin's CLIProxyAPI uses Trotter's sign-ins** (2026-10-12). The compose service reads copies
   of the two Antigravity auth files from `E:\trotter\harness\.cliproxy\auths`, kept in the
   gitignored `infra/.cliproxy/auths`; spoin has no login step of its own.

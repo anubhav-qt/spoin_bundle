@@ -498,6 +498,15 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   Templates load from `prompts/` through `apps/server/src/prompts.ts`, Trotter's loader; the image
   copies the folder and sets `PROMPTS_DIR`.
 
+- **A harness run waits Gemini out on Flash** (2026-10-13). When Gemini can't answer mid-run
+  (toad_sage, a tadpole, a reviewer), the run stays open. Flash cools after each failure, the wait
+  doubling with jitter, and it never moves to another model, so quality never changes. When every
+  Antigravity account's 5-hour or weekly limit is used up, the run waits for the first to fill
+  again, read through the proxy's management API. While the proxy is down, it checks again every
+  minute. A sign-in turned away ends the run. The limits cover all of an account's Gemini models
+  together, so an older Gemini would help only when Flash alone is overloaded (breader's harness
+  does that; `docs/architecture/model-numbers.md`). Grading and AskAI still go to NIM instead.
+
 ## Asked when we get there
 
 - Backups and image hosting on the ThinkPad, fetched pages on disk included.

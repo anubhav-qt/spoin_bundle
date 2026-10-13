@@ -189,18 +189,19 @@ export async function generationProgress(ctx: Ctx, topicId: string): Promise<Gen
 }
 
 /**
- * Withdraws this user's own request while its job is still pending: the job, the
- * subscription, and the topic itself if nobody else follows it. The DELETE ...
- * RETURNING is the guard: once a worker has claimed the job it is a concurrent
- * writer, so this refuses rather than racing it.
+ * Withdraws this user's own request while its job is still pending: their subscription, and
+ * the topic with its job if nobody else follows it. The others' request stands, so the job
+ * stays for them. Locking the pending job is the guard: once a worker has claimed it, it is a
+ * concurrent writer, so this refuses rather than racing it.
  */
 export async function cancelGeneration(db: Db, userId: string, topicId: string): Promise<void> {
   await db.transaction(async (tx) => {
     const sub = await loadSubscription(tx, userId, topicId);
     if (!sub?.isCustom) throw new HttpError(404, "No custom topic request found");
 
-    const removed = await tx
-      .delete(generationJob)
+    const pending = await tx
+      .select({ id: generationJob.id })
+      .from(generationJob)
       .where(
         and(
           eq(generationJob.topicId, topicId),
@@ -208,8 +209,8 @@ export async function cancelGeneration(db: Db, userId: string, topicId: string):
           eq(generationJob.status, "pending"),
         ),
       )
-      .returning({ id: generationJob.id });
-    if (removed.length === 0)
+      .for("update");
+    if (pending.length === 0)
       throw new HttpError(409, "Generation has already started and can no longer be cancelled");
 
     await bumpSubscribers(tx, topicId, -1);
@@ -218,7 +219,7 @@ export async function cancelGeneration(db: Db, userId: string, topicId: string):
       .where(and(eq(userTopicProgress.userId, userId), eq(userTopicProgress.topicId, topicId)));
     await tx.delete(userTopic).where(eq(userTopic.id, sub.id));
 
-    // A still-pending job generated nothing, so an unfollowed topic is an empty row: remove it.
+    // A still-pending job generated nothing, so an unfollowed topic is an empty row: it goes, and its job with it.
     const [followers] = await tx
       .select({ n: sql<number>`count(*)::int` })
       .from(userTopic)

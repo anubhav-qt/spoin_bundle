@@ -167,12 +167,12 @@ describe("accepting a name", () => {
     expect(await intakeOf(db, topicId)).toBeUndefined();
   });
 
-  test("a job the owner cancelled is no longer there to take in", async () => {
+  test("a cancelled job is no longer there to take in", async () => {
     const { topicId, jobId } = await requested(`Gone soon ${unique()}`);
     await db.delete(topic).where(eq(topic.id, topicId));
 
     await expect(call(accept, acceptance(jobId, `Gone ${unique()}`))).rejects.toThrow(
-      `There is no job ${jobId} in the queue: the owner may have cancelled it.`,
+      `There is no job ${jobId} in the queue: it was cancelled or merged.`,
     );
   });
 });

@@ -373,7 +373,7 @@ async function waitingJob(tx: Tx, jobId: string): Promise<Job> {
     .from(generationJob)
     .where(and(eq(generationJob.id, jobId), eq(generationJob.kind, "generate")))
     .for("update");
-  if (!job) throw new ToolError(`There is no job ${jobId} in the queue: the owner may have cancelled it.`);
+  if (!job) throw new ToolError(`There is no job ${jobId} in the queue: it was cancelled or merged.`);
   if (job.status !== "pending") {
     throw new ToolError(`Job ${jobId} is ${job.status}: only a name waiting in the queue can be taken in.`);
   }
@@ -390,7 +390,7 @@ async function topicOfJob(db: Conn, jobId: string): Promise<Topic> {
     .select({ topicId: generationJob.topicId })
     .from(generationJob)
     .where(and(eq(generationJob.id, jobId), eq(generationJob.kind, "generate")));
-  if (!found) throw new ToolError(`There is no job ${jobId} in the queue: the owner may have cancelled it.`);
+  if (!found) throw new ToolError(`There is no job ${jobId} in the queue: it was cancelled or merged.`);
   return topicById(db, found.topicId);
 }
 

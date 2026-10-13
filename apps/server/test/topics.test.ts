@@ -366,7 +366,7 @@ describe("requested topics", () => {
     expect((await c.get("/topics/custom")).body).toHaveLength(1);
   });
 
-  test("another follower keeps the topic alive, and only the requester may cancel", async () => {
+  test("another follower keeps the topic and its job, and only the requester may cancel", async () => {
     const { c, id } = await reader();
     const { topic: t } = await requested(id);
     const other: Client = await signedUp();
@@ -376,5 +376,7 @@ describe("requested topics", () => {
     expect((await c.delete(`/topics/${t.id}/generation-job`)).status).toBe(204);
     expect(await subscribers(t.id)).toBe(1);
     expect((await other.get("/topics")).body.map((x: { id: string }) => x.id)).toEqual([t.id]);
+    const jobs = await db.select().from(generationJob).where(eq(generationJob.topicId, t.id));
+    expect(jobs.map((job) => job.status)).toEqual(["pending"]);
   });
 });

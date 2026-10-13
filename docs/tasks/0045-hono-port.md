@@ -623,6 +623,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   hue, the priority, and both topics' subject and angle. Merged requesters follow the target
   through `followTopic`, so one who already follows it keeps one subscription. AskAI can't import
   the module (Biome and `test/architecture.test.ts`).
+- **A reader's cancel withdraws only their own request** (2026-10-13). `DELETE
+  /topics/{id}/generation-job` removes the reader's subscription, and the topic with its job only
+  when nobody else follows it; until now it deleted the pending job for every follower, which
+  would strand a topic toad_sage had accepted. A running job still answers 409.
 
 ## Asked when we get there
 

@@ -6,5 +6,5 @@ Name: {{ trigger.request.name }}
 Description: {{ trigger.request.description or "none given" }}
 </request>
 {% else %}
-Job {{ trigger.job }}: the owner cancelled this name before you took it in, so there is nothing to do for it.
+Job {{ trigger.job }} is gone from the queue: it was cancelled or merged, so there is nothing to do for it.
 {% endif %}

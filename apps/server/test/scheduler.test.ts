@@ -441,7 +441,7 @@ describe("queued names", () => {
       { kind: "job", job: cancelled.job.id },
     ]);
     expect(lastText(requests[0])).toContain(
-      `Job ${cancelled.job.id}: the owner cancelled this name before you took it in`,
+      `Job ${cancelled.job.id} is gone from the queue: it was cancelled or merged`,
     );
   });
 });

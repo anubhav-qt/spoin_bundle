@@ -383,12 +383,14 @@ describe("reading records", () => {
 });
 
 describe("every chat's tools", () => {
-  test("a main chat reads, asks and answers; a helper only reads", async () => {
+  test("a main chat reads, asks and answers; a helper only reads; designer_toad only asks and answers", async () => {
     const tadpole = await newTadpole();
     const helper = await newHelperChat(db, tadpole, "helper");
+    const designer = await openTopicChat(db, "designer_toad", tadpole.topicId ?? "");
     const names = (chat: Chat) => everyChatTools(prompts, chat).map((tool) => tool.name);
 
     expect(names(tadpole)).toEqual(["read_record", "read_record_history", "list_records", "ask", "answer"]);
     expect(names(helper)).toEqual(["read_record", "read_record_history", "list_records"]);
+    expect(names(designer)).toEqual(["ask", "answer"]);
   });
 });

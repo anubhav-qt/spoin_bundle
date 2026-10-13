@@ -36,7 +36,8 @@ As in Trotter, every chat but AskAI, which ADR-0106 gives no database handle. No
 AskAI, which is for its readers alone: the reads leave out its compaction summaries, the only
 records it writes, and read one by id as a record that isn't there. A helper gets only
 the three reads: it has no address to be asked at, and it asks nothing, leaving what it can't
-settle to its report. Each record reads as its own template shows it, with who wrote it, by role
+settle to its report. designer_toad gets only `ask` and `answer`: `list_art_requests` gives it every
+card it draws, and the reads spent its calls on plans, drafts and its own old art (ADR-0109). Each record reads as its own template shows it, with who wrote it, by role
 and topic, and when, in India time.
 
 | Tool | Does |

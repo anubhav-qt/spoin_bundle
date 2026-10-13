@@ -30,6 +30,11 @@ export interface RunChatInput {
   streamFn: (run: Run) => StreamFn;
   /** Stops the run: the model stops and the run ends as stopped. */
   signal?: AbortSignal;
+  /**
+   * Ends the run, stopped, at its next step boundary: the model call and tool calls in flight finish
+   * and are stored first, so output already paid for is never thrown away (the owner's rule).
+   */
+  drain?: AbortSignal;
   /** Hears every event of the run once it's stored, so a caller can show the run as it happens. */
   onEvent?: (event: AgentEvent, run: Run) => void;
   /** Once the chat's context reaches this many tokens, the run ends paused at its next step boundary, so the chat can compact. */
@@ -61,6 +66,7 @@ export async function runChat(input: RunChatInput): Promise<Run> {
   const outputs = new Map<string, ToolOutput>();
   const onOutput = (toolCallId: string, output: ToolOutput) => outputs.set(toolCallId, output);
   let paused = false;
+  let drained = false;
 
   const agent = new Agent({
     initialState: {
@@ -74,6 +80,10 @@ export async function runChat(input: RunChatInput): Promise<Run> {
     getApiKey: () => input.apiKey,
     sessionId: chat.id,
     finishTurn: (turn) => {
+      if (input.drain?.aborted) {
+        drained = true;
+        return { action: "end" };
+      }
       if (shouldPause(turn, input.pauseAtTokens)) {
         paused = true;
         return { action: "end" };
@@ -95,6 +105,7 @@ export async function runChat(input: RunChatInput): Promise<Run> {
   } finally {
     input.signal?.removeEventListener("abort", stop);
   }
+  if (drained) return endRun(db, run.id, { status: "stopped" });
   if (paused) return endRun(db, run.id, { status: "paused" });
   return endRun(db, run.id, endOf(agent.state.messages));
 }

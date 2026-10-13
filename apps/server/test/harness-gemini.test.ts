@@ -107,6 +107,18 @@ describe("a harness call on Gemini", () => {
     expect(total(waits)).toBeLessThanOrEqual(135_000);
   });
 
+  test("asks again after an empty answer, and lets the third one through", async () => {
+    standIn.start([says(""), says("Written.")]);
+    const first = patient();
+    expect(textOf(await first.ask())).toBe("Written.");
+    expect(first.outcomes.map((outcome) => outcome.failure)).toEqual(["empty", null]);
+
+    standIn.start([says(""), says(""), says(""), says("Never asked for.")]);
+    const second = patient();
+    expect(textOf(await second.ask())).toBe("");
+    expect(second.outcomes.map((outcome) => outcome.failure)).toEqual(["empty", "empty", "empty"]);
+  });
+
   test("waits for the first account to fill when every account is out of its limit, without cooling", async () => {
     standIn.start([refuse(429, "RESOURCE_EXHAUSTED: You have exhausted your capacity."), says("Back.")]);
     const fills = Date.now() + 3 * HOUR;

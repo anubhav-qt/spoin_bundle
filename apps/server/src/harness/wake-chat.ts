@@ -35,6 +35,8 @@ export interface WakeChatInput {
   streamFn: (run: Run) => StreamFn;
   /** Stops the run going, and wakes no more. */
   signal?: AbortSignal;
+  /** Ends the chat's run at its next step boundary, and starts no other (`RunChatInput.drain`). */
+  drain?: AbortSignal;
   /** Hears every event of every run once it's stored, with the run it's from. */
   onEvent?: (event: AgentEvent, run: Run) => void;
 }
@@ -61,10 +63,10 @@ export async function wakeChat(input: WakeChatInput): Promise<Run[]> {
     runs.push(compaction.run);
     pauseAtTokens = await pauseAfter(input, compaction.wroteSummary, limit);
   }
-  if (input.signal?.aborted) return runs;
+  if (stopping(input)) return runs;
   let run = await runOnce(input, input.triggers, input.tools, pauseAtTokens);
   runs.push(run);
-  while (run.status === "paused" && !input.signal?.aborted) {
+  while (run.status === "paused" && !stopping(input)) {
     const compaction = await compact(input);
     runs.push(compaction.run);
     const pauseAt = await pauseAfter(input, compaction.wroteSummary, limit);
@@ -72,6 +74,10 @@ export async function wakeChat(input: WakeChatInput): Promise<Run[]> {
     runs.push(run);
   }
   return runs;
+}
+
+function stopping(input: WakeChatInput): boolean {
+  return Boolean(input.signal?.aborted) || Boolean(input.drain?.aborted);
 }
 
 /** A run of the chat with these tools; it pauses at `pauseAtTokens` when given. */
@@ -95,6 +101,7 @@ async function runOnce(
     apiKey: input.apiKey,
     streamFn: input.streamFn,
     signal: input.signal,
+    drain: input.drain,
     onEvent: input.onEvent,
     pauseAtTokens,
   });

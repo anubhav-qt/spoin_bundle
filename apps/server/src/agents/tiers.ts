@@ -57,6 +57,17 @@ export const NEAR_DUPLICATE = 0.92;
 /** A card's limits, enforced here rather than asked for (CLAUDE.md). */
 export const LIMITS = { title: 120, canonicalTitle: 160, summary: 280, bodyMin: 200, bodyMax: 1800 };
 
+/**
+ * A body's prose outside its fences: the old gate's text-wall line. The prompt asks for 300 to 800,
+ * and the old pipeline's cards ran long whenever only the prompt asked.
+ */
+export const PROSE_MAX = 1200;
+
+/** Correction notes pass 1 has been seen to leave in a body, from the old gate. */
+const EDITORIAL_NOTE = /\*Source Note|\*\*Key Correction|\*\*Correction:/i;
+
+const FENCE = /```([^\n`]*)\n[\s\S]*?```/g;
+
 /** Mermaid's diagram types the web app renders (ADR-0067). */
 const MERMAID_TYPES =
   /^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|stateDiagram-v2|erDiagram|timeline|mindmap|pie|gantt|journey|quadrantChart)\b/;
@@ -516,10 +527,20 @@ export const CardDraft = Type.Object(
 
 type Draft = Static<typeof CardDraft>;
 
-/** Every structural fault of a draft, named: lengths, mermaid, and passages outside the grounding. */
+/** A tier whose quotas name no code cards is a topic with no code, so its bodies carry none either. */
+export function codeAllowedIn(tier: Tier): boolean {
+  const quotas = (tier.cardTypeQuotas ?? {}) as Record<string, number>;
+  return (quotas.code ?? 0) > 0;
+}
+
+/**
+ * Every structural fault of a draft, named: lengths, prose length, code where the tier has none,
+ * mermaid, leaked correction notes, and passages outside the grounding.
+ */
 export function draftProblems(
   draft: Omit<Draft, "passages" | "form" | "art_request" | "hero"> & { passages?: number[] },
   passages: number,
+  codeAllowed: boolean,
 ): string[] {
   const problems: string[] = [];
   if (draft.title.length > LIMITS.title)
@@ -534,11 +555,27 @@ export function draftProblems(
   if (draft.body.length < LIMITS.bodyMin || draft.body.length > LIMITS.bodyMax) {
     problems.push(`the body is ${draft.body.length} characters; give ${LIMITS.bodyMin} to ${LIMITS.bodyMax}`);
   }
+  const prose = draft.body.replace(FENCE, "").trim();
+  if (prose.length > PROSE_MAX) {
+    problems.push(
+      `its prose outside code and diagrams is ${prose.length} characters; at most ${PROSE_MAX}: a card is one idea`,
+    );
+  }
+  for (const fence of draft.body.matchAll(FENCE)) {
+    const language = (fence[1] ?? "").trim();
+    if (language !== "mermaid" && !codeAllowed) {
+      problems.push("this tier has no code cards, so a body has no code block: say it in words");
+    }
+  }
   for (const fence of draft.body.matchAll(/```mermaid\n([\s\S]*?)```/g)) {
     const first = (fence[1] ?? "").trim().split("\n")[0] ?? "";
     if (!MERMAID_TYPES.test(first))
       problems.push(`a mermaid block opens with "${first}", not a diagram type`);
+    // An emoji is one character but two columns, and breaks the diagram's text measuring.
+    if (/\p{Extended_Pictographic}/u.test(fence[1] ?? "")) problems.push("a mermaid block has an emoji");
   }
+  if (EDITORIAL_NOTE.test(draft.body))
+    problems.push("the body carries a correction note; notes go in `note`");
   if ((draft.body.match(/```/g)?.length ?? 0) % 2 !== 0) problems.push("a fenced block is never closed");
   for (const number of draft.passages ?? []) {
     if (number > passages) problems.push(`it cites passage ${number}; the grounding has ${passages}`);
@@ -562,40 +599,48 @@ export function writeCardsTool(deps: AgentDeps): HarnessTool<typeof WriteCardsPa
         .select()
         .from(card)
         .where(and(eq(card.subtopicId, tier.id), ne(card.status, "rejected")));
-      const problems: string[] = [];
+      // Each draft that passes is stored, and only a faulty one is refused, so a batch with one
+      // fault never has to be written again whole (the owner's rule: no output paid for twice).
       const room = tier.targetCards - standing.length;
-      if (params.cards.length > room) {
-        problems.push(
-          `the tier needs ${Math.max(room, 0)} more cards to reach its target of ${tier.targetCards}, and you wrote ${params.cards.length}`,
-        );
-      }
       const quotas = (tier.cardTypeQuotas ?? {}) as Record<string, number>;
       const forms = new Map<string, number>();
       for (const row of standing) forms.set(metaOf(row).form, (forms.get(metaOf(row).form) ?? 0) + 1);
       let heroes = standing.filter((row) => row.isHero).length;
+      const kept: Draft[] = [];
+      const refused: string[] = [];
       params.cards.forEach((draft, index) => {
         const where = `card ${index + 1} ("${draft.canonical_title}")`;
-        for (const problem of draftProblems(draft, grounding.length)) problems.push(`${where}: ${problem}`);
-        forms.set(draft.form, (forms.get(draft.form) ?? 0) + 1);
+        const problems = draftProblems(draft, grounding.length, codeAllowedIn(tier));
+        const used = forms.get(draft.form) ?? 0;
+        const quota = quotas[draft.form] ?? 0;
+        if (kept.length >= room) {
+          problems.push(
+            `the tier needed ${Math.max(room, 0)} more cards to reach its target of ${tier.targetCards}`,
+          );
+        } else if (used >= quota) {
+          problems.push(`the tier's quota for ${draft.form} cards is ${quota}, and it has them all`);
+        } else if (draft.hero && heroes >= 1) {
+          problems.push("the tier has its one hero card already");
+        }
+        if (problems.length > 0) {
+          refused.push(`${where}: ${problems.join("; ")}`);
+          return;
+        }
+        forms.set(draft.form, used + 1);
         if (draft.hero) heroes += 1;
+        kept.push(draft);
       });
-      for (const [form, used] of forms) {
-        const quota = quotas[form] ?? 0;
-        if (used > quota)
-          problems.push(`the tier's quota for ${form} cards is ${quota}, and it would have ${used}`);
-      }
-      if (heroes > 1) problems.push("a tier has at most one hero card");
-      if (problems.length > 0) {
+      if (kept.length === 0) {
         throw new ToolError(
-          `Nothing was stored; fix every problem and call again:\n- ${problems.join("\n- ")}`,
+          `Nothing was stored; fix every problem and call again:\n- ${refused.join("\n- ")}`,
         );
       }
-      const vectors = await deps.embedder.embedPassage(params.cards.map((draft) => draft.body));
+      const vectors = await deps.embedder.embedPassage(kept.map((draft) => draft.body));
       const chunkIds = new Map(grounding.map((passage) => [passage.number, passage.chunkId]));
       const written = await context.db
         .insert(card)
         .values(
-          params.cards.map((draft, index) => {
+          kept.map((draft, index) => {
             const meta: CardMeta = {
               stage: "drafted",
               form: draft.form,
@@ -623,11 +668,11 @@ export function writeCardsTool(deps: AgentDeps): HarnessTool<typeof WriteCardsPa
         )
         .returning({ id: card.id, canonicalTitle: card.canonicalTitle });
       const lines = written.map((row) => `- ${row.id}: ${row.canonicalTitle}`).join("\n");
-      return {
-        value: `Stored ${written.length} drafts:\n${lines}\nSend them through pass 1 with gate_cards.`,
-        dataSeen: [],
-        recordsWritten: [],
-      };
+      let value = `Stored ${written.length} drafts:\n${lines}\nSend them through pass 1 with gate_cards.`;
+      if (refused.length > 0) {
+        value += `\n\nNot stored, so write only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
+      }
+      return { value, dataSeen: [], recordsWritten: [] };
     },
   };
 }
@@ -764,53 +809,59 @@ export function writeQuestionsTool(deps: AgentDeps): HarnessTool<typeof WriteQue
           ),
         );
       const acceptedIds = new Set(accepted.map((row) => row.id));
-      const problems: string[] = [];
-      params.questions.forEach((draft, index) => {
-        const where = `question ${index + 1}`;
-        if (!acceptedIds.has(draft.card))
-          problems.push(`${where}: card ${draft.card} is not an accepted card of this tier`);
-        if (draft.kind === "mcq") {
-          const options = draft.options ?? [];
-          if (options.length < 3) problems.push(`${where}: an MCQ has 3 to 5 options`);
-          const distinct = new Set(options.map((option) => option.trim().toLowerCase()));
-          if (distinct.size !== options.length) problems.push(`${where}: two options say the same thing`);
-          if (draft.correct_index === undefined || draft.correct_index >= options.length) {
-            problems.push(`${where}: correct_index must name one of its options, counting from 0`);
-          }
-        } else {
-          if (!draft.rubric || !draft.reference_answer)
-            problems.push(`${where}: free text needs a rubric and a reference answer`);
-          const levels = new Set(draft.rubric?.match(/\b[0-3](?=\s*[:=.)-])/g) ?? []);
-          if (levels.size < 4)
-            problems.push(`${where}: the rubric gives each level 0 to 3, as "0: ...", "1: ..."`);
-        }
-      });
       const stems = await deps.embedder.embedPassage(params.questions.map((draft) => draft.stem));
       const existing = await context.db
         .select({ id: question.id, stem: question.stem, embedding: question.embedding })
         .from(question)
         .where(and(eq(question.subtopicId, tier.id), ne(question.status, "rejected")));
-      stems.forEach((vector, index) => {
+      // Each question that passes is stored, and only a faulty one is refused, so one fault never
+      // has every question written again (the owner's rule: no output paid for twice).
+      const kept: { draft: (typeof params.questions)[number]; stem: number[] }[] = [];
+      const refused: string[] = [];
+      params.questions.forEach((draft, index) => {
+        const problems: string[] = [];
+        if (!acceptedIds.has(draft.card))
+          problems.push(`card ${draft.card} is not an accepted card of this tier`);
+        if (draft.kind === "mcq") {
+          const options = draft.options ?? [];
+          if (options.length < 3) problems.push("an MCQ has 3 to 5 options");
+          const distinct = new Set(options.map((option) => option.trim().toLowerCase()));
+          if (distinct.size !== options.length) problems.push("two options say the same thing");
+          if (draft.correct_index === undefined || draft.correct_index >= options.length) {
+            problems.push("correct_index must name one of its options, counting from 0");
+          }
+        } else {
+          if (!draft.rubric || !draft.reference_answer)
+            problems.push("free text needs a rubric and a reference answer");
+          const levels = new Set(draft.rubric?.match(/\b[0-3](?=\s*[:=.)-])/g) ?? []);
+          if (levels.size < 4) problems.push('the rubric gives each level 0 to 3, as "0: ...", "1: ..."');
+        }
+        const vector = stems[index] as number[];
         for (const other of existing) {
           if (other.embedding && cosine(vector, other.embedding) >= NEAR_DUPLICATE) {
-            problems.push(`question ${index + 1}: its stem repeats question ${other.id}, "${other.stem}"`);
+            problems.push(`its stem repeats question ${other.id}, "${other.stem}"`);
           }
         }
-        for (let earlier = 0; earlier < index; earlier++) {
-          if (cosine(vector, stems[earlier] as number[]) >= NEAR_DUPLICATE) {
-            problems.push(`question ${index + 1}: its stem repeats question ${earlier + 1}'s`);
+        for (const earlier of kept) {
+          if (cosine(vector, earlier.stem) >= NEAR_DUPLICATE) {
+            problems.push(`its stem repeats "${earlier.draft.stem}", stored in this call`);
           }
         }
+        if (problems.length > 0) {
+          refused.push(`question ${index + 1}: ${problems.join("; ")}`);
+          return;
+        }
+        kept.push({ draft, stem: vector });
       });
-      if (problems.length > 0) {
+      if (kept.length === 0) {
         throw new ToolError(
-          `Nothing was stored; fix every problem and call again:\n- ${problems.join("\n- ")}`,
+          `Nothing was stored; fix every problem and call again:\n- ${refused.join("\n- ")}`,
         );
       }
       const written = await context.db
         .insert(question)
         .values(
-          params.questions.map((draft, index) => ({
+          kept.map(({ draft, stem }) => ({
             subtopicId: tier.id,
             cardId: draft.card,
             difficulty: tier.difficulty,
@@ -821,17 +872,17 @@ export function writeQuestionsTool(deps: AgentDeps): HarnessTool<typeof WriteQue
             rubric: draft.kind === "free_text" ? (draft.rubric ?? null) : null,
             referenceAnswer: draft.kind === "free_text" ? (draft.reference_answer ?? null) : null,
             explanation: draft.explanation,
-            embedding: stems[index] as number[],
+            embedding: stem,
             embeddingModel: deps.embedder.modelName,
             genMeta: { stage: "written", writer: context.chat.id, run: context.run.id },
           })),
         )
         .returning({ id: question.id });
-      return {
-        value: `Stored ${written.length} questions. Send them to pass 2 with gate_questions.`,
-        dataSeen: [],
-        recordsWritten: [],
-      };
+      let value = `Stored ${written.length} questions. Send them to pass 2 with gate_questions.`;
+      if (refused.length > 0) {
+        value += `\nNot stored, so write only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
+      }
+      return { value, dataSeen: [], recordsWritten: [] };
     },
   };
 }

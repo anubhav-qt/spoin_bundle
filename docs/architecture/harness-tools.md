@@ -140,7 +140,7 @@ other topic retrieves them before; the curriculum chat starts after ingestion.
 | Tool | Does |
 |---|---|
 | `start_writer(path, brief)` | A writer helper for one document, with the research tools, `write_document` and `report`. It reads the maps and their cited passages from the records |
-| `write_document(path, title, source, source_date, tags, epistemic fields, sections)` | The writer's. Code copies kind, category, sub-category and scope from the topic row, checks the corpus contract at write time naming every problem at once, writes the file and keeps the previous version as a record |
+| `write_document(path, title, source, source_date, tags, epistemic fields, sections)` | The writer's. Code copies kind, category, sub-category and scope from the topic row, checks the corpus contract at write time naming every problem at once, writes the file and keeps the previous version as a record. A refused call's sections are kept as the writer's try, so the next call sends only the sections that change (`drop` removes one) |
 | `audit_drafts()` | The three auditing calls (versions, false precision, the coverage matrix) with their own fixed prompts, which the tadpole does not brief. Findings are records |
 
 The topic's photographs are visual_toad's, sourced after the curriculum (below).
@@ -206,9 +206,9 @@ code makes the tadpole the topic's frog.
 | `read_cards(subtopic)` | The tier's cards so far, the lower tiers' card bodies to build on, and the topic's titles |
 | `plan_cards(subtopic, briefs[])` | The tier's plan (ADR-0059): concept, form and angle per card, as a record |
 | `request_photos(briefs[])` | Asks visual_toad for the image briefs' photographs. An image card is written only after its photo is picked; a brief left without one becomes prose |
-| `write_cards(subtopic, cards[])` | Drafts: dual titles, summary, body, cited passages, form, a picked photo or an art request (what to show, and ideas), hero. Code refuses a structural fault and names it (lengths, mermaid, a passage outside the grounding, a photo not picked for it or used elsewhere, the type quotas); nothing refused is stored. Embeds the drafts and derives their archetype |
+| `write_cards(subtopic, cards[])` | Drafts: dual titles, summary, body, cited passages, form, a picked photo or an art request (what to show, and ideas), hero. Code refuses a structural fault and names it (lengths, prose over 1,200 characters, a code block in a tier with no code cards, mermaid and its emoji, a correction note in the body, a passage outside the grounding, a photo not picked for it or used elsewhere, the type quotas). Each draft stands alone: the passing ones are stored and only the faulty ones come back to be written again. Embeds the drafts and derives their archetype |
 | `gate_cards(subtopic)` | Sends the drafts to the tier's pass-1 helper; the survivors go to the tadpole for pass 2, and the verdicts wake the writer. Accepted cards stay; a rejected one is a `rejected_card` with its feedback, and the writer drafts again against it until the tier reaches its `target_cards` |
-| `write_questions(subtopic, questions[])` | Refused until the tier reaches its target. Code checks the shape (distinct options, a correct index in range, a rubric for free text), that the card is accepted in this tier, and near-duplicate stems |
+| `write_questions(subtopic, questions[])` | Refused until the tier reaches its target. Code checks the shape (distinct options, a correct index in range, a rubric for free text), that the card is accepted in this tier, and near-duplicate stems; the passing questions are stored and only the faulty ones come back |
 | `gate_questions(subtopic)` | Sends the questions to the tadpole for pass 2 |
 | `submit_tier(subtopic)` | Refused until the tier reaches its target, every accepted card has its art or photo, and every question has passed. Then the tier goes live |
 
@@ -220,7 +220,7 @@ brief.
 | Tool | Does |
 |---|---|
 | `read_drafts()` | The waiting drafts, with their passages and the canonical topic. Difficulty withheld |
-| `correct_cards(cards[])` | Rewrites a card, or returns it unchanged; never rejects. Code checks the structure again, embeds the corrected body, and rejects a near-duplicate of the topic's cards or an earlier one in the batch, naming its twin |
+| `correct_cards(cards[])` | Rewrites a card, or returns it unchanged; never rejects. Code checks the structure again, embeds the corrected body, and rejects a near-duplicate of the topic's cards or an earlier one in the batch, naming its twin. The passing corrections are stored and only the refused ones come back |
 
 ### Pass 2: verification (a helper of the tadpole, later of the frog)
 

@@ -668,8 +668,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   can go before NVIDIA's key is in `infra/.env`. A role this phase doesn't run (ero_sennin,
   wise_toad, visual_toad) throws when woken, rather than running with no tools.
 - **The worker** (2026-10-13), `apps/server/src/worker.ts`: ends the runs and puts back the wakes
-  its last stop cut off, then runs the scheduler until SIGTERM, letting each running chat stop at
-  its next step (30 s at most). Its image is the `worker` stage of `apps/server/Dockerfile`, built
+  its last stop cut off, then runs the scheduler until SIGTERM, letting each running chat finish
+  its step in flight (the drain, below). Its image is the `worker` stage of `apps/server/Dockerfile`, built
   on the `server` stage with playwright-core's Chromium added, so the api's image carries no
   browser. It keeps fetched pages and written documents in `UNIVERSE_FILES_DIR`, the
   `hono-universe-files` volume, and renders cards on `WEB_URL`, the compose `web` service.
@@ -688,6 +688,25 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   instructions), wakes, model calls and records. It reads `DATABASE_URL` through a pool whose
   transactions are READ ONLY and leaves out AskAI's chats and runs. A development tool in
   `apps/server/src/monitor/`, in no image.
+- **The old writers' language rules come back** (2026-10-13), at the owner's ask: the old
+  pipeline's tier language and register rules are `prompts/partials/voice.njk`, included by the
+  tier writer, corrector and verifier, so all three hold a card to the same voice (one voice at
+  every tier, short sentences, each term defined once, simpler wording but never simpler facts).
+  Difficulty is the idea, never how hard a card reads. Code enforces the rest in
+  `draftProblems` (`agents/tiers.ts`): prose outside code and diagrams over 1,200 characters, a
+  code block in a tier whose quota has no code cards, an emoji in a mermaid block, and a
+  correction note left in a body.
+- **No output is paid for twice** (2026-10-13), the owner's rule. `write_cards`,
+  `write_questions` and `correct_cards` keep every passing item and send back only the faulty
+  ones, rather than refusing the batch. `write_document` keeps a refused call's sections as the
+  writer's try (`<file>.try.json` beside the document) and takes only the sections that change
+  next time, with `drop` to remove one. A worker stop drains: each running chat finishes the
+  step in flight, stores it and ends `stopped` before its next model call, with up to 4 minutes
+  before the worker aborts what's left; compose gives the worker 5 minutes to stop.
+- **An empty Gemini answer is asked again** (2026-10-13), up to three times, since a writer whose
+  last answer came back empty ended its run done with nothing written and no report.
+- **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
+  fixes the call at once instead of guessing.
 
 ## Asked when we get there
 

@@ -53,6 +53,8 @@ export interface SchedulerInput {
   compaction?: CompactionSettings;
   /** Stops the chats running, and wakes no more. */
   signal?: AbortSignal;
+  /** Wakes no more, and lets each chat running end at its next step boundary (`RunChatInput.drain`). */
+  drain?: AbortSignal;
   /** The time now. Tests set it. */
   clock?: () => Date;
   /** Hears each chat wake and settle, and anything that went wrong. */
@@ -100,18 +102,23 @@ export function createScheduler(input: SchedulerInput): Scheduler {
   };
 }
 
-/** Runs the scheduler until `signal` aborts, then waits for the chats running to stop and settle. */
+/** Runs the scheduler until `signal` or `drain` aborts, then waits for the chats running to stop and settle. */
 export async function runScheduler(input: SchedulerInput): Promise<void> {
   const scheduler = createScheduler(input);
-  while (!input.signal?.aborted) {
+  const either = AbortSignal.any([input.signal, input.drain].filter((one) => one !== undefined));
+  while (!stopping(input)) {
     await scheduler.tick();
-    await nap(TICK_MS, scheduler.nextFinish(), input.signal);
+    await nap(TICK_MS, scheduler.nextFinish(), either);
   }
   await scheduler.idle();
 }
 
+function stopping(input: SchedulerInput): boolean {
+  return Boolean(input.signal?.aborted) || Boolean(input.drain?.aborted);
+}
+
 async function tick(input: SchedulerInput, running: Map<string, Promise<void>>): Promise<void> {
-  if (input.signal?.aborted) return;
+  if (stopping(input)) return;
   const now = nowOf(input);
   try {
     await routeNewRecords(input.db, now);
@@ -161,6 +168,7 @@ async function runOnWakes(input: SchedulerInput, chat: Chat, wakes: Wake[]): Pro
       triggers: wakes.map((wake) => wake.trigger),
       compaction: input.compaction,
       signal: input.signal,
+      drain: input.drain,
     });
     outcome = outcomeOf(runs);
   } catch (error) {

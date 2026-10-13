@@ -12,6 +12,7 @@ import { type HarnessTool, type ToolContext, ToolError, type ToolOutput } from "
 import type { AgentDeps } from "./context.ts";
 import {
   type CardMeta,
+  codeAllowedIn,
   draftProblems,
   groundingOf,
   metaOf,
@@ -176,8 +177,11 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
         "Card",
       );
       const grounding = await groundingOf(deps, tier);
-      const problems: string[] = [];
-      const corrected = params.cards.map((given) => {
+      // Each correction that passes is stored, and only a faulty one is refused, so one fault never
+      // has every correction written again (the owner's rule: no output paid for twice).
+      const refused: string[] = [];
+      const corrected: { row: CardRow; draft: Draft; note: string | undefined; rewritten: boolean }[] = [];
+      for (const given of params.cards) {
         const row = waiting.get(given.card) as CardRow;
         const draft = {
           title: (given.title ?? row.title).trim(),
@@ -186,13 +190,16 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
           body: (given.body ?? row.body).trim(),
           passages: metaOf(row).passages,
         };
-        for (const problem of draftProblems(draft, grounding.length))
-          problems.push(`card ${row.id}: ${problem}`);
-        return { row, draft, note: given.note, rewritten: draft.body !== row.body };
-      });
-      if (problems.length > 0) {
+        const problems = draftProblems(draft, grounding.length, codeAllowedIn(tier));
+        if (problems.length > 0) {
+          refused.push(`card ${row.id}: ${problems.join("; ")}`);
+          continue;
+        }
+        corrected.push({ row, draft, note: given.note, rewritten: draft.body !== row.body });
+      }
+      if (corrected.length === 0) {
         throw new ToolError(
-          `Nothing was stored; fix every problem and call again:\n- ${problems.join("\n- ")}`,
+          `Nothing was stored; fix every problem and call again:\n- ${refused.join("\n- ")}`,
         );
       }
 
@@ -258,10 +265,15 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
       const left = (await correctingCards(context.db, tier.id)).length;
       let next = "Every draft is through pass 1.";
       if (left > 0) next = `${left} drafts are still waiting for you.`;
+      if (refused.length > 0) {
+        next += `\nNot stored, so correct only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
+      }
       return { ...stored, value: `${said.join("\n")}\n${String(stored.value)}\n${next}` };
     },
   };
 }
+
+type Draft = { title: string; canonical_title: string; summary: string; body: string; passages: number[] };
 
 function titlesOf(draft: { title: string; canonical_title: string; summary: string; body: string }) {
   return {

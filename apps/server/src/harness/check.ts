@@ -52,5 +52,11 @@ function describeError(error: TLocalizedValidationError): string[] {
     const fields = (error.params as { additionalProperties?: string[] }).additionalProperties ?? [];
     return fields.map((field) => `${path}: unexpected field "${field}"`);
   }
+  // Naming the values lets the model fix the call: "one of the allowed values" alone sent a
+  // document writer guessing at record kinds four times.
+  if (error.keyword === "enum") {
+    const allowed = (error.params as { allowedValues?: unknown[] }).allowedValues ?? [];
+    return [`${path}: must be one of ${allowed.map((value) => JSON.stringify(value)).join(", ")}`];
+  }
   return [`${path}: ${error.message}`];
 }

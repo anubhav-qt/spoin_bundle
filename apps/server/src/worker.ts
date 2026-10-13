@@ -21,6 +21,13 @@ import { loadPrompts } from "./prompts.ts";
  * runs and puts those wakes back before it starts.
  */
 
+/**
+ * How long a stop waits for the chats running to finish the step they are in, so no model output
+ * already paid for is lost. A chat still running past it is waiting out Gemini's limits, with
+ * nothing in flight, and is cut off. The worker's compose `stop_grace_period` is longer.
+ */
+const DRAIN_MS = 4 * 60_000;
+
 const env = loadEnv();
 const proxy = proxyConfig(env);
 if (!proxy) throw new Error("The worker needs Gemini: set CLIPROXY_API_KEY.");
@@ -57,11 +64,14 @@ const interrupted = await markInterruptedRuns(app.db);
 const released = await releaseTakenWakes(app.db);
 log.info({ interrupted: interrupted.length, released: released.length }, "worker starting");
 
+const draining = new AbortController();
 const stopping = new AbortController();
 const stop = () => {
-  log.info("worker stopping: the chats running stop at their next step");
-  stopping.abort();
-  setTimeout(() => process.exit(0), 30_000).unref();
+  if (draining.signal.aborted) return;
+  log.info("worker stopping: each chat running ends once the step it is in is stored");
+  draining.abort();
+  setTimeout(() => stopping.abort(), DRAIN_MS).unref();
+  setTimeout(() => process.exit(0), DRAIN_MS + 30_000).unref();
 };
 process.on("SIGTERM", stop);
 process.on("SIGINT", stop);
@@ -71,6 +81,7 @@ await runScheduler({
   prompts,
   setUp: agentSetUp({ deps, proxy, nimKey: env.NVIDIA_NIM_API_KEY ?? null }),
   signal: stopping.signal,
+  drain: draining.signal,
   onEvent(event) {
     if (event.type === "error") {
       log.error({ error: event.error }, "the scheduler hit an error");

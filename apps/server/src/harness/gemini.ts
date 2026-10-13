@@ -23,6 +23,9 @@ import { endWith, failedMessage, type RecordCall, runCall } from "../models/call
  * Every try is a `model_call` row.
  */
 
+/** How many empty answers in a row one call gets before the last is let through. */
+const EMPTY_TRIES = 3;
+
 /** First cooldown and cap, in seconds, for each kind of failure that waits (breader's). */
 const COOL = { rate: [60, 1800], busy: [30, 600] } as const;
 /** The longest wait before looking again, and how often a proxy that's down is looked for. */
@@ -70,6 +73,7 @@ async function callUntilAnswered(
 ): Promise<AssistantMessage> {
   const wait = options.sleep ?? sleep;
   const signal = streamOptions.signal;
+  let empties = 0;
   for (;;) {
     await whileCooling(model.id, wait, signal);
     if (signal?.aborted) return stopped(model);
@@ -78,6 +82,15 @@ async function callUntilAnswered(
     options.record(model, outcome);
     const message = outcome.message;
     if (message.stopReason === "aborted") return message;
+    // An empty answer would end the run as if the chat had finished: a document writer ended so,
+    // its document unwritten. It is asked again, as the balancer does on NIM, then let through.
+    if (outcome.failure === "empty") {
+      empties += 1;
+      if (empties < EMPTY_TRIES) {
+        cool(model.id, "busy");
+        continue;
+      }
+    }
     if (message.stopReason !== "error") {
       COOLING.delete(model.id);
       return message;

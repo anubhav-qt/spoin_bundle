@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { type ParsedDocument, parseDocument } from "@spoin/frog/ingest/contract";
 import { ingestDocument } from "@spoin/frog/ingest/runner";
@@ -126,10 +126,17 @@ const WriteDocumentParameters = Type.Object(
       Type.String({ format: "date", description: "When you checked it against what it describes" }),
     ),
     status: Type.Optional(Type.Enum(["current", "historical", "deprecated"])),
-    sections: Type.Array(Section, { minItems: 1 }),
+    sections: Type.Array(Section, {
+      description: "The whole document the first time; after that, only the sections that change",
+    }),
+    drop: Type.Optional(
+      Type.Array(Type.String({ minLength: 1 }), { description: "Headings of sections to take out" }),
+    ),
   },
   CLOSED,
 );
+
+type DocumentTry = Omit<Static<typeof WriteDocumentParameters>, "drop">;
 
 /** The writer's: its document, checked against the contract, written to disk and kept as a record. */
 export function writeDocumentTool(deps: AgentDeps): HarnessTool<typeof WriteDocumentParameters> {
@@ -146,21 +153,51 @@ export function writeDocumentTool(deps: AgentDeps): HarnessTool<typeof WriteDocu
       }
       const path = brief.body.path;
       const found = await topicById(context.db, brief.body.topic);
-      const text = documentText(found, params);
-      const problems = epistemicProblems(params);
+      const full = corpusFile(deps, path);
+      // Every try is kept as it was written, passing or not, and the next call changes only the
+      // sections it names: a document refused for one section is never written again whole (the
+      // owner's rule: no output paid for twice).
+      const tryFile = `${full}.try.json`;
+      const merged = mergeTry(readTry(tryFile), params);
+      mkdirSync(dirname(full), { recursive: true });
+      writeFileSync(tryFile, JSON.stringify(merged));
+      const text = documentText(found, merged);
+      const problems = epistemicProblems(merged);
       problems.push(...parseDocument(path, Buffer.from(text, "utf8")).errors.problems);
+      const headings = merged.sections.map((section) => `- ${section.heading.trim()}`).join("\n");
       if (problems.length > 0) {
         throw new ToolError(
-          `Nothing was written; fix every problem and call write_document again:\n- ${problems.join("\n- ")}`,
+          `Not written yet, but your try is kept: call write_document again with only the sections that change.\n` +
+            `Problems:\n- ${problems.join("\n- ")}\nThe sections as kept:\n${headings}`,
         );
       }
-      const full = corpusFile(deps, path);
-      mkdirSync(dirname(full), { recursive: true });
       writeFileSync(full, text);
       const draft = await keepDraft(context.db, context, { topic: found.id, path, text });
-      return recordsStored(context.db, deps.prompts, [draft]);
+      const stored = await recordsStored(context.db, deps.prompts, [draft]);
+      return { ...stored, value: `${String(stored.value)}\nIts sections:\n${headings}` };
     },
   };
+}
+
+function readTry(file: string): DocumentTry | null {
+  if (!existsSync(file)) return null;
+  return JSON.parse(readFileSync(file, "utf8")) as DocumentTry;
+}
+
+/**
+ * The last try with this call laid over it: its fields replace the try's, a section replaces the
+ * one of the same heading where it stood, a new heading goes at the end, and `drop` takes one out.
+ */
+export function mergeTry(
+  last: DocumentTry | null,
+  params: Static<typeof WriteDocumentParameters>,
+): DocumentTry {
+  const { drop, sections, ...fields } = params;
+  const merged = new Map<string, Static<typeof Section>>();
+  for (const section of last?.sections ?? []) merged.set(section.heading.trim(), section);
+  for (const heading of drop ?? []) merged.delete(heading.trim());
+  for (const section of sections) merged.set(section.heading.trim(), section);
+  return { ...fields, sections: [...merged.values()] };
 }
 
 /** The checks the contract leaves to the epistemic fields (antigravity-corpus-authoring.md). */

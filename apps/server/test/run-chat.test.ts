@@ -242,6 +242,31 @@ describe("a run", () => {
     expect(run.status).toBe("stopped");
   });
 
+  test("drained, it finishes and stores the step in flight, then ends stopped before the next call", async () => {
+    const drain = new AbortController();
+    const model = scriptedModel([
+      reply(
+        [{ type: "toolCall", id: "call-1", name: "write_note", arguments: { text: "Paid for" } }],
+        "toolUse",
+      ),
+      reply([{ type: "text", text: "Never asked for." }]),
+    ]);
+    const streamFn: StreamFn = (...args) => {
+      drain.abort();
+      return model.streamFn(...args);
+    };
+    const calls = { count: 0 };
+    const input = await setUp(streamFn, [noteTool(calls)]);
+
+    const run = await runChat({ ...input, drain: drain.signal });
+
+    expect(run.status).toBe("stopped");
+    expect(model.requests).toHaveLength(1);
+    expect(calls.count).toBe(1);
+    const roles = (await readTranscript(db, input.chat.id)).map((entry) => entry.message.role);
+    expect(roles).toEqual(["user", "assistant", "toolResult"]);
+  });
+
   test("pauses at the step after its chat's context reaches the limit, so the chat can compact", async () => {
     const model = scriptedModel([
       counted(

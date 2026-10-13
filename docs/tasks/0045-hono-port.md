@@ -778,7 +778,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   7,324 out); one for 15 cards took 1,698 seconds and one for 30 questions 1,489, each after two
   tries cut off by Node's fetch at 301 seconds waiting for headers (first tokens at 271 and 284
   seconds, 13,757 and 9,560 tokens out). The worker now sets undici's dispatcher to wait past the
-  call timers (`letCallsWait` in `models/calls.ts`), so only those decide a call is too slow. The
+  call timers (`letCallsWait` in `models/calls.ts`), so only those decide a call is too slow.
+  NVIDIA sends a tool call's arguments in one piece once they are all written, so a NIM write is
+  silent from its thinking to its end: 7,502 tokens took 219 s, and nine bigger writes were cut
+  by the 240 s silence limit, so a NIM call now gets 900 s of silence. The
   probes wrote text, not a tool call, because they skipped `normalizeContext` and so never sent
   the tool; a try with no call keeps its text all the same.
 - **Code runs the tiers** (2026-10-13). The tadpole no longer starts subtopics, verifiers or the

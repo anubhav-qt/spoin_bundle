@@ -24,6 +24,13 @@ import { log } from "../log.ts";
 /** Longest wait for the first token, and longest silence once the answer has started (breader's). */
 const FIRST_TOKEN_S = 600;
 const IDLE_S = 240;
+/**
+ * NIM's longest silence once the answer has started. NVIDIA sends a tool call's arguments in one
+ * piece once they are all written (a 2026-10-13 probe: thinking, then 121 s of nothing, then 4,267
+ * tokens at once), so the silence lasts the whole write: 7,502 tokens took 219 s, and nine bigger
+ * writes were cut at 240 s. 900 s is about 30,000 tokens.
+ */
+const NIM_IDLE_S = 900;
 
 /**
  * Node's fetch gives up on a response's headers after 300 seconds, and NIM's first token often
@@ -33,7 +40,7 @@ const IDLE_S = 240;
 export function letCallsWait(): void {
   const agent = new Agent({
     headersTimeout: (FIRST_TOKEN_S + 60) * 1000,
-    bodyTimeout: (IDLE_S + 60) * 1000,
+    bodyTimeout: (NIM_IDLE_S + 60) * 1000,
   });
   setGlobalDispatcher(agent);
 }
@@ -109,6 +116,11 @@ function streamFailure(message: string): ModelCallFailure {
   return "slow";
 }
 
+function idleLimit(model: Model<Api>): number {
+  if (model.provider === "nvidia") return NIM_IDLE_S;
+  return IDLE_S;
+}
+
 const usable = (message: AssistantMessage) =>
   message.content.some(
     (block) => block.type === "toolCall" || (block.type === "text" && block.text.trim() !== ""),
@@ -156,7 +168,7 @@ export async function runCall(
     for await (const event of stream) {
       if (event.type.endsWith("_delta")) {
         firstTokenMs ??= Math.round(performance.now() - t0);
-        arm(IDLE_S, "the answer stalled");
+        arm(idleLimit(model), "the answer stalled");
       }
       forward?.(event);
     }

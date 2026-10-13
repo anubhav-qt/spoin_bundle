@@ -5,10 +5,10 @@ import type { Prompts } from "../prompts.ts";
 import type { Chat } from "./chats.ts";
 import { summaryInForce } from "./compaction.ts";
 import { indiaTime } from "./india-time.ts";
+import { withoutRequestTag } from "./prompt-tags.ts";
 import { readAnyRecord } from "./records.ts";
 import type { RunTrigger } from "./schemas.ts";
 import { readActionLog } from "./transcript.ts";
-import { withoutRequestTag } from "./untrusted.ts";
 import { viewsOf } from "./views.ts";
 
 /**

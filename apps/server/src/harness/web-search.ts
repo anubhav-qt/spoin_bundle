@@ -9,9 +9,9 @@ import { GEMINI_THINKING, type ProxyConfig } from "../models/proxy.ts";
 import type { Prompts } from "../prompts.ts";
 import { checkValue } from "./check.ts";
 import { indiaTime } from "./india-time.ts";
+import { withoutTag } from "./prompt-tags.ts";
 import { CLOSED } from "./schemas.ts";
 import { type HarnessTool, ToolError } from "./tools.ts";
-import { withoutTag } from "./untrusted.ts";
 
 /**
  * Searching the web (harness-tools.md, task 0045): Google, through spoin's own SearXNG. When Google

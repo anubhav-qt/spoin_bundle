@@ -7,10 +7,10 @@ import type { Db } from "../db/client.ts";
 import { card, generationJob, subtopic, topic, topicAlias, topicEdge, userTopic } from "../db/schema.ts";
 import type { Prompts } from "../prompts.ts";
 import { intakeOf, latestJob, meaningText, topicById } from "./intake.ts";
+import { withoutRequestTag } from "./prompt-tags.ts";
 import { refOf } from "./records.ts";
 import { CLOSED, Id, type Intake, type RecordRef } from "./schemas.ts";
 import type { HarnessTool } from "./tools.ts";
-import { withoutRequestTag } from "./untrusted.ts";
 import { type RecordView, viewsOf } from "./views.ts";
 
 /**

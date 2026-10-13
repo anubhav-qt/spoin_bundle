@@ -9,6 +9,7 @@ import { startHelper } from "../src/agents/helpers.ts";
 import { generationJob, topic, userTopic, wake as wakeTable } from "../src/db/schema.ts";
 import { type Chat, listRuns, openChat, openTopicChat } from "../src/harness/chats.ts";
 import { RUNS_TO_REPORT } from "../src/harness/helper-reports.ts";
+import { systemPromptFor } from "../src/harness/instructions.ts";
 import { changeRecord, createRecord, readRecord, refOf } from "../src/harness/records.ts";
 import { routeNewJobs, routeNewRecords } from "../src/harness/routing.ts";
 import {
@@ -24,6 +25,7 @@ import {
   type Author,
   CLOSED,
   CompactionSummaryRecord,
+  MapRecord,
   QuestionRecord,
   ReportRecord,
   Text,
@@ -531,5 +533,36 @@ describe("a helper that stalls before reporting", () => {
     }
 
     expect(woke(events)).toEqual([writer.id, tadpole.id]);
+  });
+});
+
+describe("a document writer's instructions", () => {
+  test("list its topic's maps by letter and record, and no other topic's", async () => {
+    const tadpole = await newTadpole();
+    const other = await newTadpole();
+    const mapFor = (chat: Chat, map: "A" | "F", summary: string) =>
+      createRecord(db, MapRecord, {
+        kind: "map",
+        author: chatAuthor(chat),
+        body: {
+          topic: chat.topicId ?? "",
+          map,
+          items: [{ name: "Caches", text: "Why", evidence: [] }],
+          summary,
+        },
+      });
+    const misconceptions = await mapFor(tadpole, "F", "What learners get wrong.");
+    await mapFor(other, "A", "Another topic's domain.");
+    const { chat: writer } = await startHelper(db, tadpole, chatAuthor(tadpole), {
+      task: "document_writer",
+      brief: "Write tips-and-tricks.md from map F.",
+    });
+
+    const instructions = await systemPromptFor(db, prompts, writer);
+
+    expect(instructions).toContain(
+      `- map ${misconceptions.id} version 1: Map F (misconception map), 1 items: What learners get wrong.`,
+    );
+    expect(instructions).not.toContain("Another topic's domain.");
   });
 });

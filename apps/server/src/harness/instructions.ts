@@ -6,8 +6,8 @@ import { type Chat, readChat } from "./chats.ts";
 import { summaryInForce } from "./compaction.ts";
 import { indiaTime } from "./india-time.ts";
 import { withoutRequestTag } from "./prompt-tags.ts";
-import { readAnyRecord } from "./records.ts";
-import type { RunTrigger } from "./schemas.ts";
+import { listTopicRecords, readAnyRecord } from "./records.ts";
+import { MapRecord, type RunTrigger } from "./schemas.ts";
 import { readActionLog } from "./transcript.ts";
 import { viewsOf } from "./views.ts";
 
@@ -30,7 +30,8 @@ export async function systemPromptFor(db: Db, prompts: Prompts, chat: Chat): Pro
     const main = await readChat(db, chat.parentId);
     const topic = await topicOf(db, main);
     if (chat.task === "helper") return prompts.render(`${main.role}.njk`, { summary, topic, helper: true });
-    return prompts.render(`helpers/${chat.task}.njk`, { summary, topic, main: main.role });
+    const maps = await mapsOf(db, topic);
+    return prompts.render(`helpers/${chat.task}.njk`, { summary, topic, main: main.role, maps });
   }
   return prompts.render(`${chat.role}.njk`, { summary, topic: await topicOf(db, chat) });
 }
@@ -53,6 +54,15 @@ async function topicOf(
     .from(topic)
     .where(eq(topic.id, topicId));
   return found ?? null;
+}
+
+/**
+ * A topic's maps, so a writer whose brief names a map by its letter can read it. Without them the
+ * first live run's writers guessed record kinds ("misconception_map", "document") to find them.
+ */
+async function mapsOf(db: Db, found: { id: string } | null) {
+  if (!found) return [];
+  return viewsOf(db, await listTopicRecords(db, MapRecord, "map", found.id));
 }
 
 /**

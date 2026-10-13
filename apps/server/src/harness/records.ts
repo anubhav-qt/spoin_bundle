@@ -225,6 +225,21 @@ export async function listLatestRecords<Schema extends TSchema>(
   return rows.map((row) => checkRow(schema, row, `A stored ${kind}`));
 }
 
+/** The latest version of every record of a kind about one topic, least recently written first. */
+export async function listTopicRecords<Schema extends TSchema>(
+  db: Conn,
+  schema: Schema,
+  kind: string,
+  topicId: string,
+): Promise<Static<Schema>[]> {
+  const rows = await db
+    .select()
+    .from(harnessRecord)
+    .where(and(latestOfKind(kind), sql`${harnessRecord.body} ->> 'topic' = ${topicId}`))
+    .orderBy(asc(harnessRecord.seq));
+  return rows.map((row) => checkRow(schema, row, `A stored ${kind}`));
+}
+
 /** One exact version of a record whose kind is known only by name. */
 export async function readAnyRecord(db: Conn, ref: RecordRef): Promise<AnyRecord> {
   return readRecord(db, RECORD_SCHEMAS[recordKindOf(ref.kind)], ref);

@@ -89,12 +89,17 @@ describe("the agents' instructions", () => {
 
   test("every helper task renders", () => {
     for (const task of ["document_writer", "tier_writer", "corrector", "verifier"]) {
-      expect(prompts.render(`helpers/${task}.njk`, { summary: null, topic, main: "tadpole" })).toContain(
-        topic.name,
-      );
+      expect(
+        prompts.render(`helpers/${task}.njk`, { summary: null, topic, main: "tadpole", maps: [] }),
+      ).toContain(topic.name);
     }
     expect(
-      prompts.render("helpers/curriculum_writer.njk", { summary: null, topic: null, main: "curriculum" }),
+      prompts.render("helpers/curriculum_writer.njk", {
+        summary: null,
+        topic: null,
+        main: "curriculum",
+        maps: [],
+      }),
     ).toContain("write_curriculum");
   });
 

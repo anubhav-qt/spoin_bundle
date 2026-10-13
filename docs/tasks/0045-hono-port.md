@@ -718,6 +718,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   had no try file, so a partial call would have lost the rest. A written document with no try is
   now the starting try (`lastTry` in `agents/documents.ts`), and the document writer's prompt
   says to read it and send only the sections it changes.
+- **A document writer is told its topic's maps** (2026-10-13). Briefs name maps by letter, and
+  the first live run's writers guessed record kinds (`misconception_map`, `document`) to find
+  them. A helper's instructions now list its topic's maps, each with its letter, name and record,
+  and the document writer's prompt says a written document is read with read_document.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

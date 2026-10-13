@@ -6,9 +6,9 @@ import type { Chat } from "./chats.ts";
 import { summaryInForce } from "./compaction.ts";
 import { indiaTime } from "./india-time.ts";
 import { readAnyRecord } from "./records.ts";
-import { withoutRequestTag } from "./requests.ts";
 import type { RunTrigger } from "./schemas.ts";
 import { readActionLog } from "./transcript.ts";
+import { withoutRequestTag } from "./untrusted.ts";
 import { viewsOf } from "./views.ts";
 
 /**

@@ -47,6 +47,18 @@ services:
       timeout: 5s
       retries: 12
 
+  # The agents' web search (task 0045): Google, through our own SearXNG. 8889 on the host is for a
+  # server run outside compose and for tests.
+  searxng:
+    image: searxng/searxng:2026.9.30-a9d990033
+    restart: unless-stopped
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?Set SEARXNG_SECRET in infra/.env}
+    ports:
+      - "127.0.0.1:8889:8080"
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+
   migrate:
     build: { context: .., dockerfile: apps/server/Dockerfile }
     command: ["node", "--enable-source-maps", "dist/migrate.js"]
@@ -63,6 +75,7 @@ services:
       CLIPROXY_URL: http://cliproxy:8317
       CLIPROXY_API_KEY: ${CLIPROXY_API_KEY:?Set CLIPROXY_API_KEY in infra/.env}
       CLIPROXY_MANAGEMENT_KEY: ${CLIPROXY_MANAGEMENT_KEY:?Set CLIPROXY_MANAGEMENT_KEY in infra/.env}
+      SEARXNG_URL: http://searxng:8080
       # Shared with breader. Unset leaves the NIM leg off.
       NVIDIA_NIM_API_KEY: ${NVIDIA_NIM_API_KEY:-}
     depends_on:
@@ -78,6 +91,7 @@ services:
       - hono-models:/models
     depends_on:
       migrate: { condition: service_completed_successfully }
+      searxng: { condition: service_started }
 
   web:
     build: { context: .., dockerfile: apps/web/Dockerfile }

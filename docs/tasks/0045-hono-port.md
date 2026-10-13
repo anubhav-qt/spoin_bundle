@@ -285,8 +285,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   asks, and searches the web only for what the request needs and nothing stored covers.
   toad_sage's intake record names the topics it builds on. So fetched pages are kept and
   searchable after a run, not wiped like the procedure's `temp/`.
-- **The tadpoles search with our own SearXNG** (2026-10-11), a compose service querying Google,
-  Bing, DuckDuckGo and others at once, as Trotter does: no quota, any model. They read every
+- **The tadpoles search with our own SearXNG** (2026-10-11; amended 2026-10-13: Google only,
+  below), a compose service querying Google, Bing, DuckDuckGo and others at once, as Trotter
+  does: no quota, any model. They read every
   page themselves with our own fetch tool (article text from HTML, text from PDFs), keeping each
   passage's URL and date.
 - **Fetched pages live on disk, indexed in Postgres** (2026-10-11). A page's content stays on
@@ -637,6 +638,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   match are embedded as passages, as they are the same kind of text. Pre-harness topics have no
   intake and get no fallback: nothing is carried over from the old code or its topics. With
   `read_topic` and `list_categories` they are in `apps/server/src/harness/topic-reading.ts`.
+- **`web_search` asks Google alone, and Gemini when Google can't be reached** (2026-10-13),
+  amending the SearXNG entry above. The `searxng` compose service (127.0.0.1:8889, settings in
+  `infra/searxng/settings.yml`) keeps only its Google engine, and the tool hands back its first
+  10 results. When SearXNG doesn't answer, or Google turns it away (no results, Google among
+  `unresponsive_engines`), one Gemini call with `googleSearch` as its only tool searches instead
+  (a call of its own, as `googleSearch` can't share a request with function tools), recorded in
+  `model_call` like every Gemini call. The agent gets Gemini's written answer and its sources,
+  each grounding redirect read for the page it leads to. If that fails too, the tool error says
+  search is down. `SEARXNG_SECRET` lives in the gitignored `infra/.env`, and the stack refuses
+  to start without it. In `apps/server/src/harness/web-search.ts`.
 
 ## Asked when we get there
 

@@ -18,9 +18,9 @@ import { followTopic } from "../topics/service.ts";
 import { slugify } from "../topics/slug.ts";
 import { recordsStored } from "./outputs.ts";
 import { changeRecord, createRecord, readLatestRecord, refOf } from "./records.ts";
-import { withoutRequestTag } from "./requests.ts";
 import { CLOSED, Id, type Intake, IntakeRecord, MergeRecord } from "./schemas.ts";
 import { type HarnessTool, ToolError } from "./tools.ts";
+import { withoutRequestTag } from "./untrusted.ts";
 
 /**
  * toad_sage's intake (harness-tools.md, task 0045): every queued name is rejected, merged into a

@@ -137,6 +137,8 @@ const Env = z.object({
   CLIPROXY_MANAGEMENT_KEY: z.string().optional(),
   /** NVIDIA's free API, shared with breader. Unset means no NIM leg. */
   NVIDIA_NIM_API_KEY: z.string().optional(),
+  /** spoin's own SearXNG, which the agents' web_search asks for Google's results (task 0045). */
+  SEARXNG_URL: z.string().url().default("http://127.0.0.1:8889"),
 
   /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */
   DEV_ROUTES: bool.default(false),

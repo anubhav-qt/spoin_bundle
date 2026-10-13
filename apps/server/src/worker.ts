@@ -31,6 +31,9 @@ const DRAIN_MS = 4 * 60_000;
 const env = loadEnv();
 const proxy = proxyConfig(env);
 if (!proxy) throw new Error("The worker needs Gemini: set CLIPROXY_API_KEY.");
+// The writers run on NIM (the owner's rule), Gemini only taking a call NIM gave up on, so no key, no worker.
+if (!env.NVIDIA_NIM_API_KEY)
+  throw new Error("The worker's writers run on NVIDIA NIM: set NVIDIA_NIM_API_KEY.");
 if (!env.UNIVERSE_DATABASE_URL) throw new Error("The worker writes the corpus: set UNIVERSE_DATABASE_URL.");
 
 const app = connectApp(env.DATABASE_URL);
@@ -79,7 +82,7 @@ process.on("SIGINT", stop);
 await runScheduler({
   db: app.db,
   prompts,
-  setUp: agentSetUp({ deps, proxy, nimKey: env.NVIDIA_NIM_API_KEY ?? null }),
+  setUp: agentSetUp({ deps, proxy, nimKey: env.NVIDIA_NIM_API_KEY }),
   signal: stopping.signal,
   drain: draining.signal,
   onEvent(event) {

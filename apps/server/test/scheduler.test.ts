@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { type AssistantMessage, contentText, type Message } from "@spoin/pi-ai";
-import type { WakeStatus } from "@spoin/shared/enums";
+import type { HelperTask, WakeStatus } from "@spoin/shared/enums";
 import { eq, inArray } from "drizzle-orm";
 import { Type } from "typebox";
 import { beforeEach, describe, expect, test } from "vitest";
 import { startHelper } from "../src/agents/helpers.ts";
-import { COMPACT_WHILE_WAITING_AT, compactWhileWaitingAt } from "../src/agents/set-up.ts";
+import { COMPACT_WHILE_WAITING_AT, compactWhileWaitingAt, runsOnNim } from "../src/agents/set-up.ts";
 import { generationJob, topic, userTopic, wake as wakeTable } from "../src/db/schema.ts";
 import { type Chat, listRuns, openChat, openTopicChat } from "../src/harness/chats.ts";
 import { RUNS_TO_REPORT } from "../src/harness/helper-reports.ts";
@@ -565,6 +565,30 @@ describe("a document writer's instructions", () => {
       `- map ${misconceptions.id} version 1: Map F (misconception map), 1 items: What learners get wrong.`,
     );
     expect(instructions).not.toContain("Another topic's domain.");
+  });
+});
+
+describe("which model a chat runs on", () => {
+  test("the writers run on NIM; every chat that orchestrates or verifies runs on Gemini", async () => {
+    const tadpole = await newTadpole();
+    const helperFor = async (task: HelperTask) =>
+      (await startHelper(db, tadpole, chatAuthor(tadpole), { task, brief: "Work." })).chat;
+
+    for (const task of ["document_writer", "curriculum_writer", "tier_writer"] as const) {
+      expect(runsOnNim(await helperFor(task))).toBe(true);
+    }
+    for (const task of ["helper", "corrector", "verifier"] as const) {
+      expect(runsOnNim(await helperFor(task))).toBe(false);
+    }
+    const designer = await openTopicChat(db, "designer_toad", tadpole.topicId ?? "");
+    for (const chat of [
+      tadpole,
+      designer,
+      await openChat(db, "toad_sage"),
+      await openChat(db, "curriculum"),
+    ]) {
+      expect(runsOnNim(chat)).toBe(false);
+    }
   });
 });
 

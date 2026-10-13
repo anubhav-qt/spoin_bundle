@@ -46,6 +46,11 @@ export interface BalancerOptions {
   maxTries: number;
   /** A process that never ends: a model that refuses the key is asked again later, not dropped. */
   patient?: boolean;
+  /**
+   * How long one call may wait for a model before it gives up, so a caller with another model to
+   * ask isn't held through a bad day. Checked only before a try, so no answer is ever cut off.
+   */
+  giveUpAfterS?: number;
 }
 
 export const BALANCER_DEFAULTS: BalancerOptions = { waitForTopS: 300, strikesToFall: 3, maxTries: 12 };
@@ -202,13 +207,27 @@ export class Balancer {
   }
 
   /** Waits for a model free for this call; null when the caller gave up meanwhile. */
-  private async next(skip: Map<string, string>, signal?: AbortSignal): Promise<Rung | null> {
+  private async next(
+    skip: Map<string, string>,
+    deadline: number,
+    signal?: AbortSignal,
+  ): Promise<Rung | null> {
     for (;;) {
       if (signal?.aborted) return null;
       const picked = this.pick(Date.now(), skip);
       if (typeof picked !== "number") return picked;
-      await sleep(jitter(picked), signal);
+      const wait = jitter(picked);
+      if (Date.now() + wait > deadline) {
+        throw new Error(`No answer within ${this.opts.giveUpAfterS} s: every model is cooling or busy.`);
+      }
+      await sleep(wait, signal);
     }
+  }
+
+  /** When a call that starts now gives up waiting for a model; never without `giveUpAfterS`. */
+  private deadlineFrom(now: number): number {
+    if (this.opts.giveUpAfterS === undefined) return Number.POSITIVE_INFINITY;
+    return now + this.opts.giveUpAfterS * 1000;
   }
 
   private cool(rung: Rung, outcome: CallOutcome) {
@@ -234,8 +253,9 @@ export class Balancer {
     let cuts = 0;
     const skip = new Map<string, string>();
     const empties = new Map<string, number>();
+    const deadline = this.deadlineFrom(Date.now());
     for (let tries = 1; ; tries++) {
-      const rung = await this.next(skip, options.signal);
+      const rung = await this.next(skip, deadline, options.signal);
       if (!rung) return abandoned(this.ladder);
       const state = this.state(rung);
       const name = rung.model.name;

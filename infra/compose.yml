@@ -90,6 +90,8 @@ services:
     stop_grace_period: 5m
     environment:
       <<: *server-env
+      # The writers run on NIM, Gemini only taking a call NIM gave up on: no key, no worker (worker.ts checks it too).
+      NVIDIA_NIM_API_KEY: ${NVIDIA_NIM_API_KEY:?Set NVIDIA_NIM_API_KEY in infra/.env, from breader}
       UNIVERSE_FILES_DIR: /data/universe
       WEB_URL: http://web:3000
     volumes:

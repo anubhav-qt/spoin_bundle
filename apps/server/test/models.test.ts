@@ -6,6 +6,7 @@ import { Balancer } from "../src/models/balancer.ts";
 import { type CallOutcome, recordedStreamFn, recordTo, roomLeft, runCall } from "../src/models/calls.ts";
 import { geminiThenNim } from "../src/models/gemini-then-nim.ts";
 import type { Rung } from "../src/models/nim.ts";
+import { nimThenGemini } from "../src/models/nim-then-gemini.ts";
 import { admin, deps, signedUp } from "./helpers.ts";
 import { answer, chunk, modelStandIn, type Reply, refuse } from "./model-stand-in.ts";
 
@@ -251,37 +252,41 @@ describe("the model accounts page", () => {
   });
 });
 
-describe("Gemini, then NIM", () => {
-  /** A Gemini on the stand-in. */
-  const gemini = (): Model<Api> => ({
-    id: "gemini-reader",
-    name: "Gemini",
-    api: "google-generative-ai",
-    provider: "antigravity",
-    baseUrl: `${standIn.base}/v1beta`,
-    input: ["text"],
-    cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-    reasoning: false,
-    contextWindow: 1_048_576,
-    maxTokens: 65_536,
-  });
-  const part = (text: string, last = false) =>
-    `data: ${JSON.stringify({
-      candidates: [
-        {
-          content: { role: "model", parts: [{ text }] },
-          index: 0,
-          ...(last ? { finishReason: "STOP" } : {}),
-        },
-      ],
-      usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 1, totalTokenCount: 6 },
-    })}
+/** A Gemini on the stand-in. */
+const gemini = (): Model<Api> => ({
+  id: "gemini-reader",
+  name: "Gemini",
+  api: "google-generative-ai",
+  provider: "antigravity",
+  baseUrl: `${standIn.base}/v1beta`,
+  input: ["text"],
+  cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+  reasoning: false,
+  contextWindow: 1_048_576,
+  maxTokens: 65_536,
+});
+const part = (text: string, last = false) =>
+  `data: ${JSON.stringify({
+    candidates: [
+      {
+        content: { role: "model", parts: [{ text }] },
+        index: 0,
+        ...(last ? { finishReason: "STOP" } : {}),
+      },
+    ],
+    usageMetadata: { promptTokenCount: 5, candidatesTokenCount: 1, totalTokenCount: 6 },
+  })}
 
 `;
-  const writes = (...parts: string[]): Reply => ({
-    status: 200,
-    body: parts.map((text, i) => part(text, i === parts.length - 1)).join(""),
-  });
+/** Gemini's answer on the stand-in, in these parts. */
+const writes = (...parts: string[]): Reply => ({
+  status: 200,
+  body: parts.map((text, i) => part(text, i === parts.length - 1)).join(""),
+});
+const textOf = (message: { content: { type: string; text?: string }[] }) =>
+  message.content.map((block) => block.text ?? "").join("");
+
+describe("Gemini, then NIM", () => {
   const googleRefuses = (code: number): Reply => ({
     status: code,
     body: JSON.stringify({ error: { code, message: "overloaded", status: "UNAVAILABLE" } }),
@@ -300,8 +305,6 @@ describe("Gemini, then NIM", () => {
     for await (const event of stream) types.push(event.type);
     return { message: await stream.result(), types, calls };
   }
-  const textOf = (message: { content: { type: string; text?: string }[] }) =>
-    message.content.map((block) => block.text ?? "").join("");
 
   test("Gemini's answer streams on as it comes", async () => {
     start([writes("Owner", "ship.")]);
@@ -338,6 +341,67 @@ describe("Gemini, then NIM", () => {
     start([googleRefuses(503)]);
     const { message } = await call(false);
     expect(message.stopReason).toBe("error");
+    expect(standIn.requests).toHaveLength(1);
+  });
+});
+
+describe("NIM, then Gemini", () => {
+  /** A writer's call: NIM's one model first, then Gemini, which keeps the key it was handed. */
+  async function call(signal?: AbortSignal) {
+    const { calls, record } = recorder();
+    const keys: (string | undefined)[] = [];
+    const geminiFn = recordedStreamFn(record);
+    const streamFn = nimThenGemini({
+      nim: new Balancer([{ model: nimModel("kimi"), maxInFlight: 1 }], "nim-key", record),
+      geminiModel: async () => gemini(),
+      gemini: (model, context, options) => {
+        keys.push(options?.apiKey);
+        return geminiFn(model, context, options);
+      },
+      geminiApiKey: "proxy-key",
+    });
+    const stream = await streamFn(nimModel("kimi"), ask(), { apiKey: "nim-key", signal });
+    return { message: await stream.result(), calls, keys };
+  }
+
+  test("NIM answers, and Gemini is never asked", async () => {
+    start([answer("From NIM.")]);
+    const { message, keys } = await call();
+    expect(textOf(message)).toBe("From NIM.");
+    expect(keys).toEqual([]);
+    expect(standIn.requests).toHaveLength(1);
+  });
+
+  test("when NIM gives up on a call, Gemini answers it, with the proxy's key", async () => {
+    start([refuse(400, "messages must not be empty"), writes("From ", "Gemini.")]);
+    const { message, calls, keys } = await call();
+    expect(textOf(message)).toBe("From Gemini.");
+    expect(keys).toEqual(["proxy-key"]);
+    expect(calls.map((c) => c.outcome.failure)).toEqual(["bad", null]);
+    expect(standIn.requests[1]?.url).toMatch(/^\/v1beta\//);
+  });
+
+  test("a call its run stopped isn't NIM failing, so Gemini isn't asked", async () => {
+    start([]);
+    const { message, keys } = await call(AbortSignal.abort());
+    expect(message.stopReason).toBe("aborted");
+    expect(keys).toEqual([]);
+    expect(standIn.requests).toHaveLength(0);
+  });
+
+  test("the balancer gives up rather than wait for a model past its patience", async () => {
+    const model = nimModel("kimi");
+    start([refuse(429, "Too Many Requests")]);
+    const balancer = new Balancer([{ model, maxInFlight: 1 }], "k", () => {}, {
+      waitForTopS: 300,
+      strikesToFall: 3,
+      maxTries: 12,
+      giveUpAfterS: 1,
+    });
+    const message = await (await balancer.stream(ask())).result();
+    // The 429 cools the only model for a minute or more: past the second it may wait, so no sleep.
+    expect(message.stopReason).toBe("error");
+    expect(message.errorMessage).toMatch(/No answer within 1 s/);
     expect(standIn.requests).toHaveLength(1);
   });
 });

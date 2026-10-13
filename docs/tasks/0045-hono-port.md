@@ -739,6 +739,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   `RUNNING_ROLES` (`@spoin/shared/enums`): toad_sage, curriculum, tadpole and designer_toad.
   Its description and the compaction prompt name only them and what they write, and a role
   joins the list when its chat does.
+- **NIM writes, Gemini orchestrates and verifies** (2026-10-13), the owner's rule after the
+  first live run started with no NIM key and quietly ran every writer on Gemini (235 calls,
+  none on NIM). The worker now refuses to start without `NVIDIA_NIM_API_KEY`, in `worker.ts` and
+  in compose (the key is breader's), and only the writers run on it (`runsOnNim` in
+  `agents/set-up.ts`). A writer's call goes to Gemini only once NIM gives up on it, so a bad day
+  on NIM slows a run without stopping it (`models/nim-then-gemini.ts`): its 12 tries spent, no
+  model left to ask, or none free within `NIM_PATIENCE_S` (30 minutes, the balancer's
+  `giveUpAfterS`, checked only before a try so no answer is cut off). The aim is to use NIM the
+  most: few calls, each with big inputs and big outputs. Gemini runs the main chats,
+  designer_toad included, and the gate's passes.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

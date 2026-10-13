@@ -1,3 +1,7 @@
 {% macro ref(record) %}{{ record.kind }} {{ record.id }} version {{ record.version }}{% endmacro %}
 
 {% macro refs(list) %}{% for item in list %}{{ ref(item) }}{% if not loop.last %}; {% endif %}{% else %}none{% endfor %}{% endmacro %}
+
+{% macro chat(address) %}{{ address.role }}{% if address.topic %} of topic {{ address.topic }}{% endif %}{% endmacro %}
+
+{% macro writer(who) %}{% if who.kind == "chat" and who.main %}a helper of {{ chat(who.main) }}{% elif who.kind == "chat" %}{{ chat(who) }}{% elif who.kind == "code" %}code ({{ who.component }}){% else %}the owner{% endif %}{% endmacro %}

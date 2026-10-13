@@ -1,0 +1,3 @@
+{% import "partials/macros.njk" as m %}
+{% include "handovers/" + record.kind + ".njk" %}
+Written {{ record.written }}, India time, by {{ m.writer(record.writer) }}.

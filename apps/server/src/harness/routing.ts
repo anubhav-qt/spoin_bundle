@@ -48,9 +48,9 @@ async function readersOf(tx: Tx, record: AnyRecord): Promise<Chat[]> {
   return [...new Map(readers.map((chat) => [chat.id, chat])).values()];
 }
 
-/** The chat that asked a question, if a chat did. */
+/** The chat that asked a question, if a chat did: whoever wrote its first version, since a later one may be another's change. */
 async function askerOf(tx: Tx, question: RecordRef): Promise<Chat[]> {
-  const asked = await readRecord(tx, QuestionRecord, question);
+  const asked = await readRecord(tx, QuestionRecord, { ...question, version: 1 });
   if (asked.author.kind !== "chat") return [];
   return [await readChat(tx, asked.author.chatId)];
 }

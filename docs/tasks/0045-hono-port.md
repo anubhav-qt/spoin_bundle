@@ -35,7 +35,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | done |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | done |
-| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | in progress: store, run loop, compaction, scheduler and AskAI done; next the tools every chat has (`read_record`, `list_records`, `ask`, `answer`) with the real `handovers/question.njk` and `answer.njk` (a test fixture stands in), then the worker entrypoint and the agents, each prompt from the owner's gist |
+| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | in progress: store, run loop, compaction, scheduler, AskAI and the tools every chat has done; next the agents (toad_sage, the curriculum chat, a tadpole per topic, ero_sennin, wise_toad), the worker entrypoint (`markInterruptedRuns`, `releaseTakenWakes`, `runScheduler`) once the first agent lands, and ero_sennin's wake per finished run, each prompt from the owner's gist |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
@@ -553,6 +553,27 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **A turn runs on NIM's top model when Gemini can't be looked up** (2026-10-13): with no proxy, or
   a proxy that can't say what Gemini is, the run is Kimi K3's and every call goes to the balancer.
   `makeAskChat` in `apps/server/src/deps.ts`.
+- **The tools every chat has** (2026-10-13), in `docs/architecture/harness-tools.md`. `read_record`
+  takes an id and an optional version, the latest unless one is named, since a chat mostly wants
+  what is true now and the action log keeps the exact version it saw. `list_records` gives a line
+  per record, so a kind with hundreds of records stays small, and the chat reads what matters.
+  Helpers don't ask: a helper acts, then reports, and an open question goes in its report. `ask`
+  reaches only a chat that exists, so a question never starts a tadpole for a topic toad_sage
+  hasn't accepted. A chat can answer a question again, each answer its own record that wakes the
+  asker, so "I don't know yet" is followed by the answer and routing keeps its one rule. AskAI gets
+  none of them, and a Biome override and `test/architecture.test.ts` keep `src/ask/` from reaching
+  them. Built in `apps/server/src/harness/reading.ts`, `asking.ts` and `every-chat.ts`.
+- **Records read with who wrote them** (2026-10-13). Code hands each record's template its writer
+  by role and topic (a chat id says nothing to a model), its time in India time, and an answer's
+  question, so a chat woken by an answer needn't look the question up (`harness/views.ts`). A
+  question's asker and an answer's answerer are whoever wrote its first version, so a later change
+  by another leaves them as they were, and routing wakes the first version's author: Trotter's copy
+  woke the author of the version the answer cited.
+- **The handovers and tool descriptions are written to `writing-prompts.md`** (2026-10-13). The owner
+  gave no gist of their own, as for the grader's. `handovers/question.njk` and `answer.njk` hold no
+  instructions, since the chat asked, the asker and ero_sennin all read the same text; `run.njk`
+  says what to do with it. `ask`'s description names what each chat does, so a chat knows whom to
+  ask.
 
 ## Asked when we get there
 

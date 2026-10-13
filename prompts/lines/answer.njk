@@ -1,0 +1,2 @@
+{% import "partials/macros.njk" as m %}
+To {{ m.writer(record.asked.firstWriter) }}, answering question {{ record.asked.id }}: {{ record.body.answer | truncate(150) }}

@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+Question ({{ m.ref(record) }})
+From {{ m.writer(record.firstWriter) }}, to {{ m.chat(record.body.to) }}
+Question: {{ record.body.question }}
+Why it asks: {{ record.body.reasoning }}
+{% include "partials/version.njk" %}

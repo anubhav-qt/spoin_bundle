@@ -1,0 +1,2 @@
+{% import "partials/macros.njk" as m %}
+To {{ m.chat(record.body.to) }}: {{ record.body.question | truncate(150) }}

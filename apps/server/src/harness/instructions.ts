@@ -8,6 +8,7 @@ import { indiaTime } from "./india-time.ts";
 import { readAnyRecord } from "./records.ts";
 import type { RunTrigger } from "./schemas.ts";
 import { readActionLog } from "./transcript.ts";
+import { viewsOf } from "./views.ts";
 
 /**
  * What a chat is told for a run (Trotter's `instructions.ts`), rendered from prompts/ with data
@@ -55,8 +56,10 @@ export async function openingMessageFor(
 ): Promise<string> {
   const woken = await Promise.all(
     triggers.map(async (trigger) => {
-      if (trigger.kind === "record")
-        return { kind: "record", record: await readAnyRecord(db, trigger.record) };
+      if (trigger.kind === "record") {
+        const [record] = await viewsOf(db, [await readAnyRecord(db, trigger.record)]);
+        return { kind: "record", record };
+      }
       if (trigger.kind === "reader") return { ...trigger, card: await readerCard(db, trigger.card) };
       if (trigger.kind === "continuation") {
         // What the paused run already stored, so the run carrying it on doesn't do it again.

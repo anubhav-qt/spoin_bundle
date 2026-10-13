@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+Answer ({{ m.ref(record) }})
+From {{ m.writer(record.firstWriter) }}, to {{ m.writer(record.asked.firstWriter) }}
+It answers {{ m.ref(record.asked) }}: {{ record.asked.body.question }}
+Answer: {{ record.body.answer }}
+{% include "partials/version.njk" %}

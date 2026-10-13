@@ -26,6 +26,9 @@ const MODEL_CLIENTS = [
   /^@spoin\/pi-/,
 ];
 
+/** The tools every chat but AskAI has: they read any record and reach other chats. */
+const RECORD_TOOLS = ["harness/reading.ts", "harness/asking.ts", "harness/every-chat.ts"];
+
 const filesUnder = (path: string): string[] => {
   const full = join(SRC, path);
   if (full.endsWith(".ts")) return [full];
@@ -78,6 +81,13 @@ describe("architecture", () => {
     expect(offenders, "The feed read path must never touch a model: precompute a column instead.").toEqual(
       [],
     );
+  });
+
+  test("AskAI never reaches the record tools or another chat (ADR-0106)", () => {
+    const { files } = reach(filesUnder("ask"));
+    expect(files.size).toBeGreaterThan(10);
+    const offenders = [...files].filter((file) => RECORD_TOOLS.some((tool) => file === join(SRC, tool)));
+    expect(offenders, "AskAI has no database handle: a reader's text never reaches a record.").toEqual([]);
   });
 
   test("every model-facing method takes a collection (ADR-0005)", () => {

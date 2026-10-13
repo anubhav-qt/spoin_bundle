@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+{% for record in records %}
+- {{ m.ref(record) }} ({{ record.status }}), by {{ m.writer(record.writer) }}, {{ record.written }}. {% include "lines/" + record.kind + ".njk" %}
+{% else %}
+There are no {{ kind }} records{% if status %} with status {{ status }}{% endif %}.
+{% endfor %}

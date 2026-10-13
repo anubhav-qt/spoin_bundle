@@ -231,6 +231,28 @@ export async function readAnyRecord(db: Conn, ref: RecordRef): Promise<AnyRecord
   return readRecord(db, RECORD_SCHEMAS[recordKindOf(ref.kind)], ref);
 }
 
+/** A record known only by its id: the version named, or the latest. */
+export async function readAnyRecordById(db: Conn, id: string, version?: number): Promise<AnyRecord> {
+  const latest = await readLatestRow(db, id);
+  return readAnyRecord(db, { kind: latest.kind, id, version: version ?? latest.version });
+}
+
+/** Every version of a record known only by its id, oldest first. */
+export async function readAnyRecordHistory(db: Conn, id: string): Promise<AnyRecord[]> {
+  const latest = await readLatestRow(db, id);
+  const kind = recordKindOf(latest.kind);
+  return readRecordHistory(db, RECORD_SCHEMAS[kind], kind, id);
+}
+
+/** The latest version of every record of a kind, as listLatestRecords, for a kind known only by name. */
+export async function listLatestAnyRecords(
+  db: Conn,
+  kind: RecordKind,
+  status?: RecordStatus,
+): Promise<AnyRecord[]> {
+  return listLatestRecords(db, RECORD_SCHEMAS[kind], kind, status);
+}
+
 export function recordKindOf(kind: string): RecordKind {
   if (isRecordKind(kind)) return kind;
   throw new StoreError(

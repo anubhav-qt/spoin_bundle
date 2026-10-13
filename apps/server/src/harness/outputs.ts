@@ -1,7 +1,9 @@
+import type { Db } from "../db/client.ts";
 import type { Prompts } from "../prompts.ts";
 import { refOf } from "./records.ts";
 import type { AnyRecord } from "./schemas.ts";
 import type { ToolOutput } from "./tools.ts";
+import { viewsOf } from "./views.ts";
 
 /**
  * What the harness's own tools hand back (Trotter's `system-tools/outputs.ts`). Records reach the
@@ -10,9 +12,9 @@ import type { ToolOutput } from "./tools.ts";
  */
 
 /** The records a writing tool stored, as the agents that read them will see them. */
-export function recordsStored(prompts: Prompts, records: AnyRecord[]): ToolOutput {
+export async function recordsStored(db: Db, prompts: Prompts, records: AnyRecord[]): Promise<ToolOutput> {
   return {
-    value: prompts.render("tool-results/stored.njk", { records }),
+    value: prompts.render("tool-results/stored.njk", { records: await viewsOf(db, records) }),
     dataSeen: [],
     recordsWritten: records.map(refOf),
   };

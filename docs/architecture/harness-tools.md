@@ -25,9 +25,19 @@ in the code.
 
 ## Every chat
 
-As in Trotter: `read_record`, `read_record_history` and `list_records` read any record;
-`ask` and `answer` pass a question between chats; `write_summary` writes the chat's summary
-in a compaction run, under 2,000 tokens, exactly as Trotter's (task 0045).
+As in Trotter, every chat but AskAI, which ADR-0106 gives no database handle. A helper gets only
+the three reads: it has no address to be asked at, and it asks nothing, leaving what it can't
+settle to its report. Each record reads as its own template shows it, with who wrote it, by role
+and topic, and when, in India time.
+
+| Tool | Does |
+|---|---|
+| `read_record(id, version?)` | One record: the latest version, or the version named. The kind is looked up from the id |
+| `read_record_history(id)` | Every version of one record, oldest first |
+| `list_records(kind, status?)` | A line for the latest version of each record of a kind: its ref, status, writer, time and the start of its text, from the kind's template in `prompts/lines/`. The chat reads the ones that matter |
+| `ask(to, topic?, question, reasoning)` | A question to any chat that exists, never itself: toad_sage, curriculum, ero_sennin and wise_toad are made on first need, and a topic's tadpole, designer_toad or visual_toad is asked only once it has started. Wakes the chat asked |
+| `answer(question, answer)` | Only from the chat asked. A chat can answer again once it knows more; each answer is its own record and wakes the asker |
+| `write_summary(...)` | In a compaction run only, the chat's summary under 2,000 tokens, exactly as Trotter's (task 0045) |
 
 ## toad_sage
 

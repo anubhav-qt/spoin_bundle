@@ -31,7 +31,7 @@ export function writeSummaryTool(prompts: Prompts): HarnessTool<typeof SummarySe
           author,
           body,
         });
-        return recordsStored(prompts, [first]);
+        return recordsStored(db, prompts, [first]);
       }
       const next = await changeRecord(db, CompactionSummaryRecord, {
         from: refOf(earlier),
@@ -40,7 +40,7 @@ export function writeSummaryTool(prompts: Prompts): HarnessTool<typeof SummarySe
         reason: NEXT_SUMMARY_REASON,
         body,
       });
-      return recordsStored(prompts, [next]);
+      return recordsStored(db, prompts, [next]);
     },
   };
 }

@@ -49,6 +49,19 @@ export async function openTopicChat(
   return found;
 }
 
+/** A topic's tadpole, designer_toad or visual_toad, if it has started. */
+export async function findTopicChat(
+  db: Conn,
+  role: (typeof TOPIC_CHAT_ROLES)[number],
+  topicId: string,
+): Promise<Chat | undefined> {
+  const [found] = await db
+    .select()
+    .from(chat)
+    .where(and(eq(chat.role, role), eq(chat.topicId, topicId)));
+  return found;
+}
+
 /** The chat an address names, made the first time it's needed. */
 export function openChatAt(db: Conn, address: ChatAddress): Promise<Chat> {
   return "topic" in address ? openTopicChat(db, address.role, address.topic) : openChat(db, address.role);

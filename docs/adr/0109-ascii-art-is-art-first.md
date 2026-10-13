@@ -56,9 +56,11 @@ of the prompt's worked examples. A refusal says how much text or box the piece h
 screenshot), and draws it in ASCII itself, bent to the card. No ASCII art is copied in, and the
 curated library of the old pipeline is not used: nothing in the harness comes from old code.
 
-**Art drawn before this is drawn again.** `ART_STYLE` is 4; attaching art writes the style onto the
+**Art drawn before this is drawn again.** `ART_STYLE` is 5; attaching art writes the style onto the
 card's `gen_meta.artStyle`. Style 2 had the text caps without the prompt's worked examples; style 3
-had the examples but not the box check. `list_art_requests` lists the cards waiting for their first
+had the examples but not the box check; style 4 passed the box check with words inside round
+outlines (`.____.` over `(   )`), 40 pieces the owner had redrawn; style 5 adds high thinking and
+the artists' pieces. `list_art_requests` lists the cards waiting for their first
 art first, since they hold their tiers back, then every card, live ones too, whose art is an older
 style, marked Redraw, without its old art. It shows one batch of 10 at a time.
 
@@ -66,11 +68,12 @@ style, marked Redraw, without its old art. It shows one batch of 10 at a time.
 rather than a Pro model (`thinkingOf` in `set-up.ts`).
 
 **The prompt's examples** are two pieces drawn for it (a melting snowman, a stack of plates), the
-best piece of the style-4 run (a ghost), and one piece the owner chose from the old pipeline's
-curated library: Joan G. Stark's mermaid, as the craft to aim for. Any other library piece goes in
-only with the owner's leave.
+best piece of the style-4 run (a ghost), and the pieces the owner chose from the old pipeline's
+curated library as the craft to aim for: Joan G. Stark's mermaid, spider and Homer, Hayley Jane
+Wakenshaw's cat in a box, Riitta Rasimus's whale, and a mushroom cloud and a devil in flames by
+unknown artists. Any other library piece goes in only with the owner's leave.
 
-**designer_toad's chat started over** for style 4: a summary record through its last run, written by
+**designer_toad's chat started over** for style 4 and again for style 5: a summary record through its last run, written by
 the owner's leave, says it started over, so the model no longer sees its old art. The transcript
 keeps every message.
 

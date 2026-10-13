@@ -29,9 +29,11 @@ export const ART_BATCH = 10;
  * The style art is drawn in (ADR-0109): art first, its text only labels and a gag's one line. Art
  * attached in an older style is drawn again, live cards' too, after every card still waiting for
  * its first. Style 2 had the rules without the prompt's worked examples, and drew boxes of words;
- * style 3 had them but not the box check, and drew boxes padded with rows of `#`.
+ * style 3 had them but not the box check, and drew boxes padded with rows of `#`; style 4 passed
+ * the box check with words inside round outlines. Style 5 adds high thinking and the owner's
+ * picks of ASCII artists' pieces as examples.
  */
-export const ART_STYLE = 4;
+export const ART_STYLE = 5;
 
 /** The characters boxes and tables are drawn with. */
 const BOX_CHARACTERS = new Set(["+", "|", "=", "-", "#", "[", "]"]);

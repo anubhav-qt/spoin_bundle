@@ -1622,6 +1622,13 @@ body {
   overflow-x: auto;
 }
 
+/* Black on white in every palette, dark ones included (MermaidBlock.tsx). */
+.mermaid-block-svg {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 8px;
+}
+
 .mermaid-block-svg svg {
   display: block;
   max-width: 100%;

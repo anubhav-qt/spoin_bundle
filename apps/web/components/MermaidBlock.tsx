@@ -28,47 +28,39 @@ import { useEffect, useRef, useState } from "react";
  *  mermaid uses internally for its own `<svg>` and its defs. */
 let renderSeq = 0;
 
-/** Mermaid's own palette knobs, filled from the live palette's tokens
- *  (ADR-0012/0034) rather than hardcoded, so a diagram follows the same
- *  theme switch every other surface does — including the five shipped
- *  palettes and any custom one from CustomThemeModal. */
+/** Every flowchart is drawn the same way whatever the palette (the owner,
+ *  2026-10-13): a white ground, unfilled boxes outlined in black, black text
+ *  and black lines. Only the typeface follows the theme. */
+const INK = "#000000";
+const PAPER = "#ffffff";
+
 function themeVariables(el: HTMLElement): Record<string, string> {
-  const style = getComputedStyle(el);
-  const token = (name: string, fallback: string) =>
-    style.getPropertyValue(name).trim() || fallback;
-
-  const fg = token("--fg", "#262a22");
-  const fg2 = token("--fg-2", "#565f51");
-  const bg2 = token("--bg-2", "#e2e7de");
-  const bg3 = token("--bg-3", "#d6ddd1");
-  const line = token("--line-strong", "rgba(38,42,34,0.26)");
-  const accent = token("--topic-accent", "") || token("--accent", "#c1442b");
-
+  const font = getComputedStyle(el).getPropertyValue("--font-mono").trim();
   return {
-    background: "transparent",
-    primaryColor: bg3,
-    primaryTextColor: fg,
-    primaryBorderColor: line,
-    secondaryColor: bg2,
-    tertiaryColor: bg2,
-    lineColor: fg2,
-    textColor: fg,
-    mainBkg: bg3,
-    nodeBorder: line,
-    clusterBkg: bg2,
-    clusterBorder: line,
-    edgeLabelBackground: bg2,
-    titleColor: fg,
-    fontFamily: token("--font-mono", "ui-monospace, monospace"),
+    background: PAPER,
+    primaryColor: PAPER,
+    primaryTextColor: INK,
+    primaryBorderColor: INK,
+    secondaryColor: PAPER,
+    tertiaryColor: PAPER,
+    lineColor: INK,
+    textColor: INK,
+    mainBkg: PAPER,
+    nodeBorder: INK,
+    nodeTextColor: INK,
+    clusterBkg: PAPER,
+    clusterBorder: INK,
+    edgeLabelBackground: PAPER,
+    titleColor: INK,
+    fontFamily: font || "ui-monospace, monospace",
     fontSize: "13px",
-    // Sequence/flowchart accents, so an "active" or highlighted node picks up
-    // the card's own topic hue instead of mermaid's default blue.
-    actorBkg: bg3,
-    actorBorder: accent,
-    activationBkgColor: bg2,
-    noteBkgColor: bg2,
-    noteTextColor: fg,
-    noteBorderColor: line,
+    actorBkg: PAPER,
+    actorBorder: INK,
+    actorTextColor: INK,
+    activationBkgColor: PAPER,
+    noteBkgColor: PAPER,
+    noteTextColor: INK,
+    noteBorderColor: INK,
   };
 }
 

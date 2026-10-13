@@ -38,6 +38,7 @@ export default function OnboardingPage() {
   const [error, setError] = useState("");
 
   const [customName, setCustomName] = useState("");
+  const [customDescription, setCustomDescription] = useState("");
   const [customDifficulty, setCustomDifficulty] = useState<Difficulty>("beginner");
   const [customSubmitting, setCustomSubmitting] = useState(false);
   const [customError, setCustomError] = useState("");
@@ -97,9 +98,10 @@ export default function OnboardingPage() {
     setCustomSubmitting(true);
     setCustomError("");
     try {
-      const result = await api.requestTopic(trimmed, customDifficulty);
+      const result = await api.requestTopic(trimmed, customDifficulty, customDescription.trim());
       setCustomAdded((prev) => [...prev, { id: result.topic.id, name: result.topic.display_name }]);
       setCustomName("");
+      setCustomDescription("");
     } catch (cause) {
       setCustomError(cause instanceof ApiError ? cause.message : "Something went wrong");
     } finally {
@@ -257,6 +259,16 @@ export default function OnboardingPage() {
                 {customSubmitting ? "Adding…" : "Add"}
               </button>
             </div>
+            {/* The same optional description the request box in the app takes. */}
+            <textarea
+              className="request-topic-desc"
+              rows={2}
+              placeholder="What do you want from this topic? (optional)"
+              value={customDescription}
+              maxLength={400}
+              disabled={customSubmitting}
+              onChange={(e) => setCustomDescription(e.target.value)}
+            />
             <div className="onboarding-difficulty-row onboarding-difficulty-row-compact">
               {DIFFICULTIES.map((d) => (
                 <button

@@ -1,6 +1,7 @@
 import {
   CHAT_ROLES,
   DIFFICULTIES,
+  HELPER_TASKS,
   RECORD_STATUSES,
   RUN_STATUSES,
   SINGLE_CHAT_ROLES,
@@ -218,11 +219,278 @@ export const Merge = Type.Object(
   CLOSED,
 );
 
+/**
+ * A helper's task, written by the chat that starts it (task 0045); it wakes the helper. What the
+ * task is about: a document writer's path, a topic, or a tier.
+ */
+export const Brief = Type.Object(
+  {
+    helper: Id,
+    task: Type.Enum([...HELPER_TASKS]),
+    brief: Text,
+    topic: Type.Union([Id, Type.Null()]),
+    path: Type.Union([Text, Type.Null()]),
+    subtopic: Type.Union([Id, Type.Null()]),
+  },
+  CLOSED,
+);
+
+/** A helper's last word on its brief; it wakes the chat that started it. */
+export const Report = Type.Object({ brief: RecordRef, summary: Text }, CLOSED);
+
+/** What a chat hands toad_sage at the procedure's approval points (ADR-0100, task 0045). */
+export const HANDOVER_KINDS = [
+  "coverage",
+  "maps",
+  "closing_report",
+  "insufficient_evidence",
+  "curriculum",
+] as const;
+
+/** Work handed to toad_sage for review; it wakes toad_sage, and the run that sent it ends. */
+export const Handover = Type.Object(
+  {
+    kind: Type.Enum([...HANDOVER_KINDS]),
+    topic: Id,
+    records: Type.Array(RecordRef),
+    note: Type.String({ minLength: 1, description: "The note, the report or the reasoning handed over" }),
+    /** The tier an "insufficient evidence" is about. */
+    subtopic: Type.Union([Id, Type.Null()]),
+  },
+  CLOSED,
+);
+
+/** toad_sage's answer to a handover; it wakes the chat that sent it. */
+export const Review = Type.Object(
+  { handover: RecordRef, verdict: Type.Enum(["go_on", "change"]), notes: Text },
+  CLOSED,
+);
+
+/** ADR-0100's maps, before prose: domain, prerequisites, claims, evidence, competencies, misconceptions, applications, variability, gaps, versions. */
+export const MAP_KINDS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"] as const;
+export const CLAIM_TYPES = [
+  "normative",
+  "empirical",
+  "mechanistic",
+  "heuristic",
+  "implementation",
+  "pedagogical",
+] as const;
+export const CLAIM_SCOPES = ["universal", "common", "conditional", "product-specific"] as const;
+export const CONFIDENCES = ["high", "medium", "low"] as const;
+/** The source hierarchy, highest first (antigravity-corpus-authoring.md). */
+export const SOURCE_TIERS = [
+  "primary_specification",
+  "official_documentation",
+  "primary_research",
+  "authoritative_textbook",
+  "recognised_expert",
+  "secondary_synthesis",
+  "community_heuristic",
+] as const;
+
+/** A stored page's passage, as `fetch` numbered it. */
+export const Evidence = Type.Object({ page: Id, passage: Type.Integer({ minimum: 1 }) }, CLOSED);
+
+export const MapItem = Type.Object(
+  {
+    name: Type.String({ minLength: 1, description: "Short and unique within the map" }),
+    text: Text,
+    claimType: Type.Optional(Type.Enum([...CLAIM_TYPES])),
+    scope: Type.Optional(Type.Enum([...CLAIM_SCOPES])),
+    confidence: Type.Optional(Type.Enum([...CONFIDENCES])),
+    sourceTier: Type.Optional(Type.Enum([...SOURCE_TIERS])),
+    evidence: Type.Array(Evidence),
+    after: Type.Optional(
+      Type.Array(Text, { description: "Map B: the names of the items that must be understood first" }),
+    ),
+    checkBy: Type.Optional(
+      Type.String({ format: "date", description: "Map J: when the claim must be checked again" }),
+    ),
+  },
+  CLOSED,
+);
+
+export const TopicMap = Type.Object(
+  { topic: Id, map: Type.Enum([...MAP_KINDS]), items: Type.Array(MapItem, { minItems: 1 }), summary: Text },
+  CLOSED,
+);
+
+/** A corpus document as its writer last wrote it; every write is its next version. */
+export const Draft = Type.Object({ topic: Id, path: Text, text: Text }, CLOSED);
+
+/** The three auditing calls, each with its own fixed prompt (corpus-authoring-system.md roles 11-13). */
+export const AUDITORS = ["versions", "precision", "coverage"] as const;
+/** The zero-to-mastery stages the coverage auditor marks (role 13). */
+export const COMPETENCY_STAGES = [
+  "awareness",
+  "vocabulary",
+  "foundational mental model",
+  "fundamentals",
+  "basic application",
+  "guided practice",
+  "independent application",
+  "diagnosis and debugging",
+  "trade-off reasoning",
+  "novel situations",
+  "cross-topic integration",
+  "expert judgment",
+] as const;
+
+export const CoverageMark = Type.Object(
+  {
+    stage: Type.Enum([...COMPETENCY_STAGES]),
+    mark: Type.Enum(["strong", "weak", "absent"]),
+    evidence: Text,
+  },
+  CLOSED,
+);
+
+/** One run of audit_drafts: the drafts it read and the coverage matrix. Its findings are records of their own. */
+export const Audit = Type.Object(
+  { topic: Id, drafts: Type.Array(RecordRef), matrix: Type.Array(CoverageMark) },
+  CLOSED,
+);
+
+/** A problem an auditor found, settled by the tadpole once fixed or answered. */
+export const Finding = Type.Object(
+  {
+    audit: RecordRef,
+    topic: Id,
+    auditor: Type.Enum([...AUDITORS]),
+    path: Type.Union([Text, Type.Null()]),
+    problem: Text,
+    fix: Text,
+    settled: Type.Union([
+      Type.Null(),
+      Type.Object({ how: Type.Enum(["fixed", "kept"]), note: Text }, CLOSED),
+    ]),
+  },
+  CLOSED,
+);
+
+/** The card types a tier's quotas share out (content-model.md), mirrored from frog's curriculum contract. */
+export const CARD_TYPES = ["prose", "image", "code", "diagram", "comparison", "ascii"] as const;
+
+const Count = Type.Integer({ minimum: 0 });
+
+export const CardTypeQuotas = Type.Object(
+  {
+    prose: Type.Optional(Count),
+    image: Type.Optional(Count),
+    code: Type.Optional(Count),
+    diagram: Type.Optional(Count),
+    comparison: Type.Optional(Count),
+    ascii: Type.Optional(Count),
+  },
+  CLOSED,
+);
+
+export const CurriculumTier = Type.Object(
+  {
+    targetCards: Type.Integer({ minimum: 5, maximum: 25 }),
+    cardTypes: CardTypeQuotas,
+    grounding: Type.Array(Text, {
+      minItems: 1,
+      description: "`<corpus path>#<exact ## heading>`, 5 to 10 of them",
+    }),
+  },
+  CLOSED,
+);
+
+export const CurriculumSubtopic = Type.Object(
+  {
+    title: Text,
+    description: Text,
+    prerequisites: Type.Array(Text),
+    tiers: Type.Object(
+      {
+        beginner: Type.Optional(CurriculumTier),
+        intermediate: Type.Optional(CurriculumTier),
+        advanced: Type.Optional(CurriculumTier),
+      },
+      CLOSED,
+    ),
+  },
+  CLOSED,
+);
+
+/** A topic's curriculum as its writer wrote it, checked against the whole contract on the way in. */
+export const Curriculum = Type.Object(
+  {
+    topic: Id,
+    description: Text,
+    subtopics: Type.Array(CurriculumSubtopic, { minItems: 1 }),
+    reasoning: Text,
+  },
+  CLOSED,
+);
+
+/** A tier's plan (ADR-0059): concept, form and angle per card. */
+export const CardPlan = Type.Object(
+  {
+    subtopic: Id,
+    briefs: Type.Array(
+      Type.Object({ concept: Text, form: Type.Enum([...CARD_TYPES]), angle: Text }, CLOSED),
+      { minItems: 1 },
+    ),
+  },
+  CLOSED,
+);
+
+/**
+ * Cards or questions sent through the gate (task 0045): drafts to the writer's pass-1 helper, the
+ * survivors and the questions to the tadpole for pass 2. It wakes the chat it is sent to.
+ */
+export const GATE_STAGES = ["pass1", "pass2", "questions"] as const;
+export const Gate = Type.Object(
+  {
+    stage: Type.Enum([...GATE_STAGES]),
+    subtopic: Id,
+    to: Id,
+    writer: Id,
+    items: Type.Array(Id, { minItems: 1 }),
+  },
+  CLOSED,
+);
+
+/** What a gate pass decided; it wakes the writer, and designer_toad for cards pass 2 accepted. */
+export const Verdicts = Type.Object(
+  {
+    stage: Type.Enum([...GATE_STAGES]),
+    subtopic: Id,
+    writer: Id,
+    accepted: Type.Array(Id),
+    rejected: Type.Array(Type.Object({ id: Id, feedback: Text }, CLOSED)),
+  },
+  CLOSED,
+);
+
+/** One phone render of a card with designer_toad's art. */
+export const Render = Type.Object({ card: Id, art: Text }, CLOSED);
+
+/** Art attached to a card; it wakes the card's writer. */
+export const Art = Type.Object({ card: Id, render: RecordRef, writer: Id }, CLOSED);
+
 export const QuestionRecord = versionedRecord("question", Question);
 export const AnswerRecord = versionedRecord("answer", Answer);
 export const CompactionSummaryRecord = versionedRecord("compaction_summary", CompactionSummary);
 export const IntakeRecord = versionedRecord("intake", Intake);
 export const MergeRecord = versionedRecord("merge", Merge);
+export const BriefRecord = versionedRecord("brief", Brief);
+export const ReportRecord = versionedRecord("report", Report);
+export const HandoverRecord = versionedRecord("handover", Handover);
+export const ReviewRecord = versionedRecord("review", Review);
+export const MapRecord = versionedRecord("map", TopicMap);
+export const DraftRecord = versionedRecord("draft", Draft);
+export const AuditRecord = versionedRecord("audit", Audit);
+export const FindingRecord = versionedRecord("finding", Finding);
+export const CurriculumRecord = versionedRecord("curriculum", Curriculum);
+export const CardPlanRecord = versionedRecord("card_plan", CardPlan);
+export const GateRecord = versionedRecord("gate", Gate);
+export const VerdictsRecord = versionedRecord("verdicts", Verdicts);
+export const RenderRecord = versionedRecord("render", Render);
+export const ArtRecord = versionedRecord("art", Art);
 
 /** The schema of every kind of record, so code holding only a reference can read and check it. */
 export const RECORD_SCHEMAS = {
@@ -231,6 +499,20 @@ export const RECORD_SCHEMAS = {
   compaction_summary: CompactionSummaryRecord,
   intake: IntakeRecord,
   merge: MergeRecord,
+  brief: BriefRecord,
+  report: ReportRecord,
+  handover: HandoverRecord,
+  review: ReviewRecord,
+  map: MapRecord,
+  draft: DraftRecord,
+  audit: AuditRecord,
+  finding: FindingRecord,
+  curriculum: CurriculumRecord,
+  card_plan: CardPlanRecord,
+  gate: GateRecord,
+  verdicts: VerdictsRecord,
+  render: RenderRecord,
+  art: ArtRecord,
 } as const;
 
 export type RecordKind = keyof typeof RECORD_SCHEMAS;
@@ -257,3 +539,19 @@ export type CompactionSummaryRecord = Static<typeof CompactionSummaryRecord>;
 export type Intake = Static<typeof Intake>;
 export type IntakeRecord = Static<typeof IntakeRecord>;
 export type MergeRecord = Static<typeof MergeRecord>;
+export type BriefRecord = Static<typeof BriefRecord>;
+export type ReportRecord = Static<typeof ReportRecord>;
+export type HandoverRecord = Static<typeof HandoverRecord>;
+export type ReviewRecord = Static<typeof ReviewRecord>;
+export type MapRecord = Static<typeof MapRecord>;
+export type MapItem = Static<typeof MapItem>;
+export type DraftRecord = Static<typeof DraftRecord>;
+export type AuditRecord = Static<typeof AuditRecord>;
+export type FindingRecord = Static<typeof FindingRecord>;
+export type Curriculum = Static<typeof Curriculum>;
+export type CurriculumRecord = Static<typeof CurriculumRecord>;
+export type CardPlanRecord = Static<typeof CardPlanRecord>;
+export type GateRecord = Static<typeof GateRecord>;
+export type VerdictsRecord = Static<typeof VerdictsRecord>;
+export type RenderRecord = Static<typeof RenderRecord>;
+export type ArtRecord = Static<typeof ArtRecord>;

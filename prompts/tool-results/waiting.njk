@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+{% for topic in topics %}
+- Topic {{ topic.id }}, "{{ topic.name }}" ({{ topic.scope }}): {% if topic.curriculum %}curriculum {{ m.ref(topic.curriculum) }}{% else %}no curriculum yet{% endif %}, {{ topic.writers }} {{ "writer" if topic.writers == 1 else "writers" }} started
+{% else %}
+No topic is waiting for a curriculum.
+{% endfor %}

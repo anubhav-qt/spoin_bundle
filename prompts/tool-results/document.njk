@@ -1,0 +1,15 @@
+{{ path }}, as written:
+
+{{ text }}
+
+{% if problems | length > 0 %}
+It fails the corpus contract:
+{% for problem in problems %}
+- {{ problem }}
+{% endfor %}
+{% else %}
+Its `##` headings, exactly as a grounding reference must name them:
+{% for heading in headings %}
+- {{ heading }}
+{% endfor %}
+{% endif %}

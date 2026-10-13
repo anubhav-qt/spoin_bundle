@@ -141,6 +141,21 @@ export const SINGLE_CHAT_ROLES = ["toad_sage", "curriculum", "ero_sennin", "wise
 export const TOPIC_CHAT_ROLES = ["tadpole", "designer_toad", "visual_toad"] as const;
 
 /**
+ * What a helper was started for (task 0045), which picks its instructions and tools: a main chat's
+ * own work in parallel (`helper`), one corpus document, one topic's curriculum, one tier's cards,
+ * a writer's pass 1, or pass 2 for the tadpole.
+ */
+export const HELPER_TASKS = [
+  "helper",
+  "document_writer",
+  "curriculum_writer",
+  "tier_writer",
+  "corrector",
+  "verifier",
+] as const;
+export type HelperTask = (typeof HELPER_TASKS)[number];
+
+/**
  * Trotter's run statuses (its ADR 0024, 0026): `paused` ended at a step boundary because the
  * chat's context reached its limit, and a continuation run carries it on once it has compacted;
  * `interrupted` was cut off when the worker stopped.

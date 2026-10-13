@@ -1,10 +1,12 @@
 import { sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+import { askConversation } from "../src/db/schema.ts";
 import {
   ChatBusyError,
   endRun,
   markInterruptedRuns,
   newHelperChat,
+  openAskChat,
   openChat,
   openChatAt,
   openTopicChat,
@@ -46,7 +48,7 @@ import {
   takeWake,
 } from "../src/harness/wakes.ts";
 import { makeTopic } from "./fixtures.ts";
-import { deps } from "./helpers.ts";
+import { deps, signedUp, userIdOf } from "./helpers.ts";
 
 /*
  * The harness's store (task 0045, Phase 9): Trotter's records, chats, runs, transcript, action log
@@ -193,9 +195,9 @@ describe("chats", () => {
 
   test("a helper belongs to the chat that started it, and starts none of its own", async () => {
     const sage = await openChat(db, "toad_sage");
-    const helper = await newHelperChat(db, sage);
+    const helper = await newHelperChat(db, sage, "helper");
     expect(helper).toMatchObject({ role: "helper", parentId: sage.id });
-    await expect(newHelperChat(db, helper)).rejects.toThrow(/can't start helpers/);
+    await expect(newHelperChat(db, helper, "helper")).rejects.toThrow(/can't start helpers/);
   });
 
   test("the database refuses a tadpole without a topic", async () => {
@@ -286,6 +288,26 @@ describe("runs and the transcript", () => {
     });
     await markInterruptedRuns(db);
     expect((await readRun(db, run.id)).status).toBe("interrupted");
+  });
+
+  test("an AskAI run going then is left alone: it runs in the api, where a reader may wait on it", async () => {
+    const { topic } = await makeTopic();
+    const userId = await userIdOf(await signedUp());
+    const [thread] = await db
+      .insert(askConversation)
+      .values({ userId, topicId: topic.id })
+      .returning({ id: askConversation.id });
+    if (!thread) throw new Error("No thread.");
+    const chat = await openAskChat(db, thread.id);
+    const run = await startRun(db, {
+      chatId: chat.id,
+      model: "m",
+      systemPrompt: "s",
+      triggers: [{ kind: "schedule", schedule: "test" }],
+    });
+    await markInterruptedRuns(db);
+    expect((await readRun(db, run.id)).status).toBe("running");
+    await endRun(db, run.id, { status: "done" });
   });
 });
 

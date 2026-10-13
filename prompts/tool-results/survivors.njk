@@ -1,0 +1,61 @@
+{% if cards | length == 0 and mcqs | length == 0 and freeText | length == 0 %}
+Nothing is waiting for you.
+{% else %}
+The {{ tier.difficulty }} tier of "{{ tier.title }}", in the topic {{ topic }}: {{ tier.description }}
+{% if cards | length > 0 %}
+
+## Cards ({{ cards | length }}), each asking to be read as {{ tier.difficulty }}
+{% for c in cards %}
+
+<card id="{{ c.id }}" form="{{ c.meta.form }}">
+Title: {{ c.title }}
+Canonical title: {{ c.canonicalTitle }}
+Summary: {{ c.summary }}
+Body:
+{{ c.body }}
+</card>
+{% for passage in c.passages %}
+<passage number="{{ passage.number }}" source="{{ passage.path }}{% if passage.heading %}#{{ passage.heading }}{% endif %}">
+{{ passage.text }}
+</passage>
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% if mcqs | length > 0 %}
+
+## Multiple-choice questions ({{ mcqs | length }})
+{% for q in mcqs %}
+
+<question id="{{ q.id }}" card="{{ q.cardId }}">
+{{ q.stem }}
+{% for option in q.options %}
+{{ loop.index0 }}. {{ option }}
+{% endfor %}
+</question>
+{% endfor %}
+{% endif %}
+{% if freeText | length > 0 %}
+
+## Free-text questions ({{ freeText | length }})
+{% for q in freeText %}
+
+<question id="{{ q.id }}" card="{{ q.cardId }}">
+{{ q.stem }}
+Reference answer: {{ q.referenceAnswer }}
+Rubric:
+{{ q.rubric }}
+</question>
+{% endfor %}
+{% endif %}
+{% if questionCards | length > 0 %}
+
+## The cards the questions are on
+{% for c in questionCards %}
+
+<card id="{{ c.id }}">
+{{ c.title }}
+{{ c.body }}
+</card>
+{% endfor %}
+{% endif %}
+{% endif %}

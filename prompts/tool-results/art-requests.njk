@@ -1,0 +1,14 @@
+{% for c in cards %}
+
+<card id="{{ c.id }}" subtopic="{{ c.subtopicTitle }}" difficulty="{{ c.difficulty }}">
+Title: {{ c.title }}
+Canonical title: {{ c.canonicalTitle }}
+Summary: {{ c.summary }}
+Body:
+{{ c.body }}
+</card>
+Show: {{ c.meta.art.show }}
+Ideas: {{ c.meta.art.ideas }}
+{% else %}
+No card is waiting for art.
+{% endfor %}

@@ -1,0 +1,7 @@
+{% import "partials/macros.njk" as m %}
+{% set STAGES = {"pass1": "pass 1, correction", "pass2": "pass 2, verification", "questions": "pass 2, the questions"} %}
+Sent through the gate ({{ m.ref(record) }}): {{ STAGES[record.body.stage] }}, for subtopic {{ record.body.subtopic }}
+From {{ m.writer(record.firstWriter) }}
+{{ "Questions" if record.body.stage == "questions" else "Cards" }}: {% for id in record.body.items %}{{ id }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% include "partials/version.njk" %}

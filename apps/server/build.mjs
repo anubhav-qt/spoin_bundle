@@ -3,7 +3,7 @@ import { build } from "esbuild";
 
 // One self-contained file per entry point, so the runtime image needs next to no node_modules.
 await build({
-  entryPoints: ["src/api.ts", "src/migrate.ts"],
+  entryPoints: ["src/api.ts", "src/migrate.ts", "src/worker.ts"],
   outdir: "dist",
   bundle: true,
   platform: "node",
@@ -11,8 +11,9 @@ await build({
   format: "esm",
   sourcemap: true,
   // pg tries pg-native only when asked to; it isn't installed. The ONNX runtime loads
-  // native code and model files of its own, so it stays a package beside the bundle.
-  external: ["pg-native", "@huggingface/transformers", "onnxruntime-node"],
+  // native code and model files of its own, and Playwright finds its browser from its own
+  // package, so both stay packages beside the bundle.
+  external: ["pg-native", "@huggingface/transformers", "onnxruntime-node", "playwright-core"],
   // Bundled CommonJS packages still call require().
   banner: {
     js: "import { createRequire as __cr } from 'node:module'; const require = __cr(import.meta.url);",

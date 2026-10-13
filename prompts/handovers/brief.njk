@@ -1,0 +1,14 @@
+{% import "partials/macros.njk" as m %}
+Brief ({{ m.ref(record) }})
+From {{ m.writer(record.firstWriter) }}, for a {{ record.body.task | replace("_", " ") }} helper
+{% if record.body.topic %}
+Topic: {{ record.body.topic }}
+{% endif %}
+{% if record.body.path %}
+Document: {{ record.body.path }}
+{% endif %}
+{% if record.body.subtopic %}
+Tier: subtopic {{ record.body.subtopic }}
+{% endif %}
+Brief: {{ record.body.brief }}
+{% include "partials/version.njk" %}

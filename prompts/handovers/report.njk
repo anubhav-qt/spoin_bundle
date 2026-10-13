@@ -1,0 +1,5 @@
+{% import "partials/macros.njk" as m %}
+Report ({{ m.ref(record) }})
+From {{ m.writer(record.firstWriter) }}, on {{ m.ref(record.body.brief) }}
+{{ record.body.summary }}
+{% include "partials/version.njk" %}

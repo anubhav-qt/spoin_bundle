@@ -1,0 +1,1 @@
+{{ record.body.auditor }}, {{ "settled" if record.body.settled else "open" }}{% if record.body.path %}, {{ record.body.path }}{% endif %}: {{ record.body.problem | truncate(110) }}

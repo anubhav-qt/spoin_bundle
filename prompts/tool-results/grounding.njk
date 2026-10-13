@@ -1,0 +1,11 @@
+{% if passages | length == 0 %}
+The grounding of the {{ tier.difficulty }} tier of "{{ tier.title }}" names no ingested section. Report this to the tadpole: cards can't be written without grounding.
+{% else %}
+The grounding of the {{ tier.difficulty }} tier of "{{ tier.title }}": {{ passages | length }} passages. Cite them by number.
+{% for passage in passages %}
+
+<passage number="{{ passage.number }}" source="{{ passage.path }}{% if passage.heading %}#{{ passage.heading }}{% endif %}">
+{{ passage.text }}
+</passage>
+{% endfor %}
+{% endif %}

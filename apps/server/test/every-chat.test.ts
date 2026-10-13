@@ -288,7 +288,7 @@ describe("reading records", () => {
 
   test("list_records gives a line for the latest version of each record of a kind", async () => {
     const tadpole = await newTadpole();
-    const helper = await newHelperChat(db, await openChat(db, "toad_sage"));
+    const helper = await newHelperChat(db, await openChat(db, "toad_sage"), "helper");
     const long = `Should the corpus cover ${"the async runtimes ".repeat(12)}?`;
     const active = await createRecord(db, QuestionRecord, {
       kind: "question",
@@ -372,7 +372,7 @@ describe("reading records", () => {
 describe("every chat's tools", () => {
   test("a main chat reads, asks and answers; a helper only reads", async () => {
     const tadpole = await newTadpole();
-    const helper = await newHelperChat(db, tadpole);
+    const helper = await newHelperChat(db, tadpole, "helper");
     const names = (chat: Chat) => everyChatTools(prompts, chat).map((tool) => tool.name);
 
     expect(names(tadpole)).toEqual(["read_record", "read_record_history", "list_records", "ask", "answer"]);

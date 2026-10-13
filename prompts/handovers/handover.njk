@@ -1,0 +1,17 @@
+{% import "partials/macros.njk" as m %}
+{% set KINDS = {
+  "coverage": "the coverage note",
+  "maps": "the maps",
+  "closing_report": "the closing report",
+  "insufficient_evidence": "insufficient evidence",
+  "curriculum": "the curriculum"
+} %}
+Handover ({{ m.ref(record) }}): {{ KINDS[record.body.kind] }}
+From {{ m.writer(record.firstWriter) }}, for topic {{ record.body.topic }}
+{% if record.body.subtopic %}
+Tier: subtopic {{ record.body.subtopic }}
+{% endif %}
+Records handed over: {{ m.refs(record.body.records) }}
+
+{{ record.body.note }}
+{% include "partials/version.njk" %}

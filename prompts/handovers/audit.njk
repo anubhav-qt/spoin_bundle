@@ -1,0 +1,11 @@
+{% import "partials/macros.njk" as m %}
+Audit ({{ m.ref(record) }}) of topic {{ record.body.topic }}'s drafts
+Drafts read: {{ m.refs(record.body.drafts) }}
+The coverage matrix, zero to mastery:
+{% for row in record.body.matrix %}
+- {{ row.stage }}: {{ row.mark }}. {{ row.evidence }}
+{% else %}
+- not marked
+{% endfor %}
+Its findings are finding records naming this audit.
+{% include "partials/version.njk" %}

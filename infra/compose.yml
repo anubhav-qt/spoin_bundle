@@ -37,8 +37,9 @@ services:
     environment:
       CLIPROXY_API_KEY: ${CLIPROXY_API_KEY:?Set CLIPROXY_API_KEY in infra/.env}
       CLIPROXY_MANAGEMENT_KEY: ${CLIPROXY_MANAGEMENT_KEY:?Set CLIPROXY_MANAGEMENT_KEY in infra/.env}
+    # 8318 on the host is taken by another project's proxy, so ours is on 8319.
     ports:
-      - "127.0.0.1:8318:8317"
+      - "127.0.0.1:8319:8317"
     volumes:
       - ./.cliproxy/auths:/app/auths
     healthcheck:
@@ -48,7 +49,7 @@ services:
       retries: 12
 
   migrate:
-    build: { context: .., dockerfile: apps/server/Dockerfile }
+    build: { context: .., dockerfile: apps/server/Dockerfile, target: server }
     command: ["node", "--enable-source-maps", "dist/migrate.js"]
     environment: &server-env
       NODE_ENV: development
@@ -69,7 +70,7 @@ services:
       db: { condition: service_healthy }
 
   api:
-    build: { context: .., dockerfile: apps/server/Dockerfile }
+    build: { context: .., dockerfile: apps/server/Dockerfile, target: server }
     restart: unless-stopped
     environment: *server-env
     ports:
@@ -78,6 +79,23 @@ services:
       - hono-models:/models
     depends_on:
       migrate: { condition: service_completed_successfully }
+
+  # The authoring harness (task 0045): every chat but AskAI's. Its corpus, curricula and
+  # fetched pages are files in their own volume; it renders cards on the web service.
+  worker:
+    build: { context: .., dockerfile: apps/server/Dockerfile, target: worker }
+    restart: unless-stopped
+    environment:
+      <<: *server-env
+      UNIVERSE_FILES_DIR: /data/universe
+      WEB_URL: http://web:3000
+    volumes:
+      - hono-models:/models
+      - hono-universe-files:/data/universe
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      cliproxy: { condition: service_healthy }
+      web: { condition: service_started }
 
   web:
     build: { context: .., dockerfile: apps/web/Dockerfile }
@@ -101,3 +119,4 @@ services:
 volumes:
   hono-db:
   hono-models:
+  hono-universe-files:

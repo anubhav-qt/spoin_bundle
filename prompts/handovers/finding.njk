@@ -1,0 +1,11 @@
+{% import "partials/macros.njk" as m %}
+Finding ({{ m.ref(record) }}) from the {{ record.body.auditor }} auditor, in {{ m.ref(record.body.audit) }}
+Document: {{ record.body.path or "the drafts as a whole" }}
+Problem: {{ record.body.problem }}
+Fix: {{ record.body.fix }}
+{% if record.body.settled %}
+Settled: {{ "fixed" if record.body.settled.how == "fixed" else "kept as it is" }}. {{ record.body.settled.note }}
+{% else %}
+Not settled yet.
+{% endif %}
+{% include "partials/version.njk" %}

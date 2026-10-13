@@ -1,0 +1,8 @@
+{% if documents | length == 0 %}
+There are no documents{% if under %} under {{ under }}{% endif %} yet.
+{% else %}
+The documents{% if under %} under {{ under }}{% endif %}, by path:
+{% for doc in documents %}
+- {{ doc.path }}: {% if doc.title %}{{ doc.title }}, {{ doc.sections }} sections{% else %}fails the corpus contract{% endif %}, {{ "ingested" if doc.ingested else "not ingested yet" }}
+{% endfor %}
+{% endif %}

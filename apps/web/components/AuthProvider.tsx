@@ -37,6 +37,11 @@ const REDIRECT_EXEMPT_PATHS = new Set(["/claim"]);
 //: redirect only.
 const ADMIN_PATH_PREFIX = "/admin/";
 
+//: The worker's headless browser renders a card at /render/card to screenshot it
+//: for designer_toad (task 0045). It never has a session and the page calls no
+//: API, so the gate leaves it alone entirely.
+const UNGATED_PATHS = new Set(["/render/card"]);
+
 function isRedirectExempt(pathname: string): boolean {
   return REDIRECT_EXEMPT_PATHS.has(pathname) || pathname.startsWith(ADMIN_PATH_PREFIX);
 }
@@ -97,6 +102,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // for one frame before a redirect below actually lands.
     setLoading(true);
 
+    if (UNGATED_PATHS.has(pathname)) {
+      setLoading(false);
+      return;
+    }
+
     if (!hasSession()) {
       setUser(null);
       if (!PUBLIC_PATHS.has(pathname)) {
@@ -147,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // the token is checked so they never render with a null user. A deep link
   // straight to the feed lands here first — hold the SpoinWave until the
   // whole authed page is ready, then swap it for the page in one paint.
-  if (loading && !PUBLIC_PATHS.has(pathname)) {
+  if (loading && !PUBLIC_PATHS.has(pathname) && !UNGATED_PATHS.has(pathname)) {
     return <SpoinWave variant="page" />;
   }
 

@@ -1,0 +1,22 @@
+{% import "partials/macros.njk" as m %}
+Curriculum ({{ m.ref(record) }}) for topic {{ record.body.topic }}
+By {{ m.writer(record.writer) }}
+Description: {{ record.body.description }}
+{% for subtopic in record.body.subtopics %}
+
+{{ loop.index }}. {{ subtopic.title }}: {{ subtopic.description }}
+   Prerequisites: {% for name in subtopic.prerequisites %}{{ name }}{% if not loop.last %}; {% endif %}{% else %}none{% endfor %}
+
+{% for tier in ["beginner", "intermediate", "advanced"] %}
+{% set plan = subtopic.tiers[tier] %}
+{% if plan %}
+   {{ tier }}: {{ plan.targetCards }} cards ({% for type, count in plan.cardTypes %}{{ type }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% for ref in plan.grounding %}
+     grounded in {{ ref }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+Reasoning: {{ record.body.reasoning }}
+{% include "partials/version.njk" %}

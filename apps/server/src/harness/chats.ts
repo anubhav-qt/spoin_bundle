@@ -1,5 +1,5 @@
-import type { RunStatus, SINGLE_CHAT_ROLES, TOPIC_CHAT_ROLES } from "@spoin/shared/enums";
-import { and, asc, eq, gte } from "drizzle-orm";
+import type { HelperTask, RunStatus, SINGLE_CHAT_ROLES, TOPIC_CHAT_ROLES } from "@spoin/shared/enums";
+import { and, asc, eq, gte, inArray, ne } from "drizzle-orm";
 import { Type } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
 import { chat, chatRun } from "../db/schema.ts";
@@ -75,10 +75,10 @@ export async function openAskChat(db: Conn, askConversationId: string): Promise<
   return found;
 }
 
-/** A new helper under the chat that starts it. A helper never starts helpers of its own. */
-export async function newHelperChat(db: Conn, parent: Chat): Promise<Chat> {
+/** A new helper under the chat that starts it, for one task. A helper never starts helpers of its own. */
+export async function newHelperChat(db: Conn, parent: Chat, task: HelperTask): Promise<Chat> {
   if (parent.role === "helper") throw new StoreError("A helper can't start helpers of its own.");
-  const [helper] = await db.insert(chat).values({ role: "helper", parentId: parent.id }).returning();
+  const [helper] = await db.insert(chat).values({ role: "helper", parentId: parent.id, task }).returning();
   if (!helper) throw new StoreError(`A helper of chat ${parent.id} could not be made.`);
   return helper;
 }
@@ -139,14 +139,16 @@ export async function endRun(db: Conn, runId: string, end: RunEnd): Promise<Run>
 }
 
 /**
- * Ends every run still going as interrupted. The worker calls this when it starts: it is the only
- * process that runs chats, so a run still going then was cut off when it last stopped.
+ * Ends every run still going as interrupted, AskAI's excepted. The worker calls this when it
+ * starts: it runs every chat but AskAI's, so a run still going then was cut off when it last
+ * stopped. AskAI's run in the api, where a reader may be waiting on one now.
  */
 export async function markInterruptedRuns(db: Conn): Promise<Run[]> {
+  const workerChats = db.select({ id: chat.id }).from(chat).where(ne(chat.role, "ask_ai"));
   const rows = await db
     .update(chatRun)
     .set({ status: "interrupted", endedAt: new Date() })
-    .where(eq(chatRun.status, "running"))
+    .where(and(eq(chatRun.status, "running"), inArray(chatRun.chatId, workerChats)))
     .returning();
   return rows.map(asRun);
 }

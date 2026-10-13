@@ -1,0 +1,20 @@
+{% if drafts | length == 0 %}
+No drafts are waiting for you.
+{% else %}
+{{ drafts | length }} drafts of "{{ subtopic }}", in the topic {{ topic }}, each with the passages it is written from.
+{% for draft in drafts %}
+
+<draft id="{{ draft.id }}" form="{{ draft.meta.form }}">
+Title: {{ draft.title }}
+Canonical title: {{ draft.canonicalTitle }}
+Summary: {{ draft.summary }}
+Body:
+{{ draft.body }}
+</draft>
+{% for passage in draft.passages %}
+<passage number="{{ passage.number }}" source="{{ passage.path }}{% if passage.heading %}#{{ passage.heading }}{% endif %}">
+{{ passage.text }}
+</passage>
+{% endfor %}
+{% endfor %}
+{% endif %}

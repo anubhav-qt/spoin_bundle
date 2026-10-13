@@ -130,13 +130,19 @@ const Env = z.object({
 
   // -- models (task 0045, Phase 8) ---------------------------------------------
   /** CLIProxyAPI, which serves Gemini from the owner's Antigravity sign-ins. */
-  CLIPROXY_URL: z.string().url().default("http://127.0.0.1:8318"),
+  CLIPROXY_URL: z.string().url().default("http://127.0.0.1:8319"),
   /** Unset means no Gemini: the proxy refuses every call without it. */
   CLIPROXY_API_KEY: z.string().optional(),
   /** The proxy's management API, which the model accounts page reads. */
   CLIPROXY_MANAGEMENT_KEY: z.string().optional(),
   /** NVIDIA's free API, shared with breader. Unset means no NIM leg. */
   NVIDIA_NIM_API_KEY: z.string().optional(),
+
+  // -- the authoring harness (task 0045, Phase 9) ------------------------------
+  /** Where the worker keeps the corpus and curricula the chats write, and the pages they fetch. */
+  UNIVERSE_FILES_DIR: z.string().default("/data/universe"),
+  /** The web app the worker renders cards on, so designer_toad sees its art; unset, nothing renders. */
+  WEB_URL: z.string().url().optional(),
 
   /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */
   DEV_ROUTES: bool.default(false),

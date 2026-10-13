@@ -35,6 +35,9 @@ const RECORD_TOOLS = [
   "harness/topic-reading.ts",
 ];
 
+/** The agents' tools (task 0045), every one of which writes records or reads them. */
+const AGENTS = join(SRC, "agents");
+
 const filesUnder = (path: string): string[] => {
   const full = join(SRC, path);
   if (full.endsWith(".ts")) return [full];
@@ -92,7 +95,10 @@ describe("architecture", () => {
   test("AskAI never reaches the record tools or another chat (ADR-0106)", () => {
     const { files } = reach(filesUnder("ask"));
     expect(files.size).toBeGreaterThan(10);
-    const offenders = [...files].filter((file) => RECORD_TOOLS.some((tool) => file === join(SRC, tool)));
+    const offenders = [...files].filter((file) => {
+      if (file.startsWith(`${AGENTS}/`)) return true;
+      return RECORD_TOOLS.some((tool) => file === join(SRC, tool));
+    });
     expect(offenders, "AskAI has no database handle: a reader's text never reaches a record.").toEqual([]);
   });
 

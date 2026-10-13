@@ -21,7 +21,14 @@ in the code.
 | Chat | Model |
 |---|---|
 | toad_sage, every main chat, research, the gate's two passes, designer_toad, visual_toad | Gemini 3.8 Flash, medium thinking, through CLIProxyAPI |
-| The writers: corpus documents, curricula, cards, questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again |
+| The writers: corpus documents, curricula, cards, questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again. Gemini when the worker has no NIM key |
+
+## Running it
+
+The worker (`apps/server/src/worker.ts`, the compose `worker` service) runs the scheduler, and
+`apps/server/src/agents/set-up.ts` gives each chat its tools and model when it wakes. The tools
+live in `apps/server/src/agents/` and `apps/server/src/harness/`. `npm run monitor -w
+@spoin/server` serves a live page of every chat at http://localhost:4040, read only.
 
 ## Every chat
 
@@ -232,9 +239,9 @@ Draws every ASCII art itself, for cards the gate accepted, replacing the curated
 | Tool | Does |
 |---|---|
 | `list_art_requests()` | Accepted cards waiting for art, with the writer's request and ideas |
-| `web_search`, `fetch`, `view_image` | Recent trends and references |
-| `render_art(card, art)` | One call: checks the 40 columns and the character set, renders the card on a phone and returns the screenshot. Every render is a record |
-| `attach_art(card, art)` | Refused unless this run rendered that exact art |
+| `web_search`, `fetch` | Recent trends and references |
+| `render_art(card, art, alt)` | One call: checks the 40 columns, 24 lines and the character set, renders the card on a phone and returns the screenshot. Every render is a record |
+| `attach_art(card, art, alt)` | Refused unless this run rendered that exact art |
 
 ### visual_toad (one per tadpole)
 

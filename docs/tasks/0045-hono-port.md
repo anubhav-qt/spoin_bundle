@@ -447,9 +447,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **The proxy runs from our own image** (2026-10-12): a Dockerfile that downloads CLIProxyAPI's
   v8.0.23 Linux release, the version Trotter runs, and checks its checksum before installing it,
   as Trotter's ADR 0005 did for the binary.
-- **The proxy is on the compose network and 127.0.0.1:8318** (2026-10-12): the api and worker
-  reach it by service name, and a script or curl on the owner's PC reaches it while building
-  (8317 is Trotter's). `CLIPROXY_API_KEY` and `CLIPROXY_MANAGEMENT_KEY` live in the gitignored
+- **The proxy is on the compose network and 127.0.0.1:8319** (2026-10-12; moved from 8318 on
+  2026-10-13, which another project's proxy holds on the owner's Mac): the api and worker reach it
+  by service name, and a script or curl on the owner's PC reaches it while building (8317 is
+  Trotter's). `CLIPROXY_URL` defaults to it. `CLIPROXY_API_KEY` and `CLIPROXY_MANAGEMENT_KEY` live in the gitignored
   `infra/.env`, and the stack refuses to start without them. It routes round-robin across the two
   accounts (Trotter's config fills the first account first), so parallel chats and the request
   path split the load.
@@ -649,6 +650,44 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   waiting out a rate limit (the proxy hands it to the next account); when that fails too, the
   tool error tells the agent to search again, in other words if the query may be at fault. In
   `apps/server/src/harness/web-search.ts`.
+
+- **Phase 9 takes the shortest path to one live topic** (2026-10-13), the owner's choice: Claude
+  writes every role's and helper's prompts to `writing-prompts.md` and settles the small calls,
+  logged here, and asks only about what a reader or the owner would see. The prompts are
+  `prompts/toad_sage.njk`, `tadpole.njk`, `curriculum.njk`, `designer_toad.njk`, `helpers/`,
+  `auditors/`, and a description and result template per tool in `prompts/tools/` and
+  `prompts/tool-results/`. `test/agent-prompts.test.ts` renders every one with its data, so a
+  template naming a field its tool never passes fails there rather than in a run.
+- **Each chat's tools and model are set in one place** (2026-10-13), `apps/server/src/agents/
+  set-up.ts`, by role, and for a helper by its task. A plain `helper` gets its main chat's own
+  work: toad_sage's tools, or a tadpole's research tools, with `report` and never `start_helper`.
+  The corrector and verifier have no `report`: their verdicts are records that wake the tier's
+  writer, which is the report. A compaction run gets the chat's reads plus `write_map` and
+  `change_map`, so a tadpole compacting keeps its findings in its maps. The three writers run on
+  NIM; a worker without `NVIDIA_NIM_API_KEY` runs them on Gemini and says so in its log, so a run
+  can go before NVIDIA's key is in `infra/.env`. A role this phase doesn't run (ero_sennin,
+  wise_toad, visual_toad) throws when woken, rather than running with no tools.
+- **The worker** (2026-10-13), `apps/server/src/worker.ts`: ends the runs and puts back the wakes
+  its last stop cut off, then runs the scheduler until SIGTERM, letting each running chat stop at
+  its next step (30 s at most). Its image is the `worker` stage of `apps/server/Dockerfile`, built
+  on the `server` stage with playwright-core's Chromium added, so the api's image carries no
+  browser. It keeps fetched pages and written documents in `UNIVERSE_FILES_DIR`, the
+  `hono-universe-files` volume, and renders cards on `WEB_URL`, the compose `web` service.
+- **A card renders on the web's own page** (2026-10-13). `render_art` opens `/render/card` in the
+  worker's Chromium at a phone's width and hands it the card through `window.spoinRenderCard`, so
+  the art is seen on the real `Card` component. The page calls no API, so it is outside sign-in
+  (`UNGATED_PATHS` in `components/AuthProvider.tsx`), and draws with motion reduced so the
+  screenshot doesn't catch an animation half done.
+- **AskAI can't reach `agents/` either** (2026-10-13): the Biome override and
+  `test/architecture.test.ts` that keep `src/ask/` from the record tools now cover
+  `apps/server/src/agents/`, the pipeline's tools.
+- **The run monitor** (2026-10-13). `npm run monitor -w @spoin/server` serves
+  http://localhost:4040: a box per chat in the pipeline's order (toad_sage, tadpole, curriculum,
+  designer_toad), each helper under the chat that started it, live every 2.5 s, with the run's
+  time, model calls and each topic's cards. A click opens that chat's transcript, runs (with their
+  instructions), wakes, model calls and records. It reads `DATABASE_URL` through a pool whose
+  transactions are READ ONLY and leaves out AskAI's chats and runs. A development tool in
+  `apps/server/src/monitor/`, in no image.
 
 ## Asked when we get there
 

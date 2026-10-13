@@ -1,0 +1,11 @@
+{% import "partials/macros.njk" as m %}
+{% set STAGES = {"pass1": "Pass 1", "pass2": "Pass 2", "questions": "Pass 2 on the questions"} %}
+{{ STAGES[record.body.stage] }}'s verdicts ({{ m.ref(record) }}) for subtopic {{ record.body.subtopic }}
+Accepted: {% for id in record.body.accepted %}{{ id }}{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}
+
+{% for rejected in record.body.rejected %}
+Rejected {{ rejected.id }}: {{ rejected.feedback }}
+{% else %}
+Rejected: none
+{% endfor %}
+{% include "partials/version.njk" %}

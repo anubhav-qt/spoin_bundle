@@ -2,7 +2,7 @@ import { and, count, eq } from "drizzle-orm";
 import type { Db } from "../db/client.ts";
 import { askConversation, card, generationJob, topic, userTopic } from "../db/schema.ts";
 import type { Prompts } from "../prompts.ts";
-import type { Chat } from "./chats.ts";
+import { type Chat, readChat } from "./chats.ts";
 import { summaryInForce } from "./compaction.ts";
 import { indiaTime } from "./india-time.ts";
 import { withoutRequestTag } from "./prompt-tags.ts";
@@ -20,14 +20,25 @@ import { viewsOf } from "./views.ts";
 
 /**
  * A chat's instructions, from its role's template, with its topic if it has one (an AskAI chat's
- * is its thread's) and its summary once it has compacted.
+ * is its thread's, a helper's its main chat's) and its summary once it has compacted. A helper's
+ * come from its task's template; one started for its main chat's own work gets its main chat's,
+ * told it is a helper.
  */
 export async function systemPromptFor(db: Db, prompts: Prompts, chat: Chat): Promise<string> {
   const summary = (await summaryInForce(db, chat)) ?? null;
+  if (chat.role === "helper" && chat.parentId) {
+    const main = await readChat(db, chat.parentId);
+    const topic = await topicOf(db, main);
+    if (chat.task === "helper") return prompts.render(`${main.role}.njk`, { summary, topic, helper: true });
+    return prompts.render(`helpers/${chat.task}.njk`, { summary, topic, main: main.role });
+  }
   return prompts.render(`${chat.role}.njk`, { summary, topic: await topicOf(db, chat) });
 }
 
-async function topicOf(db: Db, chat: Chat): Promise<{ name: string; description: string | null } | null> {
+async function topicOf(
+  db: Db,
+  chat: Chat,
+): Promise<{ id: string; name: string; description: string | null } | null> {
   let topicId = chat.topicId;
   if (chat.askConversationId) {
     const [thread] = await db
@@ -38,7 +49,7 @@ async function topicOf(db: Db, chat: Chat): Promise<{ name: string; description:
   }
   if (!topicId) return null;
   const [found] = await db
-    .select({ name: topic.canonicalName, description: topic.description })
+    .select({ id: topic.id, name: topic.canonicalName, description: topic.description })
     .from(topic)
     .where(eq(topic.id, topicId));
   return found ?? null;

@@ -1,0 +1,3 @@
+{% import "partials/macros.njk" as m %}
+Art attached ({{ m.ref(record) }}) to card {{ record.body.card }}, as rendered in {{ m.ref(record.body.render) }}
+{% include "partials/version.njk" %}

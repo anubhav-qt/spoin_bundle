@@ -1,0 +1,9 @@
+The corpus sections nearest "{{ query }}", nearest first:
+{% for hit in hits %}
+
+{{ loop.index }}. {{ hit.sourcePath }}#{{ hit.heading }} (similarity {{ hit.score | round(2) }})
+{{ hit.text }}
+{% else %}
+
+None: nothing is ingested yet that comes near it.
+{% endfor %}

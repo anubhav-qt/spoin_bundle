@@ -1,0 +1,23 @@
+{% import "partials/macros.njk" as m %}
+Map {{ record.body.map }}, the {{ m.mapName(record.body.map) }} ({{ m.ref(record) }}), for topic {{ record.body.topic }}
+By {{ m.writer(record.writer) }}
+Summary: {{ record.body.summary }}
+{% for item in record.body.items %}
+- {{ item.name }}: {{ item.text }}
+{% if item.claimType or item.scope or item.confidence %}
+  Class: {{ item.claimType or "unstated" }}; scope: {{ item.scope or "unstated" }}; confidence: {{ item.confidence or "unstated" }}
+{% endif %}
+{% if item.sourceTier %}
+  Source tier: {{ item.sourceTier | replace("_", " ") }}
+{% endif %}
+{% if item.after %}
+  After: {% for name in item.after %}{{ name }}{% if not loop.last %}; {% endif %}{% else %}nothing{% endfor %}
+
+{% endif %}
+{% if item.checkBy %}
+  Check again by: {{ item.checkBy }}
+{% endif %}
+  Evidence: {% for cited in item.evidence %}page {{ cited.page }} passage {{ cited.passage }}{% if not loop.last %}; {% endif %}{% else %}none{% endfor %}
+
+{% endfor %}
+{% include "partials/version.njk" %}

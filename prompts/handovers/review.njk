@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+Review ({{ m.ref(record) }})
+From {{ m.writer(record.firstWriter) }}, of {{ m.ref(record.body.handover) }}
+Verdict: {{ "go on" if record.body.verdict == "go_on" else "change" }}
+Notes: {{ record.body.notes }}
+{% include "partials/version.njk" %}

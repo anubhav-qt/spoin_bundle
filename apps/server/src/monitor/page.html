@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spoin run monitor</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #edf0ea;
+    --bg-2: #f6f8f4;
+    --bg-3: #dfe5da;
+    --fg: #262a22;
+    --fg-2: #565f51;
+    --fg-3: #838c7d;
+    --line: #c9d1c3;
+    --accent: #c1442b;
+    --ok: #2f8a4a;
+    --wait: #b7791f;
+    --bad: #c1442b;
+    --info: #2f6b78;
+    --code: #e6ebe2;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171a15;
+      --bg-2: #20241d;
+      --bg-3: #2a2f26;
+      --fg: #e4e9df;
+      --fg-2: #aab3a3;
+      --fg-3: #7d8676;
+      --line: #3a4135;
+      --accent: #e0694f;
+      --ok: #5cc27a;
+      --wait: #e0a640;
+      --bad: #e0694f;
+      --info: #6fb1c0;
+      --code: #1b1f18;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171a15;
+    --bg-2: #20241d;
+    --bg-3: #2a2f26;
+    --fg: #e4e9df;
+    --fg-2: #aab3a3;
+    --fg-3: #7d8676;
+    --line: #3a4135;
+    --accent: #e0694f;
+    --ok: #5cc27a;
+    --wait: #e0a640;
+    --bad: #e0694f;
+    --info: #6fb1c0;
+    --code: #1b1f18;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .warn { color: var(--bad); }
+  .muted { color: var(--fg-3); }
+  pre, code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+
+  header { padding: 18px 24px 10px; border-bottom: 1px solid var(--line); }
+  .title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+  h1 { margin: 0; font-size: 18px; }
+  #elapsed { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  #phase { color: var(--fg-2); }
+  .line { margin: 6px 0 0; color: var(--fg-2); }
+  .line b { color: var(--fg); font-weight: 600; }
+
+  #diagram {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 24px 40px;
+  }
+  .column { flex: 1 1 220px; min-width: 200px; max-width: 340px; }
+  .column h2 { margin: 0; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .column .does { margin: 0 0 8px; color: var(--fg-3); font-size: 12px; }
+  .arrow { padding-top: 56px; color: var(--fg-3); font-size: 22px; }
+
+  .box {
+    display: block;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-left-width: 5px;
+    border-radius: 10px;
+    background: var(--bg-2);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .box:hover { border-color: var(--fg-3); }
+  .box[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .box > span { display: block; }
+  .box .name { font-weight: 650; }
+  .box .topic { color: var(--fg-3); font-size: 12px; }
+  .box .state { margin-top: 2px; font-weight: 600; }
+  .box .meta { color: var(--fg-2); font-size: 12px; }
+  .box .warn { color: var(--bad); font-size: 12px; }
+  .box.small { padding: 6px 10px; border-radius: 8px; font-size: 13px; }
+
+  .box.running { border-color: var(--ok); }
+  .box.running .state { color: var(--ok); }
+  .box.starting, .box.waiting { border-color: var(--wait); }
+  .box.starting .state, .box.waiting .state { color: var(--wait); }
+  .box.failed, .box.stopped, .box.interrupted { border-color: var(--bad); }
+  .box.failed .state, .box.stopped .state, .box.interrupted .state { color: var(--bad); }
+  .box.paused { border-color: var(--info); }
+  .box.paused .state { color: var(--info); }
+  .box.done .state { color: var(--fg-3); }
+  .box.new { border-style: dashed; background: transparent; cursor: default; }
+  .box.new .state { color: var(--fg-3); }
+
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: currentColor; }
+  .running .dot { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .running .dot { animation: none; } }
+
+  .helpers { margin: -2px 0 10px 12px; padding-left: 10px; border-left: 2px dashed var(--line); }
+  .helpers-label { margin: 0 0 4px; color: var(--fg-3); font-size: 12px; }
+
+  #detail {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(820px, 100vw);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border-left: 1px solid var(--line);
+    box-shadow: -12px 0 32px rgb(0 0 0 / 0.18);
+  }
+  #detail[hidden] { display: none; }
+  .detail-head { padding: 14px 18px 0; border-bottom: 1px solid var(--line); }
+  .detail-head h2 { margin: 0; font-size: 17px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
+  .chip, .tab, .close, .small-button {
+    padding: 3px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg-2);
+    color: inherit;
+    font: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .detail-head .close { float: right; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 10px; }
+  .tab[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  #detail-body { flex: 1; overflow: auto; padding: 12px 18px 40px; }
+
+  .run-divider { margin: 18px 0 8px; padding: 4px 0; border-top: 1px solid var(--line); color: var(--fg-3); font-size: 12px; }
+  .msg { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--line); }
+  .msg.user { border-left: 4px solid var(--info); }
+  .msg.assistant { border-left: 4px solid var(--ok); }
+  .msg.tool { border-left: 4px solid var(--fg-3); }
+  .msg.tool.error { border-left-color: var(--bad); }
+  .msg .who { margin-bottom: 4px; color: var(--fg-3); font-size: 12px; }
+  .msg .who b { color: var(--fg); }
+  .msg pre, .fold pre, .prompt {
+    margin: 4px 0 0;
+    padding: 8px;
+    max-height: 520px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--code);
+    border-radius: 6px;
+  }
+  .msg img { display: block; max-width: 100%; max-height: 640px; margin-top: 6px; border-radius: 6px; border: 1px solid var(--line); }
+  details > summary { cursor: pointer; color: var(--fg-2); }
+  .fold { margin: 4px 0 0; }
+  .call-name { font-weight: 650; color: var(--fg); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { color: var(--fg-3); font-weight: 600; }
+  .table-wrap { overflow-x: auto; }
+  .record { margin: 0 0 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); }
+
+  @media (max-width: 640px) {
+    header { padding: 14px 16px 8px; }
+    #diagram { padding: 14px 16px 32px; }
+    .column { max-width: none; }
+    .arrow { padding: 0; width: 100%; text-align: center; transform: rotate(90deg); }
+    #detail-body { padding: 10px 16px 32px; }
+    .detail-head { padding: 12px 16px 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>Spoin run</h1>
+    <span id="elapsed">connecting</span>
+    <span id="phase"></span>
+  </div>
+  <p class="line" id="totals"></p>
+  <div id="topics"></div>
+  <p class="line" id="records"></p>
+</header>
+<main id="diagram"></main>
+<aside id="detail" hidden aria-label="Chat detail">
+  <div class="detail-head" id="detail-head"></div>
+  <div id="detail-body"></div>
+</aside>
+<script src="/page.js"></script>
+</body>
+</html>

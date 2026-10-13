@@ -1,0 +1,9 @@
+Your topic's corpus drafts, each a document in full.
+{% for draft in drafts %}
+
+<document path="{{ draft.body.path }}">
+{{ draft.body.text }}
+</document>
+{% endfor %}
+
+Based on the documents above, report what your instructions ask for.

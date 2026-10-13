@@ -1,0 +1,465 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
+import { type ParsedDocument, parseDocument } from "@spoin/frog/ingest/contract";
+import { ingestDocument } from "@spoin/frog/ingest/runner";
+import type { Tool } from "@spoin/pi-ai";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { type Static, Type } from "typebox";
+import type { Db, Tx } from "../db/client.ts";
+import { harnessRecord, type topic } from "../db/schema.ts";
+import { topicById } from "../harness/intake.ts";
+import { recordsStored } from "../harness/outputs.ts";
+import { changeRecord, createRecord, readLatestRecord, refOf } from "../harness/records.ts";
+import {
+  AUDITORS,
+  AuditRecord,
+  CLAIM_TYPES,
+  CLOSED,
+  COMPETENCY_STAGES,
+  CoverageMark,
+  DraftRecord,
+  FindingRecord,
+  Id,
+  SOURCE_TIERS,
+  Text,
+} from "../harness/schemas.ts";
+import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.ts";
+import type { AgentDeps } from "./context.ts";
+import { corpusFile, corpusPaths, topicDir } from "./corpus.ts";
+import { briefOf, startHelper } from "./helpers.ts";
+
+/*
+ * A topic's corpus documents (harness-tools.md, task 0045): written one per writer helper on NIM,
+ * checked against the corpus contract at write time, audited by three fixed calls that never see
+ * the author's reasoning, and ingested only once toad_sage says go on to the closing report.
+ */
+
+type Conn = Db | Tx;
+type Topic = typeof topic.$inferSelect;
+
+/** A document's file name in its topic's directory. */
+const FILE_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
+
+/** Every subject has one (antigravity-corpus-authoring.md): field tips, pitfalls and lessons learned. */
+export const TIPS_AND_TRICKS = "tips-and-tricks.md";
+
+/** The topic a chat works on: its own, or its main chat's for a helper. */
+async function topicOfChat(context: ToolContext): Promise<Topic> {
+  let topicId = context.chat.topicId;
+  if (!topicId) {
+    const brief = await briefOf(context.db, context.chat);
+    topicId = brief?.body.topic ?? null;
+  }
+  if (!topicId) throw new ToolError("You work on no topic, so you have no documents.");
+  return topicById(context.db, topicId);
+}
+
+const StartWriterParameters = Type.Object(
+  {
+    file: Type.String({
+      pattern: FILE_NAME.source,
+      description: "The document's file name in your topic's directory, kebab-case, ending .md",
+    }),
+    brief: Type.String({
+      minLength: 1,
+      description: "What the document covers, from which maps and passages, and what it leaves to others",
+    }),
+  },
+  CLOSED,
+);
+
+/** A writer helper on NIM for one of the topic's documents. */
+export function startDocumentWriterTool(deps: AgentDeps): HarnessTool<typeof StartWriterParameters> {
+  return {
+    name: "start_writer",
+    label: "Start a document's writer",
+    description: deps.prompts.render("tools/start-document-writer.njk", {}),
+    parameters: StartWriterParameters,
+    kind: "change",
+    async execute(params, context) {
+      const found = await topicOfChat(context);
+      const path = `${topicDir(found)}/${params.file}`;
+      const { brief } = await context.db.transaction((tx) =>
+        startHelper(tx, context.chat, context.author, {
+          task: "document_writer",
+          brief: params.brief,
+          topic: found.id,
+          path,
+        }),
+      );
+      return recordsStored(context.db, deps.prompts, [brief]);
+    },
+  };
+}
+
+const Section = Type.Object(
+  {
+    heading: Type.String({ minLength: 1, description: "Descriptive: it goes into the chunk's header" }),
+    text: Type.String({
+      minLength: 1,
+      description: "Self-contained, 1,000 to 2,000 characters, never over 2,200",
+    }),
+  },
+  CLOSED,
+);
+
+const WriteDocumentParameters = Type.Object(
+  {
+    title: Text,
+    source: Type.String({ minLength: 1, description: "The URL or the origin the document is curated from" }),
+    source_date: Type.String({
+      pattern: "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+      description: "When the source material is from: YYYY-MM-DD, YYYY-MM or YYYY",
+    }),
+    tags: Type.Array(Type.String({ minLength: 1 }), {
+      minItems: 1,
+      description: "What the document is about",
+    }),
+    knowledge_kind: Type.Enum([...CLAIM_TYPES], { description: "The document's dominant claim class" }),
+    source_tier: Type.Enum([...SOURCE_TIERS]),
+    applies_to: Type.Optional(
+      Type.Record(Type.String({ minLength: 1 }), Type.String({ minLength: 1 }), {
+        description: 'What it is true of, such as {"framework": "langgraph", "version": "1.x"}',
+      }),
+    ),
+    verified_on: Type.Optional(
+      Type.String({ format: "date", description: "When you checked it against what it describes" }),
+    ),
+    status: Type.Optional(Type.Enum(["current", "historical", "deprecated"])),
+    sections: Type.Array(Section, { minItems: 1 }),
+  },
+  CLOSED,
+);
+
+/** The writer's: its document, checked against the contract, written to disk and kept as a record. */
+export function writeDocumentTool(deps: AgentDeps): HarnessTool<typeof WriteDocumentParameters> {
+  return {
+    name: "write_document",
+    label: "Write the document",
+    description: deps.prompts.render("tools/write-document.njk", {}),
+    parameters: WriteDocumentParameters,
+    kind: "change",
+    async execute(params, context) {
+      const brief = await briefOf(context.db, context.chat);
+      if (!brief?.body.path || !brief.body.topic) {
+        throw new ToolError("Only a document's writer writes it: you have no document in your brief.");
+      }
+      const path = brief.body.path;
+      const found = await topicById(context.db, brief.body.topic);
+      const text = documentText(found, params);
+      const problems = epistemicProblems(params);
+      problems.push(...parseDocument(path, Buffer.from(text, "utf8")).errors.problems);
+      if (problems.length > 0) {
+        throw new ToolError(
+          `Nothing was written; fix every problem and call write_document again:\n- ${problems.join("\n- ")}`,
+        );
+      }
+      const full = corpusFile(deps, path);
+      mkdirSync(dirname(full), { recursive: true });
+      writeFileSync(full, text);
+      const draft = await keepDraft(context.db, context, { topic: found.id, path, text });
+      return recordsStored(context.db, deps.prompts, [draft]);
+    },
+  };
+}
+
+/** The checks the contract leaves to the epistemic fields (antigravity-corpus-authoring.md). */
+function epistemicProblems(params: { knowledge_kind: string; applies_to?: object; verified_on?: string }) {
+  const problems: string[] = [];
+  if (params.knowledge_kind === "implementation" && !params.applies_to) {
+    problems.push("`applies_to` is required when `knowledge_kind` is implementation: say what it is true of");
+  }
+  if (params.applies_to && !params.verified_on) {
+    problems.push("`verified_on` is required with `applies_to`: when you last checked it against the thing");
+  }
+  return problems;
+}
+
+/**
+ * The file as the contract wants it. Front matter is YAML; each value is written as JSON, which
+ * YAML reads as it is, so a title with a colon can't break it. Kind, category, sub category and
+ * scope come from the topic row, not the writer.
+ */
+function documentText(found: Topic, params: Static<typeof WriteDocumentParameters>): string {
+  const front: Record<string, unknown> = {
+    title: params.title,
+    kind: "topic_source",
+    category: found.category ?? "uncategorized",
+  };
+  if (found.subCategory) front.sub_category = found.subCategory;
+  front.scope = found.scope;
+  front.source = params.source;
+  front.source_date = params.source_date;
+  front.topic_tags = params.tags;
+  front.knowledge_kind = params.knowledge_kind;
+  front.source_tier = params.source_tier;
+  if (params.applies_to) front.applies_to = params.applies_to;
+  if (params.verified_on) front.verified_on = params.verified_on;
+  if (params.status) front.status = params.status;
+  const lines = ["---"];
+  for (const [key, value] of Object.entries(front)) lines.push(`${key}: ${JSON.stringify(value)}`);
+  lines.push("---", "");
+  for (const section of params.sections) {
+    lines.push(`## ${section.heading.trim()}`, "", section.text.trim(), "");
+  }
+  return lines.join("\n");
+}
+
+/** The draft record of a path: its next version, or its first. */
+async function keepDraft(
+  db: Conn,
+  context: ToolContext,
+  body: { topic: string; path: string; text: string },
+): Promise<DraftRecord> {
+  const existing = await draftOf(db, body.path);
+  if (!existing) return createRecord(db, DraftRecord, { kind: "draft", author: context.author, body });
+  return changeRecord(db, DraftRecord, {
+    from: refOf(existing),
+    status: "active",
+    author: context.author,
+    reason: "Written again",
+    body,
+  });
+}
+
+async function draftOf(db: Conn, path: string): Promise<DraftRecord | undefined> {
+  const [first] = await db
+    .select({ id: harnessRecord.id })
+    .from(harnessRecord)
+    .where(
+      and(
+        eq(harnessRecord.kind, "draft"),
+        eq(harnessRecord.version, 1),
+        sql`${harnessRecord.body} ->> 'path' = ${path}`,
+      ),
+    )
+    .limit(1);
+  if (!first) return undefined;
+  return readLatestRecord(db, DraftRecord, "draft", first.id);
+}
+
+/** The latest version of each of a topic's drafts. */
+export async function draftsOf(db: Conn, topicId: string): Promise<DraftRecord[]> {
+  const firsts = await db
+    .select({ id: harnessRecord.id })
+    .from(harnessRecord)
+    .where(
+      and(
+        eq(harnessRecord.kind, "draft"),
+        eq(harnessRecord.version, 1),
+        sql`${harnessRecord.body} ->> 'topic' = ${topicId}`,
+      ),
+    )
+    .orderBy(harnessRecord.seq);
+  const drafts: DraftRecord[] = [];
+  for (const first of firsts) drafts.push(await readLatestRecord(db, DraftRecord, "draft", first.id));
+  return drafts;
+}
+
+const FoundProblems = Type.Object({
+  findings: Type.Array(
+    Type.Object({
+      path: Type.Union([Type.String({ minLength: 1 }), Type.Null()], {
+        description: "The document, or null for the drafts as a whole",
+      }),
+      problem: Type.String({ minLength: 1, description: "What is wrong, quoting the words at fault" }),
+      fix: Type.String({ minLength: 1, description: "What the document should say instead" }),
+    }),
+  ),
+});
+
+const CoverageAnswer = Type.Object({
+  matrix: Type.Array(CoverageMark, { minItems: COMPETENCY_STAGES.length }),
+  findings: FoundProblems.properties.findings,
+});
+
+/** The three auditors, each one fixed call that the tadpole doesn't brief. */
+export function auditDraftsTool(deps: AgentDeps): HarnessTool {
+  const parameters = Type.Object({}, CLOSED);
+  return {
+    name: "audit_drafts",
+    label: "Audit the drafts",
+    description: deps.prompts.render("tools/audit-drafts.njk", {}),
+    parameters,
+    kind: "change",
+    async execute(_params, context) {
+      const found = await topicOfChat(context);
+      const drafts = await draftsOf(context.db, found.id);
+      if (drafts.length === 0) throw new ToolError("There are no drafts to audit yet.");
+      const prompt = deps.prompts.render("auditors/drafts.njk", { drafts });
+      const findingsTool: Tool<typeof FoundProblems> = {
+        name: "report_findings",
+        description: deps.prompts.render("tools/report-findings.njk", {}),
+        parameters: FoundProblems,
+      };
+      const coverageTool: Tool<typeof CoverageAnswer> = {
+        name: "report_coverage",
+        description: deps.prompts.render("tools/report-coverage.njk", { stages: COMPETENCY_STAGES }),
+        parameters: CoverageAnswer,
+      };
+      const call = { prompt, runId: context.run.id, signal: context.signal };
+      const [versions, precision, coverage] = await Promise.all([
+        deps.oneShot({
+          ...call,
+          systemPrompt: deps.prompts.render("auditors/versions.njk", {}),
+          tool: findingsTool,
+        }),
+        deps.oneShot({
+          ...call,
+          systemPrompt: deps.prompts.render("auditors/precision.njk", {}),
+          tool: findingsTool,
+        }),
+        deps.oneShot({
+          ...call,
+          systemPrompt: deps.prompts.render("auditors/coverage.njk", { stages: COMPETENCY_STAGES }),
+          tool: coverageTool,
+        }),
+      ]);
+      const byAuditor = {
+        versions: versions.findings,
+        precision: precision.findings,
+        coverage: coverage.findings,
+      };
+      const stored = await context.db.transaction(async (tx) => {
+        const audit = await createRecord(tx, AuditRecord, {
+          kind: "audit",
+          author: { kind: "code", component: "audit_drafts" },
+          body: { topic: found.id, drafts: drafts.map(refOf), matrix: coverage.matrix },
+        });
+        const records = [];
+        for (const auditor of AUDITORS) {
+          for (const item of byAuditor[auditor]) {
+            records.push(
+              await createRecord(tx, FindingRecord, {
+                kind: "finding",
+                author: { kind: "code", component: "audit_drafts" },
+                body: {
+                  audit: refOf(audit),
+                  topic: found.id,
+                  auditor,
+                  path: item.path,
+                  problem: item.problem,
+                  fix: item.fix,
+                  settled: null,
+                },
+              }),
+            );
+          }
+        }
+        return [audit, ...records];
+      });
+      return recordsStored(context.db, deps.prompts, stored);
+    },
+  };
+}
+
+const SettleParameters = Type.Object(
+  {
+    finding: Id,
+    how: Type.Enum(["fixed", "kept"], { description: "fixed in a draft, or kept as it is" }),
+    note: Type.String({ minLength: 1, description: "What changed, or why the draft is right as it is" }),
+  },
+  CLOSED,
+);
+
+/** The tadpole's answer to a finding: fixed, or kept with its reason. */
+export function settleFindingTool(deps: AgentDeps): HarnessTool<typeof SettleParameters> {
+  return {
+    name: "settle_finding",
+    label: "Settle a finding",
+    description: deps.prompts.render("tools/settle-finding.njk", {}),
+    parameters: SettleParameters,
+    kind: "change",
+    async execute(params, context) {
+      const finding = await findingOf(context.db, params.finding);
+      if (finding.body.settled) throw new ToolError(`Finding ${params.finding} is settled already.`);
+      const settled = await changeRecord(context.db, FindingRecord, {
+        from: refOf(finding),
+        status: "active",
+        author: context.author,
+        reason: `Settled: ${params.how}`,
+        body: { ...finding.body, settled: { how: params.how, note: params.note } },
+      });
+      return recordsStored(context.db, deps.prompts, [settled]);
+    },
+  };
+}
+
+async function findingOf(db: Conn, id: string) {
+  const [row] = await db
+    .select({ id: harnessRecord.id })
+    .from(harnessRecord)
+    .where(and(eq(harnessRecord.kind, "finding"), eq(harnessRecord.id, id)))
+    .limit(1);
+  if (!row) throw new ToolError(`There is no finding ${id}.`);
+  return readLatestRecord(db, FindingRecord, "finding", id);
+}
+
+/** The topic's latest audit, if it has had one. */
+async function latestAudit(db: Conn, topicId: string): Promise<AuditRecord | undefined> {
+  const [last] = await db
+    .select({ id: harnessRecord.id })
+    .from(harnessRecord)
+    .where(and(eq(harnessRecord.kind, "audit"), sql`${harnessRecord.body} ->> 'topic' = ${topicId}`))
+    .orderBy(desc(harnessRecord.seq))
+    .limit(1);
+  if (!last) return undefined;
+  return readLatestRecord(db, AuditRecord, "audit", last.id);
+}
+
+/**
+ * Why the closing report can't go yet (harness-tools.md): the latest drafts audited, every finding
+ * of that audit fixed or answered, a tips-and-tricks document, and every document passing the
+ * corpus contract. Empty when it can.
+ */
+export async function closingReportProblems(deps: AgentDeps, db: Conn, found: Topic): Promise<string[]> {
+  const problems: string[] = [];
+  const dir = topicDir(found);
+  const paths = corpusPaths(deps, dir);
+  if (paths.length === 0) return ["The topic has no documents yet."];
+  if (!paths.includes(`${dir}/${TIPS_AND_TRICKS}`)) {
+    problems.push(`There is no ${TIPS_AND_TRICKS}: every topic has one.`);
+  }
+  for (const path of paths) {
+    const { errors } = parseDocument(path, readFileSync(corpusFile(deps, path)));
+    for (const problem of errors.problems) problems.push(`${path}: ${problem}`);
+  }
+  const drafts = await draftsOf(db, found.id);
+  const audit = await latestAudit(db, found.id);
+  if (!audit) {
+    problems.push("The drafts have never been audited: call audit_drafts.");
+    return problems;
+  }
+  const audited = new Set(audit.body.drafts.map((ref) => `${ref.id}@${ref.version}`));
+  const unaudited = drafts.filter((draft) => !audited.has(`${draft.id}@${draft.version}`));
+  for (const draft of unaudited) {
+    problems.push(`${draft.body.path} changed after the last audit: call audit_drafts again.`);
+  }
+  const open = await db
+    .select({ id: harnessRecord.id })
+    .from(harnessRecord)
+    .where(
+      and(eq(harnessRecord.kind, "finding"), sql`${harnessRecord.body} -> 'audit' ->> 'id' = ${audit.id}`),
+    );
+  for (const row of open) {
+    const finding = await readLatestRecord(db, FindingRecord, "finding", row.id);
+    if (!finding.body.settled) problems.push(`Finding ${finding.id} is not settled.`);
+  }
+  return problems;
+}
+
+/** Ingests a topic's documents into the universe, once toad_sage says go on to its closing report. */
+export async function ingestTopicCorpus(deps: AgentDeps, found: Topic): Promise<number> {
+  const paths = corpusPaths(deps, topicDir(found));
+  const parsed: ParsedDocument[] = [];
+  for (const path of paths) {
+    const { document, errors } = parseDocument(path, readFileSync(corpusFile(deps, path)));
+    if (!document) throw new ToolError(`${path} fails the corpus contract: ${errors.problems.join("; ")}`);
+    parsed.push(document);
+  }
+  let sections = 0;
+  await deps.universe.transaction(async (tx) => {
+    for (const document of parsed) sections += await ingestDocument(tx, document, deps.embedder);
+  });
+  return sections;
+}

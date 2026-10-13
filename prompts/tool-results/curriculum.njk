@@ -1,0 +1,18 @@
+{% import "partials/macros.njk" as m %}
+{% set record = latest %}
+{% include "handovers/curriculum.njk" %}
+Versions so far: {{ versions }}.
+
+toad_sage's reviews:
+{% for review in reviews %}
+- {{ "go on" if review.body.verdict == "go_on" else "change" }}, {{ review.written }}: {{ review.body.notes }}
+{% else %}
+- none yet
+{% endfor %}
+{% if tiers | length > 0 %}
+
+Projected tiers:
+{% for tier in tiers %}
+- {{ tier.title }}, {{ tier.difficulty }}: {{ tier.live }} of {{ tier.target }} cards live
+{% endfor %}
+{% endif %}

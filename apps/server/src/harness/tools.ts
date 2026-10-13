@@ -1,5 +1,5 @@
 import type { AgentTool } from "@spoin/pi-agent";
-import type { JsonValue } from "@spoin/pi-ai";
+import type { ImageContent, JsonValue, TextContent } from "@spoin/pi-ai";
 import type { Static, TSchema } from "typebox";
 import type { Db } from "../db/client.ts";
 import type { Chat, Run } from "./chats.ts";
@@ -25,6 +25,14 @@ export interface ToolOutput {
   value: JsonValue;
   dataSeen: RecordRef[];
   recordsWritten: RecordRef[];
+  /** Pictures the model sees with the value: designer_toad's renders. */
+  images?: ToolImage[];
+}
+
+/** A picture in a tool's output, base64-encoded. */
+export interface ToolImage {
+  data: string;
+  mimeType: string;
 }
 
 /**
@@ -75,7 +83,11 @@ export function toAgentTool(
         signal: signal ?? new AbortController().signal,
       });
       onOutput(toolCallId, output);
-      return { content: [{ type: "text", text: textFor(output.value) }], details: output };
+      const content: (TextContent | ImageContent)[] = [{ type: "text", text: textFor(output.value) }];
+      for (const image of output.images ?? []) {
+        content.push({ type: "image", data: image.data, mimeType: image.mimeType });
+      }
+      return { content, details: output };
     },
   };
 }

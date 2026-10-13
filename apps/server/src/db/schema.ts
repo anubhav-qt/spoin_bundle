@@ -12,6 +12,7 @@ import {
   CHAT_ROLES,
   DIFFICULTIES,
   ENGAGEMENT_KINDS,
+  HELPER_TASKS,
   MODEL_CALL_FAILURES,
   QUESTION_KINDS,
   QUESTION_STATUSES,
@@ -83,6 +84,7 @@ export const topicEdgeKind = pgEnum("topic_edge_kind", TOPIC_EDGE_KINDS);
 export const topicScope = pgEnum("topic_scope", TOPIC_SCOPES);
 export const visualKind = pgEnum("visual_kind", VISUAL_KINDS);
 export const chatRole = pgEnum("chat_role", CHAT_ROLES);
+export const helperTask = pgEnum("helper_task", HELPER_TASKS);
 export const runStatus = pgEnum("run_status", RUN_STATUSES);
 export const wakeStatus = pgEnum("wake_status", WAKE_STATUSES);
 export const recordStatus = pgEnum("record_status", RECORD_STATUSES);
@@ -972,6 +974,8 @@ export const chat = pgTable(
     topicId: uuid("topic_id").references(() => topic.id),
     /** A helper's main chat, whose tools it has except starting helpers. */
     parentId: uuid("parent_id").references((): AnyPgColumn => chat.id),
+    /** What a helper was started for, which picks its instructions and tools. */
+    task: helperTask("task"),
     /** An AskAI chat's thread. Deleting the thread (its reader's account going) deletes the chat. */
     askConversationId: uuid("ask_conversation_id")
       .unique("uq_chat_ask_conversation")
@@ -985,6 +989,7 @@ export const chat = pgTable(
     uniqueIndex("uq_chat_topic_role").on(t.topicId, t.role).where(sql`topic_id IS NOT NULL`),
     check("ck_chat_topic", sql`(topic_id IS NOT NULL) = (role IN (${sqlList(TOPIC_CHAT_ROLES)}))`),
     check("ck_chat_parent", sql`(parent_id IS NOT NULL) = (role = 'helper')`),
+    check("ck_chat_task", sql`(task IS NOT NULL) = (role = 'helper')`),
     // As text: the migration adds the enum value in the same transaction, where it can't be used yet.
     check("ck_chat_ask_conversation", sql`(ask_conversation_id IS NOT NULL) = (role::text = 'ask_ai')`),
   ],
@@ -1144,3 +1149,35 @@ export const routedJob = pgTable("routed_job", {
     .references(() => generationJob.id, { onDelete: "cascade" }),
   routedAt: tz("routed_at").notNull().defaultNow(),
 });
+
+/**
+ * A web page a chat fetched (harness-tools.md, task 0045). Its text stays on disk, under the
+ * worker's files; Postgres keeps where, and its passages with their embeddings, so every chat
+ * finds what any chat has read before it goes to the web again.
+ */
+export const page = pgTable("page", {
+  id: id(),
+  url: text("url").notNull().unique("uq_page_url"),
+  title: text("title"),
+  /** Relative to the pages directory. */
+  path: varchar("path", { length: 1000 }).notNull(),
+  contentHash: varchar("content_hash", { length: 64 }).notNull(),
+  /** `http` or `browser`: a page with no real text in its HTML is read in headless Chromium. */
+  fetchedWith: varchar("fetched_with", { length: 16 }).notNull(),
+  fetchedAt: tz("fetched_at").notNull().defaultNow(),
+});
+
+/** One numbered passage of a stored page: what an agent cites, and what `search_pages` ranks. */
+export const pagePassage = pgTable(
+  "page_passage",
+  {
+    pageId: uuid("page_id")
+      .notNull()
+      .references(() => page.id, { onDelete: "cascade" }),
+    ordinal: integer("ordinal").notNull(),
+    text: text("text").notNull(),
+    embedding: vector("embedding", { dimensions: EMBEDDING_DIM }).notNull(),
+    embeddingModel: varchar("embedding_model", { length: 120 }).notNull(),
+  },
+  (t) => [primaryKey({ name: "pk_page_passage", columns: [t.pageId, t.ordinal] })],
+);

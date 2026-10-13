@@ -1,0 +1,2 @@
+{% import "partials/macros.njk" as m %}
+Map {{ record.body.map }} ({{ m.mapName(record.body.map) }}), {{ record.body.items | length }} items: {{ record.body.summary | truncate(100) }}

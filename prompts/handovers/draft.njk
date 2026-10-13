@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+Draft of {{ record.body.path }} ({{ m.ref(record) }}), for topic {{ record.body.topic }}
+By {{ m.writer(record.writer) }}
+
+{{ record.body.text }}
+{% include "partials/version.njk" %}

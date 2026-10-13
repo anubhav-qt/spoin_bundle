@@ -5,3 +5,5 @@
 {% macro chat(address) %}{{ address.role }}{% if address.topic %} of topic {{ address.topic }}{% endif %}{% endmacro %}
 
 {% macro writer(who) %}{% if who.kind == "chat" and who.main %}a helper of {{ chat(who.main) }}{% elif who.kind == "chat" %}{{ chat(who) }}{% elif who.kind == "code" %}code ({{ who.component }}){% else %}the owner{% endif %}{% endmacro %}
+
+{% macro mapName(kind) %}{{ {"A": "domain map", "B": "prerequisite graph", "C": "claim inventory", "D": "evidence mapping", "E": "competency map", "F": "misconception map", "G": "application map", "H": "variability map", "I": "gap audit", "J": "version audit"}[kind] }}{% endmacro %}

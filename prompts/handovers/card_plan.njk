@@ -1,0 +1,7 @@
+{% import "partials/macros.njk" as m %}
+Card plan ({{ m.ref(record) }}) for subtopic {{ record.body.subtopic }}
+By {{ m.writer(record.writer) }}
+{% for brief in record.body.briefs %}
+{{ loop.index }}. {{ brief.form }}: {{ brief.concept }}. Angle: {{ brief.angle }}
+{% endfor %}
+{% include "partials/version.njk" %}

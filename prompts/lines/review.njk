@@ -1,0 +1,1 @@
+{{ "go on" if record.body.verdict == "go_on" else "change" }} on {{ record.body.handover.id }}: {{ record.body.notes | truncate(120) }}

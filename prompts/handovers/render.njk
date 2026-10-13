@@ -1,0 +1,6 @@
+{% import "partials/macros.njk" as m %}
+Render ({{ m.ref(record) }}) of card {{ record.body.card }}
+```
+{{ record.body.art }}
+```
+{% include "partials/version.njk" %}

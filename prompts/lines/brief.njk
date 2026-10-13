@@ -1,0 +1,1 @@
+{{ record.body.task | replace("_", " ") }}{% if record.body.path %} for {{ record.body.path }}{% endif %}: {{ record.body.brief | truncate(120) }}

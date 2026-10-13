@@ -1,0 +1,50 @@
+{% set p = progress %}
+The {{ tier.difficulty }} tier of "{{ tier.title }}": {{ tier.description }}
+Target: {{ tier.targetCards }} cards; card types: {% for form, count in tier.cardTypeQuotas %}{{ form }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}.
+Progress: {{ p.accepted + p.live }} accepted ({{ p.withArt }} with art), {{ p.inGate }} in the gate, {{ p.drafted }} drafted, {{ p.rejected }} rejected. Questions: {{ p.questions.passed }} passed, {{ p.questions.gated }} in pass 2, {{ p.questions.written }} written, {{ p.questions.rejected }} rejected.
+
+## Your cards
+{% for c in cards %}
+
+<card id="{{ c.id }}" stage="{{ c.meta.stage }}" form="{{ c.meta.form }}"{% if c.isHero %} hero="true"{% endif %}>
+Title: {{ c.title }}
+Canonical title: {{ c.canonicalTitle }}
+Summary: {{ c.summary }}
+Body:
+{{ c.body }}
+{% if c.visualKind %}Art: attached{% else %}Art requested: {{ c.meta.art.show }}{% endif %}
+
+</card>
+{% else %}
+None yet.
+{% endfor %}
+
+## Rejected
+{% for r in rejected %}
+- "{{ r.title }}" ({{ r.stage | replace("_", " ") }}): {{ r.reason }}
+{% else %}
+None.
+{% endfor %}
+{% if lower | length > 0 %}
+
+## The lower tiers' live cards, to build on and not repeat
+{% for c in lower %}
+
+<card difficulty="{{ c.difficulty }}">
+{{ c.canonicalTitle }}
+{{ c.body }}
+</card>
+{% endfor %}
+{% endif %}
+
+## Every title in the topic
+{% for t in titles %}
+- {{ t.canonicalTitle }} ("{{ t.title }}"), {{ t.difficulty }}
+{% endfor %}
+
+## Your questions
+{% for q in questions %}
+- {{ q.id }}, on card {{ q.cardId }}, {{ "MCQ" if q.kind == "mcq" else "free text" }} ({{ "live" if q.status == "active" else q.genMeta.stage }}): {{ q.stem }}
+{% else %}
+None yet.
+{% endfor %}

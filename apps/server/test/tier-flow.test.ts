@@ -13,7 +13,7 @@ import {
   searchArtLibrary,
 } from "../src/agents/art.ts";
 import type { AgentDeps } from "../src/agents/context.ts";
-import { correctCardsOnNimTool, correctCardsTool, correctedOnNim } from "../src/agents/gate.ts";
+import { correctCardsOnNimTool, correctCardsTool, correctedOnNim, settleOnce } from "../src/agents/gate.ts";
 import { startHelper } from "../src/agents/helpers.ts";
 import { correctionsOnly, writeOnNimTool } from "../src/agents/nim-writes.ts";
 import {
@@ -376,11 +376,25 @@ describe("a write on NIM", () => {
       /The first write is NIM's: call write_on_nim with correct_cards/,
     );
 
-    // NIM's correction is refused (it names the card twice), and still counts as its first.
+    // NIM's correction is refused (the body it keeps is too short), and still counts as its first.
     const onNim = correctCardsOnNimTool(agentDeps) as unknown as HarnessTool;
-    await expect(call(onNim, corrector, { cards: [entry, entry] })).rejects.toThrow("is named twice");
+    await expect(call(onNim, corrector, { cards: [entry] })).rejects.toThrow("Nothing was stored");
     const context = { db } as unknown as ToolContext;
     expect(await correctedOnNim(context, { cards: [entry] })).toBe(true);
+  });
+
+  test("an entry naming a row not waiting, or one named again, is refused alone", () => {
+    const waiting = [{ id: "a" }, { id: "b" }];
+    const entries = [{ card: "a" }, { card: "x" }, { card: "a" }, { card: "b" }];
+    const named = settleOnce(waiting, entries, (entry) => entry.card, "Card");
+    expect(named.settled.map((one) => one.row.id)).toEqual(["a", "b"]);
+    expect(named.refused).toEqual([
+      "Card x isn't one waiting for you",
+      "Card a is named twice; only its first entry counts",
+    ]);
+    expect(() => settleOnce(waiting, [{ card: "x" }], (entry) => entry.card, "Card")).toThrow(
+      "Nothing was stored",
+    );
   });
 
   test("an answer with no JSON goes back to the writer, kept", async () => {

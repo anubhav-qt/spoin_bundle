@@ -56,22 +56,36 @@ async function withPassages(deps: AgentDeps, tier: Tier, rows: CardRow[]) {
   });
 }
 
-/** A card or question is named once in a call, and only one waiting for this chat. */
-function settleOnce<Row extends { id: string }>(
+/**
+ * The entries a call settles: each names one row waiting for this chat, once. An entry naming
+ * another row, or a row already named, is refused alone, so one wrong id never has every other
+ * entry written again (the owner's rule: no output paid for twice). A call with nothing to settle
+ * is refused whole.
+ */
+export function settleOnce<Row extends { id: string }, Entry>(
   waiting: Row[],
-  ids: string[],
+  entries: Entry[],
+  idOf: (entry: Entry) => string,
   what: string,
-): Map<string, Row> {
+): { settled: { entry: Entry; row: Row }[]; refused: string[] } {
   const byId = new Map(waiting.map((row) => [row.id, row]));
-  const problems: string[] = [];
+  const settled: { entry: Entry; row: Row }[] = [];
+  const refused: string[] = [];
   const seen = new Set<string>();
-  for (const id of ids) {
-    if (!byId.has(id)) problems.push(`${what} ${id} isn't one waiting for you`);
-    if (seen.has(id)) problems.push(`${what} ${id} is named twice`);
+  for (const entry of entries) {
+    const id = idOf(entry);
+    const row = byId.get(id);
+    if (!row) {
+      refused.push(`${what} ${id} isn't one waiting for you`);
+    } else if (seen.has(id)) {
+      refused.push(`${what} ${id} is named twice; only its first entry counts`);
+    } else {
+      settled.push({ entry, row });
+    }
     seen.add(id);
   }
-  if (problems.length > 0) throw new ToolError(`Nothing was stored:\n- ${problems.join("\n- ")}`);
-  return byId;
+  if (settled.length === 0) throw new ToolError(`Nothing was stored:\n- ${refused.join("\n- ")}`);
+  return { settled, refused };
 }
 
 async function rejectCard(
@@ -178,19 +192,19 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
     kind: "change",
     async execute(params, context) {
       const tier = await tierOfHelper(context);
-      const waiting = settleOnce(
+      const named = settleOnce(
         await correctingCards(context.db, tier.id),
-        params.cards.map((corrected) => corrected.card),
+        params.cards,
+        (given) => given.card,
         "Card",
       );
       const grounding = await groundingOf(deps, tier);
       const codeAllowed = await codeAllowedIn(context.db, tier);
       // Each correction that passes is stored, and only a faulty one is refused, so one fault never
       // has every correction written again (the owner's rule: no output paid for twice).
-      const refused: string[] = [];
+      const refused: string[] = [...named.refused];
       const corrected: { row: CardRow; draft: Draft; note: string | undefined; rewritten: boolean }[] = [];
-      for (const given of params.cards) {
-        const row = waiting.get(given.card) as CardRow;
+      for (const { entry: given, row } of named.settled) {
         const draft = {
           title: (given.title ?? row.title).trim(),
           canonical_title: (given.canonical_title ?? row.canonicalTitle).trim(),
@@ -274,7 +288,7 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
       let next = "Every draft is through pass 1.";
       if (left > 0) next = `${left} drafts are still waiting for you.`;
       if (refused.length > 0) {
-        next += `\nNot stored, so correct only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
+        next += `\nNot stored, so send only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
       }
       return { ...stored, value: `${said.join("\n")}\n${String(stored.value)}\n${next}` };
     },
@@ -459,16 +473,11 @@ export function verifyCardsTool(deps: AgentDeps): HarnessTool<typeof VerifyCards
       const waiting = (await myCards(context.db, context.chat.id)).filter(
         (row) => stageOf(row) === "verifying",
       );
-      const byId = settleOnce(
-        waiting,
-        params.verdicts.map((verdict) => verdict.card),
-        "Card",
-      );
-      const said: string[] = [];
+      const named = settleOnce(waiting, params.verdicts, (verdict) => verdict.card, "Card");
+      const said = named.refused.map((problem) => `- not stored: ${problem}`);
       const tierless = await isTierless(context.db, tier.topicId);
       await context.db.transaction(async (tx) => {
-        for (const verdict of params.verdicts) {
-          const row = byId.get(verdict.card) as CardRow;
+        for (const { entry: verdict, row } of named.settled) {
           // The difficulty is checked here, not taken on trust: a card that reads as another tier's
           // is rejected. A tierless topic's cards run easy to advanced, so each takes the one read.
           if (tierless) {
@@ -566,15 +575,10 @@ export function solveQuestionsTool(deps: AgentDeps): HarnessTool<typeof SolveQue
       const waiting = (await myQuestions(context.db, context.chat.id)).filter(
         (row) => row.kind === "mcq" && row.status === "draft" && stageOf(row) === "gated",
       );
-      const byId = settleOnce(
-        waiting,
-        params.answers.map((answer) => answer.question),
-        "MCQ",
-      );
-      const said: string[] = [];
+      const named = settleOnce(waiting, params.answers, (answer) => answer.question, "MCQ");
+      const said = named.refused.map((problem) => `- not stored: ${problem}`);
       await context.db.transaction(async (tx) => {
-        for (const answer of params.answers) {
-          const row = byId.get(answer.question) as QuestionRow;
+        for (const { entry: answer, row } of named.settled) {
           const options = row.options ?? [];
           let feedback: string | null = null;
           if (answer.choice >= options.length) {
@@ -623,15 +627,10 @@ export function checkRubricsTool(deps: AgentDeps): HarnessTool<typeof CheckRubri
       const waiting = (await myQuestions(context.db, context.chat.id)).filter(
         (row) => row.kind === "free_text" && row.status === "draft" && stageOf(row) === "gated",
       );
-      const byId = settleOnce(
-        waiting,
-        params.verdicts.map((verdict) => verdict.question),
-        "Free-text question",
-      );
-      const said: string[] = [];
+      const named = settleOnce(waiting, params.verdicts, (verdict) => verdict.question, "Free-text question");
+      const said = named.refused.map((problem) => `- not stored: ${problem}`);
       await context.db.transaction(async (tx) => {
-        for (const verdict of params.verdicts) {
-          const row = byId.get(verdict.question) as QuestionRow;
+        for (const { entry: verdict, row } of named.settled) {
           let feedback: string | null = null;
           if (!verdict.pass) feedback = verdict.feedback;
           await settleQuestion(tx, row, feedback);

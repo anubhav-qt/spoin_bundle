@@ -375,6 +375,29 @@ describe("the scheduler", () => {
 
     expect(await wakesOf("done", tadpole)).toHaveLength(1);
   });
+
+  test("a stop that comes while a tick is waking chats wakes no more of them", async () => {
+    const first = await newTadpole();
+    const second = await newTadpole();
+    for (const chat of [first, second]) {
+      await queueWake(db, { chatId: chat.id, trigger: MORNING, dueAt: MONDAY_MORNING });
+    }
+    const drain = new AbortController();
+    const events: SchedulerEvent[] = [];
+    const { input } = inputFor([text("Nothing to do.")], () => MONDAY_MORNING);
+
+    await runScheduler({
+      ...input,
+      drain: drain.signal,
+      onEvent: (event) => {
+        events.push(event);
+        if (event.type === "woke") drain.abort();
+      },
+    });
+
+    expect(woke(events)).toHaveLength(1);
+    expect(await wakesOf("waiting", first, second)).toHaveLength(2);
+  });
 });
 
 describe("queued names", () => {

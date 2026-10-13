@@ -749,6 +749,12 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   `giveUpAfterS`, checked only before a try so no answer is cut off). The aim is to use NIM the
   most: few calls, each with big inputs and big outputs. Gemini runs the main chats,
   designer_toad included, and the gate's passes.
+- **A stop stops cleanly** (2026-10-13). When the first live run's worker was stopped, a slow
+  tick still took two chats' wakes eight seconds later, and Playwright closed the browser at
+  the stop signal, failing a render the drain would have let finish. The scheduler now checks
+  for a stop before each chat it wakes, and the browser ignores the signals: the worker's own
+  exit closes it. Two correctors' inserts also timed out connecting to the database during that
+  stop; their wakes wait to be tried again, and the cause is not yet known.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

@@ -30,7 +30,14 @@ export function chromiumBrowser(webUrl: string | null): Browser {
   let launched: Promise<Chromium> | null = null;
   const browser = () => {
     if (!launched) {
-      launched = chromium.launch({ headless: true });
+      // Playwright closes the browser on the stop signal by default, which failed a render the
+      // worker's drain would have let finish (the first live run's designer_toad).
+      launched = chromium.launch({
+        headless: true,
+        handleSIGTERM: false,
+        handleSIGINT: false,
+        handleSIGHUP: false,
+      });
       launched.then(
         (started) => {
           started.on("disconnected", () => {

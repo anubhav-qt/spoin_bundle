@@ -141,6 +141,9 @@ async function wakeDueChats(
   now: Date,
 ): Promise<void> {
   for (const chatId of await chatsWithDueWakes(input.db, now)) {
+    // A stop can come while a slow tick is still in this loop: the first live run's worker took two
+    // wakes eight seconds after it was told to stop.
+    if (stopping(input)) return;
     if (running.has(chatId)) continue;
     const chat = await readChat(input.db, chatId);
     const wakes = await takeDueWakes(input.db, chatId, now);

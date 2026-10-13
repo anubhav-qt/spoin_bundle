@@ -88,7 +88,9 @@ export class Qwen3OnnxEmbedder implements Embedder {
   constructor(opts: { repo?: string; dtype?: OnnxDtype; batchSize?: number; cacheDir?: string } = {}) {
     this.#repo = opts.repo ?? "onnx-community/Qwen3-Embedding-0.6B-ONNX";
     this.#dtype = opts.dtype ?? "q8";
-    this.#batchSize = opts.batchSize ?? 8;
+    // One text at a time: embedding ten Rust Book chapters peaked at 3.1 GB in batches of 8, 2.3 GB
+    // in 2s and 1.8 GB alone, in about the same time, and the 3.1 GB got the worker killed (task 0045).
+    this.#batchSize = opts.batchSize ?? 1;
     this.modelName = `Qwen/Qwen3-Embedding-0.6B:onnx-${this.#dtype}`;
     if (opts.cacheDir) this.#cacheDir = opts.cacheDir;
   }

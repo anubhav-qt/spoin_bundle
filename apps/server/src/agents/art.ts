@@ -29,9 +29,9 @@ export const ART_BATCH = 10;
 /**
  * The style art is drawn in (ADR-0109): art first, its text only labels and a gag's one line. Art
  * attached in an older style is drawn again, live cards' too, after every card still waiting for
- * its first.
+ * its first. Style 2 had the rules without the prompt's worked examples, and drew boxes of words.
  */
-export const ART_STYLE = 2;
+export const ART_STYLE = 3;
 
 /**
  * How much text a piece may carry (ADR-0109): its words, and its letters as a share of every

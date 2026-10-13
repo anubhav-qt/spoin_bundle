@@ -44,8 +44,10 @@ what share of letters the piece has.
 owner's curated library (scraped from asciiart.eu, ADR-0068) by the words of their titles, and the
 designer builds on a figure rather than copying it, adding the card's labels and line.
 
-**Art drawn before this is drawn again.** `ART_STYLE` is 2; attaching art writes the style onto the
-card's `gen_meta.artStyle`. `list_art_requests` lists the cards waiting for their first art first,
+**Art drawn before this is drawn again.** `ART_STYLE` is 3; attaching art writes the style onto the
+card's `gen_meta.artStyle`. Style 2 was these rules without the prompt's two worked examples: its
+first pieces passed the caps as boxes of words with a small `(o_o)` beside them, so it is drawn
+again too. `list_art_requests` lists the cards waiting for their first art first,
 since they hold their tiers back, then every card, live ones too, whose art is an older style,
 marked Redraw. It shows one batch of 10 at a time.
 

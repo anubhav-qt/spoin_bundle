@@ -18,6 +18,7 @@ import { correctCardsOnNimTool, correctCardsTool, correctedOnNim, settleOnce } f
 import { startHelper } from "../src/agents/helpers.ts";
 import { correctionsOnly, writeOnNimTool } from "../src/agents/nim-writes.ts";
 import { lookAtTool } from "../src/agents/pages.ts";
+import { thinkingOf } from "../src/agents/set-up.ts";
 import {
   artQuotas,
   cardMix,
@@ -441,6 +442,12 @@ describe("designer_toad's art", () => {
     expect(paddedLines("      ##### ##### #####")).toEqual([1]);
     // # that shades a drawing is art.
     expect(paddedLines(["  (#####)", " /  |####|"].join("\n"))).toEqual([]);
+  });
+
+  test("designer_toad thinks at high, every other chat at medium", async () => {
+    const { topic: made } = await newTopic();
+    expect(thinkingOf(await openTopicChat(db, "designer_toad", made.id))).toBe("high");
+    expect(thinkingOf(await openTopicChat(db, "tadpole", made.id))).toBe("medium");
   });
 
   test("look_at shows a public page or picture as a screenshot, and refuses a local one", async () => {

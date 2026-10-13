@@ -1,3 +1,4 @@
+import type { ThinkingLevel } from "@spoin/pi-ai";
 import { type Chat, readChat } from "../harness/chats.ts";
 import { everyChatTools } from "../harness/every-chat.ts";
 import { patientGemini } from "../harness/gemini.ts";
@@ -71,7 +72,7 @@ export function agentSetUp(input: AgentSetUpInput): (chat: Chat) => Promise<Chat
     const tools = [...everyChatTools(input.deps.prompts, chat), ...(await roleTools(input.deps, chat))];
     const compactionTools = tools.filter((tool) => tool.kind === "read" || MAP_TOOLS.has(tool.name));
     const chatSetUp = { tools, compactionTools, compactWhileWaitingAt: compactWhileWaitingAt(chat) };
-    return { ...(await onGemini(input, gemini)), ...chatSetUp };
+    return { ...(await onGemini(input, gemini, thinkingOf(chat))), ...chatSetUp };
   };
 }
 
@@ -99,14 +100,24 @@ const MAP_TOOLS = new Set(["write_map", "change_map"]);
 
 type ModelSetUp = Omit<ChatSetUp, "tools" | "compactionTools">;
 
+/**
+ * How hard a chat's model thinks: medium for every chat but designer_toad, which the owner set to
+ * high for its drawing (ADR-0109).
+ */
+export function thinkingOf(chat: Chat): ThinkingLevel {
+  if (chat.role === "designer_toad") return "high";
+  return GEMINI_THINKING;
+}
+
 async function onGemini(
   input: AgentSetUpInput,
   gemini: () => Promise<ChatSetUp["model"]>,
+  thinkingLevel: ThinkingLevel,
 ): Promise<ModelSetUp> {
   const proxy = input.proxy;
   return {
     model: await gemini(),
-    thinkingLevel: GEMINI_THINKING,
+    thinkingLevel,
     apiKey: proxy.apiKey,
     streamFn: (run) =>
       patientGemini({

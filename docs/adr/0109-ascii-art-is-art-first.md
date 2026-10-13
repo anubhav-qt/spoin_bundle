@@ -62,6 +62,14 @@ had the examples but not the box check. `list_art_requests` lists the cards wait
 art first, since they hold their tiers back, then every card, live ones too, whose art is an older
 style, marked Redraw, without its old art. It shows one batch of 10 at a time.
 
+**designer_toad thinks at high**, every other chat at medium: the owner's call, on Gemini 3.8 Flash
+rather than a Pro model (`thinkingOf` in `set-up.ts`).
+
+**The prompt's examples** are two pieces drawn for it (a melting snowman, a stack of plates), the
+best piece of the style-4 run (a ghost), and one piece the owner chose from the old pipeline's
+curated library: Joan G. Stark's mermaid, as the craft to aim for. Any other library piece goes in
+only with the owner's leave.
+
 **designer_toad's chat started over** for style 4: a summary record through its last run, written by
 the owner's leave, says it started over, so the model no longer sees its old art. The transcript
 keeps every message.
@@ -94,7 +102,8 @@ sentences.
 
 **The old pipeline's curated library as references.** Tried for a few hours as
 `search_art_library`, then removed: the owner's rule is that nothing in the harness comes from old
-code, and the designer drew boxes with it all the same.
+code, and the designer drew boxes with it all the same. Only pieces the owner picks go into the
+prompt as examples.
 
 **Copying ASCII art from other sites at run time.** Rejected: the pieces stay their artists', and
 the point is art drawn for the card. A reference picture is looked at, not copied.

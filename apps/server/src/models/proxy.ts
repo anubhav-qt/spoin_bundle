@@ -174,8 +174,8 @@ export function findModel(models: Model<Api>[], id: string): Model<Api> {
 
 /**
  * Gemini 3.8 Flash at medium thinking: toad_sage, the main chats, research, the gate, and on the
- * request path grading and AskAI (task 0045). The proxy names it `-high`, but it takes low, medium
- * and high, and each call says which.
+ * request path grading and AskAI (task 0045); designer_toad alone at high (set-up.ts). The proxy
+ * names it `-high`, but it takes low, medium and high, and each call says which.
  */
 export const GEMINI_ID = "gemini-3.8-flash-high";
 export const GEMINI_THINKING: ThinkingLevel = "medium";

@@ -63,6 +63,39 @@ export function fetchTool(deps: AgentDeps): HarnessTool<typeof FetchParameters> 
   };
 }
 
+const LookAtParameters = Type.Object(
+  { url: Type.String({ minLength: 1, description: "An http or https address of a page or a picture" }) },
+  CLOSED,
+);
+
+/** designer_toad's reference pictures: a meme or a character to draw from, seen as a browser shows it. */
+export function lookAtTool(deps: AgentDeps): HarnessTool<typeof LookAtParameters> {
+  return {
+    name: "look_at",
+    label: "Look at a page or picture",
+    description: deps.prompts.render("tools/look-at.njk", {}),
+    parameters: LookAtParameters,
+    kind: "read",
+    async execute(params, context) {
+      const url = publicUrl(params.url);
+      await paced(new URL(url).hostname, context.signal);
+      let jpeg: Buffer;
+      try {
+        jpeg = await deps.browser.screenshot(url, context.signal);
+      } catch (error) {
+        if (context.signal.aborted) throw error;
+        throw new ToolError(`${url} couldn't be opened just now; try another address.`);
+      }
+      return {
+        value: `${url} as a laptop's screen shows it. You see it only in this result.`,
+        dataSeen: [],
+        recordsWritten: [],
+        images: [{ data: jpeg.toString("base64"), mimeType: "image/jpeg" }],
+      };
+    },
+  };
+}
+
 const ReadPageParameters = Type.Object(
   { page: Id, from_passage: Type.Integer({ minimum: 1, description: "The first passage to read" }) },
   CLOSED,

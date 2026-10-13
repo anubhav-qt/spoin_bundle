@@ -4,8 +4,7 @@
 - **Date:** 2026-10-14
 - **Deciders:** project owner
 - **Amends:** [ADR-0099](0099-ascii-scenes-carry-their-own-explanation.md) (how much text a scene
-  carries), [ADR-0079](0079-ascii-library-is-gags-only.md) (the curated library returns, as
-  designer_toad's references)
+  carries)
 
 ## Context
 
@@ -13,8 +12,8 @@ The first harness run (Rust in easy language, task 0045) gave designer_toad 128 
 owner read them and found walls of text with a little art: tiny `(o_O)` figures beside long labels,
 a line of dialogue, and a summary sentence under a `=====` rule that repeated the caption. Measured
 over the 128: gags had a median of 21 words (p10 15, p90 26) and letters were half of every
-character that wasn't a space; informative drawings 23 words, 47% letters. The curated library's
-pieces, by real ASCII artists, are 3% letters at the median.
+character that wasn't a space; informative drawings 23 words, 47% letters. Art by ASCII artists at
+asciiart.eu is 3% letters and 19% box characters at the median.
 
 ADR-0099 asked for text on every scene because wordless art couldn't be read. The prompt then
 asked for labels, dialogue and a caption, and the model wrote all three at length.
@@ -22,34 +21,50 @@ asked for labels, dialogue and a caption, and the model wrote all three at lengt
 designer_toad's prompts had also reached 412k tokens: each render returns up to 10 phone
 screenshots, and every one was sent again with every later model call.
 
+The first redraws under the text caps were boxes again: `+====+` boxes of a word or two with a
+small `(0_0)` beside them, their text swapped for rows of `#` to pass the letter cap. They were 56%
+box characters at the median. designer_toad's chat held 225 messages of its own old art, and Flash
+kept drawing like it whatever the instructions said.
+
 ## Decision
 
 **The art carries the idea; text is labels of 1 to 3 words.** A gag may add one line of dialogue,
-best a meme the reader knows or a sarcastic remark. No sentence explains the drawing inside it: the
-caption under the art does that. An informative drawing shows the mechanism as a picture (plates for
-a stack, people in line for a queue) and may carry a few more words. Both aim to be worth a
-screenshot.
+best a meme the reader knows, a famous character's signature line, or a sarcastic remark. No
+sentence explains the drawing inside it: the caption under the art does that. An informative
+drawing shows the mechanism as a picture (plates for a stack, people in line for a queue) and may
+carry a few more words. Both aim to be worth a screenshot.
 
-**Code checks it**, in `art.ts` (`ART_TEXT`), before a piece is rendered:
+**Drawings, mostly of scenes and objects.** Animals, machines, buildings, vehicles, famous
+characters, drawn big. A stick figure or a small face is at most part of a scene, never the whole
+piece, and a batch draws different kinds of things.
 
-| Kind | Words (two letters or more) | Letters, of the characters that aren't spaces |
-|---|---|---|
-| gag | at most 12 | at most 30% |
-| informative | at most 20 | at most 40% |
+**Code checks it**, in `art.ts` (`ART_LIMITS`), before a piece is rendered:
 
-A run of one letter (`oo`, `wWw`) draws, so it isn't a word. The refusal says how many words and
-what share of letters the piece has.
+| Kind | Words (two letters or more) | Letters | Box lines (`+ \| = - # [ ]`) |
+|---|---|---|---|
+| gag | at most 12 | at most 30% | at most 40% |
+| informative | at most 20 | at most 40% | at most 45% |
 
-**The curated library is designer_toad's reference.** `search_art_library` finds pieces of the
-owner's curated library (scraped from asciiart.eu, ADR-0068) by the words of their titles, and the
-designer builds on a figure rather than copying it, adding the card's labels and line.
+Letters and box lines are shares of the characters that aren't spaces. A run of one letter (`oo`,
+`wWw`) draws, so it isn't a word. A row of `#` runs alone on its line, or alone between a box's
+sides, stands in for text and is refused; `#` that shades a drawing (`(#####)`, `|####|`) isn't.
+The box caps refuse every one of the first redraws and pass 98% of asciiart.eu's pieces and both
+of the prompt's worked examples. A refusal says how much text or box the piece has.
 
-**Art drawn before this is drawn again.** `ART_STYLE` is 3; attaching art writes the style onto the
-card's `gen_meta.artStyle`. Style 2 was these rules without the prompt's two worked examples: its
-first pieces passed the caps as boxes of words with a small `(o_o)` beside them, so it is drawn
-again too. `list_art_requests` lists the cards waiting for their first art first,
-since they hold their tiers back, then every card, live ones too, whose art is an older style,
-marked Redraw. It shows one batch of 10 at a time.
+**References come from the web.** For a meme or a famous character, designer_toad finds it with
+`web_search`, sees its picture with `look_at` (the page or picture in headless Chromium, one
+screenshot), and draws it in ASCII itself, bent to the card. No ASCII art is copied in, and the
+curated library of the old pipeline is not used: nothing in the harness comes from old code.
+
+**Art drawn before this is drawn again.** `ART_STYLE` is 4; attaching art writes the style onto the
+card's `gen_meta.artStyle`. Style 2 had the text caps without the prompt's worked examples; style 3
+had the examples but not the box check. `list_art_requests` lists the cards waiting for their first
+art first, since they hold their tiers back, then every card, live ones too, whose art is an older
+style, marked Redraw, without its old art. It shows one batch of 10 at a time.
+
+**designer_toad's chat started over** for style 4: a summary record through its last run, written by
+the owner's leave, says it started over, so the model no longer sees its old art. The transcript
+keeps every message.
 
 **A screenshot is shown to the model once**, in the call right after the tool call that took it
 (`imagesShownOnce` in `run-chat.ts`). The transcript keeps every image.
@@ -59,9 +74,10 @@ marked Redraw. It shows one batch of 10 at a time.
 **Easier.** The art reads at a glance and is the hook again. The designer's prompts stay small, so
 a turn of many batches costs about the same per call.
 
-**Harder.** A label of four or more words has to go, and a scene that needs explaining has to be
-redrawn, not captioned in place. Live cards change art under readers who saw the old one. The
-designer can't look back at an earlier screenshot; it renders again if it needs to.
+**Harder.** A label of four or more words has to go, a scene that needs explaining has to be
+redrawn, not captioned in place, and a diagram has to become a picture. Live cards change art under
+readers who saw the old one. The designer can't look back at an earlier screenshot; it renders or
+looks again if it needs to.
 
 **Committed to.** Raising `ART_STYLE` redraws every piece of a lower style, live ones included,
 whenever the style changes again.
@@ -69,16 +85,21 @@ whenever the style changes again.
 ## Alternatives considered
 
 **Prompt guidance alone.** Rejected: ADR-0099's guidance was prompt-only and produced the walls of
-text. The owner's rule is to enforce in code what must be true.
+text, and style 3's worked examples alone produced boxes. The owner's rule is to enforce in code
+what must be true.
 
 **A per-label check (no run of more than three words).** Rejected for now: telling two labels on one
 line apart from one long label needs guessing at spacing, and the word and letter caps already stop
 sentences.
 
-**Free art from other sites at run time.** Rejected: asciiart.eu's pieces stay their artists', and
-the owner's curated library already holds the best of it, checked to 40 columns.
+**The old pipeline's curated library as references.** Tried for a few hours as
+`search_art_library`, then removed: the owner's rule is that nothing in the harness comes from old
+code, and the designer drew boxes with it all the same.
+
+**Copying ASCII art from other sites at run time.** Rejected: the pieces stay their artists', and
+the point is art drawn for the card. A reference picture is looked at, not copied.
 
 ## Revisit when
 
-The owner finds rendered art still text-heavy, or the refusals stall the designer (many pieces
-refused twice for text).
+The owner finds rendered art still text- or box-heavy, or the refusals stall the designer (many
+pieces refused twice).

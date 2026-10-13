@@ -23,7 +23,12 @@ export interface Browser {
   pageText(url: string, signal: AbortSignal): Promise<{ title: string; text: string }>;
   /** The card on a phone, as a PNG. */
   renderCard(card: RenderedCard, signal: AbortSignal): Promise<Buffer>;
+  /** A page or a picture as a laptop's screen shows it, as a JPEG. */
+  screenshot(url: string, signal: AbortSignal): Promise<Buffer>;
 }
+
+/** A laptop's screen: wide enough for a page's main picture to show above the fold. */
+const SCREEN = { width: 1280, height: 900 };
 
 /** The browser, given where the web app is served; null where there is none, as in tests. */
 export function chromiumBrowser(webUrl: string | null): Browser {
@@ -102,6 +107,25 @@ export function chromiumBrowser(webUrl: string | null): Browser {
         // Fonts and the art's layout settle a beat after React commits.
         await page.waitForTimeout(500);
         return await rendered.screenshot({ type: "png" });
+      } finally {
+        signal.removeEventListener("abort", stop);
+        await context.close();
+      }
+    },
+
+    async screenshot(url, signal) {
+      const context = await (await browser()).newContext({ viewport: SCREEN });
+      const stop = () => void context.close();
+      signal.addEventListener("abort", stop, { once: true });
+      try {
+        const page = await context.newPage();
+        await page.goto(url, { waitUntil: "load", timeout: PAGE_TIMEOUT_MS }).catch((error: unknown) => {
+          // A page still loading ads or trackers has usually drawn its pictures by the timeout.
+          log.warn({ err: error, url }, "the page never finished loading");
+        });
+        // Pictures that load late, after the page says it has loaded.
+        await page.waitForTimeout(1500);
+        return await page.screenshot({ type: "jpeg", quality: 70 });
       } finally {
         signal.removeEventListener("abort", stop);
         await context.close();

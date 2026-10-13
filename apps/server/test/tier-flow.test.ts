@@ -8,14 +8,16 @@ import {
   artProblems,
   artWords,
   attachArtTool,
+  boxShare,
   listArtRequestsTool,
+  paddedLines,
   renderArtTool,
-  searchArtLibrary,
 } from "../src/agents/art.ts";
 import type { AgentDeps } from "../src/agents/context.ts";
 import { correctCardsOnNimTool, correctCardsTool, correctedOnNim, settleOnce } from "../src/agents/gate.ts";
 import { startHelper } from "../src/agents/helpers.ts";
 import { correctionsOnly, writeOnNimTool } from "../src/agents/nim-writes.ts";
+import { lookAtTool } from "../src/agents/pages.ts";
 import {
   artQuotas,
   cardMix,
@@ -49,7 +51,7 @@ const agentDeps = { db, prompts, embedder } as unknown as AgentDeps;
 /** Renders every card as the same picture: the tests read the records, not the pixels. */
 const artDeps = {
   ...agentDeps,
-  browser: { renderCard: async () => Buffer.from("png") },
+  browser: { renderCard: async () => Buffer.from("png"), screenshot: async () => Buffer.from("jpeg") },
 } as unknown as AgentDeps;
 const MORNING = { kind: "schedule" as const, schedule: "every morning" };
 
@@ -422,11 +424,33 @@ describe("designer_toad's art", () => {
     );
   });
 
-  test("the library finds pieces by what they show", () => {
-    const cats = searchArtLibrary("a cat");
-    expect(cats.length).toBeGreaterThan(0);
-    expect(cats[0]?.title.toLowerCase()).toContain("cat");
-    expect(searchArtLibrary("zzqx")).toEqual([]);
+  test("code refuses boxes, and rows of # in place of text", () => {
+    // The first redraws: a box with a small face under it, its text swapped for rows of #.
+    const boxed = [
+      "  +=============+",
+      "  |  DOOR      |",
+      "  |  ######### |",
+      "  +======+=====+",
+      "         |",
+      "       (0_0)",
+    ].join("\n");
+    const problems = artProblems(boxed, "gag").join();
+    expect(boxShare(boxed)).toBeGreaterThan(0.4);
+    expect(problems).toContain("of its characters are box lines");
+    expect(problems).toContain("line 3 is a row of # standing in for text");
+    expect(paddedLines("      ##### ##### #####")).toEqual([1]);
+    // # that shades a drawing is art.
+    expect(paddedLines(["  (#####)", " /  |####|"].join("\n"))).toEqual([]);
+  });
+
+  test("look_at shows a public page or picture as a screenshot, and refuses a local one", async () => {
+    const { topic: made } = await newTopic();
+    const designer = await openTopicChat(db, "designer_toad", made.id);
+    const seen = await call(lookAtTool(artDeps), designer, { url: "https://example.com/this-is-fine.png" });
+    expect(seen.images).toEqual([{ data: Buffer.from("jpeg").toString("base64"), mimeType: "image/jpeg" }]);
+    await expect(call(lookAtTool(artDeps), designer, { url: "http://db:5432/" })).rejects.toThrow(
+      "is not a public site",
+    );
   });
 
   test("art of an older style is redrawn after the cards waiting for their first, live cards too", async () => {

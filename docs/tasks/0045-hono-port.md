@@ -806,9 +806,13 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **ASCII art is art first** (2026-10-14, ADR-0109), after the owner read the first run's 128
   pieces: walls of text (gags a median of 21 words, half their characters letters). Text is
   labels of 1 to 3 words and a gag's one line, which code caps by words and letter share;
-  designer_toad builds on the curated library (`search_art_library`) and redraws every piece of
-  an older `ART_STYLE`, live cards' too. Its prompts had reached 412k tokens because every
-  screenshot was resent with every call; each is now shown once.
+  designer_toad redraws every piece of an older `ART_STYLE`, live cards' too. Its prompts had
+  reached 412k tokens because every screenshot was resent with every call; each is now shown
+  once. Style 3's redraws were still boxes (56% box characters at the median), padded with rows of
+  `#` to pass the letter cap, copied from the old art in the designer's own chat: style 4 caps box
+  lines, refuses `#` padding, asks for scenes and objects over faces and stick figures, adds
+  `look_at` for a meme's or a character's reference picture, and started designer_toad's chat
+  over. The curated library is not used: nothing in the harness comes from old code.
 
 ## Asked when we get there
 

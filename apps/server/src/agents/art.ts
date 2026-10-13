@@ -1,7 +1,6 @@
 import { and, asc, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { Type } from "typebox";
 import { toCardOut } from "../cards/out.ts";
-import { type AsciiLibraryEntry, loadLibrary } from "../content/ascii-library.ts";
 import type { Db } from "../db/client.ts";
 import { card, harnessRecord, subtopic, topic } from "../db/schema.ts";
 import { recordsStored } from "../harness/outputs.ts";
@@ -29,19 +28,28 @@ export const ART_BATCH = 10;
 /**
  * The style art is drawn in (ADR-0109): art first, its text only labels and a gag's one line. Art
  * attached in an older style is drawn again, live cards' too, after every card still waiting for
- * its first. Style 2 had the rules without the prompt's worked examples, and drew boxes of words.
+ * its first. Style 2 had the rules without the prompt's worked examples, and drew boxes of words;
+ * style 3 had them but not the box check, and drew boxes padded with rows of `#`.
  */
-export const ART_STYLE = 3;
+export const ART_STYLE = 4;
+
+/** The characters boxes and tables are drawn with. */
+const BOX_CHARACTERS = new Set(["+", "|", "=", "-", "#", "[", "]"]);
 
 /**
- * How much text a piece may carry (ADR-0109): its words, and its letters as a share of every
- * character that isn't a space. The first Rust run's gags had a median of 21 words, half their ink
- * letters; the curated library's art is 3% letters.
+ * How much of a piece may be text and boxes (ADR-0109): its words, its letters and its box
+ * characters, each letters and boxes as a share of every character that isn't a space. The first
+ * Rust run's gags had a median of 21 words, half their ink letters; its redraws were boxes, 56% box
+ * characters. Art by ASCII artists at asciiart.eu is 3% letters and 19% box characters.
  */
-export const ART_TEXT: Record<ArtKind, { words: number; letters: number }> = {
-  gag: { words: 12, letters: 0.3 },
-  informative: { words: 20, letters: 0.4 },
+export const ART_LIMITS: Record<ArtKind, { words: number; letters: number; boxes: number }> = {
+  gag: { words: 12, letters: 0.3, boxes: 0.4 },
+  informative: { words: 20, letters: 0.4, boxes: 0.45 },
 };
+
+/** A row of `#` runs standing in for text: alone on its line, or alone between a box's sides. */
+const PADDING_ROW = /^[\s|+[\]]*#{3,}(?:\s+#{3,})*[\s|+[\]]*$/;
+const PADDED_CELL = /\|\s+#{3,}\s+\|/;
 
 /** The art as it is stored: no carriage returns, no trailing spaces, no blank lines around it. */
 export function normalizeArt(art: string): string {
@@ -67,13 +75,30 @@ export function letterShare(art: string): number {
   return ink.replace(/[^A-Za-z]/g, "").length / ink.length;
 }
 
+/** The art's box characters as a share of its characters that aren't spaces. */
+export function boxShare(art: string): number {
+  const ink = [...art.replace(/\s/g, "")];
+  if (ink.length === 0) return 0;
+  const boxes = ink.filter((character) => BOX_CHARACTERS.has(character));
+  return boxes.length / ink.length;
+}
+
+/** The numbers of the lines that are rows of `#` in place of text. */
+export function paddedLines(art: string): number[] {
+  const numbers: number[] = [];
+  art.split("\n").forEach((line, index) => {
+    if (PADDING_ROW.test(line) || PADDED_CELL.test(line)) numbers.push(index + 1);
+  });
+  return numbers;
+}
+
 /** A kind of art as a sentence names it. */
 function kindName(kind: ArtKind): string {
   if (kind === "informative") return "an informative drawing";
   return "a gag";
 }
 
-/** Every fault of the art, named: too wide, a character outside printable ASCII, or too much text for its kind. */
+/** Every fault of the art, named: too wide, a character outside printable ASCII, or too much text or box for its kind. */
 export function artProblems(art: string, kind: ArtKind): string[] {
   const problems: string[] = [];
   const lines = art.split("\n");
@@ -92,7 +117,7 @@ export function artProblems(art: string, kind: ArtKind): string[] {
     const shown = [...outside].slice(0, 8).map((character) => JSON.stringify(character));
     problems.push(`only printable ASCII draws the same everywhere; it has ${shown.join(", ")}`);
   }
-  const limits = ART_TEXT[kind];
+  const limits = ART_LIMITS[kind];
   const words = artWords(art).length;
   if (words > limits.words) {
     problems.push(
@@ -105,16 +130,29 @@ export function artProblems(art: string, kind: ArtKind): string[] {
       `${Math.round(letters * 100)}% of its characters are letters; ${kindName(kind)} has at most ${Math.round(limits.letters * 100)}%: draw more, write less`,
     );
   }
+  const boxes = boxShare(art);
+  if (boxes > limits.boxes) {
+    problems.push(
+      `${Math.round(boxes * 100)}% of its characters are box lines (${[...BOX_CHARACTERS].join(" ")}); ${kindName(kind)} has at most ${Math.round(limits.boxes * 100)}%: draw the thing itself, not boxes`,
+    );
+  }
+  const padded = paddedLines(art);
+  if (padded.length > 0) {
+    problems.push(
+      `line ${padded.join(", ")} is a row of # standing in for text: draw something there or leave it out`,
+    );
+  }
   return problems;
 }
 
-/** The text limits as render_art's description states them. */
-function textLimits() {
-  const kinds = Object.entries(ART_TEXT) as [ArtKind, { words: number; letters: number }][];
+/** The limits as render_art's description states them. */
+function artLimits() {
+  const kinds = Object.entries(ART_LIMITS) as [ArtKind, (typeof ART_LIMITS)[ArtKind]][];
   return kinds.map(([kind, limits]) => ({
     name: kindName(kind),
     words: limits.words,
     letters: Math.round(limits.letters * 100),
+    boxes: Math.round(limits.boxes * 100),
   }));
 }
 
@@ -237,7 +275,7 @@ export function renderArtTool(deps: AgentDeps): HarnessTool<typeof ArtParameters
     description: deps.prompts.render("tools/render-art.njk", {
       columns: ART_COLUMNS,
       batch: ART_BATCH,
-      limits: textLimits(),
+      limits: artLimits(),
     }),
     parameters: ArtParameters,
     kind: "change",
@@ -369,58 +407,6 @@ export function attachArtTool(deps: AgentDeps): HarnessTool<typeof ArtParameters
       let value = String(stored.value);
       if (live.length > 0) value += `\nThat art completed ${live.join(" and ")}: its cards are live.`;
       return { ...stored, value };
-    },
-  };
-}
-
-/** Pieces a library search shows: enough to choose from, few enough to read. */
-export const LIBRARY_RESULTS = 5;
-
-/** The library's pieces whose title or category holds the most of the query's words, best first. */
-export function searchArtLibrary(query: string): AsciiLibraryEntry[] {
-  // Short words such as "a" or "of" are in nearly every title.
-  const words = (query.toLowerCase().match(/[a-z]+/g) ?? []).filter((word) => word.length > 2);
-  const scored: { entry: AsciiLibraryEntry; score: number }[] = [];
-  for (const entry of loadLibrary().values()) {
-    const about = `${entry.title} ${entry.category} ${entry.subcategory}`.toLowerCase();
-    let score = 0;
-    for (const word of words) {
-      if (about.includes(word)) score += 1;
-    }
-    if (score > 0) scored.push({ entry, score });
-  }
-  scored.sort((first, second) => second.score - first.score);
-  return scored.slice(0, LIBRARY_RESULTS).map((one) => one.entry);
-}
-
-const SearchLibraryParameters = Type.Object(
-  {
-    query: Type.String({
-      minLength: 1,
-      description: "What the piece should show: a figure, an animal, a face, an object",
-    }),
-  },
-  CLOSED,
-);
-
-export function searchArtLibraryTool(deps: AgentDeps): HarnessTool<typeof SearchLibraryParameters> {
-  return {
-    name: "search_art_library",
-    label: "Search the art library",
-    description: deps.prompts.render("tools/search-art-library.njk", {
-      count: loadLibrary().size,
-      results: LIBRARY_RESULTS,
-    }),
-    parameters: SearchLibraryParameters,
-    kind: "read",
-    async execute(params) {
-      const pieces = searchArtLibrary(params.query);
-      const categories = [...new Set([...loadLibrary().values()].map((entry) => entry.category))].sort();
-      return {
-        value: deps.prompts.render("tool-results/art-library.njk", { pieces, categories }),
-        dataSeen: [],
-        recordsWritten: [],
-      };
     },
   };
 }

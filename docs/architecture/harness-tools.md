@@ -278,18 +278,22 @@ stored or refused. After that the corrector fixes what code refused itself.
 
 ### designer_toad (one per tadpole)
 
-Draws every ASCII art itself, for the ascii cards the gate accepted, replacing the curated scene
-library (ADR-0021, ADR-0079, ADR-0080). Each piece is the kind its card asked for (ADR-0107): a
-gag with labels and a line of dialogue or caption (ADR-0099), or a small labelled informative
-drawing, on Gemini, in batches of up to 10. A tier's cards go live once every accepted card that
-asked for art has it.
+Draws every ASCII art itself, for the ascii cards the gate accepted, building on the curated scene
+library where a figure helps (ADR-0021, ADR-0079, ADR-0109). Each piece is the kind its card asked
+for (ADR-0107): a gag or a small informative drawing, on Gemini, in batches of up to 10. The art
+carries the idea and its text is labels of 1 to 3 words, plus a gag's one line of dialogue; code
+caps each piece's words and letters (ADR-0109). A tier's cards go live once every accepted card
+that asked for art has it. Art of an older style (`ART_STYLE`) is drawn again, live cards' too,
+after the cards waiting for their first. Each screenshot is shown to the model once, in the call
+after the render.
 
 | Tool | Does |
 |---|---|
-| `list_art_requests()` | Accepted cards waiting for art, with the writer's request: its kind, what to show, and ideas |
+| `list_art_requests()` | The next 10 cards waiting for art, first art before redraws, with the writer's request: its kind, what to show, and ideas; and how many more wait |
+| `search_art_library(query)` | The 5 curated library pieces whose titles best match the query, to build on |
 | `web_search`, `fetch` | Recent trends and references |
-| `render_art(art[])` | Up to 10 pieces, each a card, its art and its caption: checks the 40 columns (any height) and the character set, renders each card on a phone and returns the screenshots. A piece that fails is refused alone. Every render is a record |
-| `attach_art(art[])` | Up to 10 pieces, each refused unless this run rendered that exact art. Puts a tier's cards live once no accepted card is waiting for art |
+| `render_art(art[])` | Up to 10 pieces, each a card, its art and its caption: checks the 40 columns (any height), the character set, and the text (a gag at most 12 words and 30% letters, an informative drawing 20 and 40%), renders each card on a phone and returns the screenshots. A piece that fails is refused alone. Every render is a record |
+| `attach_art(art[])` | Up to 10 pieces, each refused unless this run rendered that exact art; marks each card's art the current style. Puts a tier's cards live once no accepted card is waiting for art |
 
 ### visual_toad (one per tadpole)
 

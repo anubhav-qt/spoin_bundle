@@ -110,6 +110,8 @@ export interface CardMeta {
   passages: number[];
   /** NIM has written the card's pass-1 correction, stored or refused; the corrector may fix it. */
   nimTried?: boolean;
+  /** The style its art was drawn in (art.ts ART_STYLE); art in an older one is drawn again. */
+  artStyle?: number;
   /** The pass-2 verifier given the card. */
   verifier?: string;
   /** Why pass 2 rejected it, for the writer. */

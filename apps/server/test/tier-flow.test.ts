@@ -3,6 +3,15 @@ import { HashEmbedder } from "@spoin/frog/embeddings";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { Type } from "typebox";
 import { describe, expect, test } from "vitest";
+import {
+  ART_STYLE,
+  artProblems,
+  artWords,
+  attachArtTool,
+  listArtRequestsTool,
+  renderArtTool,
+  searchArtLibrary,
+} from "../src/agents/art.ts";
 import type { AgentDeps } from "../src/agents/context.ts";
 import { correctCardsOnNimTool, correctCardsTool, correctedOnNim } from "../src/agents/gate.ts";
 import { startHelper } from "../src/agents/helpers.ts";
@@ -37,6 +46,11 @@ const { db } = deps;
 const prompts = loadPrompts();
 const embedder = new HashEmbedder();
 const agentDeps = { db, prompts, embedder } as unknown as AgentDeps;
+/** Renders every card as the same picture: the tests read the records, not the pixels. */
+const artDeps = {
+  ...agentDeps,
+  browser: { renderCard: async () => Buffer.from("png") },
+} as unknown as AgentDeps;
 const MORNING = { kind: "schedule" as const, schedule: "every morning" };
 
 /** A topic of one subtopic at three tiers of five cards, none written yet. */
@@ -71,6 +85,7 @@ async function newTopic() {
 /** Accepted cards as pass 2 leaves them, the first `withArt` of them ascii cards waiting on art. */
 async function acceptedCards(tier: typeof subtopic.$inferSelect, count: number, withArt = 0) {
   const gag = { kind: "gag", show: "A cache lying.", ideas: "A cache with its fingers crossed." };
+  const writer = randomUUID();
   return db
     .insert(card)
     .values(
@@ -85,8 +100,8 @@ async function acceptedCards(tier: typeof subtopic.$inferSelect, count: number, 
         body: `The body of card ${index}.`,
         genMeta:
           index < withArt
-            ? { stage: "accepted", form: "ascii", art: gag }
-            : { stage: "accepted", form: "prose" },
+            ? { stage: "accepted", form: "ascii", art: gag, writer }
+            : { stage: "accepted", form: "prose", writer },
       })),
     )
     .returning();
@@ -104,20 +119,33 @@ async function briefsTo(helper: string): Promise<string[]> {
 
 /** Calls a tool as the chat would, in a run of its own that ends with the call. */
 async function call(tool: HarnessTool, chat: Chat, params: unknown): Promise<ToolOutput> {
+  const [output] = await callsInOneRun(chat, [[tool, params]]);
+  if (!output) throw new Error("No output.");
+  return output;
+}
+
+/** Calls tools one after another in one run of the chat, as a turn would. */
+async function callsInOneRun(chat: Chat, calls: [HarnessTool, unknown][]): Promise<ToolOutput[]> {
   const run = await startRun(db, {
     chatId: chat.id,
     model: TEST_MODEL.id,
     triggers: [MORNING],
     systemPrompt: "",
   });
+  const outputs: ToolOutput[] = [];
   try {
-    return await tool.execute(params, {
-      db,
-      chat,
-      run,
-      author: { kind: "chat", chatId: chat.id, runId: run.id, model: TEST_MODEL.id },
-      signal: new AbortController().signal,
-    });
+    for (const [tool, params] of calls) {
+      outputs.push(
+        await tool.execute(params, {
+          db,
+          chat,
+          run,
+          author: { kind: "chat", chatId: chat.id, runId: run.id, model: TEST_MODEL.id },
+          signal: new AbortController().signal,
+        }),
+      );
+    }
+    return outputs;
   } finally {
     await endRun(db, run.id, { status: "done" });
   }
@@ -361,5 +389,65 @@ describe("a write on NIM", () => {
       call(tool, await writerChat(), { tool: "write_numbers", instructions: "Write one." }),
     ).rejects.toThrow(/NIM wrote no JSON for write_numbers[\s\S]*I would rather not\./);
     expect(nim.requests).toHaveLength(1);
+  });
+});
+
+describe("designer_toad's art", () => {
+  const drawn = ["   _~^~^~_", "\\) /  o o  \\ (/", "  '_   -   _'", "  / '-----' \\   owner"].join("\n");
+
+  test("code refuses art that is more text than picture", () => {
+    expect(artWords("(o_O) oo wWw zZz HEAP owner's")).toEqual(["HEAP", "owner's"]);
+    expect(artProblems(drawn, "gag")).toEqual([]);
+    const sentence = "The borrow checker refuses this because the reference outlives its owner, sadly.";
+    expect(artProblems(`${drawn}\n${sentence}`, "gag").join()).toContain(
+      "it has 13 words; a gag has at most 12",
+    );
+    // An informative drawing may carry more words, never more letters than picture.
+    expect(artProblems(`${drawn}\n${sentence}`, "informative").join()).toContain(
+      "of its characters are letters; an informative drawing has at most 40%",
+    );
+  });
+
+  test("the library finds pieces by what they show", () => {
+    const cats = searchArtLibrary("a cat");
+    expect(cats.length).toBeGreaterThan(0);
+    expect(cats[0]?.title.toLowerCase()).toContain("cat");
+    expect(searchArtLibrary("zzqx")).toEqual([]);
+  });
+
+  test("art of an older style is redrawn after the cards waiting for their first, live cards too", async () => {
+    const { topic: made, beginner, intermediate } = await newTopic();
+    const waiting = await acceptedCards(beginner, 2, 2);
+    const [old] = await acceptedCards(intermediate, 1, 1);
+    if (!old) throw new Error("No card.");
+    await db
+      .update(card)
+      .set({
+        status: "active",
+        visualId: randomUUID(),
+        visualKind: "ascii",
+        visualSlots: { art: "THE OLD ART, ALL WORDS", alt: "Old." },
+      })
+      .where(eq(card.id, old.id));
+    const designer = await openTopicChat(db, "designer_toad", made.id);
+
+    const listed = String((await call(listArtRequestsTool(artDeps), designer, {})).value);
+    const firstWaiting = listed.indexOf(waiting[0]?.id ?? "none");
+    expect(firstWaiting).toBeGreaterThan(-1);
+    expect(firstWaiting).toBeLessThan(listed.indexOf(old.id));
+    expect(listed.match(/Redraw:/g)).toHaveLength(1);
+
+    const piece = { card: old.id, art: drawn, alt: "A crab holding its box." };
+    await callsInOneRun(designer, [
+      [renderArtTool(artDeps), { art: [piece] }],
+      [attachArtTool(artDeps), { art: [piece] }],
+    ]);
+    const [redrawn] = await db.select().from(card).where(eq(card.id, old.id));
+    if (!redrawn) throw new Error("No card.");
+    expect(redrawn.status).toBe("active");
+    expect(redrawn.visualSlots).toEqual({ art: drawn, alt: "A crab holding its box." });
+    expect((redrawn.genMeta as { artStyle?: number }).artStyle).toBe(ART_STYLE);
+    const after = String((await call(listArtRequestsTool(artDeps), designer, {})).value);
+    expect(after).not.toContain(old.id);
   });
 });

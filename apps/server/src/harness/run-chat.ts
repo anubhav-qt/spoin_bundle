@@ -1,6 +1,7 @@
 import {
   Agent,
   type AgentEvent,
+  type AgentMessage,
   type AgentToolResult,
   type AgentTurnContext,
   type StreamFn,
@@ -77,6 +78,7 @@ export async function runChat(input: RunChatInput): Promise<Run> {
       messages: history,
     },
     streamFn: input.streamFn(run),
+    transformContext: async (messages) => imagesShownOnce(messages),
     getApiKey: () => input.apiKey,
     sessionId: chat.id,
     finishTurn: (turn) => {
@@ -108,6 +110,26 @@ export async function runChat(input: RunChatInput): Promise<Run> {
   if (drained) return endRun(db, run.id, { status: "stopped" });
   if (paused) return endRun(db, run.id, { status: "paused" });
   return endRun(db, run.id, endOf(agent.state.messages));
+}
+
+/**
+ * Each screenshot is shown to the model once, in the call right after the tool call that took it:
+ * the model judges it there, and resending every one with each later call took designer_toad's
+ * prompts past 400k tokens. The transcript keeps them all.
+ */
+export function imagesShownOnce(messages: AgentMessage[]): AgentMessage[] {
+  let lastAssistant = -1;
+  messages.forEach((message, index) => {
+    if (message.role === "assistant") lastAssistant = index;
+  });
+  return messages.map((message, index) => {
+    if (index > lastAssistant) return message;
+    if (message.role !== "toolResult") return message;
+    if (!message.content.some((block) => block.type === "image")) return message;
+    const content = message.content.filter((block) => block.type !== "image");
+    content.push({ type: "text", text: "(Its screenshots were shown to you once, when it came back.)" });
+    return { ...message, content };
+  });
 }
 
 /** A run pauses after a turn whose tool calls leave the context at the limit or past it, since the model would go on. */

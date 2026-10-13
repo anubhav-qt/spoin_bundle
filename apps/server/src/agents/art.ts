@@ -1,6 +1,7 @@
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { Type } from "typebox";
 import { toCardOut } from "../cards/out.ts";
+import { type AsciiLibraryEntry, loadLibrary } from "../content/ascii-library.ts";
 import type { Db } from "../db/client.ts";
 import { card, harnessRecord, subtopic, topic } from "../db/schema.ts";
 import { recordsStored } from "../harness/outputs.ts";
@@ -9,13 +10,14 @@ import { ArtRecord, CLOSED, Id, RenderRecord } from "../harness/schemas.ts";
 import { type HarnessTool, type ToolContext, ToolError, type ToolImage } from "../harness/tools.ts";
 import { log } from "../log.ts";
 import type { AgentDeps } from "./context.ts";
-import { metaOf, putCardsLiveIfDone, tierById } from "./tiers.ts";
+import { type ArtKind, metaOf, putCardsLiveIfDone, tierById } from "./tiers.ts";
 
 /*
  * designer_toad's art (harness-tools.md, task 0045): it draws every accepted card's ASCII art
  * itself, sees it on the real card at a phone's width, and attaches only art it has seen, a batch
- * of cards a call. The width and the character set are checked here, not asked for; the height is
- * free (ADR-0099). The art that completes a tier puts its cards live.
+ * of cards a call. The width, the character set and how much of it is text are checked here, not
+ * asked for; the height is free (ADR-0099, ADR-0109). The art that completes a tier puts its cards
+ * live.
  */
 
 /** The widest line a phone shows without wrapping (ADR-0021). */
@@ -23,6 +25,23 @@ export const ART_COLUMNS = 40;
 
 /** Cards a call: few calls, each with several screenshots to look at. */
 export const ART_BATCH = 10;
+
+/**
+ * The style art is drawn in (ADR-0109): art first, its text only labels and a gag's one line. Art
+ * attached in an older style is drawn again, live cards' too, after every card still waiting for
+ * its first.
+ */
+export const ART_STYLE = 2;
+
+/**
+ * How much text a piece may carry (ADR-0109): its words, and its letters as a share of every
+ * character that isn't a space. The first Rust run's gags had a median of 21 words, half their ink
+ * letters; the curated library's art is 3% letters.
+ */
+export const ART_TEXT: Record<ArtKind, { words: number; letters: number }> = {
+  gag: { words: 12, letters: 0.3 },
+  informative: { words: 20, letters: 0.4 },
+};
 
 /** The art as it is stored: no carriage returns, no trailing spaces, no blank lines around it. */
 export function normalizeArt(art: string): string {
@@ -35,8 +54,27 @@ export function normalizeArt(art: string): string {
   return lines.join("\n");
 }
 
-/** Every fault of the art, named: too wide, or a character outside printable ASCII. */
-export function artProblems(art: string): string[] {
+/** The art's words: two letters or more, leaving out a run of one letter, which draws (`oo`, `wWw`). */
+export function artWords(art: string): string[] {
+  const words = art.match(/[A-Za-z][A-Za-z']*[A-Za-z]/g) ?? [];
+  return words.filter((word) => new Set(word.toLowerCase().replaceAll("'", "")).size > 1);
+}
+
+/** The art's letters as a share of its characters that aren't spaces. */
+export function letterShare(art: string): number {
+  const ink = art.replace(/\s/g, "");
+  if (ink.length === 0) return 0;
+  return ink.replace(/[^A-Za-z]/g, "").length / ink.length;
+}
+
+/** A kind of art as a sentence names it. */
+function kindName(kind: ArtKind): string {
+  if (kind === "informative") return "an informative drawing";
+  return "a gag";
+}
+
+/** Every fault of the art, named: too wide, a character outside printable ASCII, or too much text for its kind. */
+export function artProblems(art: string, kind: ArtKind): string[] {
   const problems: string[] = [];
   const lines = art.split("\n");
   if (art.trim() === "") return ["the art is empty"];
@@ -54,7 +92,37 @@ export function artProblems(art: string): string[] {
     const shown = [...outside].slice(0, 8).map((character) => JSON.stringify(character));
     problems.push(`only printable ASCII draws the same everywhere; it has ${shown.join(", ")}`);
   }
+  const limits = ART_TEXT[kind];
+  const words = artWords(art).length;
+  if (words > limits.words) {
+    problems.push(
+      `it has ${words} words; ${kindName(kind)} has at most ${limits.words}: labels of 1 to 3 words, no sentences`,
+    );
+  }
+  const letters = letterShare(art);
+  if (letters > limits.letters) {
+    problems.push(
+      `${Math.round(letters * 100)}% of its characters are letters; ${kindName(kind)} has at most ${Math.round(limits.letters * 100)}%: draw more, write less`,
+    );
+  }
   return problems;
+}
+
+/** The text limits as render_art's description states them. */
+function textLimits() {
+  const kinds = Object.entries(ART_TEXT) as [ArtKind, { words: number; letters: number }][];
+  return kinds.map(([kind, limits]) => ({
+    name: kindName(kind),
+    words: limits.words,
+    letters: Math.round(limits.letters * 100),
+  }));
+}
+
+/** The kind of art the card asked for; a card listed for art always asked. */
+function kindOf(waiting: { card: typeof card.$inferSelect }): ArtKind {
+  const request = metaOf(waiting.card).art;
+  if (!request) throw new ToolError(`Card ${waiting.card.id} asked for no art.`);
+  return request.kind;
 }
 
 function topicOfDesigner(context: ToolContext): string {
@@ -62,7 +130,10 @@ function topicOfDesigner(context: ToolContext): string {
   return context.chat.topicId;
 }
 
-/** The topic's accepted cards still waiting for the art they asked for: half a tier's cards ask for none. */
+/**
+ * The topic's cards waiting for art: accepted cards with none yet, which hold their tier back,
+ * first; then cards, live ones too, whose art is an older style (ART_STYLE), to draw again.
+ */
 function waitingForArt(db: Db, topicId: string) {
   return db
     .select({ card, subtopicTitle: subtopic.title, difficulty: subtopic.difficulty })
@@ -71,13 +142,22 @@ function waitingForArt(db: Db, topicId: string) {
     .where(
       and(
         eq(card.topicId, topicId),
-        eq(card.status, "draft"),
-        sql`${card.genMeta} ->> 'stage' = 'accepted'`,
         sql`jsonb_typeof(${card.genMeta} -> 'art') = 'object'`,
-        isNull(card.visualKind),
+        or(
+          and(
+            eq(card.status, "draft"),
+            sql`${card.genMeta} ->> 'stage' = 'accepted'`,
+            isNull(card.visualKind),
+          ),
+          and(
+            inArray(card.status, ["draft", "active"]),
+            eq(card.visualKind, "ascii"),
+            sql`(${card.genMeta} ->> 'artStyle') is distinct from ${String(ART_STYLE)}`,
+          ),
+        ),
       ),
     )
-    .orderBy(asc(card.createdAt));
+    .orderBy(sql`${card.visualKind} nulls first`, asc(card.createdAt));
 }
 
 export function listArtRequestsTool(deps: AgentDeps): HarnessTool {
@@ -89,13 +169,20 @@ export function listArtRequestsTool(deps: AgentDeps): HarnessTool {
     kind: "read",
     async execute(_params, context) {
       const waiting = await waitingForArt(context.db, topicOfDesigner(context));
-      const cards = waiting.map((one) => ({
+      // A batch at a time: every waiting card's body at once was more than the next batch needs.
+      const cards = waiting.slice(0, ART_BATCH).map((one) => ({
         ...one.card,
         meta: metaOf(one.card),
         subtopicTitle: one.subtopicTitle,
+        redraw: one.card.visualKind !== null,
       }));
+      const redraws = waiting.filter((one) => one.card.visualKind !== null).length;
       return {
-        value: deps.prompts.render("tool-results/art-requests.njk", { cards }),
+        value: deps.prompts.render("tool-results/art-requests.njk", {
+          cards,
+          total: waiting.length,
+          redraws,
+        }),
         dataSeen: [],
         recordsWritten: [],
       };
@@ -147,7 +234,11 @@ export function renderArtTool(deps: AgentDeps): HarnessTool<typeof ArtParameters
   return {
     name: "render_art",
     label: "Render art on cards",
-    description: deps.prompts.render("tools/render-art.njk", { columns: ART_COLUMNS, batch: ART_BATCH }),
+    description: deps.prompts.render("tools/render-art.njk", {
+      columns: ART_COLUMNS,
+      batch: ART_BATCH,
+      limits: textLimits(),
+    }),
     parameters: ArtParameters,
     kind: "change",
     async execute(params, context) {
@@ -163,7 +254,7 @@ export function renderArtTool(deps: AgentDeps): HarnessTool<typeof ArtParameters
         const waiting = byId.get(piece.card);
         if (!waiting) continue;
         const art = normalizeArt(piece.art);
-        const problems = artProblems(art);
+        const problems = artProblems(art, kindOf(waiting));
         if (problems.length > 0) {
           said.push(`- card ${piece.card}: not rendered; fix every problem: ${problems.join("; ")}`);
           continue;
@@ -250,7 +341,12 @@ export function attachArtTool(deps: AgentDeps): HarnessTool<typeof ArtParameters
           const art = normalizeArt(piece.art);
           await tx
             .update(card)
-            .set({ visualId: render.id, visualKind: "ascii", visualSlots: { art, alt: piece.alt.trim() } })
+            .set({
+              visualId: render.id,
+              visualKind: "ascii",
+              visualSlots: { art, alt: piece.alt.trim() },
+              genMeta: sql`${card.genMeta} || ${JSON.stringify({ artStyle: ART_STYLE })}::jsonb`,
+            })
             .where(eq(card.id, piece.card));
           records.push(
             await createRecord(tx, ArtRecord, {
@@ -273,6 +369,58 @@ export function attachArtTool(deps: AgentDeps): HarnessTool<typeof ArtParameters
       let value = String(stored.value);
       if (live.length > 0) value += `\nThat art completed ${live.join(" and ")}: its cards are live.`;
       return { ...stored, value };
+    },
+  };
+}
+
+/** Pieces a library search shows: enough to choose from, few enough to read. */
+export const LIBRARY_RESULTS = 5;
+
+/** The library's pieces whose title or category holds the most of the query's words, best first. */
+export function searchArtLibrary(query: string): AsciiLibraryEntry[] {
+  // Short words such as "a" or "of" are in nearly every title.
+  const words = (query.toLowerCase().match(/[a-z]+/g) ?? []).filter((word) => word.length > 2);
+  const scored: { entry: AsciiLibraryEntry; score: number }[] = [];
+  for (const entry of loadLibrary().values()) {
+    const about = `${entry.title} ${entry.category} ${entry.subcategory}`.toLowerCase();
+    let score = 0;
+    for (const word of words) {
+      if (about.includes(word)) score += 1;
+    }
+    if (score > 0) scored.push({ entry, score });
+  }
+  scored.sort((first, second) => second.score - first.score);
+  return scored.slice(0, LIBRARY_RESULTS).map((one) => one.entry);
+}
+
+const SearchLibraryParameters = Type.Object(
+  {
+    query: Type.String({
+      minLength: 1,
+      description: "What the piece should show: a figure, an animal, a face, an object",
+    }),
+  },
+  CLOSED,
+);
+
+export function searchArtLibraryTool(deps: AgentDeps): HarnessTool<typeof SearchLibraryParameters> {
+  return {
+    name: "search_art_library",
+    label: "Search the art library",
+    description: deps.prompts.render("tools/search-art-library.njk", {
+      count: loadLibrary().size,
+      results: LIBRARY_RESULTS,
+    }),
+    parameters: SearchLibraryParameters,
+    kind: "read",
+    async execute(params) {
+      const pieces = searchArtLibrary(params.query);
+      const categories = [...new Set([...loadLibrary().values()].map((entry) => entry.category))].sort();
+      return {
+        value: deps.prompts.render("tool-results/art-library.njk", { pieces, categories }),
+        dataSeen: [],
+        recordsWritten: [],
+      };
     },
   };
 }

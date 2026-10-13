@@ -9,7 +9,7 @@ import { webSearchTool } from "../harness/web-search.ts";
 import { recordTo } from "../models/calls.ts";
 import { geminiOpensAt } from "../models/limits.ts";
 import { GEMINI_THINKING, geminiFrom, type ProxyConfig, proxyAnswers } from "../models/proxy.ts";
-import { attachArtTool, listArtRequestsTool, renderArtTool } from "./art.ts";
+import { attachArtTool, listArtRequestsTool, renderArtTool, searchArtLibraryTool } from "./art.ts";
 import type { AgentDeps } from "./context.ts";
 import { listDocumentsTool, readDocumentTool, searchCorpusTool } from "./corpus.ts";
 import {
@@ -238,6 +238,7 @@ function curriculumTools(deps: AgentDeps): HarnessTool[] {
 function designerTools(deps: AgentDeps): HarnessTool[] {
   return [
     listArtRequestsTool(deps),
+    searchArtLibraryTool(deps),
     renderArtTool(deps),
     attachArtTool(deps),
     ...webSearch(deps),

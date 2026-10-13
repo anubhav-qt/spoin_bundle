@@ -7,9 +7,16 @@ Summary: {{ c.summary }}
 Body:
 {{ c.body }}
 </card>
+{% if c.redraw %}
+Redraw: its art is the old style; draw it new.
+{% endif %}
 Kind: {{ c.meta.art.kind }}
 Show: {{ c.meta.art.show }}
 Ideas: {{ c.meta.art.ideas }}
 {% else %}
 No card is waiting for art.
 {% endfor %}
+{% if total > cards | length %}
+
+These are {{ cards | length }} of the {{ total }} cards waiting{% if redraws > 0 %}, {{ redraws }} of them redraws{% endif %}: list again once you have attached these.
+{% endif %}

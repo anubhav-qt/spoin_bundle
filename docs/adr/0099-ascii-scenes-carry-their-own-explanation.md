@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-05
 - **Deciders:** project owner
+- **Amended by:** [ADR-0109](0109-ascii-art-is-art-first.md) (2026-10-14): text on a scene is labels of 1 to 3 words and a gag's one line, checked in code; the caption carries the explanation.
 
 ## Context
 

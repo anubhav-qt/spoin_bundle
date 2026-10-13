@@ -1,10 +1,10 @@
-import type { StreamFn } from "@spoin/pi-agent";
+import type { AgentMessage, StreamFn } from "@spoin/pi-agent";
 import { contentText, type Message } from "@spoin/pi-ai";
 import { Type } from "typebox";
 import { describe, expect, test } from "vitest";
 import { openTopicChat } from "../src/harness/chats.ts";
 import { createRecord, readRecord } from "../src/harness/records.ts";
-import { type RunChatInput, runChat } from "../src/harness/run-chat.ts";
+import { imagesShownOnce, type RunChatInput, runChat } from "../src/harness/run-chat.ts";
 import { CLOSED, Text, versionedRecord } from "../src/harness/schemas.ts";
 import type { HarnessTool } from "../src/harness/tools.ts";
 import { readActionLog, readTranscript } from "../src/harness/transcript.ts";
@@ -285,5 +285,29 @@ describe("a run", () => {
     expect(run.status).toBe("paused");
     expect(model.requests).toHaveLength(1);
     expect(await readActionLog(db, run.id)).toHaveLength(1);
+  });
+});
+
+describe("screenshots", () => {
+  test("a screenshot is shown to the model once, in the call right after the tool that took it", () => {
+    const image = { type: "image" as const, data: "AAAA", mimeType: "image/png" };
+    const rendered = (id: string) =>
+      ({
+        role: "toolResult",
+        toolCallId: id,
+        toolName: "render_art",
+        content: [{ type: "text", text: `render ${id}` }, image],
+        isError: false,
+        timestamp: 0,
+      }) as unknown as AgentMessage;
+    const assistant = { role: "assistant", content: [] } as unknown as AgentMessage;
+    const shown = imagesShownOnce([assistant, rendered("first"), assistant, rendered("second")]);
+    const images = shown.map((message) => {
+      if (message.role !== "toolResult") return 0;
+      return message.content.filter((block) => block.type === "image").length;
+    });
+    expect(images).toEqual([0, 0, 0, 1]);
+    expect(JSON.stringify(shown[1])).toContain("render first");
+    expect(JSON.stringify(shown[1])).toContain("shown to you once");
   });
 });

@@ -1,0 +1,10 @@
+{% for p in pieces %}
+
+<piece id="{{ p.id }}" title="{{ p.title }}">
+```
+{{ p.art }}
+```
+</piece>
+{% else %}
+Nothing in the library matches those words. Its pieces are of: {{ categories | join(", ") }}.
+{% endfor %}

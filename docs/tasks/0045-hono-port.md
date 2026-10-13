@@ -769,11 +769,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 - **Only the big writes go to NIM** (2026-10-13), the owner's rule: "only big calls are to be
-  run with nim models". Every chat runs on Gemini, the writers' included. `write_document`,
-  `write_curriculum`, `write_cards` and `write_questions` take only instructions and hand NIM the
-  writer's whole chat with the real tool, so one call writes a whole document, curriculum, tier's
-  cards or tier's quiz, at most one tier (`agents/nim-writes.ts`). Every try NIM writes is kept in
-  the result, refused or not, and a refused try goes back to it with its faults, up to three. A
+  run with nim models". Every chat runs on Gemini, the writers' included. A writer calls
+  `write_on_nim` for a big write, and NIM writes a whole document, tier's cards or tier's quiz in
+  one call, at most one tier (`agents/nim-writes.ts`, ADR-0108); a curriculum is Gemini's alone,
+  the owner's call. What NIM writes is kept in the result, refused or not. A
   manual call for 25 cards from 27 passages took 518 seconds (first token at 294, 11k tokens in,
   7,324 out); one for 15 cards took 1,698 seconds and one for 30 questions 1,489, each after two
   tries cut off by Node's fetch at 301 seconds waiting for headers (first tokens at 271 and 284

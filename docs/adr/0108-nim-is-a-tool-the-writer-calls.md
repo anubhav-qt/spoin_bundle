@@ -39,8 +39,7 @@ again with what to change.
 - NIM's answer streams token by token, so the stall timer measures real silence again.
 - The split between big and small writes is the writer's judgement, stated in its prompt, not a
   rule in code.
-- A curriculum refused for one problem is still sent whole by whoever fixes it: `write_curriculum`
-  has no partial updates.
+- The curriculum writer has no `write_on_nim`: the owner keeps curricula on Gemini alone.
 - NIM writes JSON in text, so a malformed object is refused at parse time and returned to the
   writer, not retried in the tool.
 

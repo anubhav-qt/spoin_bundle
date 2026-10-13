@@ -141,7 +141,8 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
       readDocumentTool(deps),
       searchCorpusTool(deps),
       readCurriculumTool(deps),
-      ...writing(deps, [writeCurriculumTool(deps)]),
+      // The owner's call: a curriculum is Gemini's to write, never NIM's.
+      writeCurriculumTool(deps),
       report,
     ];
   }

@@ -151,7 +151,7 @@ The topic's photographs are visual_toad's, sourced after the curriculum (below).
 
 ## The curriculum chat
 
-One chat for every topic, the orchestrator, running a NIM writer helper per topic. A topic's
+One chat for every topic, the orchestrator, running a Gemini writer helper per topic. A topic's
 curriculum starts once its corpus is ingested and follows
 `docs/handoff/antigravity-curriculum-authoring.md`. It goes to toad_sage as one checked file;
 after go-on it only grows, and only when the topic's frog asks.
@@ -161,12 +161,12 @@ after go-on it only grows, and only when the topic's frog asks.
 | Tool | Does |
 |---|---|
 | `list_waiting()` | Oldest first: topics whose corpus is ingested but have no curriculum, and frogs' requests for additions |
-| `start_writer(topic, brief)` | A NIM writer helper for one topic's curriculum or addition |
+| `start_writer(topic, brief)` | A writer helper for one topic's curriculum or addition |
 | `read_curriculum(topic)` | A topic's curriculum, its versions, toad_sage's notes on each, and each tier's card counts |
 | `send_back(record, notes)` | After the quick review, wakes the writer with what to change |
 | `hand_over("curriculum", record, reasoning)` | To toad_sage, with a paragraph of reasoning per major decision. On go-on, code writes the file, ingests it, projects it onto the subtopics, and wakes the topic's tadpole (or frog) so visual_toad's sourcing starts |
 
-### A topic's curriculum writer (NIM)
+### A topic's curriculum writer (Gemini)
 
 | Tool | Does |
 |---|---|
@@ -240,8 +240,8 @@ as JSON text, and code stores them through the real tool, whose checks decide wh
 result shows what NIM wrote and what was stored or refused; the writer fixes a refusal, or
 writes a few cards, with the real tool itself, since NIM takes some five minutes to start any
 answer. The balancer retries a call across NIM's ladder and Gemini takes one NIM gives up on;
-an unusable answer goes back to the writer. The document and curriculum writers write the
-same way.
+an unusable answer goes back to the writer. The document writer writes the same way; the
+curriculum writer writes on Gemini alone (the owner's call).
 
 | Tool | Does |
 |---|---|

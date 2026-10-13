@@ -78,7 +78,10 @@ const IntakeFields = {
   }),
   category: Type.String({ minLength: 1, maxLength: 120, description: "The field it belongs to" }),
   sub_category: Type.Optional(Type.String({ minLength: 1, maxLength: 120 })),
-  card_count: Type.Integer({ minimum: 1, description: "How many cards the topic gets in all" }),
+  card_count: Type.Integer({
+    minimum: 1,
+    description: "How many cards the topic gets in all: 125 to 750, and a topic scope the most",
+  }),
   brief: Type.String({
     minLength: 1,
     description: "What the topic should cover and leave out, for the chats that write it",

@@ -757,6 +757,13 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   for a stop before each chat it wakes, and the browser ignores the signals: the worker's own
   exit closes it. Two correctors' inserts also timed out connecting to the database during that
   stop; their wakes wait to be tried again, and the cause is not yet known.
+- **The card range reaches the prompts** (2026-10-13). The owner's 125 to 750 cards per topic
+  (above) was never written into toad_sage's instructions, so the first live run planned System
+  Design at 30 cards, and the curriculum writer, allowed tiers "as each subtopic needs", taught
+  each of its 3 subtopics at a single tier. Now toad_sage, the intake's `card_count`, the
+  curriculum writer and the curriculum chat's review all say it: 125 to 750 cards whatever the
+  scope, a topic scope the most, with every subtopic at all three tiers. The tadpole sizes the
+  corpus to the card count. Still an instruction, never a check in code.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

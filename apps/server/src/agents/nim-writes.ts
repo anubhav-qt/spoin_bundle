@@ -22,7 +22,8 @@ import type { Prompts } from "../prompts.ts";
  * its questions) is one NIM call. The writer calls the tool with what to write now, and the tool
  * hands NIM the writer's whole chat with the real tool, whose own checks store what NIM writes. A
  * call NIM gives up on goes to Gemini, so a bad day on NIM slows a topic rather than stopping it.
- * A try after a refused one is a fix, a small write, so Gemini takes it.
+ * Only a writer's first call of a tool is its big write: a try after a refused one, and a later
+ * call that adds to, fixes or drops from what it wrote, are small writes, so Gemini takes them.
  */
 
 /** How a tool calls NIM: its ladder for a run, with Gemini behind it, and Gemini for the fixes. */
@@ -75,6 +76,9 @@ export function writtenOnNim(
       const messages: Message[] = [];
       if (asked === -1) messages.push(...history);
       else messages.push(...history.slice(0, asked));
+      // A writer's second call, such as one dropping five sections, waited five minutes on NIM to
+      // write 359 tokens in the first Rust run.
+      const followUp = calledBefore(messages, tool.name);
       messages.push({
         role: "user",
         content: prompts.render("lines/nim-write.njk", {
@@ -94,7 +98,7 @@ export function writtenOnNim(
       const tries: string[] = [];
       for (let attempt = 1; attempt <= TRIES; attempt++) {
         let writer = fix;
-        if (attempt === 1) writer = big;
+        if (attempt === 1 && !followUp) writer = big;
         const answer: AssistantMessage = await (
           await writer.stream(
             writer.model,
@@ -141,6 +145,17 @@ export function writtenOnNim(
       );
     },
   };
+}
+
+/** Whether the chat called this tool before: its big write is done, and this one adds to or fixes it. */
+function calledBefore(messages: Message[], name: string): boolean {
+  for (const message of messages) {
+    if (message.role !== "assistant") continue;
+    for (const block of message.content) {
+      if (block.type === "toolCall" && block.name === name) return true;
+    }
+  }
+  return false;
 }
 
 function triesSoFar(tries: string[]): string {

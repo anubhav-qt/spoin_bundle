@@ -238,7 +238,9 @@ and the real tool, so NIM writes a whole tier's cards, or its whole quiz, in one
 tier (the owner's cap). The real tool's checks store what passes; every try is kept in the
 result, and a refused try goes back with its faults, up to three tries. Only the first is NIM's:
 a fix is a small write, and NIM takes some five minutes to start any answer (the first Rust
-run's fixes waited that long for 1,445 and 919 tokens), so Gemini takes the other two. A call
+run's fixes waited that long for 1,445 and 919 tokens), so Gemini takes the other two. A
+writer's later call of the same tool, adding to, fixing or dropping from its big write, is all
+Gemini's too. A call
 NIM gives up on goes to Gemini. The document and curriculum writers write the same way.
 
 | Tool | Does |

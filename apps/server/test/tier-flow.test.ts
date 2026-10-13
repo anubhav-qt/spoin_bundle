@@ -21,6 +21,7 @@ import { card, harnessRecord, question, subtopic, topic } from "../src/db/schema
 import { type Chat, endRun, openTopicChat, startRun } from "../src/harness/chats.ts";
 import { CLOSED } from "../src/harness/schemas.ts";
 import { type HarnessTool, ToolError, type ToolOutput } from "../src/harness/tools.ts";
+import { appendMessage } from "../src/harness/transcript.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import { deps } from "./helpers.ts";
 import { reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
@@ -305,6 +306,46 @@ describe("a write on NIM", () => {
     expect(nim.requests).toHaveLength(1);
     expect(JSON.stringify(nim.requests[0]?.at(-1))).toContain("one call to write_numbers");
     expect(JSON.stringify(gemini.requests[1]?.at(-1))).toContain("Two is taken.");
+  });
+
+  test("a writer's later call of the tool is a small write, all on Gemini", async () => {
+    const { nim, gemini, writer } = onNimThenGemini([], [toolCall(3)]);
+    const tool = writtenOnNim(prompts, writer, inner);
+    const chat = await writerChat();
+    const run = await startRun(db, {
+      chatId: chat.id,
+      model: TEST_MODEL.id,
+      triggers: [MORNING],
+      systemPrompt: "",
+    });
+    const earlier = {
+      type: "toolCall" as const,
+      id: randomUUID(),
+      name: "write_numbers",
+      arguments: { instructions: "One." },
+    };
+    await appendMessage(db, run, { ...reply([earlier], "toolUse"), timestamp: Date.now() });
+    await appendMessage(db, run, {
+      role: "toolResult",
+      toolCallId: earlier.id,
+      toolName: "write_numbers",
+      content: [{ type: "text", text: "Stored 1." }],
+      isError: false,
+      timestamp: Date.now(),
+    });
+    const now = {
+      type: "toolCall" as const,
+      id: randomUUID(),
+      name: "write_numbers",
+      arguments: { instructions: "Three." },
+    };
+    await appendMessage(db, run, { ...reply([now], "toolUse"), timestamp: Date.now() });
+    await endRun(db, run.id, { status: "done" });
+
+    const output = await call(tool as unknown as HarnessTool, chat, { instructions: "Three." });
+    expect(String(output.value)).toContain('Try 1, as Gemini wrote it:\n{"n":3}');
+    expect(nim.requests).toHaveLength(0);
+    expect(gemini.requests).toHaveLength(1);
   });
 
   test("three refused tries come back to the writer with every one of them", async () => {

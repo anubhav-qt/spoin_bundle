@@ -702,8 +702,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   ones, rather than refusing the batch. `write_document` keeps a refused call's sections as the
   writer's try (`<file>.try.json` beside the document) and takes only the sections that change
   next time, with `drop` to remove one. A worker stop drains: each running chat finishes the
-  step in flight, stores it and ends `stopped` before its next model call, with up to 4 minutes
-  before the worker aborts what's left; compose gives the worker 5 minutes to stop.
+  step in flight, stores it and ends `stopped` before its next model call, with up to 31 minutes
+  before the worker aborts what's left; compose gives the worker 32 minutes to stop. It was 4
+  minutes until 2026-10-14, set when every call was a short Gemini one: a NIM write runs up to
+  its 30-minute patience, and a deploy then cut the 19 in flight.
 - **An empty Gemini answer is asked again** (2026-10-13), up to three times, since a writer whose
   last answer came back empty ended its run done with nothing written and no report.
 - **A helper never leaves its main chat waiting** (2026-10-13). The first live run's

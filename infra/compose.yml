@@ -85,9 +85,10 @@ services:
   worker:
     build: { context: .., dockerfile: apps/server/Dockerfile, target: worker }
     restart: unless-stopped
-    # A stop lets each chat finish the step it is in, up to 4 minutes (worker.ts), so model output
-    # already paid for is stored rather than cut off; Docker's default 10 s would kill it first.
-    stop_grace_period: 5m
+    # A stop lets each chat finish the step it is in, up to 31 minutes (worker.ts), so model output
+    # already paid for, a NIM write's included, is stored rather than cut off; Docker's default
+    # 10 s would kill it first.
+    stop_grace_period: 32m
     environment:
       <<: *server-env
       # The writers run on NIM, Gemini only taking a call NIM gave up on: no key, no worker (worker.ts checks it too).

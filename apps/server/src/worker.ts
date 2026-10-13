@@ -24,15 +24,16 @@ import { loadPrompts } from "./prompts.ts";
  * runs and puts those wakes back before it starts.
  */
 
-/**
- * How long a stop waits for the chats running to finish the step they are in, so no model output
- * already paid for is lost. A chat still running past it is waiting out Gemini's limits, with
- * nothing in flight, and is cut off. The worker's compose `stop_grace_period` is longer.
- */
-const DRAIN_MS = 4 * 60_000;
-
 /** How long a big write goes without an answer from NIM before Gemini takes it: a bad day on NIM. */
 const NIM_PATIENCE_S = 30 * 60;
+
+/**
+ * How long a stop waits for the chats running to finish the step they are in, so no model output
+ * already paid for is lost: a NIM write's whole patience and a minute more, since a write runs up
+ * to it (4 minutes cut 19 writes in flight). A chat still running past it is waiting out Gemini's
+ * limits, with nothing in flight, and is cut off. The worker's compose `stop_grace_period` is longer.
+ */
+const DRAIN_MS = (NIM_PATIENCE_S + 60) * 1000;
 
 const env = loadEnv();
 const proxy = proxyConfig(env);

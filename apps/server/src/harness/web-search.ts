@@ -21,6 +21,12 @@ import { type HarnessTool, ToolError } from "./tools.ts";
 /** The tag the answer is wrapped in: web content, which no one in spoin wrote. */
 const TAG = "search_results";
 
+/**
+ * Tries per search. A failed one is made again at once, without waiting out a rate limit: the
+ * proxy hands each call to the next account, and a first try can fail for reasons a second won't.
+ */
+const TRIES = 2;
+
 export interface WebSearchConfig {
   proxy: ProxyConfig;
   model: () => Promise<Model<Api>>;
@@ -78,26 +84,30 @@ export function webSearchTool(
     parameters: WebSearchParameters,
     kind: "read",
     async execute(params, context) {
-      const found = await searchWithGemini(config, prompts, params.query, {
-        db: context.db,
-        runId: context.run.id,
-        signal: context.signal,
-        fetchFn: config.fetchFn ?? fetch,
-      });
-      if (found.failed !== undefined) {
-        throw new ToolError(
-          `Web search failed (${found.failed}). Carry on without it, or search again later.`,
-        );
+      const failures: string[] = [];
+      for (let tries = 1; tries <= TRIES; tries++) {
+        const found = await searchWithGemini(config, prompts, params.query, {
+          db: context.db,
+          runId: context.run.id,
+          signal: context.signal,
+          fetchFn: config.fetchFn ?? fetch,
+        });
+        if (found.failed === undefined) {
+          return {
+            value: prompts.render("tool-results/web-search.njk", {
+              query: params.query,
+              answer: found.answer,
+              sources: found.sources,
+            }),
+            dataSeen: [],
+            recordsWritten: [],
+          };
+        }
+        failures.push(found.failed);
       }
-      return {
-        value: prompts.render("tool-results/web-search.njk", {
-          query: params.query,
-          answer: found.answer,
-          sources: found.sources,
-        }),
-        dataSeen: [],
-        recordsWritten: [],
-      };
+      throw new ToolError(
+        `Web search failed on both tries (${failures.join("; ")}). Search again, in other words if the query may be at fault, or carry on without it.`,
+      );
     },
   };
 }

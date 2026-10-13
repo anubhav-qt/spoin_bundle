@@ -645,8 +645,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   `googleSearch` as its only tool (a call of its own, as `googleSearch` can't share a request with
   function tools), recorded in `model_call` like every Gemini call and drawing on the same
   accounts as the agents. The agent gets Gemini's account of the results and its sources, each
-  grounding redirect read for the page it leads to. A failed call is a tool error, with no retry:
-  the agent can search again. In `apps/server/src/harness/web-search.ts`.
+  grounding redirect read for the page it leads to. A failed call is made again at once, without
+  waiting out a rate limit (the proxy hands it to the next account); when that fails too, the
+  tool error tells the agent to search again, in other words if the query may be at fault. In
+  `apps/server/src/harness/web-search.ts`.
 
 ## Asked when we get there
 

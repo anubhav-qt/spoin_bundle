@@ -99,14 +99,33 @@ describe("searching the web with Gemini's Google Search", () => {
     ]);
   });
 
-  test("a failed call is a tool error, recorded like every Gemini call", async () => {
+  test("a failed try is made again at once, each try recorded", async () => {
+    const model = geminiModel();
+    let tries = 0;
+    const { fetchFn } = answering(() => {
+      tries++;
+      if (tries === 1) return json({ error: "overloaded" }, 503);
+      return json({ candidates: [{ content: { parts: [{ text: "Rust is a language." }] } }] });
+    });
+
+    const output = text(await call(webSearchTool(prompts, configFor(model, fetchFn)), { query: "rust" }));
+
+    expect(output).toContain("Rust is a language.\n\nSources:\nnone given\n</search_results>");
+    const failures = (await callsOf(model)).map((row) => row.failure);
+    expect(failures).toHaveLength(2);
+    expect(failures).toContain("busy");
+    expect(failures).toContain(null);
+  });
+
+  test("two failed tries are a tool error", async () => {
     const model = geminiModel();
     const { fetchFn } = answering(() => json({ error: "too many requests" }, 429));
 
     await expect(call(webSearchTool(prompts, configFor(model, fetchFn)), { query: "rust" })).rejects.toThrow(
-      "Web search failed (the proxy answered 429). Carry on without it, or search again later.",
+      "Web search failed on both tries (the proxy answered 429; the proxy answered 429). Search again, in other words if the query may be at fault, or carry on without it.",
     );
     expect(await callsOf(model)).toMatchObject([
+      { ok: false, failure: "rate", reason: "the proxy answered 429" },
       { ok: false, failure: "rate", reason: "the proxy answered 429" },
     ]);
   });

@@ -1,11 +1,10 @@
 import type { HelperTask } from "@spoin/shared/enums";
-import { and, desc, eq, sql } from "drizzle-orm";
 import { Type } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
-import { harnessRecord } from "../db/schema.ts";
 import { type Chat, newHelperChat } from "../harness/chats.ts";
+import { briefOf } from "../harness/helper-reports.ts";
 import { recordsStored } from "../harness/outputs.ts";
-import { createRecord, readLatestRecord } from "../harness/records.ts";
+import { createRecord } from "../harness/records.ts";
 import { type Author, BriefRecord, CLOSED, ReportRecord } from "../harness/schemas.ts";
 import { type HarnessTool, ToolError } from "../harness/tools.ts";
 import type { Prompts } from "../prompts.ts";
@@ -46,24 +45,6 @@ export async function startHelper(
     },
   });
   return { chat, brief };
-}
-
-/** The brief a helper is working on: the latest one written for it. */
-export async function briefOf(db: Conn, helper: Chat): Promise<BriefRecord | undefined> {
-  const [found] = await db
-    .select({ id: harnessRecord.id })
-    .from(harnessRecord)
-    .where(
-      and(
-        eq(harnessRecord.kind, "brief"),
-        eq(harnessRecord.version, 1),
-        sql`${harnessRecord.body} ->> 'helper' = ${helper.id}`,
-      ),
-    )
-    .orderBy(desc(harnessRecord.seq))
-    .limit(1);
-  if (!found) return undefined;
-  return readLatestRecord(db, BriefRecord, "brief", found.id);
 }
 
 const StartHelperParameters = Type.Object(

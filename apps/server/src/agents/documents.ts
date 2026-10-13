@@ -7,6 +7,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { type Static, Type } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
 import { harnessRecord, type topic } from "../db/schema.ts";
+import { briefOf } from "../harness/helper-reports.ts";
 import { topicById } from "../harness/intake.ts";
 import { recordsStored } from "../harness/outputs.ts";
 import { changeRecord, createRecord, readLatestRecord, refOf } from "../harness/records.ts";
@@ -26,7 +27,7 @@ import {
 import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
 import { corpusFile, corpusPaths, topicDir } from "./corpus.ts";
-import { briefOf, startHelper } from "./helpers.ts";
+import { startHelper } from "./helpers.ts";
 
 /*
  * A topic's corpus documents (harness-tools.md, task 0045): written one per writer helper on NIM,

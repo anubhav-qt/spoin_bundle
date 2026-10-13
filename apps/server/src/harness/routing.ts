@@ -6,6 +6,7 @@ import { type Chat, openChat, openChatAt, openTopicChat, readChat } from "./chat
 import { readAnyRecord, readRecord, refOf } from "./records.ts";
 import {
   type AnyRecord,
+  BriefRecord,
   HandoverRecord,
   isRecordKind,
   QuestionRecord,
@@ -123,7 +124,7 @@ async function readersOf(tx: Tx, record: AnyRecord): Promise<Chat[]> {
   if (record.kind === "question") readers.push(await openChatAt(tx, record.body.to));
   if (record.kind === "answer") readers.push(...(await askerOf(tx, record.body.question)));
   if (record.kind === "brief") readers.push(await readChat(tx, record.body.helper));
-  if (record.kind === "report") readers.push(...(await mainChatOf(tx, record.author)));
+  if (record.kind === "report") readers.push(...(await mainChatOf(tx, record.body.brief)));
   if (record.kind === "handover") readers.push(await openChat(tx, "toad_sage"));
   if (record.kind === "review") readers.push(...(await reviewReaders(tx, record)));
   if (record.kind === "gate") readers.push(await readChat(tx, record.body.to));
@@ -134,10 +135,10 @@ async function readersOf(tx: Tx, record: AnyRecord): Promise<Chat[]> {
   return [...new Map(readers.map((chat) => [chat.id, chat])).values()];
 }
 
-/** A helper's main chat, which started it. */
-async function mainChatOf(tx: Tx, author: AnyRecord["author"]): Promise<Chat[]> {
-  if (author.kind !== "chat") return [];
-  const helper = await readChat(tx, author.chatId);
+/** The main chat of the helper a brief was for. By the brief, not the author, so a report code writes for a helper wakes it too. */
+async function mainChatOf(tx: Tx, briefRef: RecordRef): Promise<Chat[]> {
+  const brief = await readRecord(tx, BriefRecord, briefRef);
+  const helper = await readChat(tx, brief.body.helper);
   if (!helper.parentId) return [];
   return [await readChat(tx, helper.parentId)];
 }

@@ -5,9 +5,11 @@ import type { WakeStatus } from "@spoin/shared/enums";
 import { eq, inArray } from "drizzle-orm";
 import { Type } from "typebox";
 import { beforeEach, describe, expect, test } from "vitest";
+import { startHelper } from "../src/agents/helpers.ts";
 import { generationJob, topic, userTopic, wake as wakeTable } from "../src/db/schema.ts";
 import { type Chat, listRuns, openChat, openTopicChat } from "../src/harness/chats.ts";
-import { changeRecord, createRecord, refOf } from "../src/harness/records.ts";
+import { RUNS_TO_REPORT } from "../src/harness/helper-reports.ts";
+import { changeRecord, createRecord, readRecord, refOf } from "../src/harness/records.ts";
 import { routeNewJobs, routeNewRecords } from "../src/harness/routing.ts";
 import {
   createScheduler,
@@ -23,6 +25,7 @@ import {
   CLOSED,
   CompactionSummaryRecord,
   QuestionRecord,
+  ReportRecord,
   Text,
   versionedRecord,
   type WakeTrigger,
@@ -443,5 +446,90 @@ describe("queued names", () => {
     expect(lastText(requests[0])).toContain(
       `Job ${cancelled.job.id} is gone from the queue: it was cancelled or merged`,
     );
+  });
+});
+
+describe("a helper that stalls before reporting", () => {
+  test("is woken again on its brief, and after its last run code reports for it, waking its main chat", async () => {
+    const tadpole = await newTadpole();
+    const { chat: writer } = await startHelper(db, tadpole, chatAuthor(tadpole), {
+      task: "document_writer",
+      brief: "Write tips-and-tricks.md.",
+    });
+    const silent = Array.from({ length: RUNS_TO_REPORT }, () => text(""));
+    const { scheduler, events, requests } = schedulerFor([...silent, text("I'll write it myself.")]);
+
+    for (let run = 0; run <= RUNS_TO_REPORT; run++) {
+      await scheduler.tick();
+      await scheduler.idle();
+    }
+
+    expect(woke(events)).toEqual([writer.id, writer.id, writer.id, tadpole.id]);
+    expect(lastText(requests[1])).toContain("Write tips-and-tricks.md.");
+    const opening = lastText(requests[RUNS_TO_REPORT]);
+    expect(opening).toContain("From code (scheduler)");
+    expect(opening).toContain(`This helper ended ${RUNS_TO_REPORT} times without reporting`);
+  });
+
+  test("is reported for at once when its wake is given up", async () => {
+    const tadpole = await newTadpole();
+    const { chat: writer } = await startHelper(db, tadpole, chatAuthor(tadpole), {
+      task: "curriculum_writer",
+      brief: "Write the curriculum.",
+    });
+    const { scheduler, clock, events } = schedulerFor([]);
+
+    for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+      await scheduler.tick();
+      await scheduler.idle();
+      clock.now = minutesAfter(clock.now, RETRY_AFTER_MS / 60_000 + 1);
+    }
+    await scheduler.tick();
+    await scheduler.idle();
+
+    expect(woke(events)).toEqual([writer.id, writer.id, writer.id, tadpole.id]);
+    const trigger = (await listRuns(db, tadpole.id)).at(-1)?.triggers[0];
+    if (trigger?.kind !== "record") throw new Error("The tadpole wasn't woken by a record.");
+    const report = await readRecord(db, ReportRecord, trigger.record);
+    expect(report.author).toEqual({ kind: "code", component: "scheduler" });
+  });
+
+  test("never wakes a tier writer that ended its turn: it waits for its verdicts", async () => {
+    const tadpole = await newTadpole();
+    const { chat: writer } = await startHelper(db, tadpole, chatAuthor(tadpole), {
+      task: "tier_writer",
+      brief: "Write the beginner tier.",
+    });
+    const { scheduler, events } = schedulerFor([text("Gated: waiting for the verdicts.")]);
+
+    for (let tick = 0; tick < 2; tick++) {
+      await scheduler.tick();
+      await scheduler.idle();
+    }
+
+    expect(woke(events)).toEqual([writer.id]);
+  });
+
+  test("leaves a helper that reported alone", async () => {
+    const tadpole = await newTadpole();
+    const { chat: writer, brief } = await startHelper(db, tadpole, chatAuthor(tadpole), {
+      task: "helper",
+      brief: "Read three sources.",
+    });
+    const { scheduler, events } = schedulerFor([text("Read them."), text("Noted.")]);
+    await scheduler.tick();
+    await scheduler.idle();
+    await createRecord(db, ReportRecord, {
+      kind: "report",
+      author: chatAuthor(writer),
+      body: { brief: refOf(brief), summary: "Read them." },
+    });
+
+    for (let tick = 0; tick < 2; tick++) {
+      await scheduler.tick();
+      await scheduler.idle();
+    }
+
+    expect(woke(events)).toEqual([writer.id, tadpole.id]);
   });
 });

@@ -9,13 +9,14 @@ import { classifyArchetype } from "../cards/archetype.ts";
 import type { Db, Tx } from "../db/client.ts";
 import { card, generationJob, harnessRecord, question, rejectedCard, subtopic } from "../db/schema.ts";
 import { type Chat, readChat } from "../harness/chats.ts";
+import { briefOf } from "../harness/helper-reports.ts";
 import { latestJob } from "../harness/intake.ts";
 import { recordsStored } from "../harness/outputs.ts";
 import { changeRecord, createRecord, readLatestRecord, refOf } from "../harness/records.ts";
 import { CARD_TYPES, CardPlanRecord, CLOSED, GateRecord, Id, Text } from "../harness/schemas.ts";
 import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
-import { briefOf, startHelper } from "./helpers.ts";
+import { startHelper } from "./helpers.ts";
 
 /*
  * A topic's cards and questions (harness-tools.md, task 0045), after its curriculum is projected:

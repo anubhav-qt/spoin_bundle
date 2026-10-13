@@ -97,7 +97,7 @@ curriculum proposal, every "insufficient evidence" and the closing report.
 | Tool | Does |
 |---|---|
 | `start_helper(task, brief)` | A short-lived helper for one task, with every tool above but this one |
-| `report(summary)` | The helper's last call: the record its main chat reads |
+| `report(summary)` | The helper's last call: the record its main chat reads. A helper that works alone (a plain helper, a document or curriculum writer) and ends a run without it is woken again on its brief; after three runs, or a given-up wake, code reports for it, so the main chat never waits for good |
 
 ## A topic's tadpole: research, corpus, report
 

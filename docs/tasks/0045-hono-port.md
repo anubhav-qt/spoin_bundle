@@ -705,6 +705,14 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   before the worker aborts what's left; compose gives the worker 5 minutes to stop.
 - **An empty Gemini answer is asked again** (2026-10-13), up to three times, since a writer whose
   last answer came back empty ended its run done with nothing written and no report.
+- **A helper never leaves its main chat waiting** (2026-10-13). The first live run's
+  `tips-and-tricks.md` writer ended with an empty answer and no report, and its tadpole waited
+  for it with nothing left to wake either. Each scheduler tick now wakes a plain helper, document
+  writer or curriculum writer that has run, has nothing waiting and hasn't reported, on its brief
+  again, where it carries on from its transcript; after three runs, or once its wake is given up,
+  code writes its report (`harness/helper-reports.ts`). A report now reaches the main chat
+  through its brief rather than its author, so code's report wakes it too. A tier writer is left
+  alone, since it ends turns waiting for its verdicts.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

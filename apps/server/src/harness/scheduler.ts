@@ -5,6 +5,7 @@ import type { Db } from "../db/client.ts";
 import type { Prompts } from "../prompts.ts";
 import { type Chat, type Run, readChat } from "./chats.ts";
 import type { CompactionSettings } from "./compaction.ts";
+import { settleStalledHelpers } from "./helper-reports.ts";
 import { routeNewJobs, routeNewRecords, startTadpoles } from "./routing.ts";
 import type { HarnessTool } from "./tools.ts";
 import { wakeChat } from "./wake-chat.ts";
@@ -19,10 +20,10 @@ import {
 } from "./wakes.ts";
 
 /**
- * The scheduler (Trotter's `scheduler.ts`, ADR 0027): it routes each new record to the chats it's
- * for and each newly queued topic name to toad_sage, starts the tadpoles of the next topics taken
- * in, and wakes each chat once with every wake due for it. Every chat with a wake due runs at once,
- * with no limit (task 0045).
+ * The scheduler (Trotter's `scheduler.ts`, ADR 0027): it wakes again each helper that stalled
+ * before reporting, routes each new record to the chats it's for and each newly queued topic name
+ * to toad_sage, starts the tadpoles of the next topics taken in, and wakes each chat once with every
+ * wake due for it. Every chat with a wake due runs at once, with no limit (task 0045).
  */
 
 /** How often it looks for what's due, besides whenever a chat finishes. */
@@ -121,6 +122,7 @@ async function tick(input: SchedulerInput, running: Map<string, Promise<void>>):
   if (stopping(input)) return;
   const now = nowOf(input);
   try {
+    await settleStalledHelpers(input.db, now);
     await routeNewRecords(input.db, now);
     await routeNewJobs(input.db, now);
     await startTadpoles(input.db, now);

@@ -9,6 +9,7 @@ import { Type } from "typebox";
 import { projectCurricula } from "../curriculum/projection.ts";
 import type { Db, Tx } from "../db/client.ts";
 import { card, harnessRecord, subtopic, type topic } from "../db/schema.ts";
+import { briefOf } from "../harness/helper-reports.ts";
 import { intakeOf, topicById } from "../harness/intake.ts";
 import { recordsStored } from "../harness/outputs.ts";
 import {
@@ -31,7 +32,7 @@ import {
 import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.ts";
 import { viewsOf } from "../harness/views.ts";
 import type { AgentDeps } from "./context.ts";
-import { briefOf, startHelper } from "./helpers.ts";
+import { startHelper } from "./helpers.ts";
 
 /*
  * The curriculum chat and its writers (harness-tools.md, task 0045): a topic's curriculum starts

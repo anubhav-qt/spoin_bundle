@@ -134,7 +134,7 @@ export const SummarySections = Type.Object(
     soFar: Text,
     learnings: Type.Array(Text),
     feedback: Type.Array(Text, {
-      description: "ero_sennin's findings, toad_sage's reviews and wise_toad's lessons it received",
+      description: "The auditors' findings and toad_sage's reviews it received",
     }),
     dos: Type.Array(Text),
     donts: Type.Array(Text),

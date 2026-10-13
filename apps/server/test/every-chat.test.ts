@@ -12,6 +12,7 @@ import {
   openTopicChat,
   startRun,
 } from "../src/harness/chats.ts";
+import { checkValue } from "../src/harness/check.ts";
 import { everyChatTools } from "../src/harness/every-chat.ts";
 import { indiaTime } from "../src/harness/india-time.ts";
 import { openingMessageFor } from "../src/harness/instructions.ts";
@@ -201,6 +202,18 @@ describe("ask and answer", () => {
     await expect(ask({ to: "toad_sage", topic: tadpole.topicId ?? "", ...words })).rejects.toThrow(
       /one toad_sage for every topic/,
     );
+  });
+
+  test("a chat asks only the chats that run, since another would never answer", () => {
+    const parameters = askTool(prompts).parameters;
+    const words = { question: "Which sources?", reasoning: "To start." };
+
+    for (const to of ["ero_sennin", "wise_toad", "visual_toad"]) {
+      expect(() => checkValue(parameters, { to, ...words }, "The call to ask")).toThrow(
+        'must be one of "toad_sage", "curriculum", "tadpole", "designer_toad"',
+      );
+    }
+    expect(checkValue(parameters, { to: "curriculum", ...words }, "The call to ask").to).toBe("curriculum");
   });
 
   test("only the chat asked answers, and only a question", async () => {

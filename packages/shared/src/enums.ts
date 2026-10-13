@@ -139,6 +139,11 @@ export type ChatRole = (typeof CHAT_ROLES)[number];
 export const SINGLE_CHAT_ROLES = ["toad_sage", "curriculum", "ero_sennin", "wise_toad"] as const;
 /** The roles with one chat per topic. */
 export const TOPIC_CHAT_ROLES = ["tadpole", "designer_toad", "visual_toad"] as const;
+/**
+ * The main chats the pipeline runs so far (task 0045), the only ones a chat can ask: a question to
+ * ero_sennin, wise_toad or visual_toad would wait for an answer that never comes.
+ */
+export const RUNNING_ROLES = ["toad_sage", "curriculum", "tadpole", "designer_toad"] as const;
 
 /**
  * What a helper was started for (task 0045), which picks its instructions and tools: a main chat's

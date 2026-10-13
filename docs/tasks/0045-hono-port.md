@@ -339,9 +339,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   don'ts, next steps), folding in the earlier one. The summary is one versioned record per chat
   with its cut point (`throughRun`), so an undo restores both; Trotter keeps no runs word for
   word. A run that reaches the limit pauses at a step boundary, and a continuation run carries it
-  on. Only the names change: the feedback is ero_sennin's findings, toad_sage's reviews and
-  wise_toad's lessons, and the numbers left out are card counts, progress and targets, read
-  fresh from the tools. Since 2026-10-13 a chat that waits on others also compacts once its turn
+  on. Only the names change: the feedback is the auditors' findings and toad_sage's reviews
+  (ero_sennin's findings and wise_toad's lessons join them once those chats run), and the
+  numbers left out are card counts, progress and targets, read fresh from the tools. Since 2026-10-13 a chat that waits on others also compacts once its turn
   ends with 100,000 tokens or more (below).
 - **Every step is saved** (2026-10-12): plans, drafts, both gate passes, renders and picks are
   records, so a restarted run never does finished work twice.
@@ -731,6 +731,14 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   it reports, and AskAI is untouched. The 400,000-token limit still pauses a run going on. The
   scheduler judges a wake by its last run that isn't a compaction, so a compaction after a
   finished turn, failed or not, never sends the wakes back to run again.
+- **A chat asks only the chats that run** (2026-10-13). The first live run's toad_sage and
+  curriculum chat listed records of a kind "lesson", which doesn't exist, because the `ask` tool
+  told every main chat that wise_toad keeps the lessons every chat follows; and `ask` took
+  ero_sennin, wise_toad and visual_toad, none of which runs yet, so a question to one would
+  have been given up after three tries and its asker left waiting. `ask` now takes only
+  `RUNNING_ROLES` (`@spoin/shared/enums`): toad_sage, curriculum, tadpole and designer_toad.
+  Its description and the compaction prompt name only them and what they write, and a role
+  joins the list when its chat does.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

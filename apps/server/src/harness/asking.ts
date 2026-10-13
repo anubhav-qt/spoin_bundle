@@ -1,4 +1,4 @@
-import { SINGLE_CHAT_ROLES, TOPIC_CHAT_ROLES } from "@spoin/shared/enums";
+import { RUNNING_ROLES, TOPIC_CHAT_ROLES } from "@spoin/shared/enums";
 import { Type } from "typebox";
 import type { Db } from "../db/client.ts";
 import type { Prompts } from "../prompts.ts";
@@ -14,17 +14,16 @@ import { type HarnessTool, ToolError } from "./tools.ts";
  * know yet answers so, and answers again once it does.
  */
 
-const ASKED_ROLES = [...SINGLE_CHAT_ROLES, ...TOPIC_CHAT_ROLES] as const;
-type AskedRole = (typeof ASKED_ROLES)[number];
-type TopicRole = (typeof TOPIC_CHAT_ROLES)[number];
+type AskedRole = (typeof RUNNING_ROLES)[number];
+type TopicRole = Extract<AskedRole, (typeof TOPIC_CHAT_ROLES)[number]>;
 
 const AskParameters = Type.Object(
   {
-    to: Type.Enum([...ASKED_ROLES]),
+    to: Type.Enum([...RUNNING_ROLES]),
     topic: Type.Optional(
       Type.String({
         format: "uuid",
-        description: "The topic's id, to ask its tadpole, designer_toad or visual_toad",
+        description: "The topic's id, to ask its tadpole or designer_toad",
       }),
     ),
     question: Text,

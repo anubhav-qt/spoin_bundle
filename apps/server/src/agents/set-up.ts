@@ -127,7 +127,7 @@ async function onGemini(
   };
 }
 
-/** How long a writer's call waits for a NIM model before Gemini takes it: a bad day on NIM. */
+/** How long a writer's call goes without an answer from NIM before Gemini takes it: a bad day on NIM. */
 export const NIM_PATIENCE_S = 30 * 60;
 
 function onNim(input: AgentSetUpInput, gemini: () => Promise<ChatSetUp["model"]>): ModelSetUp {

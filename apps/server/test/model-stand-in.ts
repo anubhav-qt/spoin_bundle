@@ -6,7 +6,13 @@ import type { AddressInfo } from "node:net";
  * request is kept for the test to read.
  */
 
-export type Reply = { status: number; body: string; headers?: Record<string, string> };
+export type Reply = {
+  status: number;
+  body: string;
+  headers?: Record<string, string>;
+  /** How long the reply takes to come, as a model queued on a busy day does. */
+  delayMs?: number;
+};
 
 export function modelStandIn() {
   let replies: Reply[] = [];
@@ -27,9 +33,11 @@ export function modelStandIn() {
         });
         request.on("end", () => {
           standIn.requests.push({ url: request.url ?? "", body: JSON.parse(raw) });
-          const reply = replies.shift() ?? { status: 500, body: "no reply set" };
-          response.writeHead(reply.status, { "Content-Type": "text/event-stream", ...reply.headers });
-          response.end(reply.body);
+          const reply: Reply = replies.shift() ?? { status: 500, body: "no reply set" };
+          setTimeout(() => {
+            response.writeHead(reply.status, { "Content-Type": "text/event-stream", ...reply.headers });
+            response.end(reply.body);
+          }, reply.delayMs ?? 0);
         });
       });
       const listening = server;

@@ -404,4 +404,23 @@ describe("NIM, then Gemini", () => {
     expect(message.errorMessage).toMatch(/No answer within 1 s/);
     expect(standIn.requests).toHaveLength(1);
   });
+
+  test("past its patience, the balancer gives up even with a model free", async () => {
+    const ladder: Rung[] = [
+      { model: nimModel("kimi"), maxInFlight: 1, primary: true },
+      { model: nimModel("nemotron"), maxInFlight: 1 },
+    ];
+    // Kimi's try fails after the deadline, and Nemotron is free: it isn't asked.
+    start([{ ...refuse(504, "Gateway Timeout"), delayMs: 300 }, answer()]);
+    const balancer = new Balancer(ladder, "k", () => {}, {
+      waitForTopS: 0,
+      strikesToFall: 1,
+      maxTries: 12,
+      giveUpAfterS: 0.2,
+    });
+    const message = await (await balancer.stream(ask())).result();
+    expect(message.stopReason).toBe("error");
+    expect(message.errorMessage).toMatch(/No answer within 0.2 s/);
+    expect(standIn.requests).toHaveLength(1);
+  });
 });

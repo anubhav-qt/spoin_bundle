@@ -745,8 +745,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   in compose (the key is breader's), and only the writers run on it (`runsOnNim` in
   `agents/set-up.ts`). A writer's call goes to Gemini only once NIM gives up on it, so a bad day
   on NIM slows a run without stopping it (`models/nim-then-gemini.ts`): its 12 tries spent, no
-  model left to ask, or none free within `NIM_PATIENCE_S` (30 minutes, the balancer's
-  `giveUpAfterS`, checked only before a try so no answer is cut off). The aim is to use NIM the
+  model left to ask, or no answer within `NIM_PATIENCE_S` (30 minutes, the balancer's
+  `giveUpAfterS`, checked only before a try so no answer is cut off, and checked even with a
+  model free: on the resumed run's first half hour Kimi took 250 to 280 seconds to its first
+  token, and a try that took 302 seconds ended in NIM's 504). The aim is to use NIM the
   most: few calls, each with big inputs and big outputs. Gemini runs the main chats,
   designer_toad included, and the gate's passes.
 - **A stop stops cleanly** (2026-10-13). When the first live run's worker was stopped, a slow

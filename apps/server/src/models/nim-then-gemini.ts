@@ -7,7 +7,7 @@ import { endWith, failedMessage } from "./calls.ts";
 /*
  * pi's stream function for a writer (task 0045, "NIM writes, Gemini orchestrates and verifies"):
  * every call goes to NIM through the balancer, and only when NIM gives up on it (its tries spent,
- * no model left to ask, or none free within its patience on a bad day) does the same call go to
+ * no model left to ask, or no answer within its patience on a bad day) does the same call go to
  * Gemini. The balancer buffers each call until it ends, so nothing of NIM's failure reached the
  * chat, and Gemini answers it whole.
  */

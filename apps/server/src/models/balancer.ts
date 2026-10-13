@@ -47,8 +47,8 @@ export interface BalancerOptions {
   /** A process that never ends: a model that refuses the key is asked again later, not dropped. */
   patient?: boolean;
   /**
-   * How long one call may wait for a model before it gives up, so a caller with another model to
-   * ask isn't held through a bad day. Checked only before a try, so no answer is ever cut off.
+   * How long one call may go without an answer before it gives up, so a caller with another model
+   * to ask isn't held through a bad day. Checked only before a try, so no answer is ever cut off.
    */
   giveUpAfterS?: number;
 }
@@ -214,6 +214,9 @@ export class Balancer {
   ): Promise<Rung | null> {
     for (;;) {
       if (signal?.aborted) return null;
+      // A model free after the deadline isn't tried either: on the first live run's day, each of
+      // Kimi's tries took five minutes to fail.
+      if (Date.now() >= deadline) throw new Error(`No answer within ${this.opts.giveUpAfterS} s.`);
       const picked = this.pick(Date.now(), skip);
       if (typeof picked !== "number") return picked;
       const wait = jitter(picked);

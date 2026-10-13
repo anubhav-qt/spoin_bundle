@@ -21,7 +21,7 @@ in the code.
 | Chat | Model |
 |---|---|
 | toad_sage, every main chat, research, the gate's two passes, designer_toad, visual_toad | Gemini 3.8 Flash, medium thinking, through CLIProxyAPI |
-| The writers: corpus documents, curricula, cards, questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again. The worker doesn't start without a NIM key; a call goes to Gemini only once NIM gives up on it: 12 tries spent, no model left to ask, or none free within 30 minutes |
+| The writers: corpus documents, curricula, cards, questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again. The worker doesn't start without a NIM key; a call goes to Gemini only once NIM gives up on it: 12 tries spent, no model left to ask, or no answer within 30 minutes |
 
 ## Running it
 

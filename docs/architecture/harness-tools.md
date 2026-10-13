@@ -61,7 +61,7 @@ existing topic gets its own.
 | `find_topics_by_meaning(subject, angle?)` | The 5 topics taken in whose meaning (subject, angle and description, embedded at intake) is nearest toad_sage's own statement of the subject and angle, shown as above with the meaning match. Runs the embedder, so toad_sage calls it only when the name leaves the question open |
 | `read_topic(topic)` | One topic: where it stands, how many readers asked for it, its aliases and description, its intake record, its links both ways, and its subtopics per tier with their live card counts |
 | `list_categories()` | The categories and sub-categories in use, with counts |
-| `web_search(query)` | Whether a name is a real subject: Google's first 10 results through our own SearXNG, each with its title, URL, date and snippet. When Google can't be reached that way, Gemini's Google Search answers instead, with its written answer and its sources (title and real URL) |
+| `web_search(query)` | Whether a name is a real subject: Gemini's Google Search, in a call of its own, giving Gemini's account of what the results say and its sources (title and real URL) |
 | `reject_topic(job, reason)` | Fails the job; the reason is what the reader sees |
 | `merge_topic(job, into, subject, angle?, into_subject, into_angle?, reasoning)` | Into a live or a queued topic: the subscriptions and alias move, and the placeholder goes with its job. toad_sage states both topics' subject and angle; the merge record keeps the requested name, description, requesters and the job's priority, so ero_sennin can check it and undo it |
 | `accept_topic(job, name, subject, angle, scope, category, sub_category?, card_count, brief, builds_on?)` | The name is the full name ("Rust in easy language") and makes the slug; the subject is what it is about, disambiguated ("Rust, the programming language"), so two topics on one subject state the same subject. The slug is made and the category normalized by code; writes the topic row and the intake record. The topic then waits in the queue: its tadpole starts when the topics ahead of it are written (task 0045). `builds_on` names the topics sharing its subject, whose corpus and fetched pages the tadpole reuses before it searches the web |
@@ -111,7 +111,7 @@ page's content stays on disk; Postgres keeps its pointer, and pgvector its passa
 | `search_corpus(query)` | Corpus sections, by meaning |
 | `read_document(path)` | A corpus document in full |
 | `list_documents(category?, topic?)` | What the corpus holds |
-| `web_search(query)` | As toad_sage's: Google through our own SearXNG, Gemini's Google Search when that's down |
+| `web_search(query)` | As toad_sage's: Gemini's Google Search |
 | `fetch(url, fresh?)` | Plain HTTP, then a headless Chromium for a page with no real text; public pages only, robots.txt ignored, paced per site. Stores the page, and returns it as numbered passages; a stored page comes from disk unless `fresh`, and a long one says how to read the rest |
 | `read_page(page, from_passage)` | The rest of a long page |
 

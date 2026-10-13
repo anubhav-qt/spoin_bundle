@@ -67,8 +67,8 @@ specific to marking books.
   text models.
 - **Tools:**
   - `googleSearch` can't share a request with function tools: it answers 400. So Seelie searches
-    in a separate call.
-  - `urlContext` answers 200 but fetches nothing. spoin uses SearXNG and its own fetch.
+    in a separate call, and so does spoin's `web_search`.
+  - `urlContext` answers 200 but fetches nothing. spoin uses its own fetch.
 - **Input:** all of these work on `gemini-3.8-flash-high`:
   - images;
   - inline mp4, in a user turn and in a tool result, sound included;

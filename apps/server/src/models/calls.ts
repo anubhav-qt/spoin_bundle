@@ -10,6 +10,7 @@ import {
   type TranscriptContext,
 } from "@spoin/pi-ai";
 import type { ModelCallFailure } from "@spoin/shared/enums";
+import { Agent, setGlobalDispatcher } from "undici";
 import type { Db } from "../db/client.ts";
 import { modelCall } from "../db/schema.ts";
 import { log } from "../log.ts";
@@ -23,6 +24,19 @@ import { log } from "../log.ts";
 /** Longest wait for the first token, and longest silence once the answer has started (breader's). */
 const FIRST_TOKEN_S = 600;
 const IDLE_S = 240;
+
+/**
+ * Node's fetch gives up on a response's headers after 300 seconds, and NIM's first token often
+ * comes later (2026-10-13: two tries of a 30-question write cut off at 301 seconds, the third's
+ * first token at 284). The timers above decide when a call is too slow, so fetch waits past them.
+ */
+export function letCallsWait(): void {
+  const agent = new Agent({
+    headersTimeout: (FIRST_TOKEN_S + 60) * 1000,
+    bodyTimeout: (IDLE_S + 60) * 1000,
+  });
+  setGlobalDispatcher(agent);
+}
 
 /** What one call came to. `failure` is null for an answer the caller can use. */
 export interface CallOutcome {

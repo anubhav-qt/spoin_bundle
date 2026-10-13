@@ -14,6 +14,10 @@ const BLOCKS =
 const CELLS = /<\/?(td|th)\b[^>]*>/gi;
 const TAGS = /<[^>]+>/g;
 const TITLE = /<title\b[^>]*>([\s\S]*?)<\/title\s*>/i;
+const PRE = /<pre\b[^>]*>([\s\S]*?)<\/pre\s*>/gi;
+/** Stands in for a code block while the lines around it are tidied: a private-use character no page has. */
+const PRE_MARK = "\uE000";
+const SET_ASIDE = /\uE000(\d+)\uE000/g;
 
 const ENTITIES: Record<string, string> = {
   amp: "&",
@@ -38,6 +42,13 @@ export function htmlText(html: string): { title: string; text: string } {
   const bodyStart = html.search(/<body\b/i);
   let text = bodyStart >= 0 ? html.slice(bodyStart) : html;
   text = text.replace(COMMENTS, "").replace(DROPPED, "\n");
+  // A code block keeps its indentation, which tidying the lines would take: it is set aside, then
+  // put back fenced, so a chat reads it as code.
+  const codeBlocks: string[] = [];
+  text = text.replace(PRE, (_match, inner: string) => {
+    codeBlocks.push(decode(stripTags(inner)).replace(/^\n+/, "").trimEnd());
+    return `\n\n${PRE_MARK}${codeBlocks.length - 1}${PRE_MARK}\n\n`;
+  });
   text = text.replace(
     HEADINGS,
     (_match, _level: string, inner: string) => `\n\n## ${stripTags(inner).trim()}\n\n`,
@@ -45,13 +56,14 @@ export function htmlText(html: string): { title: string; text: string } {
   text = text.replace(BLOCKS, "\n").replace(CELLS, " | ");
   text = decode(stripTags(text));
   const lines = text.split("\n").map((line) => line.replace(/[ \t ]+/g, " ").trim());
-  return {
-    title,
-    text: lines
-      .join("\n")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim(),
-  };
+  const tidied = lines
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  const withCode = tidied.replace(SET_ASIDE, (_match, index: string) => {
+    return `\`\`\`\n${codeBlocks[Number(index)]}\n\`\`\``;
+  });
+  return { title, text: withCode };
 }
 
 function stripTags(html: string): string {

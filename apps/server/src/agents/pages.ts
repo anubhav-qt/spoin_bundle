@@ -252,18 +252,28 @@ async function overHttp(url: string, signal: AbortSignal): Promise<{ title: stri
     throw new ToolError(`${url} is a PDF, which fetch can't read yet: find the same material as a web page.`);
   }
   const body = await response.text();
-  if (type.includes("text/plain")) return { title: "", text: tidy(body) };
+  if (type.includes("text/plain") || type.includes("markdown")) {
+    const text = tidy(body);
+    return { title: markdownTitle(text), text };
+  }
   return htmlText(body);
 }
 
-/** Lines trimmed, and runs of blank lines folded to one. */
-function tidy(text: string): string {
+/** Lines' trailing spaces cut, and runs of blank lines folded to one. Indentation stays: code needs it. */
+export function tidy(text: string): string {
   return text
     .split("\n")
-    .map((line) => line.replace(/[ \t ]+/g, " ").trim())
+    .map((line) => line.trimEnd())
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+/** A markdown file's first heading, which plain text has in place of a `<title>`. */
+export function markdownTitle(text: string): string {
+  const heading = /^#{1,2} +(.+)$/m.exec(text);
+  if (!heading) return "";
+  return heading[1]?.trim() ?? "";
 }
 
 /** The text cut into passages at paragraph breaks, each about PASSAGE_CHARS long. */

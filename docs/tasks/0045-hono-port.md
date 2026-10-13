@@ -781,7 +781,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   call timers (`letCallsWait` in `models/calls.ts`), so only those decide a call is too slow.
   NVIDIA sends a tool call's arguments in one piece once they are all written, so a NIM write is
   silent from its thinking to its end: 7,502 tokens took 219 s, and nine bigger writes were cut
-  by the 240 s silence limit, so a NIM call now gets 900 s of silence. The
+  by the 240 s silence limit, so a NIM call now gets 900 s of silence. Since then NIM writes in
+  text, not a tool call: the writer calls `write_on_nim` for a big write and the real tools for
+  small ones (ADR-0108). The
   probes wrote text, not a tool call, because they skipped `normalizeContext` and so never sent
   the tool; a try with no call keeps its text all the same.
 - **Code runs the tiers** (2026-10-13). The tadpole no longer starts subtopics, verifiers or the

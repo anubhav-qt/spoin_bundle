@@ -232,16 +232,16 @@ code block is an ascii card. No photographs until they are sourced, so visual_to
 
 ### A tier's writer helper
 
-The writer's chat runs on Gemini; its two big writes are NIM's. `write_cards` and
-`write_questions` take only instructions: the tool hands NIM the writer's whole chat with them
-and the real tool, so NIM writes a whole tier's cards, or its whole quiz, in one call, at most a
-tier (the owner's cap). The real tool's checks store what passes; every try is kept in the
-result, and a refused try goes back with its faults, up to three tries. Only the first is NIM's:
-a fix is a small write, and NIM takes some five minutes to start any answer (the first Rust
-run's fixes waited that long for 1,445 and 919 tokens), so Gemini takes the other two. A
-writer's later call of the same tool, adding to, fixing or dropping from its big write, is all
-Gemini's too. A call
-NIM gives up on goes to Gemini. The document and curriculum writers write the same way.
+The writer's chat runs on Gemini; its two big writes are NIM's (ADR-0108). It calls
+`write_on_nim(tool, instructions)` with `write_cards` or `write_questions`, and the tool hands
+NIM the writer's whole chat with the instructions, so NIM writes a whole tier's cards, or its
+whole quiz, in one call, at most a tier (the owner's cap). NIM answers with the tool's arguments
+as JSON text, and code stores them through the real tool, whose checks decide what passes. The
+result shows what NIM wrote and what was stored or refused; the writer fixes a refusal, or
+writes a few cards, with the real tool itself, since NIM takes some five minutes to start any
+answer. The balancer retries a call across NIM's ladder and Gemini takes one NIM gives up on;
+an unusable answer goes back to the writer. The document and curriculum writers write the
+same way.
 
 | Tool | Does |
 |---|---|

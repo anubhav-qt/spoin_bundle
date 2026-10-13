@@ -146,15 +146,16 @@ describe("the agents' tools", () => {
       "at most 40 columns, any height",
     );
     expect(prompts.render("tools/attach-art.njk", { batch: 10 })).toContain("up to 10 in one call");
-    expect(prompts.render("tools/written-on-nim.njk", { tool: "Stores your tier's cards." })).toContain(
-      "The tool NIM writes through:\nStores your tier's cards.",
+    expect(prompts.render("tools/write-on-nim.njk", { tools: ["write_cards", "write_questions"] })).toContain(
+      "(write_cards or write_questions)",
     );
-    expect(
-      prompts.render("lines/nim-write.njk", {
-        tool: "write_cards",
-        instructions: "All 12 cards of the plan.",
-      }),
-    ).toContain("one call to write_cards");
+    const asked = prompts.render("lines/nim-write.njk", {
+      tool: "write_cards",
+      schema: '{"type":"object"}',
+      instructions: "All 12 cards of the plan.",
+    });
+    expect(asked).toContain("the arguments of write_cards, as one JSON object");
+    expect(asked).toContain('Schema:\n{"type":"object"}');
   });
 
   test("the tiers' results render", () => {

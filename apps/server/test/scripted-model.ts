@@ -6,6 +6,7 @@ import {
   createAssistantMessageEventStream,
   type Message,
   type Model,
+  type SimpleStreamOptions,
   type StopReason,
 } from "@spoin/pi-ai";
 
@@ -67,14 +68,20 @@ export function streamOf(message: AssistantMessage): AssistantMessageEventStream
   return stream;
 }
 
-/** Answers each request with the next reply in the script, and keeps the messages each request was sent. */
-export function scriptedModel(replies: AssistantMessage[]): { streamFn: StreamFn; requests: Message[][] } {
+/** Answers each request with the next reply in the script, and keeps the messages and options each request was sent. */
+export function scriptedModel(replies: AssistantMessage[]): {
+  streamFn: StreamFn;
+  requests: Message[][];
+  options: (SimpleStreamOptions | undefined)[];
+} {
   const requests: Message[][] = [];
-  const streamFn: StreamFn = (_model, context) => {
+  const options: (SimpleStreamOptions | undefined)[] = [];
+  const streamFn: StreamFn = (_model, context, sent) => {
     requests.push([...context.messages]);
+    options.push(sent);
     const next = replies[requests.length - 1] ?? reply([], "error", "The script has no more replies.");
     // A provider's answer is dated when it comes back; pi trusts its token count only for what came before.
     return streamOf({ ...next, timestamp: Date.now() });
   };
-  return { streamFn, requests };
+  return { streamFn, requests, options };
 }

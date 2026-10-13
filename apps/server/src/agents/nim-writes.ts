@@ -6,172 +6,144 @@ import {
   type Model,
   normalizeContext,
   type ToolCall,
-  type ToolResultMessage,
 } from "@spoin/pi-ai";
 import { Type } from "typebox";
 import { checkValue, SchemaError } from "../harness/check.ts";
 import { contextMessages } from "../harness/compaction.ts";
 import { CLOSED } from "../harness/schemas.ts";
-import { type HarnessTool, ToolError, type ToolOutput } from "../harness/tools.ts";
+import { type HarnessTool, type ToolContext, ToolError, type ToolOutput } from "../harness/tools.ts";
 import { GEMINI_THINKING } from "../models/proxy.ts";
 import type { Prompts } from "../prompts.ts";
 
 /*
- * NIM writes, Gemini orchestrates (the owner's rule, task 0045). A writer chat runs on Gemini and
- * reads, plans and fixes there; each of its big writes (a document, a curriculum, a tier's cards,
- * its questions) is one NIM call. The writer calls the tool with what to write now, and the tool
- * hands NIM the writer's whole chat with the real tool, whose own checks store what NIM writes. A
- * call NIM gives up on goes to Gemini, so a bad day on NIM slows a topic rather than stopping it.
- * Only a writer's first call of a tool is its big write: a try after a refused one, and a later
- * call that adds to, fixes or drops from what it wrote, are small writes, so Gemini takes them.
+ * NIM writes, the Gemini writer decides (the owner's rule, task 0045, ADR-0108). A writer chat runs
+ * on Gemini with the real write tools, for the small writes it makes itself: a fix, a section
+ * added or dropped. For a big write (a whole document, curriculum, tier's cards or its quiz) it
+ * calls write_on_nim, which hands NIM the writer's whole chat and instructions. NIM answers with
+ * the tool's arguments as JSON text, and code stores them through the real tool, whose checks
+ * decide what passes. Text, not a tool call: NVIDIA sends a tool call's arguments in one piece once
+ * they are all written, so a big write was minutes of silence that looked like a dead call.
  */
 
-/** How a tool calls NIM: its ladder for a run, with Gemini behind it, and Gemini for the fixes. */
+/**
+ * How write_on_nim calls NIM: its ladder for a run, which retries a call across it (busy,
+ * rate-limited, cut off or silent), with Gemini behind it for a call NIM gives up on. An answer
+ * that comes back unusable goes to the writer, which calls again with what to change.
+ */
 export interface NimWriter {
-  /** Names the call; the ladder picks the model for each try. */
+  /** Names the call; the ladder picks the model. */
   model: Model<Api>;
   apiKey: string;
   streamFn: (runId: string) => StreamFn;
-  /**
-   * Takes every try after NIM's first was refused. NIM takes some five minutes to start any answer,
-   * and the first Rust run's fixes waited that long to write 1,445 and 919 tokens (task 0045).
-   */
-  fixer: {
-    /** Gemini's model as the proxy names it today. */
-    model: () => Promise<Model<Api>>;
-    apiKey: string;
-    streamFn: (runId: string) => StreamFn;
-  };
 }
 
-/** The tries at one write: NIM's, and two on Gemini with the last one's faults named. */
-const TRIES = 3;
+function writeOnNimParameters(names: string[]) {
+  return Type.Object(
+    {
+      tool: Type.Enum(names, { description: "The tool whose write NIM makes" }),
+      instructions: Type.String({
+        minLength: 1,
+        description: "What NIM writes in this call: the shape you decided, and what to draw on",
+      }),
+    },
+    CLOSED,
+  );
+}
 
-const Instructions = Type.Object(
-  {
-    instructions: Type.String({
-      minLength: 1,
-      description: "What to write in this call, and anything to fix from before",
-    }),
-  },
-  CLOSED,
-);
-
-/** The writer's tool: NIM writes through `tool` from the writer's chat and these instructions. */
-export function writtenOnNim(
+/** The writer's big writes: NIM writes one of `tools`' arguments from the writer's chat. */
+export function writeOnNimTool(
   prompts: Prompts,
   nim: NimWriter,
-  tool: HarnessTool,
-): HarnessTool<typeof Instructions> {
+  tools: HarnessTool[],
+): HarnessTool<ReturnType<typeof writeOnNimParameters>> {
+  const names = tools.map((tool) => tool.name);
+  const parameters = writeOnNimParameters(names);
   return {
-    name: tool.name,
-    label: tool.label,
-    description: prompts.render("tools/written-on-nim.njk", { tool: tool.description }),
-    parameters: Instructions,
+    name: "write_on_nim",
+    label: "Write on NIM",
+    description: prompts.render("tools/write-on-nim.njk", { tools: names }),
+    parameters,
     kind: "change",
     async execute(params, context) {
+      const tool = tools.find((one) => one.name === params.tool);
+      if (!tool) throw new ToolError(`NIM writes only with ${names.join(" or ")}.`);
       // The chat up to the call that asked for this write, which has no result yet.
       const history = await contextMessages(context.db, context.chat);
       const asked = history.findLastIndex((message) => message.role === "assistant");
       const messages: Message[] = [];
       if (asked === -1) messages.push(...history);
       else messages.push(...history.slice(0, asked));
-      // A writer's second call, such as one dropping five sections, waited five minutes on NIM to
-      // write 359 tokens in the first Rust run.
-      const followUp = calledBefore(messages, tool.name);
       messages.push({
         role: "user",
         content: prompts.render("lines/nim-write.njk", {
           tool: tool.name,
+          schema: JSON.stringify(tool.parameters),
           instructions: params.instructions,
         }),
         timestamp: Date.now(),
       });
-      const big = { name: "NIM", model: nim.model, apiKey: nim.apiKey, stream: nim.streamFn(context.run.id) };
-      const fix = {
-        name: "Gemini",
-        model: await nim.fixer.model(),
-        apiKey: nim.fixer.apiKey,
-        stream: nim.fixer.streamFn(context.run.id),
-      };
+      // The tool goes along so the chat's earlier calls read as calls; "none" has NIM answer in text.
       const nimTool = { name: tool.name, description: tool.description, parameters: tool.parameters };
-      const tries: string[] = [];
-      for (let attempt = 1; attempt <= TRIES; attempt++) {
-        let writer = fix;
-        if (attempt === 1 && !followUp) writer = big;
-        const answer: AssistantMessage = await (
-          await writer.stream(
-            writer.model,
-            normalizeContext({ systemPrompt: context.run.systemPrompt, tools: [nimTool], messages }),
-            { apiKey: writer.apiKey, reasoning: GEMINI_THINKING, signal: context.signal },
-          )
-        ).result();
-        if (answer.stopReason === "error" || answer.stopReason === "aborted") {
-          const why = answer.errorMessage ?? answer.stopReason;
-          throw new ToolError(
-            `${triesSoFar(tries)}The write didn't come back (${why}). Call ${tool.name} again.`,
-          );
-        }
-        messages.push(answer);
-        const calls = answer.content.filter((block): block is ToolCall => block.type === "toolCall");
-        const [call, ...others] = calls;
-        if (!call) {
-          tries.push(`Try ${attempt} called no tool, and wrote:\n${textWritten(answer)}`);
-          messages.push({ role: "user", content: `Call ${tool.name} with it.`, timestamp: Date.now() });
-          continue;
-        }
-        for (const other of others) {
-          messages.push(resultFor(other, "One call at a time: only the first was read.", true));
-        }
-        // What NIM wrote is kept whether or not it passes (the owner's rule: no output paid for twice).
-        const written = `Try ${attempt}, as ${writer.name} wrote it:\n${JSON.stringify(call.arguments)}`;
-        let output: ToolOutput;
-        try {
-          output = await tool.execute(
-            checkValue(tool.parameters, call.arguments, `The call to ${tool.name}`),
-            context,
-          );
-        } catch (error) {
-          if (!(error instanceof ToolError) && !(error instanceof SchemaError)) throw error;
-          tries.push(`${written}\nRefused: ${error.message}`);
-          messages.push(resultFor(call, `${error.message}\nCall ${tool.name} again, fixed.`, true));
-          continue;
-        }
-        tries.push(written);
-        return { ...output, value: `${tries.join("\n\n")}\n\nStored:\n${textOf(output.value)}` };
+      const stream = nim.streamFn(context.run.id);
+      const answer: AssistantMessage = await (
+        await stream(
+          nim.model,
+          normalizeContext({ systemPrompt: context.run.systemPrompt, tools: [nimTool], messages }),
+          { apiKey: nim.apiKey, reasoning: GEMINI_THINKING, toolChoice: "none", signal: context.signal },
+        )
+      ).result();
+      if (answer.stopReason === "error" || answer.stopReason === "aborted") {
+        const why = answer.errorMessage ?? answer.stopReason;
+        throw new ToolError(
+          `NIM's write didn't come back (${why}). Call write_on_nim again, or write it yourself with ${tool.name}.`,
+        );
       }
-      throw new ToolError(
-        `${triesSoFar(tries)}All ${TRIES} tries were refused. Call ${tool.name} again with what to fix.`,
-      );
+      const written = argumentsWritten(answer, tool.name);
+      if (written === undefined) {
+        throw new ToolError(
+          `NIM wrote no JSON for ${tool.name}, so nothing was stored. What it wrote, kept:\n${textWritten(answer)}`,
+        );
+      }
+      return await stored(tool, written, context);
     },
   };
 }
 
-/** Whether the chat called this tool before: its big write is done, and this one adds to or fixes it. */
-function calledBefore(messages: Message[], name: string): boolean {
-  for (const message of messages) {
-    if (message.role !== "assistant") continue;
-    for (const block of message.content) {
-      if (block.type === "toolCall" && block.name === name) return true;
-    }
+/**
+ * Stores what NIM wrote through the real tool. It is kept in the result whether or not it passes
+ * (the owner's rule: no output paid for twice), so a fix is a small write the writer makes itself.
+ */
+async function stored(tool: HarnessTool, written: unknown, context: ToolContext): Promise<ToolOutput> {
+  const kept = `NIM wrote:\n${JSON.stringify(written)}`;
+  let output: ToolOutput;
+  try {
+    output = await tool.execute(checkValue(tool.parameters, written, `NIM's ${tool.name}`), context);
+  } catch (error) {
+    if (!(error instanceof ToolError) && !(error instanceof SchemaError)) throw error;
+    throw new ToolError(
+      `${kept}\n\nRefused: ${error.message}\nFix it with ${tool.name} yourself, sending only what changes.`,
+    );
   }
-  return false;
+  return { ...output, value: `${kept}\n\nStored:\n${textOf(output.value)}` };
 }
 
-function triesSoFar(tries: string[]): string {
-  if (tries.length === 0) return "";
-  return `${tries.join("\n\n")}\n\n`;
-}
-
-function resultFor(call: ToolCall, text: string, isError: boolean): ToolResultMessage {
-  return {
-    role: "toolResult",
-    toolCallId: call.id,
-    toolName: call.name,
-    content: [{ type: "text", text }],
-    isError,
-    timestamp: Date.now(),
-  };
+/**
+ * The arguments NIM wrote: the JSON object in its text, or, if it called the tool anyway, that
+ * call's. Undefined when it wrote neither.
+ */
+function argumentsWritten(answer: AssistantMessage, name: string): unknown {
+  for (const block of answer.content) {
+    if (block.type === "toolCall" && block.name === name) return (block as ToolCall).arguments;
+  }
+  const text = textWritten(answer);
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end < start) return undefined;
+  try {
+    return JSON.parse(text.slice(start, end + 1));
+  } catch {
+    return undefined;
+  }
 }
 
 function textWritten(answer: AssistantMessage): string {

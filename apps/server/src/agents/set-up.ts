@@ -38,7 +38,7 @@ import {
 import { handOverTool, reviewTool } from "./handovers.ts";
 import { reportTool, startHelperTool } from "./helpers.ts";
 import { changeMapTool, writeMapTool } from "./maps.ts";
-import { writtenOnNim } from "./nim-writes.ts";
+import { writeOnNimTool } from "./nim-writes.ts";
 import { fetchTool, readPageTool, searchPagesTool } from "./pages.ts";
 import {
   listSubtopicsTool,
@@ -52,7 +52,7 @@ import {
 /*
  * How each chat of the pipeline runs (task 0045): its tools, by its role or its helper's task, and
  * its model. Every chat runs on Gemini, waiting its limits out; the big writes alone go to NIM,
- * one call each, through the writers' write tools (nim-writes.ts), which the owner means to use
+ * one call each, when a writer calls write_on_nim (nim-writes.ts), which the owner means to use
  * the most with few calls of big inputs and outputs.
  */
 
@@ -71,9 +71,9 @@ export function agentSetUp(input: AgentSetUpInput): (chat: Chat) => Promise<Chat
   };
 }
 
-/** A writer's big write: one NIM call with the writer's whole chat. */
-function onNim(deps: AgentDeps, tool: HarnessTool): HarnessTool {
-  return writtenOnNim(deps.prompts, deps.nim, tool);
+/** A writer's write tools, which it calls itself for small writes, and write_on_nim for big ones. */
+function writing(deps: AgentDeps, tools: HarnessTool[]): HarnessTool[] {
+  return [...tools, writeOnNimTool(deps.prompts, deps.nim, tools)];
 }
 
 /** The context, in tokens, at which a chat that waits on others compacts once its turn ends (the owner's rule). */
@@ -132,7 +132,7 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
     throw new Error(`A ${main.role} chat has no helpers.`);
   }
   if (chat.task === "document_writer") {
-    return [...researchTools(deps), onNim(deps, writeDocumentTool(deps)), report];
+    return [...researchTools(deps), ...writing(deps, [writeDocumentTool(deps)]), report];
   }
   if (chat.task === "curriculum_writer") {
     return [
@@ -141,7 +141,7 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
       readDocumentTool(deps),
       searchCorpusTool(deps),
       readCurriculumTool(deps),
-      onNim(deps, writeCurriculumTool(deps)),
+      ...writing(deps, [writeCurriculumTool(deps)]),
       report,
     ];
   }
@@ -150,8 +150,7 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
       readGroundingTool(deps),
       readCardsTool(deps),
       planCardsTool(deps),
-      onNim(deps, writeCardsTool(deps)),
-      onNim(deps, writeQuestionsTool(deps)),
+      ...writing(deps, [writeCardsTool(deps), writeQuestionsTool(deps)]),
       report,
     ];
   }

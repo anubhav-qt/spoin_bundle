@@ -5,7 +5,7 @@ import { Type } from "typebox";
 import { describe, expect, test } from "vitest";
 import type { AgentDeps } from "../src/agents/context.ts";
 import { startHelper } from "../src/agents/helpers.ts";
-import { writtenOnNim } from "../src/agents/nim-writes.ts";
+import { writeOnNimTool } from "../src/agents/nim-writes.ts";
 import {
   artQuotas,
   cardMix,
@@ -21,7 +21,6 @@ import { card, harnessRecord, question, subtopic, topic } from "../src/db/schema
 import { type Chat, endRun, openTopicChat, startRun } from "../src/harness/chats.ts";
 import { CLOSED } from "../src/harness/schemas.ts";
 import { type HarnessTool, ToolError, type ToolOutput } from "../src/harness/tools.ts";
-import { appendMessage } from "../src/harness/transcript.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import { deps } from "./helpers.ts";
 import { reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
@@ -266,8 +265,7 @@ describe("a write on NIM", () => {
       return { value: `Stored ${params.n}.`, dataSeen: [], recordsWritten: [] };
     },
   };
-  const toolCall = (n: number) =>
-    reply([{ type: "toolCall", id: randomUUID(), name: "write_numbers", arguments: { n } }], "toolUse");
+  const text = (written: string) => reply([{ type: "text", text: written }]);
 
   async function writerChat(): Promise<Chat> {
     const { topic: made } = await newTopic();
@@ -275,84 +273,44 @@ describe("a write on NIM", () => {
     return (await startHelper(db, tadpole, TIERS_AUTHOR, { task: "tier_writer", brief: "Write." })).chat;
   }
 
-  /** NIM's script for the first try, and Gemini's for the fixes. */
-  function onNimThenGemini(
-    nimTries: ReturnType<typeof toolCall>[],
-    geminiTries: ReturnType<typeof toolCall>[],
-  ) {
-    const nim = scriptedModel(nimTries);
-    const gemini = scriptedModel(geminiTries);
-    const writer = {
-      model: TEST_MODEL,
-      apiKey: "test",
-      streamFn: () => nim.streamFn,
-      fixer: { model: async () => TEST_MODEL, apiKey: "test", streamFn: () => gemini.streamFn },
-    };
-    return { nim, gemini, writer };
+  function onNim(...answers: ReturnType<typeof reply>[]) {
+    const nim = scriptedModel(answers);
+    const tool = writeOnNimTool(
+      prompts,
+      { model: TEST_MODEL, apiKey: "test", streamFn: () => nim.streamFn },
+      [inner as unknown as HarnessTool],
+    );
+    return { nim, tool };
   }
 
-  test("NIM writes the first try, Gemini fixes what was refused, and every try is kept", async () => {
-    const { nim, gemini, writer } = onNimThenGemini([toolCall(7)], [toolCall(2), toolCall(1)]);
-    const tool = writtenOnNim(prompts, writer, inner);
-    const output = await call(tool as unknown as HarnessTool, await writerChat(), {
-      instructions: "Write one number.",
+  test("NIM writes the tool's arguments as JSON text, and the tool stores them", async () => {
+    const { nim, tool } = onNim(text('Here it is:\n```json\n{"n": 3}\n```'));
+    const output = await call(tool, await writerChat(), {
+      tool: "write_numbers",
+      instructions: "Write three.",
     });
 
-    const value = String(output.value);
-    expect(value).toContain('Try 1, as NIM wrote it:\n{"n":7}\nRefused:');
-    expect(value).toContain('Try 2, as Gemini wrote it:\n{"n":2}\nRefused: Two is taken.');
-    expect(value).toContain('Try 3, as Gemini wrote it:\n{"n":1}\n\nStored:\nStored 1.');
-    expect(stored).toEqual([1]);
+    expect(String(output.value)).toBe('NIM wrote:\n{"n":3}\n\nStored:\nStored 3.');
+    expect(stored).toContain(3);
     expect(nim.requests).toHaveLength(1);
-    expect(JSON.stringify(nim.requests[0]?.at(-1))).toContain("one call to write_numbers");
-    expect(JSON.stringify(gemini.requests[1]?.at(-1))).toContain("Two is taken.");
+    expect(nim.options[0]?.toolChoice).toBe("none");
+    const asked = JSON.stringify(nim.requests[0]?.at(-1));
+    expect(asked).toContain("the arguments of write_numbers");
+    expect(asked).toContain("Write three.");
   });
 
-  test("a writer's later call of the tool is a small write, all on Gemini", async () => {
-    const { nim, gemini, writer } = onNimThenGemini([], [toolCall(3)]);
-    const tool = writtenOnNim(prompts, writer, inner);
-    const chat = await writerChat();
-    const run = await startRun(db, {
-      chatId: chat.id,
-      model: TEST_MODEL.id,
-      triggers: [MORNING],
-      systemPrompt: "",
-    });
-    const earlier = {
-      type: "toolCall" as const,
-      id: randomUUID(),
-      name: "write_numbers",
-      arguments: { instructions: "One." },
-    };
-    await appendMessage(db, run, { ...reply([earlier], "toolUse"), timestamp: Date.now() });
-    await appendMessage(db, run, {
-      role: "toolResult",
-      toolCallId: earlier.id,
-      toolName: "write_numbers",
-      content: [{ type: "text", text: "Stored 1." }],
-      isError: false,
-      timestamp: Date.now(),
-    });
-    const now = {
-      type: "toolCall" as const,
-      id: randomUUID(),
-      name: "write_numbers",
-      arguments: { instructions: "Three." },
-    };
-    await appendMessage(db, run, { ...reply([now], "toolUse"), timestamp: Date.now() });
-    await endRun(db, run.id, { status: "done" });
-
-    const output = await call(tool as unknown as HarnessTool, chat, { instructions: "Three." });
-    expect(String(output.value)).toContain('Try 1, as Gemini wrote it:\n{"n":3}');
-    expect(nim.requests).toHaveLength(0);
-    expect(gemini.requests).toHaveLength(1);
-  });
-
-  test("three refused tries come back to the writer with every one of them", async () => {
-    const { writer } = onNimThenGemini([toolCall(2)], [toolCall(2), toolCall(2)]);
-    const tool = writtenOnNim(prompts, writer, inner);
+  test("a refused write comes back with what NIM wrote, for the writer to fix itself", async () => {
+    const { tool } = onNim(text('{"n": 2}'));
     await expect(
-      call(tool as unknown as HarnessTool, await writerChat(), { instructions: "Write one number." }),
-    ).rejects.toThrow(/Try 3, as Gemini wrote it:[\s\S]*All 3 tries were refused/);
+      call(tool, await writerChat(), { tool: "write_numbers", instructions: "Write two." }),
+    ).rejects.toThrow(/NIM wrote:\n\{"n":2\}\n\nRefused: Two is taken\.\nFix it with write_numbers yourself/);
+  });
+
+  test("an answer with no JSON goes back to the writer, kept", async () => {
+    const { nim, tool } = onNim(text("I would rather not."));
+    await expect(
+      call(tool, await writerChat(), { tool: "write_numbers", instructions: "Write one." }),
+    ).rejects.toThrow(/NIM wrote no JSON for write_numbers[\s\S]*I would rather not\./);
+    expect(nim.requests).toHaveLength(1);
   });
 });

@@ -22,17 +22,28 @@ import type { Prompts } from "../prompts.ts";
  * its questions) is one NIM call. The writer calls the tool with what to write now, and the tool
  * hands NIM the writer's whole chat with the real tool, whose own checks store what NIM writes. A
  * call NIM gives up on goes to Gemini, so a bad day on NIM slows a topic rather than stopping it.
+ * A try after a refused one is a fix, a small write, so Gemini takes it.
  */
 
-/** How a tool calls NIM: its ladder for a run, with Gemini behind it. */
+/** How a tool calls NIM: its ladder for a run, with Gemini behind it, and Gemini for the fixes. */
 export interface NimWriter {
   /** Names the call; the ladder picks the model for each try. */
   model: Model<Api>;
   apiKey: string;
   streamFn: (runId: string) => StreamFn;
+  /**
+   * Takes every try after NIM's first was refused. NIM takes some five minutes to start any answer,
+   * and the first Rust run's fixes waited that long to write 1,445 and 919 tokens (task 0045).
+   */
+  fixer: {
+    /** Gemini's model as the proxy names it today. */
+    model: () => Promise<Model<Api>>;
+    apiKey: string;
+    streamFn: (runId: string) => StreamFn;
+  };
 }
 
-/** NIM's tries at one write: the first, and two with the last one's faults named. */
+/** The tries at one write: NIM's, and two on Gemini with the last one's faults named. */
 const TRIES = 3;
 
 const Instructions = Type.Object(
@@ -72,15 +83,23 @@ export function writtenOnNim(
         }),
         timestamp: Date.now(),
       });
-      const stream = nim.streamFn(context.run.id);
+      const big = { name: "NIM", model: nim.model, apiKey: nim.apiKey, stream: nim.streamFn(context.run.id) };
+      const fix = {
+        name: "Gemini",
+        model: await nim.fixer.model(),
+        apiKey: nim.fixer.apiKey,
+        stream: nim.fixer.streamFn(context.run.id),
+      };
       const nimTool = { name: tool.name, description: tool.description, parameters: tool.parameters };
       const tries: string[] = [];
       for (let attempt = 1; attempt <= TRIES; attempt++) {
+        let writer = fix;
+        if (attempt === 1) writer = big;
         const answer: AssistantMessage = await (
-          await stream(
-            nim.model,
+          await writer.stream(
+            writer.model,
             normalizeContext({ systemPrompt: context.run.systemPrompt, tools: [nimTool], messages }),
-            { apiKey: nim.apiKey, reasoning: GEMINI_THINKING, signal: context.signal },
+            { apiKey: writer.apiKey, reasoning: GEMINI_THINKING, signal: context.signal },
           )
         ).result();
         if (answer.stopReason === "error" || answer.stopReason === "aborted") {
@@ -101,7 +120,7 @@ export function writtenOnNim(
           messages.push(resultFor(other, "One call at a time: only the first was read.", true));
         }
         // What NIM wrote is kept whether or not it passes (the owner's rule: no output paid for twice).
-        const written = `Try ${attempt}, as NIM wrote it:\n${JSON.stringify(call.arguments)}`;
+        const written = `Try ${attempt}, as ${writer.name} wrote it:\n${JSON.stringify(call.arguments)}`;
         let output: ToolOutput;
         try {
           output = await tool.execute(
@@ -118,7 +137,7 @@ export function writtenOnNim(
         return { ...output, value: `${tries.join("\n\n")}\n\nStored:\n${textOf(output.value)}` };
       }
       throw new ToolError(
-        `${triesSoFar(tries)}NIM's ${TRIES} tries were all refused. Call ${tool.name} again with what to fix.`,
+        `${triesSoFar(tries)}All ${TRIES} tries were refused. Call ${tool.name} again with what to fix.`,
       );
     },
   };

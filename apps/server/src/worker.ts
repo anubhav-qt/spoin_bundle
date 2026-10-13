@@ -87,6 +87,7 @@ const deps = {
         gemini: waitingOutGemini(runId),
         geminiApiKey: proxy.apiKey,
       }),
+    fixer: { model: gemini, apiKey: proxy.apiKey, streamFn: waitingOutGemini },
   },
   browser,
 };

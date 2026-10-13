@@ -235,9 +235,11 @@ code block is an ascii card. No photographs until they are sourced, so visual_to
 The writer's chat runs on Gemini; its two big writes are NIM's. `write_cards` and
 `write_questions` take only instructions: the tool hands NIM the writer's whole chat with them
 and the real tool, so NIM writes a whole tier's cards, or its whole quiz, in one call, at most a
-tier (the owner's cap). The real tool's checks store what passes; NIM's every try is kept in
-the result, and a refused try goes back to NIM with its faults, up to three tries. A call NIM
-gives up on goes to Gemini. The document and curriculum writers write the same way.
+tier (the owner's cap). The real tool's checks store what passes; every try is kept in the
+result, and a refused try goes back with its faults, up to three tries. Only the first is NIM's:
+a fix is a small write, and NIM takes some five minutes to start any answer (the first Rust
+run's fixes waited that long for 1,445 and 919 tokens), so Gemini takes the other two. A call
+NIM gives up on goes to Gemini. The document and curriculum writers write the same way.
 
 | Tool | Does |
 |---|---|

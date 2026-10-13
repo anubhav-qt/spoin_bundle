@@ -274,37 +274,44 @@ describe("a write on NIM", () => {
     return (await startHelper(db, tadpole, TIERS_AUTHOR, { task: "tier_writer", brief: "Write." })).chat;
   }
 
-  test("NIM's refused tries are kept beside what it stored, and each refusal goes back to it", async () => {
-    const scripted = scriptedModel([toolCall(7), toolCall(2), toolCall(1)]);
-    const tool = writtenOnNim(
-      prompts,
-      { model: TEST_MODEL, apiKey: "test", streamFn: () => scripted.streamFn },
-      inner,
-    );
+  /** NIM's script for the first try, and Gemini's for the fixes. */
+  function onNimThenGemini(
+    nimTries: ReturnType<typeof toolCall>[],
+    geminiTries: ReturnType<typeof toolCall>[],
+  ) {
+    const nim = scriptedModel(nimTries);
+    const gemini = scriptedModel(geminiTries);
+    const writer = {
+      model: TEST_MODEL,
+      apiKey: "test",
+      streamFn: () => nim.streamFn,
+      fixer: { model: async () => TEST_MODEL, apiKey: "test", streamFn: () => gemini.streamFn },
+    };
+    return { nim, gemini, writer };
+  }
+
+  test("NIM writes the first try, Gemini fixes what was refused, and every try is kept", async () => {
+    const { nim, gemini, writer } = onNimThenGemini([toolCall(7)], [toolCall(2), toolCall(1)]);
+    const tool = writtenOnNim(prompts, writer, inner);
     const output = await call(tool as unknown as HarnessTool, await writerChat(), {
       instructions: "Write one number.",
     });
 
     const value = String(output.value);
     expect(value).toContain('Try 1, as NIM wrote it:\n{"n":7}\nRefused:');
-    expect(value).toContain('Try 2, as NIM wrote it:\n{"n":2}\nRefused: Two is taken.');
-    expect(value).toContain('Try 3, as NIM wrote it:\n{"n":1}\n\nStored:\nStored 1.');
+    expect(value).toContain('Try 2, as Gemini wrote it:\n{"n":2}\nRefused: Two is taken.');
+    expect(value).toContain('Try 3, as Gemini wrote it:\n{"n":1}\n\nStored:\nStored 1.');
     expect(stored).toEqual([1]);
-    const first = scripted.requests[0] ?? [];
-    expect(JSON.stringify(first.at(-1))).toContain("one call to write_numbers");
-    const third = scripted.requests[2] ?? [];
-    expect(JSON.stringify(third.at(-1))).toContain("Two is taken.");
+    expect(nim.requests).toHaveLength(1);
+    expect(JSON.stringify(nim.requests[0]?.at(-1))).toContain("one call to write_numbers");
+    expect(JSON.stringify(gemini.requests[1]?.at(-1))).toContain("Two is taken.");
   });
 
   test("three refused tries come back to the writer with every one of them", async () => {
-    const scripted = scriptedModel([toolCall(2), toolCall(2), toolCall(2)]);
-    const tool = writtenOnNim(
-      prompts,
-      { model: TEST_MODEL, apiKey: "test", streamFn: () => scripted.streamFn },
-      inner,
-    );
+    const { writer } = onNimThenGemini([toolCall(2)], [toolCall(2), toolCall(2)]);
+    const tool = writtenOnNim(prompts, writer, inner);
     await expect(
       call(tool as unknown as HarnessTool, await writerChat(), { instructions: "Write one number." }),
-    ).rejects.toThrow(/Try 3, as NIM wrote it:[\s\S]*NIM's 3 tries were all refused/);
+    ).rejects.toThrow(/Try 3, as Gemini wrote it:[\s\S]*All 3 tries were refused/);
   });
 });

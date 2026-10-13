@@ -4,6 +4,7 @@ import type { Db, UniverseDb } from "../db/client.ts";
 import type { WebSearchConfig } from "../harness/web-search.ts";
 import type { Prompts } from "../prompts.ts";
 import type { Browser } from "./browser.ts";
+import type { NimWriter } from "./nim-writes.ts";
 import type { OneShot } from "./one-shot.ts";
 
 /**
@@ -24,6 +25,8 @@ export interface AgentDeps {
   webSearch: WebSearchConfig | null;
   /** The auditors' and pass 2's fixed calls. */
   oneShot: OneShot;
+  /** The writers' big writes, one NIM call each, with Gemini behind it. */
+  nim: NimWriter;
   /** Headless Chromium: pages with no text in their HTML, and designer_toad's renders. */
   browser: Browser;
 }

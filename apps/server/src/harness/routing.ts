@@ -1,6 +1,6 @@
-import { and, asc, count, eq, exists, notExists, sql } from "drizzle-orm";
+import { and, asc, count, eq, exists, inArray, notExists, sql } from "drizzle-orm";
 import type { Db, Tx } from "../db/client.ts";
-import { generationJob, harnessRecord, routedJob, routedRecord, subtopic } from "../db/schema.ts";
+import { card, generationJob, harnessRecord, routedJob, routedRecord } from "../db/schema.ts";
 import { QUEUE_ORDER } from "../jobs/order.ts";
 import { type Chat, openChat, openChatAt, openTopicChat, readChat } from "./chats.ts";
 import { readAnyRecord, readRecord, refOf } from "./records.ts";
@@ -129,9 +129,9 @@ async function readersOf(tx: Tx, record: AnyRecord): Promise<Chat[]> {
   if (record.kind === "review") readers.push(...(await reviewReaders(tx, record)));
   if (record.kind === "gate") readers.push(await readChat(tx, record.body.to));
   if (record.kind === "verdicts") readers.push(...(await verdictReaders(tx, record)));
-  if (record.kind === "art") readers.push(await readChat(tx, record.body.writer));
   // The rest are read rather than woken for: a compaction summary is in its own chat's instructions,
-  // and maps, drafts, audits and plans are what the chats that wrote them work from.
+  // maps, drafts, audits and plans are what the chats that wrote them work from, and art is code's
+  // to count, putting a tier's cards live once the last piece of it is attached.
   return [...new Map(readers.map((chat) => [chat.id, chat])).values()];
 }
 
@@ -161,16 +161,19 @@ async function reviewReaders(tx: Tx, review: ReviewRecord): Promise<Chat[]> {
   return readers;
 }
 
-/** The writer, and designer_toad for the cards pass 2 accepted, which now need their art. */
+/** The writer, and designer_toad when a card pass 2 accepted asked for art. */
 async function verdictReaders(tx: Tx, verdicts: VerdictsRecord): Promise<Chat[]> {
   const readers = [await readChat(tx, verdicts.body.writer)];
-  if (verdicts.body.stage === "pass2" && verdicts.body.accepted.length > 0) {
-    const [tier] = await tx
-      .select({ topicId: subtopic.topicId })
-      .from(subtopic)
-      .where(eq(subtopic.id, verdicts.body.subtopic));
-    if (tier) readers.push(await openTopicChat(tx, "designer_toad", tier.topicId));
-  }
+  if (verdicts.body.stage !== "pass2" || verdicts.body.accepted.length === 0) return readers;
+  const wantArt = await tx
+    .select({ topicId: card.topicId })
+    .from(card)
+    .where(
+      and(inArray(card.id, verdicts.body.accepted), sql`jsonb_typeof(${card.genMeta} -> 'art') = 'object'`),
+    )
+    .limit(1);
+  const [first] = wantArt;
+  if (first) readers.push(await openTopicChat(tx, "designer_toad", first.topicId));
   return readers;
 }
 

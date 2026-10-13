@@ -7,23 +7,33 @@ import { and, asc, eq, inArray, ne, sql } from "drizzle-orm";
 import { type Static, Type } from "typebox";
 import { classifyArchetype } from "../cards/archetype.ts";
 import type { Db, Tx } from "../db/client.ts";
-import { card, generationJob, harnessRecord, question, rejectedCard, subtopic } from "../db/schema.ts";
-import { type Chat, readChat } from "../harness/chats.ts";
+import { card, generationJob, harnessRecord, question, rejectedCard, subtopic, topic } from "../db/schema.ts";
+import { openTopicChat } from "../harness/chats.ts";
 import { briefOf } from "../harness/helper-reports.ts";
 import { latestJob } from "../harness/intake.ts";
 import { recordsStored } from "../harness/outputs.ts";
 import { changeRecord, createRecord, readLatestRecord, refOf } from "../harness/records.ts";
-import { CARD_TYPES, CardPlanRecord, CLOSED, GateRecord, Id, Text } from "../harness/schemas.ts";
+import {
+  type Author,
+  BriefRecord,
+  CARD_TYPES,
+  CardPlanRecord,
+  CLOSED,
+  GateRecord,
+  Id,
+  Text,
+} from "../harness/schemas.ts";
 import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
 import { startHelper } from "./helpers.ts";
 
 /*
- * A topic's cards and questions (harness-tools.md, task 0045), after its curriculum is projected:
- * the tadpole starts a writer helper on NIM per tier, each tier's drafts go through pass 1 and
- * pass 2, designer_toad draws each accepted card's art, and the tier goes live once it reaches its
- * target with every card's art and questions. What must be true is checked in code; a draft that
- * fails a check is refused and never stored.
+ * A topic's cards and questions (harness-tools.md, task 0045), after its curriculum is projected.
+ * Code runs the tier: it starts a writer per tier once the tier's lower tiers are live, sends each
+ * draft through pass 1 and pass 2, and puts the tier's cards live once it reaches its target and
+ * designer_toad has drawn each one's art. Only then does the writer write the tier's questions (the
+ * owner's rule: no call spent on a question before its card is in the feed), which go live as pass
+ * 2 passes them. What must be true is checked in code; a draft that fails a check is never stored.
  */
 
 type Conn = Db | Tx;
@@ -31,16 +41,71 @@ export type Tier = typeof subtopic.$inferSelect;
 type CardRow = typeof card.$inferSelect;
 
 /**
- * Where a card is in the gate, kept in its `gen_meta` until it goes live: written, sent to pass 1,
- * past it, given to a pass-2 verifier, accepted.
+ * Where a card is in the gate, kept in its `gen_meta` until it goes live: in pass 1, past it,
+ * given to a pass-2 verifier, accepted.
  */
-export type CardStage = "drafted" | "correcting" | "corrected" | "verifying" | "accepted";
+export type CardStage = "correcting" | "corrected" | "verifying" | "accepted";
+
+/** The two kinds of art a card can carry: a gag (ADR-0079, ADR-0099), or a small informative drawing. */
+export const ART_KINDS = ["gag", "informative"] as const;
+
+export type ArtKind = (typeof ART_KINDS)[number];
+
+/**
+ * Every tier's mix of cards (the owner, 2026-10-13, replacing the old canon's quota table): half
+ * are ascii cards carrying art, 30% of the tier gags and 20% small informative drawings; 20% are
+ * mermaid flowcharts, 20% prose, of which a code subject may make any part code cards, and 10% myth
+ * against fact. No photographs until they are sourced.
+ */
+export const CARD_MIX = { ascii: 0.5, diagram: 0.2, prose: 0.2, comparison: 0.1 };
+
+/** The art an ascii card carries, by kind, as shares of the whole tier. */
+export const ART_SHARES: Record<ArtKind, number> = { gag: 0.3, informative: 0.2 };
+
+/**
+ * A tier's cards by type, each its share of the target rounded so they add up to it: the largest
+ * remainders get the cards left over, the first type first on a tie.
+ */
+export function cardMix(targetCards: number): Record<keyof typeof CARD_MIX, number> {
+  const types = Object.keys(CARD_MIX) as (keyof typeof CARD_MIX)[];
+  const mix = { ascii: 0, diagram: 0, prose: 0, comparison: 0 };
+  let left = targetCards;
+  for (const type of types) {
+    mix[type] = Math.floor(targetCards * CARD_MIX[type]);
+    left -= mix[type];
+  }
+  const byRemainder = [...types].sort((a, b) => {
+    const remainderA = targetCards * CARD_MIX[a] - mix[a];
+    const remainderB = targetCards * CARD_MIX[b] - mix[b];
+    return remainderB - remainderA;
+  });
+  for (const type of byRemainder) {
+    if (left === 0) break;
+    mix[type] += 1;
+    left -= 1;
+  }
+  return mix;
+}
+
+/** How a tier's ascii cards split between gags and informative drawings, 30 to 20. */
+export function artQuotas(asciiCards: number): Record<ArtKind, number> {
+  const gag = Math.round((asciiCards * ART_SHARES.gag) / (ART_SHARES.gag + ART_SHARES.informative));
+  return { gag, informative: asciiCards - gag };
+}
+
+/** What the writer asked designer_toad to draw on a card. */
+export interface ArtRequest {
+  kind: ArtKind;
+  show: string;
+  ideas: string;
+}
 
 /** What the writer said about a card beyond its text, and where the gate has it. */
 export interface CardMeta {
   stage: CardStage;
   form: (typeof CARD_TYPES)[number];
-  art: { show: string; ideas: string };
+  /** On an ascii card only; a card without it goes live without waiting for designer_toad. */
+  art?: ArtRequest;
   writer: string;
   passages: number[];
   /** The pass-2 verifier given the card. */
@@ -49,11 +114,24 @@ export interface CardMeta {
   feedback?: string;
 }
 
-/** Where a question is in the gate: written, sent to pass 2, or passed. */
-export type QuestionStage = "written" | "gated" | "passed";
+/** Where a question is in the gate: with a pass-2 verifier, or passed and live. */
+export type QuestionStage = "gated" | "passed";
 
-/** Near-duplicates: two bodies or stems this close in meaning say the same thing. */
-export const NEAR_DUPLICATE = 0.92;
+/**
+ * A topic's questions in all, from the old pipeline (persistence.py): its card target clamped to
+ * 200 to 300, shared among its tiers by their targets. Each question is written from one card:
+ * a topic of 750 cards has questions on at most 300 of them, and one of 125 has two on some.
+ */
+export const QUESTION_BUDGET = { min: 200, max: 300 };
+
+/** The scopes taught without tiers (ADR-0106): their cards run easy to advanced in one pass. */
+export const TIERLESS_SCOPES = ["survey", "one_shot"];
+
+/**
+ * Near-duplicates: two bodies or stems this close in meaning say the same thing. The old
+ * pipeline's `card_duplicate_threshold` (`generation/dedup.py`).
+ */
+export const NEAR_DUPLICATE = 0.9;
 
 /** A card's limits, enforced here rather than asked for (CLAUDE.md). */
 export const LIMITS = { title: 120, canonicalTitle: 160, summary: 280, bodyMin: 200, bodyMax: 1800 };
@@ -68,6 +146,12 @@ export const PROSE_MAX = 1200;
 const EDITORIAL_NOTE = /\*Source Note|\*\*Key Correction|\*\*Correction:/i;
 
 const FENCE = /```([^\n`]*)\n[\s\S]*?```/g;
+
+/** A diagram card's flowchart. */
+const FLOWCHART = /```mermaid\n\s*(flowchart|graph)\b/;
+
+/** Colour in a flowchart: every one is drawn black on white (the owner's rule), so none is written in. */
+const MERMAID_STYLING = /^\s*(style|classDef|class|linkStyle)\b|:::/m;
 
 /** Mermaid's diagram types the web app renders (ADR-0067). */
 const MERMAID_TYPES =
@@ -103,13 +187,16 @@ export async function allowedShort(db: Conn, tierId: string): Promise<boolean> {
 }
 
 export interface TierProgress {
-  drafted: number;
+  /** In pass 1 or pass 2. */
   inGate: number;
+  /** Accepted by pass 2, not live yet. */
   accepted: number;
-  rejected: number;
   withArt: number;
+  /** Accepted cards with an art request and no art yet: what holds the tier back from going live. */
+  awaitingArt: number;
   live: number;
-  questions: { written: number; gated: number; passed: number; rejected: number };
+  rejected: number;
+  questions: { inGate: number; live: number; freeTextLive: number; rejected: number };
 }
 
 export async function tierProgress(db: Conn, tierId: string): Promise<TierProgress> {
@@ -118,44 +205,86 @@ export async function tierProgress(db: Conn, tierId: string): Promise<TierProgre
     .from(card)
     .where(eq(card.subtopicId, tierId));
   const progress: TierProgress = {
-    drafted: 0,
     inGate: 0,
     accepted: 0,
-    rejected: 0,
     withArt: 0,
+    awaitingArt: 0,
     live: 0,
-    questions: { written: 0, gated: 0, passed: 0, rejected: 0 },
+    rejected: 0,
+    questions: { inGate: 0, live: 0, freeTextLive: 0, rejected: 0 },
   };
   for (const row of cards) {
     const stage = (row.meta as { stage?: CardStage }).stage;
-    if (row.status === "active") progress.live += 1;
-    else if (row.status === "rejected") progress.rejected += 1;
-    else if (stage === "accepted") {
+    if (row.status === "active") {
+      progress.live += 1;
+    } else if (row.status === "rejected") {
+      progress.rejected += 1;
+    } else if (stage === "accepted") {
       progress.accepted += 1;
-      if (row.visualKind) progress.withArt += 1;
-    } else if (stage === "drafted") progress.drafted += 1;
-    else progress.inGate += 1;
+      if (row.visualKind) {
+        progress.withArt += 1;
+      } else if ((row.meta as { art?: ArtRequest }).art) {
+        progress.awaitingArt += 1;
+      }
+    } else {
+      progress.inGate += 1;
+    }
   }
   const questions = await db
-    .select({ status: question.status, meta: question.genMeta })
+    .select({ status: question.status, kind: question.kind })
     .from(question)
     .where(eq(question.subtopicId, tierId));
   for (const row of questions) {
-    const stage = (row.meta as { stage?: QuestionStage }).stage;
-    if (row.status === "rejected") progress.questions.rejected += 1;
-    else if (row.status === "active" || stage === "passed") progress.questions.passed += 1;
-    else if (stage === "gated") progress.questions.gated += 1;
-    else progress.questions.written += 1;
+    if (row.status === "rejected") {
+      progress.questions.rejected += 1;
+    } else if (row.status === "active") {
+      progress.questions.live += 1;
+      if (row.kind === "free_text") progress.questions.freeTextLive += 1;
+    } else {
+      progress.questions.inGate += 1;
+    }
   }
   return progress;
 }
 
-/** Whether a tier is live: its target reached, or toad_sage let it finish short, and nothing left in the gate. */
-export async function tierFinished(db: Conn, tier: Tier): Promise<boolean> {
+/** How many questions the tier gets: its share of the topic's budget, by its card target. */
+export async function questionTarget(db: Conn, tier: Tier): Promise<number> {
+  const tiers = await db
+    .select({ targetCards: subtopic.targetCards })
+    .from(subtopic)
+    .where(eq(subtopic.topicId, tier.topicId));
+  let total = 0;
+  for (const one of tiers) total += one.targetCards;
+  const budget = Math.min(QUESTION_BUDGET.max, Math.max(QUESTION_BUDGET.min, total));
+  return Math.max(1, Math.round((budget * tier.targetCards) / total));
+}
+
+/** Whether the tier's cards are live: its target reached, or toad_sage let it finish short, and nothing left in the gate. */
+export async function cardsLive(db: Conn, tier: Tier): Promise<boolean> {
   const progress = await tierProgress(db, tier.id);
-  if (progress.accepted > 0 || progress.drafted > 0 || progress.inGate > 0) return false;
+  if (progress.accepted > 0 || progress.inGate > 0) return false;
   if (progress.live >= tier.targetCards) return true;
   return progress.live > 0 && (await allowedShort(db, tier.id));
+}
+
+/** Whether the tier's quiz is complete: its share of the questions live, its one free-text question among them. */
+export async function quizLive(db: Conn, tier: Tier): Promise<boolean> {
+  const progress = await tierProgress(db, tier.id);
+  if (progress.questions.freeTextLive === 0) return false;
+  return progress.questions.live >= (await questionTarget(db, tier));
+}
+
+/** Whether the tier is written: its cards live, then its quiz. */
+export async function tierFinished(db: Conn, tier: Tier): Promise<boolean> {
+  if (!(await cardsLive(db, tier))) return false;
+  return quizLive(db, tier);
+}
+
+/** Whether the topic is taught in one pass, with no tiers (ADR-0106). */
+export async function isTierless(db: Conn, topicId: string): Promise<boolean> {
+  const [found] = await db.select({ scope: topic.scope }).from(topic).where(eq(topic.id, topicId));
+  if (!found) return false;
+  return TIERLESS_SCOPES.includes(found.scope);
 }
 
 /** The tier's writer helper, if one was started. */
@@ -179,6 +308,139 @@ export function topicOfTadpole(context: ToolContext): string {
   return context.chat.topicId;
 }
 
+/** What code writes as it runs a topic's tiers. */
+export const TIERS_AUTHOR: Author = { kind: "code", component: "tiers" };
+
+/**
+ * Starts a writer for each of the topic's tiers that has none and whose lower tiers' cards are
+ * live: every first tier once the curriculum is published, and each higher tier as the tier below
+ * it goes live. Each writer is the tadpole's helper.
+ */
+export async function startReadyTiers(tx: Tx, topicId: string): Promise<BriefRecord[]> {
+  const tiers = await tx
+    .select()
+    .from(subtopic)
+    .where(eq(subtopic.topicId, topicId))
+    .orderBy(asc(subtopic.position), asc(subtopic.difficulty));
+  const tadpole = await openTopicChat(tx, "tadpole", topicId);
+  const briefs: BriefRecord[] = [];
+  for (const tier of tiers) {
+    if (await writerOf(tx, tier.id)) continue;
+    if (!(await lowerTiersLive(tx, tier, tiers))) continue;
+    const { brief } = await startHelper(tx, tadpole, TIERS_AUTHOR, {
+      task: "tier_writer",
+      brief: `Write the ${tier.difficulty} tier of "${tier.title}": its ${tier.targetCards} cards first, and its questions once they are live.`,
+      topic: topicId,
+      subtopic: tier.id,
+    });
+    briefs.push(brief);
+  }
+  return briefs;
+}
+
+async function lowerTiersLive(tx: Tx, tier: Tier, tiers: Tier[]): Promise<boolean> {
+  for (const other of tiers) {
+    if (other.subtopicGroupId !== tier.subtopicGroupId) continue;
+    if (difficultyRank(other.difficulty) >= difficultyRank(tier.difficulty)) continue;
+    if (!(await cardsLive(tx, other))) return false;
+  }
+  return true;
+}
+
+/**
+ * Puts the tier's cards live once it has reached its target (or toad_sage let it finish short)
+ * with nothing left in the gate and the art drawn on every accepted card that asked for it. Then
+ * it briefs the writer on the tier's questions and starts the tiers this one unblocked. True if it
+ * did.
+ */
+export async function putCardsLiveIfDone(tx: Tx, tier: Tier): Promise<boolean> {
+  const progress = await tierProgress(tx, tier.id);
+  if (progress.accepted === 0 || progress.inGate > 0) return false;
+  if (progress.awaitingArt > 0) return false;
+  const reached = progress.accepted + progress.live >= tier.targetCards;
+  if (!reached && !(await allowedShort(tx, tier.id))) return false;
+  await tx
+    .update(card)
+    .set({ status: "active" })
+    .where(
+      and(
+        eq(card.subtopicId, tier.id),
+        eq(card.status, "draft"),
+        sql`${card.genMeta} ->> 'stage' = 'accepted'`,
+      ),
+    );
+  const writer = await writerOf(tx, tier.id);
+  if (writer) {
+    const cards = progress.accepted + progress.live;
+    const questions = await questionTarget(tx, tier);
+    await createRecord(tx, BriefRecord, {
+      kind: "brief",
+      author: TIERS_AUTHOR,
+      body: {
+        helper: writer,
+        task: "tier_writer",
+        brief: `The tier's ${cards} cards are live. Write its ${questions} questions: each from one of its cards, one of them free text and the rest MCQs.`,
+        topic: tier.topicId,
+        path: null,
+        subtopic: tier.id,
+      },
+    });
+  }
+  await startReadyTiers(tx, tier.topicId);
+  return true;
+}
+
+/**
+ * Starts a pass-2 verifier on cards past pass 1 or questions just written. Each verifier gets its
+ * own batch, so two never share an item, and reads it fresh: its brief is code's, never the
+ * writer's or pass 1's reasoning.
+ */
+export async function startVerifier(
+  tx: Tx,
+  tier: Tier,
+  items: { cards: string[]; questions: string[] },
+): Promise<BriefRecord> {
+  const what: string[] = [];
+  if (items.cards.length > 0) what.push(`${items.cards.length} cards`);
+  if (items.questions.length > 0) what.push(`${items.questions.length} questions`);
+  const tadpole = await openTopicChat(tx, "tadpole", tier.topicId);
+  const started = await startHelper(tx, tadpole, TIERS_AUTHOR, {
+    task: "verifier",
+    brief: `Check the ${what.join(" and ")} of the ${tier.difficulty} tier of "${tier.title}" given you: read_survivors shows them.`,
+    topic: tier.topicId,
+    subtopic: tier.id,
+  });
+  const assigned = sql`jsonb_build_object('verifier', ${started.chat.id}::text)`;
+  if (items.cards.length > 0) {
+    await tx
+      .update(card)
+      .set({ genMeta: sql`${card.genMeta} || ${assigned} || '{"stage": "verifying"}'::jsonb` })
+      .where(inArray(card.id, items.cards));
+  }
+  if (items.questions.length > 0) {
+    await tx
+      .update(question)
+      .set({ genMeta: sql`${question.genMeta} || ${assigned}` })
+      .where(inArray(question.id, items.questions));
+  }
+  return started.brief;
+}
+
+/** Completes the topic's job once every tier is written; true if it did. */
+export async function finishTopicIfDone(tx: Tx, topicId: string): Promise<boolean> {
+  const tiers = await tx.select().from(subtopic).where(eq(subtopic.topicId, topicId));
+  for (const tier of tiers) {
+    if (!(await tierFinished(tx, tier))) return false;
+  }
+  const job = await latestJob(tx, topicId);
+  if (job?.status !== "running") return false;
+  await tx
+    .update(generationJob)
+    .set({ status: "completed", completedAt: new Date() })
+    .where(eq(generationJob.id, job.id));
+  return true;
+}
+
 // -- the tadpole's -----------------------------------------------------------
 
 export function listSubtopicsTool(deps: AgentDeps): HarnessTool {
@@ -200,7 +462,9 @@ export function listSubtopicsTool(deps: AgentDeps): HarnessTool {
         shown.push({
           ...tier,
           progress: await tierProgress(context.db, tier.id),
+          questionTarget: await questionTarget(context.db, tier),
           writer: (await writerOf(context.db, tier.id)) ?? null,
+          cardsLive: await cardsLive(context.db, tier),
           finished: await tierFinished(context.db, tier),
           short: await allowedShort(context.db, tier.id),
         });
@@ -209,122 +473,6 @@ export function listSubtopicsTool(deps: AgentDeps): HarnessTool {
         value: deps.prompts.render("tool-results/subtopics.njk", { tiers: shown }),
         dataSeen: [],
         recordsWritten: [],
-      };
-    },
-  };
-}
-
-const StartSubtopicParameters = Type.Object(
-  {
-    subtopic: Id,
-    notes: Type.Optional(Type.String({ minLength: 1, description: "Anything the writer should know" })),
-  },
-  CLOSED,
-);
-
-export function startSubtopicTool(deps: AgentDeps): HarnessTool<typeof StartSubtopicParameters> {
-  return {
-    name: "start_subtopic",
-    label: "Start a tier's writer",
-    description: deps.prompts.render("tools/start-subtopic.njk", {}),
-    parameters: StartSubtopicParameters,
-    kind: "change",
-    async execute(params, context) {
-      const topicId = topicOfTadpole(context);
-      const tier = await tierById(context.db, params.subtopic);
-      if (tier.topicId !== topicId)
-        throw new ToolError(`Subtopic ${tier.id} is not one of your topic's tiers.`);
-      const writer = await writerOf(context.db, tier.id);
-      if (writer) throw new ToolError(`The tier's writer is started already (chat ${writer}).`);
-      const lower = await context.db
-        .select()
-        .from(subtopic)
-        .where(eq(subtopic.subtopicGroupId, tier.subtopicGroupId));
-      for (const other of lower) {
-        if (difficultyRank(other.difficulty) >= difficultyRank(tier.difficulty)) continue;
-        if (!(await tierFinished(context.db, other))) {
-          throw new ToolError(`Its ${other.difficulty} tier (${other.id}) isn't live yet: start that first.`);
-        }
-      }
-      let brief = `Write the ${tier.difficulty} tier of "${tier.title}" to its target of ${tier.targetCards} cards, with its questions.`;
-      if (params.notes) brief = `${brief} ${params.notes}`;
-      const { brief: stored } = await context.db.transaction((tx) =>
-        startHelper(tx, context.chat, context.author, {
-          task: "tier_writer",
-          brief,
-          topic: topicId,
-          subtopic: tier.id,
-        }),
-      );
-      return recordsStored(context.db, deps.prompts, [stored]);
-    },
-  };
-}
-
-const StartVerifierParameters = Type.Object(
-  {
-    subtopic: Id,
-    brief: Type.String({
-      minLength: 1,
-      description: "What it should check and what context it gets; never the writer's or pass 1's reasoning",
-    }),
-  },
-  CLOSED,
-);
-
-export function startVerifierTool(deps: AgentDeps): HarnessTool<typeof StartVerifierParameters> {
-  return {
-    name: "start_verifier",
-    label: "Start pass 2 for a tier",
-    description: deps.prompts.render("tools/start-verifier.njk", {}),
-    parameters: StartVerifierParameters,
-    kind: "change",
-    async execute(params, context) {
-      const topicId = topicOfTadpole(context);
-      const tier = await tierById(context.db, params.subtopic);
-      if (tier.topicId !== topicId)
-        throw new ToolError(`Subtopic ${tier.id} is not one of your topic's tiers.`);
-      const { brief, cards, questions } = await context.db.transaction(async (tx) => {
-        const started = await startHelper(tx, context.chat, context.author, {
-          task: "verifier",
-          brief: params.brief,
-          topic: topicId,
-          subtopic: tier.id,
-        });
-        // What waits for pass 2 now is this verifier's alone, so two verifiers never share a card.
-        const assigned = sql`jsonb_build_object('verifier', ${started.chat.id}::text)`;
-        const givenCards = await tx
-          .update(card)
-          .set({ genMeta: sql`${card.genMeta} || ${assigned} || '{"stage": "verifying"}'::jsonb` })
-          .where(
-            and(
-              eq(card.subtopicId, tier.id),
-              eq(card.status, "draft"),
-              sql`${card.genMeta} ->> 'stage' = 'corrected'`,
-            ),
-          )
-          .returning({ id: card.id });
-        const givenQuestions = await tx
-          .update(question)
-          .set({ genMeta: sql`${question.genMeta} || ${assigned}` })
-          .where(
-            and(
-              eq(question.subtopicId, tier.id),
-              eq(question.status, "draft"),
-              sql`${question.genMeta} ->> 'stage' = 'gated'`,
-              sql`NOT (${question.genMeta} ? 'verifier')`,
-            ),
-          )
-          .returning({ id: question.id });
-        if (givenCards.length === 0 && givenQuestions.length === 0) {
-          throw new ToolError("Nothing of that tier is waiting for pass 2.");
-        }
-        return { brief: started.brief, cards: givenCards.length, questions: givenQuestions.length };
-      });
-      const stored = await recordsStored(context.db, deps.prompts, [brief]);
-      return {
-        ...stored,
-        value: `${String(stored.value)}\nIt verifies ${cards} cards and ${questions} questions.`,
       };
     },
   };
@@ -435,6 +583,8 @@ export function readCardsTool(deps: AgentDeps): HarnessTool {
           titles,
           questions,
           progress: await tierProgress(context.db, tier.id),
+          questionTarget: await questionTarget(context.db, tier),
+          artQuotas: artQuotas(((tier.cardTypeQuotas ?? {}) as Record<string, number>).ascii ?? 0),
         }),
         dataSeen: [],
         recordsWritten: [],
@@ -514,12 +664,15 @@ export const CardDraft = Type.Object(
       description: "The grounding passages it is written from, by number",
     }),
     form: Type.Enum([...CARD_TYPES].filter((form) => form !== "image")),
-    art_request: Type.Object(
-      {
-        show: Type.String({ minLength: 1, description: "What the ASCII art should show" }),
-        ideas: Type.String({ minLength: 1, description: "Ideas for drawing it" }),
-      },
-      CLOSED,
+    art_request: Type.Optional(
+      Type.Object(
+        {
+          kind: Type.Enum([...ART_KINDS], { description: "A gag, or a small informative drawing" }),
+          show: Type.String({ minLength: 1, description: "What the ASCII art should show" }),
+          ideas: Type.String({ minLength: 1, description: "Ideas for drawing it" }),
+        },
+        CLOSED,
+      ),
     ),
     hero: Type.Boolean({ description: "The tier's one hero card: the concept's best way in" }),
   },
@@ -528,10 +681,23 @@ export const CardDraft = Type.Object(
 
 type Draft = Static<typeof CardDraft>;
 
-/** A tier whose quotas name no code cards is a topic with no code, so its bodies carry none either. */
-export function codeAllowedIn(tier: Tier): boolean {
-  const quotas = (tier.cardTypeQuotas ?? {}) as Record<string, number>;
-  return (quotas.code ?? 0) > 0;
+/**
+ * A topic whose tiers name no code cards has no code, so no body carries a code block. On a code
+ * subject any card may hold one and still counts as its own form (the owner, 2026-10-13): an ascii
+ * card with code is an ascii card.
+ */
+export async function codeAllowedIn(db: Db | Tx, tier: Tier): Promise<boolean> {
+  const coded = await db
+    .select({ id: subtopic.id })
+    .from(subtopic)
+    .where(
+      and(
+        eq(subtopic.topicId, tier.topicId),
+        sql`coalesce((${subtopic.cardTypeQuotas} ->> 'code')::int, 0) > 0`,
+      ),
+    )
+    .limit(1);
+  return coded.length > 0;
 }
 
 /**
@@ -565,7 +731,7 @@ export function draftProblems(
   for (const fence of draft.body.matchAll(FENCE)) {
     const language = (fence[1] ?? "").trim();
     if (language !== "mermaid" && !codeAllowed) {
-      problems.push("this tier has no code cards, so a body has no code block: say it in words");
+      problems.push("this topic has no code cards, so a body has no code block: say it in words");
     }
   }
   for (const fence of draft.body.matchAll(/```mermaid\n([\s\S]*?)```/g)) {
@@ -574,6 +740,11 @@ export function draftProblems(
       problems.push(`a mermaid block opens with "${first}", not a diagram type`);
     // An emoji is one character but two columns, and breaks the diagram's text measuring.
     if (/\p{Extended_Pictographic}/u.test(fence[1] ?? "")) problems.push("a mermaid block has an emoji");
+    if (MERMAID_STYLING.test(fence[1] ?? "")) {
+      problems.push(
+        "a mermaid block styles its nodes; every flowchart is drawn black on white, so leave colour out",
+      );
+    }
   }
   if (EDITORIAL_NOTE.test(draft.body))
     problems.push("the body carries a correction note; notes go in `note`");
@@ -606,12 +777,19 @@ export function writeCardsTool(deps: AgentDeps): HarnessTool<typeof WriteCardsPa
       const quotas = (tier.cardTypeQuotas ?? {}) as Record<string, number>;
       const forms = new Map<string, number>();
       for (const row of standing) forms.set(metaOf(row).form, (forms.get(metaOf(row).form) ?? 0) + 1);
+      const artQuota = artQuotas(quotas.ascii ?? 0);
+      const arts = new Map<string, number>();
+      for (const row of standing) {
+        const kind = metaOf(row).art?.kind;
+        if (kind) arts.set(kind, (arts.get(kind) ?? 0) + 1);
+      }
       let heroes = standing.filter((row) => row.isHero).length;
       const kept: Draft[] = [];
       const refused: string[] = [];
+      const codeAllowed = await codeAllowedIn(context.db, tier);
       params.cards.forEach((draft, index) => {
         const where = `card ${index + 1} ("${draft.canonical_title}")`;
-        const problems = draftProblems(draft, grounding.length, codeAllowedIn(tier));
+        const problems = draftProblems(draft, grounding.length, codeAllowed);
         const used = forms.get(draft.form) ?? 0;
         const quota = quotas[draft.form] ?? 0;
         if (kept.length >= room) {
@@ -623,11 +801,27 @@ export function writeCardsTool(deps: AgentDeps): HarnessTool<typeof WriteCardsPa
         } else if (draft.hero && heroes >= 1) {
           problems.push("the tier has its one hero card already");
         }
+        const art = draft.art_request?.kind;
+        if (draft.form === "ascii" && !art) {
+          problems.push("an ascii card asks for its art: a gag or an informative drawing");
+        }
+        if (draft.form === "ascii" && art && (arts.get(art) ?? 0) >= artQuota[art]) {
+          problems.push(`the tier's quota for ${art} art is ${artQuota[art]}, and it has them all`);
+        }
+        if (draft.form === "diagram" && !FLOWCHART.test(draft.body)) {
+          problems.push("a diagram card is a mermaid flowchart: a ```mermaid fence opening with `flowchart`");
+        }
         if (problems.length > 0) {
           refused.push(`${where}: ${problems.join("; ")}`);
           return;
         }
         forms.set(draft.form, used + 1);
+        if (draft.form !== "ascii") {
+          // Only an ascii card carries art, so a request on any other is dropped, not refused.
+          delete draft.art_request;
+        } else if (art) {
+          arts.set(art, (arts.get(art) ?? 0) + 1);
+        }
         if (draft.hero) heroes += 1;
         kept.push(draft);
       });
@@ -638,42 +832,52 @@ export function writeCardsTool(deps: AgentDeps): HarnessTool<typeof WriteCardsPa
       }
       const vectors = await deps.embedder.embedPassage(kept.map((draft) => draft.body));
       const chunkIds = new Map(grounding.map((passage) => [passage.number, passage.chunkId]));
-      const written = await context.db
-        .insert(card)
-        .values(
-          kept.map((draft, index) => {
-            const meta: CardMeta = {
-              stage: "drafted",
-              form: draft.form,
-              art: draft.art_request,
-              writer: context.chat.id,
-              passages: draft.passages,
-            };
-            return {
-              familyId: randomUUID(),
-              topicId: tier.topicId,
-              subtopicId: tier.id,
-              difficulty: tier.difficulty,
-              title: draft.title.trim(),
-              canonicalTitle: draft.canonical_title.trim(),
-              summary: draft.summary.trim(),
-              body: draft.body.trim(),
-              contentEmbedding: vectors[index] as number[],
-              embeddingModel: deps.embedder.modelName,
-              groundedChunkIds: draft.passages.map((number) => chunkIds.get(number) as string),
-              genMeta: { ...meta, model: context.run.model, run: context.run.id },
-              archetype: classifyArchetype(draft.body),
-              isHero: draft.hero,
-            };
-          }),
-        )
-        .returning({ id: card.id, canonicalTitle: card.canonicalTitle });
+      const { written, gate } = await context.db.transaction(async (tx) => {
+        const rows = await tx
+          .insert(card)
+          .values(
+            kept.map((draft, index) => {
+              const meta: CardMeta = {
+                stage: "correcting",
+                form: draft.form,
+                ...(draft.art_request ? { art: draft.art_request } : {}),
+                writer: context.chat.id,
+                passages: draft.passages,
+              };
+              return {
+                familyId: randomUUID(),
+                topicId: tier.topicId,
+                subtopicId: tier.id,
+                difficulty: tier.difficulty,
+                title: draft.title.trim(),
+                canonicalTitle: draft.canonical_title.trim(),
+                summary: draft.summary.trim(),
+                body: draft.body.trim(),
+                contentEmbedding: vectors[index] as number[],
+                embeddingModel: deps.embedder.modelName,
+                groundedChunkIds: draft.passages.map((number) => chunkIds.get(number) as string),
+                genMeta: { ...meta, model: context.run.model, run: context.run.id },
+                archetype: classifyArchetype(draft.body),
+                isHero: draft.hero,
+              };
+            }),
+          )
+          .returning({ id: card.id, canonicalTitle: card.canonicalTitle });
+        const sent = await sendToPassOne(
+          tx,
+          tier,
+          context,
+          rows.map((row) => row.id),
+        );
+        return { written: rows, gate: sent };
+      });
       const lines = written.map((row) => `- ${row.id}: ${row.canonicalTitle}`).join("\n");
-      let value = `Stored ${written.length} drafts:\n${lines}\nSend them through pass 1 with gate_cards.`;
+      const stored = await recordsStored(context.db, deps.prompts, [gate]);
+      let value = `Stored ${written.length} drafts, now in pass 1:\n${lines}\n${String(stored.value)}\nThe verdicts wake you.`;
       if (refused.length > 0) {
         value += `\n\nNot stored, so write only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
       }
-      return { value, dataSeen: [], recordsWritten: [] };
+      return { ...stored, value };
     },
   };
 }
@@ -694,72 +898,24 @@ async function correctorOf(db: Conn, tierId: string): Promise<string | undefined
   return found?.helper;
 }
 
-/** The writer's main chat: the tadpole that started it. */
-export async function tadpoleOf(db: Conn, writer: Chat): Promise<Chat> {
-  if (!writer.parentId) throw new ToolError("Only a tier's writer sends work through the gate.");
-  return readChat(db, writer.parentId);
-}
-
-export function gateCardsTool(deps: AgentDeps): HarnessTool {
-  return {
-    name: "gate_cards",
-    label: "Send drafts through the gate",
-    description: deps.prompts.render("tools/gate-cards.njk", {}),
-    parameters: Type.Object({}, CLOSED),
-    kind: "change",
-    async execute(_params, context) {
-      const tier = await tierOfHelper(context);
-      const drafts = await context.db
-        .select({ id: card.id, meta: card.genMeta })
-        .from(card)
-        .where(
-          and(
-            eq(card.subtopicId, tier.id),
-            eq(card.status, "draft"),
-            sql`${card.genMeta} ->> 'stage' = 'drafted'`,
-          ),
-        );
-      if (drafts.length === 0) throw new ToolError("No drafts are waiting: write some with write_cards.");
-      const gate = await context.db.transaction(async (tx) => {
-        await tx
-          .update(card)
-          .set({ genMeta: sql`${card.genMeta} || '{"stage": "correcting"}'::jsonb` })
-          .where(
-            inArray(
-              card.id,
-              drafts.map((draft) => draft.id),
-            ),
-          );
-        let corrector = await correctorOf(tx, tier.id);
-        if (!corrector) {
-          const tadpole = await tadpoleOf(tx, context.chat);
-          const started = await startHelper(tx, tadpole, context.author, {
-            task: "corrector",
-            brief: `Correct the drafts of the ${tier.difficulty} tier of "${tier.title}" as they come.`,
-            topic: tier.topicId,
-            subtopic: tier.id,
-          });
-          corrector = started.chat.id;
-        }
-        return createRecord(tx, GateRecord, {
-          kind: "gate",
-          author: context.author,
-          body: {
-            stage: "pass1",
-            subtopic: tier.id,
-            to: corrector,
-            writer: context.chat.id,
-            items: drafts.map((draft) => draft.id),
-          },
-        });
-      });
-      const stored = await recordsStored(context.db, deps.prompts, [gate]);
-      return {
-        ...stored,
-        value: `${String(stored.value)}\nThe verdicts wake you. Write more drafts meanwhile only if the tier needs them.`,
-      };
-    },
-  };
+/** Sends new drafts to the tier's corrector, starting it with the tier's first drafts. */
+async function sendToPassOne(tx: Tx, tier: Tier, context: ToolContext, items: string[]): Promise<GateRecord> {
+  let corrector = await correctorOf(tx, tier.id);
+  if (!corrector) {
+    const tadpole = await openTopicChat(tx, "tadpole", tier.topicId);
+    const started = await startHelper(tx, tadpole, TIERS_AUTHOR, {
+      task: "corrector",
+      brief: `Correct the drafts of the ${tier.difficulty} tier of "${tier.title}" as they come.`,
+      topic: tier.topicId,
+      subtopic: tier.id,
+    });
+    corrector = started.chat.id;
+  }
+  return createRecord(tx, GateRecord, {
+    kind: "gate",
+    author: context.author,
+    body: { stage: "pass1", subtopic: tier.id, to: corrector, writer: context.chat.id, items },
+  });
 }
 
 const QuestionDraft = Type.Object(
@@ -767,8 +923,8 @@ const QuestionDraft = Type.Object(
     card: Id,
     kind: Type.Enum(["mcq", "free_text"]),
     stem: Type.String({ minLength: 1 }),
-    options: Type.Optional(Type.Array(Type.String({ minLength: 1 }), { minItems: 3, maxItems: 5 })),
-    correct_index: Type.Optional(Type.Integer({ minimum: 0 })),
+    options: Type.Optional(Type.Array(Type.String({ minLength: 1 }), { minItems: 4, maxItems: 4 })),
+    correct_index: Type.Optional(Type.Integer({ minimum: 0, maximum: 3 })),
     rubric: Type.Optional(
       Type.String({ minLength: 1, description: "Levels 0 to 3, each saying what an answer at it holds" }),
     ),
@@ -783,6 +939,9 @@ const WriteQuestionsParameters = Type.Object(
   CLOSED,
 );
 
+/** An MCQ has four options (the old pipeline's quiz prompt), and a tier one free-text question. */
+const MCQ_OPTIONS = 4;
+
 export function writeQuestionsTool(deps: AgentDeps): HarnessTool<typeof WriteQuestionsParameters> {
   return {
     name: "write_questions",
@@ -792,48 +951,49 @@ export function writeQuestionsTool(deps: AgentDeps): HarnessTool<typeof WriteQue
     kind: "change",
     async execute(params, context) {
       const tier = await tierOfHelper(context);
-      const progress = await tierProgress(context.db, tier.id);
-      const reached = progress.accepted + progress.live >= tier.targetCards;
-      if (!reached && !(await allowedShort(context.db, tier.id))) {
-        throw new ToolError(
-          `Questions come once the tier reaches its target: ${progress.accepted} of ${tier.targetCards} cards are accepted.`,
-        );
+      if (!(await cardsLive(context.db, tier))) {
+        throw new ToolError("Questions come once the tier's cards are live: your brief says when they are.");
       }
-      const accepted = await context.db
-        .select({ id: card.id })
+      const target = await questionTarget(context.db, tier);
+      const live = await context.db
+        .select({ id: card.id, difficulty: card.difficulty })
         .from(card)
-        .where(
-          and(
-            eq(card.subtopicId, tier.id),
-            eq(card.status, "draft"),
-            sql`${card.genMeta} ->> 'stage' = 'accepted'`,
-          ),
-        );
-      const acceptedIds = new Set(accepted.map((row) => row.id));
-      const stems = await deps.embedder.embedPassage(params.questions.map((draft) => draft.stem));
+        .where(and(eq(card.subtopicId, tier.id), eq(card.status, "active")));
+      const difficultyOf = new Map(live.map((row) => [row.id, row.difficulty]));
       const existing = await context.db
-        .select({ id: question.id, stem: question.stem, embedding: question.embedding })
+        .select({ id: question.id, stem: question.stem, kind: question.kind, embedding: question.embedding })
         .from(question)
         .where(and(eq(question.subtopicId, tier.id), ne(question.status, "rejected")));
+      let places = target - existing.length;
+      let hasFreeText = existing.some((row) => row.kind === "free_text");
+      const stems = await deps.embedder.embedPassage(params.questions.map((draft) => draft.stem));
       // Each question that passes is stored, and only a faulty one is refused, so one fault never
       // has every question written again (the owner's rule: no output paid for twice).
       const kept: { draft: (typeof params.questions)[number]; stem: number[] }[] = [];
       const refused: string[] = [];
       params.questions.forEach((draft, index) => {
         const problems: string[] = [];
-        if (!acceptedIds.has(draft.card))
-          problems.push(`card ${draft.card} is not an accepted card of this tier`);
+        if (!difficultyOf.has(draft.card))
+          problems.push(`card ${draft.card} is not a live card of this tier`);
+        if (places <= 0) {
+          problems.push(`the tier's ${target} questions are all written`);
+        } else if (draft.kind === "free_text" && hasFreeText) {
+          problems.push("the tier has its one free-text question; write an MCQ");
+        } else if (draft.kind === "mcq" && !hasFreeText && places === 1) {
+          problems.push("the last place is the tier's one free-text question");
+        }
         if (draft.kind === "mcq") {
           const options = draft.options ?? [];
-          if (options.length < 3) problems.push("an MCQ has 3 to 5 options");
+          if (options.length !== MCQ_OPTIONS) problems.push(`an MCQ has ${MCQ_OPTIONS} options`);
           const distinct = new Set(options.map((option) => option.trim().toLowerCase()));
           if (distinct.size !== options.length) problems.push("two options say the same thing");
           if (draft.correct_index === undefined || draft.correct_index >= options.length) {
             problems.push("correct_index must name one of its options, counting from 0");
           }
         } else {
-          if (!draft.rubric || !draft.reference_answer)
+          if (!draft.rubric || !draft.reference_answer) {
             problems.push("free text needs a rubric and a reference answer");
+          }
           const levels = new Set(draft.rubric?.match(/\b[0-3](?=\s*[:=.)-])/g) ?? []);
           if (levels.size < 4) problems.push('the rubric gives each level 0 to 3, as "0: ...", "1: ..."');
         }
@@ -852,6 +1012,8 @@ export function writeQuestionsTool(deps: AgentDeps): HarnessTool<typeof WriteQue
           refused.push(`question ${index + 1}: ${problems.join("; ")}`);
           return;
         }
+        places -= 1;
+        if (draft.kind === "free_text") hasFreeText = true;
         kept.push({ draft, stem: vector });
       });
       if (kept.length === 0) {
@@ -859,160 +1021,38 @@ export function writeQuestionsTool(deps: AgentDeps): HarnessTool<typeof WriteQue
           `Nothing was stored; fix every problem and call again:\n- ${refused.join("\n- ")}`,
         );
       }
-      const written = await context.db
-        .insert(question)
-        .values(
-          kept.map(({ draft, stem }) => ({
-            subtopicId: tier.id,
-            cardId: draft.card,
-            difficulty: tier.difficulty,
-            kind: draft.kind,
-            stem: draft.stem.trim(),
-            options: draft.kind === "mcq" ? (draft.options ?? []).map((option) => option.trim()) : null,
-            correctIndex: draft.kind === "mcq" ? (draft.correct_index ?? null) : null,
-            rubric: draft.kind === "free_text" ? (draft.rubric ?? null) : null,
-            referenceAnswer: draft.kind === "free_text" ? (draft.reference_answer ?? null) : null,
-            explanation: draft.explanation,
-            embedding: stem,
-            embeddingModel: deps.embedder.modelName,
-            genMeta: { stage: "written", writer: context.chat.id, run: context.run.id },
-          })),
-        )
-        .returning({ id: question.id });
-      let value = `Stored ${written.length} questions. Send them to pass 2 with gate_questions.`;
+      const brief = await context.db.transaction(async (tx) => {
+        const written = await tx
+          .insert(question)
+          .values(
+            kept.map(({ draft, stem }) => ({
+              subtopicId: tier.id,
+              cardId: draft.card,
+              // A tierless topic's cards run easy to advanced, so a question takes its card's difficulty.
+              difficulty: difficultyOf.get(draft.card) ?? tier.difficulty,
+              kind: draft.kind,
+              stem: draft.stem.trim(),
+              options: draft.kind === "mcq" ? (draft.options ?? []).map((option) => option.trim()) : null,
+              correctIndex: draft.kind === "mcq" ? (draft.correct_index ?? null) : null,
+              rubric: draft.kind === "free_text" ? (draft.rubric ?? null) : null,
+              referenceAnswer: draft.kind === "free_text" ? (draft.reference_answer ?? null) : null,
+              explanation: draft.explanation,
+              embedding: stem,
+              embeddingModel: deps.embedder.modelName,
+              genMeta: { stage: "gated", writer: context.chat.id, run: context.run.id },
+            })),
+          )
+          .returning({ id: question.id });
+        return startVerifier(tx, tier, { cards: [], questions: written.map((row) => row.id) });
+      });
+      const stored = await recordsStored(context.db, deps.prompts, [brief]);
+      let value = `Stored ${kept.length} questions, now with a pass-2 verifier:\n${String(stored.value)}\nIts verdicts wake you.`;
       if (refused.length > 0) {
         value += `\nNot stored, so write only these again, each with its fault fixed:\n- ${refused.join("\n- ")}`;
       }
-      return { value, dataSeen: [], recordsWritten: [] };
+      return { ...stored, value };
     },
   };
-}
-
-export function gateQuestionsTool(deps: AgentDeps): HarnessTool {
-  return {
-    name: "gate_questions",
-    label: "Send questions to pass 2",
-    description: deps.prompts.render("tools/gate-questions.njk", {}),
-    parameters: Type.Object({}, CLOSED),
-    kind: "change",
-    async execute(_params, context) {
-      const tier = await tierOfHelper(context);
-      const gate = await context.db.transaction(async (tx) => {
-        const written = await tx
-          .update(question)
-          .set({ genMeta: sql`${question.genMeta} || '{"stage": "gated"}'::jsonb` })
-          .where(
-            and(
-              eq(question.subtopicId, tier.id),
-              eq(question.status, "draft"),
-              sql`${question.genMeta} ->> 'stage' = 'written'`,
-            ),
-          )
-          .returning({ id: question.id });
-        if (written.length === 0)
-          throw new ToolError("No questions are waiting: write some with write_questions.");
-        const tadpole = await tadpoleOf(tx, context.chat);
-        return createRecord(tx, GateRecord, {
-          kind: "gate",
-          author: context.author,
-          body: {
-            stage: "questions",
-            subtopic: tier.id,
-            to: tadpole.id,
-            writer: context.chat.id,
-            items: written.map((row) => row.id),
-          },
-        });
-      });
-      return recordsStored(context.db, deps.prompts, [gate]);
-    },
-  };
-}
-
-export function submitTierTool(deps: AgentDeps): HarnessTool {
-  return {
-    name: "submit_tier",
-    label: "Put the tier live",
-    description: deps.prompts.render("tools/submit-tier.njk", {}),
-    parameters: Type.Object({}, CLOSED),
-    kind: "change",
-    async execute(_params, context) {
-      const tier = await tierOfHelper(context);
-      const progress = await tierProgress(context.db, tier.id);
-      const problems: string[] = [];
-      const short = await allowedShort(context.db, tier.id);
-      if (progress.accepted + progress.live < tier.targetCards && !short) {
-        problems.push(`${progress.accepted} of ${tier.targetCards} cards are accepted`);
-      }
-      if (progress.accepted === 0) problems.push("no card is accepted");
-      if (progress.drafted + progress.inGate > 0) {
-        problems.push(`${progress.drafted + progress.inGate} cards are still on their way through the gate`);
-      }
-      if (progress.withArt < progress.accepted) {
-        problems.push(
-          `${progress.accepted - progress.withArt} accepted cards are still waiting for their art`,
-        );
-      }
-      if (progress.questions.written + progress.questions.gated > 0) {
-        problems.push(
-          `${progress.questions.written + progress.questions.gated} questions haven't passed pass 2 yet`,
-        );
-      }
-      const unquestioned = await context.db.execute(sql`
-        SELECT c.id FROM card c
-        WHERE c.subtopic_id = ${tier.id} AND c.status = 'draft' AND c.gen_meta ->> 'stage' = 'accepted'
-          AND NOT EXISTS (
-            SELECT 1 FROM question q
-            WHERE q.card_id = c.id AND q.status <> 'rejected' AND q.gen_meta ->> 'stage' = 'passed'
-          )
-      `);
-      if (unquestioned.rows.length > 0)
-        problems.push(`${unquestioned.rows.length} accepted cards have no passed question`);
-      if (problems.length > 0) throw new ToolError(`The tier can't go live yet:\n- ${problems.join("\n- ")}`);
-
-      const done = await context.db.transaction(async (tx) => {
-        await tx
-          .update(card)
-          .set({ status: "active" })
-          .where(
-            and(
-              eq(card.subtopicId, tier.id),
-              eq(card.status, "draft"),
-              sql`${card.genMeta} ->> 'stage' = 'accepted'`,
-            ),
-          );
-        await tx
-          .update(question)
-          .set({ status: "active" })
-          .where(
-            and(
-              eq(question.subtopicId, tier.id),
-              eq(question.status, "draft"),
-              sql`${question.genMeta} ->> 'stage' = 'passed'`,
-            ),
-          );
-        return finishTopicIfDone(tx, tier.topicId);
-      });
-      let said = `The ${tier.difficulty} tier of "${tier.title}" is live.`;
-      if (done) said = `${said} It was the topic's last: the topic is written, and its job is complete.`;
-      return { value: `${said} Report to the tadpole now.`, dataSeen: [], recordsWritten: [] };
-    },
-  };
-}
-
-/** Completes the topic's job once every tier is live; true if it did. */
-async function finishTopicIfDone(tx: Tx, topicId: string): Promise<boolean> {
-  const tiers = await tx.select().from(subtopic).where(eq(subtopic.topicId, topicId));
-  for (const tier of tiers) {
-    if (!(await tierFinished(tx, tier))) return false;
-  }
-  const job = await latestJob(tx, topicId);
-  if (job?.status !== "running") return false;
-  await tx
-    .update(generationJob)
-    .set({ status: "completed", completedAt: new Date() })
-    .where(eq(generationJob.id, job.id));
-  return true;
 }
 
 export type { Difficulty };

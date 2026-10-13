@@ -10,8 +10,11 @@ import { patientGemini } from "./harness/gemini.ts";
 import { runScheduler } from "./harness/scheduler.ts";
 import { releaseTakenWakes } from "./harness/wakes.ts";
 import { log } from "./log.ts";
-import { recordTo } from "./models/calls.ts";
+import { BALANCER_DEFAULTS, Balancer } from "./models/balancer.ts";
+import { letCallsWait, recordTo } from "./models/calls.ts";
 import { geminiOpensAt } from "./models/limits.ts";
+import { NIM_LADDER } from "./models/nim.ts";
+import { nimThenGemini } from "./models/nim-then-gemini.ts";
 import { geminiFrom, proxyAnswers, proxyConfig } from "./models/proxy.ts";
 import { loadPrompts } from "./prompts.ts";
 
@@ -28,12 +31,18 @@ import { loadPrompts } from "./prompts.ts";
  */
 const DRAIN_MS = 4 * 60_000;
 
+/** How long a big write goes without an answer from NIM before Gemini takes it: a bad day on NIM. */
+const NIM_PATIENCE_S = 30 * 60;
+
 const env = loadEnv();
 const proxy = proxyConfig(env);
 if (!proxy) throw new Error("The worker needs Gemini: set CLIPROXY_API_KEY.");
-// The writers run on NIM (the owner's rule), Gemini only taking a call NIM gave up on, so no key, no worker.
-if (!env.NVIDIA_NIM_API_KEY)
-  throw new Error("The worker's writers run on NVIDIA NIM: set NVIDIA_NIM_API_KEY.");
+letCallsWait();
+// The big writes run on NIM (the owner's rule), Gemini only taking a call NIM gave up on, so no key, no worker.
+const nimKey = env.NVIDIA_NIM_API_KEY;
+if (!nimKey) throw new Error("The writers' big writes run on NVIDIA NIM: set NVIDIA_NIM_API_KEY.");
+const [nimTop] = NIM_LADDER;
+if (!nimTop) throw new Error("NIM's ladder is empty.");
 if (!env.UNIVERSE_DATABASE_URL) throw new Error("The worker writes the corpus: set UNIVERSE_DATABASE_URL.");
 
 const app = connectApp(env.DATABASE_URL);
@@ -41,6 +50,13 @@ const universe = connectUniverse(env.UNIVERSE_DATABASE_URL, { readOnly: false })
 const prompts = loadPrompts();
 const gemini = geminiFrom(proxy);
 const browser = chromiumBrowser(env.WEB_URL ?? null);
+
+const waitingOutGemini = (runId: string) =>
+  patientGemini({
+    record: recordTo(app.db, runId),
+    opensAt: () => geminiOpensAt(proxy),
+    proxyAnswers: () => proxyAnswers(proxy),
+  });
 
 const deps = {
   db: app.db,
@@ -53,13 +69,25 @@ const deps = {
   oneShot: oneShot({
     model: gemini,
     apiKey: proxy.apiKey,
-    streamFn: (runId) =>
-      patientGemini({
-        record: recordTo(app.db, runId),
-        opensAt: () => geminiOpensAt(proxy),
-        proxyAnswers: () => proxyAnswers(proxy),
-      }),
+    streamFn: waitingOutGemini,
   }),
+  nim: {
+    // The ladder picks the model for each try; this one names the call.
+    model: nimTop.model,
+    apiKey: nimKey,
+    streamFn: (runId: string) =>
+      nimThenGemini({
+        // The worker never ends, so a model that refuses the key is asked again later.
+        nim: new Balancer(NIM_LADDER, nimKey, recordTo(app.db, runId), {
+          ...BALANCER_DEFAULTS,
+          patient: true,
+          giveUpAfterS: NIM_PATIENCE_S,
+        }),
+        geminiModel: gemini,
+        gemini: waitingOutGemini(runId),
+        geminiApiKey: proxy.apiKey,
+      }),
+  },
   browser,
 };
 
@@ -82,7 +110,7 @@ process.on("SIGINT", stop);
 await runScheduler({
   db: app.db,
   prompts,
-  setUp: agentSetUp({ deps, proxy, nimKey: env.NVIDIA_NIM_API_KEY }),
+  setUp: agentSetUp({ deps, proxy }),
   signal: stopping.signal,
   drain: draining.signal,
   onEvent(event) {

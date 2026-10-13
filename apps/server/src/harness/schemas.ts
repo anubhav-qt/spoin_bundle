@@ -447,8 +447,9 @@ export const CardPlan = Type.Object(
 );
 
 /**
- * Cards or questions sent through the gate (task 0045): drafts to the writer's pass-1 helper, the
- * survivors and the questions to the tadpole for pass 2. It wakes the chat it is sent to.
+ * Drafts sent to the tier's pass-1 corrector (task 0045); it wakes the corrector. Pass 2 needs no
+ * gate record: code starts a verifier on each batch with a brief of its own. The stages name the
+ * verdicts too.
  */
 export const GATE_STAGES = ["pass1", "pass2", "questions"] as const;
 export const Gate = Type.Object(
@@ -477,7 +478,7 @@ export const Verdicts = Type.Object(
 /** One phone render of a card with designer_toad's art. */
 export const Render = Type.Object({ card: Id, art: Text }, CLOSED);
 
-/** Art attached to a card; it wakes the card's writer. */
+/** Art attached to a card. It wakes no one: the art that completes a tier puts its cards live. */
 export const Art = Type.Object({ card: Id, render: RecordRef, writer: Id }, CLOSED);
 
 export const QuestionRecord = versionedRecord("question", Question);

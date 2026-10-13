@@ -33,6 +33,7 @@ import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.
 import { viewsOf } from "../harness/views.ts";
 import type { AgentDeps } from "./context.ts";
 import { startHelper } from "./helpers.ts";
+import { cardMix, TIERLESS_SCOPES } from "./tiers.ts";
 
 /*
  * The curriculum chat and its writers (harness-tools.md, task 0045): a topic's curriculum starts
@@ -82,7 +83,8 @@ export function curriculumText(found: Topic, curriculum: Curriculum): string {
 /**
  * Every problem with a curriculum, named at once (harness-tools.md): the contract's own checks, the
  * scope its documents share, 5 to 10 grounding anchors a tier, each an exact heading of the
- * topic's ingested corpus, and no image cards until visual_toad sources photos.
+ * topic's ingested corpus, no image cards until visual_toad sources photos, every tier's fixed mix
+ * of card types, and one tier a subtopic for a scope without tiers.
  */
 export async function curriculumProblems(
   deps: AgentDeps,
@@ -105,11 +107,39 @@ export async function curriculumProblems(
       if ((plan.cardTypes.image ?? 0) > 0) {
         problems.push(`${where}: image cards wait until photographs are sourced; give \`image\` 0 for now`);
       }
+      problems.push(...mixProblems(where, plan.targetCards, plan.cardTypes));
+      if (TIERLESS_SCOPES.includes(found.scope) && tier !== "beginner") {
+        problems.push(`${where}: a ${found.scope} has no tiers; give each subtopic only \`beginner\``);
+      }
       refs.push(...plan.grounding);
     }
   }
   problems.push(...(await groundingProblems(deps, found, refs)));
   return problems;
+}
+
+/** A tier's card types against the fixed mix (tiers.ts): prose's share may be any split of prose and code. */
+function mixProblems(
+  where: string,
+  targetCards: number,
+  types: Record<string, number | undefined>,
+): string[] {
+  const mix = cardMix(targetCards);
+  const given = {
+    ascii: types.ascii ?? 0,
+    diagram: types.diagram ?? 0,
+    comparison: types.comparison ?? 0,
+    proseAndCode: (types.prose ?? 0) + (types.code ?? 0),
+  };
+  const right =
+    given.ascii === mix.ascii &&
+    given.diagram === mix.diagram &&
+    given.comparison === mix.comparison &&
+    given.proseAndCode === mix.prose;
+  if (right) return [];
+  return [
+    `${where}: a tier of ${targetCards} cards is ascii ${mix.ascii}, diagram ${mix.diagram}, comparison ${mix.comparison}, and ${mix.prose} prose (a code subject may make any of those code cards)`,
+  ];
 }
 
 /** Each reference names a section of an ingested document of the topic's scope, by its exact heading. */

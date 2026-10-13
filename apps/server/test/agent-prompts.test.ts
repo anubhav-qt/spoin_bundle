@@ -23,13 +23,13 @@ const tier = {
 };
 
 const progress = {
-  drafted: 1,
   inGate: 2,
   accepted: 3,
-  rejected: 1,
   withArt: 2,
+  awaitingArt: 1,
   live: 0,
-  questions: { written: 1, gated: 0, passed: 2, rejected: 0 },
+  rejected: 1,
+  questions: { inGate: 1, live: 2, freeTextLive: 1, rejected: 0 },
 };
 
 const passage = {
@@ -51,8 +51,8 @@ const card = {
   visualKind: null,
   meta: {
     stage: "accepted",
-    form: "prose",
-    art: { show: "a crab holding a box", ideas: "the box has a label" },
+    form: "ascii",
+    art: { kind: "gag", show: "a crab holding a box", ideas: "the box has a label" },
   },
   passages: [passage],
   subtopicTitle: "Ownership",
@@ -127,16 +127,11 @@ describe("the agents' tools", () => {
       "write-document",
       "report-findings",
       "list-subtopics",
-      "start-subtopic",
-      "start-verifier",
       "read-grounding",
       "read-cards",
       "plan-cards",
       "write-cards",
-      "gate-cards",
       "write-questions",
-      "gate-questions",
-      "submit-tier",
       "read-drafts",
       "correct-cards",
       "read-survivors",
@@ -144,20 +139,42 @@ describe("the agents' tools", () => {
       "solve-questions",
       "check-rubrics",
       "list-art-requests",
-      "attach-art",
     ];
     for (const name of names) expect(prompts.render(`tools/${name}.njk`, {}).length).toBeGreaterThan(40);
     expect(prompts.render("tools/report-coverage.njk", { stages: COMPETENCY_STAGES })).toContain("awareness");
-    expect(prompts.render("tools/render-art.njk", { columns: 40, lines: 24 })).toContain(
-      "at most 40 columns and 24 lines",
+    expect(prompts.render("tools/render-art.njk", { columns: 40, batch: 10 })).toContain(
+      "at most 40 columns, any height",
     );
+    expect(prompts.render("tools/attach-art.njk", { batch: 10 })).toContain("up to 10 in one call");
+    expect(prompts.render("tools/written-on-nim.njk", { tool: "Stores your tier's cards." })).toContain(
+      "The tool NIM writes through:\nStores your tier's cards.",
+    );
+    expect(
+      prompts.render("lines/nim-write.njk", {
+        tool: "write_cards",
+        instructions: "All 12 cards of the plan.",
+      }),
+    ).toContain("one call to write_cards");
   });
 
   test("the tiers' results render", () => {
     const subtopics = prompts.render("tool-results/subtopics.njk", {
-      tiers: [{ ...tier, progress, writer: null, finished: false, short: false }],
+      tiers: [
+        {
+          ...tier,
+          progress,
+          questionTarget: 3,
+          writer: null,
+          cardsLive: false,
+          finished: false,
+          short: false,
+        },
+      ],
     });
-    expect(subtopics).toContain('"Ownership", beginner (subtopic s1): not started. Target 6 cards');
+    expect(subtopics).toContain(
+      '"Ownership", beginner (subtopic s1): waiting for the tiers below it. Target 6 cards: 0 live, 3 accepted',
+    );
+    expect(subtopics).toContain("Questions, 3: 2 live (1 free text), 1 in pass 2, 0 rejected.");
     expect(prompts.render("tool-results/subtopics.njk", { tiers: [] })).toContain("no subtopics yet");
 
     const grounding = prompts.render("tool-results/grounding.njk", { tier, passages: [passage] });
@@ -171,9 +188,14 @@ describe("the agents' tools", () => {
       titles: [{ title: card.title, canonicalTitle: card.canonicalTitle, difficulty: "beginner" }],
       questions: [mcq],
       progress,
+      questionTarget: 3,
+      artQuotas: { gag: 3, informative: 2 },
     });
+    expect(cards).toContain("Of the ascii cards' art, 3 gag and 2 informative.");
+    expect(cards).toContain("3 accepted (2 with art, 1 waiting for it)");
+    expect(cards).toContain("Questions, 3 once the cards are live: 2 live (1 free text), 1 in pass 2");
     expect(cards).toContain("card types: prose 4, code 2.");
-    expect(cards).toContain('<card id="k1" stage="accepted" form="prose" hero="true">');
+    expect(cards).toContain('<card id="k1" stage="accepted" form="ascii" hero="true">');
     expect(cards).toContain('- "Borrowing" (near duplicate): Repeats k1.');
     expect(cards).toContain("- q1, on card k1, MCQ (gated): How many owners?");
   });
@@ -184,7 +206,7 @@ describe("the agents' tools", () => {
       subtopic: tier.title,
       drafts: [card],
     });
-    expect(drafts).toContain('<draft id="k1" form="prose">');
+    expect(drafts).toContain('<draft id="k1" form="ascii">');
     expect(drafts).not.toContain("beginner");
 
     const survivors = prompts.render("tool-results/survivors.njk", {
@@ -204,7 +226,7 @@ describe("the agents' tools", () => {
 
   test("the art requests render", () => {
     const requests = prompts.render("tool-results/art-requests.njk", { cards: [card] });
-    expect(requests).toContain("Show: a crab holding a box\nIdeas: the box has a label");
+    expect(requests).toContain("Kind: gag\nShow: a crab holding a box\nIdeas: the box has a label");
     expect(prompts.render("tool-results/art-requests.njk", { cards: [] })).toBe(
       "No card is waiting for art.",
     );

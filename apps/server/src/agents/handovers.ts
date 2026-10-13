@@ -9,13 +9,16 @@ import { type HarnessTool, ToolError } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
 import { publishCurriculum } from "./curriculum.ts";
 import { closingReportProblems, ingestTopicCorpus } from "./documents.ts";
+import { putCardsLiveIfDone, startReadyTiers, tierById } from "./tiers.ts";
 
 /*
  * The procedure's approval points (ADR-0100, task 0045): a tadpole hands toad_sage its coverage
  * note, its maps, an "insufficient evidence" or its closing report, and the curriculum chat hands
  * it a curriculum. toad_sage answers each with one review, go on or change, which wakes the chat
  * that sent it. On go-on, code takes the next step: past the closing report it ingests the
- * topic's documents, and past the curriculum it writes, ingests and projects it.
+ * topic's documents, past the curriculum it writes, ingests and projects it and starts the first
+ * tiers' writers, and past an "insufficient evidence" it puts the tier's cards live if nothing
+ * else waits.
  */
 
 const HandOverParameters = Type.Object(
@@ -139,14 +142,21 @@ export function reviewTool(deps: AgentDeps): HarnessTool<typeof ReviewParameters
           );
         }
         await publishCurriculum(deps, latest.body);
-        done =
-          "The curriculum is written, ingested and projected onto the topic's subtopics; its tadpole is woken.";
+        const started = await context.db.transaction((tx) => startReadyTiers(tx, latest.body.topic));
+        done = `The curriculum is written, ingested and projected onto the topic's subtopics, and ${started.length} tiers' writers are started.`;
       }
       const review = await createRecord(context.db, ReviewRecord, {
         kind: "review",
         author: context.author,
         body: { handover: refOf(handover), verdict: params.verdict, notes: params.notes },
       });
+      const short = handover.body.subtopic;
+      if (params.verdict === "go_on" && handover.body.kind === "insufficient_evidence" && short) {
+        const tier = await tierById(context.db, short);
+        if (await context.db.transaction((tx) => putCardsLiveIfDone(tx, tier))) {
+          done = "The tier finishes short: its cards are live, and its writer is briefed on its questions.";
+        }
+      }
       const stored = await recordsStored(context.db, deps.prompts, [review]);
       if (!done) return stored;
       return { ...stored, value: `${String(stored.value)}\n${done}` };

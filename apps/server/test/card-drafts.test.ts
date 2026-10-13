@@ -3,7 +3,8 @@ import { draftProblems, PROSE_MAX } from "../src/agents/tiers.ts";
 
 /*
  * The faults code refuses in a card draft (task 0045), the old gate's included: a wall of prose,
- * code in a topic with none, an emoji in a diagram, and a correction note left in the body.
+ * code in a topic with none, an emoji or styling in a diagram, and a correction note left in the
+ * body.
  */
 
 const draft = (body: string) => ({
@@ -30,9 +31,9 @@ describe("a card draft", () => {
     expect(draftProblems(draft(`${words(10)}\n\n${fence}`), 1, true)).toEqual([]);
   });
 
-  test("carries no code block in a tier with no code cards, though a diagram is fine", () => {
+  test("carries no code block in a topic with no code cards, though a diagram is fine", () => {
     const code = `${words(10)}\n\n\`\`\`bash\nredis-cli FLUSHALL\n\`\`\``;
-    expect(draftProblems(draft(code), 1, false).join()).toContain("this tier has no code cards");
+    expect(draftProblems(draft(code), 1, false).join()).toContain("this topic has no code cards");
     expect(draftProblems(draft(code), 1, true)).toEqual([]);
 
     const diagram = `${words(10)}\n\n\`\`\`mermaid\nflowchart TD\n  A[App] --> C[Cache]\n\`\`\``;
@@ -42,6 +43,11 @@ describe("a card draft", () => {
   test("is refused for an emoji in a diagram", () => {
     const diagram = `${words(10)}\n\n\`\`\`mermaid\nflowchart TD\n  A[App 🚀] --> C[Cache]\n\`\`\``;
     expect(draftProblems(draft(diagram), 1, false)).toEqual(["a mermaid block has an emoji"]);
+  });
+
+  test("is refused for styling a diagram, which is always black on white", () => {
+    const styled = `${words(10)}\n\n\`\`\`mermaid\nflowchart TD\n  A[App] --> C[Cache]\n  style C fill:#f9f\n\`\`\``;
+    expect(draftProblems(draft(styled), 1, false).join()).toContain("a mermaid block styles its nodes");
   });
 
   test("is refused for a correction note left in its body", () => {

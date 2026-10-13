@@ -1,4 +1,3 @@
-import type { HelperTask } from "@spoin/shared/enums";
 import { type Chat, readChat } from "../harness/chats.ts";
 import { everyChatTools } from "../harness/every-chat.ts";
 import { patientGemini } from "../harness/gemini.ts";
@@ -7,11 +6,8 @@ import type { ChatSetUp } from "../harness/scheduler.ts";
 import type { HarnessTool } from "../harness/tools.ts";
 import { topicReadingTools } from "../harness/topic-reading.ts";
 import { webSearchTool } from "../harness/web-search.ts";
-import { BALANCER_DEFAULTS, Balancer } from "../models/balancer.ts";
 import { recordTo } from "../models/calls.ts";
 import { geminiOpensAt } from "../models/limits.ts";
-import { NIM_LADDER } from "../models/nim.ts";
-import { nimThenGemini } from "../models/nim-then-gemini.ts";
 import { GEMINI_THINKING, geminiFrom, type ProxyConfig, proxyAnswers } from "../models/proxy.ts";
 import { attachArtTool, listArtRequestsTool, renderArtTool } from "./art.ts";
 import type { AgentDeps } from "./context.ts";
@@ -42,35 +38,27 @@ import {
 import { handOverTool, reviewTool } from "./handovers.ts";
 import { reportTool, startHelperTool } from "./helpers.ts";
 import { changeMapTool, writeMapTool } from "./maps.ts";
+import { writtenOnNim } from "./nim-writes.ts";
 import { fetchTool, readPageTool, searchPagesTool } from "./pages.ts";
 import {
-  gateCardsTool,
-  gateQuestionsTool,
   listSubtopicsTool,
   planCardsTool,
   readCardsTool,
   readGroundingTool,
-  startSubtopicTool,
-  startVerifierTool,
-  submitTierTool,
   writeCardsTool,
   writeQuestionsTool,
 } from "./tiers.ts";
 
 /*
  * How each chat of the pipeline runs (task 0045): its tools, by its role or its helper's task, and
- * its model. The three writers write at length on NIM's ladder, which the owner means to use the
- * most; every other chat orchestrates or verifies, on Gemini, waiting its limits out. The worker
- * doesn't start without a NIM key, and a writer's call goes to Gemini only once NIM gives up on it.
+ * its model. Every chat runs on Gemini, waiting its limits out; the big writes alone go to NIM,
+ * one call each, through the writers' write tools (nim-writes.ts), which the owner means to use
+ * the most with few calls of big inputs and outputs.
  */
-
-/** The helpers that write at length, on NIM. */
-const WRITERS: HelperTask[] = ["document_writer", "curriculum_writer", "tier_writer"];
 
 export interface AgentSetUpInput {
   deps: AgentDeps;
   proxy: ProxyConfig;
-  nimKey: string;
 }
 
 export function agentSetUp(input: AgentSetUpInput): (chat: Chat) => Promise<ChatSetUp> {
@@ -79,15 +67,13 @@ export function agentSetUp(input: AgentSetUpInput): (chat: Chat) => Promise<Chat
     const tools = [...everyChatTools(input.deps.prompts, chat), ...(await roleTools(input.deps, chat))];
     const compactionTools = tools.filter((tool) => tool.kind === "read" || MAP_TOOLS.has(tool.name));
     const chatSetUp = { tools, compactionTools, compactWhileWaitingAt: compactWhileWaitingAt(chat) };
-    if (runsOnNim(chat)) return { ...onNim(input, gemini), ...chatSetUp };
     return { ...(await onGemini(input, gemini)), ...chatSetUp };
   };
 }
 
-/** Whether the chat writes at length, on NIM; every other chat is on Gemini. */
-export function runsOnNim(chat: Chat): boolean {
-  if (!chat.task) return false;
-  return WRITERS.includes(chat.task);
+/** A writer's big write: one NIM call with the writer's whole chat. */
+function onNim(deps: AgentDeps, tool: HarnessTool): HarnessTool {
+  return writtenOnNim(deps.prompts, deps.nim, tool);
 }
 
 /** The context, in tokens, at which a chat that waits on others compacts once its turn ends (the owner's rule). */
@@ -127,39 +113,6 @@ async function onGemini(
   };
 }
 
-/** How long a writer's call goes without an answer from NIM before Gemini takes it: a bad day on NIM. */
-export const NIM_PATIENCE_S = 30 * 60;
-
-function onNim(input: AgentSetUpInput, gemini: () => Promise<ChatSetUp["model"]>): ModelSetUp {
-  const [top] = NIM_LADDER;
-  if (!top) throw new Error("NIM's ladder is empty.");
-  const proxy = input.proxy;
-  return {
-    // The ladder picks the model for each call; this one names the run.
-    model: top.model,
-    thinkingLevel: GEMINI_THINKING,
-    apiKey: input.nimKey,
-    streamFn: (run) => {
-      const record = recordTo(input.deps.db, run.id);
-      return nimThenGemini({
-        // The worker never ends, so a model that refuses the key is asked again later.
-        nim: new Balancer(NIM_LADDER, input.nimKey, record, {
-          ...BALANCER_DEFAULTS,
-          patient: true,
-          giveUpAfterS: NIM_PATIENCE_S,
-        }),
-        geminiModel: gemini,
-        gemini: patientGemini({
-          record,
-          opensAt: () => geminiOpensAt(proxy),
-          proxyAnswers: () => proxyAnswers(proxy),
-        }),
-        geminiApiKey: proxy.apiKey,
-      });
-    },
-  };
-}
-
 async function roleTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> {
   if (chat.role === "helper") return helperTools(deps, chat);
   if (chat.role === "toad_sage") return [...toadSageTools(deps), startHelperTool(deps.prompts)];
@@ -178,7 +131,9 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
     if (main.role === "tadpole") return [...researchTools(deps), report];
     throw new Error(`A ${main.role} chat has no helpers.`);
   }
-  if (chat.task === "document_writer") return [...researchTools(deps), writeDocumentTool(deps), report];
+  if (chat.task === "document_writer") {
+    return [...researchTools(deps), onNim(deps, writeDocumentTool(deps)), report];
+  }
   if (chat.task === "curriculum_writer") {
     return [
       readIntakeTool(deps),
@@ -186,7 +141,7 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
       readDocumentTool(deps),
       searchCorpusTool(deps),
       readCurriculumTool(deps),
-      writeCurriculumTool(deps),
+      onNim(deps, writeCurriculumTool(deps)),
       report,
     ];
   }
@@ -195,11 +150,8 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
       readGroundingTool(deps),
       readCardsTool(deps),
       planCardsTool(deps),
-      writeCardsTool(deps),
-      gateCardsTool(deps),
-      writeQuestionsTool(deps),
-      gateQuestionsTool(deps),
-      submitTierTool(deps),
+      onNim(deps, writeCardsTool(deps)),
+      onNim(deps, writeQuestionsTool(deps)),
       report,
     ];
   }
@@ -253,8 +205,6 @@ function tadpoleTools(deps: AgentDeps): HarnessTool[] {
     settleFindingTool(deps),
     startHelperTool(deps.prompts),
     listSubtopicsTool(deps),
-    startSubtopicTool(deps),
-    startVerifierTool(deps),
   ];
 }
 

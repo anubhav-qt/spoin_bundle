@@ -20,8 +20,8 @@ in the code.
 
 | Chat | Model |
 |---|---|
-| toad_sage, every main chat, research, the gate's two passes, designer_toad, visual_toad | Gemini 3.8 Flash, medium thinking, through CLIProxyAPI |
-| The writers: corpus documents, curricula, cards, questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again. The worker doesn't start without a NIM key; a call goes to Gemini only once NIM gives up on it: 12 tries spent, no model left to ask, or no answer within 30 minutes |
+| toad_sage, every chat (the writers' included), research, the gate's two passes, designer_toad, visual_toad | Gemini 3.8 Flash, medium thinking, through CLIProxyAPI |
+| The writers' big writes, one call each: a corpus document, a curriculum, a tier's cards, a tier's questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again. The worker doesn't start without a NIM key; a call goes to Gemini only once NIM gives up on it: 12 tries spent, no model left to ask, or no answer within 30 minutes |
 
 ## Running it
 
@@ -132,7 +132,7 @@ page's content stays on disk; Postgres keeps its pointer, and pgvector its passa
 
 ### Documents
 
-A tadpole writes only its own topic's documents, each one through a writer helper on NIM.
+A tadpole writes only its own topic's documents, each one through a writer helper whose write is one NIM call.
 Stale material it notices elsewhere goes in its closing report, and toad_sage routes it to that
 topic's frog. Drafts are ingested only once toad_sage says go on to the closing report, so no
 other topic retrieves them before; the curriculum chat starts after ingestion.
@@ -177,40 +177,75 @@ after go-on it only grows, and only when the topic's frog asks.
 | `report(summary)` | The helper's last call |
 
 `write_curriculum` checks that the `scope` matches the topic's and its corpus documents'; the
-prerequisites form a DAG; every `target_cards` is 5 to 25; the quotas use the six card types
-and sum to the target; a tier with an image quota lists as many `image_needs` as the quota;
-every tier has 5 to 10 grounding anchors, each an exact existing heading. Past go-on, any
+prerequisites form a DAG; every `target_cards` is 5 to 25; every tier's quotas are the card mix
+below, with image 0 until photographs are sourced; a survey or a one-shot gives each subtopic
+only `beginner`; every tier has 5 to 10 grounding anchors, each an exact existing heading. Past go-on, any
 change to an existing subtopic or tier is refused, so only additions get through.
 
 ## A topic's tadpole: cards and questions
 
-After the curriculum is projected onto the topic's subtopics. The tadpole stays the
-orchestrator: visual_toad's sourcing first, then one writer helper per tier, each tier's two gate passes, designer_toad and
-visual_toad. Each tier goes live as soon as it is finished, and once the last one is live,
-code makes the tadpole the topic's frog.
+After the curriculum is projected onto the topic's subtopics, code runs the tiers (task 0045),
+and the tadpole watches and hands over what code can't settle:
+
+1. On publish, code starts a writer helper for every tier whose lower tiers in its group have
+   their cards live, and starts the tiers above each one as its cards go live.
+2. The writer's `write_cards` sends the drafts that pass to the tier's pass-1 helper, made with
+   its first drafts. When pass 1 has nothing left to correct, code starts a pass-2 verifier on
+   the survivors with a brief of its own, so the verifier reads none of the writer's or pass 1's
+   reasoning.
+3. designer_toad draws the art on every accepted card that asked for it, in batches. Once no
+   accepted card is waiting for art, on the last verdict or the last piece of art, the tier's
+   accepted cards go live together.
+4. Only then is the writer briefed to write the tier's questions: the topic's budget of its card
+   target clamped to 200 to 300 (the old pipeline's `persistence.py`), shared among its tiers by
+   their targets, one free text and the rest four-option MCQs, each from one card. Each question
+   goes live as it passes pass 2.
+5. The job completes when every tier's cards and quiz are live; code then makes the tadpole the
+   topic's frog.
+
+A survey or a one-shot has no tiers (ADR-0106): each subtopic has one, and its cards keep the
+difficulty pass 2 reads them at, easy to advanced.
+
+### The card mix
+
+Every tier has the same mix (the owner, 2026-10-13, ADR-0107), its numbers each type's share of
+the target, rounded so they sum to it:
+
+| Type | Share | What it is |
+|---|---|---|
+| ascii | 50% | A card carrying ASCII art: 30% of the tier a gag, 20% a small informative drawing |
+| diagram | 20% | A mermaid flowchart, always black on white: no styling, colour or emoji |
+| prose | 20% | Words. On a code subject any part of it may be code cards instead |
+| comparison | 10% | Myth against fact |
+
+Only the ascii cards carry art, so the other half of a tier waits for no drawing. A card can hold
+more than its form needs, and still counts as its form: on a code subject an ascii card with a
+code block is an ascii card. No photographs until they are sourced, so visual_toad and
+`request_photos` are not wired in.
 
 ### The tadpole
 
 | Tool | Does |
 |---|---|
-| `list_subtopics()` | Every group and tier: target, grounding, and progress (drafted, accepted, rejected, art, questions, live) |
-| `start_subtopic(subtopic)` | A tier's writer helper. Refused until the topic's photographs are sourced and `images:check` passes, and while a lower tier of its group is unfinished; the tadpole decides which tiers run at once |
-| `start_verifier(subtopic, brief)` | A pass-2 helper for a tier's cards past pass 1, or its questions. The tadpole decides what context it gets, and gives it none of the writer's or pass 1's reasoning |
+| `list_subtopics()` | Every group and tier: target, grounding, its writer, and progress (in the gate, accepted, with art, live, rejected; questions live against their target) |
 | `hand_over("insufficient_evidence", records)` | A tier that cannot reach its target from its grounding, to toad_sage. The only way a tier finishes short |
 
-### A tier's writer helper (NIM)
+### A tier's writer helper
+
+The writer's chat runs on Gemini; its two big writes are NIM's. `write_cards` and
+`write_questions` take only instructions: the tool hands NIM the writer's whole chat with them
+and the real tool, so NIM writes a whole tier's cards, or its whole quiz, in one call, at most a
+tier (the owner's cap). The real tool's checks store what passes; NIM's every try is kept in
+the result, and a refused try goes back to NIM with its faults, up to three tries. A call NIM
+gives up on goes to Gemini. The document and curriculum writers write the same way.
 
 | Tool | Does |
 |---|---|
 | `read_grounding(subtopic)` | The tier's grounding sections, as numbered passages |
 | `read_cards(subtopic)` | The tier's cards so far, the lower tiers' card bodies to build on, and the topic's titles |
 | `plan_cards(subtopic, briefs[])` | The tier's plan (ADR-0059): concept, form and angle per card, as a record |
-| `request_photos(briefs[])` | Asks visual_toad for the image briefs' photographs. An image card is written only after its photo is picked; a brief left without one becomes prose |
-| `write_cards(subtopic, cards[])` | Drafts: dual titles, summary, body, cited passages, form, a picked photo or an art request (what to show, and ideas), hero. Code refuses a structural fault and names it (lengths, prose over 1,200 characters, a code block in a tier with no code cards, mermaid and its emoji, a correction note in the body, a passage outside the grounding, a photo not picked for it or used elsewhere, the type quotas). Each draft stands alone: the passing ones are stored and only the faulty ones come back to be written again. Embeds the drafts and derives their archetype |
-| `gate_cards(subtopic)` | Sends the drafts to the tier's pass-1 helper; the survivors go to the tadpole for pass 2, and the verdicts wake the writer. Accepted cards stay; a rejected one is a `rejected_card` with its feedback, and the writer drafts again against it until the tier reaches its `target_cards` |
-| `write_questions(subtopic, questions[])` | Refused until the tier reaches its target. Code checks the shape (distinct options, a correct index in range, a rubric for free text), that the card is accepted in this tier, and near-duplicate stems; the passing questions are stored and only the faulty ones come back |
-| `gate_questions(subtopic)` | Sends the questions to the tadpole for pass 2 |
-| `submit_tier(subtopic)` | Refused until the tier reaches its target, every accepted card has its art or photo, and every question has passed. Then the tier goes live |
+| `write_cards(subtopic, cards[])` | Drafts, sent to pass 1 as they are stored: dual titles, summary, body, cited passages, form, an art request on an ascii card (gag or informative, what to show, and ideas), hero. Code refuses a structural fault and names it (lengths, prose over 1,200 characters, a code block in a topic with no code cards, mermaid and its emoji or styling, a diagram card that isn't a flowchart, an ascii card without an art request, a correction note in the body, a passage outside the grounding, the type and art quotas). An art request on any other card is dropped. Each draft stands alone: the passing ones are stored and only the faulty ones come back to be written again. Embeds the drafts and derives their archetype |
+| `write_questions(subtopic, questions[])` | Refused until the tier's cards are live. Code checks the shape (four distinct options, a correct index in range, a rubric for free text), that the card is live in this tier, the tier's question target, one free-text question, and near-duplicate stems; the passing questions go to a pass-2 verifier and only the faulty ones come back |
 
 ### Pass 1: correction (one helper per writer)
 
@@ -233,15 +268,18 @@ brief.
 
 ### designer_toad (one per tadpole)
 
-Draws every ASCII art itself, for cards the gate accepted, replacing the curated scene library
-(ADR-0021, ADR-0079, ADR-0080). A card goes live only with its art.
+Draws every ASCII art itself, for the ascii cards the gate accepted, replacing the curated scene
+library (ADR-0021, ADR-0079, ADR-0080). Each piece is the kind its card asked for (ADR-0107): a
+gag with labels and a line of dialogue or caption (ADR-0099), or a small labelled informative
+drawing, on Gemini, in batches of up to 10. A tier's cards go live once every accepted card that
+asked for art has it.
 
 | Tool | Does |
 |---|---|
-| `list_art_requests()` | Accepted cards waiting for art, with the writer's request and ideas |
+| `list_art_requests()` | Accepted cards waiting for art, with the writer's request: its kind, what to show, and ideas |
 | `web_search`, `fetch` | Recent trends and references |
-| `render_art(card, art, alt)` | One call: checks the 40 columns, 24 lines and the character set, renders the card on a phone and returns the screenshot. Every render is a record |
-| `attach_art(card, art, alt)` | Refused unless this run rendered that exact art |
+| `render_art(art[])` | Up to 10 pieces, each a card, its art and its caption: checks the 40 columns (any height) and the character set, renders each card on a phone and returns the screenshots. A piece that fails is refused alone. Every render is a record |
+| `attach_art(art[])` | Up to 10 pieces, each refused unless this run rendered that exact art. Puts a tier's cards live once no accepted card is waiting for art |
 
 ### visual_toad (one per tadpole)
 
@@ -262,8 +300,8 @@ picks one for each image card before the card is written (ADR-0105).
 ## A topic's frog
 
 The topic's tadpole once its last tier is live: the same chat, keeping every tadpole tool
-(research, maps, document writers, `audit_drafts`, `start_subtopic` for added tiers,
-`start_verifier`, designer_toad and visual_toad). A report wakes it at once, and a tadpole
+(research, maps, document writers, `audit_drafts`, designer_toad and visual_toad), with code
+starting an added tier's writer and gate as it does the first ones. A report wakes it at once, and a tadpole
 gets the report tools as soon as its first tier is live. toad_sage's routed stale material and
 map J's due dates wake it too.
 

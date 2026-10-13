@@ -742,8 +742,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 - **NIM writes, Gemini orchestrates and verifies** (2026-10-13), the owner's rule after the
   first live run started with no NIM key and quietly ran every writer on Gemini (235 calls,
   none on NIM). The worker now refuses to start without `NVIDIA_NIM_API_KEY`, in `worker.ts` and
-  in compose (the key is breader's), and only the writers run on it (`runsOnNim` in
-  `agents/set-up.ts`). A writer's call goes to Gemini only once NIM gives up on it, so a bad day
+  in compose (the key is breader's), and only the writers run on it (since narrowed to their big
+  writes, below). A writer's call goes to Gemini only once NIM gives up on it, so a bad day
   on NIM slows a run without stopping it (`models/nim-then-gemini.ts`): its 12 tries spent, no
   model left to ask, or no answer within `NIM_PATIENCE_S` (30 minutes, the balancer's
   `giveUpAfterS`, checked only before a try so no answer is cut off, and checked even with a
@@ -762,10 +762,37 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   Design at 30 cards, and the curriculum writer, allowed tiers "as each subtopic needs", taught
   each of its 3 subtopics at a single tier. Now toad_sage, the intake's `card_count`, the
   curriculum writer and the curriculum chat's review all say it: 125 to 750 cards whatever the
-  scope, a topic scope the most, with every subtopic at all three tiers. The tadpole sizes the
-  corpus to the card count. Still an instruction, never a check in code.
+  scope, a topic scope the most. The old canon's tier rule stands: in a topic scope each subtopic
+  is taught only at the tiers it can really teach, and a survey or one-shot has none (code checks
+  that one). The tadpole sizes the corpus to the card count. The range is still an instruction,
+  never a check in code.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
+- **Only the big writes go to NIM** (2026-10-13), the owner's rule: "only big calls are to be
+  run with nim models". Every chat runs on Gemini, the writers' included. `write_document`,
+  `write_curriculum`, `write_cards` and `write_questions` take only instructions and hand NIM the
+  writer's whole chat with the real tool, so one call writes a whole document, curriculum, tier's
+  cards or tier's quiz, at most one tier (`agents/nim-writes.ts`). Every try NIM writes is kept in
+  the result, refused or not, and a refused try goes back to it with its faults, up to three. A
+  manual call for 25 cards from 27 passages took 518 seconds (first token at 294, 11k tokens in,
+  7,324 out); one for 15 cards took 1,698 seconds and one for 30 questions 1,489, each after two
+  tries cut off by Node's fetch at 301 seconds waiting for headers (first tokens at 271 and 284
+  seconds, 13,757 and 9,560 tokens out). The worker now sets undici's dispatcher to wait past the
+  call timers (`letCallsWait` in `models/calls.ts`), so only those decide a call is too slow. The
+  probes wrote text, not a tool call, because they skipped `normalizeContext` and so never sent
+  the tool; a try with no call keeps its text all the same.
+- **Code runs the tiers** (2026-10-13). The tadpole no longer starts subtopics, verifiers or the
+  gate: code starts a tier's writer on publish once the tiers below it are live, a pass-2
+  verifier once pass 1 has nothing left, puts a tier's cards live and briefs its writer on its
+  questions. The tadpole watches with `list_subtopics` and hands over a tier that can't reach
+  its target.
+- **Every tier has a fixed card mix** (2026-10-13, ADR-0107): half ascii (gags 30% of the tier,
+  informative drawings 20%), 20% mermaid flowcharts drawn black on white, 20% prose (code cards
+  out of it on a code subject), 10% myth against fact, no images yet. Only the ascii cards carry
+  art, so a tier goes live once no accepted card is waiting for it, on the last verdict when none
+  asked. A card can hold more than its form and still counts as its form, so on a code subject
+  any card may carry a code block. The web app draws every flowchart black on white whatever the
+  theme (`apps/web/components/MermaidBlock.tsx`).
 
 ## Asked when we get there
 

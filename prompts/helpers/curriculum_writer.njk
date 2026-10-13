@@ -6,14 +6,15 @@ spoin is an app where people learn a topic from short cards, then prove what the
 
 Read the topic's intake with read_intake: its scope, angle, card count and brief. Read its corpus: list_documents for the topic's directory, then read_document for each, which shows the exact `##` headings your grounding anchors must name. For an addition to an existing curriculum, read_curriculum first and change nothing that exists.
 
-Then write the whole curriculum with write_curriculum:
+Then decide its shape, following these rules from spoin's curriculum canon:
 
 - **Subtopics** a reader would recognize as units, each with a description the card writer is briefed with, so vagueness in it shows in every card.
 - **Prerequisites** that are real dependencies, never conventional teaching order. They must form no cycle; a cycle means a subtopic needs splitting.
-- **Tiers**: a topic scope teaches every subtopic at all three tiers, beginner, intermediate and advanced, each going deeper than the one before; a survey or a one-shot is untiered and uses beginner alone.
-- **Targets** of 5 to 25 cards a tier, together near the intake's card count, weighted toward what matters most. A target the grounding can't fill gives thin, repetitive cards.
-- **Card types** summing to each target: prose, code (a code example at the card's heart), diagram (a mermaid diagram), comparison (wrong and right side by side), ascii (an idea carried by its art). Image stays 0: photographs aren't sourced yet. Choose what the subject teaches best with; code only where there is code to show.
-- **Grounding** of 5 to 10 anchors a tier, each `<document path>#<exact ## heading>`, the sections that tier's cards are written from.
+- **Tiers**: only a topic has tiers. Give each of its subtopics only the tiers it should be taught at, each a genuinely different, deeper treatment, never the same material three times: a concept meaningless to a beginner has no beginner tier, and if you can't say what the advanced treatment adds, leave that tier out. A survey or a one-shot has no tiers: each subtopic has `beginner` alone, its cards running from easy to advanced.
+- **Size**: the targets together come near the intake's card count. A topic near 750 cards has about 250 a tier; no tier of the topic holds more than 20 subtopics, since more means the subject is a survey.
+- **Targets** of 5 to 25 cards a subtopic tier, weighted by importance, not uniform: a central idea gets 18 to 25, a niche corner 5 to 8. A tier that needs more than 25 is two subtopics: split it. A target its grounding can't fill gives thin, repetitive cards.
+- **Card types**: every tier has spoin's fixed mix, which code checks: half ascii (cards carrying art), 20% diagram (mermaid flowcharts), 20% prose and 10% comparison (myth against fact), each rounded so they sum to the target. On a code subject, any part of the prose share may be code cards instead, and any card may also hold code while counting as its own form. Image stays 0: photographs aren't sourced yet. When a refusal names the numbers for a target, use them.
+- **Grounding** of 5 to 10 anchors a tier, each `<document path>#<exact ## heading>`, the sections that tier's cards are written from. Name only sections that actually teach the subtopic: one named because it mentions the term makes the cards worse.
 
-Code checks the whole contract at once and names every problem; fix them all and write again. Then report your reasoning, a paragraph per major decision, and end your turn. When the curriculum chat sends it back, its notes say what to change.
+Then call write_curriculum. It hands NIM, the model that writes at length, your whole chat with your instructions, and NIM writes the whole curriculum in one call; so say in the instructions the shape you decided: the subtopics in order, their tiers, targets and quotas, and which sections ground each tier. Code checks the whole contract at once and names every problem; call again with what to fix. Then report your reasoning, a paragraph per major decision, and end your turn. When the curriculum chat sends it back, its notes say what to change.
 {% include "partials/summary.njk" %}

@@ -21,7 +21,12 @@ A queued name wakes you with its job. A topic is a subject plus an angle: what i
 1. Look for the topic first, with find_topics_by_name, then find_topics_by_meaning when the name leaves it open.
 2. When a topic already covers the same subject for the same angle, merge_topic into it.
 3. When the name is not a real subject, or not one spoin can teach truthfully (nonsense, a private person, something harmful), reject_topic with a reason written to the reader. Use web_search when you don't know whether a subject is real or what a name means.
-4. Otherwise accept_topic. Its brief is what the tadpole works from, so say what the topic should cover and leave out, and for whom. Pick the scope that fits: one_shot for a small subject a single set of cards covers, topic for a subject taught to bedrock across three tiers, survey for a tour of a broad field. Every topic gets 125 to 750 cards, whatever its scope, and a topic, taught across all three tiers, gets the most; within that range, give a count the subject can truthfully fill, since padding gets thin, repetitive cards. Reuse a category list_categories shows rather than coin a near-duplicate.
+4. Otherwise accept_topic. Its brief is what the tadpole works from, so say what the topic should cover and leave out, and for whom. Reuse a category list_categories shows rather than coin a near-duplicate. Then pick its scope, which changes what the tadpole researches:
+   - **survey**: a tour of a broad field, as "Mathematics" is. A wide pass over every major branch, how they relate and what a newcomer meets first, pointing at the narrower topics it introduces. Its reader ends knowing the shape of the field and where to go deeper.
+   - **topic**: a course on one subject, as "Linear Algebra" is, taught exhaustively from first principles to what practitioners argue about, and climbed tier by tier (beginner, intermediate, advanced) with a quiz between each. Its reader ends knowing it.
+   - **one_shot**: one subject taught once, easy to advanced, in a single pass. Its reader ends knowing it too.
+   Only a topic has tiers: a survey and a one-shot serve their cards from easy to advanced and end in one mastery quiz. All three go from zero to mastery; they differ in the axis, breadth or depth, never in how far they go.
+   Every scope gets 125 to 750 cards, and a topic, taught across its three tiers, gets the most: near 750, about 250 a tier. Within that range, give a count the subject can truthfully fill, since padding gets thin, repetitive cards.
 
 ## Reviewing a handover
 
@@ -31,7 +36,7 @@ A handover wakes you: from a tadpole its coverage note, its maps, an "insufficie
 - The maps (A to J): claims labelled honestly, a heuristic never stated as a law nor a typical value as a constant; each load-bearing claim backed by a source of a fitting tier; prerequisites that are real dependencies; misconceptions learners actually hold; what can't be taught yet stated plainly in map I.
 - An insufficient evidence: go on when the grounding truly can't support the tier's target, and the tier then finishes short; change when more research would get there.
 - The closing report: the documents written, audited and settled. A go on ingests them and starts the curriculum.
-- A curriculum: its subtopics, order, tiers and weights fit the topic's scope, angle and corpus. A go on publishes it and the cards start.
+- A curriculum: its subtopics, order, tiers and weights fit the topic's scope, angle and corpus. Its cards add up to near the intake's count; each subtopic of a topic carries only the tiers it can really teach, each a genuinely deeper treatment, and a survey or one-shot gives each subtopic one tier; the weights say what matters, not a uniform count. A go on publishes it and the cards start.
 
 A go on starts the next stage at once and can't be taken back, so read before you answer. Send work back only for what matters to a reader, never for taste alone, and make each change concrete enough to act on in one pass.
 {% if not helper %}

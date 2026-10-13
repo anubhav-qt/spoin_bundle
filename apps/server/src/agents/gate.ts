@@ -7,16 +7,21 @@ import type { Db, Tx } from "../db/client.ts";
 import { card, question, rejectedCard, topic } from "../db/schema.ts";
 import { recordsStored } from "../harness/outputs.ts";
 import { createRecord } from "../harness/records.ts";
-import { CLOSED, GateRecord, Id, VerdictsRecord } from "../harness/schemas.ts";
+import { type BriefRecord, CLOSED, Id, VerdictsRecord } from "../harness/schemas.ts";
 import { type HarnessTool, type ToolContext, ToolError, type ToolOutput } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
 import {
   type CardMeta,
   codeAllowedIn,
   draftProblems,
+  finishTopicIfDone,
   groundingOf,
+  isTierless,
   metaOf,
   NEAR_DUPLICATE,
+  putCardsLiveIfDone,
+  quizLive,
+  startVerifier,
   type Tier,
   tierOfHelper,
   writerOf,
@@ -24,10 +29,11 @@ import {
 
 /*
  * The gate's two passes (harness-tools.md, task 0045). Pass 1, one corrector per tier, rewrites
- * each draft or leaves it be and never rejects; code rejects a near-duplicate. Its survivors go to
- * the tadpole, which starts a pass-2 verifier with a brief of its own. Pass 2 rates each card's
- * difficulty itself and accepts or rejects it, solves each MCQ without its key, and judges each
- * free-text rubric. Each pass's verdicts wake the writer; pass 2's accepted cards wake designer_toad.
+ * each draft or leaves it be and never rejects; code rejects a near-duplicate. Code starts a
+ * pass-2 verifier on its survivors. Pass 2 rates each card's difficulty itself and accepts or
+ * rejects it, solves each MCQ without its key, and judges each free-text rubric; a question it
+ * passes is live at once. Pass 1's rejections and pass 2's verdicts wake the writer, and pass 2's
+ * accepted cards wake designer_toad.
  */
 
 type Conn = Db | Tx;
@@ -177,6 +183,7 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
         "Card",
       );
       const grounding = await groundingOf(deps, tier);
+      const codeAllowed = await codeAllowedIn(context.db, tier);
       // Each correction that passes is stored, and only a faulty one is refused, so one fault never
       // has every correction written again (the owner's rule: no output paid for twice).
       const refused: string[] = [];
@@ -190,7 +197,7 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
           body: (given.body ?? row.body).trim(),
           passages: metaOf(row).passages,
         };
-        const problems = draftProblems(draft, grounding.length, codeAllowedIn(tier));
+        const problems = draftProblems(draft, grounding.length, codeAllowed);
         if (problems.length > 0) {
           refused.push(`card ${row.id}: ${problems.join("; ")}`);
           continue;
@@ -285,12 +292,12 @@ function titlesOf(draft: { title: string; canonical_title: string; summary: stri
 }
 
 /**
- * Pass 1's rejections go to the writer at once; once nothing waits for correction, the survivors
- * go to the tadpole for pass 2.
+ * Pass 1's rejections go to the writer at once; once nothing waits for correction, code starts a
+ * pass-2 verifier on the survivors.
  */
 async function passOn(context: ToolContext, tier: Tier, rejected: { id: string; feedback: string }[]) {
   const writer = writerOrThrow(await writerOf(context.db, tier.id));
-  const records: (GateRecord | VerdictsRecord)[] = [];
+  const records: (BriefRecord | VerdictsRecord)[] = [];
   if (rejected.length > 0) {
     records.push(
       await createRecord(context.db, VerdictsRecord, {
@@ -311,20 +318,9 @@ async function passOn(context: ToolContext, tier: Tier, rejected: { id: string; 
         sql`${card.genMeta} ->> 'stage' = 'corrected'`,
       ),
     );
-  if (survivors.length === 0 || !context.chat.parentId) return records;
-  records.push(
-    await createRecord(context.db, GateRecord, {
-      kind: "gate",
-      author: context.author,
-      body: {
-        stage: "pass2",
-        subtopic: tier.id,
-        to: context.chat.parentId,
-        writer,
-        items: survivors.map((row) => row.id),
-      },
-    }),
-  );
+  if (survivors.length === 0) return records;
+  const cards = survivors.map((row) => row.id);
+  records.push(await context.db.transaction((tx) => startVerifier(tx, tier, { cards, questions: [] })));
   return records;
 }
 
@@ -427,11 +423,16 @@ export function verifyCardsTool(deps: AgentDeps): HarnessTool<typeof VerifyCards
         "Card",
       );
       const said: string[] = [];
+      const tierless = await isTierless(context.db, tier.topicId);
       await context.db.transaction(async (tx) => {
         for (const verdict of params.verdicts) {
           const row = byId.get(verdict.card) as CardRow;
-          // The difficulty is checked here, not taken on trust: a card that reads as another tier's is rejected.
-          if (verdict.reads_as !== tier.difficulty) {
+          // The difficulty is checked here, not taken on trust: a card that reads as another tier's
+          // is rejected. A tierless topic's cards run easy to advanced, so each takes the one read.
+          if (tierless) {
+            await tx.update(card).set({ difficulty: verdict.reads_as }).where(eq(card.id, row.id));
+          }
+          if (!tierless && verdict.reads_as !== tier.difficulty) {
             const reason = `It reads as ${verdict.reads_as}, and the tier is ${tier.difficulty}. ${verdict.feedback}`;
             await rejectCard(tx, row, tier, "verification", reason);
             said.push(`- ${row.id}: rejected, it reads as ${verdict.reads_as}`);
@@ -480,11 +481,12 @@ export function verifyCardsTool(deps: AgentDeps): HarnessTool<typeof VerifyCards
           rejected,
         },
       });
+      // Cards that asked for no art wait for nothing: the tier may go live on these verdicts.
+      const wentLive = await context.db.transaction((tx) => putCardsLiveIfDone(tx, tier));
       const stored = await recordsStored(context.db, deps.prompts, [verdicts]);
-      return {
-        ...stored,
-        value: `${said.join("\n")}\n${String(stored.value)}\nEvery card given you is verified.`,
-      };
+      let value = `${said.join("\n")}\n${String(stored.value)}\nEvery card given you is verified.`;
+      if (wentLive) value += " The tier's cards are live.";
+      return { ...stored, value };
     },
   };
 }
@@ -600,12 +602,15 @@ export function checkRubricsTool(deps: AgentDeps): HarnessTool<typeof CheckRubri
   };
 }
 
-/** A question passes with no feedback; with feedback, it is rejected and the feedback kept for the writer. */
+/**
+ * A question passes with no feedback and goes live, since its card already is; with feedback, it
+ * is rejected and the feedback kept for the writer.
+ */
 async function settleQuestion(tx: Tx, row: QuestionRow, feedback: string | null): Promise<void> {
   if (feedback === null) {
     await tx
       .update(question)
-      .set({ genMeta: sql`${question.genMeta} || '{"stage": "passed"}'::jsonb` })
+      .set({ status: "active", genMeta: sql`${question.genMeta} || '{"stage": "passed"}'::jsonb` })
       .where(eq(question.id, row.id));
     return;
   }
@@ -615,7 +620,11 @@ async function settleQuestion(tx: Tx, row: QuestionRow, feedback: string | null)
     .where(eq(question.id, row.id));
 }
 
-/** Once every question given this verifier is settled, one verdicts record wakes the writer. */
+/**
+ * Once every question given this verifier is settled: if the tier's quiz is complete, the topic's
+ * job completes when it was the last, and the writer, with nothing left to do, isn't woken;
+ * otherwise one verdicts record wakes it to write what is missing.
+ */
 async function questionVerdictsIfDone(
   deps: AgentDeps,
   context: ToolContext,
@@ -627,6 +636,14 @@ async function questionVerdictsIfDone(
   if (left.length > 0) {
     return {
       value: `${said.join("\n")}\n${left.length} questions are still waiting for you.`,
+      dataSeen: [],
+      recordsWritten: [],
+    };
+  }
+  if (await quizLive(context.db, tier)) {
+    await context.db.transaction((tx) => finishTopicIfDone(tx, tier.topicId));
+    return {
+      value: `${said.join("\n")}\nEvery question given you is checked, and the tier's quiz is complete.`,
       dataSeen: [],
       recordsWritten: [],
     };

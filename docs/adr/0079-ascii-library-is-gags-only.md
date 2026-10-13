@@ -4,6 +4,8 @@
 - **Left out of the harness (2026-10-12, task 0045):** designer_toad draws every ASCII art
   itself, and the curated library is no longer a source ([harness-tools.md](../architecture/harness-tools.md)). The
   40-column invariant stands, enforced in code.
+- **Superseded in part (2026-10-13):** [ADR-0107](0107-every-tier-has-a-fixed-card-mix.md) gives
+  an ascii card a gag or a small informative drawing, gags 30% of a tier and drawings 20%.
 - **Date:** 2026-09-01
 - **Deciders:** Anubhav
 - **Amends:** [ADR-0068](0068-curated-ascii-art-library-and-worked-few-shot-generator.md)

@@ -1,7 +1,8 @@
 {% set p = progress %}
 The {{ tier.difficulty }} tier of "{{ tier.title }}": {{ tier.description }}
-Target: {{ tier.targetCards }} cards; card types: {% for form, count in tier.cardTypeQuotas %}{{ form }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}.
-Progress: {{ p.accepted + p.live }} accepted ({{ p.withArt }} with art), {{ p.inGate }} in the gate, {{ p.drafted }} drafted, {{ p.rejected }} rejected. Questions: {{ p.questions.passed }} passed, {{ p.questions.gated }} in pass 2, {{ p.questions.written }} written, {{ p.questions.rejected }} rejected.
+Target: {{ tier.targetCards }} cards; card types: {% for form, count in tier.cardTypeQuotas %}{{ form }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}. Of the ascii cards' art, {{ artQuotas.gag }} gag and {{ artQuotas.informative }} informative.
+Cards: {{ p.live }} live, {{ p.accepted }} accepted ({{ p.withArt }} with art, {{ p.awaitingArt }} waiting for it), {{ p.inGate }} in the gate, {{ p.rejected }} rejected.
+Questions, {{ questionTarget }} once the cards are live: {{ p.questions.live }} live ({{ p.questions.freeTextLive }} free text), {{ p.questions.inGate }} in pass 2, {{ p.questions.rejected }} rejected.
 
 ## Your cards
 {% for c in cards %}
@@ -12,7 +13,7 @@ Canonical title: {{ c.canonicalTitle }}
 Summary: {{ c.summary }}
 Body:
 {{ c.body }}
-{% if c.visualKind %}Art: attached{% else %}Art requested: {{ c.meta.art.show }}{% endif %}
+{% if c.visualKind %}Art: attached{% elif c.meta.art %}Art requested, {{ c.meta.art.kind }}: {{ c.meta.art.show }}{% endif %}
 
 </card>
 {% else %}

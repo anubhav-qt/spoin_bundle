@@ -128,7 +128,10 @@ its prompts, canon and validators are reused.
     and the topics joined to it by a `topic_edge` were grounded in, through frog
     retrieval. It
     is given no user id and no database handle, so ADR-0077's invariant holds: a
-    successful injection buys an off-topic answer, never data. The server keeps the
+    successful injection buys an off-topic answer, never data. It is cut off the other
+    way too (2026-10-13): AskAI is for its readers alone, so nothing else in the system
+    sees it. No other chat reads its compaction summaries, the only records it writes,
+    and nothing that acts on every chat's runs reaches its runs. The server keeps the
     thread the reader sees, the SSE events, the card hint (an active card of this
     topic, otherwise none), the 200 turns a day and the `OFF_TOPIC` sentinel. The
     embedding pre-check is dropped, so every turn reaches the chat, and a refused turn

@@ -1,7 +1,7 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, not, type SQL, sql } from "drizzle-orm";
 import type { Static, TSchema } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
-import { harnessRecord } from "../db/schema.ts";
+import { chat, harnessRecord } from "../db/schema.ts";
 import { pgCode, UNIQUE_VIOLATION } from "../lib/errors.ts";
 import { checkValue } from "./check.ts";
 import {
@@ -217,11 +217,10 @@ export async function listLatestRecords<Schema extends TSchema>(
   kind: string,
   status?: RecordStatus,
 ): Promise<Static<Schema>[]> {
-  const latest = sql`${harnessRecord.version} = (SELECT max(r.version) FROM harness_record r WHERE r.id = ${harnessRecord.id})`;
   const rows = await db
     .select()
     .from(harnessRecord)
-    .where(and(eq(harnessRecord.kind, kind), latest, status ? eq(harnessRecord.status, status) : undefined))
+    .where(latestOfKind(kind, status))
     .orderBy(asc(harnessRecord.seq));
   return rows.map((row) => checkRow(schema, row, `A stored ${kind}`));
 }
@@ -231,26 +230,37 @@ export async function readAnyRecord(db: Conn, ref: RecordRef): Promise<AnyRecord
   return readRecord(db, RECORD_SCHEMAS[recordKindOf(ref.kind)], ref);
 }
 
-/** A record known only by its id: the version named, or the latest. */
-export async function readAnyRecordById(db: Conn, id: string, version?: number): Promise<AnyRecord> {
-  const latest = await readLatestRow(db, id);
+/**
+ * AskAI's records: its chats' compaction summaries, the only records it writes. They are its
+ * readers' alone, so to every other chat they aren't there (ADR-0106).
+ */
+const askAiRecord = sql`(${harnessRecord.kind} = 'compaction_summary' AND EXISTS (SELECT 1 FROM ${chat} WHERE ${chat.id}::text = ${harnessRecord.body} ->> 'chatId' AND ${chat.role} = 'ask_ai'))`;
+
+/** A record the chats share, known only by its id: the version named, or the latest. */
+export async function readSharedRecord(db: Conn, id: string, version?: number): Promise<AnyRecord> {
+  const latest = await readLatestSharedRow(db, id);
   return readAnyRecord(db, { kind: latest.kind, id, version: version ?? latest.version });
 }
 
-/** Every version of a record known only by its id, oldest first. */
-export async function readAnyRecordHistory(db: Conn, id: string): Promise<AnyRecord[]> {
-  const latest = await readLatestRow(db, id);
+/** Every version of a record the chats share, known only by its id, oldest first. */
+export async function readSharedRecordHistory(db: Conn, id: string): Promise<AnyRecord[]> {
+  const latest = await readLatestSharedRow(db, id);
   const kind = recordKindOf(latest.kind);
   return readRecordHistory(db, RECORD_SCHEMAS[kind], kind, id);
 }
 
-/** The latest version of every record of a kind, as listLatestRecords, for a kind known only by name. */
-export async function listLatestAnyRecords(
+/** The latest version of every record of a kind the chats share, as listLatestRecords. */
+export async function listSharedRecords(
   db: Conn,
   kind: RecordKind,
   status?: RecordStatus,
 ): Promise<AnyRecord[]> {
-  return listLatestRecords(db, RECORD_SCHEMAS[kind], kind, status);
+  const rows = await db
+    .select()
+    .from(harnessRecord)
+    .where(and(latestOfKind(kind, status), not(askAiRecord)))
+    .orderBy(asc(harnessRecord.seq));
+  return rows.map((row) => checkRow(RECORD_SCHEMAS[kind], row, `A stored ${kind}`));
 }
 
 export function recordKindOf(kind: string): RecordKind {
@@ -310,6 +320,24 @@ async function readLatestRow(db: Conn, id: string): Promise<Row> {
     .limit(1);
   if (!row) throw new StoreError(`There is no record ${id}.`);
   return row;
+}
+
+/** As readLatestRow, with AskAI's records not there, in the same words as a record that isn't. */
+async function readLatestSharedRow(db: Conn, id: string): Promise<Row> {
+  const [row] = await db
+    .select()
+    .from(harnessRecord)
+    .where(and(eq(harnessRecord.id, id), not(askAiRecord)))
+    .orderBy(desc(harnessRecord.version))
+    .limit(1);
+  if (!row) throw new StoreError(`There is no record ${id}.`);
+  return row;
+}
+
+/** The latest version of each record of a kind; only those with `status` when given. */
+function latestOfKind(kind: string, status?: RecordStatus): SQL | undefined {
+  const latest = sql`${harnessRecord.version} = (SELECT max(r.version) FROM harness_record r WHERE r.id = ${harnessRecord.id})`;
+  return and(eq(harnessRecord.kind, kind), latest, status ? eq(harnessRecord.status, status) : undefined);
 }
 
 function checkFollowsLatest(latest: Row, from: RecordRef): void {

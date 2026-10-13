@@ -1,6 +1,6 @@
 import { Type } from "typebox";
 import type { Prompts } from "../prompts.ts";
-import { listLatestAnyRecords, readAnyRecordById, readAnyRecordHistory, refOf } from "./records.ts";
+import { listSharedRecords, readSharedRecord, readSharedRecordHistory, refOf } from "./records.ts";
 import { CLOSED, Id, RECORD_SCHEMAS, type RecordKind, RecordStatus } from "./schemas.ts";
 import type { HarnessTool } from "./tools.ts";
 import { viewsOf } from "./views.ts";
@@ -8,7 +8,8 @@ import { viewsOf } from "./views.ts";
 /**
  * Reading any record (Trotter's `read_record`, `read_record_history` and `list_records`, task 0045):
  * every chat's tools but AskAI's. Agents look records up rather than remember them, so a judgment
- * rests on what was recorded. Every record reads as its own template shows it.
+ * rests on what was recorded. Every record reads as its own template shows it, and AskAI's aren't
+ * there: they are its readers' alone (ADR-0106).
  */
 
 const ReadRecordParameters = Type.Object(
@@ -27,7 +28,7 @@ export function readRecordTool(prompts: Prompts): HarnessTool<typeof ReadRecordP
     parameters: ReadRecordParameters,
     kind: "read",
     async execute(params, context) {
-      const record = await readAnyRecordById(context.db, params.id, params.version);
+      const record = await readSharedRecord(context.db, params.id, params.version);
       const [view] = await viewsOf(context.db, [record]);
       return {
         value: prompts.render("tool-results/record.njk", { record: view }),
@@ -48,7 +49,7 @@ export function readRecordHistoryTool(prompts: Prompts): HarnessTool<typeof Read
     parameters: ReadRecordHistoryParameters,
     kind: "read",
     async execute(params, context) {
-      const versions = await readAnyRecordHistory(context.db, params.id);
+      const versions = await readSharedRecordHistory(context.db, params.id);
       return {
         value: prompts.render("tool-results/history.njk", { records: await viewsOf(context.db, versions) }),
         dataSeen: versions.map(refOf),
@@ -73,7 +74,7 @@ export function listRecordsTool(prompts: Prompts): HarnessTool<typeof ListRecord
     parameters: ListRecordsParameters,
     kind: "read",
     async execute(params, context) {
-      const records = await listLatestAnyRecords(context.db, params.kind, params.status);
+      const records = await listSharedRecords(context.db, params.kind, params.status);
       const value = prompts.render("tool-results/listed.njk", {
         kind: params.kind,
         status: params.status ?? null,

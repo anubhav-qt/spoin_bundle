@@ -35,7 +35,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
 | 6 | frog: `normalize_topic_text`, the ONNX Qwen3 embedder, ingest contract + chunking + runner, curriculum contract + runner + projection, image contract + runner, retrieval | done |
 | 7 | Admin in Next.js: repairs, ASCII review, the topic queue, job status (tadpole runs land with 9, model accounts with 8). Runs after 10 | done |
 | 8 | pi fork from Trotter (+ images), CLIProxyAPI compose service, NIM balancer (from breader) | done |
-| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | in progress: store, run loop, compaction, scheduler, AskAI and the tools every chat has done; next the agents (toad_sage, the curriculum chat, a tadpole per topic, ero_sennin, wise_toad), the worker entrypoint (`markInterruptedRuns`, `releaseTakenWakes`, `runScheduler`) once the first agent lands, and ero_sennin's wake per finished run, each prompt from the owner's gist |
+| 9 | The tadpoles: wake queue, runs and transcripts, compaction, versioned records; toad_sage, the curriculum tadpole, one tadpole per topic, auditor and lessons; the AskAI chat behind `AskChat`; toad_sage links related topics (`topic_edge`) and spins new topics out of a survey, recommended once it is done; q8 vs fp32 measured on the first new topic's corpus | in progress: store, run loop, compaction, scheduler, AskAI and the tools every chat has done; next the agents (toad_sage, the curriculum chat, a tadpole per topic, ero_sennin, wise_toad), the worker entrypoint (`markInterruptedRuns`, `releaseTakenWakes`, `runScheduler`) once the first agent lands, and ero_sennin's wake per finished run, both leaving AskAI's runs alone, each prompt from the owner's gist |
 | 10 | Web rewire: `lib/api.ts` to the shared contract, Better Auth client for login. Runs before 7 | done |
 | 11 | Delete the Python (`apps/api`, `apps/worker`, `apps/frog`, `packages/api-types`), update CLAUDE.md, READMEs, Makefile, CI | |
 | 12 | Port Paribelle from the ThinkPad to Oracle Cloud's free tier | later |
@@ -569,6 +569,13 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   question's asker and an answer's answerer are whoever wrote its first version, so a later change
   by another leaves them as they were, and routing wakes the first version's author: Trotter's copy
   woke the author of the version the answer cited.
+- **AskAI is hidden from the rest of the system** (2026-10-13). AskAI is for its readers alone,
+  so no other chat sees it. The record tools leave out its compaction summaries, the only records
+  it writes, and read one by id as a record that isn't there (`readSharedRecord`,
+  `readSharedRecordHistory` and `listSharedRecords` in `apps/server/src/harness/records.ts`). The
+  work after this keeps to it: ero_sennin's wake per finished run skips AskAI's runs, and the
+  worker's `markInterruptedRuns`, which marks every running run today, must leave them alone,
+  since they run in the api and a worker restart would otherwise cut off a reader's turn.
 - **The handovers and tool descriptions are written to `writing-prompts.md`** (2026-10-13). The owner
   gave no gist of their own, as for the grader's. `handovers/question.njk` and `answer.njk` hold no
   instructions, since the chat asked, the asker and ero_sennin all read the same text; `run.njk`

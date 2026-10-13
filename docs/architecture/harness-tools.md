@@ -25,7 +25,9 @@ in the code.
 
 ## Every chat
 
-As in Trotter, every chat but AskAI, which ADR-0106 gives no database handle. A helper gets only
+As in Trotter, every chat but AskAI, which ADR-0106 gives no database handle. Nor do they see
+AskAI, which is for its readers alone: the reads leave out its compaction summaries, the only
+records it writes, and read one by id as a record that isn't there. A helper gets only
 the three reads: it has no address to be asked at, and it asks nothing, leaving what it can't
 settle to its report. Each record reads as its own template shows it, with who wrote it, by role
 and topic, and when, in India time.

@@ -1,20 +1,34 @@
 import { randomUUID } from "node:crypto";
 import type { Static, TSchema } from "typebox";
 import { describe, expect, test } from "vitest";
+import { askConversation } from "../src/db/schema.ts";
 import { answerTool, askTool } from "../src/harness/asking.ts";
-import { type Chat, endRun, newHelperChat, openChat, openTopicChat, startRun } from "../src/harness/chats.ts";
+import {
+  type Chat,
+  endRun,
+  newHelperChat,
+  openAskChat,
+  openChat,
+  openTopicChat,
+  startRun,
+} from "../src/harness/chats.ts";
 import { everyChatTools } from "../src/harness/every-chat.ts";
 import { indiaTime } from "../src/harness/india-time.ts";
 import { openingMessageFor } from "../src/harness/instructions.ts";
 import { listRecordsTool, readRecordHistoryTool, readRecordTool } from "../src/harness/reading.ts";
 import { changeRecord, createRecord, refOf } from "../src/harness/records.ts";
 import { routeNewRecords } from "../src/harness/routing.ts";
-import { type Author, QuestionRecord, type RecordRef } from "../src/harness/schemas.ts";
+import {
+  type Author,
+  CompactionSummaryRecord,
+  QuestionRecord,
+  type RecordRef,
+} from "../src/harness/schemas.ts";
 import type { HarnessTool, ToolOutput } from "../src/harness/tools.ts";
 import { listWakes } from "../src/harness/wakes.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import { makeTopic } from "./fixtures.ts";
-import { deps } from "./helpers.ts";
+import { deps, signedUp, userIdOf } from "./helpers.ts";
 import { TEST_MODEL } from "./scripted-model.ts";
 
 /*
@@ -29,6 +43,18 @@ const MORNING = { kind: "schedule" as const, schedule: "every morning" };
 async function newTadpole(): Promise<Chat> {
   const { topic } = await makeTopic();
   return openTopicChat(db, "tadpole", topic.id);
+}
+
+/** A reader's AskAI chat, on a thread of their own. */
+async function newAskChat(): Promise<Chat> {
+  const { topic } = await makeTopic();
+  const userId = await userIdOf(await signedUp());
+  const [conversation] = await db
+    .insert(askConversation)
+    .values({ userId, topicId: topic.id })
+    .returning({ id: askConversation.id });
+  if (!conversation) throw new Error("No thread.");
+  return openAskChat(db, conversation.id);
 }
 
 function chatAuthor(chat: Chat): Author {
@@ -302,6 +328,38 @@ describe("reading records", () => {
     expect(onlyRetired.value).toContain(retired.id);
     expect(onlyRetired.value).not.toContain(active.id);
     expect(all.dataSeen).toContainEqual(refOf(retired));
+  });
+
+  test("AskAI's records aren't there for any other chat", async () => {
+    const tadpole = await newTadpole();
+    const summaryOf = (chat: Chat) =>
+      createRecord(db, CompactionSummaryRecord, {
+        kind: "compaction_summary",
+        author: chatAuthor(chat),
+        body: {
+          chatId: chat.id,
+          throughRun: randomUUID(),
+          soFar: "Talked it through.",
+          learnings: [],
+          feedback: [],
+          dos: [],
+          donts: [],
+          nextSteps: [],
+        },
+      });
+    const readers = await summaryOf(await newAskChat());
+    const tadpoles = await summaryOf(tadpole);
+
+    const listed = await call(listRecordsTool(prompts), tadpole, { kind: "compaction_summary" });
+
+    expect(listed.value).toContain(tadpoles.id);
+    expect(listed.value).not.toContain(readers.id);
+    await expect(call(readRecordTool(prompts), tadpole, { id: readers.id })).rejects.toThrow(
+      `There is no record ${readers.id}.`,
+    );
+    await expect(call(readRecordHistoryTool(prompts), tadpole, { id: readers.id })).rejects.toThrow(
+      `There is no record ${readers.id}.`,
+    );
   });
 
   test("an empty list says so", () => {

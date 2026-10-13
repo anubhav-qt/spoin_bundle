@@ -140,7 +140,7 @@ other topic retrieves them before; the curriculum chat starts after ingestion.
 | Tool | Does |
 |---|---|
 | `start_writer(path, brief)` | A writer helper for one document, with the research tools, `write_document` and `report`. It reads the maps and their cited passages from the records |
-| `write_document(path, title, source, source_date, tags, epistemic fields, sections)` | The writer's. Code copies kind, category, sub-category and scope from the topic row, checks the corpus contract at write time naming every problem at once, writes the file and keeps the previous version as a record. A refused call's sections are kept as the writer's try, so the next call sends only the sections that change (`drop` removes one) |
+| `write_document(path, title, source, source_date, tags, epistemic fields, sections)` | The writer's. Code copies kind, category, sub-category and scope from the topic row, checks the corpus contract at write time naming every problem at once, writes the file and keeps the previous version as a record. Every call's sections are kept as the writer's try, and a document already written is the starting try, so each later call, a rewrite included, sends only the sections that change (`drop` removes one) |
 | `audit_drafts()` | The three auditing calls (versions, false precision, the coverage matrix) with their own fixed prompts, which the tadpole does not brief. Findings are records |
 
 The topic's photographs are visual_toad's, sourced after the curriculum (below).

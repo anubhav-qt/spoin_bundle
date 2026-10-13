@@ -128,7 +128,8 @@ const WriteDocumentParameters = Type.Object(
     ),
     status: Type.Optional(Type.Enum(["current", "historical", "deprecated"])),
     sections: Type.Array(Section, {
-      description: "The whole document the first time; after that, only the sections that change",
+      description:
+        "A new document whole the first time; after that, and for one already written, only the sections that change",
     }),
     drop: Type.Optional(
       Type.Array(Type.String({ minLength: 1 }), { description: "Headings of sections to take out" }),
@@ -159,7 +160,7 @@ export function writeDocumentTool(deps: AgentDeps): HarnessTool<typeof WriteDocu
       // sections it names: a document refused for one section is never written again whole (the
       // owner's rule: no output paid for twice).
       const tryFile = `${full}.try.json`;
-      const merged = mergeTry(readTry(tryFile), params);
+      const merged = mergeTry(lastTry(tryFile, full, path), params);
       mkdirSync(dirname(full), { recursive: true });
       writeFileSync(tryFile, JSON.stringify(merged));
       const text = documentText(found, merged);
@@ -180,19 +181,26 @@ export function writeDocumentTool(deps: AgentDeps): HarnessTool<typeof WriteDocu
   };
 }
 
-function readTry(file: string): DocumentTry | null {
-  if (!existsSync(file)) return null;
-  return JSON.parse(readFileSync(file, "utf8")) as DocumentTry;
+type Sections = Pick<DocumentTry, "sections">;
+
+/**
+ * The sections a call is laid over: the last try, or the document as written when it has none (it
+ * was written before tries were kept), so a writer changing a written document sends only what
+ * changes and never loses the rest.
+ */
+export function lastTry(tryFile: string, full: string, path: string): Sections | null {
+  if (existsSync(tryFile)) return JSON.parse(readFileSync(tryFile, "utf8")) as DocumentTry;
+  if (!existsSync(full)) return null;
+  const { document } = parseDocument(path, readFileSync(full));
+  if (!document) return null;
+  return { sections: document.sections };
 }
 
 /**
  * The last try with this call laid over it: its fields replace the try's, a section replaces the
  * one of the same heading where it stood, a new heading goes at the end, and `drop` takes one out.
  */
-export function mergeTry(
-  last: DocumentTry | null,
-  params: Static<typeof WriteDocumentParameters>,
-): DocumentTry {
+export function mergeTry(last: Sections | null, params: Static<typeof WriteDocumentParameters>): DocumentTry {
   const { drop, sections, ...fields } = params;
   const merged = new Map<string, Static<typeof Section>>();
   for (const section of last?.sections ?? []) merged.set(section.heading.trim(), section);

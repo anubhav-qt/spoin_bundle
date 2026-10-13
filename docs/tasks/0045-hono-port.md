@@ -713,6 +713,11 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   code writes its report (`harness/helper-reports.ts`). A report now reaches the main chat
   through its brief rather than its author, so code's report wakes it too. A tier writer is left
   alone, since it ends turns waiting for its verdicts.
+- **A rewrite sends only what changes** (2026-10-13). The first live run's rewrite writers resent
+  every section of a document to fix one sentence, and documents written before tries were kept
+  had no try file, so a partial call would have lost the rest. A written document with no try is
+  now the starting try (`lastTry` in `agents/documents.ts`), and the document writer's prompt
+  says to read it and send only the sections it changes.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

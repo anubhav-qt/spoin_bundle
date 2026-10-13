@@ -1,9 +1,11 @@
 import {
   CHAT_ROLES,
+  DIFFICULTIES,
   RECORD_STATUSES,
   RUN_STATUSES,
   SINGLE_CHAT_ROLES,
   TOPIC_CHAT_ROLES,
+  TOPIC_SCOPES,
 } from "@spoin/shared/enums";
 import { type Static, type TSchema, Type } from "typebox";
 
@@ -149,15 +151,86 @@ export const CompactionSummary = Type.Object(
   CLOSED,
 );
 
+/**
+ * What toad_sage decided when it took a name in (task 0045): what the topic is, who it is for, how
+ * it is grouped, how many cards it gets and what it should cover. The topic row carries the name,
+ * scope and category for the product; the tadpole and the curriculum chat read this.
+ */
+export const Intake = Type.Object(
+  {
+    topic: Id,
+    name: Text,
+    subject: Type.String({
+      minLength: 1,
+      description: "What the topic is about, told apart from its namesakes",
+    }),
+    angle: Type.Union([Text, Type.Null()], {
+      description: "Who it is for and how it is written; null when it has none",
+    }),
+    scope: Type.Enum([...TOPIC_SCOPES]),
+    category: Text,
+    subCategory: Type.Union([Text, Type.Null()]),
+    cardCount: Type.Integer({ minimum: 1 }),
+    brief: Type.String({ minLength: 1, description: "What the topic should cover" }),
+    buildsOn: Type.Array(Id, {
+      description: "Topics sharing its subject, whose corpus and pages its tadpole reuses",
+    }),
+  },
+  CLOSED,
+);
+
+/** A requester moved by a merge, with what their subscription held, so an undo can put it back. */
+const MergedRequester = Type.Object(
+  {
+    userId: Id,
+    displayName: Text,
+    entry: Type.Enum([...DIFFICULTIES]),
+    accentHue: Type.Union([Type.Integer(), Type.Null()]),
+  },
+  CLOSED,
+);
+
+/**
+ * A requested name folded into a topic (task 0045). Its placeholder and job are gone, so this keeps
+ * all ero_sennin needs to judge the merge and to undo it: the name and description as asked, its
+ * aliases, requesters and priority, and both topics' subject and angle as toad_sage read them.
+ */
+export const Merge = Type.Object(
+  {
+    requested: Type.Object(
+      {
+        name: Text,
+        description: Type.Union([Text, Type.Null()]),
+        subject: Text,
+        angle: Type.Union([Text, Type.Null()]),
+        priority: Type.Integer(),
+        aliases: Type.Array(Type.Object({ normalizedText: Text, rawText: Text }, CLOSED)),
+        requesters: Type.Array(MergedRequester),
+      },
+      CLOSED,
+    ),
+    into: Type.Object(
+      { topic: Id, name: Text, subject: Text, angle: Type.Union([Text, Type.Null()]) },
+      CLOSED,
+    ),
+    reasoning: Text,
+  },
+  CLOSED,
+);
+
 export const QuestionRecord = versionedRecord("question", Question);
 export const AnswerRecord = versionedRecord("answer", Answer);
 export const CompactionSummaryRecord = versionedRecord("compaction_summary", CompactionSummary);
+export const IntakeRecord = versionedRecord("intake", Intake);
+export const MergeRecord = versionedRecord("merge", Merge);
 
 /** The schema of every kind of record, so code holding only a reference can read and check it. */
 export const RECORD_SCHEMAS = {
   question: QuestionRecord,
   answer: AnswerRecord,
   compaction_summary: CompactionSummaryRecord,
+  intake: IntakeRecord,
+  merge: MergeRecord,
 } as const;
 
 export type RecordKind = keyof typeof RECORD_SCHEMAS;
@@ -181,3 +254,6 @@ export type AnswerRecord = Static<typeof AnswerRecord>;
 export type SummarySections = Static<typeof SummarySections>;
 export type CompactionSummary = Static<typeof CompactionSummary>;
 export type CompactionSummaryRecord = Static<typeof CompactionSummaryRecord>;
+export type Intake = Static<typeof Intake>;
+export type IntakeRecord = Static<typeof IntakeRecord>;
+export type MergeRecord = Static<typeof MergeRecord>;

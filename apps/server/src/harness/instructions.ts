@@ -6,6 +6,7 @@ import type { Chat } from "./chats.ts";
 import { summaryInForce } from "./compaction.ts";
 import { indiaTime } from "./india-time.ts";
 import { readAnyRecord } from "./records.ts";
+import { withoutRequestTag } from "./requests.ts";
 import type { RunTrigger } from "./schemas.ts";
 import { readActionLog } from "./transcript.ts";
 import { viewsOf } from "./views.ts";
@@ -89,12 +90,6 @@ async function readerCard(db: Db, id: string | null) {
 }
 
 /**
- * The tag `handovers/job.njk` wraps around a requested name and description, the requester's own
- * words: they can't close it, so they stay inside the part marked as data.
- */
-const REQUEST_TAG = /<\s*\/?\s*request\b[^>]*>/gi;
-
-/**
  * The topic name a generate job queued, as it was asked for, and how many readers follow it; null
  * once the job has gone, since the owner can cancel a name before toad_sage gets to it.
  */
@@ -110,9 +105,9 @@ async function requestOf(db: Db, jobId: string) {
     .from(userTopic)
     .where(and(eq(userTopic.topicId, found.topicId), eq(userTopic.isCustom, true)));
   let description: string | null = null;
-  if (found.description) description = found.description.replace(REQUEST_TAG, "");
+  if (found.description) description = withoutRequestTag(found.description);
   return {
-    name: found.name.replace(REQUEST_TAG, ""),
+    name: withoutRequestTag(found.name),
     description,
     readers: followers?.readers ?? 0,
   };

@@ -26,8 +26,13 @@ const MODEL_CLIENTS = [
   /^@spoin\/pi-/,
 ];
 
-/** The tools every chat but AskAI has: they read any record and reach other chats. */
-const RECORD_TOOLS = ["harness/reading.ts", "harness/asking.ts", "harness/every-chat.ts"];
+/** The tools that read and write records and reach other chats, which AskAI never gets. */
+const RECORD_TOOLS = [
+  "harness/reading.ts",
+  "harness/asking.ts",
+  "harness/every-chat.ts",
+  "harness/intake.ts",
+];
 
 const filesUnder = (path: string): string[] => {
   const full = join(SRC, path);

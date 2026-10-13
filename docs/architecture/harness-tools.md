@@ -62,9 +62,9 @@ existing topic gets its own.
 | `list_categories()` | The categories and sub-categories in use, with counts |
 | `web_search(query)` | Whether a name is a real subject. Decided with the research tools |
 | `reject_topic(job, reason)` | Fails the job; the reason is what the reader sees |
-| `merge_topic(job, into)` | Into a live or a queued topic: the subscriptions and alias move, the placeholder goes, the job completes. toad_sage states both topics' subject and angle; the merge record keeps the requested name and description, so ero_sennin can check it and undo it |
+| `merge_topic(job, into, subject, angle?, into_subject, into_angle?, reasoning)` | Into a live or a queued topic: the subscriptions and alias move, and the placeholder goes with its job. toad_sage states both topics' subject and angle; the merge record keeps the requested name, description, requesters and the job's priority, so ero_sennin can check it and undo it |
 | `accept_topic(job, name, subject, angle, scope, category, sub_category?, card_count, brief, builds_on?)` | The name is the full name ("Rust in easy language") and makes the slug; the subject is what it is about, disambiguated ("Rust, the programming language"), so two topics on one subject state the same subject. The slug is made and the category normalized by code; writes the topic row and the intake record. The topic then waits in the queue: its tadpole starts when the topics ahead of it are written (task 0045). `builds_on` names the topics sharing its subject, whose corpus and fetched pages the tadpole reuses before it searches the web |
-| `change_intake(topic, …)` | Corrects the subject, angle, scope, category, card count, brief or `builds_on` before the topic goes live |
+| `change_intake(topic, reason, subject, angle?, scope, category, sub_category?, card_count, brief, builds_on?)` | Corrects the subject, angle, scope, category, card count, brief or `builds_on` before the topic goes live, the whole intake restated: its next version, and the topic row updated. The name stays as accepted |
 
 ### Reviews
 

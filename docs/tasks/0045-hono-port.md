@@ -48,8 +48,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   a miss mints a pending topic (no subtopics, so nobody else sees it), the requester's custom
   subscription, an alias and a `generate` job at priority 10. In Phase 9 toad_sage takes
   those jobs and either rejects the name (job `failed`, `last_error` is the reason the user
-  sees), merges it (repoint the subscriptions and the alias, drop the placeholder, complete
-  the job), or accepts it (canonical name and slug, category, then the topic's tadpole).
+  sees), merges it (repoint the subscriptions and the alias, drop the placeholder and, with it,
+  the job: 2026-10-13, below), or accepts it (canonical name and slug, category, then the topic's
+  tadpole in its turn).
 - **Tadpoles become frogs** (2026-10-11). A topic's tadpole becomes its frog once the topic's
   first generation is live in production; later updates and feedback-driven improvements
   run in the frog. `packages/frog`, the retrieval library, keeps its name: the owner is fine
@@ -604,6 +605,24 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   ("Rust in easy language"), which makes the slug, and the subject, disambiguated ("Rust, the
   programming language"), beside the angle. Two topics on one subject state the same subject, so
   a merge compares like with like and `builds_on` candidates are the topics sharing it.
+- **A merged name's job goes with its placeholder** (2026-10-13), amending the first entry above,
+  which completed it. A job is deleted with its topic, and a reader's topic status is its newest
+  generate job's, so a completed job moved onto a queued target would show the target as
+  finished. The subscriptions and alias move, the placeholder is deleted and its job with it, and
+  the merge record keeps the requested name, description, requesters and the job's priority, so
+  ero_sennin's undo can recreate the topic and queue its job again.
+- **toad_sage's intake tools** (2026-10-13), in `apps/server/src/harness/intake.ts`: `reject_topic`,
+  `merge_topic`, `accept_topic` and `change_intake`. Each locks the job and refuses one that is no
+  longer waiting or is taken in already. The `intake` record holds the whole decision (name,
+  subject, angle, scope, category, card count, brief, `builds_on`), and the topic row mirrors the
+  name, scope and category for the product, so `change_intake` versions every field. Categories
+  are normalized by `normalizeTopicText`, as the corpus's are. The meaning `find_topics` matches
+  on is its own column, `topic.meaning_embedding`, apart from `embedding` (the name's), which the
+  projection rewrites and the accent hues read. The `merge` record keeps the requested name and
+  description (the `<request>` tag stripped), the aliases, the requesters with their entry tier and
+  hue, the priority, and both topics' subject and angle. Merged requesters follow the target
+  through `followTopic`, so one who already follows it keeps one subscription. AskAI can't import
+  the module (Biome and `test/architecture.test.ts`).
 
 ## Asked when we get there
 

@@ -1,0 +1,14 @@
+{% import "partials/macros.njk" as m %}
+Intake ({{ m.ref(record) }})
+By {{ m.writer(record.writer) }}, for topic {{ record.body.topic }}
+Name: {{ record.body.name }}
+Subject: {{ record.body.subject }}
+Angle: {{ record.body.angle or "none" }}
+Scope: {{ record.body.scope }}
+Category: {{ record.body.category }}{% if record.body.subCategory %} / {{ record.body.subCategory }}{% endif %}
+
+Cards: {{ record.body.cardCount }}
+Builds on: {% for topic in record.body.buildsOn %}topic {{ topic }}{% if not loop.last %}, {% endif %}{% else %}nothing stored{% endfor %}
+
+Brief: {{ record.body.brief }}
+{% include "partials/version.njk" %}

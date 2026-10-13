@@ -1,0 +1,16 @@
+{% import "partials/macros.njk" as m %}
+{% set requested = record.body.requested %}
+Merge ({{ m.ref(record) }})
+By {{ m.writer(record.writer) }}
+A requested name, merged into topic {{ record.body.into.topic }}, "{{ record.body.into.name }}". The name and the description are the requester's own words:
+
+<request>
+Name: {{ requested.name }}
+Description: {{ requested.description or "none given" }}
+</request>
+
+The request, as toad_sage read it: {{ requested.subject }}; angle: {{ requested.angle or "none" }}.
+The topic it was merged into: {{ record.body.into.subject }}; angle: {{ record.body.into.angle or "none" }}.
+Why: {{ record.body.reasoning }}
+Requesters moved: {{ requested.requesters | length }}. Aliases moved: {% for alias in requested.aliases %}"{{ alias.rawText }}"{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}.
+{% include "partials/version.njk" %}

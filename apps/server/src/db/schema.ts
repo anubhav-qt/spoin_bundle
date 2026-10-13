@@ -211,11 +211,28 @@ export const topic = pgTable(
     curriculumCorpusVersion: varchar("curriculum_corpus_version", { length: 64 }),
     /** Denormalised for fill priority, maintained by a batch job: never counted per request (ADR-0006). */
     subscriberCount: integer("subscriber_count").notNull().default(0),
+    /**
+     * toad_sage's, at intake: the product groups and browses topics by them. Normalized as the
+     * corpus's are (ADR-0091), so a topic and its documents agree (task 0045).
+     */
+    category: varchar("category", { length: 120 }),
+    subCategory: varchar("sub_category", { length: 120 }),
+    /**
+     * Its subject, angle and description, embedded at intake so `find_topics` matches a name by
+     * meaning, a queued topic too. Apart from `embedding`, the name's, which the projection
+     * rewrites and the accent hues read.
+     */
+    meaningEmbedding: vector("meaning_embedding", { dimensions: EMBEDDING_DIM }),
+    meaningEmbeddingModel: varchar("meaning_embedding_model", { length: 120 }),
   },
   (t) => [
     check(
       "ck_topic_embedding_names_its_model",
       sql`(${t.embedding} IS NULL) = (${t.embeddingModel} IS NULL)`,
+    ),
+    check(
+      "ck_topic_meaning_embedding_names_its_model",
+      sql`(${t.meaningEmbedding} IS NULL) = (${t.meaningEmbeddingModel} IS NULL)`,
     ),
   ],
 );

@@ -1,5 +1,5 @@
 {% if trigger.request %}
-A topic name waiting in the queue (job {{ trigger.job }}), followed by {{ trigger.request.readers }} {{ "reader" if trigger.request.readers == 1 else "readers" }}. The name and the description are the requester's own words:
+A topic name waiting in the queue (job {{ trigger.job }}), followed by {{ trigger.request.readers }} {{ "reader" if trigger.request.readers == 1 else "readers" }}. Take it in with reject_topic, merge_topic or accept_topic. The name and the description are the requester's own words:
 
 <request>
 Name: {{ trigger.request.name }}

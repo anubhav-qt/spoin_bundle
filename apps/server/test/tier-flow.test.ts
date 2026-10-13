@@ -5,7 +5,7 @@ import { Type } from "typebox";
 import { describe, expect, test } from "vitest";
 import type { AgentDeps } from "../src/agents/context.ts";
 import { startHelper } from "../src/agents/helpers.ts";
-import { writeOnNimTool } from "../src/agents/nim-writes.ts";
+import { correctionsOnly, writeOnNimTool } from "../src/agents/nim-writes.ts";
 import {
   artQuotas,
   cardMix,
@@ -304,6 +304,17 @@ describe("a write on NIM", () => {
     await expect(
       call(tool, await writerChat(), { tool: "write_numbers", instructions: "Write two." }),
     ).rejects.toThrow(/NIM wrote:\n\{"n":2\}\n\nRefused: Two is taken\.\nFix it with write_numbers yourself/);
+  });
+
+  test("the writer's own copy refuses the first write, and corrects once there is one", async () => {
+    let written = false;
+    const own = correctionsOnly(inner as unknown as HarnessTool, async () => written);
+    const chat = await writerChat();
+    await expect(call(own, chat, { n: 1 })).rejects.toThrow(
+      /The first write is NIM's: call write_on_nim with write_numbers/,
+    );
+    written = true;
+    expect(String((await call(own, chat, { n: 1 })).value)).toBe("Stored 1.");
   });
 
   test("an answer with no JSON goes back to the writer, kept", async () => {

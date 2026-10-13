@@ -38,11 +38,13 @@ import {
 import { handOverTool, reviewTool } from "./handovers.ts";
 import { reportTool, startHelperTool } from "./helpers.ts";
 import { changeMapTool, writeMapTool } from "./maps.ts";
-import { writeOnNimTool } from "./nim-writes.ts";
+import { correctionsOnly, writeOnNimTool } from "./nim-writes.ts";
 import { fetchTool, readPageTool, searchPagesTool } from "./pages.ts";
 import {
+  cardsWritten,
   listSubtopicsTool,
   planCardsTool,
+  questionsWritten,
   readCardsTool,
   readGroundingTool,
   writeCardsTool,
@@ -147,11 +149,16 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
     ];
   }
   if (chat.task === "tier_writer") {
+    // The owner's rule: a tier's first cards and questions are NIM's; the writer only corrects.
+    const cards = writeCardsTool(deps);
+    const questions = writeQuestionsTool(deps);
     return [
       readGroundingTool(deps),
       readCardsTool(deps),
       planCardsTool(deps),
-      ...writing(deps, [writeCardsTool(deps), writeQuestionsTool(deps)]),
+      correctionsOnly(cards, cardsWritten),
+      correctionsOnly(questions, questionsWritten),
+      writeOnNimTool(deps.prompts, deps.nim, [cards, questions]),
       report,
     ];
   }

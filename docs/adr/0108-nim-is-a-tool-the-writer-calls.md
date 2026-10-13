@@ -40,6 +40,8 @@ again with what to change.
 - The split between big and small writes is the writer's judgement, stated in its prompt, not a
   rule in code.
 - The curriculum writer has no `write_on_nim`: the owner keeps curricula on Gemini alone.
+- A tier's first cards and first questions are NIM's alone (the owner's rule): the tier writer's own
+  `write_cards` and `write_questions` refuse until the tier has some, and only correct after.
 - NIM writes JSON in text, so a malformed object is refused at parse time and returned to the
   writer, not retried in the tool.
 

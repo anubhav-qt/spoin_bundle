@@ -110,6 +110,27 @@ export function writeOnNimTool(
 }
 
 /**
+ * The writer's own copy of a tool whose first write is NIM's (the owner's rule for a tier's cards
+ * and questions): it refuses until `firstWritten` says that write happened, and corrects after.
+ */
+export function correctionsOnly(
+  tool: HarnessTool,
+  firstWritten: (context: ToolContext) => Promise<boolean>,
+): HarnessTool {
+  return {
+    ...tool,
+    async execute(params, context) {
+      if (!(await firstWritten(context))) {
+        throw new ToolError(
+          `The first write is NIM's: call write_on_nim with ${tool.name}. ${tool.name} is for corrections once it has written.`,
+        );
+      }
+      return tool.execute(params, context);
+    },
+  };
+}
+
+/**
  * Stores what NIM wrote through the real tool. It is kept in the result whether or not it passes
  * (the owner's rule: no output paid for twice), so a fix is a small write the writer makes itself.
  */

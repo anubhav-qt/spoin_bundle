@@ -174,6 +174,28 @@ export async function tierOfHelper(context: ToolContext): Promise<Tier> {
   return tierById(context.db, brief.body.subtopic);
 }
 
+/** Whether the helper's tier has had cards written, whatever became of them. */
+export async function cardsWritten(context: ToolContext): Promise<boolean> {
+  const tier = await tierOfHelper(context);
+  const [row] = await context.db
+    .select({ id: card.id })
+    .from(card)
+    .where(eq(card.subtopicId, tier.id))
+    .limit(1);
+  return row !== undefined;
+}
+
+/** Whether the helper's tier has had questions written, whatever became of them. */
+export async function questionsWritten(context: ToolContext): Promise<boolean> {
+  const tier = await tierOfHelper(context);
+  const [row] = await context.db
+    .select({ id: question.id })
+    .from(question)
+    .where(eq(question.subtopicId, tier.id))
+    .limit(1);
+  return row !== undefined;
+}
+
 /** Whether toad_sage said go on to an "insufficient evidence" for the tier: the one way it finishes short. */
 export async function allowedShort(db: Conn, tierId: string): Promise<boolean> {
   const rows = await db.execute(sql`

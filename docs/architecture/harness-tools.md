@@ -237,11 +237,13 @@ The writer's chat runs on Gemini; its two big writes are NIM's (ADR-0108). It ca
 NIM the writer's whole chat with the instructions, so NIM writes a whole tier's cards, or its
 whole quiz, in one call, at most a tier (the owner's cap). NIM answers with the tool's arguments
 as JSON text, and code stores them through the real tool, whose checks decide what passes. The
-result shows what NIM wrote and what was stored or refused; the writer fixes a refusal, or
-writes a few cards, with the real tool itself, since NIM takes some five minutes to start any
-answer. The balancer retries a call across NIM's ladder and Gemini takes one NIM gives up on;
-an unusable answer goes back to the writer. The document writer writes the same way; the
-curriculum writer writes on Gemini alone (the owner's call).
+result shows what NIM wrote and what was stored or refused. A tier's first cards and first
+questions are NIM's alone: the writer's own `write_cards` and `write_questions` refuse until the
+tier has some (the owner's rule), and after that the writer makes corrections with them itself,
+since NIM takes some five minutes to start any answer. The balancer retries a call across NIM's
+ladder and Gemini takes one NIM gives up on; an unusable answer goes back to the writer. The
+document writer writes the same way; the curriculum writer writes on Gemini alone (the owner's
+call).
 
 | Tool | Does |
 |---|---|

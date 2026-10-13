@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import type { Db } from "../db/client.ts";
-import { askConversation, card, topic } from "../db/schema.ts";
+import { askConversation, card, generationJob, topic, userTopic } from "../db/schema.ts";
 import type { Prompts } from "../prompts.ts";
 import type { Chat } from "./chats.ts";
 import { summaryInForce } from "./compaction.ts";
@@ -60,6 +60,7 @@ export async function openingMessageFor(
         const [record] = await viewsOf(db, [await readAnyRecord(db, trigger.record)]);
         return { kind: "record", record };
       }
+      if (trigger.kind === "job") return { ...trigger, request: await requestOf(db, trigger.job) };
       if (trigger.kind === "reader") return { ...trigger, card: await readerCard(db, trigger.card) };
       if (trigger.kind === "continuation") {
         // What the paused run already stored, so the run carrying it on doesn't do it again.
@@ -85,4 +86,34 @@ async function readerCard(db: Db, id: string | null) {
     .from(card)
     .where(eq(card.id, id));
   return found ?? null;
+}
+
+/**
+ * The tag `handovers/job.njk` wraps around a requested name and description, the requester's own
+ * words: they can't close it, so they stay inside the part marked as data.
+ */
+const REQUEST_TAG = /<\s*\/?\s*request\b[^>]*>/gi;
+
+/**
+ * The topic name a generate job queued, as it was asked for, and how many readers follow it; null
+ * once the job has gone, since the owner can cancel a name before toad_sage gets to it.
+ */
+async function requestOf(db: Db, jobId: string) {
+  const [found] = await db
+    .select({ name: topic.canonicalName, description: topic.description, topicId: topic.id })
+    .from(generationJob)
+    .innerJoin(topic, eq(topic.id, generationJob.topicId))
+    .where(eq(generationJob.id, jobId));
+  if (!found) return null;
+  const [followers] = await db
+    .select({ readers: count() })
+    .from(userTopic)
+    .where(and(eq(userTopic.topicId, found.topicId), eq(userTopic.isCustom, true)));
+  let description: string | null = null;
+  if (found.description) description = found.description.replace(REQUEST_TAG, "");
+  return {
+    name: found.name.replace(REQUEST_TAG, ""),
+    description,
+    readers: followers?.readers ?? 0,
+  };
 }

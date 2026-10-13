@@ -43,6 +43,13 @@
       "when": 1791833696764,
       "tag": "0005_ask_ai_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791867836723,
+      "tag": "0006_routed_job",
+      "breakpoints": true
     }
   ]
 }

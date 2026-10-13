@@ -1,7 +1,8 @@
 import { and, asc, eq, notExists } from "drizzle-orm";
 import type { Db, Tx } from "../db/client.ts";
-import { harnessRecord, routedRecord } from "../db/schema.ts";
-import { type Chat, openChatAt, readChat } from "./chats.ts";
+import { generationJob, harnessRecord, routedJob, routedRecord } from "../db/schema.ts";
+import { QUEUE_ORDER } from "../jobs/order.ts";
+import { type Chat, openChat, openChatAt, readChat } from "./chats.ts";
 import { readAnyRecord, readRecord, refOf } from "./records.ts";
 import { type AnyRecord, isRecordKind, QuestionRecord, type RecordRef, type WakeTrigger } from "./schemas.ts";
 import { queueWake } from "./wakes.ts";
@@ -9,7 +10,8 @@ import { queueWake } from "./wakes.ts";
 /**
  * Which chats a record wakes, and when (Trotter's `routing.ts`, ADR 0027). A record wakes the chats
  * it's for once, when it's first written; a later version of it (a change, a retirement, an undo)
- * wakes no one. Each record is marked routed by its id in the same transaction as its wakes.
+ * wakes no one. Each record is marked routed by its id in the same transaction as its wakes. A
+ * topic name queued for writing wakes toad_sage the same way, by its generate job (task 0045).
  */
 
 /** Queues a wake for each chat that a record not yet routed is for. */
@@ -35,6 +37,29 @@ export async function routeNewRecords(db: Db, now: Date): Promise<void> {
         }
       }
       await tx.insert(routedRecord).values({ recordId: first.id });
+    }
+  });
+}
+
+/** Queues a toad_sage wake for each name waiting in the queue that it hasn't been woken for, in queue order. */
+export async function routeNewJobs(db: Db, now: Date): Promise<void> {
+  await db.transaction(async (tx) => {
+    const unrouted = await tx
+      .select({ id: generationJob.id })
+      .from(generationJob)
+      .where(
+        and(
+          eq(generationJob.kind, "generate"),
+          eq(generationJob.status, "pending"),
+          notExists(tx.select().from(routedJob).where(eq(routedJob.jobId, generationJob.id))),
+        ),
+      )
+      .orderBy(...QUEUE_ORDER);
+    if (unrouted.length === 0) return;
+    const toadSage = await openChat(tx, "toad_sage");
+    for (const job of unrouted) {
+      await queueWake(tx, { chatId: toadSage.id, trigger: { kind: "job", job: job.id }, dueAt: now });
+      await tx.insert(routedJob).values({ jobId: job.id });
     }
   });
 }

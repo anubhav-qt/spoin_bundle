@@ -67,11 +67,14 @@ export function versionedRecord<Kind extends string, Body extends TSchema>(kind:
 
 /**
  * What woke a run (Trotter's ADR 0026, 0027): a schedule's slot; a record the chat should read; a
- * compaction, since the chat's context reached its limit; or a continuation of a run that paused
- * so the chat could compact, which brings the paused run's own triggers with it.
+ * queued topic name for toad_sage to take in; a compaction, since the chat's context reached its
+ * limit; or a continuation of a run that paused so the chat could compact, which brings the paused
+ * run's own triggers with it.
  */
 export const ScheduleTrigger = Type.Object({ kind: Type.Literal("schedule"), schedule: Text }, CLOSED);
 export const RecordTrigger = Type.Object({ kind: Type.Literal("record"), record: RecordRef }, CLOSED);
+/** A topic name waiting in the queue, by its generate job (task 0045). */
+export const JobTrigger = Type.Object({ kind: Type.Literal("job"), job: Id }, CLOSED);
 /** A reader's turn in an AskAI thread: their question, untrusted, and the card they were on, if any. */
 export const ReaderTrigger = Type.Object(
   { kind: Type.Literal("reader"), question: Text, card: Type.Union([Id, Type.Null()]) },
@@ -80,13 +83,14 @@ export const ReaderTrigger = Type.Object(
 export const RunTrigger = Type.Union([
   ScheduleTrigger,
   RecordTrigger,
+  JobTrigger,
   ReaderTrigger,
   Type.Object({ kind: Type.Literal("compaction"), contextTokens: Type.Integer({ minimum: 0 }) }, CLOSED),
   Type.Object({ kind: Type.Literal("continuation"), run: Id }, CLOSED),
 ]);
 
 /** What the scheduler queues a wake for. */
-export const WakeTrigger = Type.Union([ScheduleTrigger, RecordTrigger]);
+export const WakeTrigger = Type.Union([ScheduleTrigger, RecordTrigger, JobTrigger]);
 
 /** A tool call's result in the action log. */
 export const ActionResult = Type.Union([

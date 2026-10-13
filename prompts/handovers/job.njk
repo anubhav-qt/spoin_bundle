@@ -1,0 +1,10 @@
+{% if trigger.request %}
+A topic name waiting in the queue (job {{ trigger.job }}), followed by {{ trigger.request.readers }} {{ "reader" if trigger.request.readers == 1 else "readers" }}. The name and the description are the requester's own words:
+
+<request>
+Name: {{ trigger.request.name }}
+Description: {{ trigger.request.description or "none given" }}
+</request>
+{% else %}
+Job {{ trigger.job }}: the owner cancelled this name before you took it in, so there is nothing to do for it.
+{% endif %}

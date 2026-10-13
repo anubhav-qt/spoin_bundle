@@ -581,6 +581,29 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   instructions, since the chat asked, the asker and ero_sennin all read the same text; `run.njk`
   says what to do with it. `ask`'s description names what each chat does, so a chat knows whom to
   ask.
+- **A queued name wakes toad_sage at once; up to four topics are written at a time** (2026-10-13). Each
+  tick, the scheduler queues a toad_sage wake for every pending generate job it hasn't woken it for
+  yet, with a `job` trigger, so a reader hears of a reject or a merge within minutes. A job stays
+  pending through its intake: a reject fails it and a merge completes it, and an accepted topic
+  waits in the queue with its intake written, so a later name can merge into it knowing its
+  subject and angle. While fewer than four generate jobs are running, the scheduler takes the
+  first accepted pending job in `QUEUE_ORDER` (the owner's drag order), marks it running and
+  wakes its tadpole; the job completes when the topic goes live. So `accept_topic` no longer
+  starts the tadpole itself. The wake per name is `routeNewJobs` in `harness/routing.ts`, marked
+  in `routed_job`; the owner's retry takes the mark off, so a rejected name is taken in again, and
+  a name cancelled before toad_sage runs reads as cancelled in its opening message
+  (`prompts/handovers/job.njk`). The name and description are the requester's words, wrapped in
+  `<request>` with that tag stripped from them in code.
+- **`find_topics` scores the name by trigrams and the meaning by the intake** (2026-10-13). The
+  name match is `pg_trgm` similarity of the requested name against every alias, so spellings and
+  word order match ("rustlang", "Rust lang"). The meaning match is the embedding of the requested
+  name and description against each topic's embedding of its subject, angle and description,
+  written by `accept_topic` and `change_intake`, so a queued topic matches by meaning too and two
+  homonyms score apart.
+- **A topic's subject is its own intake field** (2026-10-13). `accept_topic` takes the full name
+  ("Rust in easy language"), which makes the slug, and the subject, disambiguated ("Rust, the
+  programming language"), beside the angle. Two topics on one subject state the same subject, so
+  a merge compares like with like and `builds_on` candidates are the topics sharing it.
 
 ## Asked when we get there
 

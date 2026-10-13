@@ -5,7 +5,7 @@ import type { Db } from "../db/client.ts";
 import type { Prompts } from "../prompts.ts";
 import { type Chat, type Run, readChat } from "./chats.ts";
 import type { CompactionSettings } from "./compaction.ts";
-import { routeNewRecords } from "./routing.ts";
+import { routeNewJobs, routeNewRecords } from "./routing.ts";
 import type { HarnessTool } from "./tools.ts";
 import { wakeChat } from "./wake-chat.ts";
 import {
@@ -20,7 +20,8 @@ import {
 
 /**
  * The scheduler (Trotter's `scheduler.ts`, ADR 0027): it routes each new record to the chats it's
- * for, and wakes each chat once with every wake due for it. Every chat with a wake due runs at once,
+ * for and each newly queued topic name to toad_sage, and wakes each chat once with every wake due
+ * for it. Every chat with a wake due runs at once,
  * with no limit (task 0045).
  */
 
@@ -72,7 +73,7 @@ export type SchedulerEvent =
   | { type: "error"; error: string };
 
 export interface Scheduler {
-  /** Routes new records and wakes every chat with wakes due. Ticks run one after another. */
+  /** Routes new records and queued names, and wakes every chat with wakes due. Ticks run one after another. */
   tick(): Promise<void>;
   /** Resolves once every chat woken so far has finished and its wakes are settled. */
   idle(): Promise<void>;
@@ -114,6 +115,7 @@ async function tick(input: SchedulerInput, running: Map<string, Promise<void>>):
   const now = nowOf(input);
   try {
     await routeNewRecords(input.db, now);
+    await routeNewJobs(input.db, now);
     await wakeDueChats(input, running, now);
   } catch (error) {
     // One bad look shouldn't stop the harness: say what went wrong, and look again next tick.

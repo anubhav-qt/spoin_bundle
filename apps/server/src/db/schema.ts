@@ -1116,3 +1116,14 @@ export const routedRecord = pgTable("routed_record", {
   recordId: uuid("record_id").primaryKey(),
   routedAt: tz("routed_at").notNull().defaultNow(),
 });
+
+/**
+ * The generate jobs whose name the scheduler has woken toad_sage for (task 0045), each once. A retry
+ * takes the mark off, so a name toad_sage rejected is taken in again.
+ */
+export const routedJob = pgTable("routed_job", {
+  jobId: uuid("job_id")
+    .primaryKey()
+    .references(() => generationJob.id, { onDelete: "cascade" }),
+  routedAt: tz("routed_at").notNull().defaultNow(),
+});

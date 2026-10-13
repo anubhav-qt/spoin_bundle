@@ -3,7 +3,7 @@ import { and, eq, gt, inArray, notExists, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Deps } from "../context.ts";
 import type { Db, Tx } from "../db/client.ts";
-import { feedPlan, generationJob, subtopic, topic, userTopic } from "../db/schema.ts";
+import { feedPlan, generationJob, routedJob, subtopic, topic, userTopic } from "../db/schema.ts";
 import { HttpError, pgCode, UNIQUE_VIOLATION } from "../lib/errors.ts";
 import { iso } from "../lib/wire.ts";
 import { nameProblem, resolve } from "../topics/request.ts";
@@ -117,21 +117,28 @@ export async function moveJob(db: Db, jobId: string, beforeId: string | null): P
   return listQueue(db);
 }
 
-/** A failed job waits again, keeping its priority, its attempts and its last error. */
+/**
+ * A failed job waits again, keeping its priority, its attempts and its last error. Its routed mark
+ * comes off, so toad_sage takes the name in again (task 0045).
+ */
 export async function retryJob(db: Db, jobId: string): Promise<QueuedTopicOut[]> {
   let retried: { id: string }[];
   try {
-    retried = await db
-      .update(generationJob)
-      .set({ status: "pending", completedAt: null })
-      .where(
-        and(
-          eq(generationJob.id, jobId),
-          eq(generationJob.kind, "generate"),
-          eq(generationJob.status, "failed"),
-        ),
-      )
-      .returning({ id: generationJob.id });
+    retried = await db.transaction(async (tx) => {
+      const waiting = await tx
+        .update(generationJob)
+        .set({ status: "pending", completedAt: null })
+        .where(
+          and(
+            eq(generationJob.id, jobId),
+            eq(generationJob.kind, "generate"),
+            eq(generationJob.status, "failed"),
+          ),
+        )
+        .returning({ id: generationJob.id });
+      if (waiting.length > 0) await tx.delete(routedJob).where(eq(routedJob.jobId, jobId));
+      return waiting;
+    });
   } catch (e) {
     if (pgCode(e) === UNIQUE_VIOLATION) throw new HttpError(409, "This topic already has a job waiting");
     throw e;

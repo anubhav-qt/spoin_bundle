@@ -60,7 +60,13 @@ const text = (words: string): AssistantMessage => reply([{ type: "text", text: w
 const calls = (id: string, name: string, args: JsonObject): AssistantMessage =>
   reply([{ type: "toolCall", id, name, arguments: args }], "toolUse");
 
-function wake(chat: Chat, script: AssistantMessage[], model = TEST_MODEL, compaction = SMALL_LIMIT) {
+function wake(
+  chat: Chat,
+  script: AssistantMessage[],
+  model = TEST_MODEL,
+  compaction = SMALL_LIMIT,
+  compactWhileWaitingAt?: number,
+) {
   const scripted = scriptedModel(script);
   const runs = wakeChat({
     db,
@@ -73,6 +79,7 @@ function wake(chat: Chat, script: AssistantMessage[], model = TEST_MODEL, compac
     tools: [noteTool],
     compactionTools: [noteTool],
     compaction,
+    compactWhileWaitingAt,
     streamFn: () => scripted.streamFn,
   });
   return { runs, requests: scripted.requests };
@@ -95,6 +102,41 @@ function lastText(messages: Message[] | undefined): string {
 }
 
 describe("compaction", () => {
+  test("a turn that ends past the waiting threshold compacts after it, while the chat waits", async () => {
+    const chat = await newChat();
+
+    const { runs, requests } = wake(
+      chat,
+      [
+        counted(text("Writers started; waiting for their reports."), 3_000),
+        calls("call-1", "write_summary", SUMMARY),
+        text("Summary written."),
+      ],
+      TEST_MODEL,
+      SMALL_LIMIT,
+      2_000,
+    );
+
+    const [turn, compaction] = await runs;
+    expect([turn?.status, compaction?.status]).toEqual(["done", "done"]);
+    expect(compaction?.triggers).toEqual([{ kind: "compaction", contextTokens: 3_000, whileWaiting: true }]);
+    expect(lastText(requests[1])).toMatch(
+      /Your turn has ended, and your chat has grown to about 3000 tokens, so it compacts now, while you wait for the other chats\./,
+    );
+    expect((await summaryInForce(db, chat))?.body.throughRun).toBe(compaction?.id);
+  });
+
+  test("a turn that ends under the waiting threshold, or with none, doesn't compact", async () => {
+    const under = await newChat();
+    const none = await newChat();
+
+    const below = wake(under, [counted(text("Waiting."), 1_500)], TEST_MODEL, SMALL_LIMIT, 2_000);
+    const unset = wake(none, [counted(text("Waiting."), 3_000)]);
+
+    expect((await below.runs).map((run) => run.triggers[0]?.kind)).toEqual(["schedule"]);
+    expect((await unset.runs).map((run) => run.triggers[0]?.kind)).toEqual(["schedule"]);
+  });
+
   test("a chat whose context reached the limit compacts before its run, then reads only its summary and what follows", async () => {
     const chat = await newChat();
     await fillChat(chat);

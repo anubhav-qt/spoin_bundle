@@ -31,6 +31,11 @@ export interface WakeChatInput {
   compactionTools: HarnessTool[];
   /** When the chat compacts; the defaults unless given. */
   compaction?: CompactionSettings;
+  /**
+   * The context, in tokens, at which the chat compacts once its turn has ended, while it waits for
+   * other chats; never when not given. The limit in `compaction` still pauses a run going on.
+   */
+  compactWhileWaitingAt?: number;
   /** How the model is called, given each run. Tests pass a stand-in. */
   streamFn: (run: Run) => StreamFn;
   /** Stops the run going, and wakes no more. */
@@ -52,7 +57,8 @@ export class ContextOverflowError extends Error {
 /**
  * Wakes a chat (Trotter's `wake-chat.ts`, ADR 0014): if its context has reached the limit, it
  * compacts first, then it runs. A run that reaches the limit pauses at its next step boundary; the
- * chat compacts, and a continuation run carries it on. Returns every run, in order.
+ * chat compacts, and a continuation run carries it on. A turn that ends with the context at
+ * `compactWhileWaitingAt` or more compacts after it. Returns every run, in order.
  */
 export async function wakeChat(input: WakeChatInput): Promise<Run[]> {
   const limit = compactionLimit(input.model, input.compaction ?? COMPACTION_SETTINGS);
@@ -73,7 +79,22 @@ export async function wakeChat(input: WakeChatInput): Promise<Run[]> {
     run = await runOnce(input, continuationOf(run), input.tools, pauseAt);
     runs.push(run);
   }
+  if (await compactsWhileWaiting(input, run)) {
+    const compaction = await compact(input, true);
+    runs.push(compaction.run);
+  }
   return runs;
+}
+
+/**
+ * Whether the chat compacts now its turn has ended (the owner's rule, task 0045): a chat waiting
+ * for others to finish a stage reads a summary when they wake it, not the whole stage before.
+ */
+async function compactsWhileWaiting(input: WakeChatInput, run: Run): Promise<boolean> {
+  if (input.compactWhileWaitingAt === undefined) return false;
+  if (run.status !== "done") return false;
+  if (stopping(input)) return false;
+  return (await currentContextTokens(input)) >= input.compactWhileWaitingAt;
 }
 
 function stopping(input: WakeChatInput): boolean {
@@ -108,8 +129,12 @@ async function runOnce(
 }
 
 /** A compaction run: the chat saves what isn't stored, then writes a summary that covers this run, unless it fails to. */
-async function compact(input: WakeChatInput): Promise<{ run: Run; wroteSummary: boolean }> {
+async function compact(
+  input: WakeChatInput,
+  whileWaiting = false,
+): Promise<{ run: Run; wroteSummary: boolean }> {
   const trigger: RunTrigger = { kind: "compaction", contextTokens: await currentContextTokens(input) };
+  if (whileWaiting) trigger.whileWaiting = true;
   const tools = [...input.compactionTools, writeSummaryTool(input.prompts)];
   const run = await runOnce(input, [trigger], tools, undefined);
   const summary = await summaryInForce(input.db, input.chat);

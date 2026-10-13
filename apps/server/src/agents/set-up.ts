@@ -79,11 +79,26 @@ export function agentSetUp(input: AgentSetUpInput): (chat: Chat) => Promise<Chat
   return async (chat) => {
     const tools = [...everyChatTools(input.deps.prompts, chat), ...(await roleTools(input.deps, chat))];
     const compactionTools = tools.filter((tool) => tool.kind === "read" || MAP_TOOLS.has(tool.name));
+    const chatSetUp = { tools, compactionTools, compactWhileWaitingAt: compactWhileWaitingAt(chat) };
     if (input.nimKey && chat.task && WRITERS.includes(chat.task)) {
-      return { ...onNim(input, input.nimKey), tools, compactionTools };
+      return { ...onNim(input, input.nimKey), ...chatSetUp };
     }
-    return { ...(await onGemini(input, gemini)), tools, compactionTools };
+    return { ...(await onGemini(input, gemini)), ...chatSetUp };
   };
+}
+
+/** The context, in tokens, at which a chat that waits on others compacts once its turn ends (the owner's rule). */
+export const COMPACT_WHILE_WAITING_AT = 100_000;
+
+/**
+ * Every main chat ends its turns waiting for other chats, and so does a tier writer, for its
+ * verdicts. Any other helper is finished once it reports, so compacting it would be paid for
+ * and never read.
+ */
+export function compactWhileWaitingAt(chat: Chat): number | undefined {
+  if (chat.role !== "helper") return COMPACT_WHILE_WAITING_AT;
+  if (chat.task === "tier_writer") return COMPACT_WHILE_WAITING_AT;
+  return undefined;
 }
 
 /** A compaction run reads, and writes down the maps it keeps its work in. */

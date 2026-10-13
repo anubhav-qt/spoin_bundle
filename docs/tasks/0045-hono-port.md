@@ -341,7 +341,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   word. A run that reaches the limit pauses at a step boundary, and a continuation run carries it
   on. Only the names change: the feedback is ero_sennin's findings, toad_sage's reviews and
   wise_toad's lessons, and the numbers left out are card counts, progress and targets, read
-  fresh from the tools.
+  fresh from the tools. Since 2026-10-13 a chat that waits on others also compacts once its turn
+  ends with 100,000 tokens or more (below).
 - **Every step is saved** (2026-10-12): plans, drafts, both gate passes, renders and picks are
   records, so a restarted run never does finished work twice.
 - **A tadpole's documents are written by NIM helpers** (2026-10-12), one per document. The
@@ -722,6 +723,14 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   the first live run's writers guessed record kinds (`misconception_map`, `document`) to find
   them. A helper's instructions now list its topic's maps, each with its letter, name and record,
   and the document writer's prompt says a written document is read with read_document.
+- **A chat compacts while it waits** (2026-10-13), the owner's rule. A turn that ends with the
+  chat's context at 100,000 tokens or more is followed by a compaction run, its opening saying
+  the turn has ended and the chat compacts while it waits for the others, so the stage that
+  wakes it reads a summary instead of every stage before. It applies to the main chats and the
+  tier writer (`COMPACT_WHILE_WAITING_AT` in `agents/set-up.ts`); any other helper is done once
+  it reports, and AskAI is untouched. The 400,000-token limit still pauses a run going on. The
+  scheduler judges a wake by its last run that isn't a compaction, so a compaction after a
+  finished turn, failed or not, never sends the wakes back to run again.
 - **A refused enum names its values** (2026-10-13): `must be one of "map", "review"`, so a model
   fixes the call at once instead of guessing.
 

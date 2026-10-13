@@ -6,6 +6,7 @@ import { eq, inArray } from "drizzle-orm";
 import { Type } from "typebox";
 import { beforeEach, describe, expect, test } from "vitest";
 import { startHelper } from "../src/agents/helpers.ts";
+import { COMPACT_WHILE_WAITING_AT, compactWhileWaitingAt } from "../src/agents/set-up.ts";
 import { generationJob, topic, userTopic, wake as wakeTable } from "../src/db/schema.ts";
 import { type Chat, listRuns, openChat, openTopicChat } from "../src/harness/chats.ts";
 import { RUNS_TO_REPORT } from "../src/harness/helper-reports.ts";
@@ -37,7 +38,7 @@ import { retryJob } from "../src/jobs/topic-queue.ts";
 import { loadPrompts, PROMPTS_DIRECTORY } from "../src/prompts.ts";
 import { makeTopic } from "./fixtures.ts";
 import { deps, signedUp, userIdOf } from "./helpers.ts";
-import { reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
+import { counted, reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
 
 /*
  * The scheduler (task 0045, Phase 9): Trotter's `scheduler.test.ts` on Postgres, without the
@@ -564,5 +565,42 @@ describe("a document writer's instructions", () => {
       `- map ${misconceptions.id} version 1: Map F (misconception map), 1 items: What learners get wrong.`,
     );
     expect(instructions).not.toContain("Another topic's domain.");
+  });
+});
+
+describe("compacting while waiting", () => {
+  test("every main chat and a tier writer compact while waiting; a helper that reports is done with", async () => {
+    const tadpole = await newTadpole();
+    const toadSage = await openChat(db, "toad_sage");
+    const helperFor = async (task: "tier_writer" | "document_writer" | "corrector") =>
+      (await startHelper(db, tadpole, chatAuthor(tadpole), { task, brief: "Work." })).chat;
+
+    expect(compactWhileWaitingAt(tadpole)).toBe(COMPACT_WHILE_WAITING_AT);
+    expect(compactWhileWaitingAt(toadSage)).toBe(COMPACT_WHILE_WAITING_AT);
+    expect(compactWhileWaitingAt(await helperFor("tier_writer"))).toBe(COMPACT_WHILE_WAITING_AT);
+    expect(compactWhileWaitingAt(await helperFor("document_writer"))).toBeUndefined();
+    expect(compactWhileWaitingAt(await helperFor("corrector"))).toBeUndefined();
+  });
+
+  test("a turn that ended settles its wake done, even when the compaction after it fails", async () => {
+    const tadpole = await newTadpole();
+    await queueWake(db, { chatId: tadpole.id, trigger: MORNING, dueAt: MONDAY_MORNING });
+    const { input } = inputFor([counted(text("Waiting for the writers."), 5_000)], () => MONDAY_MORNING);
+    const setUp = input.setUp;
+    const scheduler = createScheduler({
+      ...input,
+      setUp: async (chat) => ({ ...(await setUp(chat)), compactWhileWaitingAt: 1_000 }),
+    });
+
+    await scheduler.tick();
+    await scheduler.idle();
+
+    const runs = await listRuns(db, tadpole.id);
+    expect(runs.map((run) => [run.triggers[0]?.kind, run.status])).toEqual([
+      ["schedule", "done"],
+      ["compaction", "failed"],
+    ]);
+    expect(await wakesOf("done", tadpole)).toHaveLength(1);
+    expect(await waiting()).toEqual([]);
   });
 });

@@ -88,7 +88,15 @@ export const RunTrigger = Type.Union([
   RecordTrigger,
   JobTrigger,
   ReaderTrigger,
-  Type.Object({ kind: Type.Literal("compaction"), contextTokens: Type.Integer({ minimum: 0 }) }, CLOSED),
+  Type.Object(
+    {
+      kind: Type.Literal("compaction"),
+      contextTokens: Type.Integer({ minimum: 0 }),
+      /** Set when the chat compacts after its turn ended, while it waits for other chats. */
+      whileWaiting: Type.Optional(Type.Literal(true)),
+    },
+    CLOSED,
+  ),
   Type.Object({ kind: Type.Literal("continuation"), run: Id }, CLOSED),
 ]);
 

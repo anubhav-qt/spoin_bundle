@@ -41,6 +41,8 @@ export interface ChatSetUp {
   tools: HarnessTool[];
   /** Those of its tools a compaction run stores with. */
   compactionTools: HarnessTool[];
+  /** When it compacts once its turn has ended (`WakeChatInput.compactWhileWaitingAt`). */
+  compactWhileWaitingAt?: number;
   /** How the model is called, given each run. Tests pass a stand-in. */
   streamFn: (run: Run) => StreamFn;
 }
@@ -187,13 +189,17 @@ async function runOnWakes(input: SchedulerInput, chat: Chat, wakes: Wake[]): Pro
 }
 
 /** Done once a run on the wakes finished; failed if the last run failed; otherwise the harness stopped it. */
+/**
+ * How the wakes went, by the chat's last run that wasn't a compaction: one after a turn that ended
+ * changes nothing about the turn, and one before a run that never came leaves the wakes to run.
+ */
 function outcomeOf(runs: Run[]): Outcome {
-  const last = runs.at(-1);
+  const worked = runs.filter((run) => run.triggers[0]?.kind !== "compaction");
+  const last = worked.at(-1);
   if (!last) return { kind: "stopped" };
   if (last.status === "failed")
     return { kind: "failed", error: last.error ?? "The run failed without saying why." };
-  const compacting = last.triggers[0]?.kind === "compaction";
-  if (last.status === "done" && !compacting) return { kind: "done" };
+  if (last.status === "done") return { kind: "done" };
   return { kind: "stopped" };
 }
 

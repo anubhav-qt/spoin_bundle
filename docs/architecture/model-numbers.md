@@ -83,7 +83,8 @@ specific to marking books.
   - breader compacts at 400k tokens and keeps the latest turns, up to 20% of the chat, word for
     word.
   - spoin uses Trotter's: 400k tokens or 60% of the window, whichever is smaller, with no runs
-    kept word for word.
+    kept word for word. A pipeline chat that waits on others also compacts once its turn ends
+    with 100k tokens or more (task 0045).
 - **Tool calls:** Seelie starts every tool call in a reply at once. Reads run in parallel, and
   changes run one at a time in the order asked. Trotter runs every call one at a time. spoin does
   as Seelie does (task 0045).

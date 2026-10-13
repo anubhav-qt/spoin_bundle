@@ -129,7 +129,12 @@ export class Qwen3OnnxEmbedder implements Embedder {
       const tokenizer = await AutoTokenizer.from_pretrained(this.#repo);
       const model = await AutoModel.from_pretrained(this.#repo, { dtype: this.#dtype, device: "cpu" });
       return { tokenizer, model } as unknown as Loaded;
-    })();
+    })().catch((error: unknown) => {
+      // A download that failed once (the first one in a fresh volume did) is tried again on the
+      // next call; kept, it would fail every embed until the process restarts.
+      this.#loading = null;
+      throw error;
+    });
     return this.#loading;
   }
 }

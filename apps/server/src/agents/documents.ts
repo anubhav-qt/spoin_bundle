@@ -8,7 +8,7 @@ import { type Static, Type } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
 import { harnessRecord, type topic } from "../db/schema.ts";
 import { briefOf } from "../harness/helper-reports.ts";
-import { topicById } from "../harness/intake.ts";
+import { intakeOf, topicById } from "../harness/intake.ts";
 import { recordsStored } from "../harness/outputs.ts";
 import { changeRecord, createRecord, readLatestRecord, refOf } from "../harness/records.ts";
 import {
@@ -41,6 +41,22 @@ type Topic = typeof topic.$inferSelect;
 /** A document's file name in its topic's directory. */
 const FILE_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 
+/**
+ * How many cards one section grounds, at most. A tier of 5 to 25 cards is written from 5 to 10
+ * sections of its own; the first Rust run's tadpole was only told so, and wrote 56 sections for
+ * 700 cards (task 0045).
+ */
+export const CARDS_PER_SECTION = 3;
+
+/** A document's sections: NIM writes it whole in one call, and 30 of them is some 13k tokens, as much as it gave in one. */
+const MIN_DOCUMENT_SECTIONS = 3;
+const MAX_DOCUMENT_SECTIONS = 30;
+
+/** The sections a topic's documents must hold between them before its closing report goes. */
+export function sectionsNeeded(cardCount: number): number {
+  return Math.ceil(cardCount / CARDS_PER_SECTION);
+}
+
 /** Every subject has one (antigravity-corpus-authoring.md): field tips, pitfalls and lessons learned. */
 export const TIPS_AND_TRICKS = "tips-and-tricks.md";
 
@@ -65,6 +81,11 @@ const StartWriterParameters = Type.Object(
       minLength: 1,
       description: "What the document covers, from which maps and passages, and what it leaves to others",
     }),
+    sections: Type.Integer({
+      minimum: MIN_DOCUMENT_SECTIONS,
+      maximum: MAX_DOCUMENT_SECTIONS,
+      description: "How many sections the document has, whole: write_document refuses it with fewer",
+    }),
   },
   CLOSED,
 );
@@ -86,6 +107,7 @@ export function startDocumentWriterTool(deps: AgentDeps): HarnessTool<typeof Sta
           brief: params.brief,
           topic: found.id,
           path,
+          sections: params.sections,
         }),
       );
       return recordsStored(context.db, deps.prompts, [brief]);
@@ -166,6 +188,13 @@ export function writeDocumentTool(deps: AgentDeps): HarnessTool<typeof WriteDocu
       const text = documentText(found, merged);
       const problems = epistemicProblems(merged);
       problems.push(...parseDocument(path, Buffer.from(text, "utf8")).errors.problems);
+      const asked = brief.body.sections;
+      if (asked !== undefined && merged.sections.length < asked) {
+        const missing = asked - merged.sections.length;
+        problems.push(
+          `your brief asks for ${asked} sections and the document has ${merged.sections.length}: add ${missing}, each on an idea of its own`,
+        );
+      }
       const headings = merged.sections.map((section) => `- ${section.heading.trim()}`).join("\n");
       if (problems.length > 0) {
         throw new ToolError(
@@ -466,9 +495,20 @@ export async function closingReportProblems(deps: AgentDeps, db: Conn, found: To
   if (!paths.includes(`${dir}/${TIPS_AND_TRICKS}`)) {
     problems.push(`There is no ${TIPS_AND_TRICKS}: every topic has one.`);
   }
+  let sections = 0;
   for (const path of paths) {
-    const { errors } = parseDocument(path, readFileSync(corpusFile(deps, path)));
+    const { document, errors } = parseDocument(path, readFileSync(corpusFile(deps, path)));
     for (const problem of errors.problems) problems.push(`${path}: ${problem}`);
+    if (document) sections += document.sections.length;
+  }
+  const intake = await intakeOf(db, found.id);
+  if (intake) {
+    const needed = sectionsNeeded(intake.body.cardCount);
+    if (sections < needed) {
+      problems.push(
+        `The documents hold ${sections} sections, and the topic's ${intake.body.cardCount} cards need at least ${needed}, one for every ${CARDS_PER_SECTION} cards: start writers to add ${needed - sections} more across the documents, each brief giving its document's new section count.`,
+      );
+    }
   }
   const drafts = await draftsOf(db, found.id);
   const audit = await latestAudit(db, found.id);

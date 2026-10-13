@@ -239,6 +239,8 @@ export const Brief = Type.Object(
     topic: Type.Union([Id, Type.Null()]),
     path: Type.Union([Text, Type.Null()]),
     subtopic: Type.Union([Id, Type.Null()]),
+    /** A document writer's: how many sections its document must have, which write_document holds it to. */
+    sections: Type.Optional(Type.Integer({ minimum: 1 })),
   },
   CLOSED,
 );

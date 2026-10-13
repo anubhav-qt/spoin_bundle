@@ -2,7 +2,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { lastTry, mergeTry } from "../src/agents/documents.ts";
+import { lastTry, mergeTry, sectionsNeeded } from "../src/agents/documents.ts";
 
 /*
  * A document writer's tries (task 0045): each is kept, and the next call sends only the sections
@@ -71,5 +71,13 @@ describe("a document's tries", () => {
 
     const merged = mergeTry(last, { ...fields, sections: [section("Eviction", "c, revised")] });
     expect(merged.sections).toEqual([section("Cache-aside", body("a")), section("Eviction", "c, revised")]);
+  });
+});
+
+describe("the corpus's size", () => {
+  test("a topic needs one section for every 3 of its cards, whatever its tadpole planned", () => {
+    expect(sectionsNeeded(700)).toBe(234);
+    expect(sectionsNeeded(125)).toBe(42);
+    expect(sectionsNeeded(750)).toBe(250);
   });
 });

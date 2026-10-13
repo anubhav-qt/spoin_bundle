@@ -128,7 +128,7 @@ page's content stays on disk; Postgres keeps its pointer, and pgvector its passa
 |---|---|
 | `write_map(kind, body)` | One of ADR-0100's maps, A to J, as a versioned record with its own schema. Claims carry class, scope and confidence; evidence cites stored page passages, each checked to exist |
 | `change_map(map, reason, body)` | The map's next version |
-| `hand_over(kind, records)` | The coverage note, the maps, an "insufficient evidence" or the closing report, to toad_sage. The run ends until its review wakes the tadpole. The closing report is refused until the latest drafts are audited, every finding is fixed or answered, and `corpus:check` passes |
+| `hand_over(kind, records)` | The coverage note, the maps, an "insufficient evidence" or the closing report, to toad_sage. The run ends until its review wakes the tadpole. The closing report is refused until the latest drafts are audited, every finding is fixed or answered, `corpus:check` passes, and the documents hold at least one section for every 3 of the intake's cards (a tier of 5 to 25 cards is written from 5 to 10 sections) |
 
 ### Documents
 
@@ -139,7 +139,7 @@ other topic retrieves them before; the curriculum chat starts after ingestion.
 
 | Tool | Does |
 |---|---|
-| `start_writer(path, brief)` | A writer helper for one document, with the research tools, `write_document` and `report`. It reads the maps and their cited passages from the records |
+| `start_writer(path, brief, sections)` | A writer helper for one document, with the research tools, `write_document` and `report`. It reads the maps and their cited passages from the records. `sections` (3 to 30) is how many the document has whole, and `write_document` refuses it with fewer: the first Rust run's tadpole, only told the corpus's size, wrote 56 sections for 700 cards |
 | `write_document(path, title, source, source_date, tags, epistemic fields, sections)` | The writer's. Code copies kind, category, sub-category and scope from the topic row, checks the corpus contract at write time naming every problem at once, writes the file and keeps the previous version as a record. Every call's sections are kept as the writer's try, and a document already written is the starting try, so each later call, a rewrite included, sends only the sections that change (`drop` removes one) |
 | `audit_drafts()` | The three auditing calls (versions, false precision, the coverage matrix) with their own fixed prompts, which the tadpole does not brief. Findings are records |
 

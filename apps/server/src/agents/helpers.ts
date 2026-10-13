@@ -22,6 +22,7 @@ export interface NewHelper {
   topic?: string | null;
   path?: string | null;
   subtopic?: string | null;
+  sections?: number;
 }
 
 /** Makes a helper under `main` and writes its brief, which wakes it. */
@@ -32,18 +33,16 @@ export async function startHelper(
   helper: NewHelper,
 ): Promise<{ chat: Chat; brief: BriefRecord }> {
   const chat = await newHelperChat(db, main, helper.task);
-  const brief = await createRecord(db, BriefRecord, {
-    kind: "brief",
-    author,
-    body: {
-      helper: chat.id,
-      task: helper.task,
-      brief: helper.brief,
-      topic: helper.topic ?? null,
-      path: helper.path ?? null,
-      subtopic: helper.subtopic ?? null,
-    },
-  });
+  const body: BriefRecord["body"] = {
+    helper: chat.id,
+    task: helper.task,
+    brief: helper.brief,
+    topic: helper.topic ?? null,
+    path: helper.path ?? null,
+    subtopic: helper.subtopic ?? null,
+  };
+  if (helper.sections !== undefined) body.sections = helper.sections;
+  const brief = await createRecord(db, BriefRecord, { kind: "brief", author, body });
   return { chat, brief };
 }
 

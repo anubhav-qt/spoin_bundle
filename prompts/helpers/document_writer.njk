@@ -16,6 +16,7 @@ The topic's maps:
 
 Write the document with write_document. It hands NIM, the model that writes at length, your whole chat with your instructions, and NIM writes the whole document in one call; so read what it draws on first, and say in the instructions its sections and what each must hold. The document is held to these rules:
 
+- It has the number of sections your brief gives, each on an idea of its own: write_document refuses it with fewer. Plan them before you write, and spread them across everything the brief covers.
 - Each `##` section is retrieved on its own and dropped into a prompt beside others, so it must make sense alone: a descriptive heading, and 1,000 to 2,000 characters of dense, concrete text.
 - Concrete beats general. "Postgres' REPEATABLE READ also prevents phantom reads, which the SQL standard permits" is useful; "isolation levels trade consistency for performance" is not, because every model knows it already.
 - Include what models get wrong: version-specific behaviour, defaults, names that changed, the edge case everyone misstates.

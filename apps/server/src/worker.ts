@@ -1,3 +1,4 @@
+import type { ChatRole } from "@spoin/shared/enums";
 import { chromiumBrowser } from "./agents/browser.ts";
 import { filesUnder } from "./agents/context.ts";
 import { oneShot } from "./agents/one-shot.ts";
@@ -108,12 +109,19 @@ const stop = () => {
 process.on("SIGTERM", stop);
 process.on("SIGINT", stop);
 
+let onlyRoles: ChatRole[] | undefined;
+if (env.WORKER_ONLY_ROLES.length > 0) {
+  onlyRoles = env.WORKER_ONLY_ROLES;
+  log.warn({ onlyRoles }, "waking only these roles; every other chat's wakes wait");
+}
+
 await runScheduler({
   db: app.db,
   prompts,
   setUp: agentSetUp({ deps, proxy }),
   signal: stopping.signal,
   drain: draining.signal,
+  onlyRoles,
   onEvent(event) {
     if (event.type === "error") {
       log.error({ error: event.error }, "the scheduler hit an error");

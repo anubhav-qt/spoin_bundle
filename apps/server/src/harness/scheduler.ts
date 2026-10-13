@@ -1,6 +1,7 @@
 import { setTimeout as sleep } from "node:timers/promises";
 import type { StreamFn, ThinkingLevel } from "@spoin/pi-agent";
 import type { Api, Model } from "@spoin/pi-ai";
+import type { ChatRole } from "@spoin/shared/enums";
 import type { Db } from "../db/client.ts";
 import type { Prompts } from "../prompts.ts";
 import { type Chat, type Run, readChat } from "./chats.ts";
@@ -62,6 +63,8 @@ export interface SchedulerInput {
   clock?: () => Date;
   /** Hears each chat wake and settle, and anything that went wrong. */
   onEvent?: (event: SchedulerEvent) => void;
+  /** Wakes only chats of these roles, every other chat's wakes left waiting: the owner's way to run one role alone. */
+  onlyRoles?: readonly ChatRole[];
 }
 
 /**
@@ -146,11 +149,18 @@ async function wakeDueChats(
     if (stopping(input)) return;
     if (running.has(chatId)) continue;
     const chat = await readChat(input.db, chatId);
+    if (!wakesRole(input, chat)) continue;
     const wakes = await takeDueWakes(input.db, chatId, now);
     if (wakes.length === 0) continue;
     const finished = runOnWakes(input, chat, wakes).finally(() => running.delete(chatId));
     running.set(chatId, finished);
   }
+}
+
+/** Whether the scheduler wakes this chat: every chat, unless it was given only some roles. */
+function wakesRole(input: SchedulerInput, chat: Chat): boolean {
+  if (!input.onlyRoles) return true;
+  return input.onlyRoles.includes(chat.role);
 }
 
 function takeDueWakes(db: Db, chatId: string, now: Date): Promise<Wake[]> {

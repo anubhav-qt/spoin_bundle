@@ -812,7 +812,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   `#` to pass the letter cap, copied from the old art in the designer's own chat: style 4 caps box
   lines, refuses `#` padding, asks for scenes and objects over faces and stick figures, adds
   `look_at` for a meme's or a character's reference picture, and started designer_toad's chat
-  over. The curated library is not used: nothing in the harness comes from old code.
+  over. The curated library is not used as a tool: nothing in the harness comes from old code;
+  only the owner's pick from it (Joan G. Stark's mermaid) is a prompt example. designer_toad thinks
+  at high. `WORKER_ONLY_ROLES=designer_toad` runs the worker on that role alone, every other
+  chat's wakes left waiting, so the art can be checked before the rest runs.
 
 ## Asked when we get there
 

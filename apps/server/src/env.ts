@@ -1,3 +1,4 @@
+import { CHAT_ROLES } from "@spoin/shared/enums";
 import { z } from "zod";
 
 const bool = z.enum(["true", "false", "1", "0"]).transform((v) => v === "true" || v === "1");
@@ -143,6 +144,8 @@ const Env = z.object({
   UNIVERSE_FILES_DIR: z.string().default("/data/universe"),
   /** The web app the worker renders cards on, so designer_toad sees its art; unset, nothing renders. */
   WEB_URL: z.string().url().optional(),
+  /** The only chat roles the worker wakes, comma-separated, every other chat's wakes left waiting; empty, it wakes every chat. */
+  WORKER_ONLY_ROLES: list.pipe(z.array(z.enum(CHAT_ROLES))).default([]),
 
   /** Opens `/dev/*` outside production (never in it), and the OpenAPI UI in production too. */
   DEV_ROUTES: bool.default(false),

@@ -95,6 +95,8 @@ services:
       NVIDIA_NIM_API_KEY: ${NVIDIA_NIM_API_KEY:?Set NVIDIA_NIM_API_KEY in infra/.env, from breader}
       UNIVERSE_FILES_DIR: /data/universe
       WEB_URL: http://web:3000
+      # Set in the shell to run some roles alone (WORKER_ONLY_ROLES=designer_toad); empty runs every chat.
+      WORKER_ONLY_ROLES: ${WORKER_ONLY_ROLES:-}
     volumes:
       - hono-models:/models
       - hono-universe-files:/data/universe

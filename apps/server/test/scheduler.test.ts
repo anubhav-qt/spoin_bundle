@@ -317,6 +317,22 @@ describe("the scheduler", () => {
     expect(givenUp?.error).toBe("The script has no more replies.");
   });
 
+  test("given only some roles, it wakes those chats and leaves every other chat's wakes waiting", async () => {
+    const tadpole = await newTadpole();
+    const designer = await openTopicChat(db, "designer_toad", tadpole.topicId ?? "");
+    const clock = { now: MONDAY_MORNING };
+    const { input, events } = inputFor([text("Drawn.")], () => clock.now);
+    const scheduler = createScheduler({ ...input, onlyRoles: ["designer_toad"] });
+    for (const chat of [tadpole, designer])
+      await queueWake(db, { chatId: chat.id, trigger: MORNING, dueAt: MONDAY_MORNING });
+
+    await scheduler.tick();
+    await scheduler.idle();
+
+    expect(woke(events)).toEqual([designer.id]);
+    expect(await wakesOf("waiting", tadpole)).toHaveLength(1);
+  });
+
   test("every chat with a wake due runs at once", async () => {
     const chats = [await newTadpole(), await newTadpole(), await newTadpole()];
     const { scheduler, events } = schedulerFor([text("Done."), text("Done."), text("Done.")]);

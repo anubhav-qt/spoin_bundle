@@ -4,6 +4,7 @@ import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { Type } from "typebox";
 import { describe, expect, test } from "vitest";
 import type { AgentDeps } from "../src/agents/context.ts";
+import { correctCardsOnNimTool, correctCardsTool, correctedOnNim } from "../src/agents/gate.ts";
 import { startHelper } from "../src/agents/helpers.ts";
 import { correctionsOnly, writeOnNimTool } from "../src/agents/nim-writes.ts";
 import {
@@ -20,7 +21,7 @@ import {
 import { card, harnessRecord, question, subtopic, topic } from "../src/db/schema.ts";
 import { type Chat, endRun, openTopicChat, startRun } from "../src/harness/chats.ts";
 import { CLOSED } from "../src/harness/schemas.ts";
-import { type HarnessTool, ToolError, type ToolOutput } from "../src/harness/tools.ts";
+import { type HarnessTool, type ToolContext, ToolError, type ToolOutput } from "../src/harness/tools.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import { deps } from "./helpers.ts";
 import { reply, scriptedModel, TEST_MODEL } from "./scripted-model.ts";
@@ -315,6 +316,43 @@ describe("a write on NIM", () => {
     );
     written = true;
     expect(String((await call(own, chat, { n: 1 })).value)).toBe("Stored 1.");
+  });
+
+  test("a draft's first correction is NIM's, stored or refused, and the corrector fixes it after", async () => {
+    const { topic: made, beginner: tier } = await newTopic();
+    const tadpole = await openTopicChat(db, "tadpole", made.id);
+    const { chat: corrector } = await startHelper(db, tadpole, TIERS_AUTHOR, {
+      task: "corrector",
+      brief: "Correct.",
+      topic: made.id,
+      subtopic: tier.id,
+    });
+    const [draft] = await db
+      .insert(card)
+      .values({
+        familyId: randomUUID(),
+        topicId: made.id,
+        subtopicId: tier.id,
+        difficulty: tier.difficulty,
+        title: "A draft",
+        canonicalTitle: "A concept",
+        summary: "A hook.",
+        body: "The body.",
+        genMeta: { stage: "correcting", form: "prose" },
+      })
+      .returning();
+    if (!draft) throw new Error("No draft.");
+    const entry = { card: draft.id, note: "It stands." };
+    const own = correctionsOnly(correctCardsTool(agentDeps), correctedOnNim) as unknown as HarnessTool;
+    await expect(call(own, corrector, { cards: [entry] })).rejects.toThrow(
+      /The first write is NIM's: call write_on_nim with correct_cards/,
+    );
+
+    // NIM's correction is refused (it names the card twice), and still counts as its first.
+    const onNim = correctCardsOnNimTool(agentDeps) as unknown as HarnessTool;
+    await expect(call(onNim, corrector, { cards: [entry, entry] })).rejects.toThrow("is named twice");
+    const context = { db } as unknown as ToolContext;
+    expect(await correctedOnNim(context, { cards: [entry] })).toBe(true);
   });
 
   test("an answer with no JSON goes back to the writer, kept", async () => {

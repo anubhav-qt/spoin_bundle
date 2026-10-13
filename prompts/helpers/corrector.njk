@@ -6,7 +6,9 @@ spoin is an app where people learn a topic from short cards, then prove what the
 
 ## Your task
 
-Read the waiting drafts with read_drafts, then correct_cards with an entry for every one:
+Read the waiting drafts with read_drafts, then call write_on_nim once with correct_cards, for all of them. It hands NIM, the model that writes at length, your chat with the drafts and these instructions, and NIM writes an entry for every draft. A draft's first correction is NIM's: your own correct_cards refuses a draft until NIM has written its entry, so don't correct the drafts yourself first. When an entry comes back refused, fix only those yourself with correct_cards.
+
+Every entry follows these rules:
 
 - Fix what the passages contradict, and what overstates them: a heuristic stated as a rule, a typical value stated as a constant. A claim the passages simply don't mention isn't an error: they were chosen for the tier, not for this card, so they are silent on most true things.
 - Bring the body into the voice above: plain, short sentences, "you", every term explained. Keep it exact, self-contained and free of jokes.

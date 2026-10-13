@@ -7,7 +7,7 @@ import {
   normalizeContext,
   type ToolCall,
 } from "@spoin/pi-ai";
-import { Type } from "typebox";
+import { type Static, type TSchema, Type } from "typebox";
 import { checkValue, SchemaError } from "../harness/check.ts";
 import { contextMessages } from "../harness/compaction.ts";
 import { CLOSED } from "../harness/schemas.ts";
@@ -18,8 +18,8 @@ import type { Prompts } from "../prompts.ts";
 /*
  * NIM writes, the Gemini writer decides (the owner's rule, task 0045, ADR-0108). A writer chat runs
  * on Gemini with the real write tools, for the small writes it makes itself: a fix, a section
- * added or dropped. For a big write (a whole document, curriculum, tier's cards or its quiz) it
- * calls write_on_nim, which hands NIM the writer's whole chat and instructions. NIM answers with
+ * added or dropped. For a big write (a whole document, a tier's cards or its quiz, pass 1's
+ * corrections) it calls write_on_nim, which hands NIM the writer's whole chat and instructions. NIM answers with
  * the tool's arguments as JSON text, and code stores them through the real tool, whose checks
  * decide what passes. Text, not a tool call: NVIDIA sends a tool call's arguments in one piece once
  * they are all written, so a big write was minutes of silence that looked like a dead call.
@@ -111,16 +111,17 @@ export function writeOnNimTool(
 
 /**
  * The writer's own copy of a tool whose first write is NIM's (the owner's rule for a tier's cards
- * and questions): it refuses until `firstWritten` says that write happened, and corrects after.
+ * and questions, and pass 1's corrections): it refuses until `firstWritten` says that write
+ * happened, and corrects after.
  */
-export function correctionsOnly(
-  tool: HarnessTool,
-  firstWritten: (context: ToolContext) => Promise<boolean>,
-): HarnessTool {
+export function correctionsOnly<Parameters extends TSchema>(
+  tool: HarnessTool<Parameters>,
+  firstWritten: (context: ToolContext, params: Static<Parameters>) => Promise<boolean>,
+): HarnessTool<Parameters> {
   return {
     ...tool,
     async execute(params, context) {
-      if (!(await firstWritten(context))) {
+      if (!(await firstWritten(context, params))) {
         throw new ToolError(
           `The first write is NIM's: call write_on_nim with ${tool.name}. ${tool.name} is for corrections once it has written.`,
         );

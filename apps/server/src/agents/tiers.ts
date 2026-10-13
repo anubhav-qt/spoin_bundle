@@ -108,6 +108,8 @@ export interface CardMeta {
   art?: ArtRequest;
   writer: string;
   passages: number[];
+  /** NIM has written the card's pass-1 correction, stored or refused; the corrector may fix it. */
+  nimTried?: boolean;
   /** The pass-2 verifier given the card. */
   verifier?: string;
   /** Why pass 2 rejected it, for the writer. */

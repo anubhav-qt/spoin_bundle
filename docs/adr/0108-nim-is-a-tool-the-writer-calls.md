@@ -42,6 +42,10 @@ again with what to change.
 - The curriculum writer has no `write_on_nim`: the owner keeps curricula on Gemini alone.
 - A tier's first cards and first questions are NIM's alone (the owner's rule): the tier writer's own
   `write_cards` and `write_questions` refuse until the tier has some, and only correct after.
+- Pass 1's corrections are NIM's too (the owner's call, after Gemini ran out of quota on a single
+  topic, its correctors writing 753k of its 2.64M output tokens): the corrector calls
+  `write_on_nim` with `correct_cards`, and its own `correct_cards` refuses a draft until NIM has
+  written its entry.
 - NIM writes JSON in text, so a malformed object is refused at parse time and returned to the
   writer, not retried in the tool.
 

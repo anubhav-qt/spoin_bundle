@@ -1,7 +1,7 @@
 import { cosine } from "@spoin/frog/embeddings";
 import { DIFFICULTIES } from "@spoin/shared/enums";
 import { and, asc, eq, inArray, ne, sql } from "drizzle-orm";
-import { Type } from "typebox";
+import { type Static, Type } from "typebox";
 import { classifyArchetype } from "../cards/archetype.ts";
 import type { Db, Tx } from "../db/client.ts";
 import { card, question, rejectedCard, topic } from "../db/schema.ts";
@@ -29,7 +29,8 @@ import {
 
 /*
  * The gate's two passes (harness-tools.md, task 0045). Pass 1, one corrector per tier, rewrites
- * each draft or leaves it be and never rejects; code rejects a near-duplicate. Code starts a
+ * each draft or leaves it be and never rejects; NIM writes each draft's first correction, and the
+ * corrector fixes what code refused of it. Code rejects a near-duplicate. Code starts a
  * pass-2 verifier on its survivors. Pass 2 rates each card's difficulty itself and accepts or
  * rejects it, solves each MCQ without its key, and judges each free-text rubric; a question it
  * passes is live at once. Pass 1's rejections and pass 2's verdicts wake the writer, and pass 2's
@@ -278,6 +279,47 @@ export function correctCardsTool(deps: AgentDeps): HarnessTool<typeof CorrectCar
       return { ...stored, value: `${said.join("\n")}\n${String(stored.value)}\n${next}` };
     },
   };
+}
+
+/**
+ * correct_cards as NIM writes it, through the corrector's write_on_nim. It marks the waiting cards
+ * NIM names before storing them, so once NIM has written a card's first correction, stored or
+ * refused, the corrector's own correct_cards may fix it (the owner's rule).
+ */
+export function correctCardsOnNimTool(deps: AgentDeps): HarnessTool<typeof CorrectCardsParameters> {
+  const tool = correctCardsTool(deps);
+  return {
+    ...tool,
+    async execute(params, context) {
+      const tier = await tierOfHelper(context);
+      const named = params.cards.map((one) => one.card);
+      await context.db
+        .update(card)
+        .set({ genMeta: sql`${card.genMeta} || ${JSON.stringify({ nimTried: true })}::jsonb` })
+        .where(
+          and(
+            inArray(card.id, named),
+            eq(card.subtopicId, tier.id),
+            eq(card.status, "draft"),
+            sql`${card.genMeta} ->> 'stage' = 'correcting'`,
+          ),
+        );
+      return tool.execute(params, context);
+    },
+  };
+}
+
+/** Whether NIM has written the first correction of every card the call names. */
+export async function correctedOnNim(
+  context: ToolContext,
+  params: Static<typeof CorrectCardsParameters>,
+): Promise<boolean> {
+  const named = params.cards.map((one) => one.card);
+  const untried = await context.db
+    .select({ id: card.id })
+    .from(card)
+    .where(and(inArray(card.id, named), sql`${card.genMeta} ->> 'nimTried' is distinct from 'true'`));
+  return untried.length === 0;
 }
 
 type Draft = { title: string; canonical_title: string; summary: string; body: string; passages: number[] };

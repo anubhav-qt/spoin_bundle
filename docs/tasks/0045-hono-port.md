@@ -773,7 +773,9 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   `write_on_nim` for a big write, and NIM writes a whole document, tier's cards or tier's quiz in
   one call, at most one tier (`agents/nim-writes.ts`, ADR-0108); a curriculum is Gemini's alone,
   the owner's call. A tier's first cards and questions are NIM's alone: the writer's own
-  `write_cards` and `write_questions` only correct. What NIM writes is kept in the result,
+  `write_cards` and `write_questions` only correct. So is each draft's pass-1 correction: Gemini
+  ran out of quota at 20:19 on 2026-10-13 with Rust unfinished, its correctors having written
+  753k of its 2.64M output tokens against NIM's 328k. What NIM writes is kept in the result,
   refused or not. A
   manual call for 25 cards from 27 passages took 518 seconds (first token at 294, 11k tokens in,
   7,324 out); one for 15 cards took 1,698 seconds and one for 30 questions 1,489, each after two

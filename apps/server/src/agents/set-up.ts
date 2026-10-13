@@ -29,7 +29,9 @@ import {
 } from "./documents.ts";
 import {
   checkRubricsTool,
+  correctCardsOnNimTool,
   correctCardsTool,
+  correctedOnNim,
   readDraftsTool,
   readSurvivorsTool,
   solveQuestionsTool,
@@ -162,7 +164,14 @@ async function helperTools(deps: AgentDeps, chat: Chat): Promise<HarnessTool[]> 
       report,
     ];
   }
-  if (chat.task === "corrector") return [readDraftsTool(deps), correctCardsTool(deps)];
+  if (chat.task === "corrector") {
+    // The owner's rule: a draft's first correction is NIM's; the corrector fixes what was refused.
+    return [
+      readDraftsTool(deps),
+      correctionsOnly(correctCardsTool(deps), correctedOnNim),
+      writeOnNimTool(deps.prompts, deps.nim, [correctCardsOnNimTool(deps)]),
+    ];
+  }
   if (chat.task === "verifier") {
     return [
       readSurvivorsTool(deps),

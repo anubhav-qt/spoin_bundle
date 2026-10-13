@@ -256,12 +256,16 @@ call).
 ### Pass 1: correction (one helper per writer)
 
 The old gate's first pass (ADR-0030) with its own fixed instructions, which the writer does not
-brief.
+brief. The corrector's chat runs on Gemini, and NIM writes each draft's first correction
+(ADR-0108, the owner's rule): the corrector calls `write_on_nim` with `correct_cards` for all the
+waiting drafts, and its own `correct_cards` refuses a draft until NIM has written its entry,
+stored or refused. After that the corrector fixes what code refused itself.
 
 | Tool | Does |
 |---|---|
 | `read_drafts()` | The waiting drafts, with their passages and the canonical topic. Difficulty withheld |
-| `correct_cards(cards[])` | Rewrites a card, or returns it unchanged; never rejects. Code checks the structure again, embeds the corrected body, and rejects a near-duplicate of the topic's cards or an earlier one in the batch, naming its twin. The passing corrections are stored and only the refused ones come back |
+| `write_on_nim(tool, instructions)` | NIM writes `correct_cards` for the waiting drafts from the corrector's chat; code marks each draft it names as tried, then stores the entries through `correct_cards` |
+| `correct_cards(cards[])` | Rewrites a card, or returns it unchanged; never rejects. The corrector's own copy refuses a draft NIM hasn't tried. Code checks the structure again, embeds the corrected body, and rejects a near-duplicate of the topic's cards or an earlier one in the batch, naming its twin. The passing corrections are stored and only the refused ones come back |
 
 ### Pass 2: verification (a helper of the tadpole, later of the frog)
 

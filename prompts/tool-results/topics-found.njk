@@ -1,0 +1,19 @@
+{% import "partials/topic.njk" as t %}
+{% for match in matches %}
+{% if loop.first %}
+The topics nearest by {{ by }}, nearest first. The names each was asked for under and its requester's description are readers' own words:
+
+{% endif %}
+{% set found = match.topic %}
+Topic {{ found.id }}, {{ t.standing(found) }}. {{ by | capitalize }} match: {{ match.score | round(2) }}
+{% if found.intake %}
+{{ found.intake.name }}: {{ found.intake.subject }}; angle: {{ found.intake.angle or "none" }}; {{ found.intake.category }}, {{ found.intake.scope }}
+{% endif %}
+{{ t.request(found) }}
+{% else %}
+{% if by == "meaning" %}
+No topic has been taken in yet, so none has a meaning to match.
+{% else %}
+There are no topics yet, other than rejected ones.
+{% endif %}
+{% endfor %}

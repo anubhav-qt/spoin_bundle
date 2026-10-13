@@ -218,7 +218,7 @@ export const topic = pgTable(
     category: varchar("category", { length: 120 }),
     subCategory: varchar("sub_category", { length: 120 }),
     /**
-     * Its subject, angle and description, embedded at intake so `find_topics` matches a name by
+     * Its subject, angle and description, embedded at intake so `find_topics_by_meaning` matches a name by
      * meaning, a queued topic too. Apart from `embedding`, the name's, which the projection
      * rewrites and the accent hues read.
      */

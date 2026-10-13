@@ -1,0 +1,30 @@
+{% import "partials/topic.njk" as t %}
+Topic {{ topic.id }}, {{ t.standing(topic) }}. Asked for by {{ readers }} {{ "reader" if readers == 1 else "readers" }}. The names it was asked for under and its requester's description are readers' own words:
+{{ t.request(topic) }}
+{% if intake %}
+{% set record = intake %}
+{% include "handovers/intake.njk" %}
+{% else %}
+No intake: its name hasn't been taken in yet.
+{% endif %}
+
+{% for link in links %}
+{% if loop.first %}
+Links:
+{% endif %}
+- {{ link.kind }} {{ link.direction }} topic {{ link.topic }}, "{{ link.name }}"
+{% else %}
+Links: none.
+{% endfor %}
+
+{% for tier in tiers %}
+{% if loop.first %}
+Subtopics, with the cards each has live:
+{% endif %}
+{{ tier.difficulty | capitalize }}, {{ tier.cards }} {{ "card" if tier.cards == 1 else "cards" }}:
+{% for sub in tier.subtopics %}
+- {{ sub.title }}: {{ sub.cards }} of {{ sub.target }}
+{% endfor %}
+{% else %}
+Subtopics: none yet, as its curriculum isn't written.
+{% endfor %}

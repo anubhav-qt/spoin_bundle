@@ -99,7 +99,8 @@
                       "**/harness/reading*",
                       "**/harness/asking*",
                       "**/harness/every-chat*",
-                      "**/harness/intake*"
+                      "**/harness/intake*",
+                      "**/harness/topic-reading*"
                     ],
                     "message": "AskAI has no database handle (ADR-0106): a reader's text never reaches a record or another chat."
                   }

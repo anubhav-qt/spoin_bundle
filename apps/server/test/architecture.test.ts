@@ -32,6 +32,7 @@ const RECORD_TOOLS = [
   "harness/asking.ts",
   "harness/every-chat.ts",
   "harness/intake.ts",
+  "harness/topic-reading.ts",
 ];
 
 const filesUnder = (path: string): string[] => {

@@ -1,0 +1,9 @@
+{% macro standing(found) %}{% if found.standing == "live" %}live{% elif found.standing == "writing" %}being written (job {{ found.job }}){% elif found.standing == "accepted" %}accepted, waiting its turn in the queue (job {{ found.job }}){% elif found.standing == "waiting" %}queued, its name not taken in yet (job {{ found.job }}){% else %}rejected (job {{ found.job }}){% endif %}{% endmacro %}
+
+{% macro request(found) %}
+<request>
+Asked for as: {% for alias in found.aliases %}"{{ alias }}"{% if not loop.last %}, {% endif %}{% endfor %}
+
+Description: {{ found.description or "none given" }}
+</request>
+{% endmacro %}

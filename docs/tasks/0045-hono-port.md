@@ -243,7 +243,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   questions with their helpers, the frog's, ero_sennin's and wise_toad's.
 - **A topic is a subject plus an angle** (2026-10-11): who it is for and how it is written.
   "Rust" and "Rust in easy language" are two topics, and a homonym never merges into its
-  namesake. The intake record stores the angle; `find_topics` shows each match's subject,
+  namesake. The intake record stores the angle; `find_topics_by_name` and `find_topics_by_meaning` show each match's subject,
   angle, description and aliases, scoring the name and the meaning separately; toad_sage's
   judgment decides a merge, stating both topics' subject and angle. The reader's optional
   description is read by toad_sage and ero_sennin alike, and a merge record keeps the requested
@@ -595,7 +595,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   a name cancelled before toad_sage runs reads as cancelled in its opening message
   (`prompts/handovers/job.njk`). The name and description are the requester's words, wrapped in
   `<request>` with that tag stripped from them in code.
-- **`find_topics` scores the name by trigrams and the meaning by the intake** (2026-10-13). The
+- **`find_topics` scores the name by trigrams and the meaning by the intake** (2026-10-13; split in two the same day, below). The
   name match is `pg_trgm` similarity of the requested name against every alias, so spellings and
   word order match ("rustlang", "Rust lang"). The meaning match is the embedding of the requested
   name and description against each topic's embedding of its subject, angle and description,
@@ -616,7 +616,7 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   longer waiting or is taken in already. The `intake` record holds the whole decision (name,
   subject, angle, scope, category, card count, brief, `builds_on`), and the topic row mirrors the
   name, scope and category for the product, so `change_intake` versions every field. Categories
-  are normalized by `normalizeTopicText`, as the corpus's are. The meaning `find_topics` matches
+  are normalized by `normalizeTopicText`, as the corpus's are. The meaning `find_topics_by_meaning` matches
   on is its own column, `topic.meaning_embedding`, apart from `embedding` (the name's), which the
   projection rewrites and the accent hues read. The `merge` record keeps the requested name and
   description (the `<request>` tag stripped), the aliases, the requesters with their entry tier and
@@ -627,6 +627,16 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   /topics/{id}/generation-job` removes the reader's subscription, and the topic with its job only
   when nobody else follows it; until now it deleted the pending job for every follower, which
   would strand a topic toad_sage had accepted. A running job still answers 409.
+- **Finding topics is two tools, by name and by meaning** (2026-10-13), amending the
+  `find_topics` entry above: the agent picks the next tool from what the last one showed, so the
+  embedder runs only when it asks. `find_topics_by_name(name)` scores `pg_trgm` similarity against
+  every alias; `find_topics_by_meaning(subject, angle?)` embeds toad_sage's own reading of the
+  subject and angle, the way a topic's meaning is stored, so a bare homonym can't land near its
+  namesake. Each returns its top 5 (ADR-0025's candidate count) and never a rejected topic; a name
+  not yet taken in has no meaning, so only the name search finds it. Both sides of the meaning
+  match are embedded as passages, as they are the same kind of text. Pre-harness topics have no
+  intake and get no fallback: nothing is carried over from the old code or its topics. With
+  `read_topic` and `list_categories` they are in `apps/server/src/harness/topic-reading.ts`.
 
 ## Asked when we get there
 

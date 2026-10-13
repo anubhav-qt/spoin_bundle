@@ -57,8 +57,9 @@ existing topic gets its own.
 
 | Tool | Does |
 |---|---|
-| `find_topics(name, description?)` | The topics nearest a name, live or queued, each with its subject, angle, description and aliases, the name match and the meaning match scored separately: the name by trigrams against every alias, the name and description by embedding against each topic's subject, angle and description |
-| `read_topic(topic)` | One topic: its intake record, subtopics, card counts, links, and how many readers asked for it |
+| `find_topics_by_name(name)` | The 5 topics nearest a name by `pg_trgm` similarity against every alias, live or queued, rejected ones left out. Each shows where it stands (with its job), its intake's name, subject and angle if taken in, its aliases, its requester's description, and the name match. Never runs the embedder, so toad_sage tries it first |
+| `find_topics_by_meaning(subject, angle?)` | The 5 topics taken in whose meaning (subject, angle and description, embedded at intake) is nearest toad_sage's own statement of the subject and angle, shown as above with the meaning match. Runs the embedder, so toad_sage calls it only when the name leaves the question open |
+| `read_topic(topic)` | One topic: where it stands, how many readers asked for it, its aliases and description, its intake record, its links both ways, and its subtopics per tier with their live card counts |
 | `list_categories()` | The categories and sub-categories in use, with counts |
 | `web_search(query)` | Whether a name is a real subject. Decided with the research tools |
 | `reject_topic(job, reason)` | Fails the job; the reason is what the reader sees |

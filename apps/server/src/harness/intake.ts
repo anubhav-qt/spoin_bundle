@@ -45,7 +45,7 @@ export async function intakeOf(db: Conn, topicId: string): Promise<IntakeRecord 
 }
 
 /**
- * The text a topic's meaning is embedded from, for `find_topics`: what it is about, who it is for,
+ * The text a topic's meaning is embedded from, for `find_topics_by_meaning`: what it is about, who it is for,
  * and what its requester said they want.
  */
 export function meaningText(parts: {
@@ -394,13 +394,13 @@ async function topicOfJob(db: Conn, jobId: string): Promise<Topic> {
   return topicById(db, found.topicId);
 }
 
-async function topicById(db: Conn, topicId: string): Promise<Topic> {
+export async function topicById(db: Conn, topicId: string): Promise<Topic> {
   const [found] = await db.select().from(topic).where(eq(topic.id, topicId));
   if (!found) throw new ToolError(`There is no topic ${topicId}.`);
   return found;
 }
 
-async function latestJob(db: Conn, topicId: string): Promise<Job | undefined> {
+export async function latestJob(db: Conn, topicId: string): Promise<Job | undefined> {
   const [job] = await db
     .select()
     .from(generationJob)

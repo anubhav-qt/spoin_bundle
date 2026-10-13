@@ -1,0 +1,6 @@
+{% for category in categories %}
+- {{ category.name }}: {{ category.topics }} {{ "topic" if category.topics == 1 else "topics" }}{% if category.subCategories | length %}; sub-categories: {% for sub in category.subCategories %}{{ sub.name }} ({{ sub.topics }}){% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
+
+{% else %}
+No topic has a category yet.
+{% endfor %}

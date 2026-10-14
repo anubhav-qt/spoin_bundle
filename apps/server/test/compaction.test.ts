@@ -101,6 +101,12 @@ function lastText(messages: Message[] | undefined): string {
   return contentText(last.content);
 }
 
+function lastToolResult(messages: Message[] | undefined): string {
+  const last = messages?.at(-1);
+  if (last?.role !== "toolResult") throw new Error("The last message isn't a tool's result.");
+  return contentText(last.content);
+}
+
 describe("compaction", () => {
   test("a turn that ends past the waiting threshold compacts after it, while the chat waits", async () => {
     const chat = await newChat();
@@ -261,6 +267,53 @@ describe("compaction", () => {
     await expect(
       wake(chat, [text("Never asked.")], { ...TEST_MODEL, contextWindow: 4_500 }).runs,
     ).rejects.toThrow(ContextOverflowError);
+  });
+
+  test("a compaction run is sent the chat's every tool, so its cache holds, and code refuses those that aren't for it", async () => {
+    const chat = await newChat();
+    await fillChat(chat);
+    const startTool: HarnessTool<typeof NoteArguments> = {
+      ...noteTool,
+      name: "start_writer",
+      async execute() {
+        throw new Error("A compaction run never starts a writer.");
+      },
+    };
+    const scripted = scriptedModel([
+      calls("call-1", "start_writer", { text: "The ownership chapter." }),
+      calls("call-2", "write_summary", SUMMARY),
+      text("Summary written."),
+      calls("call-3", "write_summary", SUMMARY),
+      text("Reading on."),
+    ]);
+
+    const runs = await wakeChat({
+      db,
+      prompts,
+      chat,
+      model: TEST_MODEL,
+      thinkingLevel: "off",
+      triggers: MORNING,
+      apiKey: "test-key",
+      tools: [noteTool, startTool],
+      compactionTools: [noteTool],
+      compaction: SMALL_LIMIT,
+      streamFn: () => scripted.streamFn,
+    });
+
+    expect(runs.map((run) => [run.triggers[0]?.kind, run.status])).toEqual([
+      ["compaction", "done"],
+      ["schedule", "done"],
+    ]);
+    const everyTool = ["write_note", "start_writer", "write_summary"];
+    expect(scripted.tools).toEqual([everyTool, everyTool, everyTool, everyTool, everyTool]);
+    expect(lastToolResult(scripted.requests[1])).toMatch(
+      /This run only saves your work and sums it up, so start_writer waits for the run after it/,
+    );
+    expect(lastToolResult(scripted.requests[4])).toMatch(
+      /write_summary is for when your chat compacts, and it isn't compacting now\./,
+    );
+    expect((await summaryInForce(db, chat))?.body.throughRun).toBe(runs[0]?.id);
   });
 
   test("after a compaction that leaves no room under the limit, the run goes ahead instead of compacting again", async () => {

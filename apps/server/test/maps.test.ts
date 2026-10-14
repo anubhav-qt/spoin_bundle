@@ -355,6 +355,11 @@ describe("the maps' audit and handover", () => {
     expect(prompted[0]).toContain('<item key="C/one owner">');
     expect(prompted[0]).toContain('<item key="F/a move copies the heap">');
     expect(prompted[0]).toContain("What book says.");
+    // The sources too, each beside its pages: a tier nobody checked lifted 169 C++ claims to high.
+    expect(prompted[0]).toContain('<item key="D/The Rust Reference">');
+    expect(prompted[0]).toMatch(
+      /Tier: primary_specification; date: Rust 1\.97\nIts pages:\n- reference, https:\/\/example\.org\/reference\//,
+    );
 
     const [finding] = await listTopicRecords(db, FindingRecord, "finding", topicId);
     if (!finding) throw new Error("No finding.");
@@ -389,7 +394,7 @@ describe("the maps' audit and handover", () => {
     expect(prompted[1]).not.toContain('<item key="C/moves">');
     expect(await mapsHandoverProblems(db, topicId)).toEqual([]);
     await expect(auditMapsTool(agentDeps).execute({}, context)).rejects.toThrow(
-      /Nothing in maps C and F changed/,
+      /Nothing in maps C, D and F changed/,
     );
 
     await handOverTool(agentDeps).execute({ kind: "maps", records: [mapC.id], note: "The maps." }, context);
@@ -438,6 +443,28 @@ describe("writing the maps", () => {
     expect(written.value).toContain(
       "Map C holds 1 claims, and the topic's 6 cards need at least 2: add 1 more",
     );
+  });
+});
+
+describe("a claim's domain", () => {
+  test("a claim or gap naming a domain map A doesn't hold is refused as it is written", async () => {
+    const { topicId, pages, context } = await topicWithMaps(["A"]);
+    const agentDeps = { db, prompts } as unknown as AgentDeps;
+    const write = writeMapTool(agentDeps);
+    const misnamed = claim("one owner", "ownership_and_borrowing", [pages.book]);
+    await expect(write.execute({ map: "C", items: [misnamed], summary: "s" }, context)).rejects.toThrow(
+      '"one owner" names the domain "ownership_and_borrowing", which is not an item of map A: name one of ownership',
+    );
+    await write.execute(
+      { map: "C", items: [claim("one owner", "ownership", [pages.book])], summary: "s" },
+      context,
+    );
+    const mapC = (await listTopicRecords(db, MapRecord, "map", topicId)).find((map) => map.body.map === "C");
+    if (!mapC) throw new Error("No map C.");
+    const moves = claim("moves", "moves", [pages.reference]);
+    await expect(
+      changeMapTool(agentDeps).execute({ map: mapC.id, reason: "More.", items: [moves] }, context),
+    ).rejects.toThrow('"moves" names the domain "moves", which is not an item of map A');
   });
 });
 

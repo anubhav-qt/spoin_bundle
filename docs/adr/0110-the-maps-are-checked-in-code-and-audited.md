@@ -37,7 +37,8 @@ counted, not only the tadpole's note.
 
 1. **Each item carries what code needs.** A claim names its domain, an item of map A, and an
    implementation claim names the product and version it is true of (`appliesTo`). A source in
-   map D is one publication, with its tier and its date or version (`sourceDate`).
+   map D is one publication, with its tier and its date or version (`sourceDate`). A claim or
+   gap naming a domain map A doesn't hold is refused as it is written.
 2. **The maps hold together** (`mapsProblems`), checked at `audit_maps` and at the maps' handover:
    - all ten written; every page a claim cites belongs to one source of map D;
    - a claim's confidence is no more than its sources give: high on a specification, official
@@ -48,15 +49,17 @@ counted, not only the tadpole's note.
      a gap of that domain;
    - map C holds a claim for every 3 of the intake's cards and map F a misconception for every 10
      (the owner's ratios).
-3. **An evidence auditor reads maps C and F** (`audit_maps`): fixed calls of 15 items each, every
-   item beside the passages it cites and their sources, reporting support, class, scope and
-   confidence, versions, doctrine stated as fact, and misconceptions nobody holds. Findings are
+3. **An evidence auditor reads maps C, D and F** (`audit_maps`): fixed calls of 15 items each,
+   every claim and misconception beside the passages it cites and their sources, reporting
+   support, class, scope and confidence, versions, doctrine stated as fact, and misconceptions
+   nobody holds; every source beside its pages' titles and addresses and a passage from the first
+   three, reporting a tier above what the publication is or a date its pages don't show. Findings are
    records the tadpole settles, only ever as fixed, and code refuses that while the item is as the
    audit read it: it is changed with `change_map` (cite a passage that says it, narrow it, label
    it lower) or dropped. It reads only the items changed since it last read, so nothing is paid
    for twice, and a fix is read again.
 4. **The handover waits for it.** `hand_over(maps)` is refused until the maps hold together, the
-   latest maps C and F are audited, and every finding is settled. It then stores what code
+   latest maps C, D and F are audited, and every finding is settled. It then stores what code
    counted: claims and misconceptions against their floors, the mix of confidence, class and scope,
    each domain's claims and sources, each source's tier and date, and the findings fixed. toad_sage judges from those and the maps, and its prompt names what code
    can't: coverage of the brief from beginner to mastery, sources at the topic's level and current,
@@ -88,6 +91,16 @@ page numbers of books it couldn't fetch; Rust's, which left the web to its helpe
 Cloudflare bot checks were stored as pages. The Gita's tadpole wrote 18 claims for 450 cards and
 was told it needed 150 only at the audit.
 
+### Amended after the C++ rerun (2026-10-14)
+
+Map D joined the audit, and domains are checked as they are written. C++ for Monke's maps passed
+every check with 169 of 170 claims high, standing on cppreference rated official documentation,
+the GCC manual rated the language's primary specification and the Core Guidelines an
+authoritative textbook; toad_sage went on in 9 seconds, calling the sources "authoritative,
+primary". Code turns a tier into the confidence a claim may carry, so a tier nobody checks
+decides every claim above it. The same tadpole wrote 28 claims under domain names of its own,
+caught only at the audit, and did it again after its chat compacted.
+
 ## Alternatives considered
 
 **Ask for honesty in the prompt.** Rejected: the old prompt already asked for claims "labelled
@@ -118,7 +131,9 @@ a call per 15 items. A map that can't be backed says so in map I instead of bein
 thin field finishes with honest gaps rather than confident prose.
 
 The tier-to-confidence rules are code's judgment of the source hierarchy, and a mislabelled tier
-still passes them; that is the auditor's and toad_sage's to catch.
+still passes them; the auditor reads map D to catch it, since toad_sage didn't. A source rated
+lower lowers every claim that cites it, so a fixed tier can send a hundred claims back to be
+relabelled or to cite the specification, and to be audited again.
 
 ## Revisit when
 

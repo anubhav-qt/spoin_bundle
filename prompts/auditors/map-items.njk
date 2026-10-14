@@ -1,12 +1,20 @@
 The topic's domains (map A): {{ domains | join(", ") }}.
 
-The items to audit, each with the passages it cites.
+The items to audit: each claim and misconception with the passages it cites, and each source with its pages and a passage from the first of them.
 {% for one in items %}
 
 <item key="{{ one.key }}">
 {{ one.item.text }}
 {% if one.kind == "C" %}
 Class: {{ one.item.claimType }}; scope: {{ one.item.scope }}; confidence: {{ one.item.confidence }}; domain: {{ one.item.domain }}{% if one.item.appliesTo %}; applies to: {{ one.item.appliesTo }}{% endif %}
+
+{% endif %}
+{% if one.kind == "D" %}
+Tier: {{ one.item.sourceTier }}; date: {{ one.item.sourceDate }}
+Its pages:
+{% for listed in one.pages %}
+- {{ listed.title }}, {{ listed.url }}
+{% endfor %}
 
 {% endif %}
 {% for passage in one.passages %}

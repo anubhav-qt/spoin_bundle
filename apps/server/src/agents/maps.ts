@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import type { Tool } from "@spoin/pi-ai";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { Type } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
 import { harnessRecord, page, pagePassage } from "../db/schema.ts";
@@ -74,8 +74,17 @@ const AUDIT_BATCH = 15;
 /** And makes this many calls at once. */
 const AUDIT_CALLS_AT_ONCE = 4;
 
-/** The maps the evidence auditor reads: what Spoin will teach as true, and what it will correct. */
-const AUDITED_MAPS = ["C", "F"] as const;
+/**
+ * The maps the evidence auditor reads: what Spoin will teach as true, what it will correct, and the
+ * sources both stand on, whose tiers set how high a claim's confidence may go. The C++ maps rated
+ * a community wiki official documentation and a compiler's manual the language's specification,
+ * and 169 of their 170 claims high on them.
+ */
+const AUDITED_MAPS = ["C", "F", "D"] as const;
+type AuditedKind = (typeof AUDITED_MAPS)[number];
+
+/** How many of a source's pages the auditor reads a passage of, to see what it is and when it's from. */
+const SOURCE_SAMPLE = 3;
 
 const MapBody = {
   items: Type.Array(MapItem, { minItems: 1 }),
@@ -104,7 +113,8 @@ export function writeMapTool(deps: AgentDeps): HarnessTool<typeof WriteMapParame
           "Write map A first: the domains, which your helpers research one each and every claim names.",
         );
       }
-      await checkMap(context.db, params.map, params.items);
+      const domains = await domainsOf(context.db, topicId);
+      await checkMap(context.db, params.map, params.items, domainProblems(params.map, params.items, domains));
       const map = await createRecord(context.db, MapRecord, {
         kind: "map",
         author: context.author,
@@ -154,7 +164,9 @@ export function changeMapTool(deps: AgentDeps): HarnessTool<typeof ChangeMapPara
       const latest = await readLatestRecord(context.db, MapRecord, "map", params.map);
       if (latest.body.topic !== topicId) throw new ToolError(`Map ${params.map} is another topic's.`);
       const items = mergeMapItems(latest.body.items, params.items ?? [], params.drop ?? []);
-      await checkMap(context.db, latest.body.map, items);
+      const domains = await domainsOf(context.db, topicId);
+      const misnamed = domainProblems(latest.body.map, params.items ?? [], domains);
+      await checkMap(context.db, latest.body.map, items, misnamed);
       let summary = latest.body.summary;
       if (params.summary) summary = params.summary;
       const changed = await changeRecord(context.db, MapRecord, {
@@ -239,9 +251,9 @@ export async function mapOf(db: Conn, topicId: string, kind: string): Promise<Ma
   return readLatestRecord(db, MapRecord, "map", first.id);
 }
 
-/** Every problem with a map's items, named at once: what its kind must carry, and its evidence. */
-async function checkMap(db: Db, kind: string, items: MapItem[]): Promise<void> {
-  const problems = itemProblems(kind, items);
+/** Every problem with a map's items, named at once: what its kind must carry, its evidence, and `also`. */
+async function checkMap(db: Db, kind: string, items: MapItem[], also: string[]): Promise<void> {
+  const problems = [...itemProblems(kind, items), ...also];
   for (const item of items) {
     for (const cited of item.evidence) {
       if (!(await passageExists(db, cited.page, cited.passage))) {
@@ -252,6 +264,31 @@ async function checkMap(db: Db, kind: string, items: MapItem[]): Promise<void> {
   if (problems.length > 0) {
     throw new ToolError(`Nothing was stored; fix every problem and call again:\n- ${problems.join("\n- ")}`);
   }
+}
+
+/** The names of the topic's domains, the items of its map A. */
+async function domainsOf(db: Conn, topicId: string): Promise<Set<string>> {
+  const map = await mapOf(db, topicId, "A");
+  if (!map) return new Set();
+  return new Set(map.body.items.map((item) => item.name));
+}
+
+/**
+ * The claims and gaps written now that name a domain map A doesn't hold. They are refused as they
+ * are written, not only at the audit: the C++ tadpole wrote 28 claims under domain names of its
+ * own and learned so only once the maps were done, and it did it again after its chat compacted.
+ */
+function domainProblems(kind: string, items: MapItem[], domains: Set<string>): string[] {
+  if (kind !== "C" && kind !== "I") return [];
+  const problems: string[] = [];
+  for (const item of items) {
+    if (item.domain && !domains.has(item.domain)) {
+      problems.push(
+        `"${item.name}" names the domain "${item.domain}", which is not an item of map A: name one of ${[...domains].join(", ")}`,
+      );
+    }
+  }
+  return problems;
 }
 
 /** What each item of a map of this kind must carry, every problem named. */
@@ -605,7 +642,7 @@ async function cardCountOf(db: Conn, topicId: string): Promise<number> {
 }
 
 /**
- * Why the maps can't go to toad_sage yet: they don't hold together, the latest of maps C and F
+ * Why the maps can't go to toad_sage yet: they don't hold together, the latest of maps C, D and F
  * haven't been audited, or a finding isn't settled. Empty when they can.
  */
 export async function mapsHandoverProblems(db: Conn, topicId: string): Promise<string[]> {
@@ -680,10 +717,17 @@ async function citedPassages(
   return found;
 }
 
-/** The items of maps C and F that changed since the last audit read them, or all of them before one. */
+/** An item the auditor reads, by its key. */
+interface AuditItem {
+  key: string;
+  kind: AuditedKind;
+  item: MapItem;
+}
+
+/** The items of maps C, D and F that changed since the last audit read them, or all of them before one. */
 async function itemsToAudit(db: Conn, topicId: string, maps: TopicMaps) {
   const last = (await mapAuditsOf(db, topicId)).at(-1);
-  const toAudit: { key: string; kind: "C" | "F"; item: MapItem }[] = [];
+  const toAudit: AuditItem[] = [];
   for (const kind of AUDITED_MAPS) {
     const map = maps[kind];
     if (!map) continue;
@@ -707,9 +751,9 @@ function batchesOf<Item>(items: Item[], size: number): Item[][] {
 
 /**
  * The evidence auditor (ADR-0110, corpus-authoring-system.md role 12 brought to the maps): one
- * fixed call per batch of claims and misconceptions, reading each with the passages it cites, that
- * the tadpole doesn't brief. It reads only what changed since its last audit, so no item is paid
- * for twice.
+ * fixed call per batch of claims, misconceptions and sources, reading each claim and misconception
+ * with the passages it cites and each source with its pages, that the tadpole doesn't brief. It
+ * reads only what changed since its last audit, so no item is paid for twice.
  */
 export function auditMapsTool(deps: AgentDeps): HarnessTool {
   const parameters = Type.Object({}, CLOSED);
@@ -729,18 +773,21 @@ export function auditMapsTool(deps: AgentDeps): HarnessTool {
         );
       }
       const toAudit = await itemsToAudit(context.db, topicId, maps);
-      if (toAudit.length === 0) throw new ToolError("Nothing in maps C and F changed since the last audit.");
+      if (toAudit.length === 0) {
+        throw new ToolError("Nothing in maps C, D and F changed since the last audit.");
+      }
       const { byPage } = sourcesByPage(maps);
       const passages = await citedPassages(
         context.db,
-        toAudit.map((one) => one.item),
+        toAudit.map((one) => ({ ...one.item, evidence: shownEvidence(one) })),
         byPage,
       );
+      const pages = await pagesOf(context.db, toAudit);
       const found: { item: string; problem: string; fix: string }[] = [];
       const batches = batchesOf(toAudit, AUDIT_BATCH);
       for (const round of batchesOf(batches, AUDIT_CALLS_AT_ONCE)) {
         const answers = await Promise.all(
-          round.map((batch) => auditBatch(deps, context, batch, passages, maps)),
+          round.map((batch) => auditBatch(deps, context, batch, { passages, pages }, maps)),
         );
         for (const answer of answers) found.push(...answer);
       }
@@ -785,12 +832,65 @@ export function auditMapsTool(deps: AgentDeps): HarnessTool {
   };
 }
 
+/**
+ * The passages the auditor reads of an item: all a claim or misconception cites, and of a source
+ * one from each of its first pages, since it judges a source by what the publication is and when
+ * it's from, and cppreference alone was cited 162 times.
+ */
+function shownEvidence(one: AuditItem): MapItem["evidence"] {
+  if (one.kind !== "D") return one.item.evidence;
+  const shown: MapItem["evidence"] = [];
+  for (const cited of one.item.evidence) {
+    if (shown.length === SOURCE_SAMPLE) break;
+    if (shown.some((before) => before.page === cited.page)) continue;
+    shown.push(cited);
+  }
+  return shown;
+}
+
+/** A source's page as the auditor sees it in the list of its pages. */
+interface SourcePage {
+  url: string;
+  title: string;
+}
+
+/** The pages of every source of map D to audit, by page id. */
+async function pagesOf(db: Conn, toAudit: AuditItem[]): Promise<Map<string, SourcePage>> {
+  const ids = new Set<string>();
+  for (const one of toAudit) {
+    if (one.kind !== "D") continue;
+    for (const cited of one.item.evidence) ids.add(cited.page);
+  }
+  const found = new Map<string, SourcePage>();
+  if (ids.size === 0) return found;
+  const rows = await db
+    .select({ id: page.id, url: page.url, title: page.title })
+    .from(page)
+    .where(inArray(page.id, [...ids]));
+  for (const row of rows) found.set(row.id, { url: row.url, title: row.title ?? "untitled" });
+  return found;
+}
+
+/** A source's every page, once each, as the auditor lists them; none for a claim or misconception. */
+function sourcePages(one: AuditItem, pages: Map<string, SourcePage>): SourcePage[] {
+  if (one.kind !== "D") return [];
+  const listed: SourcePage[] = [];
+  const seen = new Set<string>();
+  for (const cited of one.item.evidence) {
+    if (seen.has(cited.page)) continue;
+    seen.add(cited.page);
+    const found = pages.get(cited.page);
+    if (found) listed.push(found);
+  }
+  return listed;
+}
+
 /** One call of the evidence auditor on a batch, its findings named by the batch's own items. */
 async function auditBatch(
   deps: AgentDeps,
   context: ToolContext,
-  batch: { key: string; kind: "C" | "F"; item: MapItem }[],
-  passages: Map<string, CitedPassage>,
+  batch: AuditItem[],
+  read: { passages: Map<string, CitedPassage>; pages: Map<string, SourcePage> },
   maps: TopicMaps,
 ): Promise<{ item: string; problem: string; fix: string }[]> {
   const keys = batch.map((one) => one.key);
@@ -800,7 +900,9 @@ async function auditBatch(
     parameters: Type.Object({
       findings: Type.Array(
         Type.Object({
-          item: Type.Enum(keys, { description: "The item at fault, as its key: C/<name> or F/<name>" }),
+          item: Type.Enum(keys, {
+            description: "The item at fault, as its key: C/<name>, D/<name> or F/<name>",
+          }),
           problem: Type.String({ minLength: 1, description: "What is wrong, quoting the words at fault" }),
           fix: Type.String({ minLength: 1, description: "What the item should say or carry instead" }),
         }),
@@ -811,11 +913,12 @@ async function auditBatch(
     key: one.key,
     kind: one.kind,
     item: one.item,
-    passages: one.item.evidence.flatMap((cited) => {
-      const found = passages.get(`${cited.page}#${cited.passage}`);
+    passages: shownEvidence(one).flatMap((cited) => {
+      const found = read.passages.get(`${cited.page}#${cited.passage}`);
       if (!found) return [];
       return [found];
     }),
+    pages: sourcePages(one, read.pages),
   }));
   const domains = itemsOf(maps, "A").map((domain) => domain.name);
   const answer = (await deps.oneShot({

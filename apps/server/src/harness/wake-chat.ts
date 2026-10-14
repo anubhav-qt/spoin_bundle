@@ -15,7 +15,7 @@ import {
 import { openingMessageFor, systemPromptFor } from "./instructions.ts";
 import { runChat } from "./run-chat.ts";
 import type { RunTrigger } from "./schemas.ts";
-import type { HarnessTool } from "./tools.ts";
+import { type HarnessTool, ToolError } from "./tools.ts";
 
 export interface WakeChatInput {
   db: Db;
@@ -27,7 +27,7 @@ export interface WakeChatInput {
   apiKey: string;
   /** The chat's tools. */
   tools: HarnessTool[];
-  /** Those of its tools a compaction run stores with: none that start or decide anything. write_summary is added. */
+  /** Those of its tools a compaction run may call: none that start or decide anything. write_summary is added. */
   compactionTools: HarnessTool[];
   /** When the chat compacts; the defaults unless given. */
   compaction?: CompactionSettings;
@@ -70,13 +70,13 @@ export async function wakeChat(input: WakeChatInput): Promise<Run[]> {
     pauseAtTokens = await pauseAfter(input, compaction.wroteSummary, limit);
   }
   if (stopping(input)) return runs;
-  let run = await runOnce(input, input.triggers, input.tools, pauseAtTokens);
+  let run = await runOnce(input, input.triggers, toolsFor(input, false), pauseAtTokens);
   runs.push(run);
   while (run.status === "paused" && !stopping(input)) {
     const compaction = await compact(input);
     runs.push(compaction.run);
     const pauseAt = await pauseAfter(input, compaction.wroteSummary, limit);
-    run = await runOnce(input, continuationOf(run), input.tools, pauseAt);
+    run = await runOnce(input, continuationOf(run), toolsFor(input, false), pauseAt);
     runs.push(run);
   }
   if (await compactsWhileWaiting(input, run)) {
@@ -135,10 +135,44 @@ async function compact(
 ): Promise<{ run: Run; wroteSummary: boolean }> {
   const trigger: RunTrigger = { kind: "compaction", contextTokens: await currentContextTokens(input) };
   if (whileWaiting) trigger.whileWaiting = true;
-  const tools = [...input.compactionTools, writeSummaryTool(input.prompts)];
-  const run = await runOnce(input, [trigger], tools, undefined);
+  const run = await runOnce(input, [trigger], toolsFor(input, true), undefined);
   const summary = await summaryInForce(input.db, input.chat);
   return { run, wroteSummary: summary?.body.throughRun === run.id };
+}
+
+/**
+ * The chat's tools, the same list in every run, so a compaction run reads the context its model has
+ * cached: cut to the compaction tools, the list missed the cache, and the C++ tadpole's first three
+ * compaction steps read 410,000 tokens each uncached. Code refuses what the run may not call: in a
+ * compaction run anything that starts or decides something, and write_summary in any other.
+ */
+function toolsFor(input: WakeChatInput, compacting: boolean): HarnessTool[] {
+  const summary = writeSummaryTool(input.prompts);
+  if (!compacting) {
+    return [
+      ...input.tools,
+      refused(summary, "write_summary is for when your chat compacts, and it isn't compacting now."),
+    ];
+  }
+  const saving = new Set(input.compactionTools.map((tool) => tool.name));
+  const tools = input.tools.map((tool) => {
+    if (saving.has(tool.name)) return tool;
+    return refused(
+      tool,
+      `This run only saves your work and sums it up, so ${tool.name} waits for the run after it, which carries your work on: store what isn't stored, then call write_summary.`,
+    );
+  });
+  return [...tools, summary];
+}
+
+/** The tool as the model sees it, its every call refused with this message. */
+function refused(tool: HarnessTool, message: string): HarnessTool {
+  return {
+    ...tool,
+    async execute() {
+      throw new ToolError(message);
+    },
+  };
 }
 
 /**

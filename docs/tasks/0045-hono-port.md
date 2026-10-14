@@ -663,8 +663,11 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   set-up.ts`, by role, and for a helper by its task. A plain `helper` gets its main chat's own
   work: toad_sage's tools, or a tadpole's research tools, with `report` and never `start_helper`.
   The corrector and verifier have no `report`: their verdicts are records that wake the tier's
-  writer, which is the report. A compaction run gets the chat's reads plus `write_map` and
-  `change_map`, so a tadpole compacting keeps its findings in its maps. The three writers run on
+  writer, which is the report. A compaction run may call the chat's reads plus `write_map` and
+  `change_map`, so a tadpole compacting keeps its findings in its maps. It is sent every tool of
+  the chat, the same list as its other runs, and code refuses the rest, as it refuses
+  `write_summary` outside a compaction (2026-10-14): a list cut to those tools missed the model's
+  cache, and the C++ tadpole's first three compaction steps read 410,000 tokens each uncached. The three writers run on
   NIM; a worker without `NVIDIA_NIM_API_KEY` runs them on Gemini and says so in its log, so a run
   can go before NVIDIA's key is in `infra/.env`. A role this phase doesn't run (ero_sennin,
   wise_toad, visual_toad) throws when woken, rather than running with no tools.

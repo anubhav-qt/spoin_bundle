@@ -4,6 +4,7 @@ import {
   type AssistantMessage,
   type AssistantMessageEventStream,
   createAssistantMessageEventStream,
+  getCurrentTools,
   type Message,
   type Model,
   type SimpleStreamOptions,
@@ -68,20 +69,24 @@ export function streamOf(message: AssistantMessage): AssistantMessageEventStream
   return stream;
 }
 
-/** Answers each request with the next reply in the script, and keeps the messages and options each request was sent. */
+/** Answers each request with the next reply in the script, and keeps the messages, tools and options each request was sent. */
 export function scriptedModel(replies: AssistantMessage[]): {
   streamFn: StreamFn;
   requests: Message[][];
+  tools: string[][];
   options: (SimpleStreamOptions | undefined)[];
 } {
   const requests: Message[][] = [];
+  const tools: string[][] = [];
   const options: (SimpleStreamOptions | undefined)[] = [];
   const streamFn: StreamFn = (_model, context, sent) => {
     requests.push([...context.messages]);
+    // The tools travel in the transcript's system messages, a changed set as a new one.
+    tools.push(getCurrentTools(context.messages).map((tool) => tool.name));
     options.push(sent);
     const next = replies[requests.length - 1] ?? reply([], "error", "The script has no more replies.");
     // A provider's answer is dated when it comes back; pi trusts its token count only for what came before.
     return streamOf({ ...next, timestamp: Date.now() });
   };
-  return { streamFn, requests, options };
+  return { streamFn, requests, tools, options };
 }

@@ -1218,15 +1218,13 @@ type HeroVisualBlock = { captioned?: boolean } & (
  *  (`getPrimaryArchetype`'s order), leaving the secondary block in the body
  *  where it already was.
  *
- *  A fenced block in `body` OUTRANKS `visual_slots.art`, and that ordering is
- *  the fix for a specific, real symptom rather than a preference. The two are
- *  filled by different generation slots and the model routinely draws the
- *  same picture into both — once in full in `body`, once abbreviated into
- *  `art` ("[ EPISTEMOLOGY ] (What do we know?)" becoming "[ EPIST. ] (What
- *  know?)"). Nothing here ever truncated anything: leading with `art` simply
- *  led with the model's own shorter redraw, which read as the app cropping
- *  the preview. The body's copy is the complete one, so it is the one shown,
- *  and `art` leads only when the body has no block of its own. */
+ *  A card's `visual_slots.art` leads whenever it has art, and a code block
+ *  in its body stays in the body (ADR-0109): designer_toad draws the art for
+ *  that card alone, and on a code subject most ascii cards carry code too.
+ *  The old pipeline drew one picture into both slots, so a body fence used to
+ *  outrank the art; on the harness's Rust cards that hid the art of 219 of
+ *  304. Only a body fence that is the same scene as the art is still weighed
+ *  against it, below. */
 function resolveHero(
   archetype: ArchetypeTag | "combo" | "default",
   body: string,
@@ -1267,26 +1265,19 @@ function resolveHero(
       : { kind: "code", lang: lead.lang, content: lead.content, skipKey, captioned: true };
   }
 
-  // Two reasons this falls through to ANY fence rather than stopping at
-  // `kind`: an `art` slot present means the body fence is likely the fuller
-  // twin of the same scene, worth preferring even off-kind; and a server/
-  // client classification disagreement (`card.archetype` says "diagram" but
-  // this component's own `isDiagramFence` reads the same fence differently)
-  // must never mean the card loses its visual outright — it should show
-  // WHATEVER fence body actually has, not fall back to a bare summary line.
-  const fence =
-    (kind !== null ? firstFenceOfKind(body, kind) : null) ??
-    (art !== null || kind !== null ? firstFence(body) : null);
-
-  if (fence !== null) {
-    const skipKey = fenceKey(fence.content);
-    return fence.kind === "diagram"
-      ? { kind: "diagram", lang: fence.lang, content: fence.content, skipKey }
-      : { kind: "code", lang: fence.lang, content: fence.content, skipKey };
-  }
-
   if (art !== null) return { kind: "ascii", content: art, skipKey: fenceKey(art), captioned: true };
-  return null;
+  if (kind === null) return null;
+
+  // Falls through to ANY fence rather than stopping at `kind`: a server/client
+  // classification disagreement (`card.archetype` says "diagram" but this
+  // component's own `isDiagramFence` reads the same fence differently) must
+  // never mean the card loses its visual outright.
+  const fence = firstFenceOfKind(body, kind) ?? firstFence(body);
+  if (fence === null) return null;
+  const skipKey = fenceKey(fence.content);
+  return fence.kind === "diagram"
+    ? { kind: "diagram", lang: fence.lang, content: fence.content, skipKey }
+    : { kind: "code", lang: fence.lang, content: fence.content, skipKey };
 }
 
 /** `alt` is rendered as a visible caption under the lead visual (task F3) —

@@ -3,6 +3,7 @@ import { normalizeTopicText } from "@spoin/frog/normalize";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { generationJob, topic, topicAlias, userTopic, userTopicProgress } from "../src/db/schema.ts";
+import { checkValue } from "../src/harness/check.ts";
 import {
   acceptTopicTool,
   changeIntakeTool,
@@ -105,6 +106,26 @@ describe("accepting a name", () => {
       "A topic can't build on itself: leave it out of builds_on.",
     );
     expect(await intakeOf(db, topicId)).toBeUndefined();
+  });
+
+  test("a subject or a category written as a description, not a name, is refused", () => {
+    // The first System Design intake's, before the owner's review.
+    const described = {
+      ...acceptance(randomUUID(), "System Design"),
+      subject:
+        "System design in software engineering: architectural patterns, scalability fundamentals, and engineering trade-offs for reliable distributed systems",
+      sub_category: "software architecture distributed systems",
+    };
+    const refused = () => checkValue(accept.parameters, described, "The call to accept_topic");
+    expect(refused).toThrow(/subject/);
+    expect(refused).toThrow(/sub_category/);
+    const named = {
+      ...described,
+      subject: "System Design in Software Engineering",
+      category: "Computer Science",
+      sub_category: "Software Engineering",
+    };
+    expect(checkValue(accept.parameters, named, "The call to accept_topic")).toEqual(named);
   });
 
   test("a cancelled job is no longer there to take in", async () => {

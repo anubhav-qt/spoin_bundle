@@ -65,19 +65,35 @@ const Angle = Type.String({
     "Who it is for and how it is written: 'plain words for newcomers'. Leave it out when it has none",
 });
 
-/** The fields toad_sage decides at intake, and restates in full to change them. */
+/**
+ * The fields toad_sage decides at intake, and restates in full to change them. A subject and a
+ * category are short names, capped here: the first intakes' were descriptions, a subject of 139
+ * characters and a sub-category of four fields run together (the owner's review, 2026-10-14).
+ */
 const IntakeFields = {
   subject: Type.String({
     minLength: 1,
-    description: "What it is about, told apart from its namesakes: 'Rust, the programming language'",
+    maxLength: 60,
+    description:
+      "What it is about: the field's name as people say it, short and general, told apart from a namesake only when it has one: 'Rust Programming Language', 'System Design in Software Engineering'",
   }),
   angle: Type.Optional(Angle),
   scope: Type.Enum([...TOPIC_SCOPES], {
     description:
       "survey: a broad overview of a field, untiered; topic: one subject in three tiers, beginner to advanced; one_shot: one small subject, untiered",
   }),
-  category: Type.String({ minLength: 1, maxLength: 120, description: "The field it belongs to" }),
-  sub_category: Type.Optional(Type.String({ minLength: 1, maxLength: 120 })),
+  category: Type.String({
+    minLength: 1,
+    maxLength: 32,
+    description: "The broad field it belongs to, a short name: 'Computer Science', 'Philosophy'",
+  }),
+  sub_category: Type.Optional(
+    Type.String({
+      minLength: 1,
+      maxLength: 32,
+      description: "The area within it, a short name: 'Software Engineering', 'Religious Philosophy'",
+    }),
+  ),
   card_count: Type.Integer({
     minimum: 1,
     description: "How many cards the topic gets in all: 125 to 750, and a topic scope the most",

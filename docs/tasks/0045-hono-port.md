@@ -821,6 +821,13 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   counts an outline with a word inside as box lines and leaves padding rows out, and each new
   style is tried on 30 pieces, redrawing nothing more until the owner approves it.
 
+- **The owner reviews the harness one stage at a time** (2026-10-14), as the art was settled:
+  a stage's stored outputs on a review page, the owner's feedback into its prompts and code
+  checks, then the stage run again on new samples. Intake first: subjects and categories are
+  short names, not descriptions (a subject at most 60 characters, a category or sub-category 32),
+  categories reused from `list_categories`, and the card count stays one number, near 750 for an
+  in-depth subject.
+
 ## Asked when we get there
 
 - Backups and image hosting on the ThinkPad, fetched pages on disk included.

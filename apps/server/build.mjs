@@ -23,3 +23,5 @@ await build({
 
 // Data read at runtime beside the bundle, by the same relative URL as in the source tree.
 cpSync("src/content/ascii-library", "dist/ascii-library", { recursive: true });
+// The embedder's thread runs its own file (frog's embeddings.ts), which Node strips the types of.
+cpSync("../../packages/frog/src/embed-worker.ts", "dist/embed-worker.ts");

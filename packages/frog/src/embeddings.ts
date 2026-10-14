@@ -1,4 +1,6 @@
 import { createHash } from "node:crypto";
+import { Worker } from "node:worker_threads";
+import type { EmbedReply, EmbedRequest, EmbedWorkerData } from "./embed-worker.ts";
 
 /**
  * Local embeddings. Hard rule 5: these never run against a paid or quota'd API.
@@ -71,31 +73,45 @@ const QWEN3_QUERY_PREFIX =
 export type OnnxDtype = "fp32" | "fp16" | "q8";
 
 /**
- * `Qwen3-Embedding-0.6B` as ONNX, on the CPU (ADR-0106). Last-token pooling and L2
- * normalization, as the model card specifies. The last token is found from the
- * attention mask, so the result is right whichever side the tokenizer pads.
+ * `Qwen3-Embedding-0.6B` as ONNX, on the CPU (ADR-0106), in a worker thread (embed-worker.ts):
+ * onnxruntime-node runs an inference synchronously on the thread that asks, and on the main thread
+ * eight helpers embedding at once held every fetch, Postgres connection and model stream for
+ * seconds a step (the C++ stage 2 run, 2026-10-14: fetches of 10 to 170 seconds, some timing out).
  *
  * Loaded lazily on first use, once per process: the weights are hundreds of
  * megabytes and most processes that import frog never embed anything.
  */
 export class Qwen3OnnxEmbedder implements Embedder {
   readonly modelName: string;
-  readonly #repo: string;
-  readonly #dtype: OnnxDtype;
-  readonly #batchSize: number;
-  #loading: Promise<Loaded> | null = null;
+  readonly #data: EmbedWorkerData;
+  #worker: Worker | null = null;
+  #nextId = 0;
+  readonly #waiting = new Map<
+    number,
+    { resolve: (vectors: number[][]) => void; reject: (error: Error) => void }
+  >();
 
-  constructor(opts: { repo?: string; dtype?: OnnxDtype; batchSize?: number; cacheDir?: string } = {}) {
-    this.#repo = opts.repo ?? "onnx-community/Qwen3-Embedding-0.6B-ONNX";
-    this.#dtype = opts.dtype ?? "q8";
-    // One text at a time: embedding ten Rust Book chapters peaked at 3.1 GB in batches of 8, 2.3 GB
-    // in 2s and 1.8 GB alone, in about the same time, and the 3.1 GB got the worker killed (task 0045).
-    this.#batchSize = opts.batchSize ?? 1;
-    this.modelName = `Qwen/Qwen3-Embedding-0.6B:onnx-${this.#dtype}`;
-    if (opts.cacheDir) this.#cacheDir = opts.cacheDir;
+  constructor(
+    opts: {
+      repo?: string;
+      dtype?: OnnxDtype;
+      batchSize?: number;
+      cacheDir?: string;
+      transformers?: string;
+    } = {},
+  ) {
+    const dtype = opts.dtype ?? "q8";
+    this.#data = {
+      transformers: opts.transformers ?? "@huggingface/transformers",
+      repo: opts.repo ?? "onnx-community/Qwen3-Embedding-0.6B-ONNX",
+      dtype,
+      // One text at a time: embedding ten Rust Book chapters peaked at 3.1 GB in batches of 8, 2.3 GB
+      // in 2s and 1.8 GB alone, in about the same time, and the 3.1 GB got the worker killed (task 0045).
+      batchSize: opts.batchSize ?? 1,
+      cacheDir: opts.cacheDir,
+    };
+    this.modelName = `Qwen/Qwen3-Embedding-0.6B:onnx-${dtype}`;
   }
-
-  #cacheDir: string | undefined;
 
   async embedPassage(texts: string[]): Promise<number[][]> {
     return this.#encode(texts);
@@ -105,58 +121,40 @@ export class Qwen3OnnxEmbedder implements Embedder {
     return this.#encode(texts.map((text) => `${QWEN3_QUERY_PREFIX}${text}`));
   }
 
-  async #encode(texts: string[]): Promise<number[][]> {
-    const { tokenizer, model } = await this.#load();
-    const out: number[][] = [];
-    for (let start = 0; start < texts.length; start += this.#batchSize) {
-      const batch = texts.slice(start, start + this.#batchSize);
-      const inputs = tokenizer(batch, { padding: true, truncation: true, max_length: 2048 });
-      const { last_hidden_state: hidden } = await model(inputs);
-      const [rows, seq, dim] = hidden.dims as [number, number, number];
-      const data = hidden.data as Float32Array;
-      const mask = inputs.attention_mask.tolist() as number[][];
-      for (let row = 0; row < rows; row++) {
-        const last = lastAttended(mask[row] ?? [], seq);
-        const from = (row * seq + last) * dim;
-        out.push(l2Normalize(Array.from(data.subarray(from, from + dim))));
-      }
-    }
-    return out;
+  #encode(texts: string[]): Promise<number[][]> {
+    const worker = this.#started();
+    const id = this.#nextId++;
+    const vectors = new Promise<number[][]>((resolve, reject) => this.#waiting.set(id, { resolve, reject }));
+    // The thread keeps the process alive only while an embed waits on it.
+    worker.ref();
+    const request: EmbedRequest = { id, texts };
+    worker.postMessage(request);
+    return vectors;
   }
 
-  #load(): Promise<Loaded> {
-    this.#loading ??= (async () => {
-      const { AutoModel, AutoTokenizer, env } = await import("@huggingface/transformers");
-      if (this.#cacheDir) env.cacheDir = this.#cacheDir;
-      const tokenizer = await AutoTokenizer.from_pretrained(this.#repo);
-      const model = await AutoModel.from_pretrained(this.#repo, { dtype: this.#dtype, device: "cpu" });
-      return { tokenizer, model } as unknown as Loaded;
-    })().catch((error: unknown) => {
-      // A download that failed once (the first one in a fresh volume did) is tried again on the
-      // next call; kept, it would fail every embed until the process restarts.
-      this.#loading = null;
-      throw error;
+  #started(): Worker {
+    if (this.#worker) return this.#worker;
+    const worker = new Worker(new URL("./embed-worker.ts", import.meta.url), { workerData: this.#data });
+    worker.on("message", (reply: EmbedReply) => {
+      const waiting = this.#waiting.get(reply.id);
+      if (!waiting) return;
+      this.#waiting.delete(reply.id);
+      if (this.#waiting.size === 0) worker.unref();
+      if ("error" in reply) waiting.reject(new Error(reply.error));
+      else waiting.resolve(reply.vectors);
     });
-    return this.#loading;
+    // A thread that died (out of memory, say) fails what waited on it, and the next embed starts another.
+    const died = (error: Error) => {
+      if (this.#worker === worker) this.#worker = null;
+      for (const waiting of this.#waiting.values()) waiting.reject(error);
+      this.#waiting.clear();
+    };
+    worker.on("error", died);
+    worker.on("exit", (code) => died(new Error(`The embedding thread exited with code ${code}.`)));
+    worker.unref();
+    this.#worker = worker;
+    return worker;
   }
-}
-
-interface Tensor {
-  dims: number[];
-  data: Float32Array | number[];
-  tolist(): unknown;
-}
-
-interface Loaded {
-  tokenizer: (texts: string[], opts: object) => { attention_mask: Tensor } & Record<string, Tensor>;
-  model: (inputs: object) => Promise<{ last_hidden_state: Tensor }>;
-}
-
-function lastAttended(mask: number[], seq: number): number {
-  for (let i = seq - 1; i >= 0; i--) {
-    if (mask[i] === 1) return i;
-  }
-  return seq - 1;
 }
 
 export function l2Normalize(vector: number[]): number[] {

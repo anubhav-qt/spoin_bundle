@@ -54,6 +54,10 @@ holding all the data for now. Everything is tested in local Docker first.
 - Embeddings run in-process: `Qwen3-Embedding-0.6B` as ONNX on the CPU, ARM64 included.
   The model is unchanged and every vector is re-embedded once, because ONNX output is not
   byte-identical to sentence-transformers' and ADR-0097 allows one vector space.
+  In-process means a worker thread of the process (2026-10-14): onnxruntime-node runs an
+  inference synchronously on the thread that asks, and on the main thread eight helpers
+  embedding at once held every fetch, Postgres connection and model stream for seconds a
+  step. The thread's vectors are identical to the main thread's.
 - Background work is our own queue table plus `job_runs`, no job library.
 - Biome lints and formats; vitest runs against real Postgres, keeping the existing rule
   that the database's own behaviour is tested against the database.

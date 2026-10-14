@@ -296,7 +296,15 @@ async function overHttp(url: string, signal: AbortSignal): Promise<{ title: stri
   if (type.includes("pdf")) {
     throw new ToolError(`${url} is a PDF, which fetch can't read yet: find the same material as a web page.`);
   }
-  const body = await response.text();
+  // The timeout covers the body too, and a body cut off is a failed read like any other: the
+  // browser tries next, rather than the model reading "The operation was aborted due to timeout".
+  let body: string;
+  try {
+    body = await response.text();
+  } catch (error) {
+    if (signal.aborted) throw error;
+    return { title: "", text: "" };
+  }
   if (type.includes("text/plain") || type.includes("markdown")) {
     const text = tidy(body);
     return { title: markdownTitle(text), text };

@@ -825,8 +825,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   a stage's stored outputs on a review page, the owner's feedback into its prompts and code
   checks, then the stage run again on new samples. Intake first: subjects and categories are
   short names, not descriptions (a subject at most 60 characters, a category or sub-category 32),
-  categories reused from `list_categories`, and the card count stays one number, near 750 for an
-  in-depth subject.
+  categories reused from `list_categories`, and the card count stays one number. The count
+  follows the scope (the owner, 2026-10-14): a survey about 200 to 250 cards, a one_shot 125 to
+  200, a topic 250 to 750 by depth and difficulty; a subject needing more than 750 is a survey,
+  one needing fewer than 200 a one_shot. Still an instruction, never a check in code.
 
 ## Asked when we get there
 

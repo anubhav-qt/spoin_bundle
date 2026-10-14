@@ -96,7 +96,8 @@ const IntakeFields = {
   ),
   card_count: Type.Integer({
     minimum: 1,
-    description: "How many cards the topic gets in all: 125 to 750, and a topic scope the most",
+    description:
+      "How many cards it gets in all, by scope: a survey about 200 to 250, a one_shot 125 to 200, a topic 250 to 750 by its depth and difficulty",
   }),
   brief: Type.String({
     minLength: 1,

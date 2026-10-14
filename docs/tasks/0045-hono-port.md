@@ -837,8 +837,10 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   and the Gita on 15 verses, and went on six times on the tadpole's own words. Code now holds the
   maps together before toad_sage reads them (confidence by source tier, two sources a domain or a
   gap, a claim per 3 cards and a misconception per 10, the owner's ratios), an evidence auditor
-  reads maps C and F beside their passages, and the handover carries what code counted. A run cut
-  off between a call's end and its result hands the result to the next run.
+  reads maps C, D and F beside their passages, and the handover carries what code counted. A run cut
+  off between a call's end and its result hands the result to the next run. What these runs cost
+  in Gemini, what was fixed for it and what is still open is in
+  [task 0047](0047-cut-the-harness-gemini-use.md).
 
 ## Asked when we get there
 

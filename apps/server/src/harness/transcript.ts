@@ -1,8 +1,8 @@
 import type { AssistantMessage, ToolResultMessage, UserMessage } from "@spoin/pi-ai";
-import { and, asc, eq, gt, max, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, max, sql } from "drizzle-orm";
 import { type Static, Type } from "typebox";
 import type { Db, Tx } from "../db/client.ts";
-import { actionLog, chatMessage } from "../db/schema.ts";
+import { actionLog, chatMessage, chatRun } from "../db/schema.ts";
 import type { Run } from "./chats.ts";
 import { checkValue } from "./check.ts";
 import { StoreError } from "./records.ts";
@@ -105,4 +105,33 @@ export async function readActionLog(db: Conn, runId: string): Promise<StoredActi
     at,
     ...checkValue(ActionLogEntry, entry, `Action log entry ${id}`),
   }));
+}
+
+/**
+ * The calls of a chat's last run that finished, and are logged, but whose results never reached its
+ * transcript, since the run was cut off between the two. Its next run reads them instead of calling
+ * again: System Design's first tadpole lost a fetched page this way and cited another for it
+ * (2026-10-13). A compaction run is passed over, since it can come between the two.
+ */
+export async function resultsCutOff(db: Conn, chatId: string): Promise<StoredActionLogEntry[]> {
+  const [last] = await db
+    .select({ id: chatRun.id })
+    .from(chatRun)
+    .where(and(eq(chatRun.chatId, chatId), sql`${chatRun.triggers} -> 0 ->> 'kind' <> 'compaction'`))
+    .orderBy(desc(chatRun.startedAt))
+    .limit(1);
+  if (!last) return [];
+  const delivered = await db
+    .select({ toolCallId: sql<string>`${chatMessage.message} ->> 'toolCallId'` })
+    .from(chatMessage)
+    .where(
+      and(
+        eq(chatMessage.chatId, chatId),
+        eq(chatMessage.runId, last.id),
+        sql`${chatMessage.message} ->> 'role' = 'toolResult'`,
+      ),
+    );
+  const seen = new Set(delivered.map((row) => row.toolCallId));
+  const logged = await readActionLog(db, last.id);
+  return logged.filter((entry) => !seen.has(entry.toolCallId));
 }

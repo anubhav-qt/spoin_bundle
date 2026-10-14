@@ -7,8 +7,15 @@ Summary: {{ record.body.summary }}
 {% if item.claimType or item.scope or item.confidence %}
   Class: {{ item.claimType or "unstated" }}; scope: {{ item.scope or "unstated" }}; confidence: {{ item.confidence or "unstated" }}
 {% endif %}
+{% if item.domain %}
+  Domain: {{ item.domain }}
+{% endif %}
+{% if item.appliesTo %}
+  Applies to: {{ item.appliesTo }}
+{% endif %}
 {% if item.sourceTier %}
-  Source tier: {{ item.sourceTier | replace("_", " ") }}
+  Source tier: {{ item.sourceTier | replace("_", " ") }}{% if item.sourceDate %}; dated {{ item.sourceDate }}{% endif %}
+
 {% endif %}
 {% if item.after %}
   After: {% for name in item.after %}{{ name }}{% if not loop.last %}; {% endif %}{% else %}nothing{% endfor %}

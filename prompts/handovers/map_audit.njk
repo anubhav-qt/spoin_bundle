@@ -1,0 +1,5 @@
+{% import "partials/macros.njk" as m %}
+Map audit ({{ m.ref(record) }}) of topic {{ record.body.topic }}'s maps
+Maps read: {{ m.refs(record.body.maps) }}
+Its findings are finding records naming this audit.
+{% include "partials/version.njk" %}

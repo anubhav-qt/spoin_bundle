@@ -7,8 +7,8 @@ import { summaryInForce } from "./compaction.ts";
 import { indiaTime } from "./india-time.ts";
 import { withoutRequestTag } from "./prompt-tags.ts";
 import { listTopicRecords, readAnyRecord } from "./records.ts";
-import { MapRecord, type RunTrigger } from "./schemas.ts";
-import { readActionLog } from "./transcript.ts";
+import { type ActionResult, MapRecord, type RunTrigger } from "./schemas.ts";
+import { readActionLog, resultsCutOff } from "./transcript.ts";
 import { viewsOf } from "./views.ts";
 
 /**
@@ -92,7 +92,19 @@ export async function openingMessageFor(
       return trigger;
     }),
   );
-  return prompts.render("run.njk", { now: indiaTime(now), role: chat.role, triggers: woken });
+  const cutOff = (await resultsCutOff(db, chat.id)).map((entry) => ({
+    tool: entry.tool,
+    arguments: JSON.stringify(entry.arguments),
+    result: resultText(entry.result),
+  }));
+  return prompts.render("run.njk", { now: indiaTime(now), role: chat.role, triggers: woken, cutOff });
+}
+
+/** A logged call's result as the chat would have read it. */
+function resultText(result: ActionResult): string {
+  if (!result.ok) return `It failed: ${result.error}`;
+  if (typeof result.value === "string") return result.value;
+  return JSON.stringify(result.value);
 }
 
 /** The card a reader was on, as they saw it; null when they were on none, or it has gone since. */

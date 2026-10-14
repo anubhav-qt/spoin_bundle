@@ -48,7 +48,7 @@ import {
 } from "./gate.ts";
 import { handOverTool, reviewTool } from "./handovers.ts";
 import { reportTool, startHelperTool } from "./helpers.ts";
-import { changeMapTool, writeMapTool } from "./maps.ts";
+import { auditMapsTool, changeMapTool, writeMapTool } from "./maps.ts";
 import { correctionsOnly, writeOnNimTool } from "./nim-writes.ts";
 import { fetchTool, lookAtTool, readPageTool, searchPagesTool } from "./pages.ts";
 import {
@@ -242,6 +242,7 @@ function tadpoleTools(deps: AgentDeps): HarnessTool[] {
     ...researchTools(deps),
     writeMapTool(deps),
     changeMapTool(deps),
+    auditMapsTool(deps),
     handOverTool(deps),
     startDocumentWriterTool(deps),
     auditDraftsTool(deps),

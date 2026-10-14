@@ -31,4 +31,13 @@ Your run {{ trigger.run }} paused when your chat reached its limit, and your cha
 {% endif %}
 
 {% endfor %}
+{% if cutOff and cutOff.length > 0 %}
+Your last run was cut off after these calls finished and before their results reached you. They ran, and anything they stored is kept, so read their results here rather than calling again:
+
+{% for call in cutOff %}
+{{ call.tool }} {{ call.arguments }}
+{{ call.result }}
+
+{% endfor %}
+{% endif %}
 {% endif %}

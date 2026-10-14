@@ -829,6 +829,13 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   follows the scope (the owner, 2026-10-14): a survey about 200 to 250 cards, a one_shot 125 to
   200, a topic 250 to 750 by depth and difficulty; a subject needing more than 750 is a survey,
   one needing fewer than 200 a one_shot. Still an instruction, never a check in code.
+  Research and maps second (ADR-0110): the first maps rated all 69 claims high, held 18 to 31
+  claims and 8 misconceptions for 450 to 700 cards, rested Rust on one book partly two years old
+  and the Gita on 15 verses, and went on six times on the tadpole's own words. Code now holds the
+  maps together before toad_sage reads them (confidence by source tier, two sources a domain or a
+  gap, a claim per 3 cards and a misconception per 10, the owner's ratios), an evidence auditor
+  reads maps C and F beside their passages, and the handover carries what code counted. A run cut
+  off between a call's end and its result hands the result to the next run.
 
 ## Asked when we get there
 

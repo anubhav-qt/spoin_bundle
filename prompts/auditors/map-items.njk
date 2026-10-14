@@ -1,0 +1,22 @@
+The topic's domains (map A): {{ domains | join(", ") }}.
+
+The items to audit, each with the passages it cites.
+{% for one in items %}
+
+<item key="{{ one.key }}">
+{{ one.item.text }}
+{% if one.kind == "C" %}
+Class: {{ one.item.claimType }}; scope: {{ one.item.scope }}; confidence: {{ one.item.confidence }}; domain: {{ one.item.domain }}{% if one.item.appliesTo %}; applies to: {{ one.item.appliesTo }}{% endif %}
+
+{% endif %}
+{% for passage in one.passages %}
+<passage page="{{ passage.page }}" number="{{ passage.passage }}" source="{{ passage.source }}" url="{{ passage.url }}">
+{{ passage.text }}
+</passage>
+{% else %}
+It cites no passage.
+{% endfor %}
+</item>
+{% endfor %}
+
+Based on the items above, report what your instructions ask for.

@@ -9,6 +9,7 @@ import { type HarnessTool, ToolError } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
 import { publishCurriculum } from "./curriculum.ts";
 import { closingReportProblems, ingestTopicCorpus } from "./documents.ts";
+import { mapsHandoverFacts, mapsHandoverProblems } from "./maps.ts";
 import { putCardsLiveIfDone, startReadyTiers, tierById } from "./tiers.ts";
 
 /*
@@ -54,6 +55,14 @@ export function handOverTool(deps: AgentDeps): HarnessTool<typeof HandOverParame
           throw new ToolError(`The closing report can't go yet:\n- ${problems.join("\n- ")}`);
         }
       }
+      let facts: string | undefined;
+      if (params.kind === "maps") {
+        const problems = await mapsHandoverProblems(context.db, topicId);
+        if (problems.length > 0) {
+          throw new ToolError(`The maps can't go yet:\n- ${problems.join("\n- ")}`);
+        }
+        facts = await mapsHandoverFacts(context.db, topicId);
+      }
       let tier: string | null = null;
       if (params.kind === "insufficient_evidence") {
         if (!params.subtopic)
@@ -73,10 +82,18 @@ export function handOverTool(deps: AgentDeps): HarnessTool<typeof HandOverParame
           throw new ToolError(`There is no record ${id}.`);
         }
       }
+      const body: HandoverRecord["body"] = {
+        kind: params.kind,
+        topic: topicId,
+        records: refs,
+        note: params.note,
+        subtopic: tier,
+      };
+      if (facts) body.facts = facts;
       const handover = await createRecord(context.db, HandoverRecord, {
         kind: "handover",
         author: context.author,
-        body: { kind: params.kind, topic: topicId, records: refs, note: params.note, subtopic: tier },
+        body,
       });
       const stored = await recordsStored(context.db, deps.prompts, [handover]);
       return {

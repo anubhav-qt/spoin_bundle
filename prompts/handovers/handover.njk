@@ -14,4 +14,9 @@ Tier: subtopic {{ record.body.subtopic }}
 Records handed over: {{ m.refs(record.body.records) }}
 
 {{ record.body.note }}
+{% if record.body.facts %}
+
+What code counted in the maps (not the tadpole's words):
+{{ record.body.facts }}
+{% endif %}
 {% include "partials/version.njk" %}

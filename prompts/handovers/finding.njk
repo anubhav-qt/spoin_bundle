@@ -1,6 +1,10 @@
 {% import "partials/macros.njk" as m %}
 Finding ({{ m.ref(record) }}) from the {{ record.body.auditor }} auditor, in {{ m.ref(record.body.audit) }}
+{% if record.body.item %}
+Map item: {{ record.body.item }}
+{% else %}
 Document: {{ record.body.path or "the drafts as a whole" }}
+{% endif %}
 Problem: {{ record.body.problem }}
 Fix: {{ record.body.fix }}
 {% if record.body.settled %}

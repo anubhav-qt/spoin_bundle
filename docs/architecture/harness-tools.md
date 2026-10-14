@@ -39,7 +39,9 @@ records it writes, and read one by id as a record that isn't there. A helper get
 the three reads: it has no address to be asked at, and it asks nothing, leaving what it can't
 settle to its report. designer_toad gets only `ask` and `answer`: `list_art_requests` gives it every
 card it draws, and the reads spent its calls on plans, drafts and its own old art (ADR-0109). Each record reads as its own template shows it, with who wrote it, by role
-and topic, and when, in India time.
+and topic, and when, in India time. A run cut off after a call finished but before its result
+reached the transcript leaves the result in the action log, and the chat's next run reads it in its
+opening message instead of calling again.
 
 | Tool | Does |
 |---|---|
@@ -79,7 +81,9 @@ existing topic gets its own.
 ### Reviews
 
 toad_sage plays the owner's part at the procedure's approval points: the coverage note, the
-curriculum proposal, every "insufficient evidence" and the closing report.
+maps, the curriculum proposal, every "insufficient evidence" and the closing report. The maps'
+handover carries what code counted in them (ADR-0110), and toad_sage judges from that and the maps,
+not from the tadpole's description of them.
 
 | Tool | Does |
 |---|---|
@@ -128,9 +132,10 @@ page's content stays on disk; Postgres keeps its pointer, and pgvector its passa
 
 | Tool | Does |
 |---|---|
-| `write_map(kind, body)` | One of ADR-0100's maps, A to J, as a versioned record with its own schema. Claims carry class, scope and confidence; evidence cites stored page passages, each checked to exist |
-| `change_map(map, reason, body)` | The map's next version |
-| `hand_over(kind, records)` | The coverage note, the maps, an "insufficient evidence" or the closing report, to toad_sage. The run ends until its review wakes the tadpole. The closing report is refused until the latest drafts are audited, every finding is fixed or answered, `corpus:check` passes, and the documents hold at least one section for every 3 of the intake's cards (a tier of 5 to 25 cards is written from 5 to 10 sections) |
+| `write_map(kind, body)` | One of ADR-0100's maps, A to J, as a versioned record with its own schema. Claims carry class, scope and confidence, name their domain (an item of map A), and an implementation claim its product and version; a source of map D is one publication with its tier and date or version; evidence cites stored page passages, each checked to exist |
+| `change_map(map, reason, items?, drop?, summary?)` | The map's next version from only what changes: items replace their namesakes or are added, `drop` takes items out, so a big map is written in parts and never resent whole |
+| `audit_maps()` | The evidence auditor (ADR-0110): fixed calls of 15 claims and misconceptions of maps C and F, each read beside the passages it cites, reporting support, class, scope, confidence, versions, doctrine stated as fact and misconceptions nobody holds. Refused until the maps hold together; reads only what changed since its last audit. Findings are records, settled with `settle_finding` |
+| `hand_over(kind, records)` | The coverage note, the maps, an "insufficient evidence" or the closing report, to toad_sage. The run ends until its review wakes the tadpole. The maps are refused until they hold together (all ten written; a claim's confidence no more than its sources' tiers give, an empirical claim citing primary research; every domain taught from two sources or named a gap in map I; a claim for every 3 of the intake's cards and a misconception for every 10), the latest maps C and F are audited and every finding is settled; the handover then carries what code counted in them for toad_sage. The closing report is refused until the latest drafts are audited, every finding is fixed or answered, `corpus:check` passes, and the documents hold at least one section for every 3 of the intake's cards (a tier of 5 to 25 cards is written from 5 to 10 sections) |
 
 ### Documents
 

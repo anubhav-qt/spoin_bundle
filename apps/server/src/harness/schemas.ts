@@ -266,6 +266,8 @@ export const Handover = Type.Object(
     note: Type.String({ minLength: 1, description: "The note, the report or the reasoning handed over" }),
     /** The tier an "insufficient evidence" is about. */
     subtopic: Type.Union([Id, Type.Null()]),
+    /** The maps' handover: what code counted in them, which toad_sage reviews beside the note (ADR-0110). */
+    facts: Type.Optional(Text),
   },
   CLOSED,
 );
@@ -317,6 +319,25 @@ export const MapItem = Type.Object(
     checkBy: Type.Optional(
       Type.String({ format: "date", description: "Map J: when the claim must be checked again" }),
     ),
+    domain: Type.Optional(
+      Type.String({
+        minLength: 1,
+        description: "Maps C and I: the name of the map A domain the claim or gap belongs to",
+      }),
+    ),
+    sourceDate: Type.Optional(
+      Type.String({
+        minLength: 1,
+        description:
+          "Map D: when the source was published or last updated, or the version it documents: '2026-07', 'Rust 1.97'",
+      }),
+    ),
+    appliesTo: Type.Optional(
+      Type.String({
+        minLength: 1,
+        description: "Map C, an implementation claim: the product and version it is true of",
+      }),
+    ),
   },
   CLOSED,
 );
@@ -362,13 +383,24 @@ export const Audit = Type.Object(
   CLOSED,
 );
 
+/**
+ * One run of audit_maps (ADR-0110): the maps it read, each at the version it read. Its findings are
+ * records of their own, from the evidence auditor.
+ */
+export const MapAudit = Type.Object({ topic: Id, maps: Type.Array(RecordRef) }, CLOSED);
+
+/** Who finds problems: the drafts' three auditors, and the maps' evidence auditor. */
+export const FINDING_AUDITORS = [...AUDITORS, "evidence"] as const;
+
 /** A problem an auditor found, settled by the tadpole once fixed or answered. */
 export const Finding = Type.Object(
   {
     audit: RecordRef,
     topic: Id,
-    auditor: Type.Enum([...AUDITORS]),
+    auditor: Type.Enum([...FINDING_AUDITORS]),
     path: Type.Union([Text, Type.Null()]),
+    /** The evidence auditor's: the map item at fault, as `C/<name>`. */
+    item: Type.Optional(Text),
     problem: Text,
     fix: Text,
     settled: Type.Union([
@@ -495,6 +527,7 @@ export const ReviewRecord = versionedRecord("review", Review);
 export const MapRecord = versionedRecord("map", TopicMap);
 export const DraftRecord = versionedRecord("draft", Draft);
 export const AuditRecord = versionedRecord("audit", Audit);
+export const MapAuditRecord = versionedRecord("map_audit", MapAudit);
 export const FindingRecord = versionedRecord("finding", Finding);
 export const CurriculumRecord = versionedRecord("curriculum", Curriculum);
 export const CardPlanRecord = versionedRecord("card_plan", CardPlan);
@@ -517,6 +550,7 @@ export const RECORD_SCHEMAS = {
   map: MapRecord,
   draft: DraftRecord,
   audit: AuditRecord,
+  map_audit: MapAuditRecord,
   finding: FindingRecord,
   curriculum: CurriculumRecord,
   card_plan: CardPlanRecord,
@@ -558,6 +592,7 @@ export type MapRecord = Static<typeof MapRecord>;
 export type MapItem = Static<typeof MapItem>;
 export type DraftRecord = Static<typeof DraftRecord>;
 export type AuditRecord = Static<typeof AuditRecord>;
+export type MapAuditRecord = Static<typeof MapAuditRecord>;
 export type FindingRecord = Static<typeof FindingRecord>;
 export type Curriculum = Static<typeof Curriculum>;
 export type CurriculumRecord = Static<typeof CurriculumRecord>;

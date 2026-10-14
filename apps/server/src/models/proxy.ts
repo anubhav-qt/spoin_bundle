@@ -189,10 +189,17 @@ export function findModel(models: Model<Api>[], id: string): Model<Api> {
 /**
  * Gemini 3.8 Flash at medium thinking: toad_sage, the main chats, research, the gate, and on the
  * request path grading and AskAI (task 0045). The proxy names it `-high`, but it takes low, medium
- * and high, and each call says which.
+ * and high, and each call says which. GEMINI_THINKING in the environment sets another level for a
+ * trial: the owner's of low on the maps, for its speed and cost (2026-10-14).
  */
 export const GEMINI_ID = "gemini-3.8-flash-high";
-export const GEMINI_THINKING: ThinkingLevel = "medium";
+export const GEMINI_THINKING: ThinkingLevel = geminiThinking(process.env.GEMINI_THINKING);
+
+function geminiThinking(value: string | undefined): ThinkingLevel {
+  if (value === undefined || value === "") return "medium";
+  if (value === "low" || value === "medium" || value === "high") return value;
+  throw new Error(`GEMINI_THINKING is low, medium or high, not ${value}.`);
+}
 
 /**
  * Claude Opus 5.5 at medium thinking, through the owner's Claude Code sign-in: designer_toad's art

@@ -130,10 +130,22 @@ const ModelDefinitions = z.object({ models: z.array(ModelDefinition).optional() 
 /** The levels above off, weakest first. */
 const THINKING_LEVELS: ModelThinkingLevel[] = ["minimal", "low", "medium", "high", "xhigh", "max"];
 
+/**
+ * The channel the proxy keeps a provider's model definitions under, where it isn't the owner it
+ * serves the models as: a Claude Code sign-in's models are the owner "anthropic" and a ChatGPT
+ * one's "openai", and asking for those channels' definitions is a 400.
+ */
+const DEFINITIONS_CHANNEL: Record<string, string> = { anthropic: "claude", openai: "codex" };
+
+/** The channel a served model's definition is kept under. */
+export function channelOf(owner: string): string {
+  return DEFINITIONS_CHANNEL[owner] ?? owner;
+}
+
 /** Asks the proxy what it serves, and describes each model a chat can run on. */
 export async function loadModels(config: ProxyConfig, fetchFn: typeof fetch = fetch): Promise<Model<Api>[]> {
   const served = await getFromProxy(config, "/v1/models", "api", ServedModels, fetchFn);
-  const channels = new Set(served.data.map((model) => model.owned_by));
+  const channels = new Set(served.data.map((model) => channelOf(model.owned_by)));
   const definitions = new Map<string, ModelDefinition[]>();
   for (const channel of channels) {
     const path = `/v8/management/routing/model-definitions/${encodeURIComponent(channel)}`;
@@ -155,9 +167,10 @@ export function describeModels(
 ): Model<Api>[] {
   const models: Model<Api>[] = [];
   for (const servedModel of served) {
-    const definition = (definitions.get(servedModel.owned_by) ?? []).find((d) => d.id === servedModel.id);
+    const channel = channelOf(servedModel.owned_by);
+    const definition = (definitions.get(channel) ?? []).find((d) => d.id === servedModel.id);
     if (!definition) continue;
-    const model = describeModel(proxyUrl, servedModel.owned_by, definition);
+    const model = describeModel(proxyUrl, channel, definition);
     if (model) models.push(model);
   }
   return models;

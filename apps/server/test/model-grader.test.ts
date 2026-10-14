@@ -2,7 +2,7 @@ import type { Api, Model } from "@spoin/pi-ai";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { Balancer } from "../src/models/balancer.ts";
 import type { CallOutcome } from "../src/models/calls.ts";
-import { GEMINI_ID, geminiFrom, waitForGemini } from "../src/models/proxy.ts";
+import { GEMINI_ID, geminiFrom, loadModels, waitForGemini } from "../src/models/proxy.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import type { FreeTextGradeQuery } from "../src/quiz/grader.ts";
 import { modelGrader } from "../src/quiz/model-grader.ts";
@@ -213,6 +213,39 @@ describe("finding Gemini on the proxy", () => {
     await expect(find()).rejects.toThrow(/isn't answering/);
     up = true;
     expect((await find()).id).toBe(GEMINI_ID);
+  });
+
+  test("Claude Code's and ChatGPT's models are described from the channels the proxy keeps them in", async () => {
+    const asked: string[] = [];
+    const fetchFn = (async (input: string | URL | Request) => {
+      const url = String(input);
+      asked.push(url.replace("http://proxy", ""));
+      if (url.endsWith("/v1/models")) {
+        const data = [
+          { id: "claude-opus-5-5", owned_by: "anthropic" },
+          { id: "gpt-6.1-sol", owned_by: "openai" },
+        ];
+        return new Response(JSON.stringify({ data }), { status: 200 });
+      }
+      const definition = (id: string) => ({
+        id,
+        context_length: 272_000,
+        max_completion_tokens: 128_000,
+        supportedInputModalities: ["text", "image"],
+        thinking: { levels: ["low", "medium", "high"] },
+      });
+      if (url.endsWith("/claude"))
+        return new Response(JSON.stringify({ models: [definition("claude-opus-5-5")] }));
+      if (url.endsWith("/codex"))
+        return new Response(JSON.stringify({ models: [definition("gpt-6.1-sol")] }));
+      return new Response("unknown channel", { status: 400 });
+    }) as typeof fetch;
+    const models = await loadModels({ url: "http://proxy", apiKey: "a", managementKey: "m" }, fetchFn);
+    expect(models.map((model) => [model.id, model.api, model.provider])).toEqual([
+      ["claude-opus-5-5", "anthropic-messages", "claude"],
+      ["gpt-6.1-sol", "openai-responses", "codex"],
+    ]);
+    expect(asked).toContain("/v8/management/routing/model-definitions/claude");
   });
 
   test("the worker waits until the proxy serves Gemini, and says so once", async () => {

@@ -81,7 +81,8 @@ redraws, and then `list_art_requests` lists nothing, saying the owner is looking
 owner approves the 30, `APPROVED_ART_STYLE` is raised to the style, and every card whose art is an
 older style is drawn again, live ones too. `list_art_requests` lists the cards waiting for their
 first art first, since they hold their tiers back, then the redraws, marked Redraw, without their
-old art. It shows one batch of 10 at a time.
+old art. It shows one batch of 5 at a time, the owner's pick over 10: each piece gets more of the
+model's attention, and each answer is shorter on a paid subscription.
 
 **The request gives the idea, not the layout.** The writers' art requests often describe a
 diagram (regions side by side, boxes with their label text, arrows, numbered stations), and in the

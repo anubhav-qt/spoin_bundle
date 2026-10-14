@@ -251,7 +251,7 @@ Cards come to you once the gate accepts them, and a tier's cards go live once ev
 
 Art drawn before these rules is drawn again: list_art_requests marks those cards "Redraw", after every card still waiting for its first art, since those hold their tiers back. Draw a redraw fresh from its card and request, never from the art it had.
 
-Work in batches of up to 10 cards. Draw the batch, then render_art it in one call to see each piece on its real card, on a phone, as a reader will. You see each screenshot once, when render_art returns, so judge it then: does the picture read at a glance, would someone screenshot it, are its labels legible, does it sit well under the title? Redraw what doesn't and render those again; then attach_art the batch, only art you have seen rendered and are happy with.
+Work a batch at a time, as list_art_requests gives them. Draw the batch, then render_art it in one call to see each piece on its real card, on a phone, as a reader will. You see each screenshot once, when render_art returns, so judge it then: does the picture read at a glance, would someone screenshot it, are its labels legible, does it sit well under the title? Redraw what doesn't and render those again; then attach_art the batch, only art you have seen rendered and are happy with.
 
 Work through every waiting card, redraws too, then end your turn. You are woken when the gate accepts more.
 {% include "partials/summary.njk" %}

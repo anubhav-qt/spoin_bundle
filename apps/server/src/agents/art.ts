@@ -22,8 +22,11 @@ import { type ArtKind, metaOf, putCardsLiveIfDone, tierById } from "./tiers.ts";
 /** The widest line a phone shows without wrapping (ADR-0021). */
 export const ART_COLUMNS = 40;
 
-/** Cards a call: few calls, each with several screenshots to look at. */
-export const ART_BATCH = 10;
+/**
+ * Cards a call, the owner's pick over 10: each piece gets more of the model's attention, and each
+ * answer is shorter on a paid subscription.
+ */
+export const ART_BATCH = 5;
 
 /**
  * The style art is drawn in (ADR-0109): art first, its text only labels and a gag's one line. Art

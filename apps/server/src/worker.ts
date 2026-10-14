@@ -47,7 +47,16 @@ const [nimTop] = NIM_LADDER;
 if (!nimTop) throw new Error("NIM's ladder is empty.");
 if (!env.UNIVERSE_DATABASE_URL) throw new Error("The worker writes the corpus: set UNIVERSE_DATABASE_URL.");
 
-const app = connectApp(env.DATABASE_URL);
+/**
+ * The worker's chats share one pool, and a query that can't get a connection fails its run, losing
+ * the model's answer already paid for and retrying 15 minutes later. 17 chats researching at once,
+ * fetching big pages, waited past the API's 5 seconds five times in ten minutes (2026-10-14), so
+ * the worker has more connections and waits a minute.
+ */
+const WORKER_CONNECTIONS = 20;
+const WORKER_CONNECTION_WAIT_MS = 60_000;
+
+const app = connectApp(env.DATABASE_URL, WORKER_CONNECTIONS, WORKER_CONNECTION_WAIT_MS);
 const universe = connectUniverse(env.UNIVERSE_DATABASE_URL, { readOnly: false });
 const prompts = loadPrompts();
 const gemini = geminiFrom(proxy);

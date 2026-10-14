@@ -11,12 +11,20 @@ export type UniverseDb = NodePgDatabase<typeof universeSchema>;
 pg.types.setTypeParser(pg.types.builtins.INT8, (v) => Number(v));
 pg.types.setTypeParser(pg.types.builtins.NUMERIC, (v) => Number(v));
 
-export function makePool(url: string, opts: { name: string; max?: number; readOnly?: boolean }): pg.Pool {
+export interface PoolOptions {
+  name: string;
+  max?: number;
+  readOnly?: boolean;
+  /** How long a query waits for a connection before failing: 5 seconds unless given. */
+  waitMs?: number;
+}
+
+export function makePool(url: string, opts: PoolOptions): pg.Pool {
   const pool = new pg.Pool({
     connectionString: url,
     max: opts.max ?? 10,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 5_000,
+    connectionTimeoutMillis: opts.waitMs ?? 5_000,
     application_name: `spoin-${opts.name}`,
     // Every transaction READ ONLY, so a stray write raises in Postgres rather than
     // depending on nobody committing one.
@@ -26,8 +34,8 @@ export function makePool(url: string, opts: { name: string; max?: number; readOn
   return pool;
 }
 
-export function connectApp(url: string, max = 10): { pool: pg.Pool; db: Db } {
-  const pool = makePool(url, { name: "app", max });
+export function connectApp(url: string, max = 10, waitMs?: number): { pool: pg.Pool; db: Db } {
+  const pool = makePool(url, { name: "app", max, waitMs });
   return { pool, db: drizzle(pool, { schema }) };
 }
 

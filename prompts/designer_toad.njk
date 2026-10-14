@@ -12,9 +12,9 @@ Art, not text. A reader should get it from the picture before reading a word, an
 - **A gag may have one line**: a line of dialogue that is the punchline. Best of all a meme the reader already knows, bent to the card ("This is fine.", "One does not simply...", "Is this a...?", Drake's no and yes, top text and bottom text), or a famous character's signature line, or a sarcastic remark. Short and sharp, never an explanation.
 - **An informative drawing shows the mechanism as a picture**, not as boxes of words: a stack as plates, a queue as people in line, a cause as falling dominoes, threads as lanes on a road, a cache as a pantry beside a far-off shop. Its labels may run a little longer, but the picture carries it, and it should be as good to look at as a gag.
 
-A box with words in it isn't a picture, and neither is a table. Draw the thing itself: a washing machine with its door and drum, not a box labelled WASH; a workshop door with a padlock on it, not a box saying LOCKED. Never fill a box with rows of `#` in place of text.
+A box with words in it isn't a picture, and neither is a table, whatever the box is drawn with: `( word )` under `.~~~~.` is a box too. Draw the thing itself: a washing machine with its door and drum, not a box labelled WASH; a workshop door with a padlock on it, not a box saying LOCKED. Never fill a box with rows of `#` in place of text, and never pad a piece with rows of `~~~~` or `----`.
 
-Code counts every piece's words, letters and box lines (`+ | = - # [ ]`), and refuses a row of `#` standing in for text: render_art refuses a piece with too much text or too much box, saying how much it has.
+Code counts every piece's words, letters and box lines: `+ | = - # [ ]`, and every character of an outline with a word inside it, whatever it is drawn with. Rows of one repeated character after the first don't count as drawing. render_art refuses a piece with too much text or too much box, saying how much it has, and refuses a row of `#` standing in for text.
 
 Pieces in this style, never to reuse, only to show the balance and the craft. A gag: the picture carries the joke, with one line and two labels.
 
@@ -34,7 +34,7 @@ Pieces in this style, never to reuse, only to show the balance and the craft. A 
       ~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 
-A gag drawn for a card in an earlier run: a ghost for a type that takes no space, its one line the joke, its label on a badge it wears.
+A gag drawn for a card in an earlier run: a ghost for a type that takes no space, its one line the joke, its label under it.
 
 ```
            "I count as T!"
@@ -44,13 +44,13 @@ A gag drawn for a card in an earlier run: a ghost for a type that takes no space
           |       _       |
           |      (_)      |
          /                 \
-        |    ._________.    |
-        |   /  Phantom  \   |
-        |   \   Data    /   |
-         \   '_________'   /
+        |                   |
+        |                   |
+         \                 /
           '.             .'
             / \ / \ / \ /
            ~   ~   ~   ~
+            PhantomData
 ```
 
 An informative drawing: the mechanism drawn as the thing itself, each label a word or two.

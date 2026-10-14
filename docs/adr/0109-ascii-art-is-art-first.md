@@ -26,6 +26,12 @@ small `(0_0)` beside them, their text swapped for rows of `#` to pass the letter
 box characters at the median. designer_toad's chat held 225 messages of its own old art, and Flash
 kept drawing like it whatever the instructions said.
 
+Style 5, with high thinking and the artists' pieces as examples, drew 170 pieces overnight that
+still read as diagrams. It had moved its outlines from `+--+` to `.~~.`, `/ \` and `( )`, which the
+box cap didn't count, so words sat in round outlines (`( union U: 4 bytes )`); and 82 of the 170
+ended in two or three rows of `~~~~~~~~`, a third of all their ink, which diluted the letter share
+as the rows of `#` had.
+
 ## Decision
 
 **The art carries the idea; text is labels of 1 to 3 words.** A gag may add one line of dialogue,
@@ -51,24 +57,38 @@ sides, stands in for text and is refused; `#` that shades a drawing (`(#####)`, 
 The box caps refuse every one of the first redraws and pass 98% of asciiart.eu's pieces and both
 of the prompt's worked examples. A refusal says how much text or box the piece has.
 
+**An outline is a box whatever draws it.** Every character that walls a word in counts as a box
+line: a word is walled in when no path through spaces, letters and digits leads from it out of the
+art (`outlineCells`). **Padding doesn't count**: a row of one character repeated eight times or
+more is filler, and every filler row after the first is left out of the measure, so one ground or
+water line still draws. With both, 83 of style 5's 170 pieces are refused; of the old library's
+pieces, 2% more are refused than before (mostly words written on a drawn sign or shirt), and every
+example in the prompt passes.
+
 **References come from the web.** For a meme or a famous character, designer_toad finds it with
 `web_search`, sees its picture with `look_at` (the page or picture in headless Chromium, one
 screenshot), and draws it in ASCII itself, bent to the card. No ASCII art is copied in, and the
 curated library of the old pipeline is not used: nothing in the harness comes from old code.
 
-**Art drawn before this is drawn again.** `ART_STYLE` is 5; attaching art writes the style onto the
-card's `gen_meta.artStyle`. Style 2 had the text caps without the prompt's worked examples; style 3
-had the examples but not the box check; style 4 passed the box check with words inside round
-outlines (`.____.` over `(   )`), 40 pieces the owner had redrawn; style 5 adds high thinking and
-the artists' pieces. `list_art_requests` lists the cards waiting for their first
-art first, since they hold their tiers back, then every card, live ones too, whose art is an older
-style, marked Redraw, without its old art. It shows one batch of 10 at a time.
+**A new style is tried before anything is redrawn.** `ART_STYLE` is 6; attaching art writes the
+style onto the card's `gen_meta.artStyle`. Style 2 had the text caps without the prompt's worked
+examples; style 3 had the examples but not the box check; style 4 passed the box check with words
+inside round outlines (`.____.` over `(   )`), 40 pieces the owner had redrawn; style 5 added high
+thinking and the artists' pieces, and padded with `~`; style 6 adds the outline and padding
+checks. Four styles in a row redrew every piece before anyone saw what the new rules drew, so a
+style newer than `APPROVED_ART_STYLE` draws 30 pieces of a topic (`ART_TRIAL`), first art or
+redraws, and then `list_art_requests` lists nothing, saying the owner is looking at them. Once the
+owner approves the 30, `APPROVED_ART_STYLE` is raised to the style, and every card whose art is an
+older style is drawn again, live ones too. `list_art_requests` lists the cards waiting for their
+first art first, since they hold their tiers back, then the redraws, marked Redraw, without their
+old art. It shows one batch of 10 at a time.
 
 **designer_toad thinks at high**, every other chat at medium: the owner's call, on Gemini 3.8 Flash
 rather than a Pro model (`thinkingOf` in `set-up.ts`).
 
 **The prompt's examples** are two pieces drawn for it (a melting snowman, a stack of plates), the
-best piece of the style-4 run (a ghost), and the pieces the owner chose from the old pipeline's
+best piece of the style-4 run (a ghost, its label moved from a badge on its body to under it for
+style 6), and the pieces the owner chose from the old pipeline's
 curated library as the craft to aim for: Joan G. Stark's mermaid, spider and Homer, Hayley Jane
 Wakenshaw's cat in a box, Riitta Rasimus's whale, and a mushroom cloud and a devil in flames by
 unknown artists. Any other library piece goes in only with the owner's leave.
@@ -90,8 +110,9 @@ redrawn, not captioned in place, and a diagram has to become a picture. Live car
 readers who saw the old one. The designer can't look back at an earlier screenshot; it renders or
 looks again if it needs to.
 
-**Committed to.** Raising `ART_STYLE` redraws every piece of a lower style, live ones included,
-whenever the style changes again.
+**Committed to.** Raising `ART_STYLE` starts a trial of 30 pieces; approving it redraws every
+piece of a lower style, live ones included. Approval is a code change (`APPROVED_ART_STYLE`), so
+the worker is rebuilt to start the redraw.
 
 ## Alternatives considered
 

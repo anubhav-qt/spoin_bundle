@@ -5,11 +5,14 @@ import { Type } from "typebox";
 import { describe, expect, test } from "vitest";
 import {
   ART_STYLE,
+  ART_TRIAL,
   artProblems,
   artWords,
   attachArtTool,
   boxShare,
+  letterShare,
   listArtRequestsTool,
+  outlineCells,
   paddedLines,
   renderArtTool,
 } from "../src/agents/art.ts";
@@ -442,6 +445,60 @@ describe("designer_toad's art", () => {
     expect(paddedLines("      ##### ##### #####")).toEqual([1]);
     // # that shades a drawing is art.
     expect(paddedLines(["  (#####)", " /  |####|"].join("\n"))).toEqual([]);
+  });
+
+  test("an outline with a word inside is box lines, whatever draws it, and padding doesn't count", () => {
+    // Style 5's pieces: words inside round outlines, padded with rows of ~.
+    const outlined = [
+      "         /~~~~~~~~~~~~~~~~~\\",
+      "        (  union U: 4 bytes )",
+      "         \\_________________/",
+    ].join("\n");
+    expect(outlineCells(outlined).size).toBeGreaterThan(0);
+    expect(artProblems(outlined, "informative").join()).toContain("of its characters are box lines");
+    // The same outline with nothing inside is a drawing, and a label beside a shape isn't in it.
+    expect(boxShare(outlined.replace("union U: 4 bytes", " ".repeat(16)))).toBe(0);
+    expect(outlineCells("  (   )  owner").size).toBe(0);
+    const water = "~".repeat(20);
+    const once = [drawn, "  HEAP OWNER", water].join("\n");
+    expect(letterShare([once, water, water].join("\n"))).toBe(letterShare(once));
+  });
+
+  test("a new style draws its trial's pieces, then nothing until the owner approves it", async () => {
+    const { topic: made, beginner } = await newTopic();
+    const drawnBefore = await acceptedCards(beginner, ART_TRIAL - 1, ART_TRIAL - 1);
+    await db
+      .update(card)
+      .set({
+        visualId: sql`gen_random_uuid()`,
+        visualKind: "ascii",
+        visualSlots: { art: drawn, alt: "A crab." },
+        genMeta: sql`${card.genMeta} || ${JSON.stringify({ artStyle: ART_STYLE })}::jsonb`,
+      })
+      .where(
+        inArray(
+          card.id,
+          drawnBefore.map((one) => one.id),
+        ),
+      );
+    const [last, next] = await acceptedCards(beginner, 2, 2);
+    if (!last || !next) throw new Error("No card.");
+    const designer = await openTopicChat(db, "designer_toad", made.id);
+
+    const listed = String((await call(listArtRequestsTool(artDeps), designer, {})).value);
+    expect(listed).toContain(last.id);
+    expect(listed).not.toContain(next.id);
+
+    const piece = { card: last.id, art: drawn, alt: "A crab." };
+    await callsInOneRun(designer, [
+      [renderArtTool(artDeps), { art: [piece] }],
+      [attachArtTool(artDeps), { art: [piece] }],
+    ]);
+    const after = String((await call(listArtRequestsTool(artDeps), designer, {})).value);
+    expect(after).toContain(`The owner is looking at the first ${ART_TRIAL} pieces in this style`);
+    await expect(
+      call(renderArtTool(artDeps), designer, { art: [{ ...piece, card: next.id }] }),
+    ).rejects.toThrow("isn't waiting for art");
   });
 
   test("designer_toad thinks at high, every other chat at medium", async () => {

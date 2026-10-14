@@ -14,7 +14,11 @@ Kind: {{ c.meta.art.kind }}
 Show: {{ c.meta.art.show }}
 Ideas: {{ c.meta.art.ideas }}
 {% else %}
+{% if trial and trial.left == 0 %}
+The owner is looking at the first {{ trial.size }} pieces in this style: nothing more is drawn until they approve it.
+{% else %}
 No card is waiting for art.
+{% endif %}
 {% endfor %}
 {% if total > cards | length %}
 

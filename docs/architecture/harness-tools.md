@@ -285,16 +285,18 @@ or an informative drawing, on Gemini, in batches of up to 10. The art carries th
 scenes and objects more than faces and stick figures, and its text is labels of 1 to 3 words, plus
 a gag's one line of dialogue; code caps each piece's words, letters and box lines (ADR-0109). For a
 meme or a famous character it searches the web and looks at a reference picture before drawing. A
-tier's cards go live once every accepted card that asked for art has it. Art of an older style
-(`ART_STYLE`) is drawn again, live cards' too, after the cards waiting for their first. Each
-screenshot is shown to the model once, in the call after the render or the look.
+tier's cards go live once every accepted card that asked for art has it. A new style
+(`ART_STYLE`) is tried on 30 pieces of a topic and then nothing more is drawn until the owner
+approves it (`APPROVED_ART_STYLE`); once approved, art of an older style is drawn again, live
+cards' too, after the cards waiting for their first. Each screenshot is shown to the model once,
+in the call after the render or the look.
 
 | Tool | Does |
 |---|---|
-| `list_art_requests()` | The next 10 cards waiting for art, first art before redraws, with the writer's request: its kind, what to show, and ideas; and how many more wait |
+| `list_art_requests()` | The next 10 cards waiting for art, first art before redraws, with the writer's request: its kind, what to show, and ideas; and how many more wait. During a style's trial, only as many as the trial has left |
 | `web_search`, `fetch` | Memes, characters and their lines, and references for a subject it can't picture |
 | `look_at(url)` | A public page or picture in headless Chromium at a laptop's width, returned as one screenshot: a meme's picture or a character's look to draw from |
-| `render_art(art[])` | Up to 10 pieces, each a card, its art and its caption: checks the 40 columns (any height), the character set, the text and the boxes (a gag at most 12 words, 30% letters and 40% box lines, an informative drawing 20, 40% and 45%), refuses rows of `#` standing in for text, then renders each card on a phone and returns the screenshots. A piece that fails is refused alone. Every render is a record |
+| `render_art(art[])` | Up to 10 pieces, each a card, its art and its caption: checks the 40 columns (any height), the character set, the text and the boxes (a gag at most 12 words, 30% letters and 40% box lines, an informative drawing 20, 40% and 45%; a box line is `+ \| = - # [ ]` or any character of an outline with a word inside, and rows of one repeated character after the first don't count), refuses rows of `#` standing in for text, then renders each card on a phone and returns the screenshots. A piece that fails is refused alone. Every render is a record |
 | `attach_art(art[])` | Up to 10 pieces, each refused unless this run rendered that exact art; marks each card's art the current style. Puts a tier's cards live once no accepted card is waiting for art |
 
 ### visual_toad (one per tadpole)

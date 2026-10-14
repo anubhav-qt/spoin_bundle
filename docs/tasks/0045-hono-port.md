@@ -815,7 +815,11 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   over. The curated library is not used as a tool: nothing in the harness comes from old code;
   only the owner's picks from it (seven pieces, ADR-0109) are prompt examples. designer_toad thinks
   at high. `WORKER_ONLY_ROLES=designer_toad` runs the worker on that role alone, every other
-  chat's wakes left waiting, so the art can be checked before the rest runs.
+  chat's wakes left waiting, so the art can be checked before the rest runs. Style 5 (high
+  thinking, the owner's examples) drew 170 pieces that were still words in outlines, drawn with
+  `.~'/\()` to pass the box cap, and padded with rows of `~~~~` (a third of their ink): style 6
+  counts an outline with a word inside as box lines and leaves padding rows out, and each new
+  style is tried on 30 pieces, redrawing nothing more until the owner approves it.
 
 ## Asked when we get there
 

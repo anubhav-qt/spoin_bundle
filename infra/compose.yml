@@ -107,6 +107,8 @@ services:
 
   web:
     build: { context: .., dockerfile: apps/web/Dockerfile }
+    # designer_toad renders its art here; without it, a reboot left every render failing.
+    restart: unless-stopped
     environment:
       # The browser resolves this, not the container, so it is the host's port.
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8001

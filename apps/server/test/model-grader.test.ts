@@ -2,7 +2,7 @@ import type { Api, Model } from "@spoin/pi-ai";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { Balancer } from "../src/models/balancer.ts";
 import type { CallOutcome } from "../src/models/calls.ts";
-import { GEMINI_ID, geminiFrom } from "../src/models/proxy.ts";
+import { GEMINI_ID, geminiFrom, waitForGemini } from "../src/models/proxy.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import type { FreeTextGradeQuery } from "../src/quiz/grader.ts";
 import { modelGrader } from "../src/quiz/model-grader.ts";
@@ -213,5 +213,28 @@ describe("finding Gemini on the proxy", () => {
     await expect(find()).rejects.toThrow(/isn't answering/);
     up = true;
     expect((await find()).id).toBe(GEMINI_ID);
+  });
+
+  test("the worker waits until the proxy serves Gemini, and says so once", async () => {
+    let asked = 0;
+    const find = async () => {
+      asked += 1;
+      if (asked < 3) throw new Error("It serves: nothing.");
+      return gemini();
+    };
+    const misses: unknown[] = [];
+    await waitForGemini(find, new AbortController().signal, (error) => misses.push(error), 1);
+    expect(asked).toBe(3);
+    expect(misses).toHaveLength(1);
+  });
+
+  test("a stop ends the wait", async () => {
+    const stop = new AbortController();
+    const find = async () => {
+      stop.abort();
+      throw new Error("It serves: nothing.");
+    };
+    await waitForGemini(find, stop.signal, () => {}, 60_000);
+    expect(stop.signal.aborted).toBe(true);
   });
 });

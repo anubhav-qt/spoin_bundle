@@ -1,3 +1,4 @@
+import { setTimeout as sleep } from "node:timers/promises";
 import type { Api, Model, ModelThinkingLevel, ThinkingLevel, ThinkingLevelMap } from "@spoin/pi-ai";
 import { z } from "zod";
 import type { Env } from "../env.ts";
@@ -192,6 +193,37 @@ export function geminiFrom(config: ProxyConfig, fetchFn: typeof fetch = fetch): 
     }
     return found;
   };
+}
+
+/** How often a worker waiting on the proxy asks again. */
+const ASK_AGAIN_MS = 10_000;
+
+/**
+ * Resolves once `find` finds Gemini, or once `signal` aborts. Docker starts the worker again with
+ * the machine without waiting for the proxy to sign its accounts in, and a chat woken before then
+ * failed its run and spent one of its wakes' tries. `onMiss` hears the first miss.
+ */
+export async function waitForGemini(
+  find: () => Promise<Model<Api>>,
+  signal: AbortSignal,
+  onMiss: (error: unknown) => void,
+  askAgainMs = ASK_AGAIN_MS,
+): Promise<void> {
+  let missed = false;
+  while (!signal.aborted) {
+    try {
+      await find();
+      return;
+    } catch (error) {
+      if (!missed) onMiss(error);
+      missed = true;
+    }
+    try {
+      await sleep(askAgainMs, undefined, { signal });
+    } catch {
+      // Stopped while waiting: the scheduler sees the stop and wakes nothing.
+    }
+  }
 }
 
 function describeModel(

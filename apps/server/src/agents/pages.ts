@@ -26,8 +26,12 @@ const PASSAGE_CHARS = 1200;
 const SHOWN_CHARS = 14_000;
 /** HTML with less text than this is read again in the browser. */
 const REAL_TEXT_CHARS = 600;
-/** The longest a page is kept: past it, a page is mostly navigation or a dump. */
-const MAX_TEXT_CHARS = 400_000;
+/**
+ * The longest a page is kept: past it, a page is mostly a dump. The C++ Core Guidelines are one
+ * page of about 1.5 million characters, and cut at 400,000 they lost everything past ES, from
+ * concurrency to templates, with nothing to say so.
+ */
+export const MAX_TEXT_CHARS = 2_000_000;
 /** The least time between two fetches from one site. */
 const PACE_MS = 2_000;
 const FETCH_TIMEOUT_MS = 30_000;
@@ -65,9 +69,11 @@ export function fetchTool(deps: AgentDeps): HarnessTool<typeof FetchParameters> 
     async execute(params, context) {
       const url = publicUrl(params.url);
       const [stored] = await deps.db.select().from(page).where(eq(page.url, url));
-      let found = stored;
-      if (!found || params.fresh) found = await fetchAndStore(deps, url, context.signal);
-      return { value: await shown(deps, found, 1), dataSeen: [], recordsWritten: [] };
+      if (stored && !params.fresh) {
+        return { value: await shown(deps, stored, 1, false), dataSeen: [], recordsWritten: [] };
+      }
+      const fetched = await fetchAndStore(deps, url, context.signal);
+      return { value: await shown(deps, fetched.page, 1, fetched.cut), dataSeen: [], recordsWritten: [] };
     },
   };
 }
@@ -120,7 +126,11 @@ export function readPageTool(deps: AgentDeps): HarnessTool<typeof ReadPageParame
     async execute(params) {
       const [found] = await deps.db.select().from(page).where(eq(page.id, params.page));
       if (!found) throw new ToolError(`There is no stored page ${params.page}: fetch it first.`);
-      return { value: await shown(deps, found, params.from_passage), dataSeen: [], recordsWritten: [] };
+      return {
+        value: await shown(deps, found, params.from_passage, false),
+        dataSeen: [],
+        recordsWritten: [],
+      };
     },
   };
 }
@@ -200,7 +210,17 @@ function publicUrl(raw: string): string {
   return url.toString();
 }
 
-async function fetchAndStore(deps: AgentDeps, url: string, signal: AbortSignal): Promise<Page> {
+/** A page's text as it is kept, and whether it was cut to be. */
+export function keptText(text: string): { text: string; cut: boolean } {
+  if (text.length <= MAX_TEXT_CHARS) return { text, cut: false };
+  return { text: text.slice(0, MAX_TEXT_CHARS), cut: true };
+}
+
+async function fetchAndStore(
+  deps: AgentDeps,
+  url: string,
+  signal: AbortSignal,
+): Promise<{ page: Page; cut: boolean }> {
   await paced(new URL(url).hostname, signal);
   let read = await overHttp(url, signal);
   let fetchedWith = "http";
@@ -222,7 +242,7 @@ async function fetchAndStore(deps: AgentDeps, url: string, signal: AbortSignal):
   if (isBotCheck(read.title, read.text)) {
     throw new ToolError(`${url} answered with a bot check, not the page: find the same text elsewhere.`);
   }
-  const text = read.text.slice(0, MAX_TEXT_CHARS);
+  const { text, cut } = keptText(read.text);
   const passages = passagesOf(text);
   const vectors = await deps.embedder.embedPassage(passages);
   const hash = createHash("sha256").update(url).digest("hex");
@@ -231,7 +251,7 @@ async function fetchAndStore(deps: AgentDeps, url: string, signal: AbortSignal):
   writeFileSync(join(deps.files.pages, path), text);
   const contentHash = createHash("sha256").update(text).digest("hex");
 
-  return deps.db.transaction(async (tx) => {
+  const stored = await deps.db.transaction(async (tx) => {
     const values = { url, title: read.title || null, path, contentHash, fetchedWith, fetchedAt: new Date() };
     const [stored] = await tx
       .insert(page)
@@ -251,6 +271,7 @@ async function fetchAndStore(deps: AgentDeps, url: string, signal: AbortSignal):
     );
     return stored;
   });
+  return { page: stored, cut };
 }
 
 /** Waits until the site's last fetch is far enough behind. */
@@ -367,8 +388,8 @@ export function passagesOf(text: string): string[] {
   return passages;
 }
 
-/** The page from a passage on, as much as one call shows, with how to read the rest. */
-async function shown(deps: AgentDeps, found: Page, from: number): Promise<string> {
+/** The page from a passage on, as much as one call shows, with how to read the rest, and whether fetch cut it. */
+async function shown(deps: AgentDeps, found: Page, from: number, cut: boolean): Promise<string> {
   const passages = await deps.db
     .select({ ordinal: pagePassage.ordinal, text: pagePassage.text })
     .from(pagePassage)
@@ -392,5 +413,7 @@ async function shown(deps: AgentDeps, found: Page, from: number): Promise<string
     passages: shownPassages,
     total: total?.count ?? 0,
     next: last < (total?.count ?? 0) ? last + 1 : null,
+    cut,
+    maxChars: MAX_TEXT_CHARS.toLocaleString("en-US"),
   });
 }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { htmlText } from "../src/agents/html-text.ts";
-import { isBotCheck, markdownTitle, tidy } from "../src/agents/pages.ts";
+import { isBotCheck, keptText, MAX_TEXT_CHARS, markdownTitle, tidy } from "../src/agents/pages.ts";
 
 /*
  * A fetched page's text (task 0045) keeps its code as code: the first Rust run's pages lost every
@@ -53,5 +53,16 @@ describe("a fetched page's text", () => {
     const article = `How bot checks work. ${"A challenge page asks the browser to run a script. ".repeat(60)} Performing security verification is what the page says.`;
     expect(isBotCheck("Bot checks, explained", article)).toBe(false);
     expect(isBotCheck("Ownership", "A move transfers ownership.")).toBe(false);
+  });
+
+  test("a page past the longest kept is cut there, and says it was cut", () => {
+    // The C++ Core Guidelines are one page of about 1.5 million characters; cut at 400,000 they
+    // lost everything past ES with nothing to say so (2026-10-14).
+    const guidelines = "x".repeat(1_500_000);
+    expect(keptText(guidelines)).toEqual({ text: guidelines, cut: false });
+    const dump = "y".repeat(MAX_TEXT_CHARS + 10);
+    const kept = keptText(dump);
+    expect(kept.cut).toBe(true);
+    expect(kept.text).toHaveLength(MAX_TEXT_CHARS);
   });
 });

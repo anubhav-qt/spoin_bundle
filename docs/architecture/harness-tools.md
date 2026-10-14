@@ -127,7 +127,7 @@ pgvector its passages' embeddings.
 | `read_document(path)` | A corpus document in full |
 | `list_documents(category?, topic?)` | What the corpus holds |
 | `web_search(query)` | A helper's: as toad_sage's, Gemini's Google Search |
-| `fetch(url, fresh?)` | A helper's: plain HTTP, then a headless Chromium for a page with no real text; public pages only, robots.txt ignored, paced per site. A site's bot check ("Just a moment...", "Attention Required!") is refused, never stored. Stores the page, and returns it as numbered passages; a stored page comes from disk unless `fresh`, and a long one says how to read the rest |
+| `fetch(url, fresh?)` | A helper's: plain HTTP, then a headless Chromium for a page with no real text; public pages only, robots.txt ignored, paced per site. A site's bot check ("Just a moment...", "Attention Required!") is refused, never stored. Stores the page, and returns it as numbered passages; a stored page comes from disk unless `fresh`, and a long one says how to read the rest. A page is kept to its first 2,000,000 characters, and one cut there says so |
 | `read_page(page, from_passage)` | The rest of a long page |
 
 ### Maps and handovers

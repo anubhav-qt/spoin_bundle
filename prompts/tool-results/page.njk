@@ -10,5 +10,8 @@ Page {{ page.id }}: {{ page.title or "untitled" }}
 {% if next %}
 Passages {{ next }} to {{ total }} follow: read_page with from_passage {{ next }}.
 {% else %}
-That is the whole page.
+That is the end of the page as stored.
+{% endif %}
+{% if cut %}
+The page goes on past passage {{ total }}, but fetch keeps only a page's first {{ maxChars }} characters, so the rest isn't stored: find it in a page of its own.
 {% endif %}

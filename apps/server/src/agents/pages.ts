@@ -28,7 +28,7 @@ const SHOWN_CHARS = 14_000;
 const REAL_TEXT_CHARS = 600;
 /**
  * The longest a page is kept: past it, a page is mostly a dump. The C++ Core Guidelines are one
- * page of about 1.5 million characters, and cut at 400,000 they lost everything past ES, from
+ * page of about 765,000 characters, and cut at 400,000 they lost everything past ES, from
  * concurrency to templates, with nothing to say so.
  */
 export const MAX_TEXT_CHARS = 2_000_000;

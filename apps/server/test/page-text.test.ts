@@ -56,9 +56,9 @@ describe("a fetched page's text", () => {
   });
 
   test("a page past the longest kept is cut there, and says it was cut", () => {
-    // The C++ Core Guidelines are one page of about 1.5 million characters; cut at 400,000 they
+    // The C++ Core Guidelines are one page of about 765,000 characters; cut at 400,000 they
     // lost everything past ES with nothing to say so (2026-10-14).
-    const guidelines = "x".repeat(1_500_000);
+    const guidelines = "x".repeat(765_000);
     expect(keptText(guidelines)).toEqual({ text: guidelines, cut: false });
     const dump = "y".repeat(MAX_TEXT_CHARS + 10);
     const kept = keptText(dump);

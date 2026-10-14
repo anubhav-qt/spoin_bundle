@@ -9,7 +9,15 @@ import { topicReadingTools } from "../harness/topic-reading.ts";
 import { webSearchTool } from "../harness/web-search.ts";
 import { recordTo } from "../models/calls.ts";
 import { geminiOpensAt } from "../models/limits.ts";
-import { GEMINI_THINKING, geminiFrom, type ProxyConfig, proxyAnswers } from "../models/proxy.ts";
+import {
+  CLAUDE_ID,
+  CLAUDE_THINKING,
+  GEMINI_THINKING,
+  geminiFrom,
+  modelFrom,
+  type ProxyConfig,
+  proxyAnswers,
+} from "../models/proxy.ts";
 import { attachArtTool, listArtRequestsTool, renderArtTool } from "./art.ts";
 import type { AgentDeps } from "./context.ts";
 import { listDocumentsTool, readDocumentTool, searchCorpusTool } from "./corpus.ts";
@@ -68,11 +76,13 @@ export interface AgentSetUpInput {
 
 export function agentSetUp(input: AgentSetUpInput): (chat: Chat) => Promise<ChatSetUp> {
   const gemini = geminiFrom(input.proxy);
+  const claude = modelFrom(input.proxy, CLAUDE_ID);
   return async (chat) => {
     const tools = [...everyChatTools(input.deps.prompts, chat), ...(await roleTools(input.deps, chat))];
     const compactionTools = tools.filter((tool) => tool.kind === "read" || MAP_TOOLS.has(tool.name));
     const chatSetUp = { tools, compactionTools, compactWhileWaitingAt: compactWhileWaitingAt(chat) };
-    return { ...(await onGemini(input, gemini, thinkingOf(chat))), ...chatSetUp };
+    if (drawsOnClaude(chat)) return { ...(await onProxy(input, claude, CLAUDE_THINKING)), ...chatSetUp };
+    return { ...(await onProxy(input, gemini, GEMINI_THINKING)), ...chatSetUp };
   };
 }
 
@@ -101,28 +111,34 @@ const MAP_TOOLS = new Set(["write_map", "change_map"]);
 type ModelSetUp = Omit<ChatSetUp, "tools" | "compactionTools">;
 
 /**
- * How hard a chat's model thinks: medium for every chat but designer_toad, which the owner set to
- * high for its drawing (ADR-0109).
+ * Whether the chat runs on Claude: designer_toad alone, whose art the owner judged best on Claude
+ * Opus 5.5 over three rounds against Gemini and GPT (ADR-0109). Every other chat runs on Gemini.
  */
-export function thinkingOf(chat: Chat): ThinkingLevel {
-  if (chat.role === "designer_toad") return "high";
-  return GEMINI_THINKING;
+export function drawsOnClaude(chat: Chat): boolean {
+  return chat.role === "designer_toad";
 }
 
-async function onGemini(
+/**
+ * A chat on a model the proxy serves, waiting its failures out the harness's way. Only Gemini's
+ * limits can be looked up (Antigravity's quota); a limit on Claude cools and tries again.
+ */
+async function onProxy(
   input: AgentSetUpInput,
-  gemini: () => Promise<ChatSetUp["model"]>,
+  model: () => Promise<ChatSetUp["model"]>,
   thinkingLevel: ThinkingLevel,
 ): Promise<ModelSetUp> {
   const proxy = input.proxy;
+  const found = await model();
+  let opensAt = async (): Promise<number | null> => null;
+  if (found.provider === "antigravity") opensAt = () => geminiOpensAt(proxy);
   return {
-    model: await gemini(),
+    model: found,
     thinkingLevel,
     apiKey: proxy.apiKey,
     streamFn: (run) =>
       patientGemini({
         record: recordTo(input.deps.db, run.id),
-        opensAt: () => geminiOpensAt(proxy),
+        opensAt,
         proxyAnswers: () => proxyAnswers(proxy),
       }),
   };

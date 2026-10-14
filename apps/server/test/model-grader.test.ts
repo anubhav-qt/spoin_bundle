@@ -2,7 +2,7 @@ import type { Api, Model } from "@spoin/pi-ai";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { Balancer } from "../src/models/balancer.ts";
 import type { CallOutcome } from "../src/models/calls.ts";
-import { GEMINI_ID, geminiFrom, loadModels, waitForGemini } from "../src/models/proxy.ts";
+import { GEMINI_ID, geminiFrom, loadModels, waitForModel } from "../src/models/proxy.ts";
 import { loadPrompts } from "../src/prompts.ts";
 import type { FreeTextGradeQuery } from "../src/quiz/grader.ts";
 import { modelGrader } from "../src/quiz/model-grader.ts";
@@ -248,7 +248,7 @@ describe("finding Gemini on the proxy", () => {
     expect(asked).toContain("/v8/management/routing/model-definitions/claude");
   });
 
-  test("the worker waits until the proxy serves Gemini, and says so once", async () => {
+  test("the worker waits until the proxy serves a model it runs on, and says so once", async () => {
     let asked = 0;
     const find = async () => {
       asked += 1;
@@ -256,7 +256,7 @@ describe("finding Gemini on the proxy", () => {
       return gemini();
     };
     const misses: unknown[] = [];
-    await waitForGemini(find, new AbortController().signal, (error) => misses.push(error), 1);
+    await waitForModel(find, new AbortController().signal, (error) => misses.push(error), 1);
     expect(asked).toBe(3);
     expect(misses).toHaveLength(1);
   });
@@ -267,7 +267,7 @@ describe("finding Gemini on the proxy", () => {
       stop.abort();
       throw new Error("It serves: nothing.");
     };
-    await waitForGemini(find, stop.signal, () => {}, 60_000);
+    await waitForModel(find, stop.signal, () => {}, 60_000);
     expect(stop.signal.aborted).toBe(true);
   });
 });

@@ -813,8 +813,8 @@ global setup refuses any database name that doesn't end in `_test`. Local settin
   lines, refuses `#` padding, asks for scenes and objects over faces and stick figures, adds
   `look_at` for a meme's or a character's reference picture, and started designer_toad's chat
   over. The curated library is not used as a tool: nothing in the harness comes from old code;
-  only the owner's picks from it (seven pieces, ADR-0109) are prompt examples. designer_toad thinks
-  at high. `WORKER_ONLY_ROLES=designer_toad` runs the worker on that role alone, every other
+  only the owner's picks from it (seven pieces, ADR-0109) are prompt examples. designer_toad draws
+  on Claude Opus 5.5 at medium, the owner's pick after three rounds against Gemini and GPT. `WORKER_ONLY_ROLES=designer_toad` runs the worker on that role alone, every other
   chat's wakes left waiting, so the art can be checked before the rest runs. Style 5 (high
   thinking, the owner's examples) drew 170 pieces that were still words in outlines, drawn with
   `.~'/\()` to pass the box cap, and padded with rows of `~~~~` (a third of their ink): style 6

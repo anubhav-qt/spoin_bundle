@@ -16,7 +16,7 @@ import { letCallsWait, recordTo } from "./models/calls.ts";
 import { geminiOpensAt } from "./models/limits.ts";
 import { NIM_LADDER } from "./models/nim.ts";
 import { nimThenGemini } from "./models/nim-then-gemini.ts";
-import { geminiFrom, proxyAnswers, proxyConfig, waitForGemini } from "./models/proxy.ts";
+import { CLAUDE_ID, geminiFrom, modelFrom, proxyAnswers, proxyConfig, waitForModel } from "./models/proxy.ts";
 import { loadPrompts } from "./prompts.ts";
 
 /*
@@ -110,9 +110,14 @@ process.on("SIGTERM", stop);
 process.on("SIGINT", stop);
 
 // 38 of designer_toad's wakes spent a try on a proxy that served nothing yet (2026-10-14).
-await waitForGemini(gemini, draining.signal, (error) => {
-  log.warn({ err: error }, "CLIProxyAPI doesn't serve Gemini yet: no chat wakes until it does");
-});
+for (const find of [gemini, modelFrom(proxy, CLAUDE_ID)]) {
+  await waitForModel(find, draining.signal, (error) => {
+    log.warn(
+      { err: error },
+      "CLIProxyAPI doesn't serve a model the chats run on yet: no chat wakes until it does",
+    );
+  });
+}
 
 let onlyRoles: ChatRole[] | undefined;
 if (env.WORKER_ONLY_ROLES.length > 0) {

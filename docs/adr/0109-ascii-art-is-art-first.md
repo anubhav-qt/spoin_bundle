@@ -98,8 +98,13 @@ into both: on 219 of the Rust run's 304 ascii cards the art was shown nowhere, a
 designer_toad judged showed the code instead. A card's art now leads whenever it has art, and the
 code stays in the body (`resolveHero` in `Card.tsx`).
 
-**designer_toad thinks at high**, every other chat at medium: the owner's call, on Gemini 3.8 Flash
-rather than a Pro model (`thinkingOf` in `set-up.ts`).
+**designer_toad draws on Claude Opus 5.5 at medium thinking**, through the owner's Claude Code
+sign-in on the proxy; every other chat stays on Gemini. Gemini 3.8 Flash at high drew style 5 and
+6. The owner then had the same cards drawn by Gemini, Claude Opus 5.5 and GPT 6.1 Sol, each with
+designer_toad's prompt, checks and phone render, judging its own screenshots: round one was split
+(Gemini's drawing and GPT's line on one gag, GPT's stamp, Claude's reactor), round two went to
+Claude, and round three, Claude against GPT, went to Claude. Claude and GPT each took about two
+minutes for five cards, Gemini about six (`drawsOnClaude` in `set-up.ts`).
 
 **The prompt's examples** are two pieces drawn for it (a melting snowman, a stack of plates), the
 best piece of the style-4 run (a ghost, its label moved from a badge on its body to under it for

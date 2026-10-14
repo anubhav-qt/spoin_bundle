@@ -20,7 +20,8 @@ in the code.
 
 | Chat | Model |
 |---|---|
-| toad_sage, every chat (the writers' included), research, the gate's two passes, designer_toad, visual_toad | Gemini 3.8 Flash, medium thinking (designer_toad high, ADR-0109), through CLIProxyAPI |
+| toad_sage, every chat (the writers' included), research, the gate's two passes, visual_toad | Gemini 3.8 Flash, medium thinking, through CLIProxyAPI |
+| designer_toad | Claude Opus 5.5, medium thinking, through the owner's Claude Code sign-in on CLIProxyAPI (ADR-0109) |
 | The writers' big writes, one call each: a corpus document, a curriculum, a tier's cards, a tier's questions | NIM, on breader's ladder: Kimi K3 (high reasoning) as primary, Nemotron 3 Ultra only while it is down, with breader's cooldowns per failure kind, doubling with each failure in a row, jittered waits, and empty answers and refusals asked again. The worker doesn't start without a NIM key; a call goes to Gemini only once NIM gives up on it: 12 tries spent, no model left to ask, or no answer within 30 minutes |
 
 ## Running it
@@ -281,7 +282,7 @@ stored or refused. After that the corrector fixes what code refused itself.
 
 Draws every ASCII art itself, for the ascii cards the gate accepted, replacing the curated scene
 library (ADR-0021, ADR-0079, ADR-0080). Each piece is the kind its card asked for (ADR-0107): a gag
-or an informative drawing, on Gemini, in batches of up to 5. The art carries the idea, drawn as
+or an informative drawing, on Claude Opus 5.5, in batches of up to 5. The art carries the idea, drawn as
 scenes and objects more than faces and stick figures, and its text is labels of 1 to 3 words, plus
 a gag's one line of dialogue; code caps each piece's words, letters and box lines (ADR-0109). For a
 meme or a famous character it searches the web and looks at a reference picture before drawing. A

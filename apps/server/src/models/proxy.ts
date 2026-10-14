@@ -188,18 +188,35 @@ export function findModel(models: Model<Api>[], id: string): Model<Api> {
 
 /**
  * Gemini 3.8 Flash at medium thinking: toad_sage, the main chats, research, the gate, and on the
- * request path grading and AskAI (task 0045); designer_toad alone at high (set-up.ts). The proxy
- * names it `-high`, but it takes low, medium and high, and each call says which.
+ * request path grading and AskAI (task 0045). The proxy names it `-high`, but it takes low, medium
+ * and high, and each call says which.
  */
 export const GEMINI_ID = "gemini-3.8-flash-high";
 export const GEMINI_THINKING: ThinkingLevel = "medium";
 
+/**
+ * Claude Opus 5.5 at medium thinking, through the owner's Claude Code sign-in: designer_toad's art
+ * alone, the owner's pick after three rounds of the same cards drawn on Gemini, Claude and GPT
+ * (ADR-0109).
+ */
+export const CLAUDE_ID = "claude-opus-5-5";
+export const CLAUDE_THINKING: ThinkingLevel = "medium";
+
 /** Looks Gemini up once per process. A failed lookup isn't kept, so the next call asks again. */
 export function geminiFrom(config: ProxyConfig, fetchFn: typeof fetch = fetch): () => Promise<Model<Api>> {
+  return modelFrom(config, GEMINI_ID, fetchFn);
+}
+
+/** Looks a served model up once per process. A failed lookup isn't kept, so the next call asks again. */
+export function modelFrom(
+  config: ProxyConfig,
+  id: string,
+  fetchFn: typeof fetch = fetch,
+): () => Promise<Model<Api>> {
   let found: Promise<Model<Api>> | null = null;
   return () => {
     if (!found) {
-      found = loadModels(config, fetchFn).then((models) => findModel(models, GEMINI_ID));
+      found = loadModels(config, fetchFn).then((models) => findModel(models, id));
       found.catch(() => {
         found = null;
       });
@@ -212,11 +229,11 @@ export function geminiFrom(config: ProxyConfig, fetchFn: typeof fetch = fetch): 
 const ASK_AGAIN_MS = 10_000;
 
 /**
- * Resolves once `find` finds Gemini, or once `signal` aborts. Docker starts the worker again with
- * the machine without waiting for the proxy to sign its accounts in, and a chat woken before then
- * failed its run and spent one of its wakes' tries. `onMiss` hears the first miss.
+ * Resolves once `find` finds its model, or once `signal` aborts. Docker starts the worker again
+ * with the machine without waiting for the proxy to sign its accounts in, and a chat woken before
+ * then failed its run and spent one of its wakes' tries. `onMiss` hears the first miss.
  */
-export async function waitForGemini(
+export async function waitForModel(
   find: () => Promise<Model<Api>>,
   signal: AbortSignal,
   onMiss: (error: unknown) => void,

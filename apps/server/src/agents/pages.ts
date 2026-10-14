@@ -32,6 +32,15 @@ const MAX_TEXT_CHARS = 400_000;
 const PACE_MS = 2_000;
 const FETCH_TIMEOUT_MS = 30_000;
 const SEARCH_RESULTS = 8;
+/**
+ * A site's bot check, served in place of the page: Cloudflare's "Just a moment..." and "Attention
+ * Required!" were stored as pages in the stage 2 rerun (2026-10-14). Only a short page is judged,
+ * so an article about bot checks is still read.
+ */
+const BOT_CHECK_CHARS = 2_000;
+const BOT_CHECK_TITLE = /^(just a moment\.*|attention required!? \| cloudflare|access denied)$/i;
+const BOT_CHECK_TEXT =
+  /performing security verification|verif(y|ies) you are (not a bot|human)|you have been blocked|checking your browser before accessing|enable javascript and cookies to continue/i;
 
 /** When each site was last fetched from, shared by every chat in the process. */
 const lastFetch = new Map<string, number>();
@@ -210,6 +219,9 @@ async function fetchAndStore(deps: AgentDeps, url: string, signal: AbortSignal):
     }
   }
   if (read.text.length === 0) throw new ToolError(`${url} has no text to read.`);
+  if (isBotCheck(read.title, read.text)) {
+    throw new ToolError(`${url} answered with a bot check, not the page: find the same text elsewhere.`);
+  }
   const text = read.text.slice(0, MAX_TEXT_CHARS);
   const passages = passagesOf(text);
   const vectors = await deps.embedder.embedPassage(passages);
@@ -290,6 +302,13 @@ async function overHttp(url: string, signal: AbortSignal): Promise<{ title: stri
     return { title: markdownTitle(text), text };
   }
   return htmlText(body);
+}
+
+/** Whether a fetched page is a site's bot check rather than the page asked for. */
+export function isBotCheck(title: string, text: string): boolean {
+  if (text.length > BOT_CHECK_CHARS) return false;
+  if (BOT_CHECK_TITLE.test(title.trim())) return true;
+  return BOT_CHECK_TEXT.test(text);
 }
 
 /** Lines' trailing spaces cut, and runs of blank lines folded to one. Indentation stays: code needs it. */

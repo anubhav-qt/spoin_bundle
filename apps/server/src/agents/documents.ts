@@ -28,6 +28,7 @@ import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.
 import type { AgentDeps } from "./context.ts";
 import { corpusFile, corpusPaths, topicDir } from "./corpus.ts";
 import { startHelper } from "./helpers.ts";
+import { mapFindingRefusal } from "./maps.ts";
 
 /*
  * A topic's corpus documents (harness-tools.md, task 0045): written one per writer helper on NIM,
@@ -431,7 +432,9 @@ export function auditDraftsTool(deps: AgentDeps): HarnessTool {
 const SettleParameters = Type.Object(
   {
     finding: Id,
-    how: Type.Enum(["fixed", "kept"], { description: "fixed in a draft, or kept as it is" }),
+    how: Type.Enum(["fixed", "kept"], {
+      description: "fixed in a draft or a map item, or kept as it is (a draft's finding only)",
+    }),
     note: Type.String({ minLength: 1, description: "What changed, or why the draft is right as it is" }),
   },
   CLOSED,
@@ -448,6 +451,10 @@ export function settleFindingTool(deps: AgentDeps): HarnessTool<typeof SettlePar
     async execute(params, context) {
       const finding = await findingOf(context.db, params.finding);
       if (finding.body.settled) throw new ToolError(`Finding ${params.finding} is settled already.`);
+      if (finding.body.auditor === "evidence") {
+        const refusal = await mapFindingRefusal(context.db, finding, params.how);
+        if (refusal) throw new ToolError(refusal);
+      }
       const settled = await changeRecord(context.db, FindingRecord, {
         from: refOf(finding),
         status: "active",

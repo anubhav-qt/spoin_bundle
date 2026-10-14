@@ -114,9 +114,11 @@ after the curriculum, as their own set.
 
 ### Research
 
-The tadpole looks in what is already stored before it goes to the web: a topic that shares its
-subject with one already written reshapes that material to what its request asks. A fetched
-page's content stays on disk; Postgres keeps its pointer, and pgvector its passages' embeddings.
+The tadpole looks in what is already stored before its helpers go to the web: a topic that
+shares its subject with one already written reshapes that material to what its request asks.
+The web is the helpers' alone: the tadpole reads what they fetched, and never searches or fetches
+itself (ADR-0110). A fetched page's content stays on disk; Postgres keeps its pointer, and
+pgvector its passages' embeddings.
 
 | Tool | Does |
 |---|---|
@@ -124,17 +126,17 @@ page's content stays on disk; Postgres keeps its pointer, and pgvector its passa
 | `search_corpus(query)` | Corpus sections, by meaning |
 | `read_document(path)` | A corpus document in full |
 | `list_documents(category?, topic?)` | What the corpus holds |
-| `web_search(query)` | As toad_sage's: Gemini's Google Search |
-| `fetch(url, fresh?)` | Plain HTTP, then a headless Chromium for a page with no real text; public pages only, robots.txt ignored, paced per site. Stores the page, and returns it as numbered passages; a stored page comes from disk unless `fresh`, and a long one says how to read the rest |
+| `web_search(query)` | A helper's: as toad_sage's, Gemini's Google Search |
+| `fetch(url, fresh?)` | A helper's: plain HTTP, then a headless Chromium for a page with no real text; public pages only, robots.txt ignored, paced per site. A site's bot check ("Just a moment...", "Attention Required!") is refused, never stored. Stores the page, and returns it as numbered passages; a stored page comes from disk unless `fresh`, and a long one says how to read the rest |
 | `read_page(page, from_passage)` | The rest of a long page |
 
 ### Maps and handovers
 
 | Tool | Does |
 |---|---|
-| `write_map(kind, body)` | One of ADR-0100's maps, A to J, as a versioned record with its own schema. Claims carry class, scope and confidence, name their domain (an item of map A), and an implementation claim its product and version; a source of map D is one publication with its tier and date or version; evidence cites stored page passages, each checked to exist |
+| `write_map(kind, body)` | One of ADR-0100's maps, A to J, as a versioned record with its own schema. Claims carry class, scope and confidence, name their domain (an item of map A), and an implementation claim its product and version; a source of map D is one publication with its tier and date or version; evidence cites stored page passages, each checked to exist. Map A is written first. A map C or F short of the intake's floor says by how much |
 | `change_map(map, reason, items?, drop?, summary?)` | The map's next version from only what changes: items replace their namesakes or are added, `drop` takes items out, so a big map is written in parts and never resent whole |
-| `audit_maps()` | The evidence auditor (ADR-0110): fixed calls of 15 claims and misconceptions of maps C and F, each read beside the passages it cites, reporting support, class, scope, confidence, versions, doctrine stated as fact and misconceptions nobody holds. Refused until the maps hold together; reads only what changed since its last audit. Findings are records, settled with `settle_finding` |
+| `audit_maps()` | The evidence auditor (ADR-0110): fixed calls of 15 claims and misconceptions of maps C and F, each read beside the passages it cites, reporting support, class, scope, confidence, versions, doctrine stated as fact and misconceptions nobody holds. Refused until the maps hold together; reads only what changed since its last audit. Findings are records, settled with `settle_finding`: only ever fixed, once the item changed or was dropped, never kept |
 | `hand_over(kind, records)` | The coverage note, the maps, an "insufficient evidence" or the closing report, to toad_sage. The run ends until its review wakes the tadpole. The maps are refused until they hold together (all ten written; a claim's confidence no more than its sources' tiers give, an empirical claim citing primary research; every domain taught from two sources or named a gap in map I; a claim for every 3 of the intake's cards and a misconception for every 10), the latest maps C and F are audited and every finding is settled; the handover then carries what code counted in them for toad_sage. The closing report is refused until the latest drafts are audited, every finding is fixed or answered, `corpus:check` passes, and the documents hold at least one section for every 3 of the intake's cards (a tier of 5 to 25 cards is written from 5 to 10 sections) |
 
 ### Documents
@@ -149,6 +151,7 @@ other topic retrieves them before; the curriculum chat starts after ingestion.
 | `start_writer(path, brief, sections)` | A writer helper for one document, with the research tools, `write_document` and `report`. It reads the maps and their cited passages from the records. `sections` (3 to 30) is how many the document has whole, and `write_document` refuses it with fewer: the first Rust run's tadpole, only told the corpus's size, wrote 56 sections for 700 cards |
 | `write_document(path, title, source, source_date, tags, epistemic fields, sections)` | The writer's. Code copies kind, category, sub-category and scope from the topic row, checks the corpus contract at write time naming every problem at once, writes the file and keeps the previous version as a record. Every call's sections are kept as the writer's try, and a document already written is the starting try, so each later call, a rewrite included, sends only the sections that change (`drop` removes one) |
 | `audit_drafts()` | The three auditing calls (versions, false precision, the coverage matrix) with their own fixed prompts, which the tadpole does not brief. Findings are records |
+| `settle_finding(finding, how, note)` | An auditor's finding, fixed or kept with a reason. A finding of the maps' evidence auditor is never kept, and is refused as fixed while its item is as the audit read it |
 
 The topic's photographs are visual_toad's, sourced after the curriculum (below).
 
@@ -313,7 +316,7 @@ picks one for each image card before the card is written (ADR-0105).
 
 | Tool | Does |
 |---|---|
-| `web_search`, `fetch` | As the tadpole's |
+| `web_search`, `fetch` | As the tadpole's helpers' |
 | `view_image(url)` | Downloads and stores the image, and shows it to the model |
 | `add_image(image, licence, licence_url, author, description, …)` | An entry in the topic's image manifest. Refuses a licence outside the allowlist and an image this run has not viewed |
 | `remove_image(image)` | Takes an entry out |

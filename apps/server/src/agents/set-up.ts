@@ -223,23 +223,31 @@ function toadSageTools(deps: AgentDeps): HarnessTool[] {
   ];
 }
 
-/** What a tadpole and the helpers it briefs read the topic's sources with. */
-function researchTools(deps: AgentDeps): HarnessTool[] {
+/** What a tadpole and the helpers it briefs read the stored sources with. */
+function readingTools(deps: AgentDeps): HarnessTool[] {
   return [
     searchPagesTool(deps),
     searchCorpusTool(deps),
     readDocumentTool(deps),
     listDocumentsTool(deps),
-    ...webSearch(deps),
-    fetchTool(deps),
     readPageTool(deps),
     readIntakeTool(deps),
   ];
 }
 
+/** What a helper researches with: the stored sources, and the web. */
+function researchTools(deps: AgentDeps): HarnessTool[] {
+  return [...readingTools(deps), ...webSearch(deps), fetchTool(deps)];
+}
+
+/**
+ * The tadpole reads what its helpers fetched but never goes to the web itself (ADR-0110): in the
+ * stage 2 rerun two tadpoles searched alone for an hour, 105 and 60 web calls one after another,
+ * while their helpers could have run at once.
+ */
 function tadpoleTools(deps: AgentDeps): HarnessTool[] {
   return [
-    ...researchTools(deps),
+    ...readingTools(deps),
     writeMapTool(deps),
     changeMapTool(deps),
     auditMapsTool(deps),

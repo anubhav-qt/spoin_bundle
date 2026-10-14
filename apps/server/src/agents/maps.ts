@@ -25,7 +25,7 @@ import {
   type SOURCE_TIERS,
   Text,
 } from "../harness/schemas.ts";
-import { type HarnessTool, type ToolContext, ToolError } from "../harness/tools.ts";
+import { type HarnessTool, type ToolContext, ToolError, type ToolOutput } from "../harness/tools.ts";
 import type { AgentDeps } from "./context.ts";
 import { passageExists } from "./pages.ts";
 
@@ -97,13 +97,20 @@ export function writeMapTool(deps: AgentDeps): HarnessTool<typeof WriteMapParame
       if (existing) {
         throw new ToolError(`Map ${params.map} exists already (${existing.id}): change it with change_map.`);
       }
+      // The domains come first: the helpers research one each and every claim names one. The System
+      // Design tadpole of the stage 2 rerun searched alone for an hour with no map A.
+      if (params.map !== "A" && !(await mapOf(context.db, topicId, "A"))) {
+        throw new ToolError(
+          "Write map A first: the domains, which your helpers research one each and every claim names.",
+        );
+      }
       await checkMap(context.db, params.map, params.items);
       const map = await createRecord(context.db, MapRecord, {
         kind: "map",
         author: context.author,
         body: { topic: topicId, map: params.map, items: params.items, summary: params.summary },
       });
-      return recordsStored(context.db, deps.prompts, [map]);
+      return withShortfall(context.db, topicId, map, await recordsStored(context.db, deps.prompts, [map]));
     },
   };
 }
@@ -157,7 +164,12 @@ export function changeMapTool(deps: AgentDeps): HarnessTool<typeof ChangeMapPara
         reason: params.reason,
         body: { ...latest.body, items, summary },
       });
-      return recordsStored(context.db, deps.prompts, [changed]);
+      return withShortfall(
+        context.db,
+        topicId,
+        changed,
+        await recordsStored(context.db, deps.prompts, [changed]),
+      );
     },
   };
 }
@@ -177,6 +189,31 @@ export function mergeMapItems(items: MapItem[], changes: MapItem[], drop: string
   }
   if (merged.length === 0) throw new ToolError("A map keeps at least one item.");
   return merged;
+}
+
+/**
+ * A map C or F short of the topic's floor says so as it is written, not only at the audit: the
+ * Gita's tadpole wrote 18 claims for 450 cards and learned it needed 150 only when it was done.
+ */
+async function withShortfall(
+  db: Conn,
+  topicId: string,
+  map: MapRecord,
+  output: ToolOutput,
+): Promise<ToolOutput> {
+  const intake = await intakeOf(db, topicId);
+  if (!intake) return output;
+  const cardCount = intake.body.cardCount;
+  const count = map.body.items.length;
+  let note = "";
+  if (map.body.map === "C" && count < claimsNeeded(cardCount)) {
+    note = `Map C holds ${count} claims, and the topic's ${cardCount} cards need at least ${claimsNeeded(cardCount)}: add ${claimsNeeded(cardCount) - count} more with change_map, domain by domain.`;
+  }
+  if (map.body.map === "F" && count < misconceptionsNeeded(cardCount)) {
+    note = `Map F holds ${count} misconceptions, and the topic's ${cardCount} cards need at least ${misconceptionsNeeded(cardCount)}: add ${misconceptionsNeeded(cardCount) - count} more with change_map.`;
+  }
+  if (!note) return output;
+  return { ...output, value: `${String(output.value)}\n${note}` };
 }
 
 function topicOf(context: ToolContext): string {
@@ -525,6 +562,39 @@ async function mapFindingsOf(db: Conn, topicId: string) {
   const audits = new Set((await mapAuditsOf(db, topicId)).map((audit) => audit.id));
   const findings = await listTopicRecords(db, FindingRecord, "finding", topicId);
   return findings.filter((finding) => audits.has(finding.body.audit.id));
+}
+
+/**
+ * Why the evidence auditor's finding can't be settled so, if it can't (ADR-0110). It is never
+ * kept, since the auditor read the passages and a reason is only the tadpole's word: in the stage
+ * 2 rerun Rust's tadpole kept 104 of 126, "standard syntax; kept" on claims their passages don't
+ * make, and toad_sage went on from those reasons. And it is fixed only once its item changed or
+ * went, so the next audit reads what was fixed.
+ */
+export async function mapFindingRefusal(
+  db: Conn,
+  finding: FindingRecord,
+  how: "fixed" | "kept",
+): Promise<string | undefined> {
+  const key = finding.body.item ?? "";
+  if (how === "kept") {
+    return `The evidence auditor's findings are fixed, never kept: change ${key} with change_map so it says only what its passages say (cite a passage that says it, narrow it, label it lower, or drop it), then settle this as fixed.`;
+  }
+  const at = key.indexOf("/");
+  const kind = key.slice(0, at);
+  const name = key.slice(at + 1);
+  const audit = await readRecord(db, MapAuditRecord, finding.body.audit);
+  for (const ref of audit.body.maps) {
+    const audited = await readRecord(db, MapRecord, ref);
+    if (audited.body.map !== kind) continue;
+    const before = audited.body.items.find((item) => item.name === name);
+    const latest = await readLatestRecord(db, MapRecord, "map", ref.id);
+    const now = latest.body.items.find((item) => item.name === name);
+    if (before && now && isDeepStrictEqual(before, now)) {
+      return `${key} hasn't changed since the audit that found this: change it with change_map first, or drop it.`;
+    }
+  }
+  return undefined;
 }
 
 /** The topic's card count, from its intake. */

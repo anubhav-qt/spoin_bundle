@@ -51,18 +51,23 @@ counted, not only the tadpole's note.
 3. **An evidence auditor reads maps C and F** (`audit_maps`): fixed calls of 15 items each, every
    item beside the passages it cites and their sources, reporting support, class, scope and
    confidence, versions, doctrine stated as fact, and misconceptions nobody holds. Findings are
-   records the tadpole settles, fixed after `change_map` or kept with a reason. It reads only the
-   items changed since it last read, so nothing is paid for twice.
+   records the tadpole settles, only ever as fixed, and code refuses that while the item is as the
+   audit read it: it is changed with `change_map` (cite a passage that says it, narrow it, label
+   it lower) or dropped. It reads only the items changed since it last read, so nothing is paid
+   for twice, and a fix is read again.
 4. **The handover waits for it.** `hand_over(maps)` is refused until the maps hold together, the
    latest maps C and F are audited, and every finding is settled. It then stores what code
    counted: claims and misconceptions against their floors, the mix of confidence, class and scope,
-   each domain's claims and sources, each source's tier and date, and every finding the tadpole
-   kept with its reason. toad_sage judges from those and the maps, and its prompt names what code
+   each domain's claims and sources, each source's tier and date, and the findings fixed. toad_sage judges from those and the maps, and its prompt names what code
    can't: coverage of the brief from beginner to mastery, sources at the topic's level and current,
    and the coverage note's promises kept.
 5. **`change_map` sends only what changes**, items by name and `drop`, as a document's sections
-   are: a claim inventory of 234 claims is never resent to fix one.
-6. **The tadpole's prompt** researches a domain per helper, past any introductory book to the
+   are: a claim inventory of 234 claims is never resent to fix one. `write_map` and `change_map`
+   say by how much a map C or F falls short of its floor, as it is written.
+6. **The web is the helpers'.** Map A is written first, and the tadpole has no `web_search` or
+   `fetch`: it starts a helper per domain, and reads what they stored. `fetch` refuses a site's
+   bot check rather than store it as the page.
+7. **The tadpole's prompt** researches a domain per helper, past any introductory book to the
    reference and specification, a text whole with a neutral translation and its commentary
    traditions, checks what is current, takes misconceptions from what learners really get wrong,
    and says what a text or tradition teaches rather than stating it as fact.
@@ -70,6 +75,18 @@ counted, not only the tadpole's note.
 A run cut off between a call's end and its result is a harness fix of the same review: the next
 run's opening message carries the logged results that never reached the transcript (System
 Design's first tadpole lost a fetched page this way and cited another for it).
+
+### Amended after the first rerun (2026-10-14)
+
+Points 3 to 6 were tightened after the three topics were run again on these rules at Gemini's low
+thinking. Rust's tadpole settled 104 of the auditor's 126 findings as kept, most with "standard
+syntax; kept" on a claim its cited passage doesn't make, and toad_sage said go on because "the
+kept audit findings are sound": a reason the tadpole writes is the same evidence as its note, so
+kept is gone for the maps. The System Design and Gita tadpoles made 105 and 60 web calls
+themselves, one after another, System Design's an hour of them with no map A and no helper, hunting
+page numbers of books it couldn't fetch; Rust's, which left the web to its helpers, made 15. Two
+Cloudflare bot checks were stored as pages. The Gita's tadpole wrote 18 claims for 450 cards and
+was told it needed 150 only at the audit.
 
 ## Alternatives considered
 
@@ -80,6 +97,10 @@ in a prompt is a wish (CLAUDE.md, "the generator is trusted for taste, never for
 **Let toad_sage audit the evidence.** Rejected for the same reason ADR-0100 gives: the reviewer that
 reads the tadpole's description of its maps is the same class of evidence as the maps. The auditor
 reads the passages, not the author's reasoning.
+
+**Let the tadpole keep a finding, for toad_sage to judge.** Tried first, and toad_sage went on
+from the tadpole's reasons. A finding the auditor got wrong is cheap to answer in the item itself:
+cite the passage that says it, and the next audit reads it again.
 
 **Require two sources for every claim.** Rejected: an official documentation page alone is enough
 for a claim it states, and two blogs repeating each other are not two sources. Two sources per

@@ -14,6 +14,7 @@ import {
   mergeMapItems,
   misconceptionsNeeded,
   type TopicMaps,
+  writeMapTool,
 } from "../src/agents/maps.ts";
 import { page, pagePassage, topic } from "../src/db/schema.ts";
 import { endRun, openTopicChat, startRun } from "../src/harness/chats.ts";
@@ -258,8 +259,8 @@ describe("whether the maps hold together", () => {
   });
 });
 
-/** A topic of six cards with its pages stored and its ten maps written, and its tadpole running. */
-async function topicWithMaps() {
+/** A topic of six cards with its pages stored and its maps written, all ten unless told, and its tadpole running. */
+async function topicWithMaps(kinds: readonly (typeof MAP_KINDS)[number][] = MAP_KINDS) {
   const name = `Rust ${randomUUID().slice(0, 6)}`;
   const [made] = await db
     .insert(topic)
@@ -306,7 +307,7 @@ async function topicWithMaps() {
     },
   });
   const items = itemsByKind(pages);
-  for (const kind of MAP_KINDS) {
+  for (const kind of kinds) {
     await createRecord(db, MapRecord, {
       kind: "map",
       author,
@@ -361,11 +362,14 @@ describe("the maps' audit and handover", () => {
     expect(await mapsHandoverProblems(db, topicId)).toEqual([
       `Finding ${finding.id} (C/one owner) is not settled.`,
     ]);
-    await settleFindingTool(agentDeps).execute(
-      { finding: finding.id, how: "fixed", note: "Narrowed." },
-      context,
-    );
-    expect(await mapsHandoverProblems(db, topicId)).toEqual([]);
+    // Never kept, and fixed only once the item changed: Rust's tadpole kept 104 of 126.
+    const settle = settleFindingTool(agentDeps);
+    await expect(
+      settle.execute({ finding: finding.id, how: "kept", note: "Standard syntax." }, context),
+    ).rejects.toThrow(/fixed, never kept: change C\/one owner with change_map/);
+    await expect(
+      settle.execute({ finding: finding.id, how: "fixed", note: "Narrowed." }, context),
+    ).rejects.toThrow("C/one owner hasn't changed since the audit that found this");
 
     const mapC = (await listTopicRecords(db, MapRecord, "map", topicId)).find((map) => map.body.map === "C");
     if (!mapC) throw new Error("No map C.");
@@ -373,6 +377,7 @@ describe("the maps' audit and handover", () => {
       text: "Each value has one owner at a time.",
     });
     await changeMapTool(agentDeps).execute({ map: mapC.id, reason: "Narrowed.", items: [narrowed] }, context);
+    await settle.execute({ finding: finding.id, how: "fixed", note: "Narrowed." }, context);
     expect(await mapsHandoverProblems(db, topicId)).toEqual([
       "Map C changed after the last audit: call audit_maps again.",
     ]);
@@ -400,13 +405,39 @@ describe("the maps' audit and handover", () => {
     const mapC = (await listTopicRecords(db, MapRecord, "map", topicId)).find((map) => map.body.map === "C");
     if (!mapC) throw new Error("No map C.");
     const agentDeps = { db, prompts, oneShot: async () => ({ findings: [] }) } as unknown as AgentDeps;
-    await changeMapTool(agentDeps).execute({ map: mapC.id, reason: "Thinner.", drop: ["moves"] }, context);
+    const thinner = await changeMapTool(agentDeps).execute(
+      { map: mapC.id, reason: "Thinner.", drop: ["moves"] },
+      context,
+    );
+    expect(thinner.value).toContain(
+      "Map C holds 1 claims, and the topic's 6 cards need at least 2: add 1 more with change_map, domain by domain.",
+    );
     await expect(auditMapsTool(agentDeps).execute({}, context)).rejects.toThrow(
       /don't hold together yet[\s\S]*map C holds 1 claims/,
     );
     await expect(
       handOverTool(agentDeps).execute({ kind: "maps", records: [mapC.id], note: "The maps." }, context),
     ).rejects.toThrow(/The maps can't go yet/);
+  });
+});
+
+describe("writing the maps", () => {
+  test("map A comes first, and a map C short of the cards says so as it is written", async () => {
+    const { pages, context } = await topicWithMaps([]);
+    const agentDeps = { db, prompts } as unknown as AgentDeps;
+    const write = writeMapTool(agentDeps);
+    const claims = [claim("one owner", "ownership", [pages.book])];
+    await expect(write.execute({ map: "C", items: claims, summary: "s" }, context)).rejects.toThrow(
+      "Write map A first",
+    );
+    await write.execute(
+      { map: "A", items: [{ name: "ownership", text: "Who owns a value.", evidence: [] }], summary: "s" },
+      context,
+    );
+    const written = await write.execute({ map: "C", items: claims, summary: "s" }, context);
+    expect(written.value).toContain(
+      "Map C holds 1 claims, and the topic's 6 cards need at least 2: add 1 more",
+    );
   });
 });
 

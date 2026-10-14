@@ -83,12 +83,27 @@ older style is drawn again, live ones too. `list_art_requests` lists the cards w
 first art first, since they hold their tiers back, then the redraws, marked Redraw, without their
 old art. It shows one batch of 10 at a time.
 
+**The request gives the idea, not the layout.** The writers' art requests often describe a
+diagram (regions side by side, boxes with their label text, arrows, numbered stations), and in the
+first comparison every model that drew one faithfully drew a diagram the owner rejected; the one
+that told the same mechanism as a story with characters won. designer_toad takes the idea and finds
+the scene, and the tier writer's request names a scene with real things, never a diagram. A gag's
+line is a catchphrase people already say ("Who dis?", "Not so fast.") over one that restates the
+idea, and a gag is one scene, two or three labels and the line.
+
+**The art leads its card.** On a code subject most ascii cards carry a code block too, and the web
+card let a body fence outrank `visual_slots.art`, a rule from the old pipeline, which drew one scene
+into both: on 219 of the Rust run's 304 ascii cards the art was shown nowhere, and every render
+designer_toad judged showed the code instead. A card's art now leads whenever it has art, and the
+code stays in the body (`resolveHero` in `Card.tsx`).
+
 **designer_toad thinks at high**, every other chat at medium: the owner's call, on Gemini 3.8 Flash
 rather than a Pro model (`thinkingOf` in `set-up.ts`).
 
 **The prompt's examples** are two pieces drawn for it (a melting snowman, a stack of plates), the
 best piece of the style-4 run (a ghost, its label moved from a badge on its body to under it for
-style 6), and the pieces the owner chose from the old pipeline's
+style 6), the owner's picks from the first comparison of art models (Gemini's two cats named temp
+with GPT's line "Who dis?", GPT's rejection stamp, Claude's reactor told as a story), and the pieces the owner chose from the old pipeline's
 curated library as the craft to aim for: Joan G. Stark's mermaid, spider and Homer, Hayley Jane
 Wakenshaw's cat in a box, Riitta Rasimus's whale, and a mushroom cloud and a devil in flames by
 unknown artists. Any other library piece goes in only with the owner's leave.
